@@ -43,6 +43,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <HintPath>..\..\XternalObjects\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FluentValidation, Version=6.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\XternalObjects\FluentValidation.6.2.1.0\lib\Net45\FluentValidation.dll</HintPath>
       <Private>True</Private>
@@ -56,6 +60,10 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\XternalObjects\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -72,6 +80,10 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
+    <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\XternalObjects\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Web.Razor">
@@ -97,8 +109,346 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\AdminLTE\css\AdminLTE.css" />
+    <Content Include="Content\AdminLTE\css\AdminLTE.min.css" />
+    <Content Include="Content\AdminLTE\css\skins\skin-blue-light.css" />
+    <Content Include="Content\AdminLTE\css\skins\skin-blue-light.min.css" />
+    <Content Include="Content\bootstrap-theme.css" />
+    <Content Include="Content\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\font-awesome.css" />
+    <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\iCheck\all.css" />
+    <Content Include="Content\iCheck\flat\aero%402x.png" />
+    <Content Include="Content\iCheck\flat\aero.css" />
+    <Content Include="Content\iCheck\flat\aero.png" />
+    <Content Include="Content\iCheck\flat\blue%402x.png" />
+    <Content Include="Content\iCheck\flat\blue.css" />
+    <Content Include="Content\iCheck\flat\blue.png" />
+    <Content Include="Content\iCheck\flat\flat%402x.png" />
+    <Content Include="Content\iCheck\flat\flat.css" />
+    <Content Include="Content\iCheck\flat\flat.png" />
+    <Content Include="Content\iCheck\flat\green%402x.png" />
+    <Content Include="Content\iCheck\flat\green.css" />
+    <Content Include="Content\iCheck\flat\green.png" />
+    <Content Include="Content\iCheck\flat\grey%402x.png" />
+    <Content Include="Content\iCheck\flat\grey.css" />
+    <Content Include="Content\iCheck\flat\grey.png" />
+    <Content Include="Content\iCheck\flat\orange%402x.png" />
+    <Content Include="Content\iCheck\flat\orange.css" />
+    <Content Include="Content\iCheck\flat\orange.png" />
+    <Content Include="Content\iCheck\flat\pink%402x.png" />
+    <Content Include="Content\iCheck\flat\pink.css" />
+    <Content Include="Content\iCheck\flat\pink.png" />
+    <Content Include="Content\iCheck\flat\purple%402x.png" />
+    <Content Include="Content\iCheck\flat\purple.css" />
+    <Content Include="Content\iCheck\flat\purple.png" />
+    <Content Include="Content\iCheck\flat\red%402x.png" />
+    <Content Include="Content\iCheck\flat\red.css" />
+    <Content Include="Content\iCheck\flat\red.png" />
+    <Content Include="Content\iCheck\flat\yellow%402x.png" />
+    <Content Include="Content\iCheck\flat\yellow.css" />
+    <Content Include="Content\iCheck\flat\yellow.png" />
+    <Content Include="Content\iCheck\flat\_all.css" />
+    <Content Include="Content\iCheck\futurico\futurico%402x.png" />
+    <Content Include="Content\iCheck\futurico\futurico.css" />
+    <Content Include="Content\iCheck\futurico\futurico.png" />
+    <Content Include="Content\iCheck\line\aero.css" />
+    <Content Include="Content\iCheck\line\blue.css" />
+    <Content Include="Content\iCheck\line\green.css" />
+    <Content Include="Content\iCheck\line\grey.css" />
+    <Content Include="Content\iCheck\line\line%402x.png" />
+    <Content Include="Content\iCheck\line\line.css" />
+    <Content Include="Content\iCheck\line\line.png" />
+    <Content Include="Content\iCheck\line\orange.css" />
+    <Content Include="Content\iCheck\line\pink.css" />
+    <Content Include="Content\iCheck\line\purple.css" />
+    <Content Include="Content\iCheck\line\red.css" />
+    <Content Include="Content\iCheck\line\yellow.css" />
+    <Content Include="Content\iCheck\line\_all.css" />
+    <Content Include="Content\iCheck\minimal\aero%402x.png" />
+    <Content Include="Content\iCheck\minimal\aero.css" />
+    <Content Include="Content\iCheck\minimal\aero.png" />
+    <Content Include="Content\iCheck\minimal\blue%402x.png" />
+    <Content Include="Content\iCheck\minimal\blue.css" />
+    <Content Include="Content\iCheck\minimal\blue.png" />
+    <Content Include="Content\iCheck\minimal\green%402x.png" />
+    <Content Include="Content\iCheck\minimal\green.css" />
+    <Content Include="Content\iCheck\minimal\green.png" />
+    <Content Include="Content\iCheck\minimal\grey%402x.png" />
+    <Content Include="Content\iCheck\minimal\grey.css" />
+    <Content Include="Content\iCheck\minimal\grey.png" />
+    <Content Include="Content\iCheck\minimal\minimal%402x.png" />
+    <Content Include="Content\iCheck\minimal\minimal.css" />
+    <Content Include="Content\iCheck\minimal\minimal.png" />
+    <Content Include="Content\iCheck\minimal\orange%402x.png" />
+    <Content Include="Content\iCheck\minimal\orange.css" />
+    <Content Include="Content\iCheck\minimal\orange.png" />
+    <Content Include="Content\iCheck\minimal\pink%402x.png" />
+    <Content Include="Content\iCheck\minimal\pink.css" />
+    <Content Include="Content\iCheck\minimal\pink.png" />
+    <Content Include="Content\iCheck\minimal\purple%402x.png" />
+    <Content Include="Content\iCheck\minimal\purple.css" />
+    <Content Include="Content\iCheck\minimal\purple.png" />
+    <Content Include="Content\iCheck\minimal\red%402x.png" />
+    <Content Include="Content\iCheck\minimal\red.css" />
+    <Content Include="Content\iCheck\minimal\red.png" />
+    <Content Include="Content\iCheck\minimal\yellow%402x.png" />
+    <Content Include="Content\iCheck\minimal\yellow.css" />
+    <Content Include="Content\iCheck\minimal\yellow.png" />
+    <Content Include="Content\iCheck\minimal\_all.css" />
+    <Content Include="Content\iCheck\polaris\polaris%402x.png" />
+    <Content Include="Content\iCheck\polaris\polaris.css" />
+    <Content Include="Content\iCheck\polaris\polaris.png" />
+    <Content Include="Content\iCheck\square\aero%402x.png" />
+    <Content Include="Content\iCheck\square\aero.css" />
+    <Content Include="Content\iCheck\square\aero.png" />
+    <Content Include="Content\iCheck\square\blue%402x.png" />
+    <Content Include="Content\iCheck\square\blue.css" />
+    <Content Include="Content\iCheck\square\blue.png" />
+    <Content Include="Content\iCheck\square\green%402x.png" />
+    <Content Include="Content\iCheck\square\green.css" />
+    <Content Include="Content\iCheck\square\green.png" />
+    <Content Include="Content\iCheck\square\grey%402x.png" />
+    <Content Include="Content\iCheck\square\grey.css" />
+    <Content Include="Content\iCheck\square\grey.png" />
+    <Content Include="Content\iCheck\square\orange%402x.png" />
+    <Content Include="Content\iCheck\square\orange.css" />
+    <Content Include="Content\iCheck\square\orange.png" />
+    <Content Include="Content\iCheck\square\pink%402x.png" />
+    <Content Include="Content\iCheck\square\pink.css" />
+    <Content Include="Content\iCheck\square\pink.png" />
+    <Content Include="Content\iCheck\square\purple%402x.png" />
+    <Content Include="Content\iCheck\square\purple.css" />
+    <Content Include="Content\iCheck\square\purple.png" />
+    <Content Include="Content\iCheck\square\red%402x.png" />
+    <Content Include="Content\iCheck\square\red.css" />
+    <Content Include="Content\iCheck\square\red.png" />
+    <Content Include="Content\iCheck\square\square%402x.png" />
+    <Content Include="Content\iCheck\square\square.css" />
+    <Content Include="Content\iCheck\square\square.png" />
+    <Content Include="Content\iCheck\square\yellow%402x.png" />
+    <Content Include="Content\iCheck\square\yellow.css" />
+    <Content Include="Content\iCheck\square\yellow.png" />
+    <Content Include="Content\iCheck\square\_all.css" />
+    <Content Include="Content\pace\templates\pace-theme-barber-shop.tmpl.css" />
+    <Content Include="Content\pace\templates\pace-theme-big-counter.tmpl.css" />
+    <Content Include="Content\pace\templates\pace-theme-bounce.tmpl.css" />
+    <Content Include="Content\pace\templates\pace-theme-center-atom.tmpl.css" />
+    <Content Include="Content\pace\templates\pace-theme-center-circle.tmpl.css" />
+    <Content Include="Content\pace\templates\pace-theme-center-radar.tmpl.css" />
+    <Content Include="Content\pace\templates\pace-theme-center-simple.tmpl.css" />
+    <Content Include="Content\pace\templates\pace-theme-corner-indicator.tmpl.css" />
+    <Content Include="Content\pace\templates\pace-theme-fill-left.tmpl.css" />
+    <Content Include="Content\pace\templates\pace-theme-flash.tmpl.css" />
+    <Content Include="Content\pace\templates\pace-theme-flat-top.tmpl.css" />
+    <Content Include="Content\pace\templates\pace-theme-loading-bar.tmpl.css" />
+    <Content Include="Content\pace\templates\pace-theme-mac-osx.tmpl.css" />
+    <Content Include="Content\pace\templates\pace-theme-minimal.tmpl.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-barber-shop.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-big-counter.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-bounce.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-center-atom.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-center-circle.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-center-radar.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-center-simple.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-corner-indicator.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-fill-left.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-flash.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-flat-top.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-loading-bar.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-mac-osx.css" />
+    <Content Include="Content\pace\themes\black\pace-theme-minimal.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-barber-shop.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-big-counter.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-bounce.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-center-atom.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-center-circle.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-center-radar.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-center-simple.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-corner-indicator.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-fill-left.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-flash.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-flat-top.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-loading-bar.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-mac-osx.css" />
+    <Content Include="Content\pace\themes\blue\pace-theme-minimal.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-barber-shop.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-big-counter.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-bounce.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-center-atom.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-center-circle.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-center-radar.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-center-simple.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-corner-indicator.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-fill-left.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-flash.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-flat-top.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-loading-bar.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-mac-osx.css" />
+    <Content Include="Content\pace\themes\green\pace-theme-minimal.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-barber-shop.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-big-counter.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-bounce.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-center-atom.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-center-circle.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-center-radar.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-center-simple.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-corner-indicator.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-fill-left.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-flash.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-flat-top.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-loading-bar.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-mac-osx.css" />
+    <Content Include="Content\pace\themes\orange\pace-theme-minimal.css" />
+    <Content Include="Content\pace\themes\pace-theme-barber-shop.css" />
+    <Content Include="Content\pace\themes\pace-theme-big-counter.css" />
+    <Content Include="Content\pace\themes\pace-theme-bounce.css" />
+    <Content Include="Content\pace\themes\pace-theme-center-atom.css" />
+    <Content Include="Content\pace\themes\pace-theme-center-circle.css" />
+    <Content Include="Content\pace\themes\pace-theme-center-radar.css" />
+    <Content Include="Content\pace\themes\pace-theme-center-simple.css" />
+    <Content Include="Content\pace\themes\pace-theme-corner-indicator.css" />
+    <Content Include="Content\pace\themes\pace-theme-fill-left.css" />
+    <Content Include="Content\pace\themes\pace-theme-flash.css" />
+    <Content Include="Content\pace\themes\pace-theme-flat-top.css" />
+    <Content Include="Content\pace\themes\pace-theme-loading-bar.css" />
+    <Content Include="Content\pace\themes\pace-theme-mac-osx.css" />
+    <Content Include="Content\pace\themes\pace-theme-minimal.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-barber-shop.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-big-counter.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-bounce.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-center-atom.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-center-circle.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-center-radar.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-center-simple.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-corner-indicator.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-fill-left.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-flash.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-flat-top.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-loading-bar.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-mac-osx.css" />
+    <Content Include="Content\pace\themes\pink\pace-theme-minimal.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-barber-shop.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-big-counter.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-bounce.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-center-atom.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-center-circle.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-center-radar.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-center-simple.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-corner-indicator.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-fill-left.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-flash.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-flat-top.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-loading-bar.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-mac-osx.css" />
+    <Content Include="Content\pace\themes\purple\pace-theme-minimal.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-barber-shop.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-big-counter.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-bounce.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-center-atom.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-center-circle.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-center-radar.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-center-simple.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-corner-indicator.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-fill-left.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-flash.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-flat-top.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-loading-bar.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-mac-osx.css" />
+    <Content Include="Content\pace\themes\red\pace-theme-minimal.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-barber-shop.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-big-counter.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-bounce.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-center-atom.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-center-circle.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-center-radar.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-center-simple.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-corner-indicator.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-fill-left.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-flash.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-flat-top.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-loading-bar.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-mac-osx.css" />
+    <Content Include="Content\pace\themes\silver\pace-theme-minimal.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-barber-shop.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-big-counter.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-bounce.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-center-atom.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-center-circle.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-center-radar.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-center-simple.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-corner-indicator.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-fill-left.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-flash.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-flat-top.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-loading-bar.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-mac-osx.css" />
+    <Content Include="Content\pace\themes\white\pace-theme-minimal.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-barber-shop.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-big-counter.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-bounce.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-center-atom.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-center-circle.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-center-radar.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-center-simple.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-corner-indicator.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-fill-left.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-flash.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-flat-top.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-loading-bar.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-mac-osx.css" />
+    <Content Include="Content\pace\themes\yellow\pace-theme-minimal.css" />
+    <Content Include="fonts\fontawesome-webfont.svg" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="Web.config" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\bootstrap.min.css.map" />
+    <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Content\bootstrap-theme.min.css.map" />
+    <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="fonts\fontawesome-webfont.woff2" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
+    <None Include="Scripts\jquery-3.1.0.intellisense.js" />
+    <Content Include="Scripts\AdminLTE\app.js" />
+    <Content Include="Scripts\AdminLTE\app.min.js" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\jquery-3.1.0.js" />
+    <Content Include="Scripts\jquery-3.1.0.min.js" />
+    <Content Include="Scripts\jquery-3.1.0.slim.js" />
+    <Content Include="Scripts\jquery-3.1.0.slim.min.js" />
+    <Content Include="Scripts\jquery.icheck.js" />
+    <Content Include="Scripts\jquery.icheck.min.js" />
+    <Content Include="Scripts\jquery.inputmask\inputmask.date.extensions.js" />
+    <Content Include="Scripts\jquery.inputmask\inputmask.date.extensions.min.js" />
+    <Content Include="Scripts\jquery.inputmask\inputmask.extensions.js" />
+    <Content Include="Scripts\jquery.inputmask\inputmask.extensions.min.js" />
+    <Content Include="Scripts\jquery.inputmask\inputmask.js" />
+    <Content Include="Scripts\jquery.inputmask\inputmask.min.js" />
+    <Content Include="Scripts\jquery.inputmask\inputmask.numeric.extensions.js" />
+    <Content Include="Scripts\jquery.inputmask\inputmask.numeric.extensions.min.js" />
+    <Content Include="Scripts\jquery.inputmask\inputmask.phone.extensions.js" />
+    <Content Include="Scripts\jquery.inputmask\inputmask.phone.extensions.min.js" />
+    <Content Include="Scripts\jquery.inputmask\inputmask.regex.extensions.js" />
+    <Content Include="Scripts\jquery.inputmask\inputmask.regex.extensions.min.js" />
+    <Content Include="Scripts\jquery.inputmask\jquery.inputmask.bundle.js" />
+    <Content Include="Scripts\jquery.inputmask\jquery.inputmask.js" />
+    <Content Include="Scripts\jquery.inputmask\jquery.inputmask.min.js" />
+    <Content Include="Scripts\jquery.slimscroll.js" />
+    <Content Include="Scripts\jquery.slimscroll.min.js" />
+    <Content Include="Scripts\pace.js" />
+    <Content Include="Scripts\pace.min.js" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -109,7 +459,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config" />
-    <Content Include="packages.config" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-3.1.0.slim.min.map" />
+    <Content Include="Scripts\jquery-3.1.0.min.map" />
+    <Content Include="Scripts\jquery.icheck.min.js.map" />
+    <Content Include="Scripts\pace.min.js.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -119,9 +475,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Controllers\" />
     <Folder Include="ViewModels\" />
-    <Folder Include="Views\Shared\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Linko.LinkoExchange.Core\Linko.LinkoExchange.Core.csproj">
