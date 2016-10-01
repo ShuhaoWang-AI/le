@@ -1,7 +1,4 @@
-﻿// Linko.LinkoExchange.Web -  Global.asax.cs
-// 9/20/2016 - rsaha 
-
-using System;
+﻿using System;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
@@ -11,14 +8,17 @@ using Microsoft.Practices.Unity;
 
 namespace Linko.LinkoExchange.Web
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class MvcApplication : System.Web.HttpApplication
     {
         protected void Application_Start()
         {
-            AreaRegistration.RegisterAllAreas ();
-            RouteConfig.RegisterRoutes (RouteTable.Routes);
-            BundleConfig.RegisterBundles (BundleTable.Bundles);
-            FluentValidationModelValidatorProvider.Configure ();
+            AreaRegistration.RegisterAllAreas();
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
+            FluentValidationModelValidatorProvider.Configure();
         }
 
         /// <summary>
@@ -36,31 +36,31 @@ namespace Linko.LinkoExchange.Web
 
             string currentController = " ";
             string currentAction = " ";
-            RouteData currentRouteData = RouteTable.Routes.GetRouteData (new System.Web.HttpContextWrapper (httpContext));
+            RouteData currentRouteData = RouteTable.Routes.GetRouteData(new System.Web.HttpContextWrapper(httpContext));
             if (currentRouteData != null)
             {
-                if (currentRouteData.Values["controller"] != null && !string.IsNullOrEmpty (currentRouteData.Values["controller"].ToString ()))
+                if (currentRouteData.Values["controller"] != null && !string.IsNullOrEmpty(currentRouteData.Values["controller"].ToString()))
                 {
-                    currentController = currentRouteData.Values["controller"].ToString ();
+                    currentController = currentRouteData.Values["controller"].ToString();
                 }
 
-                if (currentRouteData.Values["action"] != null && !string.IsNullOrEmpty (currentRouteData.Values["action"].ToString ()))
+                if (currentRouteData.Values["action"] != null && !string.IsNullOrEmpty(currentRouteData.Values["action"].ToString()))
                 {
-                    currentAction = currentRouteData.Values["action"].ToString ();
+                    currentAction = currentRouteData.Values["action"].ToString();
                 }
             }
 
             // Instantiate the common controller and invoke it by calling the Execute() method passing the HandleErrorInfo model 
             // This is the model used by the HandleError filter as well
-            Exception ex = Server.GetLastError ();
-            CommonController controller = UnityConfig.GetConfiguredContainer ().Resolve<CommonController> ();
-            var routeData = new RouteData ();
+            Exception ex = Server.GetLastError();
+            CommonController controller = UnityConfig.GetConfiguredContainer().Resolve<CommonController>();
+            RouteData routeData = new RouteData();
             string action = "DefaultError";
             if (ex is System.Web.HttpException)
             {
-                var httpEx = ex as System.Web.HttpException;
+                System.Web.HttpException httpEx = ex as System.Web.HttpException;
 
-                switch (httpEx.GetHttpCode ())
+                switch (httpEx.GetHttpCode())
                 {
                     case 404:
                         action = "PageNotFound";
@@ -68,16 +68,18 @@ namespace Linko.LinkoExchange.Web
                 }
             }
 
-            httpContext.ClearError ();
-            httpContext.Response.Clear ();
-            httpContext.Response.StatusCode = ex is System.Web.HttpException ? ((System.Web.HttpException) ex).GetHttpCode () : 500;
+            httpContext.ClearError();
+            httpContext.Response.Clear();
+            httpContext.Response.StatusCode = ex is System.Web.HttpException ? ((System.Web.HttpException) ex).GetHttpCode() : 500;
             httpContext.Response.TrySkipIisCustomErrors = true;
 
             routeData.Values["controller"] = "Common";
             routeData.Values["action"] = action;
 
-            controller.ViewData.Model = new HandleErrorInfo (ex, currentController, currentAction);
-            ((IController) controller).Execute (new RequestContext (new System.Web.HttpContextWrapper (httpContext), routeData));
+            controller.ViewData.Model = new HandleErrorInfo(ex, currentController, currentAction);
+            ((IController) controller).Execute(new RequestContext(new System.Web.HttpContextWrapper(httpContext), routeData));
         }
+
+
     }
 }
