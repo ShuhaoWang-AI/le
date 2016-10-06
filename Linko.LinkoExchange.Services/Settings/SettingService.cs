@@ -65,7 +65,10 @@ namespace Linko.LinkoExchange.Services.Settings
         public IDictionary<string, string> GetGlobalSettings()
         {
             //TODO: get system global settings
-            throw new System.NotImplementedException();
+            var globalSetting = new Dictionary<string, string>();
+            globalSetting.Add("PasswordRequireLength", "6");
+            globalSetting.Add("PasswordRequireDigit", "true");
+            return globalSetting; 
         }
 
         /// <summary>

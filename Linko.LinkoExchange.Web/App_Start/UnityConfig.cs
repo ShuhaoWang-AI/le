@@ -11,6 +11,7 @@ using Linko.LinkoExchange.Services.Settings;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Linko.LinkoExchange.Services.Program;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -58,6 +59,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<ISettingService, SettingService>();
             container.RegisterType<IOrganizationService, OrganizationService>();
             container.RegisterType<IInvitationService, InvitationService>();
+            container.RegisterType<IProgramService, ProgramService>();
         }
     }
 }
