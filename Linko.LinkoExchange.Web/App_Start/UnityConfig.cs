@@ -1,6 +1,16 @@
 using System;
+using System.Web;
 using Microsoft.Practices.Unity;
-using Microsoft.Practices.Unity.Configuration;
+using Linko.LinkoExchange.Services.Authentication;
+using Microsoft.Owin.Security;
+using System.Data.Entity;
+using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Settings;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -37,6 +47,17 @@ namespace Linko.LinkoExchange.Web
 
             // TODO: Register your types here
             // container.RegisterType<IProductRepository, ProductRepository>();
+
+            container.RegisterType<DbContext, ApplicationDbContext> (new PerRequestLifetimeManager ());
+            container.RegisterType<IUserStore<ApplicationUser>, UserStore<ApplicationUser>> ();
+            container.RegisterType<ApplicationSignInManager> ();
+            container.RegisterType<ApplicationUserManager> ();
+            container.RegisterType<IAuthenticationManager> (new InjectionFactory (c => HttpContext.Current.GetOwinContext ().Authentication));
+            container.RegisterType<ApplicationSignInManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Get<ApplicationSignInManager>()));
+            container.RegisterType<IAuthenticationService, AuthenticationService> ();
+            container.RegisterType<ISettingService, SettingService>();
+            container.RegisterType<IOrganizationService, OrganizationService>();
+            container.RegisterType<IInvitationService, InvitationService>();
         }
     }
 }

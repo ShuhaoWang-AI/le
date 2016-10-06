@@ -1,4 +1,6 @@
-﻿using System.Web.Mvc;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
+using System.Web.Mvc;
 using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
@@ -6,6 +8,8 @@ namespace Linko.LinkoExchange.Web.Controllers
     public class CommonController : Controller
     {
         private readonly ILogger _logger;
+
+        private IEnumerable<Claim> claims;
 
         #region constructor
 
