@@ -583,6 +583,10 @@
       <Project>{a3075702-4649-4486-bd38-fc5abb00a221}</Project>
       <Name>Linko.LinkoExchange.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Linko.LinkoExchange.Data\Linko.LinkoExchange.Data.csproj">
+      <Project>{783A2A05-1FC9-4BF8-B7E1-032997FA6B70}</Project>
+      <Name>Linko.LinkoExchange.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Linko.LinkoExchange.Services\Linko.LinkoExchange.Services.csproj">
       <Project>{b78c098d-9b34-4907-a648-fa65caf7767c}</Project>
       <Name>Linko.LinkoExchange.Services</Name>

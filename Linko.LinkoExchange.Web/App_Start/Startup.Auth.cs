@@ -1,5 +1,4 @@
 ﻿using Linko.LinkoExchange.Services.Authentication;
-using Linko.LinkoExchange.Services.Dto;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
@@ -9,6 +8,7 @@ using System;
 using System.Configuration;
 using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Data;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -31,6 +31,7 @@ namespace Linko.LinkoExchange.Web
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
                 LoginPath = new PathString("/Account/Login"),
+                ExpireTimeSpan = TimeSpan.FromMinutes(cookieValidateInterval),
                 Provider = new CookieAuthenticationProvider
                 {
                     // Enables the application to validate the security stamp when the user logs in.

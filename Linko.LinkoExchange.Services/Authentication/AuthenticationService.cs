@@ -263,6 +263,11 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private bool GetStrictestBooleanPasswordRequire(IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings,string settingKey)
         {
+            if (!_globalSettings.ContainsKey(settingKey))
+            {
+                return false;
+            }
+
             var passwordRequireDigital = _globalSettings[settingKey];
             var passwordRequireDigitalValue = bool.Parse(passwordRequireDigital);
             if (programSettings.Any(i => i.Name.Equals(settingKey)))

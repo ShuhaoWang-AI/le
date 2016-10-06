@@ -5,6 +5,7 @@ using Linko.LinkoExchange.Services.Authentication;
 using Microsoft.Owin.Security;
 using System.Data.Entity;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
