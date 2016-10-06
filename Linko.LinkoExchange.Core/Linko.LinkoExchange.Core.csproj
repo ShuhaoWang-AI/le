@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="Common\ValueParser.cs" />
     <Compile Include="Domain\ApplicationUser.cs" />
+    <Compile Include="Domain\EmailTemplate.cs" />
     <Compile Include="Enum\AuthenticationResult.cs" />
     <Compile Include="Enum\EmailType.cs" />
     <Compile Include="Logging\CreationStackTrackerExtension.cs" />

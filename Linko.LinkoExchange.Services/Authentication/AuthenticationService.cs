@@ -298,7 +298,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 {"{copyCode}", html}
             };
 
-            LinkoExchangeEmailService.SendEmail(userDto.Email, subject, EmailType.RegistrationConfirmation, replacements);
+             LinkoExchangeEmailService.SendEmail(userDto.Email, subject, EmailType.RegistrationConfirmation, replacements);
 
             //            var mailMessage =  LinkoExchangeEmailService.GenerateMailMessage(userDto.Email, subject, EmailType.RegistrationConfirmation,
             //                    replacements).Result;
