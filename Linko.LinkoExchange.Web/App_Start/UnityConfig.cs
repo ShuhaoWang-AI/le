@@ -55,6 +55,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<ApplicationSignInManager> ();
             container.RegisterType<ApplicationUserManager> ();
             container.RegisterType<IAuthenticationManager> (new InjectionFactory (c => HttpContext.Current.GetOwinContext ().Authentication));
+            container.RegisterType<IAuthenticationManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));
             container.RegisterType<ApplicationSignInManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Get<ApplicationSignInManager>()));
             container.RegisterType<IAuthenticationService, AuthenticationService> ();
             container.RegisterType<ISettingService, SettingService>();

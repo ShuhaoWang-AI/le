@@ -8,8 +8,11 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using Microsoft.Owin.Host.SystemWeb;
+using System.Net.Http;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using Linko.LinkoExchange.Services.Email;  
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Core.Common;
@@ -17,7 +20,7 @@ using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
-using Linko.LinkoExchange.Services.Program;
+using Linko.LinkoExchange.Services.Program; 
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
@@ -25,11 +28,12 @@ namespace Linko.LinkoExchange.Services.Authentication
     {
         private readonly ApplicationSignInManager _signInManager;
         private readonly ApplicationUserManager _userManager;
-        private readonly IAuthenticationManager _authenticationManager;
+        
         private readonly ISettingService _settingService;
         private readonly IOrganizationService _organizationService;
         private readonly IProgramService _programService;
         private readonly IInvitationService _invitationService;
+        private readonly IAuthenticationManager _authenticationManager;
 
         private readonly TokenGenerator _tokenGenerator = new TokenGenerator();
         private readonly IAuditLogService _auditLogService = new CrommerAuditLogService();
@@ -44,13 +48,13 @@ namespace Linko.LinkoExchange.Services.Authentication
             IProgramService programService,
             IInvitationService invitationService)
         {
-            if (userManager == null) throw new NullReferenceException("userManager");
-            if (signInManager == null) throw new NullReferenceException("signInManager");
-            if (authenticationManager == null) throw new NullReferenceException("authenticationManager");
-            if (settingService == null) throw new NullReferenceException("settingService");
-            if (organizationService == null) throw new NullReferenceException("organizationService");
-            if (programService == null) throw new NullReferenceException("programService");
-            if (invitationService == null) throw new NullReferenceException("invitationService");
+            if (userManager == null) throw new ArgumentNullException("userManager");
+            if (signInManager == null) throw new ArgumentNullException("signInManager");
+            if (authenticationManager == null) throw new ArgumentNullException("authenticationManager");
+            if (settingService == null) throw new ArgumentNullException("settingService");
+            if (organizationService == null) throw new ArgumentNullException("organizationService");
+            if (programService == null) throw new ArgumentNullException("programService");
+            if (invitationService == null) throw new ArgumentNullException("invitationService");
 
             _userManager = userManager;
             _signInManager = signInManager;
@@ -60,6 +64,19 @@ namespace Linko.LinkoExchange.Services.Authentication
             _programService = programService;
             _invitationService = invitationService; 
             _globalSettings = _settingService.GetGlobalSettings();
+        }
+
+        public IEnumerable<Claim> GetClaims()
+        {
+            var claims = HttpContext.Current.Session["claims"] as IEnumerable<Claim>;
+            if (claims == null)
+            {
+                var userId = HttpContext.Current.Session["userId"] as string;
+                claims = string.IsNullOrWhiteSpace(userId) ? null : _userManager.GetClaims(userId);
+                HttpContext.Current.Session["claims"] = claims;
+            }
+
+            return claims;
         }
 
         public Task<AuthenticationResultDto> ChangePasswordAsync(string userId, string newPassword)
@@ -83,7 +100,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 if (result == IdentityResult.Success)
                 {
                     authenticationResult.Success = true; 
-                    SendRegistrationConfirmationEmail(applicationUser.Id, userInfo);
+                    SendRegistrationConfirmationEmail(applicationUser.Id, userInfo);  
                     return Task.FromResult(authenticationResult);
                 }
 
@@ -105,7 +122,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             //TODO to implement
             throw new NotImplementedException();
         }
-
+         
         public Task<SignInResultDto> SignInByUserName(string userName, string password, bool isPersistent)
         {
             SignInResultDto signInResultDto = new SignInResultDto();
@@ -123,16 +140,18 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return Task.FromResult(signInResultDto);
             }
 
-            //Todo: change to the real userid;
+            // clear claims from db if there are   
+            ClearClaims(applicationUser.Id);
+            applicationUser.Claims.Clear();
+
+            // Todo: change to the real userid;
             var userId = 100;  //applicationUser.profileId;
             var programIds = GetUserProgramIds(userId);
             var organizationIds = GetUserOrganizationIds(userId);
             SetPasswordPolicy(programIds, organizationIds);
 
             _signInManager.UserManager = _userManager; 
-
-            SignInStatus signInStatus =
-                _signInManager.PasswordSignInAsync(userName, password, isPersistent: isPersistent, shouldLockout: true).Result; 
+            var signInStatus = _signInManager.PasswordSignInAsync(userName, password, isPersistent, true).Result;
 
             if (signInStatus == SignInStatus.Success)
             {
@@ -140,11 +159,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                 signInResultDto.AutehticationResult = AuthenticationResult.Success;
                 signInResultDto.Token = _tokenGenerator.GenToken(userName);
 
-                //TODO to be delete
-                //Save into session;  
-                //HttpContext.Current.Session["userInfo"] = GetUser(applicationUser);
+                HttpContext.Current.Session["userId"] = applicationUser.Id; 
 
-                //Set userDto's claims
+                //Set user's claims
                 GetUserIdentity(applicationUser); 
             }
             else if (signInStatus == SignInStatus.Failure)
@@ -157,21 +174,23 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         public void SignOff()
         {
-            HttpContext.Current.Session["userInfo"] = null;
-            _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            var userId = HttpContext.Current.Session["userid"] as string;
+            ClearClaims(userId);
+            HttpContext.Current.Session.Clear();
+            _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie); 
         }
         
         #region private section
-        private UserDto GetUser(ApplicationUser applicationUser)
-        {
-            return new UserDto
-            {
-                FirstName = applicationUser.UserName,
-                LastName = applicationUser.UserName,
-                Email = applicationUser.Email
 
-                // other informations like industry list, authority list,  roles 
-            };
+        private void ClearClaims(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId)) return;
+
+            var claims = _userManager.GetClaims(userId).ToList();
+            foreach (var claim in claims)
+            {
+                _userManager.RemoveClaim(userId, claim);
+            }
         }
 
         private ApplicationUser AssignUser(string userName, string email)
@@ -206,6 +225,11 @@ namespace Linko.LinkoExchange.Services.Authentication
                 IsPersistent = true,
                 ExpiresUtc = DateTime.UtcNow.AddDays(7)
             };
+
+            foreach (var claim in claims)
+            {
+                _userManager.AddClaim(applicationUser.Id, claim);
+            } 
 
             _authenticationManager.SignIn(authProperties, identity); 
         }
@@ -299,10 +323,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             };
 
              LinkoExchangeEmailService.SendEmail(userDto.Email, subject, EmailType.RegistrationConfirmation, replacements);
-
-            //            var mailMessage =  LinkoExchangeEmailService.GenerateMailMessage(userDto.Email, subject, EmailType.RegistrationConfirmation,
-            //                    replacements).Result;
-            //            _userManager.SendEmailAsync(userId, mailMessage.Subject, mailMessage.Body);   
         }
 
         private IEnumerable<int> GetUserProgramIds(int userId)
@@ -315,7 +335,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             var orgnizations = _organizationService.GetUserOrganizations(userid);
             return orgnizations.Select(i => i.OrganizationId).ToArray();
-        } 
+        }
 
         #endregion
     }

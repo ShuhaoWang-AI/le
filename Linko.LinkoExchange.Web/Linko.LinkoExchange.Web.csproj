@@ -569,6 +569,8 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\Index.cshtml" />
+    <Content Include="Views\User\View.cshtml" />
+    <Content Include="Views\User\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -580,7 +582,6 @@
     <Folder Include="App_Data\" />
     <Folder Include="ViewModels\Common\" />
     <Folder Include="Views\Shared\" />
-    <Folder Include="Views\User\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Linko.LinkoExchange.Core\Linko.LinkoExchange.Core.csproj">

@@ -1,4 +1,6 @@
-﻿using Linko.LinkoExchange.Services.Dto;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
+using Linko.LinkoExchange.Services.Dto;
 using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services.Authentication
@@ -17,9 +19,10 @@ namespace Linko.LinkoExchange.Services.Authentication
         Task<AuthenticationResultDto> ChangePasswordAsync(string userId, string newPassword);
         Task<AuthenticationResultDto> ResetPasswordAsync(string userId, string changePasswordToken, string newPassword);
 
-        // Sign in 
+        // Sign in  
         Task<SignInResultDto> SignInByUserName(string userName, string password, bool isPersistent);
 
+        IEnumerable<Claim> GetClaims();
         //sign off
         void SignOff();
     }

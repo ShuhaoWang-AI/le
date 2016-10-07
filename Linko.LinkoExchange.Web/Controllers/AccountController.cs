@@ -2,13 +2,8 @@
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Web.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
-
 
 
 namespace Linko.LinkoExchange.Web.Controllers
@@ -42,14 +37,14 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var email = model.Email;
             var password = model.Password;
-            var signInResult = await _authenticateService.SignInByUserName(email, password, true);
-
-            return RedirectToLocal("");
+            var signInResult = await _authenticateService.SignInByUserName(email, password, true);  
+             
+            return View();
         }
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult Register(RegisterViewModel model, string registrationToken)
+        public async Task<ActionResult> Register(RegisterViewModel model, string registrationToken)
         {
             var userInfo = new UserDto
             {
@@ -60,11 +55,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                 UserName = model.UserName
             };
 
-            var newUser = _authenticateService.CreateUserAsync(userInfo, registrationToken).Result;
+            var newUser = await _authenticateService.CreateUserAsync(userInfo, registrationToken);
 
             return View();
         }
-        public ActionResult LogOff()
+        public ActionResult SignOff()
         {
             _authenticateService.SignOff ();
             return View ();
