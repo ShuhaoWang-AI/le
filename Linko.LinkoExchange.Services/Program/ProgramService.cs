@@ -25,7 +25,7 @@ namespace Linko.LinkoExchange.Services.Program
         }
 
         /// <summary>
-        /// The programs that fullfilled an organization
+        /// The programs that fulfilled by an organization
         /// </summary>
         /// <param name="organizationId">Organization Id</param>
         /// <returns>A collection of programs</returns>

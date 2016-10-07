@@ -13,7 +13,7 @@ namespace Linko.LinkoExchange.Services.Program
         IEnumerable<ProgramDto> GetUserPrograms(int userId);
 
         /// <summary>
-        /// The programs that fullfilled an organization
+        /// The programs that fulfilled an organization
         /// </summary>
         /// <param name="organizationId">Organization Id</param>
         /// <returns>A collection of programs</returns>

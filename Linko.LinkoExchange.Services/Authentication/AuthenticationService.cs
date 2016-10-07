@@ -8,19 +8,16 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using Microsoft.Owin.Host.SystemWeb;
-using System.Net.Http;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading;
-using Linko.LinkoExchange.Services.Email;  
+using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
-using Linko.LinkoExchange.Services.Program; 
+using Linko.LinkoExchange.Services.Program;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {

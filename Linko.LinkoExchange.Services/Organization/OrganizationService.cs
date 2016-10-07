@@ -10,12 +10,12 @@ namespace Linko.LinkoExchange.Services.Organization
         /// </summary>
         /// <param name="userId">User id</param>
         /// <returns>Collection of organization</returns>
-        public IEnumerable<Dto.OrganizationDto> GetUserOrganizations(int userId)
+        public IEnumerable<OrganizationDto> GetUserOrganizations(int userId)
         {
             //TODO
-            var list = new List<Dto.OrganizationDto>
+            var list = new List<OrganizationDto>
             {
-                new Dto.OrganizationDto
+                new OrganizationDto
                 {
                     OrganizationId = 1000,
                     OrganizationName = "Mock organization name"
@@ -30,10 +30,10 @@ namespace Linko.LinkoExchange.Services.Organization
         /// </summary>
         /// <param name="organizationId">Organization id</param>
         /// <returns>Collection of organization</returns>
-        public Dto.OrganizationDto GetOrganization(int organizationId)
+        public OrganizationDto GetOrganization(int organizationId)
         {
             //TODO
-            return new Dto.OrganizationDto
+            return new OrganizationDto
             {
                 OrganizationId = 1000,
                 OrganizationName = "Mock organization name"
