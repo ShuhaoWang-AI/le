@@ -11,6 +11,10 @@
     <AssemblyName>Linko.LinkoExchange.Services</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -105,6 +109,7 @@
     <Compile Include="Authentication\IAuthenticationService.cs" />
     <Compile Include="Authentication\IdentityConfig.cs" />
     <Compile Include="Authentication\TokenGenerator.cs" />
+    <Compile Include="Authority\IAuthorityService.cs" />
     <Compile Include="Dto\OrganizationDto.cs" />
     <Compile Include="Dto\OrganizationSettingDto.cs" />
     <Compile Include="Dto\ProgramDto.cs" />
@@ -115,6 +120,7 @@
     <Compile Include="Dto\UserDto.cs" />
     <Compile Include="Dto\SignInResultDto.cs" />
     <Compile Include="Dto\AuthenticationResultDto.cs" />
+    <Compile Include="Industry\IIndustryService.cs" />
     <Compile Include="Invitation\IInvitationService.cs" />
     <Compile Include="Invitation\InvitationService.cs" />
     <Compile Include="Organization\IOrganizationService.cs" />
@@ -124,7 +130,7 @@
     <Compile Include="Settings\ISettingService.cs" />
     <Compile Include="Settings\SettingService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UserService\IUserService.cs" />
+    <Compile Include="User\IUserService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Linko.LinkoExchange.Core\Linko.LinkoExchange.Core.csproj">

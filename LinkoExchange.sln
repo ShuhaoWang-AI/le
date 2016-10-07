@@ -37,4 +37,22 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://wtrxtfs2013:8080/tfs/linko
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Linko.LinkoExchange.Web\\Linko.LinkoExchange.Web.csproj
+		SccProjectName1 = Linko.LinkoExchange.Web
+		SccLocalPath1 = Linko.LinkoExchange.Web
+		SccProjectUniqueName2 = Linko.LinkoExchange.Services\\Linko.LinkoExchange.Services.csproj
+		SccProjectName2 = Linko.LinkoExchange.Services
+		SccLocalPath2 = Linko.LinkoExchange.Services
+		SccProjectUniqueName3 = Linko.LinkoExchange.Data\\Linko.LinkoExchange.Data.csproj
+		SccProjectName3 = Linko.LinkoExchange.Data
+		SccLocalPath3 = Linko.LinkoExchange.Data
+		SccProjectUniqueName4 = Linko.LinkoExchange.Core\\Linko.LinkoExchange.Core.csproj
+		SccProjectName4 = Linko.LinkoExchange.Core
+		SccLocalPath4 = Linko.LinkoExchange.Core
+	EndGlobalSection
 EndGlobal

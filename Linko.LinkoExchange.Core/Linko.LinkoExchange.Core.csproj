@@ -11,6 +11,10 @@
     <AssemblyName>Linko.LinkoExchange.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -68,6 +72,7 @@
     <Compile Include="Common\ValueParser.cs" />
     <Compile Include="Domain\ApplicationUser.cs" />
     <Compile Include="Domain\EmailTemplate.cs" />
+    <Compile Include="Domain\Organization.cs" />
     <Compile Include="Enum\AuthenticationResult.cs" />
     <Compile Include="Enum\EmailType.cs" />
     <Compile Include="Logging\CreationStackTrackerExtension.cs" />
