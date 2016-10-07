@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Linko.LinkoExchange.Services.Dto;
+using System.Collections.Generic;
 
 namespace Linko.LinkoExchange.Services.Organization
 {
@@ -38,5 +39,11 @@ namespace Linko.LinkoExchange.Services.Organization
                 OrganizationName = "Mock organization name"
             };
         }
+
+        public void UpdateOrganization(OrganizationDto organization)
+        {
+            //TODO
+        }
+
     }
 }

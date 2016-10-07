@@ -18,5 +18,12 @@ namespace Linko.LinkoExchange.Services.Organization
         /// <param name="organizationId">Organization id</param>
         /// <returns>Collection of organization</returns>
         OrganizationDto GetOrganization(int organizationId);
+
+        /// <summary>
+        /// Update the Organization underneath the Authority or Industry
+        /// Should not be called directly from BL layer
+        /// </summary>
+        /// <param name="organization"></param>
+        void UpdateOrganization(OrganizationDto organization);
     }
 }
