@@ -25,5 +25,19 @@ namespace Linko.LinkoExchange.Services.Organization
         /// </summary>
         /// <param name="organization"></param>
         void UpdateOrganization(OrganizationDto organization);
+
+        void UpdateSettings(OrganizationSettingsDto settings);
+
+
+        /// When enabling, we need to check the parent (RegulatorOrganizationId)
+        /// to see if there are any available licenses left
+        ///
+        /// Otherwise throw exception
+        void UpdateEnableDisableFlag(int orgRegProgId, bool isEnabled);
+
+        List<OrganizationDto> GetChildrenOrganizations(int regOrgId);
+
+        void AddChildOrganization(int parentRegOrdId, OrganizationDto childOrganization);
+
     }
 }

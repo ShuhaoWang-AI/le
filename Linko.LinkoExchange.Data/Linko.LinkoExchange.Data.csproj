@@ -66,7 +66,6 @@
   <ItemGroup>
     <Compile Include="ApplicationDbContext.cs" />
     <Compile Include="Mapping\EmailTemplates.cs" />
-    <Compile Include="Mapping\OrganizationMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -4,22 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Linko.LinkoExchange.Services.Authority
+namespace Linko.LinkoExchange.Services.Dto
 {
-    public class AuthorityConfigurationsDTO
-    {
-        public int MaxPasswordAttempts { get; set; }
-        public int MaxKBQAttempts { get; set; }
-        public int MaxFailedPasswordAttempts { get; set; }
-        public int InvitationExpiryHours { get; set; }
-        public int PasswordChangeDays { get; set; }
-        public int PasswordHistoryCount { get; set; }
-        public int MaxUserLicenseCount { get; set; }
-        public int CurrentUserLicenseCount { get; set; }
-        public int TimeZoneId { get; set; }
-    }
-
-    public class AuthorityDetailsDTO
+    public class AuthorityDetailsDto
     {
         public string Name { get; set; }
         public string AddressLine1 { get; set; }
@@ -41,12 +28,5 @@ namespace Linko.LinkoExchange.Services.Authority
         public int MaxIndustryLicenses { get; set; }
         public int IndustryLicensesInUse { get; set; }
         public int MaxUsersPerIndustry { get; set; }
-    }
-
-    public interface IAuthorityService
-    {
-        void UpdateConfigurations(AuthorityConfigurationsDTO configDTO);
-        
-        AuthorityDetailsDTO GetAuthorityDetails(int authorityId);
     }
 }
