@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Linko.LinkoExchange.Core.Extensions;
+using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -35,23 +36,64 @@ namespace Linko.LinkoExchange.Services.User
         #region public methods
         
 
-        public UserProfileDTO GetUserProfileById(int userProfileId)
+        public UserDto GetUserProfileById(int userProfileId)
         {
-            return null;
+            var dto = new UserDto();
+
+            var userProfile = _dbContext.UserProfiles.Single(up => up.UserProfileId == userProfileId);
+
+            dto.FirstName = userProfile.FirstName;
+            dto.LastName = userProfile.LastName;
+            //TODO map remaining properties
+
+            return dto;
         }
 
-        public UserProfileDTO GetUserProfileByEmail(string emailAddress)
+        public UserDto GetUserProfileByEmail(string emailAddress)
         {
-            return null;
+            UserDto dto = null;
+            UserProfile userProfile = _dbContext.UserProfiles.SingleOrDefault(u => u.Email == emailAddress);
+            if (userProfile != null)
+            {
+                dto.FirstName = userProfile.FirstName;
+                dto.LastName = userProfile.LastName;
+                //TODO map remaining properties
+                return dto;
+            }
+            else
+            {
+                //_logger.Log("ERROR")
+                throw new Exception();
+            }
         }
 
-        public List<UserProfileDTO> GetUserProfilesForOrgRegProgram(int organizationRegulatoryProgramId,
+        public List<UserDto> GetUserProfilesForOrgRegProgram(int orgRegProgramId,
                              bool? isRegApproved,
                              bool? isRegDenied,
                              bool? isEnabled,
                              bool? isRemoved)
         {
-            return null;
+            var dtos = new List<UserDto>();
+            IQueryable<OrganizationRegulatoryProgramUser> users = _dbContext.OrganizationRegulatoryProgramUsers.Where(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
+
+            if (isRegApproved != null)
+                users = users.Where(u => u.IsRegistrationApproved == isRegApproved);
+            if (isRegDenied != null)
+                users = users.Where(u => u.IsRegistrationDenied == isRegDenied);
+            if (isEnabled != null)
+                users = users.Where(u => u.IsEnabled == isEnabled);
+            if (isRemoved != null)
+                users = users.Where(u => u.IsRemoved == isRemoved);
+
+            foreach (var user in users)
+            {
+                var dto = new UserDto();
+                dto.IsEnabled = user.IsEnabled;
+                //TODO map remaining properties
+                dtos.Add(dto);
+            }
+
+            return dtos;
         }
 
 
@@ -87,7 +129,7 @@ namespace Linko.LinkoExchange.Services.User
             }
         }
 
-        public void RequestSignatoryStatus(int userProfileId)
+        public void RequestSignatoryStatus(int orgRegProgUserId)
         {
         }
 
@@ -144,7 +186,7 @@ namespace Linko.LinkoExchange.Services.User
             }
         }
 
-        public void UpdateUserProfile(UserProfileDTO request)
+        public void UpdateUser(UserDto request)
         {
             if (request != null)
             {

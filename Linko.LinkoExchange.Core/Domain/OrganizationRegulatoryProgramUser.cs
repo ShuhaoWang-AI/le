@@ -11,6 +11,7 @@ namespace Linko.LinkoExchange.Core.Domain
     {
         [Key]
         public int OrganizationRegulatoryProgramUserId { get; set; }
+        public int OrganizationRegulatoryProgramId { get; set; }
         public bool IsRegistrationApproved { get; set; }
         public bool IsRegistrationDenied { get; set; }
         public bool IsEnabled { get; set; }

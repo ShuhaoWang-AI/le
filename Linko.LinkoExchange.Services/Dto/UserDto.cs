@@ -1,7 +1,9 @@
 ﻿namespace Linko.LinkoExchange.Services.Dto
 {
     public class UserDto
-    { 
+    {
+        public int OrgRegProgUserId { get; set; }
+        public int UserProfileId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string UserName { get; set; }
@@ -11,5 +13,7 @@
         public string IndustryName { get; set; }
         public string Password { get; set; }
         public string PasswordHash { get; set; }
+        public bool IsEnabled { get; set; }
+
     }
 }
