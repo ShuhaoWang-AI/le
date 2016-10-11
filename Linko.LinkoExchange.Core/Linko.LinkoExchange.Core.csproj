@@ -75,11 +75,13 @@
     <Compile Include="Domain\Organization.cs" />
     <Compile Include="Domain\OrganizationRegulatoryProgram.cs" />
     <Compile Include="Domain\OrganizationRegulatoryProgramSetting.cs" />
+    <Compile Include="Domain\OrganizationRegulatoryProgramUser.cs" />
     <Compile Include="Domain\OrganizationSetting.cs" />
     <Compile Include="Domain\UserPasswordHistory.cs" />
     <Compile Include="Domain\UserProfile.cs" />
     <Compile Include="Enum\AuthenticationResult.cs" />
     <Compile Include="Enum\EmailType.cs" />
+    <Compile Include="Extensions\IdentityExtensions.cs" />
     <Compile Include="Logging\CreationStackTrackerExtension.cs" />
     <Compile Include="Logging\CreationStackTrackerPolicy.cs" />
     <Compile Include="Logging\CreationStackTrackerStrategy.cs" />

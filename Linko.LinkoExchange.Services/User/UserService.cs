@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Linko.LinkoExchange.Core.Extensions;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -77,10 +78,26 @@ namespace Linko.LinkoExchange.Services.User
 
         public void ResetUser(int userProfileId)
         {
+
         }
 
-        public void RemoveUser(int userProfileId)
+        public void RemoveUser(int orgRegProgUserId)
         {
+            OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+            if (user != null)
+            {
+                user.IsRemoved = true;
+
+                //Persist modification date and modifier actor
+                user.LastModificationDateTime = DateTime.Now;
+                user.LastModificationUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
+                _dbContext.SaveChanges();
+            }
+            else
+            {
+                //_logger.Log("ERROR")
+                throw new Exception();
+            }
         }
 
         public void UpdateUserProfile(UserProfileDTO request)
