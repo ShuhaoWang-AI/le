@@ -146,8 +146,11 @@ namespace Linko.LinkoExchange.Services.User
             }
         }
 
-        public void UpdateUserPermissionGroupId(int userProfileId, int permissionGroupId)
+        public void UpdateUserPermissionGroupId(int orgRegProgUserId, int permissionGroupId)
         {
+            var user = _dbContext.OrganizationRegulatoryProgramUsers.Single(o => o.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+            user.PermissionGroupId = permissionGroupId;
+            _dbContext.SaveChanges();
         }
 
         public void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory)

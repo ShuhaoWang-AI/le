@@ -27,7 +27,7 @@ namespace Linko.LinkoExchange.Services.User
 
         UserDto GetUserProfileByEmail(string emailAddress);
 
-        List<UserDto> GetUserProfilesForOrgRegProgram(int organizationRegulatoryProgramId,
+        List<UserDto> GetUserProfilesForOrgRegProgram(int orgRegProgramId,
                              bool? isRegApproved,
                              bool? isRegDenied,
                              bool? isEnabled,
@@ -37,7 +37,7 @@ namespace Linko.LinkoExchange.Services.User
 
         void UpdateUserState(int orgRegProgUserId, bool? isRegApproved, bool? isRegDenied, bool? isEnabled, bool? isRemoved);
 
-        void UpdateUserPermissionGroupId(int userProfileId, int permissionGroupId);
+        void UpdateUserPermissionGroupId(int orgRegProgUserId, int permissionGroupId);
 
         void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory);
 
@@ -45,7 +45,7 @@ namespace Linko.LinkoExchange.Services.User
 
         void ResetUser(int userProfileId, string newEmailAddress);
 
-        void RemoveUser(int userProfileId);
+        void RemoveUser(int orgRegProgUserId);
 
         void UpdateUser(UserDto request);
 
