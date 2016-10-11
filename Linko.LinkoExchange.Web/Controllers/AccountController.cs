@@ -1,4 +1,5 @@
-﻿using Linko.LinkoExchange.Services.AuditLog;
+﻿using System.Collections.Generic;
+using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Web.ViewModels;
@@ -63,6 +64,73 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             _authenticateService.SignOff ();
             return View ();
+        }
+
+        [AllowAnonymous]
+        public ActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous] 
+        public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+
+                var result = await _authenticateService.RequestResetPassword(model.Email);
+                if (result.Success)
+                {
+                    return RedirectToAction("", "");
+                }
+                else
+                {
+                    // redirect to show error of forget password
+                    System.Console.WriteLine("Reset password error");
+                    System.Console.WriteLine(result.Errors.ToString());
+
+                    RedirectToLocal("error");
+                } 
+            }
+
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        public ActionResult ResetPassword(string code)
+        {
+            return string.IsNullOrWhiteSpace(code)  ? View("ErrorPage") : View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+             
+            var result = await _authenticateService.ResetPasswordAsync(model.Email, model.Code, model.Password);
+
+            if (result.Success)
+            {
+                return RedirectToAction("ResetPasswordConfirmation", "Account");
+            }
+
+            AddErrors(result.Errors); 
+
+            return View();
+        }
+
+        private void AddErrors(IEnumerable<string> errors)
+        {
+            foreach (var error in errors)
+            {
+                ModelState.AddModelError("", error);
+            }
         }
 
         private ActionResult RedirectToLocal(string returnUrl)

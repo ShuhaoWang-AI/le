@@ -8,6 +8,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Security.Claims;
 using Linko.LinkoExchange.Services.Email;
@@ -76,11 +77,36 @@ namespace Linko.LinkoExchange.Services.Authentication
             return claims;
         }
 
+        // Change or reset password
+        /// <summary>
+        /// Change password happends after a user login, and change his password
+        /// </summary>
+        /// <param name="userId">User Id</param>
+        /// <param name="newPassword">The new password</param>
+        /// <returns></returns>
         public Task<AuthenticationResultDto> ChangePasswordAsync(string userId, string newPassword)
         {
-            throw new NotImplementedException();
+            var authenticationResult = new AuthenticationResultDto();
+            try
+            {
+                _userManager.RemovePassword(userId);
+                _userManager.AddPassword(userId, newPassword);
+            }
+            catch (Exception ex)
+            {
+                authenticationResult.Success = false;
+                var errors = new List<string> { ex.Message };
+                authenticationResult.Errors = errors;
+            }
+            return Task.FromResult(authenticationResult);
         }
 
+        /// <summary>
+        /// Create a new user for registration
+        /// </summary>
+        /// <param name="userInfo"></param>
+        /// <param name="registrationToken"></param>
+        /// <returns></returns>
         public Task<AuthenticationResultDto> CreateUserAsync(UserDto userInfo, string registrationToken)
         {
             var authenticationResult = new AuthenticationResultDto();
@@ -113,13 +139,105 @@ namespace Linko.LinkoExchange.Services.Authentication
             return Task.FromResult(authenticationResult);
         }
 
-        public Task<AuthenticationResultDto> ResetPasswordAsync(string userId, string changePasswordToken,
+        /// <summary>
+        /// Reset password happends when user request a 'reset password', and system generates a reset password token and sends to user's email
+        /// And user click the link in the email to reset the password.
+        /// </summary>
+        /// <param name="email">User email address</param>
+        /// <param name="resetPasswordToken">The reset password token</param>
+        /// <param name="newPassword">The new password</param>
+        /// <returns></returns>
+        public async Task<AuthenticationResultDto> ResetPasswordAsync(string email, string resetPasswordToken,
             string newPassword)
         {
-            //TODO to implement
-            throw new NotImplementedException();
+            AuthenticationResultDto authenticationResult = new AuthenticationResultDto();
+            try
+            {
+                // Step 1: Determine if the user by email address exists 
+                var applicationUser = await _userManager.FindByEmailAsync(email);
+                if (applicationUser == null)
+                {
+                    authenticationResult.Success = false;
+                    authenticationResult.Result = AuthenticationResult.UserNotFound;
+                }
+                else if (applicationUser.EmailConfirmed == false)
+                {
+                    authenticationResult.Success = false;
+                    authenticationResult.Result = AuthenticationResult.EmailIsNotConfirmed;
+                }
+                else
+                {
+                    //TODO
+                    var userId = 100;  //applicationUser.profileId;
+                    var programIds = GetUserProgramIds(userId);
+                    var organizationIds = GetUserOrganizationIds(userId);
+                    SetPasswordPolicy(programIds, organizationIds);
+
+                    // Step 2: reset the password
+                    var identityResult =
+                        await _userManager.ResetPasswordAsync(applicationUser.Id, resetPasswordToken, newPassword);
+
+                    if (identityResult.Succeeded)
+                    {
+                        authenticationResult.Success = true;
+                    }
+                    else
+                    {
+                        authenticationResult.Success = false;
+                        authenticationResult.Errors = identityResult.Errors;
+                    }
+                }
+
+                return authenticationResult;
+            }
+            catch (Exception ex)
+            {
+                var errors = new List<string> {ex.Message};
+                authenticationResult.Errors = errors;
+            }
+
+            return authenticationResult;
         }
-         
+
+        /// <summary>
+        /// To request a password reset. This will do follow:
+        /// 1. generate a reset password token
+        /// 2. send a reset password email
+        /// 3. log to system 
+        /// </summary>
+        /// <param name="email">The user address </param>
+        /// <returns></returns>
+        public async Task<AuthenticationResultDto> RequestResetPassword(string email)
+        {
+            AuthenticationResultDto authenticationResult = new AuthenticationResultDto();
+
+            var user = _userManager.FindByEmail(email);
+            if(user == null)
+            {
+                authenticationResult.Success = false;  
+                authenticationResult.Result = AuthenticationResult.UserNotFound;
+                authenticationResult.Errors = new[] {"UserNotFound"};
+            } else if (!await _userManager.IsEmailConfirmedAsync(user.Id))
+            {
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.EmailIsNotConfirmed;
+                authenticationResult.Errors = new[] { "EmailIsNotConfirmed" };
+            }
+            else
+            {
+                SendResetPasswordConfirmationEmail(user);
+            }
+
+            return authenticationResult;
+        }
+
+        /// <summary>
+        /// Sign in by user name and password.  "isPersistent" indicates to keep the cookie or now. 
+        /// </summary>
+        /// <param name="userName">The username used when sign in</param>
+        /// <param name="password">The password used when sign in</param>
+        /// <param name="isPersistent">The flag indicates persistent the sign or not</param>
+        /// <returns></returns>
         public Task<SignInResultDto> SignInByUserName(string userName, string password, bool isPersistent)
         {
             SignInResultDto signInResultDto = new SignInResultDto();
@@ -198,7 +316,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 Email = email
             };
         } 
-
+         
         private void GetUserIdentity(ApplicationUser applicationUser)
         { 
             //TODO: to replace using real claims  
@@ -332,6 +450,24 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             var orgnizations = _organizationService.GetUserOrganizations(userid);
             return orgnizations.Select(i => i.OrganizationId).ToArray();
+        }
+
+        void SendResetPasswordConfirmationEmail(ApplicationUser user)
+        {
+            var code = _userManager.GeneratePasswordResetTokenAsync(user.Id).Result;
+
+            code = HttpUtility.UrlEncode(code);
+
+            var subject = "Reset Password";
+            var html = HttpUtility.HtmlEncode(code); ;
+
+            //TODO to replace the values 
+            var replacements = new ListDictionary();
+            replacements.Add("{code}", code);
+            replacements.Add("{copyCode", html);
+            replacements.Add("{userId}", user.Id);
+
+            LinkoExchangeEmailService.SendEmail(user.Email, subject, EmailType.ResetPasswordConfirmation, replacements);
         }
 
         #endregion

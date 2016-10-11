@@ -8,6 +8,7 @@
         UserIsLocked,
         UserIsDisabled,
         UserNotFound,
+        EmailIsNotConfirmed,
         PasswordLockedOut,
         UserAlreadyExists
     }

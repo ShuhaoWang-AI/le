@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Configuration;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Data;
 using Microsoft.AspNet.Identity;
@@ -15,11 +17,21 @@ namespace Linko.LinkoExchange.Services.Authentication
     public class ApplicationUserManager : UserManager<ApplicationUser>
     {
         public ApplicationUserManager(IUserStore<ApplicationUser> store)
-            : base (store)
+            : base(store)
         {
-            var provider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider ("TokenProvider");
-            UserTokenProvider = new DataProtectorTokenProvider<ApplicationUser> (provider.Create ("TokenProvider"));
-            EmailService = new EmailService ();
+            var provider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider("TokenProvider");
+            var tokenLife =
+                ValueParser.TryParseInt(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"], 168);
+
+            UserTokenProvider =
+                new DataProtectorTokenProvider<ApplicationUser>(provider.Create("ASP.NET Identity"))
+                {
+                    // set the token life span;
+                    TokenLifespan = TimeSpan.FromHours(tokenLife)
+                };
+
+
+            EmailService = new EmailService();
         }
 
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context)
@@ -43,7 +55,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                 RequireUppercase = true,
             };
 
-//            var cookieValidateInterval = ValueParser.TryParseInt(ConfigurationManager.AppSettings["CookieValidateInterval"], 30); 
+            //
+            //var cookieValidateInterval = ValueParser.TryParseInt(ConfigurationManager.AppSettings["CookieValidateInterval"], 30); 
 
             // Configure user lockout defaults
             manager.UserLockoutEnabledByDefault = true;
@@ -65,11 +78,14 @@ namespace Linko.LinkoExchange.Services.Authentication
             var dataProtectionProvider = options.DataProtectionProvider;
             if (dataProtectionProvider != null)
             {
+                var tokenLife =
+                    ValueParser.TryParseInt(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"], 168);
+
                 manager.UserTokenProvider =
-                    new DataProtectorTokenProvider<ApplicationUser> (dataProtectionProvider.Create ("ASP.NET Identity"))
+                    new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"))
                     {
-                        //Todo:set token life span in configure file or 30 minutes hard coded
-                        TokenLifespan = TimeSpan.FromMinutes (1)   // set the token life span;
+                        // set the token life span;
+                        TokenLifespan = TimeSpan.FromHours(tokenLife)
                     };
 
             }

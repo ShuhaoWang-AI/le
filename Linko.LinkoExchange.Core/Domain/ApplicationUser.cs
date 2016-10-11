@@ -14,11 +14,11 @@ namespace Linko.LinkoExchange.Core.Domain
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
             var userIdentity = await manager.CreateIdentityAsync (this, DefaultAuthenticationTypes.ApplicationCookie);
             // Add custom user claims here
-            userIdentity.AddClaim(new Claim("OrganizationRegulatoryProgramUserId", this.OrganizationRegulatoryProgramUserId.ToString()));
+//            userIdentity.AddClaim(new Claim("OrganizationRegulatoryProgramUserId", this.OrganizationRegulatoryProgramUserId.ToString()));
 
             return userIdentity;
         }
 
-        public int OrganizationRegulatoryProgramUserId { get; set; }
+//        public int OrganizationRegulatoryProgramUserId { get; set; }
     }
 }
