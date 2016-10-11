@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace Linko.LinkoExchange.Core.Domain
 {
     public class OrganizationRegulatoryProgramUser
     {
+        [Key]
         public int OrganizationRegulatoryProgramUserId { get; set; }
         public bool IsRegistrationApproved { get; set; }
         public bool IsRegistrationDenied { get; set; }

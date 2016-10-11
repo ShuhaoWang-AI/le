@@ -91,9 +91,38 @@ namespace Linko.LinkoExchange.Services.User
         {
         }
 
-        public void ResetUser(int userProfileId)
+        public void ResetUser(int userProfileId, string newEmailAddress)
         {
+            UserProfile user = _dbContext.UserProfiles.SingleOrDefault(u => u.UserProfileId == userProfileId);
+            if (user != null)
+            {
+                user.IsAccountLocked = false;
+                user.PasswordHash = null;
+                user.OldEmailAddress = user.Email;
+                user.Email = newEmailAddress;
+                user.IsEmailConfirmed = false;
+                user.IsPhoneNumberConfirmed = false;
 
+                var answers = _dbContext.UserQuestionAnswers.Where(a => a.UserProfileId == userProfileId);
+                if (answers != null && answers.Count() > 0)
+                {
+                    foreach (var answer in answers)
+                    {
+                        //get question too
+                        var question = _dbContext.Questions.Single(q => q.QuestionId == answer.QuestionId);
+                        _dbContext.Questions.Remove(question);
+
+                        _dbContext.UserQuestionAnswers.Remove(answer);
+                    }
+                }
+
+                _dbContext.SaveChanges();
+            }
+            else
+            {
+                //_logger.Log("ERROR")
+                throw new Exception();
+            }
         }
 
         public void RemoveUser(int orgRegProgUserId)

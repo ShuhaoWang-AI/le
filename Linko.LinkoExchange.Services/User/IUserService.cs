@@ -56,7 +56,7 @@ namespace Linko.LinkoExchange.Services.User
 
         void RequestSignatoryStatus(int userProfileId);
 
-        void ResetUser(int userProfileId);
+        void ResetUser(int userProfileId, string newEmailAddress);
 
         void RemoveUser(int userProfileId);
 
