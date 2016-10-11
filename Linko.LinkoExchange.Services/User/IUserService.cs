@@ -52,7 +52,7 @@ namespace Linko.LinkoExchange.Services.User
 
         void UpdateUserPermissionGroupId(int userProfileId, int permissionGroupId);
 
-        void UpdateUserSignatoryStatus(bool isSignatory);
+        void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory);
 
         void RequestSignatoryStatus(int userProfileId);
 

@@ -68,8 +68,23 @@ namespace Linko.LinkoExchange.Services.User
         {
         }
 
-        public void UpdateUserSignatoryStatus(bool isSignatory)
+        public void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory)
         {
+            OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+            if (user != null)
+            {
+                user.IsSignatory = isSignatory;
+
+                //Persist modification date and modifier actor
+                user.LastModificationDateTime = DateTime.Now;
+                user.LastModificationUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
+                _dbContext.SaveChanges();
+            }
+            else
+            {
+                //_logger.Log("ERROR")
+                throw new Exception();
+            }
         }
 
         public void RequestSignatoryStatus(int userProfileId)
