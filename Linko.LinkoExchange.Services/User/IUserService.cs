@@ -34,23 +34,6 @@ namespace Linko.LinkoExchange.Services.User
         public List<QuestionAnswerPair> QuestionAnswerPairs { get; set; }
     }
 
-    public enum UserEmailCommunicationType
-    {
-        AuthorityInvitation,
-        AuthorityRegistrationApproved,
-        AuthorityRegistrationDenied,
-        AuthorityReset,
-        AuthorityAccountReset,
-        AuthorityEmailChanged,
-        AuthorityToIndustryInvitation,
-        AuthorityToIndustryRegistrationApproved,
-        AuthorityToIndustryRegistrationDenied,
-        IndustryToIndustryInvitation,
-        IndustryToIndustryRegistrationApproved,
-        IndustryToIndustryRegistrationDenied,
-        
-    }
-
     public interface IUserService
     {
         UserProfileDTO GetUserProfileById(int userProfileId);
@@ -62,8 +45,6 @@ namespace Linko.LinkoExchange.Services.User
                              bool? isRegDenied,
                              bool? isEnabled,
                              bool? isRemoved);
-
-        void SendEmailCommunication(int userProfileId, UserEmailCommunicationType type, string emailAddressOverride = null);
 
         int AddNewUser(string emailAddress, string firstName, string lastName);
 

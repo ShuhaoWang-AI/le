@@ -53,9 +53,6 @@ namespace Linko.LinkoExchange.Services.User
             return null;
         }
 
-        public void SendEmailCommunication(int userProfileId, UserEmailCommunicationType type, string emailAddressOverride = null)
-        {
-        }
 
         public int AddNewUser(string emailAddress, string firstName, string lastName)
         {
