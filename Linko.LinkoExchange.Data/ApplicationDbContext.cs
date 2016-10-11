@@ -23,6 +23,8 @@ namespace Linko.LinkoExchange.Data
 
         public DbSet<EmailTemplate> EmailTemplates { get; set; }
         public DbSet<Organization> Organizations { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<UserPasswordHistory> UserPasswordHistories { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

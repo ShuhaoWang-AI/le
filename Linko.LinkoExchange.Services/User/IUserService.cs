@@ -81,7 +81,7 @@ namespace Linko.LinkoExchange.Services.User
 
         void UpdateUserProfile(UserProfileDTO request);
 
-        void ChangePassword(int userProfileID, string oldPassword, string newPassword);
+        void ChangePassword(int userProfileId, string oldPassword, string newPassword);
 
         void UpdateQuestionAnswerPairs(UserQuestionAnswerPairsDTO questionAnswerPairs);
 
