@@ -19,5 +19,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public bool IsSignatory { get; set; }
         public DateTime LastModificationDateTime { get; set; }
         public int LastModificationUserId { get; set; }
+        public UserProfile UserProfile { get; set; }
+        public int PermissionGroupId { get; set; }
     }
 }

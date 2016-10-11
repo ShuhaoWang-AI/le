@@ -33,9 +33,9 @@ namespace Linko.LinkoExchange.Services.User
                              bool? isEnabled,
                              bool? isRemoved);
 
-        int AddNewUser(string emailAddress, string firstName, string lastName);
+        int AddNewUser(int orgRegProgId, int permissionGroupId, string emailAddress, string firstName, string lastName);
 
-        void UpdateUserProfileState(int userProfileId, bool? isRegApproved, bool? isRegDenied, bool? isEnabled, bool? isRemoved);
+        void UpdateUserState(int orgRegProgUserId, bool? isRegApproved, bool? isRegDenied, bool? isEnabled, bool? isRemoved);
 
         void UpdateUserPermissionGroupId(int userProfileId, int permissionGroupId);
 

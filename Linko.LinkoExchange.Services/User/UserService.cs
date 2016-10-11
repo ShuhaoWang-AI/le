@@ -76,13 +76,13 @@ namespace Linko.LinkoExchange.Services.User
             var dtos = new List<UserDto>();
             IQueryable<OrganizationRegulatoryProgramUser> users = _dbContext.OrganizationRegulatoryProgramUsers.Where(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
 
-            if (isRegApproved != null)
+            if (isRegApproved.HasValue)
                 users = users.Where(u => u.IsRegistrationApproved == isRegApproved);
-            if (isRegDenied != null)
+            if (isRegDenied.HasValue)
                 users = users.Where(u => u.IsRegistrationDenied == isRegDenied);
-            if (isEnabled != null)
+            if (isEnabled.HasValue)
                 users = users.Where(u => u.IsEnabled == isEnabled);
-            if (isRemoved != null)
+            if (isRemoved.HasValue)
                 users = users.Where(u => u.IsRemoved == isRemoved);
 
             foreach (var user in users)
@@ -97,13 +97,53 @@ namespace Linko.LinkoExchange.Services.User
         }
 
 
-        public int AddNewUser(string emailAddress, string firstName, string lastName)
+        public int AddNewUser(int orgRegProgId, int permissionGroupId, string emailAddress, string firstName, string lastName)
         {
-            return -1;
+            var newOrgRegProgUser = _dbContext.OrganizationRegulatoryProgramUsers.Create();
+            newOrgRegProgUser.OrganizationRegulatoryProgramId = orgRegProgId;
+            newOrgRegProgUser.PermissionGroupId = permissionGroupId;
+
+            var newUserProfile = new UserProfile();
+            newUserProfile.Email = emailAddress;
+            newUserProfile.FirstName = firstName;
+            newUserProfile.LastName = lastName;
+            newOrgRegProgUser.UserProfile = newUserProfile;
+
+            try
+            {
+                return _dbContext.SaveChanges();
+            }
+            catch (Exception ex) {
+                //_logger.Log("ERROR")
+                throw new Exception();
+            }
         }
 
-        public void UpdateUserProfileState(int userProfileId, bool? isRegApproved, bool? isRegDenied, bool? isEnabled, bool? isRemoved)
+
+        public void UpdateUserState(int orgRegProgUserId, bool? isRegApproved, bool? isRegDenied, bool? isEnabled, bool? isRemoved)
         {
+            OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+            if (user != null)
+            {
+                if (isRegApproved.HasValue)
+                    user.IsRegistrationApproved = isRegApproved.Value;
+                if (isRegDenied.HasValue)
+                    user.IsRegistrationDenied = isRegDenied.Value;
+                if (isEnabled.HasValue)
+                    user.IsEnabled = isEnabled.Value;
+                if (isRemoved.HasValue)
+                    user.IsRemoved = isRemoved.Value;
+
+                //Persist modification date and modifier actor
+                user.LastModificationDateTime = DateTime.Now;
+                user.LastModificationUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
+                _dbContext.SaveChanges();
+            }
+            else
+            {
+                //_logger.Log("ERROR")
+                throw new Exception();
+            }
         }
 
         public void UpdateUserPermissionGroupId(int userProfileId, int permissionGroupId)
