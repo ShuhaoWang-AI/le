@@ -82,7 +82,10 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         // Change or reset password
         /// <summary>
-        /// Change password happends after a user login, and change his password
+        /// Change password happens after a user login, and change his password.
+        /// New password must meet the following criteria
+        /// 1. Meet the strictest password policies when the user have multiple access to organizations and programs 
+        /// 2. Can not be the same as the last X number of passwords saved in UserPasswordHistory table.
         /// </summary>
         /// <param name="userId">User Id</param>
         /// <param name="newPassword">The new password</param>
@@ -92,6 +95,39 @@ namespace Linko.LinkoExchange.Services.Authentication
             var authenticationResult = new AuthenticationResultDto();
             try
             {
+                var applicationUser = _userManager.FindById(userId);
+                if (applicationUser == null)
+                {
+                    authenticationResult.Success = false;
+                    authenticationResult.Result = AuthenticationResult.UserNotFound; 
+                    return Task.FromResult(authenticationResult);
+                }
+
+                var programIds = GetUserProgramIds(applicationUser.UserProfileId);
+                var organizationIds = GetUserOrganizationIds(applicationUser.UserProfileId);
+
+                var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
+                var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings).ToList();
+
+                SetPasswordPolicy(organizationSettings, programSettings); 
+                // Use PasswordValidator
+                var validateResult = _userManager.PasswordValidator.ValidateAsync(newPassword).Result;
+                if (validateResult.Succeeded == false)
+                {
+                    authenticationResult.Success = false;
+                    authenticationResult.Errors = validateResult.Errors;
+                    return Task.FromResult(authenticationResult);
+                }
+
+                // Check if the new password is one of the password used last # numbers
+                if (IsValidPasswordCheckInHistory(applicationUser.PasswordHash, applicationUser.UserProfileId, organizationSettings, programSettings))
+                {
+                    authenticationResult.Success = false;
+                    authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
+                    authenticationResult.Errors = new string[] { "Can not use old password." };
+                    return Task.FromResult(authenticationResult);
+                }
+                 
                 _userManager.RemovePassword(userId);
                 _userManager.AddPassword(userId, newPassword);
             }
@@ -128,7 +164,6 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 if (result == IdentityResult.Success)
                 {
-
                     // Create a new row in user password history table 
                     LinkoExchangeDbContext.UserPasswordHistories.Add(new UserPasswordHistory
                     {
@@ -158,7 +193,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         }
 
         /// <summary>
-        /// Reset password happends when user request a 'reset password', and system generates a reset password token and sends to user's email
+        /// Reset password happens when user request a 'reset password', and system generates a reset password token and sends to user's email
         /// And user click the link in the email to reset the password.
         /// </summary>
         /// <param name="email">User email address</param>
@@ -329,6 +364,25 @@ namespace Linko.LinkoExchange.Services.Authentication
         }
 
         #region private section
+
+        // Check if password is in one of the last # passwords stores in UserPasswordHistory table
+        // Return false means the new password is not validate because it has been used in the last #number of times
+        // Return true means the new password is validate to use
+        private bool IsValidPasswordCheckInHistory(string passwordHash, int userProfileId, IEnumerable<SettingDto> organizationSettings, IEnumerable<SettingDto> programSettings)
+        {
+            var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(programSettings, organizationSettings);
+
+            var lastNumberPasswordInHistory = LinkoExchangeDbContext.UserPasswordHistories
+                .Where(i => i.UserProfileId == userProfileId)
+                .OrderByDescending(i => i.LastModificationDateTime).Take(numberOfPasswordsInHistory);
+            if (lastNumberPasswordInHistory.Any(i=>i.PasswordHash == passwordHash))
+            {
+                return false; 
+            }
+
+            return true;
+        } 
+
         private bool IsUserPasswordExpired(int userProfileId, IEnumerable<SettingDto> organizationSettings, IEnumerable<SettingDto> programSettings)
         {
             var lastestUserPassword = LinkoExchangeDbContext.UserPasswordHistories
@@ -412,7 +466,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             // 2: get all multiple organization policies if there is no definition from program policies 
             // 3: get setting from global settings if there is no definitions from programs and organizations 
             // 
-            // If one setting has muliple definitions, choose the strictest one
+            // If one setting has multiple definitions, choose the strictest one
             _userManager.UserLockoutEnabledByDefault = true;
             _userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromDays(GetStrictestDefaultAccountLockoutTimeSpan(programSettings, organizationSettings));
 
@@ -462,6 +516,18 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             return GetSettingIntValue(settingKey, programSettings, organizationSettings, isMax: false);
+        }
+
+        private int GetStrictestPasswordHistoryCounts(IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings)
+        {
+            string settingKey = "NumberOfPasswordsInHistory";
+
+            if (!_globalSettings.ContainsKey(settingKey))
+            {
+                return 10;
+            }
+
+            return GetSettingIntValue(settingKey, programSettings, organizationSettings, isMax: true);
         }
 
         private int GetStrictestDefaultAccountLockoutTimeSpan(IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings)

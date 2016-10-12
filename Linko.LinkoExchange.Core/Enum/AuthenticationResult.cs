@@ -11,6 +11,7 @@
         EmailIsNotConfirmed,
         PasswordLockedOut,
         PasswordExpired,
-        UserAlreadyExists
+        UserAlreadyExists,
+        CanNotUseOldPassword
     }
 }

@@ -69,8 +69,9 @@ namespace Linko.LinkoExchange.Services.Settings
 			globalSetting.Add("PasswordRequireLength", "6");
 			globalSetting.Add("PasswordRequireDigit", "true");
 			globalSetting.Add("PasswordExpiredDays", "90");
+            globalSetting.Add("NumberOfPasswordsInHistory", "10");
 
-			return globalSetting;
+            return globalSetting;
 		}
 
 		/// <summary>
@@ -144,7 +145,13 @@ namespace Linko.LinkoExchange.Services.Settings
 						 {
 							 Name="DaysBeforeRequirePasswordChanging",
 							 Value="10"
-						 }
+						 },
+
+                         new SettingDto
+                         {
+                             Name ="NumberOfPasswordsInHistory",
+                             Value = "10"
+                         }
 				};
 		}
 	}
