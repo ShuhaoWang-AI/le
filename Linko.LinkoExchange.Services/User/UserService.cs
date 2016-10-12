@@ -194,8 +194,7 @@ namespace Linko.LinkoExchange.Services.User
                     foreach (var answer in answers)
                     {
                         //get question too
-                        var question = _dbContext.Questions.Single(q => q.QuestionId == answer.QuestionId);
-                        _dbContext.Questions.Remove(question);
+                        _dbContext.Questions.Remove(answer.Question);
 
                         _dbContext.UserQuestionAnswers.Remove(answer);
                     }

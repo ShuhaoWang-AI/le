@@ -32,21 +32,20 @@ namespace Linko.LinkoExchange.Services.User
             {
                 Question newQuestion = _dbContext.Questions.Create();
                 newQuestion.Content = question.Content;
-                newQuestion.QuestionTypeId = question.QuestionTypeId;
+                newQuestion.QuestionType = _dbContext.QuestionTypes.Single(q => q.QuestionTypeId == question.QuestionTypeId);
                 newQuestion.IsActive = true;
-                newQuestion.CreationDateTime = DateTime.Now; //or UTC??
-                newQuestion.LastModificationDateTime = DateTime.Now; //or UTC??
+                newQuestion.CreationDateTime = DateTime.UtcNow;
+                newQuestion.LastModificationDateTime = DateTime.UtcNow;
                 newQuestion.LastModifierUserId = HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
 
                 UserQuestionAnswer newAnswer = _dbContext.UserQuestionAnswers.Create();
                 newAnswer.Content = answer.Content;
-                newAnswer.QuestionId = newQuestion.QuestionId;
+                newAnswer.Question = newQuestion;
                 newAnswer.UserProfileId = userProfileId;
-                newAnswer.CreationDateTime = DateTime.Now; //or UTC??
-                newAnswer.LastModificationDateTime = DateTime.Now; //or UTC??
+                newAnswer.CreationDateTime = DateTime.UtcNow;
+                newAnswer.LastModificationDateTime = DateTime.UtcNow;
 
-
-                _dbContext.Questions.Add(newQuestion);
+                //_dbContext.Questions.Add(newQuestion); //Needed?
                 _dbContext.UserQuestionAnswers.Add(newAnswer);
                 _dbContext.SaveChanges();
             }
@@ -64,7 +63,7 @@ namespace Linko.LinkoExchange.Services.User
             {
                 var questionToUpdate = _dbContext.Questions.Single(q => q.QuestionId == question.QuestionId);
                 questionToUpdate.Content = question.Content;
-                questionToUpdate.QuestionTypeId = question.QuestionTypeId;
+                questionToUpdate.QuestionType = _dbContext.QuestionTypes.Single(q => q.QuestionTypeId == question.QuestionTypeId);
                 questionToUpdate.IsActive = question.IsActive;
                 questionToUpdate.LastModificationDateTime = DateTime.Now; //or UTC??
                 questionToUpdate.LastModifierUserId = HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
@@ -83,7 +82,7 @@ namespace Linko.LinkoExchange.Services.User
             {
                 List<RuleViolation> validationIssues = new List<RuleViolation>();
                 validationIssues.Add(new RuleViolation(string.Empty, null, "Question update attempt failed."));
-                //_logger.Info("SubmitPOMDetails. Null question or missing QuestionId.");
+                //_logger.Error("SubmitPOMDetails. Null question or missing QuestionId.");
                 throw new RuleViolationException("Validation errors", validationIssues);
             }
 
@@ -99,10 +98,9 @@ namespace Linko.LinkoExchange.Services.User
             var answerToDelete = _dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId);
             if (answerToDelete != null)
             {
-                var questionToDelete = _dbContext.Questions.Single(a => a.QuestionId == answerToDelete.QuestionId);
-                if (questionToDelete != null)
+                if (answerToDelete.Question != null)
                 {
-                    _dbContext.Questions.Remove(questionToDelete);
+                    _dbContext.Questions.Remove(answerToDelete.Question);
                 }
                 _dbContext.UserQuestionAnswers.Remove(answerToDelete);
 

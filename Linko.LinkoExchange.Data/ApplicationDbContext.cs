@@ -28,6 +28,7 @@ namespace Linko.LinkoExchange.Data
         public DbSet<OrganizationRegulatoryProgramUser> OrganizationRegulatoryProgramUsers { get; set; }
         public DbSet<UserQuestionAnswer> UserQuestionAnswers { get; set; }
         public DbSet<Question> Questions { get; set; }
+        public DbSet<QuestionType> QuestionTypes { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

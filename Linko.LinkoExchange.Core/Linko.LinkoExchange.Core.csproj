@@ -78,6 +78,7 @@
     <Compile Include="Domain\OrganizationRegulatoryProgramUser.cs" />
     <Compile Include="Domain\OrganizationSetting.cs" />
     <Compile Include="Domain\Question.cs" />
+    <Compile Include="Domain\QuestionType.cs" />
     <Compile Include="Domain\SignatoryRequest.cs" />
     <Compile Include="Domain\UserPasswordHistory.cs" />
     <Compile Include="Domain\UserProfile.cs" />
