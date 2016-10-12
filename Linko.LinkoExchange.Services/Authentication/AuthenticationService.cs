@@ -128,17 +128,29 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 if (result == IdentityResult.Success)
                 {
+
+                    // Create a new row in user password history table 
+                    LinkoExchangeDbContext.UserPasswordHistories.Add(new UserPasswordHistory
+                    {
+                         LastModificationDateTime = DateTime.UtcNow,
+                         PasswordHash = applicationUser.PasswordHash,
+                         UserProfileId = applicationUser.UserProfileId
+                    });
+                    LinkoExchangeDbContext.SaveChangesAsync();
+
                     authenticationResult.Success = true; 
                     SendRegistrationConfirmationEmail(applicationUser.Id, userInfo);  
                     return Task.FromResult(authenticationResult);
                 }
 
+                authenticationResult.Success = false;
                 authenticationResult.Errors = result.Errors;
                 return Task.FromResult(authenticationResult);
             }
             catch (Exception ex)
             {
                 var errors = new List<string> {ex.Message};
+                authenticationResult.Success = false;
                 authenticationResult.Errors = errors;
             }
 
@@ -243,15 +255,14 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <summary>
         /// Sign in by user name and password.  "isPersistent" indicates to keep the cookie or now. 
         /// </summary>
-        /// <param name="userName">The username used when sign in</param>
+        /// <param name="userName">The user name used when sign in</param>
         /// <param name="password">The password used when sign in</param>
         /// <param name="isPersistent">The flag indicates persistent the sign or not</param>
         /// <returns></returns>
         public Task<SignInResultDto> SignInByUserName(string userName, string password, bool isPersistent)
         {
             SignInResultDto signInResultDto = new SignInResultDto();
-            
-            //Todo find out userDto's organizations, and set policy 
+             
             var applicationUser = _userManager.FindByName(userName);
             if (applicationUser == null)
             {
@@ -278,8 +289,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
             var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings).ToList();
-
-            // TODO to check if user's password is expired or not  
+            // Check if user's password is expired or not  
             if (IsUserPasswordExpired(userId, organizationSettings, programSettings))
             {
                 signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
@@ -330,9 +340,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return true;
             }
 
-            // Get password expiration setting 
-            string settingKey = "PasswordExpiredDays";
-            var passwordExpiredDays = GetStrictestLengthPasswordRequire(programSettings, organizationSettings, settingKey);
+            // Get password expiration setting
+            var passwordExpiredDays = GetStrictestLengthPasswordExpiredDays(programSettings, organizationSettings);
             if (DateTime.UtcNow > lastestUserPassword.LastModificationDateTime.AddDays(passwordExpiredDays))
             {
                 return true;
@@ -405,9 +414,9 @@ namespace Linko.LinkoExchange.Services.Authentication
             // 
             // If one setting has muliple definitions, choose the strictest one
             _userManager.UserLockoutEnabledByDefault = true;
-            _userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromDays(GetStrictestLengthPasswordRequire(programSettings, organizationSettings, "DefaultAccountLockoutTimeSpan"));
+            _userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromDays(GetStrictestDefaultAccountLockoutTimeSpan(programSettings, organizationSettings));
 
-            passwordValidator.RequiredLength = GetStrictestLengthPasswordRequire(programSettings, organizationSettings, "PasswordRequireLength");
+            passwordValidator.RequiredLength = GetStrictestLengthPasswordRequire(programSettings, organizationSettings);
             passwordValidator.RequireDigit = GetStrictestBooleanPasswordRequire(programSettings, organizationSettings,
                 "PasswordRequireDigit");
 
@@ -417,35 +426,77 @@ namespace Linko.LinkoExchange.Services.Authentication
             passwordValidator.RequireUppercase = GetStrictestBooleanPasswordRequire(programSettings, organizationSettings,
                      "PasswordRequireUpppercase");
 
-            _userManager.MaxFailedAccessAttemptsBeforeLockout = GetStrictestLengthPasswordRequire(programSettings,
-                organizationSettings, "MaxFailedAccessAttemptsBeforeLockout"); 
+            _userManager.MaxFailedAccessAttemptsBeforeLockout = GetStrictestFailedAccessAttemptsBeforeLockout(programSettings, organizationSettings); 
 
             _userManager.PasswordValidator = passwordValidator; 
+        }
+        
+        private int GetSettingIntValue(string settingKey, IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings, bool isMax = true)
+        {
+            var defaultValueStr = _globalSettings[settingKey];
+
+            var defaultValue = int.Parse(defaultValueStr);
+            if (programSettings.Any(i => i.Name.Equals(settingKey)))
+            {
+                defaultValue = isMax ? programSettings.Where(i=>i.Name== settingKey)
+                    .Max(i => ValueParser.TryParseInt(i.Value, defaultValue)) :
+                    programSettings.Where(i => i.Name == settingKey).Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
+            }
+            else
+            {
+                defaultValue = isMax ? organizationSettings
+                    .Where(i => i.Name == settingKey).Max(i => ValueParser.TryParseInt(i.Value, defaultValue)) : 
+                    organizationSettings.Where(i => i.Name == settingKey).Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
+            }
+
+            return defaultValue;
+        }
+
+        private int GetStrictestFailedAccessAttemptsBeforeLockout(IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings)
+        {
+            string settingKey = "MaxFailedAccessAttemptsBeforeLockout";
+
+            if (!_globalSettings.ContainsKey(settingKey))
+            {
+                return 6;
+            }
+
+            return GetSettingIntValue(settingKey, programSettings, organizationSettings, isMax: false);
+        }
+
+        private int GetStrictestDefaultAccountLockoutTimeSpan(IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings)
+        {
+            string settingKey = "DefaultAccountLockoutTimeSpan"; 
+            if (!_globalSettings.ContainsKey(settingKey))
+            {
+                return 1;
+            }
+
+            return GetSettingIntValue(settingKey, programSettings, organizationSettings);
+
         } 
 
-        private int GetStrictestLengthPasswordRequire(IEnumerable<SettingDto> programSettings,IEnumerable<SettingDto> organizationSettings, string settingKey)
+        private int GetStrictestLengthPasswordExpiredDays(IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings)
         {
-            string maxPasswordRequireLenthStr = "90";
+            string settingKey = "PasswordExpiredDays";  
             if (!_globalSettings.ContainsKey(settingKey))
             {
                 return 90;
             }
 
-            maxPasswordRequireLenthStr = _globalSettings[settingKey]; 
+            return GetSettingIntValue(settingKey, programSettings, organizationSettings, isMax:false); 
+        } 
 
-            var maxPasswordRequireLengthValue = int.Parse(maxPasswordRequireLenthStr);
-            if (programSettings.Any(i => i.Name.Equals(settingKey)))
+        private int GetStrictestLengthPasswordRequire(IEnumerable<SettingDto> programSettings,IEnumerable<SettingDto> organizationSettings)
+        {
+            var settingKey = "PasswordRequireLength";  
+            if (!_globalSettings.ContainsKey(settingKey))
             {
-                maxPasswordRequireLengthValue =
-                    programSettings.Max(i => ValueParser.TryParseInt(i.Value, maxPasswordRequireLengthValue));
-            }
-            else
-            {
-                maxPasswordRequireLengthValue =
-                    organizationSettings.Max(i => ValueParser.TryParseInt(i.Value, maxPasswordRequireLengthValue));
+                return 6;
             }
 
-            return maxPasswordRequireLengthValue;
+
+            return GetSettingIntValue(settingKey, programSettings, organizationSettings, isMax:true); 
         }
 
         private bool GetStrictestBooleanPasswordRequire(IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings,string settingKey)
@@ -459,12 +510,12 @@ namespace Linko.LinkoExchange.Services.Authentication
             var passwordRequireDigitalValue = bool.Parse(passwordRequireDigital);
             if (programSettings.Any(i => i.Name.Equals(settingKey)))
             {
-                return programSettings.Any(i => i.Value.ToLower() == "true");
+                return programSettings.Where(i => i.Name == settingKey).Any(i => i.Value.ToLower() == "true");
             }
 
             if (organizationSettings.Any(i=> i.Name.Equals(settingKey)))
             {
-                return organizationSettings.Any(i => i.Value.ToLower() == "true"); 
+                return organizationSettings.Where(i => i.Name == settingKey).Any(i => i.Value.ToLower() == "true"); 
             }
 
             return passwordRequireDigitalValue;
@@ -476,8 +527,9 @@ namespace Linko.LinkoExchange.Services.Authentication
             var code = HttpUtility.UrlEncode(token);
 
             var subject = "Confirm your account";
-            var html = HttpUtility.HtmlEncode(code);
+            var html = HttpUtility.HtmlEncode(code); 
 
+            // TODO to use real email templates
             var replacements = new ListDictionary
             {
                 {"{name}", userDto.FirstName + " " + userDto.LastName},
