@@ -284,10 +284,6 @@ namespace Linko.LinkoExchange.Services.User
             }
         }
 
-        public void UpdateQuestionAnswerPairs(UserQuestionAnswerPairsDTO questionAnswerPairs)
-        {
-        }
-
         #endregion
 
 

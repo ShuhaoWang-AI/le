@@ -8,19 +8,6 @@ using System.Threading.Tasks;
 namespace Linko.LinkoExchange.Services.User
 {
 
-    public class QuestionAnswerPair
-    {
-        public int QuestionId { get; set; }
-        public string Question { get; set; }
-        public string AnswerId { get; set; }
-        public string Answer { get; set; }
-    }
-
-    public class UserQuestionAnswerPairsDTO
-    {
-        public List<QuestionAnswerPair> QuestionAnswerPairs { get; set; }
-    }
-
     public interface IUserService
     {
         UserDto GetUserProfileById(int userProfileId);
@@ -51,7 +38,6 @@ namespace Linko.LinkoExchange.Services.User
 
         void ChangePassword(int userProfileId, string oldPassword, string newPassword);
 
-        void UpdateQuestionAnswerPairs(UserQuestionAnswerPairsDTO questionAnswerPairs);
 
     }
 }
