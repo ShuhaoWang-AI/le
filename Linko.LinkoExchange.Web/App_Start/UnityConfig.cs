@@ -13,6 +13,9 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Linko.LinkoExchange.Services.Program;
+using Linko.LinkoExchange.Core.Logging;
+using NLog;
+using Linko.LinkoExchange.Web.Controllers;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -49,6 +52,12 @@ namespace Linko.LinkoExchange.Web
 
             // TODO: Register your types here
             // container.RegisterType<IProductRepository, ProductRepository>();
+
+            // Logger
+            container.AddNewExtension<NLogExtension>();
+
+            // Custom filter
+            container.RegisterType<CommonController>(new InjectionConstructor(typeof(ILogger)));
 
             container.RegisterType<DbContext, ApplicationDbContext> (new PerRequestLifetimeManager ());
             container.RegisterType<IUserStore<ApplicationUser>, UserStore<ApplicationUser>> ();
