@@ -17,7 +17,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         // Change or reset password
         /// <summary>
-        /// Change password happends after a user login, and change his password
+        /// Change password happens after a user login, and change his password
         /// </summary>
         /// <param name="userId">User Id</param>
         /// <param name="newPassword">The new password</param>
@@ -25,7 +25,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         Task<AuthenticationResultDto> ChangePasswordAsync(string userId, string newPassword);
 
         /// <summary>
-        /// Reset password happends when user request a 'reset password', and system generates a reset password token and sends to user's email
+        /// Reset password happens when user request a 'reset password', and system generates a reset password token and sends to user's email
         /// And user click the link in the email to reset the password.
         /// </summary>
         /// <param name="email">User email address </param>
