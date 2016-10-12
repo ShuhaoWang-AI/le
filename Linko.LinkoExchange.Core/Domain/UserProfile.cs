@@ -10,7 +10,7 @@ namespace Linko.LinkoExchange.Core.Domain
     public class UserProfile
     {
         [Key]
-        public int UserProfileId { get; set; }
+        public int UserProfileId { get; private set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PasswordHash { get; set; }

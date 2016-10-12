@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
@@ -19,6 +20,12 @@ namespace Linko.LinkoExchange.Core.Domain
             return userIdentity;
         }
 
-//        public int OrganizationRegulatoryProgramUserId { get; set; }
+        //        public int OrganizationRegulatoryProgramUserId { get; set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int UserProfileId
+        {
+            get; private set;
+        }
     }
 }
