@@ -65,7 +65,7 @@ namespace Linko.LinkoExchange.Services.User
                 questionToUpdate.Content = question.Content;
                 questionToUpdate.QuestionType = _dbContext.QuestionTypes.Single(q => q.QuestionTypeId == question.QuestionTypeId);
                 questionToUpdate.IsActive = question.IsActive;
-                questionToUpdate.LastModificationDateTime = DateTime.Now; //or UTC??
+                questionToUpdate.LastModificationDateTime = DateTime.UtcNow;
                 questionToUpdate.LastModifierUserId = HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
 
                 try

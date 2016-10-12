@@ -101,7 +101,7 @@ namespace Linko.LinkoExchange.Services.User
         {
             var newOrgRegProgUser = _dbContext.OrganizationRegulatoryProgramUsers.Create();
             newOrgRegProgUser.OrganizationRegulatoryProgramId = orgRegProgId;
-            newOrgRegProgUser.PermissionGroupId = permissionGroupId;
+            newOrgRegProgUser.PermissionGroup = _dbContext.PermissionGroups.Single(p => p.PermissionGroupId == permissionGroupId);
 
             var newUserProfile = new UserProfile();
             newUserProfile.Email = emailAddress;
@@ -135,7 +135,7 @@ namespace Linko.LinkoExchange.Services.User
                     user.IsRemoved = isRemoved.Value;
 
                 //Persist modification date and modifier actor
-                user.LastModificationDateTime = DateTime.Now;
+                user.LastModificationDateTime = DateTime.UtcNow;
                 user.LastModificationUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
                 _dbContext.SaveChanges();
             }
@@ -149,7 +149,7 @@ namespace Linko.LinkoExchange.Services.User
         public void UpdateUserPermissionGroupId(int orgRegProgUserId, int permissionGroupId)
         {
             var user = _dbContext.OrganizationRegulatoryProgramUsers.Single(o => o.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
-            user.PermissionGroupId = permissionGroupId;
+            user.PermissionGroup = _dbContext.PermissionGroups.Single(p => p.PermissionGroupId == permissionGroupId);
             _dbContext.SaveChanges();
         }
 
@@ -161,7 +161,7 @@ namespace Linko.LinkoExchange.Services.User
                 user.IsSignatory = isSignatory;
 
                 //Persist modification date and modifier actor
-                user.LastModificationDateTime = DateTime.Now;
+                user.LastModificationDateTime = DateTime.UtcNow;
                 user.LastModificationUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
                 _dbContext.SaveChanges();
             }
@@ -217,7 +217,7 @@ namespace Linko.LinkoExchange.Services.User
                 user.IsRemoved = true;
 
                 //Persist modification date and modifier actor
-                user.LastModificationDateTime = DateTime.Now;
+                user.LastModificationDateTime = DateTime.UtcNow;
                 user.LastModificationUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
                 _dbContext.SaveChanges();
             }
@@ -265,7 +265,7 @@ namespace Linko.LinkoExchange.Services.User
                     UserPasswordHistory history = _dbContext.UserPasswordHistories.Create();
                     history.UserProfileId = userProfileId;
                     history.PasswordHash = userProfile.PasswordHash;
-                    history.LastModificationDateTime = DateTime.Now;
+                    history.LastModificationDateTime = DateTime.UtcNow;
 
                     _dbContext.SaveChanges();
                 }

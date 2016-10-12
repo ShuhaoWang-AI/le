@@ -20,6 +20,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTime LastModificationDateTime { get; set; }
         public int LastModificationUserId { get; set; }
         public UserProfile UserProfile { get; set; }
-        public int PermissionGroupId { get; set; }
+        public OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
+        public PermissionGroup PermissionGroup { get; set; }
     }
 }
