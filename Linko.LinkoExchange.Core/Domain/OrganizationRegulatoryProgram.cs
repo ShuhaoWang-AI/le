@@ -11,10 +11,10 @@ namespace Linko.LinkoExchange.Core.Domain
     {
         [Key]
         public int OrganizationRegulatoryProgramId { get; set; }
-        public RegulatoryProgram RegulatoryProgram { get; set; }
-        public Organization Organization { get; set; }
-        public Organization RegulatorOrganization { get; set; }
+        public virtual RegulatoryProgram RegulatoryProgram { get; set; }
+        public virtual Organization Organization { get; set; }
+        public virtual Organization RegulatorOrganization { get; set; }
         public bool IsEnabled { get; set; }
-        public List<OrganizationRegulatoryProgramSetting> OrganizationRegulatoryProgramSettings  { get; set; }
+        public virtual List<OrganizationRegulatoryProgramSetting> OrganizationRegulatoryProgramSettings  { get; set; }
     }
 }

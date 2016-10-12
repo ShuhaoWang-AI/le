@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
-    public class RegulatoryProgram
+    public class SignatoryRequestStatus
     {
         [Key]
-        public int RegulatoryProgramId { get; set; }
+        public int SignatoryRequestStatusId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
     }

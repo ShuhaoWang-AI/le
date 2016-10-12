@@ -12,7 +12,7 @@ namespace Linko.LinkoExchange.Core.Domain
         [Key]
         public int QuestionId { get; set; }
         public string Content { get; set; }
-        public QuestionType QuestionType { get; set; }
+        public virtual QuestionType QuestionType { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreationDateTime { get; set; }
         public DateTime LastModificationDateTime { get; set; }

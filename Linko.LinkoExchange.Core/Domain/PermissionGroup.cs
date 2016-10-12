@@ -16,7 +16,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTime CreationDateTime { get; set; }
         public DateTime LastModificationDateTime { get; set; }
 
-        public OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
+        public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 
     }
 }

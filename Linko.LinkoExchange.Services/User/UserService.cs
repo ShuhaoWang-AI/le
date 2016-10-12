@@ -188,7 +188,7 @@ namespace Linko.LinkoExchange.Services.User
                 user.IsEmailConfirmed = false;
                 user.IsPhoneNumberConfirmed = false;
 
-                var answers = _dbContext.UserQuestionAnswers.Where(a => a.UserProfileId == userProfileId);
+                var answers = _dbContext.UserQuestionAnswers.Where(a => a.UserProfile.UserProfileId == userProfileId);
                 if (answers != null && answers.Count() > 0)
                 {
                     foreach (var answer in answers)
@@ -263,7 +263,7 @@ namespace Linko.LinkoExchange.Services.User
 
                     //create history record
                     UserPasswordHistory history = _dbContext.UserPasswordHistories.Create();
-                    history.UserProfileId = userProfileId;
+                    history.UserProfile = userProfile;
                     history.PasswordHash = userProfile.PasswordHash;
                     history.LastModificationDateTime = DateTime.UtcNow;
 

@@ -14,7 +14,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTime RequestDateTime { get; set; }
         public DateTime GrantDenyDateTime { get; set; }
         public DateTime RevokeDateTime { get; set; }
-        public int OrganizationRegulatoryProgramUserId { get; set; }
-        public int SignatoryRequestStatusId { get; set; }
+        public virtual OrganizationRegulatoryProgramUser OrganizationRegulatoryProgramUser { get; set; }
+        public virtual SignatoryRequestStatus SignatoryRequestStatus { get; set; }
     }
 }
