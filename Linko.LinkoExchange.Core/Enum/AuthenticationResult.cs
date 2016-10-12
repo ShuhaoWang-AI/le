@@ -10,6 +10,7 @@
         UserNotFound,
         EmailIsNotConfirmed,
         PasswordLockedOut,
+        PasswordExpired,
         UserAlreadyExists
     }
 }

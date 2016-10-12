@@ -7,7 +7,7 @@ namespace Linko.LinkoExchange.Data.Mapping
     {
         public EmailTemplateMap()
         {
-            ToTable("EmailTemplates");
+            ToTable("tEmailTemplates");
 
             HasKey(i => i.Id);
 

@@ -19,11 +19,14 @@ using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Program;
+using Linko.LinkoExchange.Data; 
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
     public class AuthenticationService : IAuthenticationService
     {
+        private static readonly ApplicationDbContext LinkoExchangeDbContext = new ApplicationDbContext(); 
+
         private readonly ApplicationSignInManager _signInManager;
         private readonly ApplicationUserManager _userManager;
         
@@ -114,9 +117,12 @@ namespace Linko.LinkoExchange.Services.Authentication
             try
             { 
                 var programIds = new[] {_invitationService.GetInvitationProgram(registrationToken).ProgramId};
-                var organizationIds = _invitationService.GetInvitationrOrganizations(registrationToken).Select(i=>i.OrganizationId); 
+                var organizationIds = _invitationService.GetInvitationrOrganizations(registrationToken).Select(i=>i.OrganizationId);
+                 
+                var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
+                var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings).ToList();
 
-                SetPasswordPolicy(programIds,organizationIds);
+                SetPasswordPolicy(organizationSettings, programSettings);
 
                 var result = _userManager.CreateAsync(applicationUser, userInfo.Password).Result;
 
@@ -167,11 +173,14 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
                 else
                 {
-                    //TODO
-                    var userId = 100;  //applicationUser.profileId;
+                    var userId = applicationUser.UserProfileId;
                     var programIds = GetUserProgramIds(userId);
                     var organizationIds = GetUserOrganizationIds(userId);
-                    SetPasswordPolicy(programIds, organizationIds);
+
+                    var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
+                    var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings).ToList();
+
+                    SetPasswordPolicy(organizationSettings, programSettings); 
 
                     // Step 2: reset the password
                     var identityResult =
@@ -255,15 +264,29 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return Task.FromResult(signInResultDto);
             }
 
+            // TODO to check if the user has been locked "Account Lockout"  by an authority
+            
+            // TODO to check if the user is disabled or not  
             // clear claims from db if there are   
+
             ClearClaims(applicationUser.Id);
             applicationUser.Claims.Clear();
-
-            // Todo: change to the real userid;
-            var userId = 100;  //applicationUser.profileId;
+            
+            var userId = applicationUser.UserProfileId;
             var programIds = GetUserProgramIds(userId);
             var organizationIds = GetUserOrganizationIds(userId);
-            SetPasswordPolicy(programIds, organizationIds);
+
+            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
+            var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings).ToList();
+
+            // TODO to check if user's password is expired or not  
+            if (IsUserPasswordExpired(userId, organizationSettings, programSettings))
+            {
+                signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
+                return Task.FromResult(signInResultDto); 
+            }
+
+            SetPasswordPolicy(organizationSettings, programSettings); 
 
             _signInManager.UserManager = _userManager; 
             var signInStatus = _signInManager.PasswordSignInAsync(userName, password, isPersistent, true).Result;
@@ -294,8 +317,29 @@ namespace Linko.LinkoExchange.Services.Authentication
             HttpContext.Current.Session.Clear();
             _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie); 
         }
-        
+
         #region private section
+        private bool IsUserPasswordExpired(int userProfileId, IEnumerable<SettingDto> organizationSettings, IEnumerable<SettingDto> programSettings)
+        {
+            var lastestUserPassword = LinkoExchangeDbContext.UserPasswordHistories
+                .Where(i => i.UserProfileId == userProfileId)
+                .OrderByDescending(i => i.LastModificationDateTime).FirstOrDefault();
+
+            if (lastestUserPassword == null || lastestUserPassword.UserProfileId == 0)
+            {
+                return true;
+            }
+
+            // Get password expiration setting 
+            string settingKey = "PasswordExpiredDays";
+            var passwordExpiredDays = GetStrictestLengthPasswordRequire(programSettings, organizationSettings, settingKey);
+            if (DateTime.UtcNow > lastestUserPassword.LastModificationDateTime.AddDays(passwordExpiredDays))
+            {
+                return true;
+            }
+
+            return false; 
+        }
 
         private void ClearClaims(string userId)
         {
@@ -349,11 +393,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             _authenticationManager.SignIn(authProperties, identity); 
         }
 
-        private void SetPasswordPolicy(IEnumerable<int> programIds, IEnumerable<int> orgnizationIds)
+        private void SetPasswordPolicy(IEnumerable<SettingDto> organizationSettings, IEnumerable<SettingDto> programSettings)
         {
-            // todo: from registrationToken get program Id, then get organizationIds
-            var organizationSettings = _settingService.GetOrganizationSettingsByIds(orgnizationIds).SelectMany(i => i.Settings);
-            var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings);
 
             var passwordValidator = new PasswordValidator();
 
@@ -384,9 +425,16 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private int GetStrictestLengthPasswordRequire(IEnumerable<SettingDto> programSettings,IEnumerable<SettingDto> organizationSettings, string settingKey)
         {
-            var maxPasswordRequireLenthStr = _globalSettings["PasswordRequireLength"];
+            string maxPasswordRequireLenthStr = "90";
+            if (!_globalSettings.ContainsKey(settingKey))
+            {
+                return 90;
+            }
+
+            maxPasswordRequireLenthStr = _globalSettings[settingKey]; 
+
             var maxPasswordRequireLengthValue = int.Parse(maxPasswordRequireLenthStr);
-            if (programSettings.Any(i => i.Name.Equals("PasswordRequireLength")))
+            if (programSettings.Any(i => i.Name.Equals(settingKey)))
             {
                 maxPasswordRequireLengthValue =
                     programSettings.Max(i => ValueParser.TryParseInt(i.Value, maxPasswordRequireLengthValue));
