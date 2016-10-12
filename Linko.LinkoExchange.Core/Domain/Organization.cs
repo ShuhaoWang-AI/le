@@ -15,6 +15,9 @@ namespace Linko.LinkoExchange.Core.Domain
         public string Name { get; set; }
         public string AddressLine1 { get; set; }
         public List<OrganizationSetting> OrganizationSettings { get; set; }
-}
+        public object AddressLine2 { get; set; }
+        public object City { get; set; }
+        public object ZipCode { get; set; }
+    }
 
 }
