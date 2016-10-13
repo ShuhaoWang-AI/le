@@ -12,12 +12,12 @@ namespace Linko.LinkoExchange.Services.Organization
     public class OrganizationService : IOrganizationService
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly IAuditLogEntry _logger;
+        //private readonly IAuditLogEntry _logger;
 
-        public OrganizationService(ApplicationDbContext dbContext, IAuditLogEntry logger)
+        public OrganizationService(ApplicationDbContext dbContext)//, IAuditLogEntry logger)
         {
             _dbContext = dbContext;
-            _logger = logger;
+            //_logger = logger;
         }
 
         /// <summary>

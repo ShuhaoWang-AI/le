@@ -20,8 +20,6 @@ namespace Linko.LinkoExchange.Web
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             FluentValidationModelValidatorProvider.Configure();
-
-            AutoMapperServicesConfiguration.Configure();
         }
 
         /// <summary>

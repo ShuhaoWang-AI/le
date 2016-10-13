@@ -73,7 +73,13 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IOrganizationService, OrganizationService>();
             container.RegisterType<IInvitationService, InvitationService>();
             container.RegisterType<IProgramService, ProgramService>();
-            container.RegisterInstance<IMapper>(Mapper.Instance);
+            //container.RegisterInstance<IMapper>(Mapper.Instance);
+
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new UserMapProfile());
+            });
+            container.RegisterInstance<IMapper>(config.CreateMapper());
         }
     }
 }
