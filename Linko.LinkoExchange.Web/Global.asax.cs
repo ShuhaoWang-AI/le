@@ -5,6 +5,7 @@ using System.Web.Routing;
 using FluentValidation.Mvc;
 using Linko.LinkoExchange.Web.Controllers;
 using Microsoft.Practices.Unity;
+using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -19,6 +20,8 @@ namespace Linko.LinkoExchange.Web
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             FluentValidationModelValidatorProvider.Configure();
+
+            AutoMapperServicesConfiguration.Configure();
         }
 
         /// <summary>

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Linko.LinkoExchange.Core.Extensions;
 using Linko.LinkoExchange.Services.Dto;
+using AutoMapper;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -19,16 +20,17 @@ namespace Linko.LinkoExchange.Services.User
         private readonly ApplicationDbContext _dbContext;
         private readonly IAuditLogEntry _logger;
         private readonly IPasswordHasher _passwordHasher;
-
+        private readonly IMapper _mapper;
         #endregion
 
         #region constructor
 
-        public UserService(ApplicationDbContext dbContext, IAuditLogEntry logger, IPasswordHasher passwordHasher)
+        public UserService(ApplicationDbContext dbContext, IAuditLogEntry logger, IPasswordHasher passwordHasher, IMapper mapper)
         {
             this._dbContext = dbContext;
             _logger = logger;
             _passwordHasher = passwordHasher;
+            _mapper = mapper;
         }
 
         #endregion
@@ -38,14 +40,8 @@ namespace Linko.LinkoExchange.Services.User
 
         public UserDto GetUserProfileById(int userProfileId)
         {
-            var dto = new UserDto();
-
             var userProfile = _dbContext.UserProfiles.Single(up => up.UserProfileId == userProfileId);
-
-            dto.FirstName = userProfile.FirstName;
-            dto.LastName = userProfile.LastName;
-            //TODO map remaining properties
-
+            UserDto dto = _mapper.Map<UserProfile, UserDto>(userProfile);
             return dto;
         }
 
@@ -55,9 +51,7 @@ namespace Linko.LinkoExchange.Services.User
             UserProfile userProfile = _dbContext.UserProfiles.SingleOrDefault(u => u.Email == emailAddress);
             if (userProfile != null)
             {
-                dto.FirstName = userProfile.FirstName;
-                dto.LastName = userProfile.LastName;
-                //TODO map remaining properties
+                dto = _mapper.Map<UserProfile, UserDto>(userProfile);
                 return dto;
             }
             else
@@ -87,9 +81,7 @@ namespace Linko.LinkoExchange.Services.User
 
             foreach (var user in users)
             {
-                var dto = new UserDto();
-                dto.IsEnabled = user.IsEnabled;
-                //TODO map remaining properties
+                UserDto dto = _mapper.Map<OrganizationRegulatoryProgramUser, UserDto>(user);
                 dtos.Add(dto);
             }
 

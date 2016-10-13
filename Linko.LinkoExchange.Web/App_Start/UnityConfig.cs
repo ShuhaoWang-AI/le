@@ -16,6 +16,8 @@ using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Core.Logging;
 using NLog;
 using Linko.LinkoExchange.Web.Controllers;
+using AutoMapper;
+using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -71,6 +73,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IOrganizationService, OrganizationService>();
             container.RegisterType<IInvitationService, InvitationService>();
             container.RegisterType<IProgramService, ProgramService>();
+            container.RegisterInstance<IMapper>(Mapper.Instance);
         }
     }
 }
