@@ -12,6 +12,7 @@ namespace Linko.LinkoExchange.Core.Domain
         [Key]
         public int UserPasswordHistoryId { get; set; }
         public string PasswordHash  { get; set; }
+        public virtual int UserProfileId { get; set; }
         public virtual UserProfile UserProfile { get; set; }
         public DateTime LastModificationDateTime { get; set; }
     }
