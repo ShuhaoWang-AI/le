@@ -38,8 +38,15 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var email = model.Email;
             var password = model.Password;
-            var signInResult = await _authenticateService.SignInByUserName(email, password, true);  
-             
+            var signInResult = await _authenticateService.SignInByUserName(email, password, true);
+
+            // TODO to test set addition information  
+            var testClaims = new Dictionary<string, string>();
+            testClaims.Add("currentAuthorityId", "123435");
+            testClaims.Add("currentPrograId", "67890");
+            testClaims.Add("currentIndustryId", "industry_001");
+
+            _authenticateService.SetCurrentUserClaims(testClaims);
             return View();
         }
 

@@ -67,7 +67,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             _globalSettings = _settingService.GetGlobalSettings();
         }
 
-        public IEnumerable<Claim> GetClaims()
+        public IList<Claim> GetClaims()
         {
             var claims = HttpContext.Current.Session["claims"] as IEnumerable<Claim>;
             if (claims == null)
@@ -77,7 +77,32 @@ namespace Linko.LinkoExchange.Services.Authentication
                 HttpContext.Current.Session["claims"] = claims;
             }
 
-            return claims;
+            return claims.ToList();
+        }
+
+        /// <summary>
+        /// Set current user's additional claims, such as current organizationId, current authorityId, current programId
+        /// </summary>
+        /// <param name="claims">The claims to set</param>
+        public void SetCurrentUserClaims(IDictionary<string, string> claims)
+        {
+            if (claims == null || claims.Count < 1)
+                return; 
+
+            var currentClaims = GetClaims();
+            if (currentClaims != null)
+            {
+                var userId = HttpContext.Current.Session["userId"] as string;
+                var itor = claims.GetEnumerator();
+
+                while (itor.MoveNext())
+                {
+                    currentClaims.Add(new Claim(itor.Current.Key, itor.Current.Value)); 
+                }
+
+                ClearClaims(userId);
+                SaveClaims(userId, currentClaims);
+            } 
         }
 
         // Change or reset password
@@ -338,7 +363,6 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             if (signInStatus == SignInStatus.Success)
             {
-                //TODO try sign on GetUserIdentity
                 signInResultDto.AutehticationResult = AuthenticationResult.Success;
                 signInResultDto.Token = _tokenGenerator.GenToken(userName);
 
@@ -438,8 +462,13 @@ namespace Linko.LinkoExchange.Services.Authentication
             claims.Add(new Claim("CurrentProgramId", "678910"));
             claims.Add(new Claim("OrganizationName", "This is a very looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog orgnaization name"));
             claims.Add(new Claim("IndustryName", "This is  a very loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong industry name"));
-            claims.Add(new Claim("ProgramName", "This is a very looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong program name"));  
+            claims.Add(new Claim("ProgramName", "This is a very looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong program name"));
 
+            SaveClaims(applicationUser.Id, claims);
+        }
+
+        private void SaveClaims(string userId, IList<Claim> claims)
+        {
             var identity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
 
             var authProperties = new AuthenticationProperties
@@ -450,12 +479,11 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             foreach (var claim in claims)
             {
-                _userManager.AddClaim(applicationUser.Id, claim);
-            } 
+                _userManager.AddClaim(userId, claim);
+            }
 
-            _authenticationManager.SignIn(authProperties, identity); 
+            _authenticationManager.SignIn(authProperties, identity);  
         }
-
         private void SetPasswordPolicy(IEnumerable<SettingDto> organizationSettings, IEnumerable<SettingDto> programSettings)
         {
 

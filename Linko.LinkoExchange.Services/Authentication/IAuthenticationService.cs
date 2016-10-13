@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
 using Linko.LinkoExchange.Services.Dto;
-using System.Threading.Tasks;
+using System.Threading.Tasks; 
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
@@ -44,10 +44,15 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <returns></returns>
         Task<AuthenticationResultDto> RequestResetPassword(string email); 
 
-            // Sign in  
+        // Sign in  
         Task<SignInResultDto> SignInByUserName(string userName, string password, bool isPersistent);
 
-        IEnumerable<Claim> GetClaims();
+        /// <summary>
+        /// Set current user's additional claims, such as current organizationId, current authorityId, current programId
+        /// </summary>
+        /// <param name="claims">The claims to set</param>
+        void SetCurrentUserClaims(IDictionary<string,string> claims);
+        IList<Claim> GetClaims();
         //sign off
         void SignOff();
     }
