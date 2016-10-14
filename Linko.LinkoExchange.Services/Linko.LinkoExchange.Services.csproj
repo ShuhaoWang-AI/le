@@ -107,17 +107,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuditLog\CrommerAuditLogEntry.cs" />
     <Compile Include="AuditLog\CrommerAuditLogService.cs" />
-    <Compile Include="AuditLog\EmailAuditLogEntry.cs" />
     <Compile Include="AuditLog\EmailAuditLogService.cs" />
-    <Compile Include="AuditLog\IAuditLogEntry.cs" />
     <Compile Include="AuditLog\IAuditLogService.cs" />
     <Compile Include="Authentication\AuthenticationService.cs" />
     <Compile Include="Authentication\IAuthenticationService.cs" />
     <Compile Include="Authentication\IdentityConfig.cs" />
     <Compile Include="Authentication\TokenGenerator.cs" />
     <Compile Include="AutoMapperServicesConfiguration.cs" />
+    <Compile Include="Dto\CrommerAuditLogEntry.cs" />
+    <Compile Include="Dto\EmailAuditLogEntryDto.cs" />
+    <Compile Include="Dto\IAuditLogEntry.cs" />
     <Compile Include="Dto\OrganizationSettingsDto.cs" />
     <Compile Include="Dto\AuthorityDetailsDto.cs" />
     <Compile Include="Dto\OrganizationDto.cs" />

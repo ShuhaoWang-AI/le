@@ -4,7 +4,8 @@ using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Web.ViewModels;
 using System.Threading.Tasks;
-using System.Web.Mvc; 
+using System.Web.Mvc;
+using Linko.LinkoExchange.Services.Email;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -21,6 +22,29 @@ namespace Linko.LinkoExchange.Web.Controllers
         // GET: Account
         public async Task<ActionResult> Index()
         {
+            IEmailService emailService = new LinkoExchange.Services.Email.LinkoExchangeEmailService();
+
+            var contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("organizationName", "Green Vally Plant");
+            contentReplacements.Add("authorityName", "Grand Rapids");
+            contentReplacements.Add("userName", "Shuhao Wang");
+            contentReplacements.Add("addressLine1", "1055 Pender Street");
+            contentReplacements.Add("cityName", "Vancouver");
+            contentReplacements.Add("stateName", "BC");
+
+            var receivers = new List<string> { "shuhao.wang@watertrax.com" };
+
+            var logEntry = new EmailAuditLogEntryDto();
+            logEntry.RecipientFirstName = "First Name";
+            logEntry.RecipientLastName = "last name";
+            logEntry.RecipientUserName = "Fist name, lastName";
+            logEntry.SenderFirstName = "Linko support";
+            logEntry.SenderLastName = "Linko support";
+            logEntry.SenderEmailAddress = "shuhao.wang@watertrax.com";
+
+            emailService.SendEmail(receivers, Linko.LinkoExchange.Core.Enum.EmailType.Signature_SignatoryGranted, contentReplacements, logEntry, logEntry.SenderEmailAddress);
+
+
             return View ();
         }
 

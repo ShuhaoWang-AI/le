@@ -1,4 +1,7 @@
-﻿namespace Linko.LinkoExchange.Services.AuditLog
+﻿
+using Linko.LinkoExchange.Services.Dto;
+
+namespace Linko.LinkoExchange.Services.AuditLog
 {
     public interface IAuditLogService
     {

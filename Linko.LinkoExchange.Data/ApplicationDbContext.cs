@@ -20,10 +20,8 @@ namespace Linko.LinkoExchange.Data
             return new ApplicationDbContext ();
         }
 
-        public DbSet<AuditLogTemplate> AuditLogTemplates
-        {
-            set;get;
-        }
+        public DbSet<AuditLogTemplate> AuditLogTemplates { set;get; }
+        public DbSet<EmailAuditLog> EmailAuditLog  { set; get; }
 
         public DbSet<EmailTemplate> EmailTemplates { get; set; }
         public DbSet<Organization> Organizations { get; set; }

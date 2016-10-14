@@ -7,29 +7,52 @@ using System.Web.UI.WebControls;
 using Linko.LinkoExchange.Core.Enum;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Services.Dto;
+using System;
 
 namespace Linko.LinkoExchange.Services.Email
 {
     public class LinkoExchangeEmailService : IEmailService
     {
         private readonly ApplicationDbContext _linkoExchangeDbContext = new ApplicationDbContext();
-        
+        private readonly IAuditLogService _emailAuditLogService = new EmailAuditLogService(); 
+
         private readonly string _emailServer = ConfigurationManager.AppSettings["EmailServer"];
         private readonly string _fromEmailAddress = ConfigurationManager.AppSettings["EmailSenderFromEmail"];
 
-        public async void SendEmail(IEnumerable<string> recipients, EmailType emailType, IDictionary<string, string> contentReplacements)
+        public async void SendEmail(IEnumerable<string> recipients, EmailType emailType, IDictionary<string, string> contentReplacements, IAuditLogEntry logEntry, string senderEmail = null)
         {
             string sendTo = string.Join(",", recipients);
 
-            MailMessage msg = await GetMailMessage(sendTo, emailType, contentReplacements);
+            if (string.IsNullOrWhiteSpace(senderEmail))
+            {
+                senderEmail = _fromEmailAddress;
+            }
+
+            MailMessage msg = await GetMailMessage(sendTo, emailType, contentReplacements, senderEmail);
             using (var smtpClient = new SmtpClient(_emailServer))
             {
                 smtpClient.Send(msg);
             }
+
+            var emailLogEntry = logEntry as EmailAuditLogEntryDto;
+            if (emailLogEntry == null) return; 
+
+            emailLogEntry.Body = msg.Body;
+            emailLogEntry.Subject = msg.Subject;
+            emailLogEntry.SenderEmailAddress = msg.From.Address;
+            emailLogEntry.SentDateTimeUtc = DateTime.UtcNow;
+            foreach (var email in recipients)
+            {
+                emailLogEntry.RecipientEmailAddress = email; 
+                _emailAuditLogService.Log(logEntry);
+            } 
         }
         
-        private Task<MailMessage> GetMailMessage(string sendTo, EmailType emailType, IDictionary<string,string> replacements)
-        {         
+        private Task<MailMessage> GetMailMessage(string sendTo, EmailType emailType, IDictionary<string,string> replacements, string senderEmail)
+        {
+         
             var keyValues = replacements.Select(i =>
             {
                 return new KeyValuePair<string, string>("{" + i.Key + "}", i.Value);
@@ -46,7 +69,7 @@ namespace Linko.LinkoExchange.Services.Email
             var mailDefinition = new MailDefinition
             {
                 IsBodyHtml = true,
-                From = _fromEmailAddress,
+                From = senderEmail,
                 Subject = ReplaceUsingTemplates(emailTemplate.SubjectTemplate, keyValues)
             };
 
@@ -62,6 +85,6 @@ namespace Linko.LinkoExchange.Services.Email
             }
 
             return originText;
-        }
+        } 
     }
 }

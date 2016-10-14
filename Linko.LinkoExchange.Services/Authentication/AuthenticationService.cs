@@ -228,13 +228,22 @@ namespace Linko.LinkoExchange.Services.Authentication
                     var isUserAuthorityUser = true;
                     var emailContentReplacements = new Dictionary<string, string>(); 
 
+                    // TODO  to prepare email audit log entry information 
+                     
+                    var logEntry = new EmailAuditLogEntryDto();
+                    logEntry.RecipientFirstName = "First Name";
+                    logEntry.RecipientLastName = "last name";
+                    logEntry.RecipientUserName = "Fist name, lastName";
+                    logEntry.SenderFirstName = "Linko support";
+                    logEntry.SenderLastName = "Linko support"; 
+
                     if (isUserAuthorityUser)
                     {
-                        _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements);
+                        _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements, logEntry);
                     }
                     else
                     {  
-                        _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
+                        _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements, logEntry);
                     } 
 
                     // 5 TODO logs invite email  
@@ -710,8 +719,16 @@ namespace Linko.LinkoExchange.Services.Authentication
             contentReplacements.Add("link", link);
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
             contentReplacements.Add("supportEmail", supportEmail);
-             
-            _emailService.SendEmail(new[] { user.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
+
+            var logEntry = new EmailAuditLogEntryDto();
+            logEntry.RecipientFirstName = "First Name";
+            logEntry.RecipientLastName = "last name";
+            logEntry.RecipientUserName = "Fist name, lastName";
+            logEntry.SenderFirstName = "Linko support";
+            logEntry.SenderLastName = "Linko support";
+
+
+            _emailService.SendEmail(new[] { user.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements, logEntry);
         }
 
         string GetBaseUrl()
