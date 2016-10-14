@@ -18,6 +18,9 @@ using NLog;
 using Linko.LinkoExchange.Web.Controllers;
 using AutoMapper;
 using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Permission;
+using Linko.LinkoExchange.Services.Email;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -73,7 +76,10 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IOrganizationService, OrganizationService>();
             container.RegisterType<IInvitationService, InvitationService>();
             container.RegisterType<IProgramService, ProgramService>();
-            
+            container.RegisterType<IPermissionService, PermissionService>();
+            container.RegisterType<IEmailService, LinkoExchangeEmailService>();
+
+
 
             //var config = new MapperConfiguration(cfg =>
             //{

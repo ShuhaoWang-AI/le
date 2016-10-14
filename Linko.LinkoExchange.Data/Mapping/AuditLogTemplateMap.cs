@@ -12,13 +12,15 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasKey(i => i.AuditLogTemplateId);
 
+            HasKey(i => i.Name);
+
             Property(i => i.TemplateType); 
 
             Property(i => i.EventCategory);
 
             Property(i => i.EventType);
 
-            Property(i => i.SubjectTempate); 
+            Property(i => i.SubjectTemplate); 
 
             Property(i => i.MessageTemplate); 
         }

@@ -7,8 +7,6 @@ using Linko.LinkoExchange.Services.AuditLog;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Security.Claims;
 using Linko.LinkoExchange.Services.Email;
@@ -19,13 +17,14 @@ using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Program;
-using Linko.LinkoExchange.Data; 
+using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.Permission;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private static readonly ApplicationDbContext LinkoExchangeDbContext = new ApplicationDbContext(); 
+        private static readonly ApplicationDbContext _linkoExchangeDbContext = new ApplicationDbContext(); 
 
         private readonly ApplicationSignInManager _signInManager;
         private readonly ApplicationUserManager _userManager;
@@ -35,6 +34,8 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IProgramService _programService;
         private readonly IInvitationService _invitationService;
         private readonly IAuthenticationManager _authenticationManager;
+        private readonly IPermissionService _permissionService;
+        private readonly IEmailService _emailService;
 
         private readonly TokenGenerator _tokenGenerator = new TokenGenerator();
         private readonly IAuditLogService _auditLogService = new CrommerAuditLogService();
@@ -47,7 +48,9 @@ namespace Linko.LinkoExchange.Services.Authentication
             ISettingService settingService,
             IOrganizationService organizationService,
             IProgramService programService,
-            IInvitationService invitationService)
+            IInvitationService invitationService,
+            IEmailService emailService,
+            IPermissionService permissionService)
         {
             if (userManager == null) throw new ArgumentNullException("userManager");
             if (signInManager == null) throw new ArgumentNullException("signInManager");
@@ -56,6 +59,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (organizationService == null) throw new ArgumentNullException("organizationService");
             if (programService == null) throw new ArgumentNullException("programService");
             if (invitationService == null) throw new ArgumentNullException("invitationService");
+            if (emailService == null) throw new ArgumentNullException("emailService");
+            if (permissionService == null) throw new ArgumentNullException("permissionService");
 
             _userManager = userManager;
             _signInManager = signInManager;
@@ -65,6 +70,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             _programService = programService;
             _invitationService = invitationService; 
             _globalSettings = _settingService.GetGlobalSettings();
+            _emailService = emailService;
+            _permissionService = permissionService;
         }
 
         public IList<Claim> GetClaims()
@@ -176,7 +183,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             var authenticationResult = new AuthenticationResultDto();
             var applicationUser = AssignUser(userInfo.UserName, userInfo.Email);
             try
-            { 
+            {  
+                // TODO invitation and program and organization relationship ?  one to many or one to one?  
                 var programIds = new[] {_invitationService.GetInvitationProgram(registrationToken).ProgramId};
                 var organizationIds = _invitationService.GetInvitationrOrganizations(registrationToken).Select(i=>i.OrganizationId);
                  
@@ -189,16 +197,57 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 if (result == IdentityResult.Success)
                 {
-                    // Create a new row in user password history table 
-                    LinkoExchangeDbContext.UserPasswordHistories.Add(new UserPasswordHistory
+                    // Retrieve user again to get userProfile Id. 
+                    applicationUser = _userManager.FindById(applicationUser.Id);  
+
+                    // 1. Create a new row in user password history table 
+                    _linkoExchangeDbContext.UserPasswordHistories.Add(new UserPasswordHistory
                     {
                          LastModificationDateTime = DateTime.UtcNow,
                          PasswordHash = applicationUser.PasswordHash,
                          UserProfileId = applicationUser.UserProfileId
                     });
-                    LinkoExchangeDbContext.SaveChangesAsync();
+                    
+                    // 2 TODO change user status to  Registration Pending
+                    // UC-42 6
 
-                    authenticationResult.Success = true; 
+
+                    // 3 TODO send email to all users who have rights to approve a registrant 
+                    // UC-42 7
+                    // find out who have the approve permission
+
+
+                    // 4 TODO remove the invitation from table
+                    // UC-42 8
+
+                    var organizationId = 100;
+                    var approvalPeople = _permissionService.GetApprovalPeople(applicationUser.UserProfileId, organizationId);
+                    var sendTo = approvalPeople.Select(i => i.Email);
+
+                    // TODO:  to determine if user is authority user or is industry user;
+                    var isUserAuthorityUser = true;
+                    var emailContentReplacements = new Dictionary<string, string>(); 
+
+                    if (isUserAuthorityUser)
+                    {
+                        _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements);
+                    }
+                    else
+                    {  
+                        _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
+                    } 
+
+                    // 5 TODO logs invite email  
+                    // UC-1 
+
+                    // 6 TODO logs invite to Audit 
+                    // UC-2 
+
+                    _linkoExchangeDbContext.SaveChangesAsync();
+
+                    authenticationResult.Success = true;
+
+
                     SendRegistrationConfirmationEmail(applicationUser.Id, userInfo);  
                     return Task.FromResult(authenticationResult);
                 }
@@ -396,7 +445,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(programSettings, organizationSettings);
 
-            var lastNumberPasswordInHistory = LinkoExchangeDbContext.UserPasswordHistories
+            var lastNumberPasswordInHistory = _linkoExchangeDbContext.UserPasswordHistories
                 .Where(i => i.UserProfileId == userProfileId)
                 .OrderByDescending(i => i.LastModificationDateTime).Take(numberOfPasswordsInHistory);
             if (lastNumberPasswordInHistory.Any(i=>i.PasswordHash == passwordHash))
@@ -409,7 +458,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private bool IsUserPasswordExpired(int userProfileId, IEnumerable<SettingDto> organizationSettings, IEnumerable<SettingDto> programSettings)
         {
-            var lastestUserPassword = LinkoExchangeDbContext.UserPasswordHistories
+            var lastestUserPassword = _linkoExchangeDbContext.UserPasswordHistories
                 .Where(i => i.UserProfileId == userProfileId)
                 .OrderByDescending(i => i.LastModificationDateTime).FirstOrDefault();
 
@@ -617,21 +666,22 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private void SendRegistrationConfirmationEmail(string userId, UserDto userDto)
         {
-            var token = _userManager.GenerateEmailConfirmationTokenAsync(userId).Result;
-            var code = HttpUtility.UrlEncode(token);
+            //var token = _userManager.GenerateEmailConfirmationTokenAsync(userId).Result;
+            //var code = HttpUtility.UrlEncode(token);
 
-            var subject = "Confirm your account";
-            var html = HttpUtility.HtmlEncode(code); 
+            //var subject = "Confirm your account";
+            //var html = HttpUtility.HtmlEncode(code); 
 
             // TODO to use real email templates
-            var replacements = new ListDictionary
-            {
-                {"{name}", userDto.FirstName + " " + userDto.LastName},
-                {"{code}", code},
-                {"{copyCode}", html}
-            };
+            //var replacements = new ListDictionary
+            //{
+            //    {"{name}", userDto.FirstName + " " + userDto.LastName},
+            //    {"{code}", code},
+            //    {"{copyCode}", html}
+            //};
 
-             LinkoExchangeEmailService.SendEmail(userDto.Email, subject, EmailType.RegistrationConfirmation, replacements);
+            //_emailService.SendEmail(EmailType.regi)
+            // LinkoExchangeEmailService.SendEmail(userDto.Email, subject, EmailType.RegistrationConfirmation, replacements);
         }
 
         private IEnumerable<int> GetUserProgramIds(int userId)
@@ -648,22 +698,28 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         void SendResetPasswordConfirmationEmail(ApplicationUser user)
         {
-            var code = _userManager.GeneratePasswordResetTokenAsync(user.Id).Result;
+            var code = _userManager.GeneratePasswordResetTokenAsync(user.Id).Result; 
 
-            code = HttpUtility.UrlEncode(code);
+            string baseUrl = GetBaseUrl();
+            string link = baseUrl + "?code=" + code;
 
-            var subject = "Reset Password";
-            var html = HttpUtility.HtmlEncode(code); ;
+            string supportPhoneNumber = _globalSettings["supportPhoneNumber"]; 
+            string supportEmail = _globalSettings["supportEmail"];
 
-            //TODO to replace the values 
-            var replacements = new ListDictionary();
-            replacements.Add("{code}", code);
-            replacements.Add("{copyCode", html);
-            replacements.Add("{userId}", user.Id);
-
-            LinkoExchangeEmailService.SendEmail(user.Email, subject, EmailType.ResetPasswordConfirmation, replacements);
+            var contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("link", link);
+            contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
+            contentReplacements.Add("supportEmail", supportEmail);
+             
+            _emailService.SendEmail(new[] { user.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
         }
 
+        string GetBaseUrl()
+        {
+            return HttpContext.Current.Request.Url.Scheme + "://" 
+                + HttpContext.Current.Request.Url.Authority 
+                + HttpContext.Current.Request.ApplicationPath.TrimEnd('/') + "/";
+        }
         #endregion
     }
 }

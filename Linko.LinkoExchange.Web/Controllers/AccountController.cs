@@ -4,8 +4,7 @@ using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Web.ViewModels;
 using System.Threading.Tasks;
-using System.Web.Mvc;
-
+using System.Web.Mvc; 
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -85,7 +84,6 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-
                 var result = await _authenticateService.RequestResetPassword(model.Email);
                 if (result.Success)
                 {

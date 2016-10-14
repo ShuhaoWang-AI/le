@@ -58,7 +58,7 @@
         Profile_ProfilePasswordChanged,
 
         // UC-33 Forgot Password 
-        Profile_ForgotPassword,
+        ForgotPassword_ForgotPassword,
 
         // UC-35 Reset Profile from Account Reset
         Profile_ResetProfileRequired,

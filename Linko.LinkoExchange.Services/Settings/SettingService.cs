@@ -71,6 +71,9 @@ namespace Linko.LinkoExchange.Services.Settings
 			globalSetting.Add("PasswordExpiredDays", "90");
             globalSetting.Add("NumberOfPasswordsInHistory", "10");
 
+            globalSetting.Add("supportPhoneNumber", "+1-604-418-3201");
+            globalSetting.Add("supportEmail", "support@linkoExchange.com");
+
             return globalSetting;
 		}
 

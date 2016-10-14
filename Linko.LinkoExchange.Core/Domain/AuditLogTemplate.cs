@@ -7,6 +7,10 @@
             get;set;
         }
 
+        public string Name
+        {
+            get;set;
+        }
         public string TemplateType
         {
             get;set;
@@ -22,7 +26,7 @@
             get;set;
         }
 
-        public string SubjectTempate
+        public string SubjectTemplate
         {
             get;set;
         }
