@@ -8,9 +8,156 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using Linko.LinkoExchange.Core.Enum;
+using System.Collections.Generic;
+using System;
 
 namespace Linko.LinkoExchange.Services.Email
 {
+    public interface IEmailService
+    {
+        void SendEmail(string sendTo, string subject, EmailType emailType, IDictionary replacements);  
+        void SendEmail(IList<string> receiveers, EmailType emailType, IDictionary subjectReplacements, IDictionary contentReplacements); 
+    }
+
+    public class LinkoExchangeEmailService2 : IEmailService
+    {
+        private readonly ApplicationDbContext _linkoExchangeDbContext = new ApplicationDbContext();
+
+        private readonly string EmailServer = ConfigurationManager.AppSettings["EmailServer"];
+
+        public void SendEmail(string sendTo, string subject, EmailType emailType, IDictionary replacements)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SendEmail(IList<string> receiveers, EmailType emailType, IDictionary subjectReplacements, IDictionary contentReplacements)
+        {
+            EventCategory eventCategory;
+            EventType eventType;
+
+            switch (emailType)
+            {
+                case EmailType.AuthorityRegistrationDenied:
+                    eventCategory = EventCategory.Registration;
+                    eventType = EventType.AuthorityRegistrationDenied;
+                    break;
+                case EmailType.IndustryRegistrationDenied:
+                    eventCategory = EventCategory.Registration;
+                    eventType = EventType.IndustryRegistrationDenied;
+                    break;
+                case EmailType.IndustryRegistrationApproved:
+                    eventCategory = EventCategory.Registration;
+                    eventType = EventType.IndustryRegistrationApproved;
+                    break;
+                case EmailType.AuthorityRegistrationApproved:
+                    eventCategory = EventCategory.Registration;
+                    eventType = EventType.AuthorityRegistrationApproved;
+                    break;
+                case EmailType.AccountLockOut:
+                    eventCategory = EventCategory.UserAccess;
+                    eventType = EventType.AccountLockOut;
+                    break;
+                case EmailType.LockOutToSysAdmins:
+                    eventCategory = EventCategory.UserAccess;
+                    eventType = EventType.LockOutToSysAdmins;
+                    break;
+                case EmailType.RegistratioinResetRequired:
+                    eventCategory = EventCategory.Registration;
+                    eventType = EventType.ResetRequired;
+                    break; 
+                case EmailType.InviteAuthorityUser:
+                    eventCategory = EventCategory.Registration;
+                    eventType = EventType.InviteAuthorityUser;
+                    break;
+
+                case EmailType.InviteIndustryUser:
+                    eventCategory = EventCategory.Registration;
+                    eventType = EventType.InviteIndustryUser;
+                    break;
+
+                case EmailType.SignatoryGranted:
+                    eventCategory = EventCategory.Signature;
+                    eventType = EventType.SignatoryGranted;
+                    break;
+
+                case EmailType.SignatoryRevoked:
+                    eventCategory = EventCategory.Signature;
+                    eventType = EventType.SignatoryRevoked;
+                    break;
+
+                case EmailType.KBQFailedLockOut:
+                    eventCategory = EventCategory.Profile;
+                    eventType = EventType.KBQFailedLockOut;
+                    break;
+
+                case EmailType.ProfileChanged:
+                    eventCategory = EventCategory.Profile;
+                    eventType = EventType.ProfileChanged;
+                    break;
+
+                case EmailType.ProfileEmailChanged:
+                    eventCategory = EventCategory.Profile;
+                    eventType = EventType.EmailChanged;
+                    break;
+
+                case EmailType.KBQChanged:
+                    eventCategory = EventCategory.Profile;
+                    eventType = EventType.KBQChanged;
+                    break;
+
+                case EmailType.SecurityQuestionsChanged:
+                    eventCategory = EventCategory.Profile;
+                    eventType = EventType.SecurityQuestionsChanged;
+                    break;
+
+                case EmailType.ProfilePasswordChanged:
+                    eventCategory = EventCategory.Profile;
+                    eventType = EventType.PasswordChanged;
+                    break;
+
+                case EmailType.ForgotPassword:
+                    eventCategory = EventCategory.ForgotPassword;
+                    eventType = EventType.ForgotPassword;
+                    break;
+
+                case EmailType.ResetProfileRequired:
+                    eventCategory = EventCategory.Profile;
+                    eventType = EventType.ResetProfileRequired;
+                    break;
+                    
+                case EmailType.IndustryUserRegistrationPendingToApprovers:
+                    eventCategory = EventCategory.Registration;
+                    eventType = EventType.IndustryUserRegistrationPendingToApprovers;
+                    break; 
+
+                case EmailType.AuthorityUserRegistrationPendingToApprovers:
+                    eventCategory = EventCategory.Registration;
+                    eventType = EventType.AuthorityUserRegistrationPendingToApprovers;
+                    break;
+
+                case EmailType.ForgotUserName:
+                    eventCategory = EventCategory.ForgotUserName;
+                    eventType = EventType.ForgotUserName;
+                    break;
+
+                case EmailType.RegistrationResetPending:
+                    eventCategory = EventCategory.Registration;
+                    eventType = EventType.RegistrationResetPending;
+                    break;
+                default:
+                    throw new Exception("Not valid EmailType");
+            }
+
+
+            var template = _linkoExchangeDbContext.AuditLogTemplates.FirstOrDefault(i => i.TemplateType == "Email"
+                   && i.EventCategory == eventCategory.ToString()
+                   && i.EventType == eventType.ToString()
+               ); 
+
+
+        }
+    }
+
     public class LinkoExchangeEmailService
     { 
         private static readonly ApplicationDbContext LinkoExchangeDbContext = new ApplicationDbContext(); 

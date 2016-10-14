@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="Common\ValueParser.cs" />
     <Compile Include="Domain\ApplicationUser.cs" />
+    <Compile Include="Domain\AuditLogTemplate.cs" />
     <Compile Include="Domain\EmailTemplate.cs" />
     <Compile Include="Domain\Organization.cs" />
     <Compile Include="Domain\OrganizationRegulatoryProgram.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Domain\UserQuestionAnswer.cs" />
     <Compile Include="Enum\AuthenticationResult.cs" />
     <Compile Include="Enum\EmailType.cs" />
+    <Compile Include="Enum\EventCategory.cs" />
     <Compile Include="Extensions\IdentityExtensions.cs" />
     <Compile Include="Logging\CreationStackTrackerExtension.cs" />
     <Compile Include="Logging\CreationStackTrackerPolicy.cs" />
