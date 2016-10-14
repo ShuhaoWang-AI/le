@@ -2,73 +2,77 @@
 {
     public enum EmailType
     {
+        //TODO to remove
+        RegistrationConfirmation,
+        ResetPasswordConfirmation,
+
         // UC-5.1 registration denied, for authority
-        AuthorityRegistrationDenied,
+        Registration_AuthorityRegistrationDenied,
 
         // UC-5.1 registration denied, for industry
-        IndustryRegistrationDenied,
+        Registration_IndustryRegistrationDenied,
 
         // UC-5.1 registration approved, for industry
-        IndustryRegistrationApproved,
+        Registration_IndustryRegistrationApproved,
 
         // UC-5.1 registration approved, for authority
-        AuthorityRegistrationApproved,
+        Registration_AuthorityRegistrationApproved,
 
         // UC-5.5 Lock/UnLock  (for authority user account / and IU User Account)
-        AccountLockOut,
+        UserAccess_AccountLockOut,
 
         // UC-5.5 Lock/UnLock (for Authority Sys Admin / IU Authority sys Admin
-        LockOutToSysAdmins,
+        UserAccess_LockOutToSysAdmins,
 
         // UC-5.6 UC-7.6 Reset Authority User Account/Reset IU User Account
-        RegistratioinResetRequired,
+        Registration_RegistratioinResetRequired,
 
         // UC-5.7  Authority Invites Authority User 
-        InviteAuthorityUser,
+        Registration_InviteAuthorityUser,
 
-        // UC-7.7  Authority Invites Industry User 
-        InviteIndustryUser,
+        // UC-7.7  Authority Invites Industry User, and Industry invites Industry User 
+        Registration_InviteIndustryUser,
 
         // UC-7.8 Grant/Remove Signatory 
-        SignatoryGranted,
+        Signature_SignatoryGranted,
 
         // UC-7.8 Grant/Revoke Signatory
-        SignatoryRevoked,
+        Signature_SignatoryRevoked,
 
         // UC-30 Manage My Profile-Profile LockOut
-        KBQFailedLockOut,
+        Profile_KBQFailedLockOut,
 
         // UC-30 Manage My Profile-Profile Changed
-        ProfileChanged,
+        Profile_ProfileChanged,
 
         // UC-30 Manage My Profile-Email Changed
-        ProfileEmailChanged,
+        Profile_ProfileEmailChanged,
 
         // UC-30 Manage My Profile-KBQs Changed
-        KBQChanged,
+        Profile_KBQChanged,
 
         // UC-30 Manage My Profile-SQs Changed
-        SecurityQuestionsChanged,
+        Profile_SecurityQuestionsChanged,
 
         // UC-30 Manage My Profile-Password Changed
-        ProfilePasswordChanged,
+        Profile_ProfilePasswordChanged,
 
         // UC-33 Forgot Password 
-        ForgotPassword,
+        Profile_ForgotPassword,
 
         // UC-35 Reset Profile from Account Reset
-        ResetProfileRequired,
+        Profile_ResetProfileRequired,
 
         // UC-42.2.a Registration From invitation -- Email to Registration Approvers, industry user
-        IndustryUserRegistrationPendingToApprovers,
+        Registration_IndustryUserRegistrationPendingToApprovers,
 
         // UC-42.2.a, Registration From invitation -- Email to Registration Approvers, authority user
-        AuthorityUserRegistrationPendingToApprovers,
+        Registration_AuthorityUserRegistrationPendingToApprovers,
 
         //  UC-34 ForgotUserName
-        ForgotUserName,
+        ForgotUserName_ForgotUserName,
 
         // UC-35 RegistrationResetPending
-        RegistrationResetPending
+        Registration_RegistrationResetPending
     }
 }
