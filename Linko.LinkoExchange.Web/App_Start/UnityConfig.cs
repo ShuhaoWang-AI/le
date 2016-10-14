@@ -7,7 +7,7 @@ using System.Data.Entity;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Invitation;
-using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Settings;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity;
@@ -73,13 +73,23 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IOrganizationService, OrganizationService>();
             container.RegisterType<IInvitationService, InvitationService>();
             container.RegisterType<IProgramService, ProgramService>();
-            //container.RegisterInstance<IMapper>(Mapper.Instance);
+            
 
-            var config = new MapperConfiguration(cfg =>
+            //var config = new MapperConfiguration(cfg =>
+            //{
+            //    cfg.AddProfile(new UserMapProfile());
+            //});
+            //container.RegisterInstance<IMapper>(config.CreateMapper());
+            Mapper.Initialize(cfg =>
             {
                 cfg.AddProfile(new UserMapProfile());
             });
-            container.RegisterInstance<IMapper>(config.CreateMapper());
+
+            //Make sure there no methods were missing in the mappings loaded above via profiles
+            Mapper.AssertConfigurationIsValid();
+
+            container.RegisterInstance<IMapper>(Mapper.Instance);
+
         }
     }
 }

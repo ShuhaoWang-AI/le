@@ -9,29 +9,28 @@ using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services
 {
-    //public static class AutoMapperServicesConfiguration
-    //{
-    //    public static void Configure()
-    //    {
-    //        Mapper.Initialize(cfg =>
-    //        {
-    //            cfg.AddProfile(new UserMapProfile());
-    //        });
-
-    //        Mapper.AssertConfigurationIsValid();
-    //    }
-    //}
-
-    //These profiles are now loaded when Unity is configured
+    /// <summary>
+    /// These mapping profiles are loaded individually 
+    /// where Unity is configured
+    /// </summary>
     public class UserMapProfile : Profile
     {
         protected override void Configure()
         {
             CreateMap<UserProfile, UserDto>()
-                .ForMember(d => d.FirstName, o => o.MapFrom(s => s.FirstName))
-                .ForAllOtherMembers(opts => opts.Ignore()); //We should be explicitly ignoring each property we don't map to prevent silent failures!
-            CreateMap<OrganizationRegulatoryProgramUser, UserDto>()
-                .ForAllOtherMembers(opts => opts.Ignore());
+                //.ForAllMembers(opts => opts.Ignore()); //We should be explicitly ignoring each property we don't map to prevent silent failures!
+                .ForMember(d => d.OrgRegProgUserId, o => o.Ignore())
+                .ForMember(d => d.UserName, o => o.Ignore())
+                .ForMember(d => d.AuthorityId, o => o.Ignore())
+                .ForMember(d => d.IndustryId, o => o.Ignore())
+                .ForMember(d => d.IndustryName, o => o.Ignore())
+                .ForMember(d => d.Password, o => o.Ignore())
+                .ForMember(d => d.IsEnabled, o => o.Ignore());
+
+            CreateMap<Organization, OrganizationDto>() //Map all properties in the destination where names are the same 
+            .ForMember(d => d.OrganizationName, o => o.MapFrom(s => s.Name)) //Need to explicitly map b/c mismatched naming
+            .ReverseMap();
+
         }
     }
 }

@@ -34,6 +34,7 @@ namespace Linko.LinkoExchange.Data
         public DbSet<Question> Questions { get; set; }
         public DbSet<QuestionType> QuestionTypes { get; set; }
         public DbSet<PermissionGroup> PermissionGroups{ get; set; }
+        public DbSet<OrganizationRegulatoryProgram> OrganizationRegulatoryPrograms{ get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
