@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
@@ -29,22 +30,22 @@ namespace Linko.LinkoExchange.Core.Domain
             get; set;
         }
 
-        public int SenderUserName
+        public string SenderUserName
         {
             get; set;
         }
 
-        public int SenderFirstName
+        public string SenderFirstName
         {
             get; set;
         }
 
-        public int SenderLastName
+        public string SenderLastName
         {
             get; set;
         }
 
-        public int SenderEmailAddress
+        public string SenderEmailAddress
         {
             get; set;
         }
@@ -62,31 +63,31 @@ namespace Linko.LinkoExchange.Core.Domain
         {
             get; set;
         }
-        public int RecipientUserName
+        public string RecipientUserName
         {
             get; set;
         }
-        public int RecipientFirstName
+        public string RecipientFirstName
         {
             get; set;
         }
-        public int RecipientLastName
+        public string RecipientLastName
         {
             get; set;
         }
-        public int RecipientEmailAddress
+        public string RecipientEmailAddress
         {
             get; set;
         }
-        public int Subject
+        public string Subject
         {
             get; set;
         }
-        public int Body
+        public string Body
         {
             get; set;
         }
-        public int SentDateTimeUtc
+        public DateTime SentDateTimeUtc
         {
             get; set;
         }

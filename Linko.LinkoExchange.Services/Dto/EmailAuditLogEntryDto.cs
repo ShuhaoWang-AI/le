@@ -3,7 +3,12 @@
 namespace Linko.LinkoExchange.Services.Dto
 {
     public class EmailAuditLogEntryDto : IAuditLogEntry
-    { 
+    {
+        public int EmailAuditLogId
+        {
+            get; set;
+        }
+
         public int AuditLogTemplateId
         {
             get;set;
