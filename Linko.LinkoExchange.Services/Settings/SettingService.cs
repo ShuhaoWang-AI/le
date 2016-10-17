@@ -41,7 +41,7 @@ namespace Linko.LinkoExchange.Services.Settings
 			};
 		}
 
-        public IEnumerable<OrganizationSettingDto> GetOrganizationSettingsByIds_actual(IEnumerable<int> organizationIds)
+        public ICollection<OrganizationSettingDto> GetOrganizationSettingsByIds_actual(IEnumerable<int> organizationIds)
         {
             var orgSettingsDtoList = new List<OrganizationSettingDto>();
             if (organizationIds != null)
@@ -49,32 +49,31 @@ namespace Linko.LinkoExchange.Services.Settings
                 foreach (var orgId in organizationIds)
                 {
                     var orgSettingDto = new OrganizationSettingDto() { OrganizationId = orgId };
-                    var orgSettingDtoProgramSettings = new List<ProgramSettingDto>();
+                    orgSettingDto.Settings = new List<SettingDto>();
                     //Get Organization settings first
                     var org = _dbContext.Organizations.Single(o => o.OrganizationId == orgId);
                     foreach (var orgSetting in org.OrganizationSettings)
                     {
-                        orgSettingDto = _mapper.Map<OrganizationSetting, OrganizationSettingDto>(orgSetting); 
+                        orgSettingDto.Settings.Add(_mapper.Map<OrganizationSetting, SettingDto>(orgSetting));
                     }
-                    orgSettingsDtoList.Add(orgSettingDto);
 
                     //Get settings for each program this Organization is involved with
-
+                    orgSettingDto.ProgramSettings = new List<ProgramSettingDto>();
                     var OrganizationRegulatoryPrograms = _dbContext.OrganizationRegulatoryPrograms.Where(o => o.OrganizationId == orgId);
                     foreach (var OrganizationRegulatoryProgram in OrganizationRegulatoryPrograms)
                     {
                         //Get setting for this Regulatory Program
                         var programSettingDto = new ProgramSettingDto() { ProgramId = OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId };
-                        var programSettingDtoSettings = new List<SettingDto>();
+                        programSettingDto.Settings = new List<SettingDto>();
                         foreach (var OrganizationRegulatoryProgramSetting in OrganizationRegulatoryProgram.OrganizationRegulatoryProgramSettings)
                         {
                             var settingDto = _mapper.Map<OrganizationRegulatoryProgramSetting, SettingDto>(OrganizationRegulatoryProgramSetting);
-                            programSettingDtoSettings.Add(settingDto);
+                            programSettingDto.Settings.Add(settingDto);
                         }
-                        programSettingDto.Settings = programSettingDtoSettings;
-                        orgSettingDtoProgramSettings.Add(programSettingDto);
+                        orgSettingDto.ProgramSettings.Add(programSettingDto);
                     }
-                    orgSettingDto.ProgramSettings = orgSettingDtoProgramSettings;
+
+                    orgSettingsDtoList.Add(orgSettingDto);
                 }
             }
 
