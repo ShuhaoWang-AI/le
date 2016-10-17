@@ -114,12 +114,6 @@ namespace Linko.LinkoExchange.Services
 
         }
 
-        public void UpdateSettings(OrganizationSettingsDto settings)
-        {
-            //TODO
-        }
-
-
         /// When enabling, we need to check the parent (RegulatorOrganizationId)
         /// to see if there are any available licenses left
         ///

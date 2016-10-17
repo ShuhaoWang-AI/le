@@ -26,8 +26,6 @@ namespace Linko.LinkoExchange.Services
         /// <param name="organization"></param>
         void UpdateOrganization(OrganizationDto organization);
 
-        void UpdateSettings(OrganizationSettingsDto settings);
-
 
         /// When enabling, we need to check the parent (RegulatorOrganizationId)
         /// to see if there are any available licenses left
