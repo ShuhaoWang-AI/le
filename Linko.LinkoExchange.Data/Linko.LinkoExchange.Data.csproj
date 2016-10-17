@@ -68,6 +68,7 @@
     <Compile Include="Mapping\EmailAuditLogMap.cs" />
     <Compile Include="Mapping\EmailTemplateMap.cs" />
     <Compile Include="Mapping\AuditLogTemplateMap.cs" />
+    <Compile Include="Mapping\InvitationMap.cs" />
     <Compile Include="Mapping\UserPasswordHistoryMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
