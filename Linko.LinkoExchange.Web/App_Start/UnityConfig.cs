@@ -17,7 +17,7 @@ using Linko.LinkoExchange.Core.Logging;
 using NLog;
 using Linko.LinkoExchange.Web.Controllers;
 using AutoMapper;
-using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.Email;
 
