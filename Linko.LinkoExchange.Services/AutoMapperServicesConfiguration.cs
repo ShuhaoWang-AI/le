@@ -34,11 +34,15 @@ namespace Linko.LinkoExchange.Services
         }
     }
 
+    /// <summary>
+    /// AutoMapper profile from EmailAuditLogEntryDto to EmailAuditLog.
+    /// </summary>
     public class EmailAuditLogEntryDtoMapEmailAuditLog : Profile
     {
-        protected override void Configure()
+        public EmailAuditLogEntryDtoMapEmailAuditLog()
         {
             CreateMap<EmailAuditLogEntryDto, EmailAuditLog>().ForMember(i => i.EmailAuditLogId, o => o.Ignore());
-        }
+        }  
     }
+     
 }
