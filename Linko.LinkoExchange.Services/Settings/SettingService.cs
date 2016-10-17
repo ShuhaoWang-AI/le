@@ -1,16 +1,35 @@
-﻿using System.Collections.Generic; 
+﻿using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Data;
+using AutoMapper;
+using System.Linq;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Services.Settings
 {
 	public class SettingService : ISettingService
 	{
-		/// <summary>
-		/// Get organization settings for a collection of organization Ids
-		/// </summary>
-		/// <param name="organizationIds">The organization Ids.</param>
-		/// <returns>Collection of organization settings</returns>
-		public IEnumerable<OrganizationSettingDto> GetOrganizationSettingsByIds(IEnumerable<int> organizationIds)
+        #region private members
+
+        private readonly ApplicationDbContext _dbContext;
+        private readonly IAuditLogEntry _logger;
+        private readonly IMapper _mapper;
+
+        #endregion
+
+        public SettingService(ApplicationDbContext dbContext, IAuditLogEntry logger, IMapper mapper)
+        {
+            _dbContext = dbContext;
+            _logger = logger;
+            _mapper = mapper;
+        }
+
+        /// <summary>
+        /// Get organization settings for a collection of organization Ids
+        /// </summary>
+        /// <param name="organizationIds">The organization Ids.</param>
+        /// <returns>Collection of organization settings</returns>
+        public IEnumerable<OrganizationSettingDto> GetOrganizationSettingsByIds(IEnumerable<int> organizationIds)
 		{
 			return new[]
 			{
@@ -22,12 +41,52 @@ namespace Linko.LinkoExchange.Services.Settings
 			};
 		}
 
-		/// <summary>
-		/// Get the organization settings by organization Id
-		/// </summary>
-		/// <param name="organizationId"></param>
-		/// <returns>OrganizationSettingDto object</returns>
-		public OrganizationSettingDto GetOrganizationSettingsById(int organizationId)
+        public IEnumerable<OrganizationSettingDto> GetOrganizationSettingsByIds_actual(IEnumerable<int> organizationIds)
+        {
+            var orgSettingsDtoList = new List<OrganizationSettingDto>();
+            if (organizationIds != null)
+            {
+                foreach (var orgId in organizationIds)
+                {
+                    var orgSettingDto = new OrganizationSettingDto() { OrganizationId = orgId };
+                    var orgSettingDtoProgramSettings = new List<ProgramSettingDto>();
+                    //Get Organization settings first
+                    var org = _dbContext.Organizations.Single(o => o.OrganizationId == orgId);
+                    foreach (var orgSetting in org.OrganizationSettings)
+                    {
+                        orgSettingDto = _mapper.Map<OrganizationSetting, OrganizationSettingDto>(orgSetting); 
+                    }
+                    orgSettingsDtoList.Add(orgSettingDto);
+
+                    //Get settings for each program this Organization is involved with
+
+                    var OrganizationRegulatoryPrograms = _dbContext.OrganizationRegulatoryPrograms.Where(o => o.OrganizationId == orgId);
+                    foreach (var OrganizationRegulatoryProgram in OrganizationRegulatoryPrograms)
+                    {
+                        //Get setting for this Regulatory Program
+                        var programSettingDto = new ProgramSettingDto() { ProgramId = OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId };
+                        var programSettingDtoSettings = new List<SettingDto>();
+                        foreach (var OrganizationRegulatoryProgramSetting in OrganizationRegulatoryProgram.OrganizationRegulatoryProgramSettings)
+                        {
+                            var settingDto = _mapper.Map<OrganizationRegulatoryProgramSetting, SettingDto>(OrganizationRegulatoryProgramSetting);
+                            programSettingDtoSettings.Add(settingDto);
+                        }
+                        programSettingDto.Settings = programSettingDtoSettings;
+                        orgSettingDtoProgramSettings.Add(programSettingDto);
+                    }
+                    orgSettingDto.ProgramSettings = orgSettingDtoProgramSettings;
+                }
+            }
+
+            return orgSettingsDtoList;
+        }
+
+        /// <summary>
+        /// Get the organization settings by organization Id
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <returns>OrganizationSettingDto object</returns>
+        public OrganizationSettingDto GetOrganizationSettingsById(int organizationId)
 		{
 			return new OrganizationSettingDto
 			{
