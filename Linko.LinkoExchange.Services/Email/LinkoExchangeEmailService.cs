@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Dto;
 using System;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Services.Email
 {
@@ -30,15 +32,18 @@ namespace Linko.LinkoExchange.Services.Email
                 senderEmail = _fromEmailAddress;
             }
 
-            MailMessage msg = await GetMailMessage(sendTo, emailType, contentReplacements, senderEmail);
+            var template = await GetTemplate(emailType);
+            if (template == null) return;
+
+            MailMessage msg = await GetMailMessage(sendTo, template, contentReplacements, senderEmail);
             using (var smtpClient = new SmtpClient(_emailServer))
             {
                 smtpClient.Send(msg);
             }
 
             var emailLogEntry = logEntry as EmailAuditLogEntryDto;
-            if (emailLogEntry == null) return; 
-
+            if (emailLogEntry == null) return;
+            emailLogEntry.AuditLogTemplateId = template.AuditLogTemplateId;
             emailLogEntry.Body = msg.Body;
             emailLogEntry.Subject = msg.Subject;
             emailLogEntry.SenderEmailAddress = msg.From.Address;
@@ -49,8 +54,14 @@ namespace Linko.LinkoExchange.Services.Email
                 _emailAuditLogService.Log(logEntry);
             } 
         }
-        
-        private Task<MailMessage> GetMailMessage(string sendTo, EmailType emailType, IDictionary<string,string> replacements, string senderEmail)
+
+        private Task<AuditLogTemplate> GetTemplate(EmailType emailType)
+        {
+            var emailTemplateName = string.Format("Email_{0}", emailType.ToString());
+            return Task.FromResult(_linkoExchangeDbContext.AuditLogTemplates.First(i => i.Name == emailTemplateName));   
+        }
+
+        private Task<MailMessage> GetMailMessage(string sendTo, AuditLogTemplate emailTemplate, IDictionary<string,string> replacements, string senderEmail)
         {
          
             var keyValues = replacements.Select(i =>
@@ -58,13 +69,7 @@ namespace Linko.LinkoExchange.Services.Email
                 return new KeyValuePair<string, string>("{" + i.Key + "}", i.Value);
             }); 
 
-            replacements = keyValues.ToDictionary(i=>i.Key, i=>i.Value);
-            
-            var emailTemplateName = string.Format("Email_{0}", emailType.ToString());
-            var emailTemplate = _linkoExchangeDbContext.AuditLogTemplates.First(i => i.Name == emailTemplateName);
-
-            if (emailTemplate == null)
-                return null;
+            replacements = keyValues.ToDictionary(i=>i.Key, i=>i.Value); 
 
             var mailDefinition = new MailDefinition
             {

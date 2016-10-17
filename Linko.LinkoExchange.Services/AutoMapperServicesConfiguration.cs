@@ -33,4 +33,12 @@ namespace Linko.LinkoExchange.Services
 
         }
     }
+
+    public class EmailAuditLogEntryDtoMapEmailAuditLog : Profile
+    {
+        protected override void Configure()
+        {
+            CreateMap<EmailAuditLogEntryDto, EmailAuditLog>().ForMember(i => i.EmailAuditLogId, o => o.Ignore());
+        }
+    }
 }
