@@ -318,6 +318,7 @@
     <Content Include="Content\Images\logo.png" />
     <Content Include="Content\site.css" />
     <Content Include="ErrorPage.htm" />
+    <Content Include="favicon.ico" />
     <Content Include="FileNotFound.htm" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />

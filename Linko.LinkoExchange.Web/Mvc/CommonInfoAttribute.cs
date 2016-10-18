@@ -14,6 +14,13 @@ namespace Linko.LinkoExchange.Web.Mvc
                 filterContext.Controller.ViewBag.UserName = "UserName";
                 filterContext.Controller.ViewBag.UserRole = "UserRole";
             }
+            else
+            {
+                filterContext.Controller.ViewBag.PortalName = "";
+                filterContext.Controller.ViewBag.OrganizationName = "";
+                filterContext.Controller.ViewBag.UserName = "";
+                filterContext.Controller.ViewBag.UserRole = "";
+            }
         }
     }
 }
