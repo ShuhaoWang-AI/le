@@ -63,16 +63,22 @@ namespace Linko.LinkoExchange.Services.Program
         /// <summary>
         /// Get all the OrganizationRegulatoryProgram(s) that the users have access to
         /// </summary>
-        /// <param name="emails"></param>
+        /// <param name="email">The email address.</param>
         /// <returns></returns>
-        public IEnumerable<ProgramDto> GetUserPrograms(string  email)
+        public IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserPrograms(string  email)
         {
-            var user = _userService.GetUserProfileByEmail(email);
-            if (user == null)
+            var userProfile = _userService.GetUserProfileByEmail(email);
+            if (userProfile == null)
                 return null;
 
-            var regulatoryProgramUsers = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.ToList().Find(i => i.UserProfileId == user.UserProfileId);  
-            return null;
+            var organziationRegulatoryProgramUserDtos = new List<OrganizationRegulatoryProgramUserDto>();
+            var regulatoryProgramUsers = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.ToList().FindAll(i => i.UserProfileId == userProfile.UserProfileId);
+            if (regulatoryProgramUsers.Any()) 
+            {
+                organziationRegulatoryProgramUserDtos
+                    .AddRange(regulatoryProgramUsers.Select(user => _mapper.Map<OrganizationRegulatoryProgramUserDto>(user)));
+            }
+            return organziationRegulatoryProgramUserDtos;
         }
     }
 }

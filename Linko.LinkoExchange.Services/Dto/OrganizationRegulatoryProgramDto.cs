@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
-    class OrganizationRegulatoryProgramDto
+    public class OrganizationRegulatoryProgramDto
     { 
         public int OrganizationRegulatoryProgramId
         {

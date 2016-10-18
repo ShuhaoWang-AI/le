@@ -5,7 +5,7 @@ namespace Linko.LinkoExchange.Services.Program
 {
     public interface IProgramService
     {
-        IEnumerable<ProgramDto> GetUserPrograms(string email);
+        IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserPrograms(string email);
         /// <summary>
         /// Get programs that a user can access
         /// </summary>
