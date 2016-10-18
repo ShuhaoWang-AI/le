@@ -14,7 +14,6 @@ using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Core.Logging;
 using NLog;
 using AutoMapper;
-using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.Email;
 using System.Configuration;
@@ -98,7 +97,8 @@ namespace Linko.LinkoExchange.Web
             {
                 cfg.AddProfile(new UserMapProfile());
                 cfg.AddProfile(new EmailAuditLogEntryMapProfile()); 
-
+                cfg.AddProfile(new InvitationMapProfile());
+                cfg.AddProfile(new OrganziationRegulatoryProgramUserDtoMapProfile()); 
             });
 
             //Make sure there no methods were missing in the mappings loaded above via profiles

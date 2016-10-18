@@ -10,5 +10,5 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
             CreateMap<Core.Domain.Invitation, InvitationDto>();
             CreateMap<InvitationDto, Core.Domain.Invitation>();
         }
-    } 
+    }
 }
