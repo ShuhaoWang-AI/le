@@ -114,10 +114,14 @@
     <Compile Include="Authentication\IAuthenticationService.cs" />
     <Compile Include="Authentication\IdentityConfig.cs" />
     <Compile Include="Authentication\TokenGenerator.cs" />
-    <Compile Include="AutoMapperServicesConfiguration.cs" />
+    <Compile Include="AutoMapperProfile\EmailAuditLogEntryMapProfile.cs" />
+    <Compile Include="AutoMapperProfile\InvitationMapProfile.cs" />
+    <Compile Include="AutoMapperProfile\AutoMapperServicesConfiguration.cs" />
     <Compile Include="Dto\CrommerAuditLogEntry.cs" />
     <Compile Include="Dto\EmailAuditLogEntryDto.cs" />
     <Compile Include="Dto\IAuditLogEntry.cs" />
+    <Compile Include="Dto\InvitationDto.cs" />
+    <Compile Include="Dto\InvitationServiceResultDto.cs" />
     <Compile Include="Dto\OrganizationRegulatoryProgram.cs" />
     <Compile Include="Dto\OrganizationRegulatoryProgramUserDto.cs" />
     <Compile Include="Dto\OrganizationSettingsDto.cs" />

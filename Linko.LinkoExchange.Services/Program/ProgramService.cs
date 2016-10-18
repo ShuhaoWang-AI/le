@@ -4,17 +4,24 @@ using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.User;
 using System.Linq;
+using AutoMapper;
 
 namespace Linko.LinkoExchange.Services.Program
 {
     public class ProgramService : IProgramService
     {
         private readonly LinkoExchangeContext _linkoExchangeDbContext;
-        private readonly IUserService _userService; 
-        public ProgramService(LinkoExchangeContext applicationDbContext, IUserService userService)
+        private readonly IUserService _userService;
+        private readonly IMapper _mapper; 
+        public ProgramService(
+            LinkoExchangeContext applicationDbContext, 
+            IUserService userService,
+            IMapper mapper
+            )
         {
             _userService = userService;
             _linkoExchangeDbContext = applicationDbContext;
+            _mapper = mapper; 
         }
         
         /// <summary>

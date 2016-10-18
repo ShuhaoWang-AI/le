@@ -1,13 +1,8 @@
 ﻿using AutoMapper;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Dto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Linko.LinkoExchange.Services
+namespace Linko.LinkoExchange.Services.AutoMapperProfile
 {
     /// <summary>
     /// These mapping profiles are loaded individually 
@@ -31,17 +26,5 @@ namespace Linko.LinkoExchange.Services
             .ForMember(d => d.OrganizationName, o => o.MapFrom(s => s.Name)) //Need to explicitly map b/c mismatched naming
             .ReverseMap();
         }
-    }
-
-    /// <summary>
-    /// AutoMapper profile from EmailAuditLogEntryDto to EmailAuditLog.
-    /// </summary>
-    public class EmailAuditLogEntryDtoMapEmailAuditLog : Profile
-    {
-        public EmailAuditLogEntryDtoMapEmailAuditLog()
-        {
-            CreateMap<EmailAuditLogEntryDto, EmailAuditLog>().ForMember(i => i.EmailAuditLogId, o => o.Ignore());
-        }  
-    }
-     
+    } 
 }

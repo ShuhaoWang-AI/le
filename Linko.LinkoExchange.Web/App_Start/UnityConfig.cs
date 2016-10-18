@@ -20,6 +20,7 @@ using Linko.LinkoExchange.Services.Email;
 using System.Configuration;
 using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Services.AutoMapperProfile;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -96,7 +97,7 @@ namespace Linko.LinkoExchange.Web
             Mapper.Initialize(cfg =>
             {
                 cfg.AddProfile(new UserMapProfile());
-                cfg.AddProfile(new EmailAuditLogEntryDtoMapEmailAuditLog());
+                cfg.AddProfile(new EmailAuditLogEntryMapProfile()); 
 
             });
 

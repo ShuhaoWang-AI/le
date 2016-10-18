@@ -47,5 +47,5 @@ obj
 *.dll
 *.mdf
 *.ldf
-
+.git*
 
