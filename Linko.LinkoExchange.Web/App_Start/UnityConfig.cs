@@ -20,6 +20,7 @@ using System.Configuration;
 using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.AutoMapperProfile;
+using Linko.LinkoExchange.Services.User;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -76,6 +77,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IOrganizationService, OrganizationService>();
             container.RegisterType<IInvitationService, InvitationService>();
             container.RegisterType<IProgramService, ProgramService>();
+            container.RegisterType<IUserService, UserService>();
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();

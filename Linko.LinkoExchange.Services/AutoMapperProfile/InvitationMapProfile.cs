@@ -7,7 +7,9 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
     {
         public InvitationMapProfile()
         {
-            CreateMap<Core.Domain.Invitation, InvitationDto>();
+            CreateMap<Core.Domain.Invitation, InvitationDto>()
+                .ForMember(d => d.Token, o => o.Ignore());
+
             CreateMap<InvitationDto, Core.Domain.Invitation>();
         }
     }
