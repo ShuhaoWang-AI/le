@@ -14,10 +14,13 @@ namespace Linko.LinkoExchange.Data.Mapping
         {
             ToTable("tOrganizationSetting");
 
-            HasKey(i => i.OrganizationSettingId);
+            this.HasKey(i => i.OrganizationSettingId);
             Property(i => i.OrganizationId);
-            //Property(i => i.SettingTemplate);
-            Property(i => i.Value);
+            this.Property(i => i.Value);
+            this.Property(i => i.SettingTemplateId);
+            this.HasRequired(i => i.SettingTemplate)
+                .WithMany()
+                .HasForeignKey(i => i.SettingTemplateId);
         }
     }
 }

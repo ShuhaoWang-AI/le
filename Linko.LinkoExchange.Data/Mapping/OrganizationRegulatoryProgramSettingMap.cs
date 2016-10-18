@@ -20,6 +20,9 @@ namespace Linko.LinkoExchange.Data.Mapping
             this.HasRequired(i => i.SettingTemplate)
                 .WithMany()
                 .HasForeignKey(i => i.SettingTemplateId);
+            this.HasRequired(i => i.OrganizationRegulatoryProgram)
+                .WithMany()
+                .HasForeignKey(i => i.OrganizationRegulatoryProgramId);
 
         }
     }

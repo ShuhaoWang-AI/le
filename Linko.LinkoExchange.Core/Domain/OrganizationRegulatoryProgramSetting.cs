@@ -10,7 +10,9 @@ namespace Linko.LinkoExchange.Core.Domain
     public class OrganizationRegulatoryProgramSetting
     {
         [Key]
-        public int OrganizationRegulatoryProgramSettingId { get; set;}
+        public int OrganizationRegulatoryProgramSettingId { get; set; }
+        public int OrganizationRegulatoryProgramId { get; set; }
+        public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
         public int SettingTemplateId { get; set; }
         public virtual SettingTemplate SettingTemplate { get; set;}
         public string Value { get; set;}
