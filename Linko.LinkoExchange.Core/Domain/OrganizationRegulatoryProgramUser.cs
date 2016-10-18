@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
@@ -19,8 +15,12 @@ namespace Linko.LinkoExchange.Core.Domain
         public bool IsSignatory { get; set; }
         public DateTime LastModificationDateTime { get; set; }
         public int LastModificationUserId { get; set; }
-        public virtual UserProfile UserProfile { get; set; }
+        public int UserProfileId { get;set; }
+        public virtual UserProfile UserProfile { get; set; } 
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
         public virtual PermissionGroup PermissionGroup { get; set; }
+        public int PermissionGrouopId;
+        public DateTime CreationDateTimeUtc { get;set; }
+        public DateTime RegistrationDateTime { get;set;}
     }
 }

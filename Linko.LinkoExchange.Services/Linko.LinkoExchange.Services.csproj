@@ -118,6 +118,8 @@
     <Compile Include="Dto\CrommerAuditLogEntry.cs" />
     <Compile Include="Dto\EmailAuditLogEntryDto.cs" />
     <Compile Include="Dto\IAuditLogEntry.cs" />
+    <Compile Include="Dto\OrganizationRegulatoryProgram.cs" />
+    <Compile Include="Dto\OrganizationRegulatoryProgramUserDto.cs" />
     <Compile Include="Dto\OrganizationSettingsDto.cs" />
     <Compile Include="Dto\AuthorityDetailsDto.cs" />
     <Compile Include="Dto\OrganizationDto.cs" />

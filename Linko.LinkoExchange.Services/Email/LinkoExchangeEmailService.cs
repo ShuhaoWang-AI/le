@@ -96,6 +96,13 @@ namespace Linko.LinkoExchange.Services.Email
             }
 
             return originText;
-        } 
+        }
+
+        private IEnumerable<EmailAuditLog> GetEmailAuditLog(IEnumerable<string> emailAddresses)
+        {
+
+
+            return new[] { new EmailAuditLog() };
+        }
     }
 }

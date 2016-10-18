@@ -1,10 +1,22 @@
+using System;
 using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.User;
+using System.Linq;
 
 namespace Linko.LinkoExchange.Services.Program
 {
     public class ProgramService : IProgramService
     {
+        private readonly LinkoExchangeContext _linkoExchangeDbContext;
+        private readonly IUserService _userService; 
+        public ProgramService(LinkoExchangeContext applicationDbContext, IUserService userService)
+        {
+            _userService = userService;
+            _linkoExchangeDbContext = applicationDbContext;
+        }
+        
         /// <summary>
         /// Get programs that a user can access
         /// </summary>
@@ -39,6 +51,21 @@ namespace Linko.LinkoExchange.Services.Program
                     ProgramName = "Mock program name"
                 }
             };
+        }
+
+        /// <summary>
+        /// Get all the OrganizationRegulatoryProgram(s) that the users have access to
+        /// </summary>
+        /// <param name="emails"></param>
+        /// <returns></returns>
+        public IEnumerable<ProgramDto> GetUserPrograms(string  email)
+        {
+            var user = _userService.GetUserProfileByEmail(email);
+            if (user == null)
+                return null;
+
+            var regulatoryProgramUsers = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.ToList().Find(i => i.UserProfileId == user.UserProfileId);  
+            return null;
         }
     }
 }
