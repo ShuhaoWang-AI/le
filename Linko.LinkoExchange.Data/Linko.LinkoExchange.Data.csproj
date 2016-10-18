@@ -69,7 +69,13 @@
     <Compile Include="Mapping\EmailTemplateMap.cs" />
     <Compile Include="Mapping\AuditLogTemplateMap.cs" />
     <Compile Include="Mapping\InvitationMap.cs" />
+    <Compile Include="Mapping\OrganizationMap.cs" />
+    <Compile Include="Mapping\OrganizationRegulatoryProgramMap.cs" />
+    <Compile Include="Mapping\OrganizationRegulatoryProgramSettingMap.cs" />
     <Compile Include="Mapping\OrganizationRegulatoryProgramUserMap.cs" />
+    <Compile Include="Mapping\OrganizationSettingMap.cs" />
+    <Compile Include="Mapping\RegulatoryProgramMap.cs" />
+    <Compile Include="Mapping\SettingTemplateMap.cs" />
     <Compile Include="Mapping\UserPasswordHistoryMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

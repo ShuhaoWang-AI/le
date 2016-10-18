@@ -12,5 +12,6 @@ namespace Linko.LinkoExchange.Core.Domain
         [Key]
         public int SettingTemplateId { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
     }
 }
