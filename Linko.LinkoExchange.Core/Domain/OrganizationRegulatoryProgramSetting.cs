@@ -11,7 +11,8 @@ namespace Linko.LinkoExchange.Core.Domain
     {
         [Key]
         public int OrganizationRegulatoryProgramSettingId { get; set;}
-        public string Name { get; set;}
+        public int SettingTemplateId { get; set; }
+        public virtual SettingTemplate SettingTemplate { get; set;}
         public string Value { get; set;}
     }
 }

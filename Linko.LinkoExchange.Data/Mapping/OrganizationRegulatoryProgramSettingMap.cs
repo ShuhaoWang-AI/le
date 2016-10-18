@@ -14,9 +14,13 @@ namespace Linko.LinkoExchange.Data.Mapping
         {
             ToTable("tOrganizationRegulatoryProgramSetting");
 
-            HasKey(i => i.OrganizationRegulatoryProgramSettingId);
-            //Property(i => i.SettingTemplate);
-            Property(i => i.Value);
+            this.HasKey(i => i.OrganizationRegulatoryProgramSettingId);
+            this.Property(i => i.Value);
+            this.Property(i => i.SettingTemplateId);
+            this.HasRequired(i => i.SettingTemplate)
+                .WithMany()
+                .HasForeignKey(i => i.SettingTemplateId);
+
         }
     }
 }
