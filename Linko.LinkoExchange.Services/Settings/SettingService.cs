@@ -50,35 +50,10 @@ namespace Linko.LinkoExchange.Services.Settings
             {
                 foreach (var orgId in organizationIds)
                 {
-                    var orgSettingDto = new OrganizationSettingDto() { OrganizationId = orgId };
-                    orgSettingDto.Settings = new List<SettingDto>();
-                    //Get Organization settings first
-                    var org = _dbContext.Organizations.Single(o => o.OrganizationId == orgId);
-                    foreach (var orgSetting in org.OrganizationSettings)
-                    {
-                        orgSettingDto.Settings.Add(_mapper.Map<OrganizationSetting, SettingDto>(orgSetting));
-                    }
-
-                    //Get settings for each program this Organization is involved with
-                    orgSettingDto.ProgramSettings = new List<ProgramSettingDto>();
-                    var OrganizationRegulatoryPrograms = _dbContext.OrganizationRegulatoryPrograms.Where(o => o.OrganizationId == orgId);
-                    foreach (var OrganizationRegulatoryProgram in OrganizationRegulatoryPrograms)
-                    {
-                        //Get setting for this Regulatory Program
-                        var programSettingDto = new ProgramSettingDto() { ProgramId = OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId };
-                        programSettingDto.Settings = new List<SettingDto>();
-                        foreach (var OrganizationRegulatoryProgramSetting in OrganizationRegulatoryProgram.OrganizationRegulatoryProgramSettings)
-                        {
-                            var settingDto = _mapper.Map<OrganizationRegulatoryProgramSetting, SettingDto>(OrganizationRegulatoryProgramSetting);
-                            programSettingDto.Settings.Add(settingDto);
-                        }
-                        orgSettingDto.ProgramSettings.Add(programSettingDto);
-                    }
-
+                    var orgSettingDto = GetOrganizationSettingsById_actual(orgId);
                     orgSettingsDtoList.Add(orgSettingDto);
                 }
             }
-
             return orgSettingsDtoList;
         }
 
@@ -95,6 +70,36 @@ namespace Linko.LinkoExchange.Services.Settings
 				Settings = GetMockData()
 			};
 		}
+        public OrganizationSettingDto GetOrganizationSettingsById_actual(int organizationId)
+        {
+            var orgSettingDto = new OrganizationSettingDto() { OrganizationId = organizationId };
+            orgSettingDto.Settings = new List<SettingDto>();
+            //Get Organization settings first
+            var org = _dbContext.Organizations.Single(o => o.OrganizationId == organizationId);
+            foreach (var orgSetting in org.OrganizationSettings)
+            {
+                orgSettingDto.Settings.Add(_mapper.Map<OrganizationSetting, SettingDto>(orgSetting));
+            }
+
+            //Get settings for each program this Organization is involved with
+            orgSettingDto.ProgramSettings = new List<ProgramSettingDto>();
+            var OrganizationRegulatoryPrograms = _dbContext.OrganizationRegulatoryPrograms.Where(o => o.OrganizationId == organizationId);
+            foreach (var OrganizationRegulatoryProgram in OrganizationRegulatoryPrograms)
+            {
+                //Get setting for this Regulatory Program
+                var programSettingDto = new ProgramSettingDto() { ProgramId = OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId };
+                programSettingDto.Settings = new List<SettingDto>();
+                foreach (var OrganizationRegulatoryProgramSetting in OrganizationRegulatoryProgram.OrganizationRegulatoryProgramSettings)
+                {
+                    var settingDto = _mapper.Map<OrganizationRegulatoryProgramSetting, SettingDto>(OrganizationRegulatoryProgramSetting);
+                    programSettingDto.Settings.Add(settingDto);
+                }
+                orgSettingDto.ProgramSettings.Add(programSettingDto);
+            }
+
+            return orgSettingDto;
+        }
+
 
 		/// <summary>
 		/// Get settings for one program
@@ -103,7 +108,14 @@ namespace Linko.LinkoExchange.Services.Settings
 		/// <returns>The PrrogramSetting object</returns>
 		public ProgramSettingDto GetProgramSettingsById(int programId)
 		{
-			throw new System.NotImplementedException();
+            var progSettingDto = new ProgramSettingDto() { ProgramId = programId };
+            progSettingDto.Settings = new List<SettingDto>();
+            var program = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == programId);
+            foreach (var setting in program.OrganizationRegulatoryProgramSettings)
+            {
+                progSettingDto.Settings.Add(_mapper.Map<OrganizationRegulatoryProgramSetting, SettingDto>(setting));
+            }
+            return progSettingDto;
 		}
 
 		public IEnumerable<ProgramSettingDto> GetProgramSettingsByIds(IEnumerable<int> programIds)
@@ -117,12 +129,24 @@ namespace Linko.LinkoExchange.Services.Settings
 				}
 			};
 		}
+        public ICollection<ProgramSettingDto> GetProgramSettingsByIds_actual(IEnumerable<int> programIds)
+        {
+            var settingDtoList = new List<ProgramSettingDto>();
+            if (programIds != null)
+            {
+                foreach (var programId in programIds)
+                {
+                    settingDtoList.Add(GetProgramSettingsById(programId));
+                }
+            }
+            return settingDtoList;
+        }
 
-		/// <summary>
-		/// Get application global settings.
-		/// </summary>
-		/// <returns>The settings for dictionary object</returns>
-		public IDictionary<string, string> GetGlobalSettings()
+        /// <summary>
+        /// Get application global settings.
+        /// </summary>
+        /// <returns>The settings for dictionary object</returns>
+        public IDictionary<string, string> GetGlobalSettings()
 		{
 			//TODO: get system global settings
 			var globalSetting = new Dictionary<string, string>();

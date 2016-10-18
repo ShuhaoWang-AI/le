@@ -84,6 +84,7 @@
     <Compile Include="Domain\Question.cs" />
     <Compile Include="Domain\QuestionType.cs" />
     <Compile Include="Domain\RegulatoryProgram.cs" />
+    <Compile Include="Domain\SettingTemplate.cs" />
     <Compile Include="Domain\SignatoryRequest.cs" />
     <Compile Include="Domain\SignatoryRequestStatus.cs" />
     <Compile Include="Domain\UserPasswordHistory.cs" />
