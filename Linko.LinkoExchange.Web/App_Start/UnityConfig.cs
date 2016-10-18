@@ -3,7 +3,6 @@ using System.Web;
 using Microsoft.Practices.Unity;
 using Linko.LinkoExchange.Services.Authentication;
 using Microsoft.Owin.Security;
-using System.Data.Entity;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Invitation;
@@ -11,15 +10,16 @@ using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Settings;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Core.Logging;
 using NLog;
-using Linko.LinkoExchange.Web.Controllers;
 using AutoMapper;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.Email;
+using System.Configuration;
+using Linko.LinkoExchange.Web.Mvc;
+using Linko.LinkoExchange.Services.AuditLog;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -57,26 +57,34 @@ namespace Linko.LinkoExchange.Web
             // TODO: Register your types here
             // container.RegisterType<IProductRepository, ProductRepository>();
 
+            // Data layer
+            string connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ToString();
+            container.RegisterType<LinkoExchangeContext>(new PerRequestLifetimeManager(), new InjectionConstructor(connectionString));
+
             // Logger
             container.AddNewExtension<NLogExtension>();
 
             // Custom filter
-            container.RegisterType<CommonController>(new InjectionConstructor(typeof(ILogger)));
+            container.RegisterType<CustomHandleErrorAttribute>(new InjectionConstructor(typeof(ILogger)));
 
-            container.RegisterType<DbContext, ApplicationDbContext> (new PerRequestLifetimeManager ());
-            container.RegisterType<IUserStore<ApplicationUser>, UserStore<ApplicationUser>> ();
-            container.RegisterType<ApplicationSignInManager> ();
-            container.RegisterType<ApplicationUserManager> ();
-            container.RegisterType<IAuthenticationManager> (new InjectionFactory (c => HttpContext.Current.GetOwinContext ().Authentication));
+            // Services
             container.RegisterType<IAuthenticationManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));
-            container.RegisterType<ApplicationSignInManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Get<ApplicationSignInManager>()));
-            container.RegisterType<IAuthenticationService, AuthenticationService> ();
+            container.RegisterType<IAuthenticationManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));
+            //container.RegisterType<ApplicationSignInManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Get<ApplicationSignInManager>()));
+            container.RegisterType<IAuthenticationService, AuthenticationService>();
             container.RegisterType<ISettingService, SettingService>();
             container.RegisterType<IOrganizationService, OrganizationService>();
             container.RegisterType<IInvitationService, InvitationService>();
             container.RegisterType<IProgramService, ProgramService>();
+
+            // Custom identity services           
+            container.RegisterType<ApplicationSignInManager>();
+            container.RegisterType<ApplicationUserManager>();
+            container.RegisterType<IAuthenticationManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));
+            container.RegisterType<IUserStore<ApplicationUser>, UserStore<ApplicationUser>>(new InjectionConstructor(typeof(LinkoExchangeContext)));
             container.RegisterType<IPermissionService, PermissionService>();
-            container.RegisterType<IEmailService, LinkoExchangeEmailService>();
+            container.RegisterType<IAuditLogService, EmailAuditLogService>(new InjectionConstructor(typeof(LinkoExchangeContext)));
+            container.RegisterType<IEmailService, LinkoExchangeEmailService>(new InjectionConstructor(typeof(LinkoExchangeContext), typeof(EmailAuditLogService)));
 
 
 
@@ -89,7 +97,7 @@ namespace Linko.LinkoExchange.Web
             {
                 cfg.AddProfile(new UserMapProfile());
                 cfg.AddProfile(new EmailAuditLogEntryDtoMapEmailAuditLog());
-                
+
             });
 
             //Make sure there no methods were missing in the mappings loaded above via profiles

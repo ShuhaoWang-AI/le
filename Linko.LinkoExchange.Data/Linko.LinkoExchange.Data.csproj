@@ -64,7 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApplicationDbContext.cs" />
+    <Compile Include="LinkoExchangeContext.cs" />
     <Compile Include="Mapping\EmailAuditLogMap.cs" />
     <Compile Include="Mapping\EmailTemplateMap.cs" />
     <Compile Include="Mapping\AuditLogTemplateMap.cs" />

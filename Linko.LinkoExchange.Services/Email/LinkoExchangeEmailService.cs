@@ -17,15 +17,21 @@ namespace Linko.LinkoExchange.Services.Email
 {
     public class LinkoExchangeEmailService : IEmailService
     {
-        private readonly ApplicationDbContext _linkoExchangeDbContext = new ApplicationDbContext();
-        private readonly IAuditLogService _emailAuditLogService = new EmailAuditLogService(); 
+        private readonly LinkoExchangeContext _dbContext;
+        private readonly IAuditLogService _emailAuditLogService; 
 
         private readonly string _emailServer = ConfigurationManager.AppSettings["EmailServer"];
         private readonly string _fromEmailAddress = ConfigurationManager.AppSettings["EmailSenderFromEmail"];
 
-        public async void SendEmail(IEnumerable<string> recipients, EmailType emailType, IDictionary<string, string> contentReplacements, IAuditLogEntry logEntry, string senderEmail = null)
+        public LinkoExchangeEmailService(LinkoExchangeContext linkoExchangeContext, EmailAuditLogService emailAuditLogService)
         {
-            string sendTo = string.Join(",", recipients);
+            _dbContext = linkoExchangeContext;
+            _emailAuditLogService = emailAuditLogService;
+        }
+
+    public async void SendEmail(IEnumerable<string> recipients, EmailType emailType, IDictionary<string, string> contentReplacements, IAuditLogEntry logEntry, string senderEmail = null)
+        {
+            string sendTo = string.Join(separator: ",", values: recipients);
 
             if (string.IsNullOrWhiteSpace(senderEmail))
             {
@@ -58,7 +64,7 @@ namespace Linko.LinkoExchange.Services.Email
         private Task<AuditLogTemplate> GetTemplate(EmailType emailType)
         {
             var emailTemplateName = string.Format("Email_{0}", emailType.ToString());
-            return Task.FromResult(_linkoExchangeDbContext.AuditLogTemplates.First(i => i.Name == emailTemplateName));   
+            return Task.FromResult(_dbContext.AuditLogTemplates.First(i => i.Name == emailTemplateName));   
         }
 
         private Task<MailMessage> GetMailMessage(string sendTo, AuditLogTemplate emailTemplate, IDictionary<string,string> replacements, string senderEmail)

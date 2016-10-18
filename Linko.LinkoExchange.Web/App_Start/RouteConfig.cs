@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace Linko.LinkoExchange.Web
@@ -11,7 +7,7 @@ namespace Linko.LinkoExchange.Web
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
-            routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+            routes.IgnoreRoute(url: "{resource}.axd/{*pathInfo}");
 
             //Enable attribute routing.
             routes.MapMvcAttributeRoutes();

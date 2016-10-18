@@ -11,16 +11,18 @@ namespace Linko.LinkoExchange.Services.Settings
 	{
         #region private members
 
-        private readonly ApplicationDbContext _dbContext;
-        private readonly IAuditLogEntry _logger;
+        private readonly LinkoExchangeContext _dbContext;
+        //private readonly IAuditLogEntry _logger;
         private readonly IMapper _mapper;
 
         #endregion
 
-        public SettingService(ApplicationDbContext dbContext, IAuditLogEntry logger, IMapper mapper)
+        public SettingService(LinkoExchangeContext dbContext
+            //, IAuditLogEntry logger
+            , IMapper mapper)
         {
             _dbContext = dbContext;
-            _logger = logger;
+         //   _logger = logger;
             _mapper = mapper;
         }
 

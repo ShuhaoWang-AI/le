@@ -20,6 +20,8 @@ namespace Linko.LinkoExchange.Web
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             FluentValidationModelValidatorProvider.Configure();
+            UnityConfig.RegisterTypes(UnityConfig.GetConfiguredContainer());
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
         }
 
         /// <summary>

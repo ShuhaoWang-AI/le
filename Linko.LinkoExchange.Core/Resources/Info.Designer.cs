@@ -59,5 +59,14 @@ namespace Linko.LinkoExchange.Core.Resources {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sorry, but your session has timed out. You&apos;ll be redirected to the Sign In page in 30 seconds....
+        /// </summary>
+        public static string SessionTimeOutPopupMessage {
+            get {
+                return ResourceManager.GetString("SessionTimeOutPopupMessage", resourceCulture);
+            }
+        }
     }
 }

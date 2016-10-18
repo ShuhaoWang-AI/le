@@ -11,7 +11,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 {
     public class AccountController : Controller
     { 
-        private IAuditLogService _auditLogService;
+        //private IAuditLogService _auditLogService;
         private readonly IAuthenticationService _authenticateService; 
 
         public AccountController(IAuthenticationService authenticateService)
@@ -22,34 +22,34 @@ namespace Linko.LinkoExchange.Web.Controllers
         // GET: Account
         public async Task<ActionResult> Index()
         {
-            IEmailService emailService = new LinkoExchange.Services.Email.LinkoExchangeEmailService();
+            //IEmailService emailService = new LinkoExchangeEmailService();
 
-            var contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add("organizationName", "Green Vally Plant");
-            contentReplacements.Add("authorityName", "Grand Rapids");
-            contentReplacements.Add("userName", "Shuhao Wang");
-            contentReplacements.Add("addressLine1", "1055 Pender Street");
-            contentReplacements.Add("cityName", "Vancouver");
-            contentReplacements.Add("stateName", "BC");
+            //var contentReplacements = new Dictionary<string, string>();
+            //contentReplacements.Add("organizationName", "Green Vally Plant");
+            //contentReplacements.Add("authorityName", "Grand Rapids");
+            //contentReplacements.Add("userName", "Shuhao Wang");
+            //contentReplacements.Add("addressLine1", "1055 Pender Street");
+            //contentReplacements.Add("cityName", "Vancouver");
+            //contentReplacements.Add("stateName", "BC");
 
-            var receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            //var receivers = new List<string> { "shuhao.wang@watertrax.com" };
 
-            var logEntry = new EmailAuditLogEntryDto();
-            logEntry.RecipientFirstName = "First Name";
-            logEntry.RecipientLastName = "last name";
-            logEntry.RecipientUserName = "Fist name, lastName";
-            logEntry.SenderFirstName = "Linko support";
-            logEntry.SenderLastName = "Linko support";
-            logEntry.SenderEmailAddress = "shuhao.wang@watertrax.com";
+            //var logEntry = new EmailAuditLogEntryDto();
+            //logEntry.RecipientFirstName = "First Name";
+            //logEntry.RecipientLastName = "last name";
+            //logEntry.RecipientUserName = "Fist name, lastName";
+            //logEntry.SenderFirstName = "Linko support";
+            //logEntry.SenderLastName = "Linko support";
+            //logEntry.SenderEmailAddress = "shuhao.wang@watertrax.com";
 
-            emailService.SendEmail(receivers, Linko.LinkoExchange.Core.Enum.EmailType.Signature_SignatoryGranted, contentReplacements, logEntry, logEntry.SenderEmailAddress);
+            //emailService.SendEmail(receivers, Linko.LinkoExchange.Core.Enum.EmailType.Signature_SignatoryGranted, contentReplacements, logEntry, logEntry.SenderEmailAddress);
 
 
             return View ();
         }
 
         [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
+        public ActionResult SignIn(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
             return View();
@@ -57,9 +57,9 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult> Login(LoginViewModel model)
+        public async Task<ActionResult> SignIn(SignInViewModel model)
         {
-            var email = model.Email;
+            var email = model.UserName;
             var password = model.Password;
             var signInResult = await _authenticateService.SignInByUserName(email, password, true);
 

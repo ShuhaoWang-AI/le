@@ -1,0 +1,141 @@
+﻿
+@using Linko.LinkoExchange.Core.Resources
+<header class="main-header">
+    @if (Request.IsAuthenticated)
+    {
+        @* BEGIN Logo *@
+        <a href="@Url.RouteUrl(routeName:"Default")" class="logo">
+            <!-- mini logo for sidebar mini 50x50 pixels -->
+            <span class="logo-mini">
+                <img title=" " alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo-min.png")" width="40" height="40" />
+            </span>
+            <!-- logo for regular state and mobile devices -->
+            <span class="logo-lg">
+                <img title=" " alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo.png")" class="img-responsive" width="200" height="40" />
+            </span>
+        </a>
+        @* END Logo *@
+
+        @* BEGIN Header *@
+        <nav class="navbar navbar-static-top" role="navigation">
+            <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                <span class="sr-only">Toggle navigation</span>
+            </a>
+            <span class="navbar-brand program-font">
+                @if (!string.IsNullOrWhiteSpace(ViewBag.PortalName))
+                {
+                    @ViewBag.PortalName
+                }
+            </span>
+            <span class="navbar-brand">-</span>
+            <span class="navbar-brand  program-font">
+                @if (!string.IsNullOrWhiteSpace(ViewBag.OrganizationName))
+                {
+                    @ViewBag.OrganizationName
+                }
+            </span>
+            <div class="navbar-custom-menu">
+                @using (Html.BeginForm(actionName: "SignOff", controllerName: "Account", method: FormMethod.Post, htmlAttributes: new { id = "formSignOut", @class = "navbar-right" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <ul class="nav navbar-nav">
+                        @* BEGIN User Account Menu *@
+                        <li class="dropdown user user-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-user"></i>
+                                <span class="hidden-xs">
+                                    @if (!string.IsNullOrWhiteSpace(ViewBag.UserName))
+                                    {
+                                        @ViewBag.UserName
+                                    }
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="user-body">
+                                    <div class="row">
+                                        <div class="col-xs-12 text-center">
+
+                                            @if (!string.IsNullOrWhiteSpace(ViewBag.UserName))
+                                            {
+                                                @ViewBag.UserName
+                                            }
+                                        </div>
+                                        <div class="col-xs-12 text-center">
+                                            <small>
+                                                @if (!string.IsNullOrWhiteSpace(ViewBag.UserRole))
+                                                {
+                                                    @ViewBag.UserRole
+                                                }
+                                            </small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="user-footer">
+                                    <div class="pull-left">
+                                        <a href="#" class="btn .btn-sm btn-primary">@Label.ButtonProfile (need to update link)</a>
+                                    </div>
+                                    <div class="pull-right">
+                                        <a href="javascript:document.getElementById('formSignOut').submit()" class="btn .btn-sm btn-primary">@Label.ButtonSignOut</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                        @* END User Account Menu *@
+                        @* BEGIN Control Sidebar Toggle Button *@
+                        @* Keep the following line so that user Account menu does not push to right side edge of the screen *@
+                        <li>
+                            <a href="#">&nbsp;</a>
+                        </li>
+                        @* END Control Sidebar Toggle Button *@
+                    </ul>
+                }
+            </div>
+        </nav>
+
+        @* BEGIN Pop-up for when session timeout *@
+        <script>
+
+            $(document).ready(function () {
+                var timeOut = @System.Web.Configuration.WebConfigurationManager.AppSettings["CookieValidateInterval"] * 60 * 1000;
+                setTimeout("showPopup()", timeOut); // milliseconds
+            });
+
+            function showPopup() {
+                var message = @Info.SessionTimeOutPopupMessage;
+
+                $('body').append('<div class="popup" data-popup="popup-1">' +
+                                    '<div class="popup-inner">' +
+                                        '<h4>' + message + '</h4>' +
+                                        '<a class="popup-close" data-popup-close="popup-1" href="#">x</a>' +
+                                    '</div>' +
+                                '</div>');
+
+                $('[data-popup="popup-1"]').fadeIn(350);
+
+                $('[data-popup-close]').on('click', function (e) {
+                    $('[data-popup="popup-1"]').fadeOut(350);
+                    location.reload();
+                });
+
+                setTimeout(function () {
+                    location.reload();
+                }, 30 * 1000);
+            }
+
+        </script>
+        @* END Pop-up for when session timeout *@
+    }
+    else
+    {
+        <a href="#" class="logo hidden-xs">&nbsp;</a>
+        <nav class="navbar navbar-static-top" role="navigation">
+            @* BEGIN Logo *@
+            <span>
+                <a href="@Url.RouteUrl(routeName:"Default")">
+                    <img title=" " alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo.png")" class="img-responsive" width="200" height="40" />
+                </a>
+            </span>
+            @* END Logo *@
+        </nav>
+    }
+</header>

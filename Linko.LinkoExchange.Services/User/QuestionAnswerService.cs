@@ -17,10 +17,10 @@ namespace Linko.LinkoExchange.Services.User
 {
     public class QuestionAnswerService : IQuestionAnswerService
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly LinkoExchangeContext _dbContext;
         private readonly IAuditLogEntry _logger;
 
-        public QuestionAnswerService(ApplicationDbContext dbContext, IAuditLogEntry logger)
+        public QuestionAnswerService(LinkoExchangeContext dbContext, IAuditLogEntry logger)
         {
             _dbContext = dbContext;
             _logger = logger;

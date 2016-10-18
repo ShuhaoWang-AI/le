@@ -10,8 +10,12 @@ namespace Linko.LinkoExchange.Services.AuditLog
     /// </summary>
     public class EmailAuditLogService : IAuditLogService
     {
-        private readonly ApplicationDbContext _linkoExchangeDbContext = new ApplicationDbContext();
+        private readonly LinkoExchangeContext _dbContext;
 
+        public EmailAuditLogService(LinkoExchangeContext linkoExchangeContext)
+        { 
+            _dbContext = linkoExchangeContext;
+        }
         /// <summary>
         /// Write email audit log
         /// </summary>
@@ -24,8 +28,8 @@ namespace Linko.LinkoExchange.Services.AuditLog
 
             var emailLogEntry = AutoMapper.Mapper.Map<EmailAuditLog>(emailLogEntryDto) ;
 
-            this._linkoExchangeDbContext.EmailAuditLog.Add(emailLogEntry);
-            this._linkoExchangeDbContext.SaveChangesAsync();
+            this._dbContext.EmailAuditLog.Add(emailLogEntry);
+            this._dbContext.SaveChangesAsync();
         }
     }
 }

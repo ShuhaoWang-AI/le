@@ -14,11 +14,11 @@ namespace Linko.LinkoExchange.Services
 {
     public class OrganizationService : IOrganizationService
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly LinkoExchangeContext _dbContext;
         //private readonly IAuditLogEntry _logger;
         private readonly IMapper _mapper;
 
-        public OrganizationService(ApplicationDbContext dbContext, IMapper mapper)//, IAuditLogEntry logger)
+        public OrganizationService(LinkoExchangeContext dbContext, IMapper mapper)//, IAuditLogEntry logger)
         {
             _dbContext = dbContext;
             //_logger = logger;

@@ -17,7 +17,7 @@ namespace Linko.LinkoExchange.Services.User
     {
         #region private members
 
-        private readonly ApplicationDbContext _dbContext;
+        private readonly LinkoExchangeContext _dbContext;
         private readonly IAuditLogEntry _logger;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IMapper _mapper;
@@ -25,7 +25,7 @@ namespace Linko.LinkoExchange.Services.User
 
         #region constructor
 
-        public UserService(ApplicationDbContext dbContext, IAuditLogEntry logger, IPasswordHasher passwordHasher, IMapper mapper)
+        public UserService(LinkoExchangeContext dbContext, IAuditLogEntry logger, IPasswordHasher passwordHasher, IMapper mapper)
         {
             this._dbContext = dbContext;
             _logger = logger;

@@ -24,8 +24,8 @@ namespace Linko.LinkoExchange.Services.Authentication
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private static readonly ApplicationDbContext _linkoExchangeDbContext = new ApplicationDbContext(); 
-
+        private readonly LinkoExchangeContext _dbContext;
+        
         private readonly ApplicationSignInManager _signInManager;
         private readonly ApplicationUserManager _userManager;
         
@@ -50,18 +50,21 @@ namespace Linko.LinkoExchange.Services.Authentication
             IProgramService programService,
             IInvitationService invitationService,
             IEmailService emailService,
-            IPermissionService permissionService)
+            IPermissionService permissionService,
+            LinkoExchangeContext linkoExchangeContext)
         {
-            if (userManager == null) throw new ArgumentNullException("userManager");
-            if (signInManager == null) throw new ArgumentNullException("signInManager");
-            if (authenticationManager == null) throw new ArgumentNullException("authenticationManager");
-            if (settingService == null) throw new ArgumentNullException("settingService");
-            if (organizationService == null) throw new ArgumentNullException("organizationService");
-            if (programService == null) throw new ArgumentNullException("programService");
-            if (invitationService == null) throw new ArgumentNullException("invitationService");
-            if (emailService == null) throw new ArgumentNullException("emailService");
-            if (permissionService == null) throw new ArgumentNullException("permissionService");
+            if (linkoExchangeContext == null) throw new ArgumentNullException(paramName: "linkoExchangeContext");
+            if (userManager == null) throw new ArgumentNullException(paramName: "userManager");
+            if (signInManager == null) throw new ArgumentNullException(paramName: "signInManager");
+            if (authenticationManager == null) throw new ArgumentNullException(paramName: "authenticationManager");
+            if (settingService == null) throw new ArgumentNullException(paramName: "settingService");
+            if (organizationService == null) throw new ArgumentNullException(paramName: "organizationService");
+            if (programService == null) throw new ArgumentNullException(paramName: "programService");
+            if (invitationService == null) throw new ArgumentNullException(paramName: "invitationService");
+            if (emailService == null) throw new ArgumentNullException(paramName: "emailService");
+            if (permissionService == null) throw new ArgumentNullException(paramName: "permissionService");
 
+            _dbContext = linkoExchangeContext;
             _userManager = userManager;
             _signInManager = signInManager;
             _authenticationManager = authenticationManager; 
@@ -198,10 +201,10 @@ namespace Linko.LinkoExchange.Services.Authentication
                 if (result == IdentityResult.Success)
                 {
                     // Retrieve user again to get userProfile Id. 
-                    applicationUser = _userManager.FindById(applicationUser.Id);  
+                    applicationUser = _userManager.FindById(applicationUser.Id);
 
                     // 1. Create a new row in user password history table 
-                    _linkoExchangeDbContext.UserPasswordHistories.Add(new UserPasswordHistory
+                    _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
                     {
                          LastModificationDateTime = DateTime.UtcNow,
                          PasswordHash = applicationUser.PasswordHash,
@@ -244,7 +247,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     else
                     {  
                         _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements, logEntry);
-                    } 
+                    }
 
                     // 5 TODO logs invite email  
                     // UC-1 
@@ -252,7 +255,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     // 6 TODO logs invite to Audit 
                     // UC-2 
 
-                    _linkoExchangeDbContext.SaveChangesAsync();
+                    _dbContext.SaveChangesAsync();
 
                     authenticationResult.Success = true;
 
@@ -454,7 +457,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(programSettings, organizationSettings);
 
-            var lastNumberPasswordInHistory = _linkoExchangeDbContext.UserPasswordHistories
+            var lastNumberPasswordInHistory = _dbContext.UserPasswordHistories
                 .Where(i => i.UserProfileId == userProfileId)
                 .OrderByDescending(i => i.LastModificationDateTime).Take(numberOfPasswordsInHistory);
             if (lastNumberPasswordInHistory.Any(i=>i.PasswordHash == passwordHash))
@@ -467,7 +470,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private bool IsUserPasswordExpired(int userProfileId, IEnumerable<SettingDto> organizationSettings, IEnumerable<SettingDto> programSettings)
         {
-            var lastestUserPassword = _linkoExchangeDbContext.UserPasswordHistories
+            var lastestUserPassword = _dbContext.UserPasswordHistories
                 .Where(i => i.UserProfileId == userProfileId)
                 .OrderByDescending(i => i.LastModificationDateTime).FirstOrDefault();
 
