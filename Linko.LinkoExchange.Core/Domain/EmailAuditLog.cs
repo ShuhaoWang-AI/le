@@ -15,17 +15,17 @@ namespace Linko.LinkoExchange.Core.Domain
             get; set;
         }
 
-        public int SenderRegulatorId
-        {
-            get; set;
-        }
-
-        public int SenderRegulateeId
-        {
-            get; set;
-        }
-
         public int SenderRegulatoryProgramId
+        {
+            get; set;
+        }
+
+        public int SenderOrganizationId
+        {
+            get; set;
+        }
+
+        public int SenderRegulatorOrganizationId
         {
             get; set;
         }
@@ -48,14 +48,13 @@ namespace Linko.LinkoExchange.Core.Domain
         public string SenderEmailAddress
         {
             get; set;
-        }
-
-        public int RecipientRegulatorId
+        } 
+ 
+        public int RecipientOrganizationId
         {
             get; set;
         }
-
-        public int RecipientRegulateeId
+        public int RecipientRegulatoryOrganizationid
         {
             get; set;
         }

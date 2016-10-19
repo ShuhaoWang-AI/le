@@ -57,7 +57,7 @@ namespace Linko.LinkoExchange.Services
             try
             {
                 var foundOrg = _dbContext.Organizations.Single(o => o.OrganizationId == organizationId);
-                returnDto = _mapper.Map<Organization, OrganizationDto>(foundOrg);
+                returnDto = _mapper.Map<Core.Domain.Organization, OrganizationDto>(foundOrg);
             }
             catch (DbEntityValidationException ex)
             {
@@ -86,7 +86,7 @@ namespace Linko.LinkoExchange.Services
             try
             {
                 var foundOrg = _dbContext.Organizations.Single(o => o.OrganizationId == organization.OrganizationId);
-                foundOrg = _mapper.Map<OrganizationDto, Organization>(organization);
+                foundOrg = _mapper.Map<OrganizationDto, Core.Domain.Organization>(organization);
                 _dbContext.SaveChanges();
             }
             catch (DbEntityValidationException ex)
@@ -152,7 +152,7 @@ namespace Linko.LinkoExchange.Services
                     var dtoList = new List<OrganizationDto>();
                     foreach (var orgRegProg in orgRegProgs)
                     {
-                        dtoList.Add(_mapper.Map<Organization, OrganizationDto>(orgRegProg.Organization));
+                        dtoList.Add(_mapper.Map<Core.Domain.Organization, OrganizationDto>(orgRegProg.Organization));
 
                     }
                     return dtoList;
@@ -188,7 +188,7 @@ namespace Linko.LinkoExchange.Services
             //ASSUMPTION: Organization record does not already exist
             try
             {
-                var newOrg = _mapper.Map<OrganizationDto, Organization>(childOrganization);
+                var newOrg = _mapper.Map<OrganizationDto, Core.Domain.Organization>(childOrganization);
 
                 var newOrgRegProg = _dbContext.OrganizationRegulatoryPrograms.Create();
                 newOrgRegProg.Organization = newOrg;

@@ -7,6 +7,6 @@ namespace Linko.LinkoExchange.Services.Email
     public interface IEmailService
     {
         void SendEmail(IEnumerable<string> recipients, EmailType emailType,
-            IDictionary<string, string> contentReplacements, IAuditLogEntry logEntry, string senderEmail = null);
+            IDictionary<string, string> contentReplacements, IAuditLogEntry logEntry);
     }
 }

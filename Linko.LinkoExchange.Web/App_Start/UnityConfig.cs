@@ -106,7 +106,7 @@ namespace Linko.LinkoExchange.Web
                 cfg.AddProfile(new InvitationMapProfile());
                 cfg.AddProfile(new OrganziationRegulatoryProgramUserDtoMapProfile());
                 cfg.AddProfile(new OrganizationMapProfile());
-                cfg.AddProfile(new SettingMapProfile());
+//                cfg.AddProfile(new SettingMapProfile());
             });
 
             //Make sure there no methods were missing in the mappings loaded above via profiles

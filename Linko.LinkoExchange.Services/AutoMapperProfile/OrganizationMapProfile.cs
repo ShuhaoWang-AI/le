@@ -13,7 +13,7 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
     {
         public OrganizationMapProfile()
         {
-            CreateMap<Organization, OrganizationDto>() //Map all properties in the destination where names are the same 
+            CreateMap<Core.Domain.Organization, OrganizationDto>() //Map all properties in the destination where names are the same 
             .ForMember(d => d.OrganizationName, o => o.MapFrom(s => s.Name)) //Need to explicitly map b/c mismatched naming
             .ReverseMap();
 

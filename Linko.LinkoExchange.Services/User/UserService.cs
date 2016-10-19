@@ -283,6 +283,18 @@ namespace Linko.LinkoExchange.Services.User
             return _mapper.Map<OrganizationRegulatoryProgramUserDto>(user); 
         }
 
+        public void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, int organizationRegulatoryProgramId,
+            bool isApproved)
+        {
+            var user = _dbContext.OrganizationRegulatoryProgramUsers
+                .SingleOrDefault(u => u.UserProfileId == userProfileId && u.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId); 
+
+            if (user == null) return;
+
+            user.IsRegistrationApproved = isApproved;
+            _dbContext.SaveChangesAsync();
+        }
+
         public void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, bool isApproved)
         {
             var user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.UserProfileId == userProfileId);

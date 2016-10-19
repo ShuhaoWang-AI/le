@@ -190,6 +190,10 @@ namespace Linko.LinkoExchange.Services.Settings
             globalSetting.Add("supportPhoneNumber", "+1-604-418-3201");
             globalSetting.Add("supportEmail", "support@linkoExchange.com");
 
+            globalSetting.Add("SystemEmailEmailAddress", "shuhao.wang@watertrax.com");
+            globalSetting.Add("SystemEmailFirstName", "LinkoExchange ");
+            globalSetting.Add("SystemEmailLastName", "System");
+
             return globalSetting;
 		}
 

@@ -15,6 +15,7 @@ using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Program;
+using Linko.LinkoExchange.Services.Settings;
 
 namespace Linko.LinkoExchange.Services.Email
 {
@@ -23,33 +24,41 @@ namespace Linko.LinkoExchange.Services.Email
         private readonly LinkoExchangeContext _dbContext;
         private readonly IAuditLogService _emailAuditLogService;
         private readonly IProgramService _programService;
+        private readonly ISettingService _settingService;  
 
-        private readonly string _emailServer = ConfigurationManager.AppSettings["EmailServer"];
-        private readonly string _fromEmailAddress = ConfigurationManager.AppSettings["EmailSenderFromEmail"]; 
+        private readonly string _emailServer = ConfigurationManager.AppSettings["EmailServer"]; 
+
+        private readonly string _senderEmailAddres;
+        private readonly string _senderFistName;
+        private readonly string _senderLastName;
+
         public LinkoExchangeEmailService(
             LinkoExchangeContext linkoExchangeContext,
             EmailAuditLogService emailAuditLogService,
-            IProgramService programService)
+            IProgramService programService,
+            ISettingService settingService)
         {
             _dbContext = linkoExchangeContext;
             _emailAuditLogService = emailAuditLogService;
-            _programService = programService; 
+            _programService = programService;
+            _settingService = settingService;
+
+
+            _senderEmailAddres = _settingService.GetGlobalSettings()["SystemEmailEmailAddress"];
+            _senderFistName = _settingService.GetGlobalSettings()["SystemEmailFirstName"];
+            _senderLastName = _settingService.GetGlobalSettings()["SystemEmailLastName"];
+
         }
 
         public async void SendEmail(IEnumerable<string> recipients, EmailType emailType,
-            IDictionary<string, string> contentReplacements, IAuditLogEntry logEntry, string senderEmail = null)
+            IDictionary<string, string> contentReplacements, IAuditLogEntry logEntry)
         {
-            string sendTo = string.Join(separator: ",", values: recipients);
-
-            if (string.IsNullOrWhiteSpace(senderEmail))
-            {
-                senderEmail = _fromEmailAddress;
-            }
+            string sendTo = string.Join(separator: ",", values: recipients); 
 
             var template = await GetTemplate(emailType);
             if (template == null) return;
 
-            MailMessage msg = await GetMailMessage(sendTo, template, contentReplacements, senderEmail);
+            MailMessage msg = await GetMailMessage(sendTo, template, contentReplacements, _senderEmailAddres);
             using (var smtpClient = new SmtpClient(_emailServer))
             {
                 smtpClient.Send(msg);
@@ -57,7 +66,7 @@ namespace Linko.LinkoExchange.Services.Email
 
             foreach (var receipientEmail in recipients)
             {
-                var logEntries = GetEmailAuditLog(senderEmail, receipientEmail, emailType, msg.Subject, msg.Body);
+                var logEntries = GetEmailAuditLog(_senderEmailAddres, receipientEmail, emailType, msg.Subject, msg.Body);
                 foreach (var log in logEntries)
                 {
                     _emailAuditLogService.Log(logEntry);
@@ -110,7 +119,7 @@ namespace Linko.LinkoExchange.Services.Email
         /// <param name="email">The email address of recipient.</param>
         /// <param name="programFilters">Filter collection of program IDs</param>
         /// <returns></returns>
-        private IEnumerable<EmailAuditLog> GetRecipientLogData(string email, IEnumerable<int> programFilters = null)
+        private IEnumerable<EmailAuditLog> PopulateRecipientLogDataForAllPrograms(string email, IEnumerable<int> programFilters = null)
         {
             var emailAuditLogs = new List<EmailAuditLog>();
             var oRpUs = _programService.GetUserPrograms(email);
@@ -127,10 +136,11 @@ namespace Linko.LinkoExchange.Services.Email
                             {
                                 RecipientFirstName = user.UserProfileDto.FirstName,
                                 RecipientLastName = user.UserProfileDto.LastName,
-                                RecipientUserName = user.UserProfileDto.UserName,
+                                RecipientUserName = user.UserProfileDto.UserName, 
+
                                 RecipientRegulatoryProgramId = user.OragnizationRegulatoryProgramId,
-                                RecipientRegulateeId = program.OrganizationId,
-                                RecipientRegulatorId = program.RegulatorOrganizationId,
+                                RecipientOrganizationId = program.OrganizationId, 
+                                RecipientRegulatoryOrganizationid = program.RegulatorOrganizationId
                             };
 
                             emailAuditLogs.Add(auditLog); 
@@ -147,78 +157,63 @@ namespace Linko.LinkoExchange.Services.Email
             return emailAuditLogs;
         }
 
-        private void UpdateSenderLogData(List<EmailAuditLog> logs)
+        private IEnumerable<EmailAuditLog> PopulateSingleRecipientProgramData(string email)
         {
-            if (logs == null || !logs.Any()) return;
-
-            var currentRegulatorOrganziationId =
-                ValueParser.TryParseInt(HttpContext.Current.Session["currentRegulatorOrganziationId"] as string, 0);
-            var currentOrganizationId =
-                ValueParser.TryParseInt(HttpContext.Current.Session["currentOrganziationId"] as string, 0);
-            var currentUserRegulatoryProgramId = ValueParser.TryParseInt(HttpContext.Current.Session["currentUserRegulatoryProgramId"] as string, 0);
-
-            var currentUserFirstName = HttpContext.Current.Session["currentUserFirstName"] as string;
-            var currentUserLastName = HttpContext.Current.Session["currentUserLastName"] as string;
-            var currentUserName = HttpContext.Current.Session["currentUserName"] as string;
-            var currentUserEmail = HttpContext.Current.Session["currentUserName"] as string;
-
-            foreach (var log in logs)
+            var emailAuditLogs = new List<EmailAuditLog>();
+            var oRpUs = _programService.GetUserPrograms(email).ToArray();
+            if (oRpUs.Any())
             {
-                log.SenderEmailAddress = currentUserEmail;
-                log.SenderRegulateeId = currentRegulatorOrganziationId;
-                log.SenderRegulateeId = currentOrganizationId;
-                log.SenderRegulatoryProgramId = currentUserRegulatoryProgramId;
-                log.SenderFirstName = currentUserFirstName;
-                log.SenderLastName = currentUserLastName;
-                log.SenderUserName = currentUserName; 
+                var user = oRpUs[0]; // get the first one to get user first name, last, and user name; 
+                var firstName = user.UserProfileDto.FirstName;
+                var lastName = user.UserProfileDto.LastName;
+                var userName = user.UserProfileDto.UserName;
+
+                var auditLog = new EmailAuditLog
+                {
+                    RecipientFirstName = firstName,
+                    RecipientLastName = lastName,
+                    RecipientUserName = userName,
+
+                    RecipientRegulatoryProgramId =
+                        ValueParser.TryParseInt(
+                            HttpContext.Current.Items["EmailRecipientRegulatoryProgramId"] as string, 0),
+                    RecipientOrganizationId =
+                        ValueParser.TryParseInt(HttpContext.Current.Items["EmailRecipientOrganizationId"] as string, 0),
+                    RecipientRegulatoryOrganizationid =
+                        ValueParser.TryParseInt(HttpContext.Current.Items["EmailRecipientOrganizationId"] as string, 0)
+                };
+
+                emailAuditLogs.Add(auditLog);
             }
 
+            return emailAuditLogs;
         }
 
-        private void UpdateSenderLogDataToSystem(List<EmailAuditLog> logs)
-        {
-            if (logs == null || !logs.Any()) return;
-            
-            foreach (var log in logs)
-            {
-                log.SenderEmailAddress = _fromEmailAddress;
-            }
-        }
 
         private IEnumerable<EmailAuditLog> GetEmailAuditLog(string senderEmail, string receipientEmail, EmailType emailType, string subject, string body)
         { 
-
-            var emailAuditLogs = new List<EmailAuditLog>();
-
-            var logs = new List<EmailAuditLog>();
+            var emailAuditLogs = new List<EmailAuditLog>(); 
  
             switch (emailType)
             {
+                // Below type only needs to log one program or the recipient  
                 case EmailType.Registration_AuthorityRegistrationDenied:   
                 case EmailType.Registration_IndustryRegistrationDenied: 
                 case EmailType.Registration_IndustryRegistrationApproved:
                 case EmailType.Registration_AuthorityRegistrationApproved:
-                case EmailType.UserAccess_AccountLockOut:
-                    // Manual lock
-                case EmailType.UserAccess_LockOutToSysAdmins:
-                    // Manu Lock to system admin  
-                case EmailType.Registration_RegistratioinResetRequired:
-                case EmailType.Registration_InviteAuthorityUser:
-                case EmailType.Registration_InviteIndustryUser:
-                    logs.AddRange(GetRecipientLogData(receipientEmail));
-                    UpdateSenderLogData(logs);
-                    break;
-
-                case EmailType.Signature_SignatoryGranted:  
+                case EmailType.Registration_AuthorityInviteIndustryUser:
+                case EmailType.Registration_IndustryInviteIndustryUser: 
+                case EmailType.Signature_SignatoryGranted:
                 case EmailType.Signature_SignatoryRevoked:
-                    var signatoryRequestOrgpUserId =
-                        ValueParser.TryParseInt(
-                            HttpContext.Current.Items["organizationRegulatoryProgramUserId"] as string, 0);
+                case EmailType.Registration_AuthorityUserRegistrationPendingToApprovers:
+                case EmailType.Registration_IndustryUserRegistrationPendingToApprovers:
+                    emailAuditLogs.AddRange(PopulateSingleRecipientProgramData(receipientEmail));    
+                    break; 
 
-                    logs.AddRange(GetRecipientLogData(receipientEmail, new []{signatoryRequestOrgpUserId}));
-                    UpdateSenderLogData(logs);
-                    break;
-
+                // Below type needs to log for all programs 
+                case EmailType.UserAccess_AccountLockOut:    
+                case EmailType.UserAccess_LockOutToSysAdmins: 
+                case EmailType.Registration_RegistratioinResetRequired:    
                 case EmailType.Profile_KBQFailedLockOut: 
                 case EmailType.Profile_KBQChanged:  
                 case EmailType.Profile_ProfileEmailChanged:  
@@ -226,43 +221,21 @@ namespace Linko.LinkoExchange.Services.Email
                 case EmailType.Profile_SecurityQuestionsChanged:  
                 case EmailType.Profile_ProfilePasswordChanged: 
                 case EmailType.ForgotPassword_ForgotPassword:
-                    logs.AddRange(GetRecipientLogData(receipientEmail));
-                    UpdateSenderLogDataToSystem(logs);
-                    break;
-
                 case EmailType.Profile_ResetProfileRequired:
-                    logs.AddRange(GetRecipientLogData(receipientEmail));
-                    UpdateSenderLogData(logs);
-                    break;
-
-                case EmailType.Registration_AuthorityUserRegistrationPendingToApprovers:  
-                case EmailType.Registration_IndustryUserRegistrationPendingToApprovers:
-                    logs.AddRange(GetRecipientLogData(receipientEmail));
-                    UpdateSenderLogDataToSystem(logs); 
-                    break;
-
-                case EmailType.ForgotUserName_ForgotUserName: 
-                    var auditLog = new EmailAuditLog
-                    {
-                        AuditLogTemplateId = (int) EmailType.ForgotUserName_ForgotUserName,
-                        SenderEmailAddress = _fromEmailAddress
-                    };
-
-                    emailAuditLogs.Add(auditLog);
-                    break;
-
+                case EmailType.ForgotUserName_ForgotUserName:
                 case EmailType.Registration_RegistrationResetPending:
-                    logs.AddRange(GetRecipientLogData(receipientEmail));
-                    UpdateSenderLogDataToSystem(logs); 
+                    emailAuditLogs.AddRange(PopulateRecipientLogDataForAllPrograms(receipientEmail)); 
                     break;
                 default:
-                    throw new Exception("Not valid EmailType");
-
-
+                    throw new Exception("Not valid EmailType");  
             }
 
             foreach (var log in emailAuditLogs)
             {
+                log.SenderEmailAddress = _senderEmailAddres;
+                log.SenderFirstName = _senderFistName;
+                log.SenderLastName = _senderLastName; 
+
                 log.RecipientRegulatoryProgramId = (int) emailType;
                 log.Body = body;
                 log.Subject = subject;

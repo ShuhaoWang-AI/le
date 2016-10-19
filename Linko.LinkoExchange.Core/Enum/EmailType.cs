@@ -30,8 +30,8 @@
         // UC-5.7  Authority Invites Authority User 
         Registration_InviteAuthorityUser,
 
-        // UC-7.7  Authority Invites Industry User, and Industry invites Industry User 
-        Registration_InviteIndustryUser,
+        // UC-7.7  Authority Invites Industry User
+        Registration_AuthorityInviteIndustryUser,
 
         // UC-7.8 Grant/Remove Signatory 
         Signature_SignatoryGranted,
@@ -73,6 +73,9 @@
         ForgotUserName_ForgotUserName,
 
         // UC-35 RegistrationResetPending
-        Registration_RegistrationResetPending
+        Registration_RegistrationResetPending,
+
+        // UC-5.7 Industry invites industry user 
+        Registration_IndustryInviteIndustryUser
     }
 }
