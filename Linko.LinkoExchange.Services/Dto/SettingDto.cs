@@ -1,6 +1,6 @@
 ﻿namespace Linko.LinkoExchange.Services.Dto
 {
-    public enum SettingName
+    public enum SettingType
     {
         MaxPasswordAttempts = 1,
         MaxKBQAttempts = 2,

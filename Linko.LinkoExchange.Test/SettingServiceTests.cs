@@ -5,6 +5,7 @@ using AutoMapper;
 using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
+using System.Collections.Generic;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -41,5 +42,16 @@ namespace Linko.LinkoExchange.Test
         {
             OrganizationSettingDto orgSettings = settingService.GetOrganizationSettingsById_actual(1);
         }
+
+        [TestMethod]
+        public void CreateOrUpdateProgramSettings()
+        {
+            var settings = new ProgramSettingDto() { OrgRegProgId = 1 };
+            settings.Settings = new List<SettingDto>();
+            settings.Settings.Add(new SettingDto() { Name = "MaxKBQAttempts", Value = "9" });
+            settings.Settings.Add(new SettingDto() { Name = "PasswordChangeDays", Value = "30" });
+            settingService.CreateOrUpdateProgramSettings(settings);
+        }
+
     }
 }

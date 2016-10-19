@@ -4,6 +4,7 @@ using Linko.LinkoExchange.Data;
 using AutoMapper;
 using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
+using System;
 
 namespace Linko.LinkoExchange.Services.Settings
 {
@@ -89,7 +90,7 @@ namespace Linko.LinkoExchange.Services.Settings
                 foreach (var OrganizationRegulatoryProgram in OrganizationRegulatoryPrograms.ToList())
                 {
                     //Get setting for this Regulatory Program
-                    var programSettingDto = new ProgramSettingDto() { ProgramId = OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId };
+                    var programSettingDto = new ProgramSettingDto() { OrgRegProgId = OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId };
                     programSettingDto.Settings = new List<SettingDto>();
                     var organizationRegulatoryProgramSettings = _dbContext.OrganizationRegulatoryProgramSettings.Where(o => o.OrganizationRegulatoryProgramId == OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId);
                     if (organizationRegulatoryProgramSettings != null)
@@ -115,7 +116,7 @@ namespace Linko.LinkoExchange.Services.Settings
 		/// <returns>The PrrogramSetting object</returns>
 		public ProgramSettingDto GetProgramSettingsById(int programId)
 		{
-            var progSettingDto = new ProgramSettingDto() { ProgramId = programId };
+            var progSettingDto = new ProgramSettingDto() { OrgRegProgId = programId };
             progSettingDto.Settings = new List<SettingDto>();
             var settings = _dbContext.OrganizationRegulatoryProgramSettings.Where(o => o.OrganizationRegulatoryProgramId == programId);
             foreach (var setting in settings)
@@ -125,13 +126,37 @@ namespace Linko.LinkoExchange.Services.Settings
             return progSettingDto;
 		}
 
-		public IEnumerable<ProgramSettingDto> GetProgramSettingsByIds(IEnumerable<int> programIds)
+        public void CreateOrUpdateProgramSettings(ProgramSettingDto settingDtos)
+        {
+            var existingSettings = _dbContext.OrganizationRegulatoryProgramSettings.Where(o => o.OrganizationRegulatoryProgramId == settingDtos.OrgRegProgId).ToArray();
+            foreach (var settingDto in settingDtos.Settings)
+            {
+                var foundSetting = existingSettings != null ? existingSettings.SingleOrDefault(s => s.SettingTemplate.Name == settingDto.Name) : null;
+                if (foundSetting != null)
+                {
+                    foundSetting.Value = settingDto.Value;
+                }
+                else
+                {
+                    var newSetting = _dbContext.OrganizationRegulatoryProgramSettings.Create();
+                    newSetting.SettingTemplate = new SettingTemplate();
+                    //newSetting.SettingTemplate.SettingTemplateId = Convert.ToInt32(settingDto.SettingTemplateEnum);
+                    newSetting.SettingTemplate.Name = settingDto.Name;
+                    newSetting.Value = settingDto.Value;
+                    _dbContext.OrganizationRegulatoryProgramSettings.Add(newSetting);
+                }
+                
+            }
+            _dbContext.SaveChanges();
+        }
+
+		public IEnumerable<ProgramSettingDto> GetProgramSettingsByIds(IEnumerable<int> orgRegProgIds)
 		{
 			return new[]
 			{
 				new ProgramSettingDto
 				{
-					ProgramId = 100,
+					OrgRegProgId = 100,
 					Settings = GetMockData()
 				}
 			};
