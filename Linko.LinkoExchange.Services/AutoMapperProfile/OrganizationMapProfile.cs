@@ -16,6 +16,9 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
             CreateMap<Organization, OrganizationDto>() //Map all properties in the destination where names are the same 
             .ForMember(d => d.OrganizationName, o => o.MapFrom(s => s.Name)) //Need to explicitly map b/c mismatched naming
             .ReverseMap();
+
+            CreateMap<OrganizationType, OrganizationTypeDto>()
+                .ReverseMap();
         }
     }
 }

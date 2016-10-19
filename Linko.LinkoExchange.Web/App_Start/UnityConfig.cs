@@ -21,6 +21,7 @@ using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -85,6 +86,8 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IAuthenticationManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));
             container.RegisterType<IUserStore<ApplicationUser>, UserStore<ApplicationUser>>(new InjectionConstructor(typeof(LinkoExchangeContext)));
             container.RegisterType<IPermissionService, PermissionService>();
+            container.RegisterType<IAuditLogEntry, EmailAuditLogEntryDto>();
+            container.RegisterType<IPasswordHasher, PasswordHasher>();
             container.RegisterType<IAuditLogService, EmailAuditLogService>(new InjectionConstructor(typeof(LinkoExchangeContext)));
             container.RegisterType<IEmailService, LinkoExchangeEmailService>(new InjectionConstructor(typeof(LinkoExchangeContext), typeof(EmailAuditLogService), typeof(IProgramService), typeof(IAuthenticationService)));
 
