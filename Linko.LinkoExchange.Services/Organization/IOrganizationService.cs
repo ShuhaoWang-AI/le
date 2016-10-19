@@ -33,7 +33,7 @@ namespace Linko.LinkoExchange.Services.Organization
         /// Otherwise throw exception
         void UpdateEnableDisableFlag(int orgRegProgId, bool isEnabled);
 
-        List<OrganizationDto> GetChildrenOrganizations(int regOrgId);
+        List<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int orgRegProgId);
 
         void AddChildOrganization(int parentRegOrdId, OrganizationDto childOrganization);  
     }

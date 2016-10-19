@@ -18,9 +18,9 @@ namespace Linko.LinkoExchange.Test
             Mapper.Initialize(cfg =>
             {
                 cfg.AddProfile(new UserMapProfile());
-                cfg.AddProfile(new EmailAuditLogEntryMapProfile());
+                //cfg.AddProfile(new EmailAuditLogEntryMapProfile());
                 cfg.AddProfile(new InvitationMapProfile());
-                cfg.AddProfile(new OrganziationRegulatoryProgramUserDtoMapProfile());
+                cfg.AddProfile(new OrganizationRegulatoryProgramUserDtoMapProfile());
                 cfg.AddProfile(new OrganizationMapProfile());
             });
 
@@ -38,6 +38,12 @@ namespace Linko.LinkoExchange.Test
         public void GetOrganization()
         {
             var org = orgService.GetOrganization(1);
+        }
+
+        [TestMethod]
+        public void GetChildOrganizationRegulatoryPrograms()
+        {
+            var childOrgs = orgService.GetChildOrganizationRegulatoryPrograms(1);
         }
     }
 }

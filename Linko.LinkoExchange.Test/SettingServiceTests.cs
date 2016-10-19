@@ -22,7 +22,7 @@ namespace Linko.LinkoExchange.Test
                 //cfg.AddProfile(new UserMapProfile());
                 //cfg.AddProfile(new EmailAuditLogEntryMapProfile());
                 //cfg.AddProfile(new InvitationMapProfile());
-                cfg.AddProfile(new OrganziationRegulatoryProgramUserDtoMapProfile());
+                cfg.AddProfile(new OrganizationRegulatoryProgramUserDtoMapProfile());
                 cfg.AddProfile(new OrganizationMapProfile());
                 cfg.AddProfile(new SettingMapProfile());
             });
@@ -48,8 +48,8 @@ namespace Linko.LinkoExchange.Test
         {
             var settings = new ProgramSettingDto() { OrgRegProgId = 1 };
             settings.Settings = new List<SettingDto>();
-            settings.Settings.Add(new SettingDto() { Type = SettingType.MaxKBQAttempts, Value = "9" });
-            settings.Settings.Add(new SettingDto() { Type = SettingType.PasswordChangeDays, Value = "30" });
+            settings.Settings.Add(new SettingDto() { Type = SettingType.MaxKBQAttempts, Value = "10" });
+            settings.Settings.Add(new SettingDto() { Type = SettingType.PasswordChangeDays, Value = "31" });
             settingService.CreateOrUpdateProgramSettings(settings);
         }
 

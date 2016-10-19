@@ -36,6 +36,11 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool IsRemoved
         {
             get;set;
-        } 
+        }
+
+        public bool HasSignatory
+        {
+            get; set;
+        }
     }
 }

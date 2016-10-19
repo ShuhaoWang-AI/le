@@ -142,17 +142,23 @@ namespace Linko.LinkoExchange.Services
             }
         }
 
-        public List<OrganizationDto> GetChildrenOrganizations(int regOrgId)
+        public List<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int orgRegProgId)
         {
             try
             {
-                var orgRegProgs = _dbContext.OrganizationRegulatoryPrograms.Where(o => o.RegulatorOrganizationId == regOrgId);
-                if (orgRegProgs != null)
+                var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId);
+                var childOrgRegProgs = _dbContext.OrganizationRegulatoryPrograms.Where(o => orgRegProgram.RegulatorOrganizationId == orgRegProgram.OrganizationId
+                    && o.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
+                if (childOrgRegProgs != null)
                 {
-                    var dtoList = new List<OrganizationDto>();
-                    foreach (var orgRegProg in orgRegProgs)
+                    var dtoList = new List<OrganizationRegulatoryProgramDto>();
+                    foreach (var orgRegProg in childOrgRegProgs.ToList())
                     {
-                        dtoList.Add(_mapper.Map<Core.Domain.Organization, OrganizationDto>(orgRegProg.Organization));
+                        OrganizationRegulatoryProgramDto dto = _mapper.Map<OrganizationRegulatoryProgram, OrganizationRegulatoryProgramDto>(orgRegProg);
+                        dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
+                            .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgId 
+                            && o.IsSignatory == true) > 0;
+                        dtoList.Add(dto);
 
                     }
                     return dtoList;
