@@ -6,7 +6,7 @@ namespace Linko.LinkoExchange.Core.Domain
     public class Invitation
     {
         [Key]
-        public int InvitationId { get; set; }
+        public string InvitationId { get; set; }
 
         public string FirstName { get; set; }
         public string LastName { get; set; }

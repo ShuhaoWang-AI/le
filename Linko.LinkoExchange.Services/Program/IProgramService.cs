@@ -19,5 +19,12 @@ namespace Linko.LinkoExchange.Services.Program
         /// <param name="organizationId">Organization Id</param>
         /// <returns>A collection of programs</returns>
         IEnumerable<ProgramDto> GetOrganization(int organizationId);
+
+        /// <summary>
+        /// Get the organziation regulatory program 
+        /// </summary>
+        /// <param name="organizationRegulatoryProgramId">The organziation regulatory program Id</param>
+        /// <returns></returns>
+        OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int organizationRegulatoryProgramId);
     }
 }

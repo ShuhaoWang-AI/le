@@ -12,6 +12,7 @@
         PasswordLockedOut,
         PasswordExpired,
         UserAlreadyExists,
-        CanNotUseOldPassword
+        CanNotUseOldPassword,
+        InvalidateRegistrationToken
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
 
-namespace Linko.LinkoExchange.Services
+namespace Linko.LinkoExchange.Services.Organization
 {
     public interface IOrganizationService
     {
@@ -35,7 +35,6 @@ namespace Linko.LinkoExchange.Services
 
         List<OrganizationDto> GetChildrenOrganizations(int regOrgId);
 
-        void AddChildOrganization(int parentRegOrdId, OrganizationDto childOrganization);
-
+        void AddChildOrganization(int parentRegOrdId, OrganizationDto childOrganization);  
     }
 }

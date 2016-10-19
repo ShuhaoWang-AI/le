@@ -275,6 +275,23 @@ namespace Linko.LinkoExchange.Services.User
             }
         }
 
+        public OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int userProfileId)
+        {
+            var user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.UserProfileId == userProfileId);
+            if (user == null) return null;
+
+            return _mapper.Map<OrganizationRegulatoryProgramUserDto>(user); 
+        }
+
+        public void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, bool isApproved)
+        {
+            var user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.UserProfileId == userProfileId);
+            if (user == null) return;
+
+            user.IsRegistrationApproved = isApproved;
+            _dbContext.SaveChangesAsync(); 
+        }
+
         #endregion
 
 

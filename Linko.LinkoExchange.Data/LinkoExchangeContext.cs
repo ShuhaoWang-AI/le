@@ -29,7 +29,7 @@ namespace Linko.LinkoExchange.Data
         #region DBSets
         public DbSet<AuditLogTemplate> AuditLogTemplates { set; get; }
         public DbSet<EmailAuditLog> EmailAuditLog { set; get; }
-
+        public DbSet<Invitation> Invitations { get; set; }
         public DbSet<EmailTemplate> EmailTemplates { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }

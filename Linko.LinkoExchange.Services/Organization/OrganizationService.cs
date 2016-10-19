@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
+using Linko.LinkoExchange.Services.Organization;
 
 namespace Linko.LinkoExchange.Services
 {

@@ -18,7 +18,9 @@ using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Permission;
+using Linko.LinkoExchange.Services.User;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
@@ -36,7 +38,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IAuthenticationManager _authenticationManager;
         private readonly IPermissionService _permissionService;
         private readonly IEmailService _emailService;
-
+        private readonly IUserService _userService; 
         private readonly TokenGenerator _tokenGenerator = new TokenGenerator();
         private readonly IAuditLogService _auditLogService = new CrommerAuditLogService();
 
@@ -51,7 +53,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             IInvitationService invitationService,
             IEmailService emailService,
             IPermissionService permissionService,
-            LinkoExchangeContext linkoExchangeContext)
+            LinkoExchangeContext linkoExchangeContext,
+            IUserService userService )
         {
             if (linkoExchangeContext == null) throw new ArgumentNullException(paramName: "linkoExchangeContext");
             if (userManager == null) throw new ArgumentNullException(paramName: "userManager");
@@ -63,6 +66,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (invitationService == null) throw new ArgumentNullException(paramName: "invitationService");
             if (emailService == null) throw new ArgumentNullException(paramName: "emailService");
             if (permissionService == null) throw new ArgumentNullException(paramName: "permissionService");
+            if( userService == null) throw new ArgumentNullException("userService");
 
             _dbContext = linkoExchangeContext;
             _userManager = userManager;
@@ -75,6 +79,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             _globalSettings = _settingService.GetGlobalSettings();
             _emailService = emailService;
             _permissionService = permissionService;
+            _userService = userService;
         }
 
         public IList<Claim> GetClaims()
@@ -187,16 +192,30 @@ namespace Linko.LinkoExchange.Services.Authentication
             try
             {  
                 // TODO invitation and program and organization relationship ?  one to many or one to one?  
-                var programIds = new[] {_invitationService.GetInvitationProgram(registrationToken).ProgramId};
-                var organizationIds = _invitationService.GetInvitationrOrganizations(registrationToken).Select(i=>i.OrganizationId);
+                var invitationDto = _invitationService.GetInvitation(registrationToken);
+                if (invitationDto == null)
+                {
+                    authenticationResult.Success = false;
+                    authenticationResult.Result = AuthenticationResult.InvalidateRegistrationToken;
+                    return Task.FromResult(authenticationResult);
+                }
+
+                var programIds = new[] {invitationDto.RecipientOrganizationRegulatoryProgramId};
+
+                var organizationIds = new int[]
+                {
+                    _programService.GetOrganizationRegulatoryProgram(
+                            invitationDto.RecipientOrganizationRegulatoryProgramId)
+                        .OrganizationId
+                };  
                  
                 var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
-                var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings).ToList();
+                var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings).ToList(); 
 
                 SetPasswordPolicy(organizationSettings, programSettings);
 
-                var result = _userManager.CreateAsync(applicationUser, userInfo.Password).Result;
-
+                var result = _userManager.CreateAsync(applicationUser, userInfo.Password).Result;  
+                
                 if (result == IdentityResult.Success)
                 {
                     // Retrieve user again to get userProfile Id. 
@@ -209,9 +228,14 @@ namespace Linko.LinkoExchange.Services.Authentication
                          PasswordHash = applicationUser.PasswordHash,
                          UserProfileId = applicationUser.UserProfileId
                     });
-                    
-                    // 2 TODO change user status to  Registration Pending
+
+                    // Save into user profile 
+
+
+                    // 2 // Create organziation regulatory program user, and set the approved statue to false  
+                    // TODO change user status to  Registration Pending
                     // UC-42 6
+                    _userService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId, false);
 
 
                     // 3 TODO send email to all users who have rights to approve a registrant 

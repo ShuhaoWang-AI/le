@@ -5,6 +5,14 @@ namespace Linko.LinkoExchange.Services.Invitation
 {
     public interface IInvitationService
     {
+
+        /// <summary>
+        /// Get the invitation by ID
+        /// </summary>
+        /// <param name="invitationId">The invitation Id</param>
+        /// <returns>The invitation</returns>
+        InvitationDto GetInvitation(string invitationId);
+
         /// <summary>
         /// Get the program of the invitation
         /// </summary>
@@ -17,6 +25,6 @@ namespace Linko.LinkoExchange.Services.Invitation
         /// </summary>
         /// <param name="invitationId">Invitation id</param>
         /// <returns>The organization of the invitation</returns>
-        IEnumerable<OrganizationDto> GetInvitationrOrganizations(string invitationId);
+        IEnumerable<OrganizationDto> GetInvitationrRecipientOrganization(string invitationId); 
     }
 }

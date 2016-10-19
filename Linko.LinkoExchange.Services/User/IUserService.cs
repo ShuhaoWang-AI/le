@@ -38,6 +38,8 @@ namespace Linko.LinkoExchange.Services.User
 
         void ChangePassword(int userProfileId, string oldPassword, string newPassword);
 
+        OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int userProfileId);
 
+        void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, int organizationRegulatoryProgramId, bool isApproved);
     }
 }

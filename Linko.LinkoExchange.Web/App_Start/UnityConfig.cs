@@ -22,6 +22,7 @@ using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Organization;
 
 namespace Linko.LinkoExchange.Web
 {

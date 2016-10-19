@@ -60,6 +60,14 @@ namespace Linko.LinkoExchange.Services.Program
             };
         }
 
+        public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int organizationRegulatoryProgramId)
+        {
+            var  orp =  _linkoExchangeDbContext.OrganizationRegulatoryPrograms.SingleOrDefault(
+                i => i.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId);
+
+            return orp == null ? null : _mapper.Map<OrganizationRegulatoryProgramDto>(orp);
+        }
+
         /// <summary>
         /// Get all the OrganizationRegulatoryProgram(s) that the users have access to
         /// </summary>
