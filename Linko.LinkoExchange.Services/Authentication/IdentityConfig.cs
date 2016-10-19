@@ -41,8 +41,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             // Configure validation logic for usernames
             manager.UserValidator = new UserValidator<ApplicationUser> (manager)
             {
-                AllowOnlyAlphanumericUserNames = false,
-                RequireUniqueEmail = true
+                AllowOnlyAlphanumericUserNames = false 
             };
 
             // Configure validation logic for passwords
