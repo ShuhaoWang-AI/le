@@ -139,9 +139,8 @@ namespace Linko.LinkoExchange.Services.Settings
                 else
                 {
                     var newSetting = _dbContext.OrganizationRegulatoryProgramSettings.Create();
-                    newSetting.SettingTemplate = new SettingTemplate();
-                    newSetting.SettingTemplate.SettingTemplateId = Convert.ToInt32(settingDto.Type);
-                    newSetting.SettingTemplate.Name = settingDto.Type.ToString();
+                    newSetting.OrganizationRegulatoryProgramId = settingDtos.OrgRegProgId;
+                    newSetting.SettingTemplateId = Convert.ToInt32(settingDto.Type);
                     newSetting.Value = settingDto.Value;
                     _dbContext.OrganizationRegulatoryProgramSettings.Add(newSetting);
                 }
