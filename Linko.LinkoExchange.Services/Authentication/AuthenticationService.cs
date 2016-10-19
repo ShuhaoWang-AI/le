@@ -265,11 +265,11 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     if (isUserAuthorityUser)
                     {
-                        _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements, logEntry);
+                        _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements);
                     }
                     else
                     {  
-                        _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements, logEntry);
+                        _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
                     }
 
                     // 5 TODO logs invite email  
@@ -754,7 +754,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             logEntry.SenderLastName = "Linko support";
 
 
-            _emailService.SendEmail(new[] { user.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements, logEntry);
+            _emailService.SendEmail(new[] { user.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
         }
 
         string GetBaseUrl()

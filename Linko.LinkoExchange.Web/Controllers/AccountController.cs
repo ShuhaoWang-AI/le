@@ -12,38 +12,28 @@ namespace Linko.LinkoExchange.Web.Controllers
     public class AccountController : Controller
     { 
         //private IAuditLogService _auditLogService;
-        private readonly IAuthenticationService _authenticateService; 
+        private readonly IAuthenticationService _authenticateService;
+        private readonly IEmailService _emailService;
 
-        public AccountController(IAuthenticationService authenticateService)
+        public AccountController(IAuthenticationService authenticateService, IEmailService emailService)
         {
-            _authenticateService = authenticateService;    
+            _authenticateService = authenticateService;
+            _emailService = emailService;
         }
 
         // GET: Account
         public async Task<ActionResult> Index()
-        {
-            //IEmailService emailService = new LinkoExchangeEmailService();
-
-            //var contentReplacements = new Dictionary<string, string>();
-            //contentReplacements.Add("organizationName", "Green Vally Plant");
-            //contentReplacements.Add("authorityName", "Grand Rapids");
-            //contentReplacements.Add("userName", "Shuhao Wang");
-            //contentReplacements.Add("addressLine1", "1055 Pender Street");
-            //contentReplacements.Add("cityName", "Vancouver");
-            //contentReplacements.Add("stateName", "BC");
-
-            //var receivers = new List<string> { "shuhao.wang@watertrax.com" };
-
-            //var logEntry = new EmailAuditLogEntryDto();
-            //logEntry.RecipientFirstName = "First Name";
-            //logEntry.RecipientLastName = "last name";
-            //logEntry.RecipientUserName = "Fist name, lastName";
-            //logEntry.SenderFirstName = "Linko support";
-            //logEntry.SenderLastName = "Linko support";
-            //logEntry.SenderEmailAddress = "shuhao.wang@watertrax.com";
-
-            //emailService.SendEmail(receivers, Linko.LinkoExchange.Core.Enum.EmailType.Signature_SignatoryGranted, contentReplacements, logEntry, logEntry.SenderEmailAddress);
-
+        { 
+//            var contentReplacements = new Dictionary<string, string>();
+//            contentReplacements.Add("organizationName", "Green Vally Plant");
+//            contentReplacements.Add("authorityName", "Grand Rapids");
+//            contentReplacements.Add("userName", "Shuhao Wang");
+//            contentReplacements.Add("addressLine1", "1055 Pender Street");
+//            contentReplacements.Add("cityName", "Vancouver");
+//            contentReplacements.Add("stateName", "BC");
+//
+//            var receivers = new List<string> { "shuhao.wang@watertrax.com" };  
+//            _emailService.SendEmail(receivers, Linko.LinkoExchange.Core.Enum.EmailType.Signature_SignatoryGranted, contentReplacements); 
 
             return View ();
         }

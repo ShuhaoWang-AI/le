@@ -14,17 +14,17 @@ namespace Linko.LinkoExchange.Services.Dto
             get;set;
         }
 
-        public int SenderRegulatorId
-        {
-            get;set;
-        }
-
-        public int SenderRegulateeId
+        public int SenderRegulatoryProgramId
         {
             get; set;
         }
 
-        public int SenderRegulatoryProgramId
+        public int SenderOrganizationId
+        {
+            get; set;
+        }
+
+        public int SenderRegulatorOrganizationId
         {
             get; set;
         }
@@ -49,12 +49,12 @@ namespace Linko.LinkoExchange.Services.Dto
             get; set;
         }
 
-        public int RecipientRegulatorId
+        public int RecipientOrganizationId
         {
             get; set;
         }
 
-        public int RecipientRegulateeId
+        public int RecipientRegulatoryOrganizationid
         {
             get; set;
         }

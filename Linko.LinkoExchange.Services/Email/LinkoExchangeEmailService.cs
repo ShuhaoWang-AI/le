@@ -51,7 +51,7 @@ namespace Linko.LinkoExchange.Services.Email
         }
 
         public async void SendEmail(IEnumerable<string> recipients, EmailType emailType,
-            IDictionary<string, string> contentReplacements, IAuditLogEntry logEntry)
+            IDictionary<string, string> contentReplacements)
         {
             string sendTo = string.Join(separator: ",", values: recipients); 
 
@@ -66,10 +66,10 @@ namespace Linko.LinkoExchange.Services.Email
 
             foreach (var receipientEmail in recipients)
             {
-                var logEntries = GetEmailAuditLog(_senderEmailAddres, receipientEmail, emailType, msg.Subject, msg.Body);
+                var logEntries = GetEmailAuditLog(_senderEmailAddres, receipientEmail, emailType, msg.Subject, msg.Body, template.AuditLogTemplateId);
                 foreach (var log in logEntries)
                 {
-                    _emailAuditLogService.Log(logEntry);
+                    _emailAuditLogService.Log(log);
                 } 
             }  
         }
@@ -119,9 +119,9 @@ namespace Linko.LinkoExchange.Services.Email
         /// <param name="email">The email address of recipient.</param>
         /// <param name="programFilters">Filter collection of program IDs</param>
         /// <returns></returns>
-        private IEnumerable<EmailAuditLog> PopulateRecipientLogDataForAllPrograms(string email, IEnumerable<int> programFilters = null)
+        private IEnumerable<EmailAuditLogEntryDto> PopulateRecipientLogDataForAllPrograms(string email, IEnumerable<int> programFilters = null)
         {
-            var emailAuditLogs = new List<EmailAuditLog>();
+            var emailAuditLogs = new List<EmailAuditLogEntryDto>();
             var oRpUs = _programService.GetUserPrograms(email);
             if (oRpUs.Any())
             {
@@ -132,7 +132,7 @@ namespace Linko.LinkoExchange.Services.Email
                     {
                         foreach (var program in user.OrganizationRegulatoryProgramDtos)
                         {
-                            var auditLog = new EmailAuditLog
+                            var auditLog = new EmailAuditLogEntryDto
                             {
                                 RecipientFirstName = user.UserProfileDto.FirstName,
                                 RecipientLastName = user.UserProfileDto.LastName,
@@ -157,9 +157,9 @@ namespace Linko.LinkoExchange.Services.Email
             return emailAuditLogs;
         }
 
-        private IEnumerable<EmailAuditLog> PopulateSingleRecipientProgramData(string email)
+        private IEnumerable<EmailAuditLogEntryDto> PopulateSingleRecipientProgramData(string email)
         {
-            var emailAuditLogs = new List<EmailAuditLog>();
+            var emailAuditLogs = new List<EmailAuditLogEntryDto>();
             var oRpUs = _programService.GetUserPrograms(email).ToArray();
             if (oRpUs.Any())
             {
@@ -168,7 +168,7 @@ namespace Linko.LinkoExchange.Services.Email
                 var lastName = user.UserProfileDto.LastName;
                 var userName = user.UserProfileDto.UserName;
 
-                var auditLog = new EmailAuditLog
+                var auditLog = new EmailAuditLogEntryDto
                 {
                     RecipientFirstName = firstName,
                     RecipientLastName = lastName,
@@ -190,9 +190,9 @@ namespace Linko.LinkoExchange.Services.Email
         }
 
 
-        private IEnumerable<EmailAuditLog> GetEmailAuditLog(string senderEmail, string receipientEmail, EmailType emailType, string subject, string body)
+        private IEnumerable<EmailAuditLogEntryDto> GetEmailAuditLog(string senderEmail, string receipientEmail, EmailType emailType, string subject, string body, int emailTemplateId)
         { 
-            var emailAuditLogs = new List<EmailAuditLog>(); 
+            var emailAuditLogs = new List<EmailAuditLogEntryDto>(); 
  
             switch (emailType)
             {
@@ -234,9 +234,9 @@ namespace Linko.LinkoExchange.Services.Email
             {
                 log.SenderEmailAddress = _senderEmailAddres;
                 log.SenderFirstName = _senderFistName;
-                log.SenderLastName = _senderLastName; 
+                log.SenderLastName = _senderLastName;
 
-                log.RecipientRegulatoryProgramId = (int) emailType;
+                log.AuditLogTemplateId = emailTemplateId;
                 log.Body = body;
                 log.Subject = subject;
                 log.RecipientEmailAddress = receipientEmail;
