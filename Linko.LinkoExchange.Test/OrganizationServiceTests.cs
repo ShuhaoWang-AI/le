@@ -13,8 +13,7 @@ namespace Linko.LinkoExchange.Test
         private OrganizationService orgService;
         private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LXDev01;Data Source=(local);";
 
-        [TestMethod]
-        public void TestMethod1()
+        public OrganizationServiceTests()
         {
             Mapper.Initialize(cfg =>
             {
@@ -27,10 +26,18 @@ namespace Linko.LinkoExchange.Test
 
             //Make sure there no methods were missing in the mappings loaded above via profiles
             Mapper.AssertConfigurationIsValid();
+        }
 
+        [TestInitialize]
+        public void Initialize()
+        {
             orgService = new OrganizationService(new LinkoExchangeContext(CONN_STRING), Mapper.Instance);
-            var org = orgService.GetOrganization(1);
+        }
 
+        [TestMethod]
+        public void GetOrganization()
+        {
+            var org = orgService.GetOrganization(1);
         }
     }
 }
