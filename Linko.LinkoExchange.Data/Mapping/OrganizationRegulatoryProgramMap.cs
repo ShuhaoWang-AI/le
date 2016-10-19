@@ -16,7 +16,16 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasKey(i => i.OrganizationRegulatoryProgramId);
             Property(i => i.RegulatoryProgramId);
+            Property(i => i.OrganizationId);
+            this.HasRequired(i => i.Organization)
+                .WithMany()
+                .HasForeignKey(i => i.OrganizationId);
+
             Property(i => i.RegulatorOrganizationId);
+            this.HasRequired(i => i.RegulatorOrganization)
+                .WithMany()
+                .HasForeignKey(i => i.RegulatorOrganizationId);
+
             Property(i => i.IsEnabled);
         }
     }

@@ -15,9 +15,8 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual RegulatoryProgram RegulatoryProgram { get; set; }
         public int OrganizationId { get; set; }
         public virtual Organization Organization { get; set; }
-        public int RegulatorOrganizationId { get; set; }
+        public int? RegulatorOrganizationId { get; set; }
         public virtual Organization RegulatorOrganization { get; set; }
         public bool IsEnabled { get; set; }
-        public virtual List<OrganizationRegulatoryProgramSetting> OrganizationRegulatoryProgramSettings  { get; set; }
     }
 }

@@ -16,10 +16,13 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             this.HasKey(i => i.OrganizationRegulatoryProgramSettingId);
             this.Property(i => i.Value);
+
             this.Property(i => i.SettingTemplateId);
             this.HasRequired(i => i.SettingTemplate)
                 .WithMany()
                 .HasForeignKey(i => i.SettingTemplateId);
+
+            this.Property(i => i.OrganizationRegulatoryProgramId).HasColumnName("OrganizationRegulatoryProgramId");
             this.HasRequired(i => i.OrganizationRegulatoryProgram)
                 .WithMany()
                 .HasForeignKey(i => i.OrganizationRegulatoryProgramId);

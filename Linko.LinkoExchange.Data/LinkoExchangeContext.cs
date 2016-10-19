@@ -40,6 +40,7 @@ namespace Linko.LinkoExchange.Data
         public DbSet<QuestionType> QuestionTypes { get; set; }
         public DbSet<PermissionGroup> PermissionGroups { get; set; }
         public DbSet<OrganizationRegulatoryProgram> OrganizationRegulatoryPrograms { get; set; }
+        public DbSet<OrganizationRegulatoryProgramSetting> OrganizationRegulatoryProgramSettings { get; set; }
 
         #endregion
 
