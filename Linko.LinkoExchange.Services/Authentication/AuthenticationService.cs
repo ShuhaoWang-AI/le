@@ -86,8 +86,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 claims = string.IsNullOrWhiteSpace(userId) ? null : _userManager.GetClaims(userId);
                 HttpContext.Current.Session["claims"] = claims;
             }
-
-            return claims.ToList();
+            return claims?.ToList();
         }
 
         /// <summary>

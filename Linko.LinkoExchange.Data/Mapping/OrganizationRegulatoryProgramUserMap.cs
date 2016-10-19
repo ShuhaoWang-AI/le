@@ -17,7 +17,7 @@ namespace Linko.LinkoExchange.Data.Mapping
             HasKey(i => i.OrganizationRegulatoryProgramUserId);  
             Property(i => i.UserProfileId);
             Property(i => i.OrganizationRegulatoryProgramId);
-            Property(i => i.PermissionGrouopId); 
+            Property(i => i.PermissionGroupId); 
             Property(i => i.RegistrationDateTime);
             Property(i => i.IsRegistrationApproved);
             Property(i => i.IsRegistrationDenied);
