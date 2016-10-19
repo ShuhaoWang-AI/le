@@ -8,6 +8,7 @@ namespace Linko.LinkoExchange.Core.Domain
 {
     public class OrganizationType
     {
+        public int OrganizationTypeId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
     }

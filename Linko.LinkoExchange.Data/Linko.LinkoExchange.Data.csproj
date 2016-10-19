@@ -74,6 +74,7 @@
     <Compile Include="Mapping\OrganizationRegulatoryProgramSettingMap.cs" />
     <Compile Include="Mapping\OrganizationRegulatoryProgramUserMap.cs" />
     <Compile Include="Mapping\OrganizationSettingMap.cs" />
+    <Compile Include="Mapping\OrganizationTypeMap.cs" />
     <Compile Include="Mapping\RegulatoryProgramMap.cs" />
     <Compile Include="Mapping\SettingTemplateMap.cs" />
     <Compile Include="Mapping\UserPasswordHistoryMap.cs" />

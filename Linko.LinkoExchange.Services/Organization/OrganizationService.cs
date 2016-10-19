@@ -56,12 +56,7 @@ namespace Linko.LinkoExchange.Services
             try
             {
                 var foundOrg = _dbContext.Organizations.Single(o => o.OrganizationId == organizationId);
-                returnDto = new Dto.OrganizationDto();
-                returnDto.OrganizationName = foundOrg.Name;
-                returnDto.AddressLine1 = foundOrg.AddressLine1;
-                returnDto.AddressLine2 = foundOrg.AddressLine2;
-                returnDto.City = foundOrg.City;
-                returnDto.ZipCode = foundOrg.ZipCode;
+                returnDto = _mapper.Map<Organization, OrganizationDto>(foundOrg);
             }
             catch (DbEntityValidationException ex)
             {
