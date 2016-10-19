@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linko.LinkoExchange.Data", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linko.LinkoExchange.Core", "Linko.LinkoExchange.Core\Linko.LinkoExchange.Core.csproj", "{A3075702-4649-4486-BD38-FC5ABB00A221}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linko.LinkoExchange.Test", "Linko.LinkoExchange.Test\Linko.LinkoExchange.Test.csproj", "{43524214-42FE-49A8-9321-347F56762F6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,12 +35,16 @@ Global
 		{A3075702-4649-4486-BD38-FC5ABB00A221}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3075702-4649-4486-BD38-FC5ABB00A221}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3075702-4649-4486-BD38-FC5ABB00A221}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43524214-42FE-49A8-9321-347F56762F6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43524214-42FE-49A8-9321-347F56762F6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43524214-42FE-49A8-9321-347F56762F6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43524214-42FE-49A8-9321-347F56762F6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 6
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = http://wtrxtfs2013:8080/tfs/linko
 		SccLocalPath0 = .
@@ -54,5 +60,8 @@ Global
 		SccProjectUniqueName4 = Linko.LinkoExchange.Core\\Linko.LinkoExchange.Core.csproj
 		SccProjectName4 = Linko.LinkoExchange.Core
 		SccLocalPath4 = Linko.LinkoExchange.Core
+		SccProjectUniqueName5 = Linko.LinkoExchange.Test\\Linko.LinkoExchange.Test.csproj
+		SccProjectName5 = Linko.LinkoExchange.Test
+		SccLocalPath5 = Linko.LinkoExchange.Test
 	EndGlobalSection
 EndGlobal
