@@ -29,8 +29,7 @@ namespace Linko.LinkoExchange.Services.Email
         public LinkoExchangeEmailService(
             LinkoExchangeContext linkoExchangeContext,
             EmailAuditLogService emailAuditLogService,
-            IProgramService programService,
-            IAuthenticationService authenticationService)
+            IProgramService programService)
         {
             _dbContext = linkoExchangeContext;
             _emailAuditLogService = emailAuditLogService;
