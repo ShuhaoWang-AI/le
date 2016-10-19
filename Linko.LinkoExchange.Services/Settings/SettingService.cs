@@ -131,7 +131,7 @@ namespace Linko.LinkoExchange.Services.Settings
             var existingSettings = _dbContext.OrganizationRegulatoryProgramSettings.Where(o => o.OrganizationRegulatoryProgramId == settingDtos.OrgRegProgId).ToArray();
             foreach (var settingDto in settingDtos.Settings)
             {
-                var foundSetting = existingSettings != null ? existingSettings.SingleOrDefault(s => s.SettingTemplate.Name == settingDto.Name) : null;
+                var foundSetting = existingSettings != null ? existingSettings.SingleOrDefault(s => s.SettingTemplate.SettingTemplateId == Convert.ToInt32(settingDto.Type)) : null;
                 if (foundSetting != null)
                 {
                     foundSetting.Value = settingDto.Value;
@@ -140,8 +140,8 @@ namespace Linko.LinkoExchange.Services.Settings
                 {
                     var newSetting = _dbContext.OrganizationRegulatoryProgramSettings.Create();
                     newSetting.SettingTemplate = new SettingTemplate();
-                    //newSetting.SettingTemplate.SettingTemplateId = Convert.ToInt32(settingDto.SettingTemplateEnum);
-                    newSetting.SettingTemplate.Name = settingDto.Name;
+                    newSetting.SettingTemplate.SettingTemplateId = Convert.ToInt32(settingDto.Type);
+                    newSetting.SettingTemplate.Name = settingDto.Type.ToString();
                     newSetting.Value = settingDto.Value;
                     _dbContext.OrganizationRegulatoryProgramSettings.Add(newSetting);
                 }
@@ -219,60 +219,60 @@ namespace Linko.LinkoExchange.Services.Settings
 			return new[] {
 						 new SettingDto
 						 {
-							 Name="PasswordRequireLength",
+                             Type=SettingType.PasswordRequireLength,
 							 Value="6"
 						 },
 
 						 new SettingDto
 						 {
-							 Name="PasswordRequireDigit",
+                             Type=SettingType.PasswordRequireDigit,
 							 Value = "true"
 						 },
 
 						 new SettingDto
 						 {
-							 Name="PasswordRequireLowerCase",
+                             Type=SettingType.PasswordRequireLowerCase,
 							 Value = "true"
 						 },
 
 						 new SettingDto
 						 {
-							 Name="PasswordRequireUpperCase",
+                             Type=SettingType.PasswordRequireUpperCase,
 							 Value = "true"
 						 },
 						 new SettingDto
 						 {
-							 Name="UserLockoutEnabledByDefault",
+                             Type=SettingType.UserLockoutEnabledByDefault,
 							 Value = "true"
 						 },
 
 						 new SettingDto
 						 {
-							 Name = "DefaultAccountLockoutTimeSpan",   // lock out days
+                             Type = SettingType.DefaultAccountLockoutTimeSpan,   // lock out days
 							 Value = "1"
 						 },
 
 						 new SettingDto
 						 {
-							 Name = "MaxFailedAccessAttemptsBeforeLockout",
+                             Type = SettingType.MaxFailedAccessAttemptsBeforeLockout,
 							 Value = "2"
 						 },
 
 						 new SettingDto
 						 {
-							 Name="PasswordExpiredDays",
+                             Type=SettingType.PasswordExpiredDays,
 							 Value="90"
 						 },
 
 						 new SettingDto
 						 {
-							 Name="DaysBeforeRequirePasswordChanging",
+                             Type=SettingType.DaysBeforeRequirePasswordChanging,
 							 Value="10"
 						 },
 
                          new SettingDto
                          {
-                             Name ="NumberOfPasswordsInHistory",
+                             Type =SettingType.NumberOfPasswordsInHistory,
                              Value = "10"
                          }
 				};

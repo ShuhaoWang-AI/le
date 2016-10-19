@@ -14,10 +14,10 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
         public SettingMapProfile()
         {
             CreateMap<OrganizationSetting, SettingDto>()
-               .ForMember(d => d.Name, o => o.MapFrom(s => s.SettingTemplate.Name));
+               .ForMember(d => d.Type, o => o.MapFrom(s => s.SettingTemplate.Name));
 
             CreateMap<OrganizationRegulatoryProgramSetting, SettingDto>()
-               .ForMember(d => d.Name, o => o.MapFrom(s => s.SettingTemplate.Name));
+               .ForMember(d => d.Type, o => o.MapFrom(s => s.SettingTemplate.Name));
         }
     }
 }

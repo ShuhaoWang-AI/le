@@ -602,17 +602,17 @@ namespace Linko.LinkoExchange.Services.Authentication
             var defaultValueStr = _globalSettings[settingKey];
 
             var defaultValue = int.Parse(defaultValueStr);
-            if (programSettings.Any(i => i.Name.Equals(settingKey)))
+            if (programSettings.Any(i => i.Type.ToString().Equals(settingKey)))
             {
-                defaultValue = isMax ? programSettings.Where(i=>i.Name== settingKey)
+                defaultValue = isMax ? programSettings.Where(i=>i.Type.ToString() == settingKey)
                     .Max(i => ValueParser.TryParseInt(i.Value, defaultValue)) :
-                    programSettings.Where(i => i.Name == settingKey).Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
+                    programSettings.Where(i => i.Type.ToString() == settingKey).Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
             }
             else
             {
                 defaultValue = isMax ? organizationSettings
-                    .Where(i => i.Name == settingKey).Max(i => ValueParser.TryParseInt(i.Value, defaultValue)) : 
-                    organizationSettings.Where(i => i.Name == settingKey).Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
+                    .Where(i => i.Type.ToString() == settingKey).Max(i => ValueParser.TryParseInt(i.Value, defaultValue)) : 
+                    organizationSettings.Where(i => i.Type.ToString() == settingKey).Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
             }
 
             return defaultValue;
@@ -686,14 +686,14 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             var passwordRequireDigital = _globalSettings[settingKey];
             var passwordRequireDigitalValue = bool.Parse(passwordRequireDigital);
-            if (programSettings.Any(i => i.Name.Equals(settingKey)))
+            if (programSettings.Any(i => i.Type.Equals(settingKey)))
             {
-                return programSettings.Where(i => i.Name == settingKey).Any(i => i.Value.ToLower() == "true");
+                return programSettings.Where(i => i.Type.ToString() == settingKey).Any(i => i.Value.ToLower() == "true");
             }
 
-            if (organizationSettings.Any(i=> i.Name.Equals(settingKey)))
+            if (organizationSettings.Any(i=> i.Type.Equals(settingKey)))
             {
-                return organizationSettings.Where(i => i.Name == settingKey).Any(i => i.Value.ToLower() == "true"); 
+                return organizationSettings.Where(i => i.Type.ToString() == settingKey).Any(i => i.Value.ToLower() == "true"); 
             }
 
             return passwordRequireDigitalValue;

@@ -48,8 +48,8 @@ namespace Linko.LinkoExchange.Test
         {
             var settings = new ProgramSettingDto() { OrgRegProgId = 1 };
             settings.Settings = new List<SettingDto>();
-            settings.Settings.Add(new SettingDto() { Name = "MaxKBQAttempts", Value = "9" });
-            settings.Settings.Add(new SettingDto() { Name = "PasswordChangeDays", Value = "30" });
+            settings.Settings.Add(new SettingDto() { Type = SettingType.MaxKBQAttempts, Value = "9" });
+            settings.Settings.Add(new SettingDto() { Type = SettingType.PasswordChangeDays, Value = "30" });
             settingService.CreateOrUpdateProgramSettings(settings);
         }
 
