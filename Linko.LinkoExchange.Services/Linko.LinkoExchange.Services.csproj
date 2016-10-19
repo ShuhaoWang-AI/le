@@ -116,8 +116,9 @@
     <Compile Include="Authentication\TokenGenerator.cs" />
     <Compile Include="AutoMapperProfile\EmailAuditLogEntryMapProfile.cs" />
     <Compile Include="AutoMapperProfile\InvitationMapProfile.cs" />
-    <Compile Include="AutoMapperProfile\AutoMapperServicesConfiguration.cs" />
+    <Compile Include="AutoMapperProfile\OrganizationMapProfile.cs" />
     <Compile Include="AutoMapperProfile\OrganziationRegulatoryProgramUserDtoMapProfile.cs" />
+    <Compile Include="AutoMapperProfile\UserMapProfile.cs" />
     <Compile Include="Dto\CrommerAuditLogEntry.cs" />
     <Compile Include="Dto\EmailAuditLogEntryDto.cs" />
     <Compile Include="Dto\IAuditLogEntry.cs" />

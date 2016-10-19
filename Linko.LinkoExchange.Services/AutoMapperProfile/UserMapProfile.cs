@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Dto;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services.AutoMapperProfile
 {
-    /// <summary>
-    /// These mapping profiles are loaded individually 
-    /// where Unity is configured
-    /// </summary>
     public class UserMapProfile : Profile
     {
         public UserMapProfile()
@@ -22,9 +23,6 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
                .ForMember(d => d.Password, o => o.Ignore())
                .ForMember(d => d.IsEnabled, o => o.Ignore());
 
-            CreateMap<Organization, OrganizationDto>() //Map all properties in the destination where names are the same 
-            .ForMember(d => d.OrganizationName, o => o.MapFrom(s => s.Name)) //Need to explicitly map b/c mismatched naming
-            .ReverseMap();
         }
-    } 
+    }
 }

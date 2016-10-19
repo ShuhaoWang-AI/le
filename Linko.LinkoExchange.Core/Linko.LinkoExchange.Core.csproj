@@ -80,6 +80,7 @@
     <Compile Include="Domain\OrganizationRegulatoryProgramSetting.cs" />
     <Compile Include="Domain\OrganizationRegulatoryProgramUser.cs" />
     <Compile Include="Domain\OrganizationSetting.cs" />
+    <Compile Include="Domain\OrganizationType.cs" />
     <Compile Include="Domain\PermissionGroup.cs" />
     <Compile Include="Domain\Question.cs" />
     <Compile Include="Domain\QuestionType.cs" />

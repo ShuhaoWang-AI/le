@@ -12,6 +12,7 @@ namespace Linko.LinkoExchange.Core.Domain
         [Key]
         public int OrganizationId { get; set; }
         public int OrganizationTypeId { get; set; }
+        public virtual OrganizationType OrganizationType { get; set; }
         public string Name { get; set; }
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }

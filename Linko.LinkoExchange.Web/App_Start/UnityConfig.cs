@@ -86,7 +86,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IUserStore<ApplicationUser>, UserStore<ApplicationUser>>(new InjectionConstructor(typeof(LinkoExchangeContext)));
             container.RegisterType<IPermissionService, PermissionService>();
             container.RegisterType<IAuditLogService, EmailAuditLogService>(new InjectionConstructor(typeof(LinkoExchangeContext)));
-            container.RegisterType<IEmailService, LinkoExchangeEmailService>(new InjectionConstructor(typeof(LinkoExchangeContext), typeof(EmailAuditLogService)));
+            container.RegisterType<IEmailService, LinkoExchangeEmailService>(new InjectionConstructor(typeof(LinkoExchangeContext), typeof(EmailAuditLogService), typeof(IProgramService), typeof(IAuthenticationService)));
 
 
 
@@ -100,7 +100,8 @@ namespace Linko.LinkoExchange.Web
                 cfg.AddProfile(new UserMapProfile());
                 cfg.AddProfile(new EmailAuditLogEntryMapProfile()); 
                 cfg.AddProfile(new InvitationMapProfile());
-                cfg.AddProfile(new OrganziationRegulatoryProgramUserDtoMapProfile()); 
+                cfg.AddProfile(new OrganziationRegulatoryProgramUserDtoMapProfile());
+                cfg.AddProfile(new OrganizationMapProfile());
             });
 
             //Make sure there no methods were missing in the mappings loaded above via profiles
