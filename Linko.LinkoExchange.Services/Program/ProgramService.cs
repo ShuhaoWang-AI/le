@@ -29,7 +29,7 @@ namespace Linko.LinkoExchange.Services.Program
         /// </summary>
         /// <param name="userId">User id</param>
         /// <returns>A collection of programs</returns>
-        public IEnumerable<ProgramDto> GetUserPrograms(int userId)
+        public IEnumerable<ProgramDto> GetUserRegulatoryPrograms(int userId)
         {
             var list = new List<ProgramDto>
             {
@@ -69,18 +69,39 @@ namespace Linko.LinkoExchange.Services.Program
         }
 
         /// <summary>
-        /// Get all the OrganizationRegulatoryProgram(s) that the users have access to
+        /// Get all the OrganizationRegulatoryProgramDto(s) that the users have access to
         /// </summary>
         /// <param name="email">The email address.</param>
         /// <returns></returns>
-        public IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserPrograms(string  email)
+        public IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string  email)
         {
+            //TODO 
+
+//            var t = new OrganizationRegulatoryProgramUserDto
+//             {
+//                UserProfileDto = new UserDto
+//                {
+//                    FirstName = "test first name",
+//                    LastName = "test last name",
+//                    UserName = "the user name"
+//                }
+//            };
+//
+//            var list = new List<OrganizationRegulatoryProgramUserDto>();
+//            list.Add(t);
+//
+//            return list;
+
+           
+
             var userProfile = _userService.GetUserProfileByEmail(email);
             if (userProfile == null)
                 return null;
 
             var organziationRegulatoryProgramUserDtos = new List<OrganizationRegulatoryProgramUserDto>();
-            var regulatoryProgramUsers = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.ToList().FindAll(i => i.UserProfileId == userProfile.UserProfileId);
+            var regulatoryProgramUsers = _linkoExchangeDbContext
+                .OrganizationRegulatoryProgramUsers.ToList()
+                .FindAll(i => !i.IsRemove && i.UserProfileId == userProfile.UserProfileId);
             if (regulatoryProgramUsers.Any()) 
             {
                 organziationRegulatoryProgramUserDtos

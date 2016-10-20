@@ -419,11 +419,44 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return Task.FromResult(signInResultDto);
             }
 
-            // TODO to check if the user has been locked "Account Lockout"  by an authority
-            
-            // TODO to check if the user is disabled or not  
-            // clear claims from db if there are   
+            // Check if the user is in 'passowrd lock' status
+            // This step will be handled by Owin 
 
+            // TODO to check if the user has been locked "Account Lockout"  by an authority
+            // check UserProfile ->  IsAccountLocked field
+            if (applicationUser.IsAccountLocked)
+            {
+                signInResultDto.AutehticationResult = AuthenticationResult.UserIsLocked;
+                return Task.FromResult(signInResultDto);
+            }
+
+            // TODO waiting for the DB tables
+
+            //  UC-29 4.a
+            //  To check if user status is:
+            //    1. Registration Pending ( OrganizationRegulatoryProgramUser.IsRegistrationApproved == false) 
+            //    2. No other programs that is approved,  or no other programs that is enabled
+            //  return:  your registratin is not approved yet.     RegistrationApprovalPending,
+
+//            var orpus = _programService.GetUserRegulatoryPrograms(applicationUser.Email);
+//            if (orpus != null && orpus.Any())
+//            {
+//                //  all registrations have not approved yet 
+//                if ( orpus.All(i=>i.IsRegistrationApproved == false) || orpus.Any(u => u.IsRegistrationApproved && u.OrganizationRegulatoryProgramDto.IsEnabled) )
+//                {
+//                    signInResultDto.AutehticationResult = AuthenticationResult.RegistrationApprovalPending;
+//                    return Task.FromResult(signInResultDto);
+//                }
+//
+//                // If the user is disabled for all programs
+//                if (!orpus.Any(u => u.IsEnabled))
+//                {
+//                    signInResultDto.AutehticationResult = AuthenticationResult.UserIsDisabled;
+//                    return Task.FromResult(signInResultDto);
+//                }  
+//            } 
+
+            // clear claims from db if there are   
             ClearClaims(applicationUser.Id);
             applicationUser.Claims.Clear();
             
@@ -721,7 +754,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private IEnumerable<int> GetUserProgramIds(int userId)
         {
-            var programs = _programService.GetUserPrograms(userId);
+            var programs = _programService.GetUserRegulatoryPrograms(userId);
             return programs.Select(i => i.ProgramId).ToArray();
         }
 

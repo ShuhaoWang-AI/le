@@ -45,6 +45,26 @@ namespace Linko.LinkoExchange.Services
 
             return list;
         }
+        
+        /// <summary>
+        /// Return all the programs' regulatory list for the user
+        /// </summary>
+        /// <param name="userId">The user Id</param>
+        /// <returns>The organizationId </returns>
+        public IEnumerable<OrganizationDto> GetUserRegulatories(int userId)
+        {
+            var orpUsers = _dbContext.OrganizationRegulatoryProgramUsers.ToList()
+                .FindAll(u => u.UserProfileId == userId && u.IsRemove == false);
+
+            var orgs = new List<OrganizationDto>();
+            foreach (var orpUser in orpUsers)
+            {
+                if(orpUser.OrganizationRegulatoryProgram?.Organization != null)  
+                 orgs.Add(_mapper.Map<OrganizationDto>(orpUser.OrganizationRegulatoryProgram.Organization)); 
+            }
+
+            return orgs;
+        }
 
         /// <summary>
         /// Get the organization by organization id

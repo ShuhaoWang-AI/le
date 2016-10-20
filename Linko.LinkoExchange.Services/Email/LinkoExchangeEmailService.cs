@@ -122,29 +122,25 @@ namespace Linko.LinkoExchange.Services.Email
         private IEnumerable<EmailAuditLogEntryDto> PopulateRecipientLogDataForAllPrograms(string email, IEnumerable<int> programFilters = null)
         {
             var emailAuditLogs = new List<EmailAuditLogEntryDto>();
-            var oRpUs = _programService.GetUserPrograms(email);
+            var oRpUs = _programService.GetUserRegulatoryPrograms(email);
             if (oRpUs.Any())
             {
                 foreach (var user in oRpUs)
                 {
-                    if (user.OrganizationRegulatoryProgramDtos != null &&
-                        user.OrganizationRegulatoryProgramDtos.Count > 0)
+                    if (user.OrganizationRegulatoryProgramDto != null)
                     {
-                        foreach (var program in user.OrganizationRegulatoryProgramDtos)
+                        var auditLog = new EmailAuditLogEntryDto
                         {
-                            var auditLog = new EmailAuditLogEntryDto
-                            {
-                                RecipientFirstName = user.UserProfileDto.FirstName,
-                                RecipientLastName = user.UserProfileDto.LastName,
-                                RecipientUserName = user.UserProfileDto.UserName, 
+                            RecipientFirstName = user.UserProfileDto.FirstName,
+                            RecipientLastName = user.UserProfileDto.LastName,
+                            RecipientUserName = user.UserProfileDto.UserName,
 
-                                RecipientRegulatoryProgramId = user.OragnizationRegulatoryProgramId,
-                                RecipientOrganizationId = program.OrganizationId, 
-                                RecipientRegulatoryOrganizationid = program.RegulatorOrganizationId
-                            };
+                            RecipientRegulatoryProgramId = user.OragnizationRegulatoryProgramId,
+                            RecipientOrganizationId = user.OrganizationRegulatoryProgramDto.OrganizationId,
+                            RecipientRegulatoryOrganizationid = user.OrganizationRegulatoryProgramDto.RegulatorOrganizationId
+                        };
 
-                            emailAuditLogs.Add(auditLog); 
-                        }
+                        emailAuditLogs.Add(auditLog);
                     }
                 }
             }
@@ -160,7 +156,7 @@ namespace Linko.LinkoExchange.Services.Email
         private IEnumerable<EmailAuditLogEntryDto> PopulateSingleRecipientProgramData(string email)
         {
             var emailAuditLogs = new List<EmailAuditLogEntryDto>();
-            var oRpUs = _programService.GetUserPrograms(email).ToArray();
+            var oRpUs = _programService.GetUserRegulatoryPrograms(email).ToArray();
             if (oRpUs.Any())
             {
                 var user = oRpUs[0]; // get the first one to get user first name, last, and user name; 

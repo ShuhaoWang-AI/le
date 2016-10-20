@@ -22,5 +22,6 @@ namespace Linko.LinkoExchange.Core.Domain
         public int PermissionGroupId { get; set; }
         public DateTime CreationDateTimeUtc { get;set; }
         public DateTime RegistrationDateTime { get;set;}
+        public bool IsRemove { get; set; }
     }
 }

@@ -13,6 +13,13 @@ namespace Linko.LinkoExchange.Services.Organization
         IEnumerable<OrganizationDto> GetUserOrganizations(int userId);
 
         /// <summary>
+        /// Get the regulatories list that the user belonged to.
+        /// </summary>
+        /// <param name="userId">The user Id.</param>
+        /// <returns></returns>
+        IEnumerable<OrganizationDto> GetUserRegulatories(int userId);
+
+            /// <summary>
         /// Get the organization by organization id
         /// </summary>
         /// <param name="organizationId">Organization id</param>

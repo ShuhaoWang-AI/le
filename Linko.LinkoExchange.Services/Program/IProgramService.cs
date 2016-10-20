@@ -5,13 +5,13 @@ namespace Linko.LinkoExchange.Services.Program
 {
     public interface IProgramService
     {
-        IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserPrograms(string email);
+        IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string email);
         /// <summary>
         /// Get programs that a user can access
         /// </summary>
         /// <param name="userId">User id</param>
         /// <returns>A collection of programs</returns>
-        IEnumerable<ProgramDto> GetUserPrograms(int userId);
+        IEnumerable<ProgramDto> GetUserRegulatoryPrograms(int userId);
 
         /// <summary>
         /// The programs that fulfilled an organization

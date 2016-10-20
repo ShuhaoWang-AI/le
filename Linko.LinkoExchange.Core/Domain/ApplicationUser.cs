@@ -27,5 +27,11 @@ namespace Linko.LinkoExchange.Core.Domain
         {
             get; private set;
         }
+
+        public string Email { get; set; }
+
+        public bool IsAccountLocked { get; set; }
+        public bool IsAccountResetRequired { get; set; }
+        public bool EmailConfirmed { get; set; }
     }
 }

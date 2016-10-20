@@ -20,12 +20,16 @@ namespace Linko.LinkoExchange.Services.Dto
             get;set;
         }
 
+        public bool IsRegistrationApproved { get; set; }
+        public bool IsRegistrationDenied { get; set; }
+        public bool IsRemoved { get; set; } 
+
         public UserDto UserProfileDto
         {
             get; set;
         }
 
-        public ICollection<OrganizationRegulatoryProgramDto> OrganizationRegulatoryProgramDtos
+        public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgramDto
         {
             get; set;
         }
