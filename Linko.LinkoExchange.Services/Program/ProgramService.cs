@@ -101,7 +101,7 @@ namespace Linko.LinkoExchange.Services.Program
             var organziationRegulatoryProgramUserDtos = new List<OrganizationRegulatoryProgramUserDto>();
             var regulatoryProgramUsers = _linkoExchangeDbContext
                 .OrganizationRegulatoryProgramUsers.ToList()
-                .FindAll(i => !i.IsRemove && i.UserProfileId == userProfile.UserProfileId);
+                .FindAll(i => !i.IsRemoved && i.UserProfileId == userProfile.UserProfileId);
             if (regulatoryProgramUsers.Any()) 
             {
                 organziationRegulatoryProgramUserDtos
