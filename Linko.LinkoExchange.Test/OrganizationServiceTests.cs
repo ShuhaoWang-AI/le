@@ -45,5 +45,12 @@ namespace Linko.LinkoExchange.Test
         {
             var childOrgs = orgService.GetChildOrganizationRegulatoryPrograms(2);
         }
+
+        
+        [TestMethod]
+        public void UpdateEnableDisableFlag()
+        {
+            orgService.UpdateEnableDisableFlag(1, true);
+        }
     }
 }
