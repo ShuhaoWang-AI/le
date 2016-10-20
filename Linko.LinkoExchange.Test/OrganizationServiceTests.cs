@@ -43,7 +43,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetChildOrganizationRegulatoryPrograms()
         {
-            var childOrgs = orgService.GetChildOrganizationRegulatoryPrograms(1);
+            var childOrgs = orgService.GetChildOrganizationRegulatoryPrograms(2);
         }
     }
 }
