@@ -11,6 +11,7 @@ namespace Linko.LinkoExchange.Data.Mapping
             ToTable("tInvitation");
 
             HasKey(i => i.InvitationId);
+            Property(i => i.InvitationId).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 
             Property(i => i.FirstName);
             Property(i => i.LastName);

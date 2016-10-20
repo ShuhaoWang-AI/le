@@ -14,7 +14,6 @@ using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
-using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Data;

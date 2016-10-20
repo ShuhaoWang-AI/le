@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
 
-namespace Linko.LinkoExchange.Services.Invitation
+namespace Linko.LinkoExchange.Services
 {
     public interface IInvitationService
     {
@@ -25,6 +25,12 @@ namespace Linko.LinkoExchange.Services.Invitation
         /// </summary>
         /// <param name="invitationId">Invitation id</param>
         /// <returns>The organization of the invitation</returns>
-        IEnumerable<OrganizationDto> GetInvitationrRecipientOrganization(string invitationId); 
+        IEnumerable<OrganizationDto> GetInvitationrRecipientOrganization(string invitationId);
+
+        /// <summary>
+        /// Creates record in Invitation table
+        /// </summary>
+        /// <param name="invite"></param>
+        void CreateInvitation(InvitationDto inviteDto);
     }
 }
