@@ -43,5 +43,11 @@ namespace Linko.LinkoExchange.Test
         {
             List<UserDto> userDtoList = userService.GetUserProfilesForOrgRegProgram(1, null, null, null, null);
         }
+
+        [TestMethod]
+        public void GetPendingRegistrationPendingUsersOrgRegProgram()
+        {
+            List<UserDto> userDtoList = userService.GetUserProfilesForOrgRegProgram(1, false, false, true, false);
+        }
     }
 }
