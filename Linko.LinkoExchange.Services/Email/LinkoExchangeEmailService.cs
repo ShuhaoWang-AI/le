@@ -15,6 +15,7 @@ using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Program;
+using Linko.LinkoExchange.Services.RequestCache;
 using Linko.LinkoExchange.Services.Settings;
 
 namespace Linko.LinkoExchange.Services.Email
@@ -24,9 +25,10 @@ namespace Linko.LinkoExchange.Services.Email
         private readonly LinkoExchangeContext _dbContext;
         private readonly IAuditLogService _emailAuditLogService;
         private readonly IProgramService _programService;
-        private readonly ISettingService _settingService;  
+        private readonly ISettingService _settingService;
+        private readonly IRequestCache _requestCache; 
 
-        private readonly string _emailServer = ConfigurationManager.AppSettings["EmailServer"]; 
+        private string _emailServer = ConfigurationManager.AppSettings["EmailServer"]; 
 
         private readonly string _senderEmailAddres;
         private readonly string _senderFistName;
@@ -34,14 +36,16 @@ namespace Linko.LinkoExchange.Services.Email
 
         public LinkoExchangeEmailService(
             LinkoExchangeContext linkoExchangeContext,
-            EmailAuditLogService emailAuditLogService,
+            IAuditLogService emailAuditLogService,
             IProgramService programService,
-            ISettingService settingService)
+            ISettingService settingService,
+            IRequestCache requestCache)
         {
             _dbContext = linkoExchangeContext;
             _emailAuditLogService = emailAuditLogService;
             _programService = programService;
             _settingService = settingService;
+            _requestCache = requestCache;
 
 
             _senderEmailAddres = _settingService.GetGlobalSettings()["SystemEmailEmailAddress"];
@@ -59,6 +63,16 @@ namespace Linko.LinkoExchange.Services.Email
             if (template == null) return;
 
             MailMessage msg = await GetMailMessage(sendTo, template, contentReplacements, _senderEmailAddres);
+            if (string.IsNullOrWhiteSpace(_emailServer))
+            {
+                _emailServer = _settingService.GetGlobalSettings()["EmailServer"]; 
+            }
+
+            if (string.IsNullOrWhiteSpace(_emailServer))
+            {
+                throw  new ArgumentException("EmailServer");
+            }
+
             using (var smtpClient = new SmtpClient(_emailServer))
             {
                 smtpClient.Send(msg);
@@ -171,12 +185,11 @@ namespace Linko.LinkoExchange.Services.Email
                     RecipientUserName = userName,
 
                     RecipientRegulatoryProgramId =
-                        ValueParser.TryParseInt(
-                            HttpContext.Current.Items["EmailRecipientRegulatoryProgramId"] as string, 0),
+                        ValueParser.TryParseInt(_requestCache.GetValue("EmailRecipientRegulatoryProgramId")as string, 0),
                     RecipientOrganizationId =
-                        ValueParser.TryParseInt(HttpContext.Current.Items["EmailRecipientOrganizationId"] as string, 0),
+                        ValueParser.TryParseInt(_requestCache.GetValue("EmailRecipientOrganizationId")as string, 0),
                     RecipientRegulatoryOrganizationid =
-                        ValueParser.TryParseInt(HttpContext.Current.Items["EmailRecipientOrganizationId"] as string, 0)
+                        ValueParser.TryParseInt(_requestCache.GetValue("EmailRecipientOrganizationId") as string, 0)
                 };
 
                 emailAuditLogs.Add(auditLog);
@@ -184,8 +197,7 @@ namespace Linko.LinkoExchange.Services.Email
 
             return emailAuditLogs;
         }
-
-
+        
         private IEnumerable<EmailAuditLogEntryDto> GetEmailAuditLog(string senderEmail, string receipientEmail, EmailType emailType, string subject, string body, int emailTemplateId)
         { 
             var emailAuditLogs = new List<EmailAuditLogEntryDto>(); 

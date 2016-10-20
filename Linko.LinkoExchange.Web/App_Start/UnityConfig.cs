@@ -23,6 +23,7 @@ using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.RequestCache;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -80,6 +81,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IInvitationService, InvitationService>();
             container.RegisterType<IProgramService, ProgramService>();
             container.RegisterType<IUserService, UserService>();
+            container.RegisterType<IRequestCache, RequestCache>();
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
@@ -93,7 +95,8 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IEmailService, LinkoExchangeEmailService>(new InjectionConstructor(typeof(LinkoExchangeContext),
                 typeof(EmailAuditLogService), 
                 typeof(IProgramService),
-                typeof(ISettingService)));
+                typeof(ISettingService),
+                typeof(IRequestCache)));
 
 
 
