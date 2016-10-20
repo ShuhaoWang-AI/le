@@ -78,6 +78,7 @@
     <Compile Include="Mapping\RegulatoryProgramMap.cs" />
     <Compile Include="Mapping\SettingTemplateMap.cs" />
     <Compile Include="Mapping\UserPasswordHistoryMap.cs" />
+    <Compile Include="Mapping\UserProfileMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

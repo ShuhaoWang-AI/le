@@ -16,6 +16,9 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasKey(i => i.OrganizationRegulatoryProgramUserId);  
             Property(i => i.UserProfileId);
+            this.HasRequired(i => i.UserProfile)
+                .WithMany()
+                .HasForeignKey(i => i.UserProfileId);
             Property(i => i.OrganizationRegulatoryProgramId);
             Property(i => i.PermissionGroupId); 
             Property(i => i.RegistrationDateTime);

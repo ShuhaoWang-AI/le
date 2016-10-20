@@ -68,7 +68,7 @@ namespace Linko.LinkoExchange.Services.User
                              bool? isRemoved)
         {
             var dtos = new List<UserDto>();
-            IQueryable<OrganizationRegulatoryProgramUser> users = _dbContext.OrganizationRegulatoryProgramUsers.Where(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
+            var users = _dbContext.OrganizationRegulatoryProgramUsers.Where(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
 
             if (isRegApproved.HasValue)
                 users = users.Where(u => u.IsRegistrationApproved == isRegApproved);
@@ -79,7 +79,7 @@ namespace Linko.LinkoExchange.Services.User
             if (isRemoved.HasValue)
                 users = users.Where(u => u.IsRemoved == isRemoved);
 
-            foreach (var user in users)
+            foreach (var user in users.ToList())
             {
                 UserDto dto = _mapper.Map<OrganizationRegulatoryProgramUser, UserDto>(user);
                 dtos.Add(dto);
