@@ -17,6 +17,7 @@ using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.User;
@@ -187,31 +188,36 @@ namespace Linko.LinkoExchange.Services.Authentication
         public Task<AuthenticationResultDto> CreateUserAsync(UserDto userInfo, string registrationToken)
         {
             var authenticationResult = new AuthenticationResultDto();
+            
+            var invitationDto = _invitationService.GetInvitation(registrationToken);
+            if (invitationDto == null)
+            {
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.InvalidateRegistrationToken;
+                return Task.FromResult(authenticationResult);
+            }
+             
+            // TODO  check token is expired or not? from organization settings
+            var invitationRecipientProgram =
+                _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
+            var inivitationRecipintOrganizationSettings =
+                _settingService.GetOrganizationSettingsById(invitationRecipientProgram.OrganizationId);
+
+            var invitationExpirationHours = ValueParser.TryParseInt(inivitationRecipintOrganizationSettings
+                .Settings.Single(i => i.Type == SettingType.InvitationExpiryHours).Value, 0);
+
+            if (DateTime.UtcNow > invitationDto.InvitationDateTimeUtc.AddHours(invitationExpirationHours))
+            {
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.ExpiredRegistrationToken;
+                return Task.FromResult(authenticationResult);
+            } 
+            
             var applicationUser = AssignUser(userInfo.UserName, userInfo.Email);
             try
             {  
-                // TODO invitation and program and organization relationship ?  one to many or one to one?  
-                var invitationDto = _invitationService.GetInvitation(registrationToken);
-                if (invitationDto == null)
-                {
-                    authenticationResult.Success = false;
-                    authenticationResult.Result = AuthenticationResult.InvalidateRegistrationToken;
-                    return Task.FromResult(authenticationResult);
-                }
-
-                var programIds = new[] {invitationDto.RecipientOrganizationRegulatoryProgramId};
-
-                var organizationIds = new int[]
-                {
-                    _programService.GetOrganizationRegulatoryProgram(
-                            invitationDto.RecipientOrganizationRegulatoryProgramId)
-                        .OrganizationId
-                };  
-                 
-                var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
-                var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings).ToList(); 
-
-                SetPasswordPolicy(organizationSettings, programSettings);
+                // Only check the organization settings of invitation regulatory program
+                SetPasswordPolicy(inivitationRecipintOrganizationSettings.Settings, null);
 
                 var result = _userManager.CreateAsync(applicationUser, userInfo.Password).Result;  
                 
@@ -228,8 +234,10 @@ namespace Linko.LinkoExchange.Services.Authentication
                          UserProfileId = applicationUser.UserProfileId
                     });
 
-                    // Save into user profile 
-
+                    // Save into user profile? 
+                    var userProfile = _userService.GetUserProfileByEmail(applicationUser.Email);
+                    // TODO more..... 
+                    
 
                     // 2 // Create organziation regulatory program user, and set the approved statue to false  
                     // TODO change user status to  Registration Pending
@@ -634,7 +642,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             var defaultValueStr = _globalSettings[settingKey];
 
             var defaultValue = int.Parse(defaultValueStr);
-            if (programSettings.Any(i => i.Type.ToString().Equals(settingKey)))
+            if (programSettings != null && programSettings.Any(i => i.Type.ToString().Equals(settingKey)))
             {
                 defaultValue = isMax ? programSettings.Where(i=>i.Type.ToString() == settingKey)
                     .Max(i => ValueParser.TryParseInt(i.Value, defaultValue)) :
@@ -718,7 +726,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             var passwordRequireDigital = _globalSettings[settingKey];
             var passwordRequireDigitalValue = bool.Parse(passwordRequireDigital);
-            if (programSettings.Any(i => i.Type.Equals(settingKey)))
+            if (programSettings != null && programSettings.Any(i => i.Type.Equals(settingKey)))
             {
                 return programSettings.Where(i => i.Type.ToString() == settingKey).Any(i => i.Value.ToLower() == "true");
             }

@@ -14,6 +14,7 @@
         PasswordExpired,
         UserAlreadyExists,
         CanNotUseOldPassword,
-        InvalidateRegistrationToken
+        InvalidateRegistrationToken,
+        ExpiredRegistrationToken
     }
 }
