@@ -44,9 +44,16 @@ namespace Linko.LinkoExchange.Test
                                                         { EmailAddress = "test@test.com",
                                                          FirstName = "Ryan",
                                                          LastName = "Lee",
+                                                         InvitationId = Guid.NewGuid().ToString(),
                                                          InvitationDateTimeUtc = DateTime.Now,
                                                          SenderOrganizationRegulatoryProgramId = 1,
                                                          RecipientOrganizationRegulatoryProgramId = 1});
+        }
+
+        [TestMethod]
+        public void GetInvitationsForOrgRegProgram()
+        {
+            var dto = invitationService.GetInvitationsForOrgRegProgram(1);
         }
     }
 }

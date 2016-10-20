@@ -32,5 +32,13 @@ namespace Linko.LinkoExchange.Services
         /// </summary>
         /// <param name="invite"></param>
         void CreateInvitation(InvitationDto inviteDto);
+
+        /// <summary>
+        /// Returns all records in the Invitation table 
+        /// where recipient program id matches
+        /// </summary>
+        /// <param name="orgRegProgramId"></param>
+        /// <returns></returns>
+        ICollection<InvitationDto> GetInvitationsForOrgRegProgram(int orgRegProgramId);
     }
 }

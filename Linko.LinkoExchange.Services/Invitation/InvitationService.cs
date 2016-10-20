@@ -109,7 +109,6 @@ namespace Linko.LinkoExchange.Services
 
                         }
                     }
-                    //_logger.Info("???");
                     throw new RuleViolationException("Validation errors", validationIssues);
 
                 }
@@ -120,6 +119,18 @@ namespace Linko.LinkoExchange.Services
                 }
             }
 
+        }
+
+        public ICollection<InvitationDto> GetInvitationsForOrgRegProgram(int orgRegProgramId)
+        {
+            var dtos = new List<InvitationDto>();
+            var invites = _dbContext.Invitations.Where(i => i.RecipientOrganizationRegulatoryProgramId == orgRegProgramId);
+            if (invites != null)
+            {
+                foreach (var invite in invites)
+                    dtos.Add(_mapper.Map<Invitation, InvitationDto>(invite));
+            }
+            return dtos;
         }
     }
 }
