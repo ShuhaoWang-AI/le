@@ -13,9 +13,9 @@ namespace Linko.LinkoExchange.Core.Domain
         public int PermissionGroupId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public DateTime CreationDateTime { get; set; }
-        public DateTime LastModificationDateTime { get; set; }
-
+        public DateTime CreationDateTimeUtc { get; set; }
+        public DateTime LastModificationDateTimeUtc { get; set; }
+        public int OrganizationRegulatoryProgramId { get; set; }
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 
     }

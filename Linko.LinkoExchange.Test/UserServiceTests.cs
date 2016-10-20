@@ -15,6 +15,7 @@ namespace Linko.LinkoExchange.Test
     {
         private UserService userService;
         private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LXDev01;Data Source=(local);";
+        //private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LinkoExchange;Data Source=(local);";
 
         public UserServiceTests()
         {
@@ -48,6 +49,15 @@ namespace Linko.LinkoExchange.Test
         public void GetPendingRegistrationPendingUsersOrgRegProgram()
         {
             List<UserDto> userDtoList = userService.GetUserProfilesForOrgRegProgram(1, false, false, true, false);
+        }
+
+        [TestMethod]
+        public void ApproveUserRegistrationWithPermissionsForProgram()
+        {
+            var orgRegProgUserId = 1;
+            var permissionGroupId = 1;
+            userService.UpdateUserPermissionGroupId(1, 1);
+            userService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, true);
         }
     }
 }

@@ -13,7 +13,8 @@ namespace Linko.LinkoExchange.Test
     public class SettingServiceTests
     {
         private SettingService settingService;
-        private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LXDev01;Data Source=(local);";
+        //private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LXDev01;Data Source=(local);";
+        private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LinkoExchange;Data Source=(local);";
 
         public SettingServiceTests()
         {

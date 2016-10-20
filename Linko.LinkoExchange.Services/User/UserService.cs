@@ -141,7 +141,7 @@ namespace Linko.LinkoExchange.Services.User
         public void UpdateUserPermissionGroupId(int orgRegProgUserId, int permissionGroupId)
         {
             var user = _dbContext.OrganizationRegulatoryProgramUsers.Single(o => o.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
-            user.PermissionGroup = _dbContext.PermissionGroups.Single(p => p.PermissionGroupId == permissionGroupId);
+            user.PermissionGroupId = permissionGroupId;
             _dbContext.SaveChanges();
         }
 
@@ -295,9 +295,9 @@ namespace Linko.LinkoExchange.Services.User
             _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, bool isApproved)
+        public void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int orgRegProgUserId, bool isApproved)
         {
-            var user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.UserProfileId == userProfileId);
+            var user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
             if (user == null) return;
 
             user.IsRegistrationApproved = isApproved;
