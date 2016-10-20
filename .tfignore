@@ -48,4 +48,5 @@ obj
 *.mdf
 *.ldf
 .git*
+node_modules
 
