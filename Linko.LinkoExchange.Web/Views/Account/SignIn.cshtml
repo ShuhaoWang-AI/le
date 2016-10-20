@@ -1,4 +1,4 @@
-﻿@model Linko.LinkoExchange.Web.ViewModels.SignInViewModel
+﻿@model Linko.LinkoExchange.Web.ViewModels.Account.SignInViewModel
 @using Linko.LinkoExchange.Core.Resources
 
 @{
@@ -19,7 +19,7 @@
             @using (Html.BeginForm(actionName: "SignIn", controllerName: "Account", routeValues: new { ReturnUrl = ViewBag.ReturnUrl }, method: FormMethod.Post, htmlAttributes: new { @class = "form-horizontal", role = "form" }))
             {
                 @Html.AntiForgeryToken()
-                @Html.ValidationSummary(true, "", new { @class = "text-danger box box-info" })
+                @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
 
                 <div class="form-group">
                     @Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })

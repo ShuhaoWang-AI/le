@@ -2317,7 +2317,7 @@ a:focus {
   border-color: #e08e0b;
 }
 .alert-info {
-  border-color: #00acd6;
+  border-color: #30bbbb;
 }
 /*
  * Component: Nav
@@ -2773,7 +2773,6 @@ table.text-center th {
 }
 .bg-aqua,
 .callout.callout-info,
-.alert-info,
 .label-info,
 .modal-info .modal-body {
   background-color: #00c0ef !important;
@@ -2796,7 +2795,8 @@ table.text-center th {
 .bg-navy {
   background-color: #001f3f !important;
 }
-.bg-teal {
+.bg-teal,
+.alert-info {
   background-color: #39cccc !important;
 }
 .bg-olive {

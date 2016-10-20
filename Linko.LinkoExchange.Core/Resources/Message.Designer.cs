@@ -22,14 +22,14 @@ namespace Linko.LinkoExchange.Core.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Info {
+    public class Message {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Info() {
+        internal Message() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Linko.LinkoExchange.Core.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Linko.LinkoExchange.Core.Resources.Info", typeof(Info).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Linko.LinkoExchange.Core.Resources.Message", typeof(Message).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,11 +61,65 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your account is locked. Please contact your Authority for assistance..
+        /// </summary>
+        public static string AccountLocked {
+            get {
+                return ResourceManager.GetString("AccountLocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your account has been locked because you exceeded the maximum login attempts..
+        /// </summary>
+        public static string ExceedMaximumLoginAttempt {
+            get {
+                return ResourceManager.GetString("ExceedMaximumLoginAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid login attempt..
+        /// </summary>
+        public static string InvalidLoginAttempt {
+            get {
+                return ResourceManager.GetString("InvalidLoginAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your password has expired..
+        /// </summary>
+        public static string PasswordExpired {
+            get {
+                return ResourceManager.GetString("PasswordExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your Registration has not yet been approved..
+        /// </summary>
+        public static string RegistrationApprovalPending {
+            get {
+                return ResourceManager.GetString("RegistrationApprovalPending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sorry, but your session has timed out. You&apos;ll be redirected to the Sign In page in 30 seconds....
         /// </summary>
         public static string SessionTimeOutPopupMessage {
             get {
                 return ResourceManager.GetString("SessionTimeOutPopupMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your account is disabled. Please contact your Authority for assistance..
+        /// </summary>
+        public static string UserAccountDisabled {
+            get {
+                return ResourceManager.GetString("UserAccountDisabled", resourceCulture);
             }
         }
     }

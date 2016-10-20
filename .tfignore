@@ -50,3 +50,4 @@ obj
 .git*
 node_modules
 
+*.vsext

@@ -9,6 +9,7 @@
         UserIsDisabled,
         UserNotFound,
         EmailIsNotConfirmed,
+        RegistrationApprovalPending,
         PasswordLockedOut,
         PasswordExpired,
         UserAlreadyExists,

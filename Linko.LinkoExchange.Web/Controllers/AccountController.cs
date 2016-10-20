@@ -1,154 +1,190 @@
-﻿using System.Collections.Generic;
-using Linko.LinkoExchange.Services.AuditLog;
-using Linko.LinkoExchange.Services.Authentication;
-using Linko.LinkoExchange.Services.Dto;
-using Linko.LinkoExchange.Web.ViewModels;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Web.Mvc;
-using Linko.LinkoExchange.Services.Email;
+using Linko.LinkoExchange.Services.Authentication;
+using Linko.LinkoExchange.Web.ViewModels.Account;
+using Linko.LinkoExchange.Core.Enum;
+using NLog;
+using System.Web;
+using System;
+using System.Collections.Generic;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
+    [RoutePrefix("Account")]
+    [Route("{action=Index}")]
     public class AccountController : Controller
-    { 
-        //private IAuditLogService _auditLogService;
-        private readonly IAuthenticationService _authenticateService;
-        private readonly IEmailService _emailService;
+    {
+        #region constructor
 
-        public AccountController(IAuthenticationService authenticateService, IEmailService emailService)
+        private readonly IAuthenticationService _authenticateService;
+        private readonly ILogger _logger;
+
+        public AccountController(IAuthenticationService authenticateService, ILogger logger)
         {
             _authenticateService = authenticateService;
-            _emailService = emailService;
+            _logger = logger;
         }
 
-        // GET: Account
-        public async Task<ActionResult> Index()
-        { 
-//            var contentReplacements = new Dictionary<string, string>();
-//            contentReplacements.Add("organizationName", "Green Vally Plant");
-//            contentReplacements.Add("authorityName", "Grand Rapids");
-//            contentReplacements.Add("userName", "Shuhao Wang");
-//            contentReplacements.Add("addressLine1", "1055 Pender Street");
-//            contentReplacements.Add("cityName", "Vancouver");
-//            contentReplacements.Add("stateName", "BC");
-//
-//            var receivers = new List<string> { "shuhao.wang@watertrax.com" };  
-//            _emailService.SendEmail(receivers, Linko.LinkoExchange.Core.Enum.EmailType.Signature_SignatoryGranted, contentReplacements); 
+        #endregion
 
-            return View ();
+
+        #region default action
+
+        [AllowAnonymous]
+        public ActionResult Index()
+        {
+            if (Request.IsAuthenticated)
+            {
+                return RedirectToAction(actionName: "UpdateUser"); // TODO: change to appropriate action
+            }
+            else
+            {
+                return RedirectToAction(actionName: "SignIn");
+            }
         }
 
+        #endregion
+
+
+        #region sign in action
+
+
+        // GET: Account/SignIn
         [AllowAnonymous]
         public ActionResult SignIn(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
-            return View();
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<ActionResult> SignIn(SignInViewModel model)
-        {
-            var email = model.UserName;
-            var password = model.Password;
-            var signInResult = await _authenticateService.SignInByUserName(email, password, true);
-
-            // TODO to test set addition information  
-            var testClaims = new Dictionary<string, string>();
-            testClaims.Add("currentAuthorityId", "123435");
-            testClaims.Add("currentPrograId", "67890");
-            testClaims.Add("currentIndustryId", "industry_001");
-
-            _authenticateService.SetCurrentUserClaims(testClaims);
-            return View();
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<ActionResult> Register(RegisterViewModel model, string registrationToken)
-        {
-            var userInfo = new UserDto
-            {
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Password = model.Password,
-                UserName = model.UserName
-            };
-
-            var newUser = await _authenticateService.CreateUserAsync(userInfo, registrationToken);
-
-            return View();
-        }
-        public ActionResult SignOff()
-        {
-            _authenticateService.SignOff ();
-            return View ();
-        }
-
-        [AllowAnonymous]
-        public ActionResult ForgotPassword()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [AllowAnonymous] 
-        public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var result = await _authenticateService.RequestResetPassword(model.Email);
-                if (result.Success)
-                {
-                    return RedirectToAction("", "");
-                }
-                else
-                {
-                    // redirect to show error of forget password
-                    System.Console.WriteLine("Reset password error");
-                    System.Console.WriteLine(result.Errors.ToString());
-
-                    RedirectToLocal("error");
-                } 
-            }
+            SignInViewModel model = new SignInViewModel();
+            model.UserName = (HttpContext.Request.Cookies["lastSignInName"] != null) ? HttpContext.Request.Cookies.Get(name: "lastSignInName").Value : "";
 
             return View(model);
         }
 
-        [AllowAnonymous]
-        public ActionResult ResetPassword(string code)
-        {
-            return string.IsNullOrWhiteSpace(code)  ? View("ErrorPage") : View();
-        }
 
+        // POST: Account/SignIn
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
+        public async Task<ActionResult> SignIn(SignInViewModel model, string returnUrl)
         {
-            if (!ModelState.IsValid)
+            var result = await _authenticateService.SignInByUserName(model.UserName, model.Password, model.RememberMe);
+
+            switch (result.AutehticationResult)
             {
-                return View(model);
+                case AuthenticationResult.Success:
+                    HttpCookie cookie = new HttpCookie(name: "lastSignInName", value: model.UserName);
+                    HttpContext.Response.SetCookie(cookie);
+                    _logger.Info(string.Format(format: "SignIn. User={0} has successfully logged in.", arg0: model.UserName));
+                    return RedirectToLocal(returnUrl);
+                case AuthenticationResult.PasswordLockedOut:
+                    _logger.Info(string.Format(format: "SignIn. User={0} has been locked out for exceeding the maximum login attempts.", arg0: model.UserName));
+                    return RedirectToAction(actionName: "LockedOut", controllerName: "Account");
+                case AuthenticationResult.UserIsLocked:
+                    _logger.Info(string.Format(format: "SignIn. User={0} has been locked out.", arg0: model.UserName));
+                    return RedirectToAction(actionName: "AccountLocked", controllerName: "Account");
+                case AuthenticationResult.UserIsDisabled:
+                    _logger.Info(string.Format(format: "SignIn. User={0} has been disabled.", arg0: model.UserName));
+                    return RedirectToAction(actionName: "AccountDisabled", controllerName: "Account");
+                case AuthenticationResult.RegistrationApprovalPending:
+                    _logger.Info(string.Format(format: "SignIn. User={0} registration approval pending.", arg0: model.UserName));
+                    return RedirectToAction(actionName: "RegistrationApprovalPending", controllerName: "Account");
+                case AuthenticationResult.PasswordExpired:
+                    _logger.Info(string.Format(format: "SignIn. User={0} password is expired.", arg0: model.UserName));
+                    return RedirectToAction(actionName: "PasswordExpired", controllerName: "Account");
+                case AuthenticationResult.UserNotFound:
+                case AuthenticationResult.InvalidUserNameOrPassword:
+                case AuthenticationResult.Failed:
+                default:
+                    ModelState.AddModelError(key: "", errorMessage: Core.Resources.Message.InvalidLoginAttempt);
+                    ModelState.AddModelError(key: "", errorMessage: Core.Resources.Message.InvalidLoginAttempt);
+                    return View(model);
             }
-             
-            var result = await _authenticateService.ResetPasswordAsync(model.Email, model.Code, model.Password);
-
-            if (result.Success)
-            {
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
-            }
-
-            AddErrors(result.Errors); 
-
-            return View();
         }
+
+        // Account locked out by Administrator
+        // GET: /Account/AccountLocked
+        [AllowAnonymous]
+        public ActionResult AccountLocked()
+        {
+            ViewBag.SubTitle = "Account Locked";
+            ViewBag.HtmlStr = Core.Resources.Message.AccountLocked + "<br/>";
+            // need authority list
+
+            return View(viewName: "Confirmation");
+        }
+
+        // account locked out due to several failure login attempt
+        // GET: /Account/LockedOut
+        [AllowAnonymous]
+        public ActionResult LockedOut()
+        {
+            ViewBag.SubTitle = "Locked out";
+            ViewBag.HtmlStr = Core.Resources.Message.ExceedMaximumLoginAttempt + "<br/>";
+            ViewBag.HtmlStr += "Use <span class='alert-link'> <a href= " + Url.Action(actionName: "ForgotPassword", controllerName: "Account");
+            ViewBag.HtmlStr += ">Forgot Password </a></span> to reset your password or try again later.";
+
+            return View(viewName: "Confirmation");
+        }
+
+        // user registration approval pending
+        // GET: /Account/RegistrationApprovalPending
+        [AllowAnonymous]
+        public ActionResult RegistrationApprovalPending()
+        {
+            ViewBag.SubTitle = "Registration Approval Pending";
+            ViewBag.message = Core.Resources.Message.RegistrationApprovalPending;
+
+            return View(viewName: "Confirmation");
+        }
+
+        // user account is disabled
+        // GET: /Account/AccountDisabled
+        [AllowAnonymous]
+        public ActionResult AccountDisabled()
+        {
+            ViewBag.SubTitle = "Account Disabled";
+            ViewBag.HtmlStr = Core.Resources.Message.UserAccountDisabled + "<br/>";
+            // need authority list
+
+            return View(viewName: "Confirmation");
+        }
+
+        // TODO: change password will be in same page
+        // user password is expired
+        // GET: /Account/PasswordExpired
+        [AllowAnonymous]
+        public ActionResult PasswordExpired()
+        {
+            ViewBag.SubTitle = "Locked out";
+            ViewBag.HtmlStr = Core.Resources.Message.PasswordExpired + "<br/>";
+            ViewBag.HtmlStr += "Use <span class='alert-link'> <a href= " + Url.Action(actionName: "ChangePassword", controllerName: "Account");
+            ViewBag.HtmlStr += ">Change Password </a></span> to change your password.";
+
+            return View(viewName: "Confirmation");
+        }
+
+        #endregion
+
+        #region SignOut
+        //
+        // POST: /Account/SignOut
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult SignOut()
+        {
+            _authenticateService.SignOff();
+            return RedirectToLocal(returnUrl: "");
+        }
+
+        #endregion
+
+        #region Helpers
 
         private void AddErrors(IEnumerable<string> errors)
         {
             foreach (var error in errors)
             {
-                ModelState.AddModelError("", error);
+                ModelState.AddModelError(key: "", errorMessage: error);
             }
         }
 
@@ -158,7 +194,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "Home");
+
+            return RedirectToAction(actionName: "Index", controllerName: "Home");
         }
+
+        #endregion
     }
 }

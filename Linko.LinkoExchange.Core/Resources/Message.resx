@@ -120,4 +120,22 @@
   <data name="SessionTimeOutPopupMessage" xml:space="preserve">
     <value>Sorry, but your session has timed out. You'll be redirected to the Sign In page in 30 seconds...</value>
   </data>
+  <data name="InvalidLoginAttempt" xml:space="preserve">
+    <value>Invalid login attempt.</value>
+  </data>
+  <data name="AccountLocked" xml:space="preserve">
+    <value>Your account is locked. Please contact your Authority for assistance.</value>
+  </data>
+  <data name="RegistrationApprovalPending" xml:space="preserve">
+    <value>Your Registration has not yet been approved.</value>
+  </data>
+  <data name="UserAccountDisabled" xml:space="preserve">
+    <value>Your account is disabled. Please contact your Authority for assistance.</value>
+  </data>
+  <data name="PasswordExpired" xml:space="preserve">
+    <value>Your password has expired.</value>
+  </data>
+  <data name="ExceedMaximumLoginAttempt" xml:space="preserve">
+    <value>Your account has been locked because you exceeded the maximum login attempts.</value>
+  </data>
 </root>

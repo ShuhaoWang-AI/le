@@ -44,7 +44,6 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return View (viewName: "Error");
         }
-
         #endregion
     }
 }

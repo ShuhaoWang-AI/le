@@ -19,12 +19,12 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult Index()
         {
             // TODO: to test get claims 
-            var claims = _authenticateService.GetClaims();
-            var organization = claims?.FirstOrDefault(i => i.Type == "OrganizationName");
-            if (organization != null)
-            {
-                ViewBag.organizationName = organization.Value;
-            }
+            //var claims = _authenticateService.GetClaims();
+            //var organization = claims?.FirstOrDefault(i => i.Type == "OrganizationName");
+            //if (organization != null)
+            //{
+            //    ViewBag.organizationName = organization.Value;
+            //}
 
             return View(); 
         }
