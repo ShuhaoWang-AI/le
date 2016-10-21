@@ -72,7 +72,6 @@ namespace Linko.LinkoExchange.Web
 
             // Services
             container.RegisterType<IAuthenticationManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));
-            container.RegisterType<IAuthenticationManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));
             //container.RegisterType<ApplicationSignInManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Get<ApplicationSignInManager>()));
             container.RegisterType<IAuthenticationService, AuthenticationService>();
             container.RegisterType<ISettingService, SettingService>();
@@ -84,8 +83,7 @@ namespace Linko.LinkoExchange.Web
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
-            container.RegisterType<ApplicationUserManager>();
-            container.RegisterType<IAuthenticationManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));
+            container.RegisterType<ApplicationUserManager>(); 
             container.RegisterType<IUserStore<ApplicationUser>, UserStore<ApplicationUser>>(new InjectionConstructor(typeof(LinkoExchangeContext)));
             container.RegisterType<IPermissionService, PermissionService>();
             container.RegisterType<IAuditLogEntry, EmailAuditLogEntryDto>();
