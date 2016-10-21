@@ -6,6 +6,7 @@ using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using Microsoft.AspNet.Identity;
+using System.Configuration;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -13,9 +14,7 @@ namespace Linko.LinkoExchange.Test
     public class InvitationServiceTests
     {
         private InvitationService invitationService;
-        //private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LXDev01;Data Source=(local);";
-        private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LinkoExchange;Data Source=(local);";
-
+       
         public InvitationServiceTests()
         {
             Mapper.Initialize(cfg =>
@@ -35,7 +34,8 @@ namespace Linko.LinkoExchange.Test
         [TestInitialize]
         public void Initialize()
         {
-            invitationService = new InvitationService(new LinkoExchangeContext(CONN_STRING), Mapper.Instance);
+            var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
+            invitationService = new InvitationService(new LinkoExchangeContext(connectionString), Mapper.Instance);
         }
 
         [TestMethod]

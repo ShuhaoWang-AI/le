@@ -7,15 +7,14 @@ using Linko.LinkoExchange.Services.AutoMapperProfile;
 using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
 using Microsoft.AspNet.Identity;
+using System.Configuration;
 
 namespace Linko.LinkoExchange.Test
 {
     [TestClass]
     public class UserServiceTests
     {
-        private UserService userService;
-        private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LXDev01;Data Source=(local);";
-        //private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LinkoExchange;Data Source=(local);";
+        private UserService _userService;
 
         public UserServiceTests()
         {
@@ -36,19 +35,20 @@ namespace Linko.LinkoExchange.Test
         [TestInitialize]
         public void Initialize()
         {
-            userService = new UserService(new LinkoExchangeContext(CONN_STRING), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance);
+            var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
+            _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance);
         }
 
         [TestMethod]
         public void GetUserProfilesForOrgRegProgram()
         {
-            List<UserDto> userDtoList = userService.GetUserProfilesForOrgRegProgram(1, null, null, null, null);
+            List<UserDto> userDtoList = _userService.GetUserProfilesForOrgRegProgram(1, null, null, null, null);
         }
 
         [TestMethod]
         public void GetPendingRegistrationPendingUsersOrgRegProgram()
         {
-            List<UserDto> userDtoList = userService.GetUserProfilesForOrgRegProgram(1, false, false, true, false);
+            List<UserDto> userDtoList = _userService.GetUserProfilesForOrgRegProgram(1, false, false, true, false);
         }
 
         [TestMethod]
@@ -56,8 +56,8 @@ namespace Linko.LinkoExchange.Test
         {
             var orgRegProgUserId = 1;
             var permissionGroupId = 1;
-            userService.UpdateUserPermissionGroupId(1, 1);
-            userService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, true);
+            _userService.UpdateUserPermissionGroupId(1, permissionGroupId);
+            _userService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, true);
         }
     }
 }

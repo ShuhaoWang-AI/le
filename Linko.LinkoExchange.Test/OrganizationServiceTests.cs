@@ -4,6 +4,7 @@ using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Data;
 using AutoMapper;
 using Linko.LinkoExchange.Services.AutoMapperProfile;
+using System.Configuration;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -11,8 +12,6 @@ namespace Linko.LinkoExchange.Test
     public class OrganizationServiceTests
     {
         private OrganizationService orgService;
-        //private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LXDev01;Data Source=(local);";
-        private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LinkoExchange;Data Source=(local);";
 
         public OrganizationServiceTests()
         {
@@ -32,19 +31,20 @@ namespace Linko.LinkoExchange.Test
         [TestInitialize]
         public void Initialize()
         {
-            orgService = new OrganizationService(new LinkoExchangeContext(CONN_STRING), Mapper.Instance);
+            var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
+            orgService = new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance);
         }
 
         [TestMethod]
         public void GetOrganization()
         {
-            var org = orgService.GetOrganization(1);
+            var org = orgService.GetOrganization(1001);
         }
 
         [TestMethod]
         public void GetChildOrganizationRegulatoryPrograms()
         {
-            var childOrgs = orgService.GetChildOrganizationRegulatoryPrograms(2);
+            var childOrgs = orgService.GetChildOrganizationRegulatoryPrograms(1);
         }
 
         

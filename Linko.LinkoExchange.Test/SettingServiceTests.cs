@@ -6,15 +6,14 @@ using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace Linko.LinkoExchange.Test
 {
     [TestClass]
     public class SettingServiceTests
     {
-        private SettingService settingService;
-        //private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LXDev01;Data Source=(local);";
-        private const string CONN_STRING = "Integrated Security=SSPI;Initial Catalog=LinkoExchange;Data Source=(local);";
+        private SettingService _settingService;
 
         public SettingServiceTests()
         {
@@ -35,13 +34,14 @@ namespace Linko.LinkoExchange.Test
         [TestInitialize]
         public void Initialize()
         {
-            settingService = new SettingService(new LinkoExchangeContext(CONN_STRING), Mapper.Instance);
+            var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
+            _settingService = new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance);
         }
 
         [TestMethod]
         public void GetOrganizationSettingsById_actual()
         {
-            OrganizationSettingDto orgSettings = settingService.GetOrganizationSettingsById_actual(1);
+            OrganizationSettingDto orgSettings = _settingService.GetOrganizationSettingsById_actual(1);
         }
 
         [TestMethod]
@@ -51,7 +51,7 @@ namespace Linko.LinkoExchange.Test
             settings.Settings = new List<SettingDto>();
             settings.Settings.Add(new SettingDto() { Type = SettingType.MaxKBQAttempts, Value = "10" });
             settings.Settings.Add(new SettingDto() { Type = SettingType.PasswordChangeDays, Value = "31" });
-            settingService.CreateOrUpdateProgramSettings(settings);
+            _settingService.CreateOrUpdateProgramSettings(settings);
         }
 
     }

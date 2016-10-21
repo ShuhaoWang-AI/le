@@ -27,9 +27,9 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(i => i.IsRemoved);
             Property(i => i.IsSignatory);
             Property(i => i.IsEnabled);
-            Property(i => i.LastModificationDateTime);
+            Property(i => i.LastModificationDateTimeUtc);
             Property(i => i.CreationDateTimeUtc);
-            Property(i => i.LastModificationUserId); 
+            Property(i => i.LastModifierUserId); 
         }
     }
 }

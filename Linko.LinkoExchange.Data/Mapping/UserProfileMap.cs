@@ -17,9 +17,9 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(i => i.FirstName);
             Property(i => i.LastName);
             Property(i => i.Email);
-            Property(i => i.IsEmailConfirmed);
+            Property(i => i.IsEmailConfirmed).HasColumnName("EmailConfirmed");
             Property(i => i.IsAccountLocked);
-            Property(i => i.IsPhoneNumberConfirmed);
+            Property(i => i.IsPhoneNumberConfirmed).HasColumnName("PhoneNumberConfirmed");
             Property(i => i.OldEmailAddress);
             Property(i => i.PasswordHash);
         }

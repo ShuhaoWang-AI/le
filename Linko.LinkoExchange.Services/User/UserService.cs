@@ -127,8 +127,8 @@ namespace Linko.LinkoExchange.Services.User
                     user.IsRemoved = isRemoved.Value;
 
                 //Persist modification date and modifier actor
-                user.LastModificationDateTime = DateTime.UtcNow;
-                user.LastModificationUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
+                user.LastModificationDateTimeUtc = DateTime.UtcNow;
+                user.LastModifierUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
                 _dbContext.SaveChanges();
             }
             else
@@ -153,8 +153,8 @@ namespace Linko.LinkoExchange.Services.User
                 user.IsSignatory = isSignatory;
 
                 //Persist modification date and modifier actor
-                user.LastModificationDateTime = DateTime.UtcNow;
-                user.LastModificationUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
+                user.LastModificationDateTimeUtc = DateTime.UtcNow;
+                user.LastModifierUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
                 _dbContext.SaveChanges();
             }
             else
@@ -209,8 +209,8 @@ namespace Linko.LinkoExchange.Services.User
                 user.IsRemoved = true;
 
                 //Persist modification date and modifier actor
-                user.LastModificationDateTime = DateTime.UtcNow;
-                user.LastModificationUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
+                user.LastModificationDateTimeUtc = DateTime.UtcNow;
+                user.LastModifierUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
                 _dbContext.SaveChanges();
             }
             else
