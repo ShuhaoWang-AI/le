@@ -54,5 +54,12 @@ namespace Linko.LinkoExchange.Services.Settings
 
         int PasswordLockoutHours();
 
+
+        void CreateOrUpdateProgramSettings(ProgramSettingDto settingDtos);
+        void CreateOrUpdateProgramSettings(int orgRegProgId, IEnumerable<SettingDto> settingDtos);
+        void CreateOrUpdateProgramSetting(int orgRegProgId, SettingDto settingDto);
+        void CreateOrUpdateOrganizationSettings(OrganizationSettingDto settingDtos);
+        void CreateOrUpdateOrganizationSettings(int organizationId, IEnumerable<SettingDto> settingDtos);
+        void CreateOrUpdateOrganizationSetting(int organizationId, SettingDto settingDto);
     }
 }

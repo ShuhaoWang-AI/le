@@ -148,28 +148,77 @@ namespace Linko.LinkoExchange.Services.Settings
 
         public void CreateOrUpdateProgramSettings(ProgramSettingDto settingDtos)
         {
-            var existingSettings = _dbContext.OrganizationRegulatoryProgramSettings.Where(o => o.OrganizationRegulatoryProgramId == settingDtos.OrgRegProgId).ToArray();
             foreach (var settingDto in settingDtos.Settings)
             {
-                var foundSetting = existingSettings != null ? existingSettings.SingleOrDefault(s => s.SettingTemplate.SettingTemplateId == Convert.ToInt32(settingDto.Type)) : null;
-                if (foundSetting != null)
-                {
-                    foundSetting.Value = settingDto.Value;
-                }
-                else
-                {
-                    var newSetting = _dbContext.OrganizationRegulatoryProgramSettings.Create();
-                    newSetting.OrganizationRegulatoryProgramId = settingDtos.OrgRegProgId;
-                    newSetting.SettingTemplateId = Convert.ToInt32(settingDto.Type);
-                    newSetting.Value = settingDto.Value;
-                    _dbContext.OrganizationRegulatoryProgramSettings.Add(newSetting);
-                }
-                
+                CreateOrUpdateProgramSetting(settingDtos.OrgRegProgId, settingDto);
             }
+        }
+
+        public void CreateOrUpdateProgramSettings(int orgRegProgId, IEnumerable<SettingDto> settingDtos)
+        {
+            foreach (var settingDto in settingDtos)
+            {
+                CreateOrUpdateProgramSetting(orgRegProgId, settingDto);
+            }
+        }
+        public void CreateOrUpdateProgramSetting(int orgRegProgId, SettingDto settingDto)
+        {
+            var existingSetting = _dbContext.OrganizationRegulatoryProgramSettings
+                .SingleOrDefault(o => o.OrganizationRegulatoryProgramId == orgRegProgId
+                 && o.SettingTemplateId == (int)settingDto.Type);
+
+            if (existingSetting != null)
+            {
+                existingSetting.Value = settingDto.Value;
+            }
+            else
+            {
+                var newSetting = _dbContext.OrganizationRegulatoryProgramSettings.Create();
+                newSetting.OrganizationRegulatoryProgramId = orgRegProgId;
+                newSetting.SettingTemplateId = Convert.ToInt32(settingDto.Type);
+                newSetting.Value = settingDto.Value;
+                _dbContext.OrganizationRegulatoryProgramSettings.Add(newSetting);
+            }
+
+            _dbContext.SaveChanges();
+        }
+        public void CreateOrUpdateOrganizationSettings(OrganizationSettingDto settingDtos)
+        {
+            foreach (var settingDto in settingDtos.Settings)
+            {
+                CreateOrUpdateOrganizationSetting(settingDtos.OrganizationId, settingDto);
+            }
+        }
+        public void CreateOrUpdateOrganizationSettings(int organizationId, IEnumerable<SettingDto> settingDtos)
+        {
+            foreach (var settingDto in settingDtos)
+            {
+                CreateOrUpdateOrganizationSetting(organizationId, settingDto);
+            }
+        }
+        public void CreateOrUpdateOrganizationSetting(int organizationId, SettingDto settingDto)
+        {
+            var existingSetting = _dbContext.OrganizationSettings
+                .SingleOrDefault(o => o.OrganizationId == organizationId
+                 && o.SettingTemplateId == (int)settingDto.Type);
+
+            if (existingSetting != null)
+            {
+                existingSetting.Value = settingDto.Value;
+            }
+            else
+            {
+                var newSetting = _dbContext.OrganizationSettings.Create();
+                newSetting.OrganizationId = organizationId;
+                newSetting.SettingTemplateId = Convert.ToInt32(settingDto.Type);
+                newSetting.Value = settingDto.Value;
+                _dbContext.OrganizationSettings.Add(newSetting);
+            }
+
             _dbContext.SaveChanges();
         }
 
-		public IEnumerable<ProgramSettingDto> GetProgramSettingsByIds(IEnumerable<int> orgRegProgIds)
+        public IEnumerable<ProgramSettingDto> GetProgramSettingsByIds(IEnumerable<int> orgRegProgIds)
 		{
 			return new[]
 			{

@@ -41,7 +41,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetOrganizationSettingsById_actual()
         {
-            OrganizationSettingDto orgSettings = _settingService.GetOrganizationSettingsById_actual(1);
+            OrganizationSettingDto orgSettings = _settingService.GetOrganizationSettingsById_actual(1001);
         }
 
         [TestMethod]
@@ -52,6 +52,16 @@ namespace Linko.LinkoExchange.Test
             settings.Settings.Add(new SettingDto() { Type = SettingType.MaxKBQAttempts, Value = "10" });
             settings.Settings.Add(new SettingDto() { Type = SettingType.PasswordChangeDays, Value = "31" });
             _settingService.CreateOrUpdateProgramSettings(settings);
+        }
+
+        [TestMethod]
+        public void CreateOrUpdateOrganizationSettings()
+        {
+            var settings = new OrganizationSettingDto() { OrganizationId = 1001 };
+            settings.Settings = new List<SettingDto>();
+            settings.Settings.Add(new SettingDto() { Type = SettingType.TimeZoneId, Value = "2" });
+            settings.Settings.Add(new SettingDto() { Type = SettingType.PasswordRequireLength, Value = "5" });
+            _settingService.CreateOrUpdateOrganizationSettings(settings);
         }
 
     }

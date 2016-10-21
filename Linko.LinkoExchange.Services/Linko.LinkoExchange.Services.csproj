@@ -128,7 +128,6 @@
     <Compile Include="Dto\InvitationServiceResultDto.cs" />
     <Compile Include="Dto\OrganizationRegulatoryProgramDto.cs" />
     <Compile Include="Dto\OrganizationRegulatoryProgramUserDto.cs" />
-    <Compile Include="Dto\OrganizationSettingsDto.cs" />
     <Compile Include="Dto\AuthorityDetailsDto.cs" />
     <Compile Include="Dto\OrganizationDto.cs" />
     <Compile Include="Dto\OrganizationSettingDto.cs" />
