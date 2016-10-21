@@ -16,11 +16,16 @@
         PasswordRequireLowerCase = 12,
         PasswordRequireUpperCase = 13,
         UserLockoutEnabledByDefault = 14,
-        DefaultAccountLockoutTimeSpan = 15,
-        MaxFailedAccessAttemptsBeforeLockout = 16,
-        PasswordExpiredDays = 17,
-        DaysBeforeRequirePasswordChanging = 18,
-        NumberOfPasswordsInHistory = 19
+        DefaultAccountLockoutTimeSpan = 15, 
+
+        PasswordExpiredDays = 16,
+        DaysBeforeRequirePasswordChanging = 17, 
+        EmailServer = 18,
+        SupportPhoneNumber = 19,
+        SupportEmail = 20,
+        SystemEmailEmailAddress = 21,
+        SystemEmailFirstName = 22,
+        SystemEmailLastName = 23
     }
 
     public class SettingDto

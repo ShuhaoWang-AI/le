@@ -17,7 +17,6 @@ using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.User;
@@ -42,7 +41,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly TokenGenerator _tokenGenerator = new TokenGenerator();
         private readonly IAuditLogService _auditLogService = new CrommerAuditLogService();
 
-        private readonly IDictionary<string, string> _globalSettings;
+        private readonly IDictionary<SettingType, string> _globalSettings;
 
         public AuthenticationService(ApplicationUserManager userManager,
             ApplicationSignInManager signInManager, 
@@ -148,7 +147,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
                 var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings).ToList();
 
-                SetPasswordPolicy(organizationSettings, programSettings); 
+                SetPasswordPolicy(organizationSettings); 
                 // Use PasswordValidator
                 var validateResult = _userManager.PasswordValidator.ValidateAsync(newPassword).Result;
                 if (validateResult.Succeeded == false)
@@ -159,7 +158,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
 
                 // Check if the new password is one of the password used last # numbers
-                if (IsValidPasswordCheckInHistory(applicationUser.PasswordHash, applicationUser.UserProfileId, organizationSettings, programSettings))
+                if (IsValidPasswordCheckInHistory(applicationUser.PasswordHash, applicationUser.UserProfileId, organizationSettings))
                 {
                     authenticationResult.Success = false;
                     authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
@@ -217,7 +216,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             try
             {  
                 // Only check the organization settings of invitation regulatory program
-                SetPasswordPolicy(inivitationRecipintOrganizationSettings.Settings, null);
+                SetPasswordPolicy(inivitationRecipintOrganizationSettings.Settings);
 
                 var result = _userManager.CreateAsync(applicationUser, userInfo.Password).Result;  
                 
@@ -336,14 +335,12 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
                 else
                 {
-                    var userId = applicationUser.UserProfileId;
-                    var programIds = GetUserProgramIds(userId);
+                    var userId = applicationUser.UserProfileId; 
                     var organizationIds = GetUserOrganizationIds(userId);
 
-                    var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
-                    var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings).ToList();
+                    var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList(); 
 
-                    SetPasswordPolicy(organizationSettings, programSettings); 
+                    SetPasswordPolicy(organizationSettings); 
 
                     // Step 2: reset the password
                     var identityResult =
@@ -420,67 +417,47 @@ namespace Linko.LinkoExchange.Services.Authentication
                 signInResultDto.AutehticationResult = AuthenticationResult.UserNotFound;
                 return Task.FromResult(signInResultDto);
             }
+
+            // Check if the user is in 'passowrd lock' status
             if (_userManager.IsLockedOut(applicationUser.Id))
             {
+                //TODO: log failed login because of Locked to Audit (UC-2) 
                 signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
                 return Task.FromResult(signInResultDto);
             }
 
-            // Check if the user is in 'passowrd lock' status
-            // This step will be handled by Owin 
-
-            // TODO to check if the user has been locked "Account Lockout"  by an authority
+            // TODO: to check if the user has been locked "Account Lockout"  by an authority
             // check UserProfile ->  IsAccountLocked field
             if (applicationUser.IsAccountLocked)
             {
-                signInResultDto.AutehticationResult = AuthenticationResult.UserIsLocked;
+                //TODO: log failed login because of Locked to Audit (UC-2) 
+                signInResultDto.AutehticationResult = AuthenticationResult.UserIsLocked; 
                 return Task.FromResult(signInResultDto);
             }
-
-            // TODO waiting for the DB tables
-
-            //  UC-29 4.a
-            //  To check if user status is:
-            //    1. Registration Pending ( OrganizationRegulatoryProgramUser.IsRegistrationApproved == false) 
-            //    2. No other programs that is approved,  or no other programs that is enabled
-            //  return:  your registratin is not approved yet.     RegistrationApprovalPending,
-
-//            var orpus = _programService.GetUserRegulatoryPrograms(applicationUser.Email);
-//            if (orpus != null && orpus.Any())
-//            {
-//                //  all registrations have not approved yet 
-//                if ( orpus.All(i=>i.IsRegistrationApproved == false) || orpus.Any(u => u.IsRegistrationApproved && u.OrganizationRegulatoryProgramDto.IsEnabled) )
-//                {
-//                    signInResultDto.AutehticationResult = AuthenticationResult.RegistrationApprovalPending;
-//                    return Task.FromResult(signInResultDto);
-//                }
-//
-//                // If the user is disabled for all programs
-//                if (!orpus.Any(u => u.IsEnabled))
-//                {
-//                    signInResultDto.AutehticationResult = AuthenticationResult.UserIsDisabled;
-//                    return Task.FromResult(signInResultDto);
-//                }  
-//            } 
+             
+            if (!ValidateUserAccess(applicationUser, signInResultDto))
+            {
+                return Task.FromResult(signInResultDto);
+            }
 
             // clear claims from db if there are   
             ClearClaims(applicationUser.Id);
             applicationUser.Claims.Clear();
             
-            var userId = applicationUser.UserProfileId;
-            var programIds = GetUserProgramIds(userId);
+            var userId = applicationUser.UserProfileId; 
             var organizationIds = GetUserOrganizationIds(userId);
 
-            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
-            var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings).ToList();
+            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList(); 
+
+            // UC-29 7.a
             // Check if user's password is expired or not  
-            if (IsUserPasswordExpired(userId, organizationSettings, programSettings))
+            if (IsUserPasswordExpired(userId, organizationSettings))
             {
                 signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
                 return Task.FromResult(signInResultDto); 
             }
 
-            SetPasswordPolicy(organizationSettings, programSettings); 
+            SetPasswordPolicy(organizationSettings); 
 
             _signInManager.UserManager = _userManager; 
             var signInStatus = _signInManager.PasswordSignInAsync(userName, password, isPersistent, true).Result;
@@ -493,7 +470,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 HttpContext.Current.Session["userId"] = applicationUser.Id; 
 
                 //Set user's claims
-                GetUserIdentity(applicationUser); 
+                GetUserIdentity(applicationUser);  
             }
             else if (signInStatus == SignInStatus.Failure)
             {
@@ -501,6 +478,45 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             return Task.FromResult(signInResultDto);
+        }
+
+        // Validate user access for UC-29(4.a, 5.a, 6.a)
+        private bool ValidateUserAccess(ApplicationUser applicationUser, SignInResultDto signInResultDto)
+        {
+            var orpus = _programService.GetUserRegulatoryPrograms(applicationUser.Email);
+            if (orpus != null && orpus.Any())
+            {
+                // UC-29 4.a
+                // System confirms user has status “Registration Pending” (and no access to any other portal where registration is not pending or portal is not disabled)
+                if (orpus.All(i => i.IsRegistrationApproved == false) ||
+                    orpus.All(i => i.IsRegistrationApproved && i.OrganizationRegulatoryProgramDto.IsEnabled == false))
+                {
+                    // TODO: Log failed login because of registration pending to Audit (UC-2)
+                    signInResultDto.AutehticationResult = AuthenticationResult.RegistrationApprovalPending;
+                    return false;
+                }
+
+                // UC-29 5.a, User account is disabled for all industry, or authorty or application admin
+                // If the user is disabled for all programs
+                if (orpus.All(u => u.IsEnabled == false) || //--- user is disabled for all industry and authority 
+                    applicationUser.IsInternalAccount == false //--- user is diabled for Application admin.
+                )
+                {
+                    // TODO: Log failed login because user disabled to Audit (UC-2)
+                    signInResultDto.AutehticationResult = AuthenticationResult.UserIsDisabled;
+                    return false;
+                }
+
+                // 6.a determine user doesn't have access to any enabled industry or authority 
+                if (orpus.Any(i => i.IsRegistrationApproved &&
+                                   i.IsEnabled && i.OrganizationRegulatoryProgramDto.IsEnabled) == false)
+                {
+                    // Log failed login because no associations to Audit (UC-2) 
+                    signInResultDto.AutehticationResult = AuthenticationResult.AccountIsNotAssociated;
+                    return false;
+                }
+            }
+            return true;
         }
 
         public void SignOff()
@@ -516,9 +532,9 @@ namespace Linko.LinkoExchange.Services.Authentication
         // Check if password is in one of the last # passwords stores in UserPasswordHistory table
         // Return false means the new password is not validate because it has been used in the last #number of times
         // Return true means the new password is validate to use
-        private bool IsValidPasswordCheckInHistory(string passwordHash, int userProfileId, IEnumerable<SettingDto> organizationSettings, IEnumerable<SettingDto> programSettings)
+        private bool IsValidPasswordCheckInHistory(string passwordHash, int userProfileId, IEnumerable<SettingDto> organizationSettings)
         {
-            var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(programSettings, organizationSettings);
+            var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings);
 
             var lastNumberPasswordInHistory = _dbContext.UserPasswordHistories
                 .Where(i => i.UserProfileId == userProfileId)
@@ -531,7 +547,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             return true;
         } 
 
-        private bool IsUserPasswordExpired(int userProfileId, IEnumerable<SettingDto> organizationSettings, IEnumerable<SettingDto> programSettings)
+        private bool IsUserPasswordExpired(int userProfileId, IEnumerable<SettingDto> organizationSettings)
         {
             var lastestUserPassword = _dbContext.UserPasswordHistories
                 .Where(i => i.UserProfileId == userProfileId)
@@ -543,7 +559,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             // Get password expiration setting
-            var passwordExpiredDays = GetStrictestLengthPasswordExpiredDays(programSettings, organizationSettings);
+            var passwordExpiredDays = GetStrictestLengthPasswordExpiredDays(organizationSettings);
             if (DateTime.UtcNow > lastestUserPassword.LastModificationDateTime.AddDays(passwordExpiredDays))
             {
                 return true;
@@ -608,8 +624,10 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             _authenticationManager.SignIn(authProperties, identity);  
         }
-        private void SetPasswordPolicy(IEnumerable<SettingDto> organizationSettings, IEnumerable<SettingDto> programSettings)
+        private void SetPasswordPolicy(IEnumerable<SettingDto> organizationSettings)
         {
+            // Password policy is only defined on system global level 
+            // Failed trial times is defined on organization level
 
             var passwordValidator = new PasswordValidator();
 
@@ -620,124 +638,53 @@ namespace Linko.LinkoExchange.Services.Authentication
             // 
             // If one setting has multiple definitions, choose the strictest one
             _userManager.UserLockoutEnabledByDefault = true;
-            _userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromDays(GetStrictestDefaultAccountLockoutTimeSpan(programSettings, organizationSettings));
+            _userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromHours(_settingService.PasswordLockoutHours()); 
 
-            passwordValidator.RequiredLength = GetStrictestLengthPasswordRequire(programSettings, organizationSettings);
-            passwordValidator.RequireDigit = GetStrictestBooleanPasswordRequire(programSettings, organizationSettings,
-                "PasswordRequireDigit");
-
-            passwordValidator.RequireLowercase = GetStrictestBooleanPasswordRequire(programSettings, organizationSettings,
-                         "PasswordRequireLowercase");
-
-            passwordValidator.RequireUppercase = GetStrictestBooleanPasswordRequire(programSettings, organizationSettings,
-                     "PasswordRequireUpppercase");
-
-            _userManager.MaxFailedAccessAttemptsBeforeLockout = GetStrictestFailedAccessAttemptsBeforeLockout(programSettings, organizationSettings); 
+            passwordValidator.RequiredLength =     _settingService.PasswordRequireLength();
+            passwordValidator.RequireDigit = _settingService.PasswordRequireDigital();
+            passwordValidator.RequireLowercase = _settingService.PassowrdRequireLowerCase();
+            passwordValidator.RequireUppercase = _settingService.PasswordRequireUpperCase();
+            
+            _userManager.MaxFailedAccessAttemptsBeforeLockout = MaxFailedPasswordAttempts(organizationSettings);
 
             _userManager.PasswordValidator = passwordValidator; 
         }
-        
-        private int GetSettingIntValue(string settingKey, IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings, bool isMax = true)
-        {
-            var defaultValueStr = _globalSettings[settingKey];
 
+
+        #region organization setting;
+
+        private int GetSettingIntValue(SettingType settingType, IEnumerable<SettingDto> organizationSettings, bool isMax = true)
+        {
+            var defaultValueStr = _globalSettings[settingType];
             var defaultValue = int.Parse(defaultValueStr);
-            if (programSettings != null && programSettings.Any(i => i.Type.ToString().Equals(settingKey)))
+            if (organizationSettings != null)
             {
-                defaultValue = isMax ? programSettings.Where(i=>i.Type.ToString() == settingKey)
-                    .Max(i => ValueParser.TryParseInt(i.Value, defaultValue)) :
-                    programSettings.Where(i => i.Type.ToString() == settingKey).Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
-            }
-            else
-            {
-                defaultValue = isMax ? organizationSettings
-                    .Where(i => i.Type.ToString() == settingKey).Max(i => ValueParser.TryParseInt(i.Value, defaultValue)) : 
-                    organizationSettings.Where(i => i.Type.ToString() == settingKey).Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
+                defaultValue = isMax
+                    ? organizationSettings
+                        .Where(i => i.Type == settingType).Max(i => ValueParser.TryParseInt(i.Value, defaultValue))
+                    : organizationSettings.Where(i => i.Type == settingType)
+                        .Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
             }
 
             return defaultValue;
         }
 
-        private int GetStrictestFailedAccessAttemptsBeforeLockout(IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings)
+        private int GetStrictestPasswordHistoryCounts(IEnumerable<SettingDto> organizationSettings)
         {
-            string settingKey = "MaxFailedAccessAttemptsBeforeLockout";
-
-            if (!_globalSettings.ContainsKey(settingKey))
-            {
-                return 6;
-            }
-
-            return GetSettingIntValue(settingKey, programSettings, organizationSettings, isMax: false);
-        }
-
-        private int GetStrictestPasswordHistoryCounts(IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings)
-        {
-            string settingKey = "NumberOfPasswordsInHistory";
-
-            if (!_globalSettings.ContainsKey(settingKey))
-            {
-                return 10;
-            }
-
-            return GetSettingIntValue(settingKey, programSettings, organizationSettings, isMax: true);
-        }
-
-        private int GetStrictestDefaultAccountLockoutTimeSpan(IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings)
-        {
-            string settingKey = "DefaultAccountLockoutTimeSpan"; 
-            if (!_globalSettings.ContainsKey(settingKey))
-            {
-                return 1;
-            }
-
-            return GetSettingIntValue(settingKey, programSettings, organizationSettings);
-
+            return GetSettingIntValue(SettingType.PasswordHistoryCount, organizationSettings, isMax: false);
         } 
 
-        private int GetStrictestLengthPasswordExpiredDays(IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings)
+        private int GetStrictestLengthPasswordExpiredDays(IEnumerable<SettingDto> organizationSettings)
         {
-            string settingKey = "PasswordExpiredDays";  
-            if (!_globalSettings.ContainsKey(settingKey))
-            {
-                return 90;
-            }
+            return GetSettingIntValue(SettingType.PasswordExpiredDays, organizationSettings, isMax:false); 
+        }
 
-            return GetSettingIntValue(settingKey, programSettings, organizationSettings, isMax:false); 
+        private int MaxFailedPasswordAttempts(IEnumerable<SettingDto> organizationSettings)
+        {
+            return GetSettingIntValue(SettingType.MaxFailedPasswordAttempts, organizationSettings, isMax: false);
         } 
 
-        private int GetStrictestLengthPasswordRequire(IEnumerable<SettingDto> programSettings,IEnumerable<SettingDto> organizationSettings)
-        {
-            var settingKey = "PasswordRequireLength";  
-            if (!_globalSettings.ContainsKey(settingKey))
-            {
-                return 6;
-            }
-
-
-            return GetSettingIntValue(settingKey, programSettings, organizationSettings, isMax:true); 
-        }
-
-        private bool GetStrictestBooleanPasswordRequire(IEnumerable<SettingDto> programSettings, IEnumerable<SettingDto> organizationSettings,string settingKey)
-        {
-            if (!_globalSettings.ContainsKey(settingKey))
-            {
-                return false;
-            }
-
-            var passwordRequireDigital = _globalSettings[settingKey];
-            var passwordRequireDigitalValue = bool.Parse(passwordRequireDigital);
-            if (programSettings != null && programSettings.Any(i => i.Type.Equals(settingKey)))
-            {
-                return programSettings.Where(i => i.Type.ToString() == settingKey).Any(i => i.Value.ToLower() == "true");
-            }
-
-            if (organizationSettings.Any(i=> i.Type.Equals(settingKey)))
-            {
-                return organizationSettings.Where(i => i.Type.ToString() == settingKey).Any(i => i.Value.ToLower() == "true"); 
-            }
-
-            return passwordRequireDigitalValue;
-        }
+        #endregion
 
         private void SendRegistrationConfirmationEmail(string userId, UserDto userDto)
         {
@@ -778,21 +725,13 @@ namespace Linko.LinkoExchange.Services.Authentication
             string baseUrl = GetBaseUrl();
             string link = baseUrl + "?code=" + code;
 
-            string supportPhoneNumber = _globalSettings["supportPhoneNumber"]; 
-            string supportEmail = _globalSettings["supportEmail"];
+            string supportPhoneNumber = _globalSettings[SettingType.SupportPhoneNumber]; 
+            string supportEmail = _globalSettings[SettingType.SupportEmail];
 
             var contentReplacements = new Dictionary<string, string>();
             contentReplacements.Add("link", link);
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
             contentReplacements.Add("supportEmail", supportEmail);
-
-            var logEntry = new EmailAuditLogEntryDto();
-            logEntry.RecipientFirstName = "First Name";
-            logEntry.RecipientLastName = "last name";
-            logEntry.RecipientUserName = "Fist name, lastName";
-            logEntry.SenderFirstName = "Linko support";
-            logEntry.SenderLastName = "Linko support";
-
 
             _emailService.SendEmail(new[] { user.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
         }

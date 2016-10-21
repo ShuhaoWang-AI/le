@@ -5,6 +5,7 @@ using AutoMapper;
 using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
 using System;
+using Linko.LinkoExchange.Core.Common;
 
 namespace Linko.LinkoExchange.Services.Settings
 {
@@ -16,6 +17,9 @@ namespace Linko.LinkoExchange.Services.Settings
         //private readonly IAuditLogEntry _logger;
         private readonly IMapper _mapper;
 
+	    private  Dictionary<SettingType, string> _globalSettings = new Dictionary<SettingType, string>();
+
+
         #endregion
 
         public SettingService(LinkoExchangeContext dbContext
@@ -25,6 +29,22 @@ namespace Linko.LinkoExchange.Services.Settings
             _dbContext = dbContext;
          //   _logger = logger;
             _mapper = mapper;
+
+
+            //TODO: get system global settings 
+
+            _globalSettings.Add(SettingType.PasswordRequireLength, "6");
+            _globalSettings.Add(SettingType.PasswordRequireDigit, "true");
+            _globalSettings.Add(SettingType.PasswordExpiredDays, "90");
+
+            _globalSettings.Add(SettingType.PasswordHistoryCount, "10");
+            _globalSettings.Add(SettingType.EmailServer, "6");
+            _globalSettings.Add(SettingType.SupportPhoneNumber, "+1-604-418-3201");
+            _globalSettings.Add(SettingType.SupportEmail, "support@linkoExchange.com");
+            _globalSettings.Add(SettingType.SystemEmailEmailAddress, "shuhao.wang@watertrax.com");
+            _globalSettings.Add(SettingType.SystemEmailFirstName, "LinkoExchange");
+            _globalSettings.Add(SettingType.SystemEmailLastName, "System"); 
+
         }
 
         /// <summary>
@@ -160,7 +180,60 @@ namespace Linko.LinkoExchange.Services.Settings
 				}
 			};
 		}
-        public ICollection<ProgramSettingDto> GetProgramSettingsByIds_actual(IEnumerable<int> programIds)
+
+	    public bool PasswordRequireDigital()
+	    {
+            if (!_globalSettings.ContainsKey(SettingType.PasswordRequireDigit))
+            {
+                return false;
+            }
+
+            return _globalSettings[SettingType.PasswordRequireDigit] == "true";
+        }
+
+	    public bool PassowrdRequireLowerCase()
+	    {
+            if (!_globalSettings.ContainsKey(SettingType.PasswordRequireLowerCase))
+            {
+                return false;
+            }
+
+            return _globalSettings[SettingType.PasswordRequireLowerCase] == "true";
+        }
+
+	    public bool PasswordRequireUpperCase()
+	    {
+            if (!_globalSettings.ContainsKey(SettingType.PasswordRequireUpperCase))
+            {
+                return false;
+            }
+
+            return _globalSettings[SettingType.PasswordRequireLowerCase] == "true";
+        }
+
+	    public int PasswordRequireLength()
+	    {
+            var settingKey = SettingType.PasswordRequireLength;
+            if (!_globalSettings.ContainsKey(settingKey))
+            {
+                return 6;
+            }
+
+            return ValueParser.TryParseInt(_globalSettings[settingKey], 6);
+        }
+
+	    public int PasswordLockoutHours()
+	    {
+            var settingType = SettingType.DefaultAccountLockoutTimeSpan;
+            if (!_globalSettings.ContainsKey(settingType))
+            {
+                return 24;
+            }
+
+            return int.Parse(_globalSettings[settingType]);
+        }
+
+	    public ICollection<ProgramSettingDto> GetProgramSettingsByIds_actual(IEnumerable<int> programIds)
         {
             var settingDtoList = new List<ProgramSettingDto>();
             if (programIds != null)
@@ -177,24 +250,9 @@ namespace Linko.LinkoExchange.Services.Settings
         /// Get application global settings.
         /// </summary>
         /// <returns>The settings for dictionary object</returns>
-        public IDictionary<string, string> GetGlobalSettings()
+        public IDictionary<SettingType, string> GetGlobalSettings()
 		{
-			//TODO: get system global settings
-			var globalSetting = new Dictionary<string, string>();
-			globalSetting.Add("PasswordRequireLength", "6");
-			globalSetting.Add("PasswordRequireDigit", "true");
-			globalSetting.Add("PasswordExpiredDays", "90");
-            globalSetting.Add("NumberOfPasswordsInHistory", "10");
-
-            globalSetting.Add("EmailServer", "wtraxadc2.watertrax.local");
-            globalSetting.Add("supportPhoneNumber", "+1-604-418-3201");
-            globalSetting.Add("supportEmail", "support@linkoExchange.com");
-
-            globalSetting.Add("SystemEmailEmailAddress", "shuhao.wang@watertrax.com");
-            globalSetting.Add("SystemEmailFirstName", "LinkoExchange ");
-            globalSetting.Add("SystemEmailLastName", "System");
-
-            return globalSetting;
+            return _globalSettings;
 		}
 
 		/// <summary>
@@ -254,7 +312,7 @@ namespace Linko.LinkoExchange.Services.Settings
 
 						 new SettingDto
 						 {
-                             Type = SettingType.MaxFailedAccessAttemptsBeforeLockout,
+                             Type = SettingType.MaxFailedPasswordAttempts,
 							 Value = "2"
 						 },
 
@@ -272,7 +330,7 @@ namespace Linko.LinkoExchange.Services.Settings
 
                          new SettingDto
                          {
-                             Type =SettingType.NumberOfPasswordsInHistory,
+                             Type =SettingType.PasswordHistoryCount,
                              Value = "10"
                          }
 				};

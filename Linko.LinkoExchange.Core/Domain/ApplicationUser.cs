@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -33,5 +34,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public bool IsAccountLocked { get; set; }
         public bool IsAccountResetRequired { get; set; }
         public bool EmailConfirmed { get; set; }
+        public DateTime LockOutEndDateUtc { get; set; }
+        public bool IsInternalAccount { get; set; }
     }
 }

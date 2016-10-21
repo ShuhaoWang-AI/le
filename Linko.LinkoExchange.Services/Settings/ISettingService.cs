@@ -9,7 +9,7 @@ namespace Linko.LinkoExchange.Services.Settings
         /// Ge the system global settings;
         /// </summary>
         /// <returns></returns>
-        IDictionary<string, string > GetGlobalSettings(); 
+        IDictionary<SettingType, string > GetGlobalSettings(); 
 
         /// <summary>
         /// Get the organizationSetting by UserId
@@ -45,5 +45,14 @@ namespace Linko.LinkoExchange.Services.Settings
         /// <param name="programIds">The program Ids</param>
         /// <returns></returns>
         IEnumerable<ProgramSettingDto> GetProgramSettingsByIds(IEnumerable<int> programIds);
+
+
+        bool PasswordRequireDigital();
+        bool PassowrdRequireLowerCase();
+        bool PasswordRequireUpperCase();
+        int PasswordRequireLength();
+
+        int PasswordLockoutHours();
+
     }
 }

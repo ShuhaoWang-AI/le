@@ -48,10 +48,9 @@ namespace Linko.LinkoExchange.Services.Email
             _requestCache = requestCache;
 
 
-            _senderEmailAddres = _settingService.GetGlobalSettings()["SystemEmailEmailAddress"];
-            _senderFistName = _settingService.GetGlobalSettings()["SystemEmailFirstName"];
-            _senderLastName = _settingService.GetGlobalSettings()["SystemEmailLastName"];
-
+            _senderEmailAddres = _settingService.GetGlobalSettings()[SettingType.SystemEmailEmailAddress];
+            _senderFistName = _settingService.GetGlobalSettings()[SettingType.SystemEmailFirstName];
+            _senderLastName = _settingService.GetGlobalSettings()[SettingType.SystemEmailLastName]; 
         }
 
         public async void SendEmail(IEnumerable<string> recipients, EmailType emailType,
@@ -65,7 +64,7 @@ namespace Linko.LinkoExchange.Services.Email
             MailMessage msg = await GetMailMessage(sendTo, template, contentReplacements, _senderEmailAddres);
             if (string.IsNullOrWhiteSpace(_emailServer))
             {
-                _emailServer = _settingService.GetGlobalSettings()["EmailServer"]; 
+                _emailServer = _settingService.GetGlobalSettings()[SettingType.EmailServer]; 
             }
 
             if (string.IsNullOrWhiteSpace(_emailServer))
