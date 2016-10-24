@@ -75,10 +75,12 @@
     <Compile Include="Mapping\OrganizationRegulatoryProgramUserMap.cs" />
     <Compile Include="Mapping\OrganizationSettingMap.cs" />
     <Compile Include="Mapping\OrganizationTypeMap.cs" />
+    <Compile Include="Mapping\QuestionMap.cs" />
     <Compile Include="Mapping\RegulatoryProgramMap.cs" />
     <Compile Include="Mapping\SettingTemplateMap.cs" />
     <Compile Include="Mapping\UserPasswordHistoryMap.cs" />
     <Compile Include="Mapping\PermissionGroupProfileMap.cs" />
+    <Compile Include="Mapping\UserQuestionAnswerMap.cs" />
     <Compile Include="Mapping\UserProfileMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

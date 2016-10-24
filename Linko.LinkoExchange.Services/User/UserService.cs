@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Linko.LinkoExchange.Core.Extensions;
 using Linko.LinkoExchange.Services.Dto;
 using AutoMapper;
+using System.Web;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -21,16 +22,19 @@ namespace Linko.LinkoExchange.Services.User
         private readonly IAuditLogEntry _logger;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IMapper _mapper;
+        private readonly ICurrentUser _currentUser;
         #endregion
 
         #region constructor
 
-        public UserService(LinkoExchangeContext dbContext, IAuditLogEntry logger, IPasswordHasher passwordHasher, IMapper mapper)
+        public UserService(LinkoExchangeContext dbContext, IAuditLogEntry logger,
+            IPasswordHasher passwordHasher, IMapper mapper, ICurrentUser currentUser)
         {
             this._dbContext = dbContext;
             _logger = logger;
             _passwordHasher = passwordHasher;
             _mapper = mapper;
+            _currentUser = currentUser;
         }
 
         #endregion
@@ -95,11 +99,12 @@ namespace Linko.LinkoExchange.Services.User
             newOrgRegProgUser.OrganizationRegulatoryProgramId = orgRegProgId;
             newOrgRegProgUser.PermissionGroup = _dbContext.PermissionGroups.Single(p => p.PermissionGroupId == permissionGroupId);
 
-            var newUserProfile = new UserProfile();
+            var newUserProfile = _dbContext.Users.Create();
             newUserProfile.Email = emailAddress;
             newUserProfile.FirstName = firstName;
             newUserProfile.LastName = lastName;
-            //newOrgRegProgUser.UserProfile = newUserProfile;
+            _dbContext.Users.Add(newUserProfile);
+            newOrgRegProgUser.UserProfileId = newUserProfile.UserProfileId;
 
             try
             {
@@ -128,7 +133,7 @@ namespace Linko.LinkoExchange.Services.User
 
                 //Persist modification date and modifier actor
                 user.LastModificationDateTimeUtc = DateTime.UtcNow;
-                user.LastModifierUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
+                user.LastModifierUserId = _currentUser.GetCurrentOrgRegProgramUserId();
                 _dbContext.SaveChanges();
             }
             else
@@ -147,21 +152,11 @@ namespace Linko.LinkoExchange.Services.User
 
         public void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory)
         {
-            OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
-            if (user != null)
-            {
-                user.IsSignatory = isSignatory;
-
-                //Persist modification date and modifier actor
-                user.LastModificationDateTimeUtc = DateTime.UtcNow;
-                user.LastModifierUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
-                _dbContext.SaveChanges();
-            }
-            else
-            {
-                //_logger.Log("ERROR")
-                throw new Exception();
-            }
+            OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+            user.IsSignatory = isSignatory;
+            user.LastModificationDateTimeUtc = DateTime.UtcNow;
+            user.LastModifierUserId = _currentUser.GetCurrentOrgRegProgramUserId();
+            _dbContext.SaveChanges();
         }
 
         public void RequestSignatoryStatus(int orgRegProgUserId)
@@ -176,7 +171,9 @@ namespace Linko.LinkoExchange.Services.User
                 user.IsAccountLocked = false;
                 user.PasswordHash = null;
                 user.OldEmailAddress = user.Email;
-                user.Email = newEmailAddress; 
+                user.Email = newEmailAddress;
+                user.EmailConfirmed = false;
+                user.PhoneNumberConfirmed = false;
 
                 var answers = _dbContext.UserQuestionAnswers.Where(a => a.UserProfile.UserProfileId == userProfileId);
                 if (answers != null && answers.Count() > 0)
@@ -208,7 +205,7 @@ namespace Linko.LinkoExchange.Services.User
 
                 //Persist modification date and modifier actor
                 user.LastModificationDateTimeUtc = DateTime.UtcNow;
-                user.LastModifierUserId = System.Web.HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId();
+                user.LastModifierUserId = _currentUser.GetCurrentOrgRegProgramUserId();
                 _dbContext.SaveChanges();
             }
             else
@@ -253,24 +250,18 @@ namespace Linko.LinkoExchange.Services.User
 
                     //create history record
                     UserPasswordHistory history = _dbContext.UserPasswordHistories.Create();
-                    history.UserProfileId = userProfile.UserProfileId;
+                    history.UserProfileId = userProfileId;
                     history.PasswordHash = userProfile.PasswordHash;
                     history.LastModificationDateTimeUtc = DateTime.UtcNow;
 
                     _dbContext.SaveChanges();
                 }
-                else
-                {
-                    //_logger.Log("ERROR")
-                    throw new Exception();
-                }
-
             }
             else
             {
-                //_logger.Log("ERROR")
-                throw new Exception();
+                throw new Exception("ERROR: Old password does not match");
             }
+
         }
 
         public OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int userProfileId)

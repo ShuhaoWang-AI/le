@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Linko.LinkoExchange.Services.User
+namespace Linko.LinkoExchange.Services
 {
     /// <summary>
     /// 
@@ -19,6 +19,13 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="question"></param>
         /// <param name="answer"></param>
         void AddQuestionAnswerPair(int userProfileId, QuestionDto question, AnswerDto answer);
+
+        /// <summary>
+        /// Adds a question if no Id's are provided or updates if Id's are present
+        /// </summary>
+        /// <param name="userProfileId"></param>
+        /// <param name="questionAnswer"></param>
+        void CreateOrUpdateQuestionAnswerPair(int userProfileId, QuestionAnswerPairDto questionAnswer);
 
         /// <summary>
         /// 

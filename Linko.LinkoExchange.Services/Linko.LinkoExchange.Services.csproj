@@ -154,9 +154,11 @@
     <Compile Include="Settings\ISettingService.cs" />
     <Compile Include="Settings\SettingService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="User\IQuestionAnswerService.cs" />
+    <Compile Include="QuestionAnswer\IQuestionAnswerService.cs" />
+    <Compile Include="User\CurrentUser.cs" />
+    <Compile Include="User\ICurrentUser.cs" />
     <Compile Include="User\IUserService.cs" />
-    <Compile Include="User\QuestionAnswerService.cs" />
+    <Compile Include="QuestionAnswer\QuestionAnswerService.cs" />
     <Compile Include="User\UserService.cs" />
   </ItemGroup>
   <ItemGroup>

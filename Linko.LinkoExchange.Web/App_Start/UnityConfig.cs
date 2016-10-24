@@ -79,6 +79,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IInvitationService, InvitationService>();
             container.RegisterType<IProgramService, ProgramService>();
             container.RegisterType<IUserService, UserService>();
+            container.RegisterType<ICurrentUser, CurrentUser>();
             container.RegisterType<IRequestCache, RequestCache>();
 
             // Custom identity services           

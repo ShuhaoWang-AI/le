@@ -36,7 +36,7 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance);
+            _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, new CurrentUser());
         }
 
         [TestMethod]
@@ -58,6 +58,51 @@ namespace Linko.LinkoExchange.Test
             var permissionGroupId = 1;
             _userService.UpdateUserPermissionGroupId(1, permissionGroupId);
             _userService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, true);
+        }
+
+        [TestMethod]
+        public void UpdateUserSignatoryStatus()
+        {
+            var orgRegProgUserId = 1;
+            _userService.UpdateUserSignatoryStatus(orgRegProgUserId, true);
+        }
+
+        [TestMethod]
+        public void UpdateUserState_RegistrationApproved()
+        {
+            var orgRegProgUserId = 1;
+            _userService.UpdateUserState(orgRegProgUserId, false, false, false, false);
+            _userService.UpdateUserState(orgRegProgUserId, true, null, null, null);
+        }
+
+        [TestMethod]
+        public void UpdateUserState_RegistrationDenied()
+        {
+            var orgRegProgUserId = 1;
+            _userService.UpdateUserState(orgRegProgUserId, false, false, false, false);
+            _userService.UpdateUserState(orgRegProgUserId, null, true, null, null);
+        }
+
+        [TestMethod]
+        public void UpdateUserState_Enabled()
+        {
+            var orgRegProgUserId = 1;
+            _userService.UpdateUserState(orgRegProgUserId, false, false, false, false);
+            _userService.UpdateUserState(orgRegProgUserId, null, null, true, null);
+        }
+        [TestMethod]
+        public void UpdateUserState_Removed()
+        {
+            var orgRegProgUserId = 1;
+            _userService.UpdateUserState(orgRegProgUserId, false, false, false, false);
+        }
+
+        [TestMethod]
+        public void UpdateUserState_UnRemove()
+        {
+            var orgRegProgUserId = 1;
+            _userService.RemoveUser(orgRegProgUserId);
+            _userService.UpdateUserState(orgRegProgUserId, null, null, null, false);
         }
     }
 }
