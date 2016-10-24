@@ -16,18 +16,23 @@ namespace Linko.LinkoExchange.Core.Domain
         public int UserProfileId { get; private set; }
 
         public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string LastName { get; set; } 
+        public string BusinessName { get; set; }
 
-        public bool IsAccountLocked { get; set; }
-
-        public string OldEmailAddress { get; set; }
-        public bool IsAccountResetRequired { get; set; } 
-        public bool IsInternalAccount { get; set; }
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
         public string CityName { get; set; }
         public string ZipCode { get; set; }
-        public bool IsIdentityProofed { get; set; } 
+        public string Jurisdictionid { get; set; }
+
+        public int? PhoneExt { get; set; }
+        public bool IsAccountLocked { get; set; }
+        public bool IsAccountResetRequired { get; set; }
+        public bool IsIdentityProofed { get; set; }
+        public bool IsInternalAccount { get; set; }
+        public DateTime? LastModificationDateTimeUtc { get; set; }
+
+        public string OldEmailAddress { get; set; }  
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<UserProfile> manager)
         {
