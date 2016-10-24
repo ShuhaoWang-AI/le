@@ -434,6 +434,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return Task.FromResult(signInResultDto);
             }
 
+            // UC-29, 2.c
             // Check if the user is in 'passowrd lock' status
             if (_userManager.IsLockedOut(applicationUser.Id))
             {
@@ -442,8 +443,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return Task.FromResult(signInResultDto);
             }
 
-            // TODO: to check if the user has been locked "Account Lockout"  by an authority
-            // check UserProfile ->  IsAccountLocked field
+            // UC-29, 3.a
+            // Check if the user has been locked "Account Lockout"  by an authority
             if (applicationUser.IsAccountLocked)
             {
                 //TODO: log failed login because of Locked to Audit (UC-2) 
@@ -451,7 +452,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return Task.FromResult(signInResultDto);
             }
              
-            //TODO 
+            // UC-29, 4.a, 5.a, 6.a
             if (!ValidateUserAccess(applicationUser, signInResultDto))
             {
                 return Task.FromResult(signInResultDto);
@@ -517,7 +518,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 // UC-29 5.a, User account is disabled for all industry, or authorty or application admin
                 // If the user is disabled for all programs
                 if (orpus.All(u => u.IsEnabled == false) || //--- user is disabled for all industry and authority 
-                    userProfile.IsInternalAccount == false //--- user is diabled for Application admin.
+                    userProfile.IsInternalAccount == false  //--- user is diabled for Application admin.
                 )
                 {
                     // TODO: Log failed login because userProfile disabled to Audit (UC-2)
@@ -533,6 +534,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                     signInResultDto.AutehticationResult = AuthenticationResult.AccountIsNotAssociated;
                     return false;
                 }
+
+                // 6.b returned in the intermediate page call.... 
+
             }
             return true;
         }

@@ -54,13 +54,15 @@ namespace Linko.LinkoExchange.Services
         public IEnumerable<OrganizationDto> GetUserRegulatories(int userId)
         {
             var orpUsers = _dbContext.OrganizationRegulatoryProgramUsers.ToList()
-                .FindAll(u => u.UserProfileId == userId && u.IsRemoved == false);
+                .FindAll(u => u.UserProfileId == userId && u.IsRemoved == false && u.IsEnabled == true 
+                   && u.OrganizationRegulatoryProgram.IsEnabled && u.OrganizationRegulatoryProgram.IsRemoved == false);
 
             var orgs = new List<OrganizationDto>();
             foreach (var orpUser in orpUsers)
             {
-                if(orpUser.OrganizationRegulatoryProgram?.Organization != null)  
-                 orgs.Add(_mapper.Map<OrganizationDto>(orpUser.OrganizationRegulatoryProgram.Organization)); 
+                if(orpUser.OrganizationRegulatoryProgram.RegulatorOrganizationId !=null &&
+                    orpUser.OrganizationRegulatoryProgram?.Organization != null)
+                    orgs.Add(_mapper.Map<OrganizationDto>(orpUser.OrganizationRegulatoryProgram.Organization)); 
             }
 
             return orgs;
