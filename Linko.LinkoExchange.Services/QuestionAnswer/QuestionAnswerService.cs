@@ -49,7 +49,7 @@ namespace Linko.LinkoExchange.Services
                 newAnswer.CreationDateTimeUtc = DateTime.UtcNow;
                 newAnswer.LastModificationDateTimeUtc = null;
                 newAnswer.Question = newQuestion;
-                newAnswer.UserProfile = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
+                newAnswer.UserProfileId = userProfileId;
                 newAnswer.CreationDateTimeUtc = DateTime.UtcNow;
                 newAnswer.LastModificationDateTimeUtc = DateTime.UtcNow;
 

@@ -175,7 +175,7 @@ namespace Linko.LinkoExchange.Services.User
                 user.EmailConfirmed = false;
                 user.PhoneNumberConfirmed = false;
 
-                var answers = _dbContext.UserQuestionAnswers.Where(a => a.UserProfile.UserProfileId == userProfileId);
+                var answers = _dbContext.UserQuestionAnswers.Where(a => a.UserProfileId == userProfileId);
                 if (answers != null && answers.Count() > 0)
                 {
                     foreach (var answer in answers)

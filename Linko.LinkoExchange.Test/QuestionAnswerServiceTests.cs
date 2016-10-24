@@ -56,7 +56,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void DeleteQuestionAnswerPair()
         {
-            _questionAnswerService.DeleteQuestionAnswerPair(7);
+            _questionAnswerService.DeleteQuestionAnswerPair(12);
         }
         [TestMethod]
         public void UpdateAnswer()

@@ -14,11 +14,9 @@ namespace Linko.LinkoExchange.Core.Domain
         public bool IsEnabled { get; set; }
         public bool IsRemoved { get; set; }
         public bool IsSignatory { get; set; }
-        public DateTime? LastModificationDateTimeUtc { get; set; }
+        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
         public int? LastModifierUserId { get; set; } 
         public int UserProfileId { get;set; }
-                 
-        //public virtual UserProfile UserProfile { get; set; } 
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
         public virtual PermissionGroup PermissionGroup { get; set; }
         public int PermissionGroupId { get; set; }

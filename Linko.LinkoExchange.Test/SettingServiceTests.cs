@@ -50,7 +50,7 @@ namespace Linko.LinkoExchange.Test
             var settings = new ProgramSettingDto() { OrgRegProgId = 1 };
             settings.Settings = new List<SettingDto>();
             settings.Settings.Add(new SettingDto() { Type = SettingType.MaxKBQAttempts, Value = "10" });
-            settings.Settings.Add(new SettingDto() { Type = SettingType.PasswordChangeDays, Value = "31" });
+            settings.Settings.Add(new SettingDto() { Type = SettingType.MaxFailedPasswordAttempts, Value = "31" });
             _settingService.CreateOrUpdateProgramSettings(settings);
         }
 
@@ -60,7 +60,7 @@ namespace Linko.LinkoExchange.Test
             var settings = new OrganizationSettingDto() { OrganizationId = 1001 };
             settings.Settings = new List<SettingDto>();
             settings.Settings.Add(new SettingDto() { Type = SettingType.TimeZoneId, Value = "2" });
-            settings.Settings.Add(new SettingDto() { Type = SettingType.PasswordRequireLength, Value = "5" });
+            settings.Settings.Add(new SettingDto() { Type = SettingType.MaxFailedPasswordAttempts, Value = "5" });
             _settingService.CreateOrUpdateOrganizationSettings(settings);
         }
 
