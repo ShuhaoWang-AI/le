@@ -27,14 +27,31 @@ namespace Linko.LinkoExchange.Services
         }
 
         /// <summary>
-        /// Get organizations that a user can access to
+        /// Get organizations that a user can access to (IU portal, AU portal, content MGT portal)
         /// </summary>
         /// <param name="userId">User id</param>
         /// <returns>Collection of organization</returns>
         public IEnumerable<OrganizationDto> GetUserOrganizations(int userId)
-        {
-            //TODO
-            var list = new List<OrganizationDto>
+        { 
+            var orpUsers = _dbContext.OrganizationRegulatoryProgramUsers.ToList()
+                .FindAll(u => u.UserProfileId == userId &&
+                            u.IsRemoved == false &&
+                            u.IsEnabled == true &&
+                            u.IsRegistrationApproved &&
+                            u.OrganizationRegulatoryProgram.IsEnabled &&
+                            u.OrganizationRegulatoryProgram.IsRemoved == false);
+                             
+            var orgs = new List<OrganizationDto>();
+            foreach (var orpUser in orpUsers)
+            {
+                if (orpUser.OrganizationRegulatoryProgram?.Organization != null &&
+                    !orgs.Any(i => i.OrganizationId == orpUser.OrganizationRegulatoryProgram.OrganizationId))
+                    orgs.Add(_mapper.Map<OrganizationDto>(orpUser.OrganizationRegulatoryProgram.Organization));
+            }
+
+            return orgs; 
+
+            /*            
             {
                 new OrganizationDto
                 {
@@ -42,10 +59,10 @@ namespace Linko.LinkoExchange.Services
                     OrganizationName = "Mock organization name"
                 }
             };
-
             return list;
+            */
         }
-        
+
         /// <summary>
         /// Return all the programs' regulatory list for the user
         /// </summary>
@@ -54,14 +71,19 @@ namespace Linko.LinkoExchange.Services
         public IEnumerable<OrganizationDto> GetUserRegulatories(int userId)
         {
             var orpUsers = _dbContext.OrganizationRegulatoryProgramUsers.ToList()
-                .FindAll(u => u.UserProfileId == userId && u.IsRemoved == false && u.IsEnabled == true 
-                   && u.OrganizationRegulatoryProgram.IsEnabled && u.OrganizationRegulatoryProgram.IsRemoved == false);
+                .FindAll(u => u.UserProfileId == userId && 
+                            u.IsRemoved == false && 
+                            u.IsEnabled == true && 
+                            u.IsRegistrationApproved && 
+                            u.OrganizationRegulatoryProgram.IsEnabled && 
+                            u.OrganizationRegulatoryProgram.IsRemoved == false);
 
             var orgs = new List<OrganizationDto>();
             foreach (var orpUser in orpUsers)
             {
                 if(orpUser.OrganizationRegulatoryProgram.RegulatorOrganizationId !=null &&
-                    orpUser.OrganizationRegulatoryProgram?.Organization != null)
+                    orpUser.OrganizationRegulatoryProgram?.Organization != null &&
+                    ! orgs.Any(i=>i.OrganizationId == orpUser.OrganizationRegulatoryProgram.RegulatorOrganizationId) )
                     orgs.Add(_mapper.Map<OrganizationDto>(orpUser.OrganizationRegulatoryProgram.Organization)); 
             }
 
@@ -245,3 +267,4 @@ namespace Linko.LinkoExchange.Services
 
     }
 }
+ 

@@ -11,13 +11,19 @@ namespace Linko.LinkoExchange.Core.Domain
     {
         [Key]
         public int OrganizationId { get; set; }
-        public int OrganizationTypeId { get; set; }
+        public int OrganizationTypeId { get; set; } 
+        [Required]
         public virtual OrganizationType OrganizationType { get; set; }
         public string Name { get; set; }
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
-        public string City { get; set; }
+        public string CityName { get; set; }
         public string ZipCode { get; set; }
+        public string PhoneNumber { get; set; }
+        public string PhoneExt { get; set; }
+        public string FaxNumber { get; set; }
+        public string WebsiteURL { get; set; } 
+
         public virtual List<OrganizationSetting> OrganizationSettings { get; set; }
 
     }
