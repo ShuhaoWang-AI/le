@@ -45,7 +45,7 @@ namespace Linko.LinkoExchange.Web
                 {
                     // Enables the application to validate the security stamp when the user logs in.
                     // This is a security feature which is used when you change a password or add an external SignIn to your account.  
-                    OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<ApplicationUserManager, ApplicationUser>(
+                    OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<ApplicationUserManager, UserProfile>(
                         validateInterval: TimeSpan.FromMinutes(cookieValidateInterval),
                         regenerateIdentity: (manager, user) => user.GenerateUserIdentityAsync(manager))
                 }

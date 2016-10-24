@@ -37,6 +37,8 @@ namespace Linko.LinkoExchange.Services.Settings
             _globalSettings.Add(SettingType.PasswordRequireDigit, "true");
             _globalSettings.Add(SettingType.PasswordExpiredDays, "90");
 
+            _globalSettings.Add(SettingType.MaxFailedPasswordAttempts, "3");
+
             _globalSettings.Add(SettingType.PasswordHistoryCount, "10");
             _globalSettings.Add(SettingType.EmailServer, "6");
             _globalSettings.Add(SettingType.SupportPhoneNumber, "+1-604-418-3201");

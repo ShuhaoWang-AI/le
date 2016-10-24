@@ -78,7 +78,7 @@ namespace Linko.LinkoExchange.Services
                 try
                 {
                     //Final check for email in use
-                    if (!_dbContext.UserProfiles.Any(u => u.Email == inviteDto.EmailAddress) &&
+                    if (!_dbContext.Users.Any(u => u.Email == inviteDto.EmailAddress) &&
                         !_dbContext.Invitations.Any(i => i.EmailAddress == inviteDto.EmailAddress))
                     {
                         var newInvitation = _dbContext.Invitations.Create();

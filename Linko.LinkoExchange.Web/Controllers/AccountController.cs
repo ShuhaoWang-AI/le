@@ -64,7 +64,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         // POST: Account/SignIn
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+//        [ValidateAntiForgeryToken]
         public async Task<ActionResult> SignIn(SignInViewModel model, string returnUrl)
         {
             var result = await _authenticateService.SignInByUserName(model.UserName, model.Password, model.RememberMe);

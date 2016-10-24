@@ -41,7 +41,7 @@ namespace Linko.LinkoExchange.Services.User
                 UserQuestionAnswer newAnswer = _dbContext.UserQuestionAnswers.Create();
                 newAnswer.Content = answer.Content;
                 newAnswer.Question = newQuestion;
-                newAnswer.UserProfile = _dbContext.UserProfiles.Single(u => u.UserProfileId == userProfileId);
+                newAnswer.UserProfile = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
                 newAnswer.CreationDateTime = DateTime.UtcNow;
                 newAnswer.LastModificationDateTime = DateTime.UtcNow;
 

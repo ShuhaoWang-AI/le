@@ -40,7 +40,7 @@ namespace Linko.LinkoExchange.Services.User
 
         public UserDto GetUserProfileById(int userProfileId)
         {
-            var userProfile = _dbContext.UserProfiles.Single(up => up.UserProfileId == userProfileId);
+            var userProfile = _dbContext.Users.Single(up => up.UserProfileId == userProfileId);
             UserDto dto = _mapper.Map<UserProfile, UserDto>(userProfile);
             return dto;
         }
@@ -48,7 +48,7 @@ namespace Linko.LinkoExchange.Services.User
         public UserDto GetUserProfileByEmail(string emailAddress)
         {
             UserDto dto = null;
-            UserProfile userProfile = _dbContext.UserProfiles.SingleOrDefault(u => u.Email == emailAddress);
+            UserProfile userProfile = _dbContext.Users.SingleOrDefault(u => u.Email == emailAddress);
             if (userProfile != null)
             {
                 dto = _mapper.Map<UserProfile, UserDto>(userProfile);
@@ -99,7 +99,7 @@ namespace Linko.LinkoExchange.Services.User
             newUserProfile.Email = emailAddress;
             newUserProfile.FirstName = firstName;
             newUserProfile.LastName = lastName;
-            newOrgRegProgUser.UserProfile = newUserProfile;
+            //newOrgRegProgUser.UserProfile = newUserProfile;
 
             try
             {
@@ -170,15 +170,13 @@ namespace Linko.LinkoExchange.Services.User
 
         public void ResetUser(int userProfileId, string newEmailAddress)
         {
-            UserProfile user = _dbContext.UserProfiles.SingleOrDefault(u => u.UserProfileId == userProfileId);
+            UserProfile user = _dbContext.Users.SingleOrDefault(u => u.UserProfileId == userProfileId);
             if (user != null)
             {
                 user.IsAccountLocked = false;
                 user.PasswordHash = null;
                 user.OldEmailAddress = user.Email;
-                user.Email = newEmailAddress;
-                user.IsEmailConfirmed = false;
-                user.IsPhoneNumberConfirmed = false;
+                user.Email = newEmailAddress; 
 
                 var answers = _dbContext.UserQuestionAnswers.Where(a => a.UserProfile.UserProfileId == userProfileId);
                 if (answers != null && answers.Count() > 0)
@@ -224,7 +222,7 @@ namespace Linko.LinkoExchange.Services.User
         {
             if (request != null)
             {
-                UserProfile userProfile = _dbContext.UserProfiles.SingleOrDefault(up => up.UserProfileId == request.UserProfileId);
+                UserProfile userProfile = _dbContext.Users.SingleOrDefault(up => up.UserProfileId == request.UserProfileId);
                 if (userProfile != null)
                 {
                     userProfile.FirstName = request.FirstName;
@@ -245,7 +243,7 @@ namespace Linko.LinkoExchange.Services.User
 
         public void ChangePassword(int userProfileId, string oldPassword, string newPassword)
         {
-            UserProfile userProfile = _dbContext.UserProfiles.SingleOrDefault(up => up.UserProfileId == userProfileId);
+            UserProfile userProfile = _dbContext.Users.SingleOrDefault(up => up.UserProfileId == userProfileId);
             if (userProfile != null)
             {
                 //Check old password matches
@@ -255,9 +253,9 @@ namespace Linko.LinkoExchange.Services.User
 
                     //create history record
                     UserPasswordHistory history = _dbContext.UserPasswordHistories.Create();
-                    history.UserProfile = userProfile;
+                    history.UserProfileId = userProfile.UserProfileId;
                     history.PasswordHash = userProfile.PasswordHash;
-                    history.LastModificationDateTime = DateTime.UtcNow;
+                    history.LastModificationDateTimeUtc = DateTime.UtcNow;
 
                     _dbContext.SaveChanges();
                 }

@@ -12,7 +12,7 @@ namespace Linko.LinkoExchange.Data.Mapping
             HasKey(i => i.UserPasswordHistoryId); 
 
             Property(i => i.PasswordHash).HasMaxLength(value: 100);
-            Property(i => i.LastModificationDateTime);
+            Property(i => i.LastModificationDateTimeUtc);
             Property(i => i.UserProfileId);
         } 
     } 

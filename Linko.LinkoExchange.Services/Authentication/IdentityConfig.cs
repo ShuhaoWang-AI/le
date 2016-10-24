@@ -14,9 +14,9 @@ using Linko.LinkoExchange.Services.Email;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
-    public class ApplicationUserManager : UserManager<ApplicationUser>
+    public class ApplicationUserManager : UserManager<UserProfile>
     {
-        public ApplicationUserManager(IUserStore<ApplicationUser> store)
+        public ApplicationUserManager(IUserStore<UserProfile> store)
             : base(store)
         {
             var provider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider("TokenProvider");
@@ -24,7 +24,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 ValueParser.TryParseInt(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"], 168);
 
             UserTokenProvider =
-                new DataProtectorTokenProvider<ApplicationUser>(provider.Create("ASP.NET Identity"))
+                new DataProtectorTokenProvider<UserProfile>(provider.Create("ASP.NET Identity"))
                 {
                     // set the token life span;
                     TokenLifespan = TimeSpan.FromHours(tokenLife)
@@ -36,10 +36,10 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context)
         {
-            var manager = new ApplicationUserManager (new UserStore<ApplicationUser> (context.Get<LinkoExchangeContext> ()));
+            var manager = new ApplicationUserManager (new UserStore<UserProfile> (context.Get<LinkoExchangeContext> ()));
             
             // Configure validation logic for usernames
-            manager.UserValidator = new UserValidator<ApplicationUser> (manager)
+            manager.UserValidator = new UserValidator<UserProfile> (manager)
             {
                 AllowOnlyAlphanumericUserNames = false 
             };
@@ -62,13 +62,13 @@ namespace Linko.LinkoExchange.Services.Authentication
             manager.DefaultAccountLockoutTimeSpan = TimeSpan.FromDays(1);   
             manager.MaxFailedAccessAttemptsBeforeLockout = 5;
 
-            // Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the user
+            // Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the userProfile
             // You can write your own provider and plug it in here.
-            manager.RegisterTwoFactorProvider ("Phone Code", new PhoneNumberTokenProvider<ApplicationUser>
+            manager.RegisterTwoFactorProvider ("Phone Code", new PhoneNumberTokenProvider<UserProfile>
             {
                 MessageFormat = "Your security code is {0}"
             });
-            manager.RegisterTwoFactorProvider ("Email Code", new EmailTokenProvider<ApplicationUser>
+            manager.RegisterTwoFactorProvider ("Email Code", new EmailTokenProvider<UserProfile>
             {
                 Subject = "Security Code",
                 BodyFormat = "Your security code is {0}"
@@ -81,7 +81,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     ValueParser.TryParseInt(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"], 168);
 
                 manager.UserTokenProvider =
-                    new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"))
+                    new DataProtectorTokenProvider<UserProfile>(dataProtectionProvider.Create("ASP.NET Identity"))
                     {
                         // set the token life span;
                         TokenLifespan = TimeSpan.FromHours(tokenLife)
@@ -94,16 +94,16 @@ namespace Linko.LinkoExchange.Services.Authentication
     }
 
     // Configure the application sign-in manager which is used in this application.
-    public class ApplicationSignInManager : SignInManager<ApplicationUser, string>
+    public class ApplicationSignInManager : SignInManager<UserProfile, string>
     {
         public ApplicationSignInManager(ApplicationUserManager userManager, IAuthenticationManager authenticationManager)
             : base (userManager, authenticationManager)
         {
         }
 
-        public override Task<ClaimsIdentity> CreateUserIdentityAsync(ApplicationUser user)
+        public override Task<ClaimsIdentity> CreateUserIdentityAsync(UserProfile userProfile)
         {
-            return user.GenerateUserIdentityAsync ((ApplicationUserManager) UserManager);
+            return userProfile.GenerateUserIdentityAsync ((ApplicationUserManager) UserManager);
         }
 
         public static ApplicationSignInManager Create(IdentityFactoryOptions<ApplicationSignInManager> options, IOwinContext context)

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using FluentValidation.Mvc;
+using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Web.Controllers;
 using Microsoft.Practices.Unity;
 using Linko.LinkoExchange.Services;
@@ -16,6 +18,7 @@ namespace Linko.LinkoExchange.Web
     {
         protected void Application_Start()
         {
+            Database.SetInitializer <LinkoExchangeContext> (null);
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);

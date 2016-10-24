@@ -70,7 +70,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\ValueParser.cs" />
-    <Compile Include="Domain\ApplicationUser.cs" />
     <Compile Include="Domain\AuditLogTemplate.cs" />
     <Compile Include="Domain\EmailAuditLog.cs" />
     <Compile Include="Domain\EmailTemplate.cs" />

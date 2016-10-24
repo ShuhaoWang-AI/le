@@ -84,7 +84,7 @@ namespace Linko.LinkoExchange.Web
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
             container.RegisterType<ApplicationUserManager>(); 
-            container.RegisterType<IUserStore<ApplicationUser>, UserStore<ApplicationUser>>(new InjectionConstructor(typeof(LinkoExchangeContext)));
+            container.RegisterType<IUserStore<UserProfile>, UserStore<UserProfile>>(new InjectionConstructor(typeof(LinkoExchangeContext)));
             container.RegisterType<IPermissionService, PermissionService>();
             container.RegisterType<IAuditLogEntry, EmailAuditLogEntryDto>();
             container.RegisterType<IPasswordHasher, PasswordHasher>();

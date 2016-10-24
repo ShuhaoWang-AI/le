@@ -195,8 +195,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Result = AuthenticationResult.InvalidateRegistrationToken;
                 return Task.FromResult(authenticationResult);
             }
-             
-            // TODO  check token is expired or not? from organization settings
+//             
+//            // TODO  check token is expired or not? from organization settings
             var invitationRecipientProgram =
                 _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
             var inivitationRecipintOrganizationSettings =
@@ -216,7 +216,21 @@ namespace Linko.LinkoExchange.Services.Authentication
             try
             {  
                 // Only check the organization settings of invitation regulatory program
-                SetPasswordPolicy(inivitationRecipintOrganizationSettings.Settings);
+                //SetPasswordPolicy(inivitationRecipintOrganizationSettings.Settings);
+                applicationUser.FirstName = userInfo.FirstName;
+                applicationUser.LastName = userInfo.LastName;
+                applicationUser.IsAccountLocked = false;
+                applicationUser.IsAccountResetRequired = false;
+                applicationUser.LockoutEnabled = true;
+                applicationUser.EmailConfirmed = true;
+                applicationUser.IsInternalAccount = false;
+                applicationUser.AddressLine1 = userInfo.AddressLine1;
+                applicationUser.AddressLine2 = userInfo.AddressLine2;
+                applicationUser.CityName = userInfo.City;
+                applicationUser.ZipCode = userInfo.ZipCode;
+                applicationUser.IsIdentityProofed = false; 
+
+
 
                 var result = _userManager.CreateAsync(applicationUser, userInfo.Password).Result;  
                 
@@ -225,10 +239,10 @@ namespace Linko.LinkoExchange.Services.Authentication
                     // Retrieve user again to get userProfile Id. 
                     applicationUser = _userManager.FindById(applicationUser.Id);
 
-                    // 1. Create a new row in user password history table 
+                    // 1. Create a new row in userProfile password history table 
                     _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
                     {
-                         LastModificationDateTime = DateTime.UtcNow,
+                         LastModificationDateTimeUtc = DateTime.UtcNow,
                          PasswordHash = applicationUser.PasswordHash,
                          UserProfileId = applicationUser.UserProfileId
                     });
@@ -238,10 +252,10 @@ namespace Linko.LinkoExchange.Services.Authentication
                     // TODO more..... 
                     
 
-                    // 2 // Create organziation regulatory program user, and set the approved statue to false  
+                    // 2 // Create organziation regulatory program userProfile, and set the approved statue to false  
                     // TODO change user status to  Registration Pending
                     // UC-42 6
-                    _userService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId, false);
+                    //_userService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId, false);
 
 
                     // 3 TODO send email to all users who have rights to approve a registrant 
@@ -308,7 +322,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         }
 
         /// <summary>
-        /// Reset password happens when user request a 'reset password', and system generates a reset password token and sends to user's email
+        /// Reset password happens when user request a 'reset password', and system generates a reset password token and sends to userProfile's email
         /// And user click the link in the email to reset the password.
         /// </summary>
         /// <param name="email">User email address</param>
@@ -435,6 +449,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return Task.FromResult(signInResultDto);
             }
              
+            //TODO 
             if (!ValidateUserAccess(applicationUser, signInResultDto))
             {
                 return Task.FromResult(signInResultDto);
@@ -451,6 +466,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             // UC-29 7.a
             // Check if user's password is expired or not  
+            //TODO
             if (IsUserPasswordExpired(userId, organizationSettings))
             {
                 signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
@@ -481,9 +497,9 @@ namespace Linko.LinkoExchange.Services.Authentication
         }
 
         // Validate user access for UC-29(4.a, 5.a, 6.a)
-        private bool ValidateUserAccess(ApplicationUser applicationUser, SignInResultDto signInResultDto)
+        private bool ValidateUserAccess(UserProfile userProfile, SignInResultDto signInResultDto)
         {
-            var orpus = _programService.GetUserRegulatoryPrograms(applicationUser.Email);
+            var orpus = _programService.GetUserRegulatoryPrograms(userProfile.Email);
             if (orpus != null && orpus.Any())
             {
                 // UC-29 4.a
@@ -499,10 +515,10 @@ namespace Linko.LinkoExchange.Services.Authentication
                 // UC-29 5.a, User account is disabled for all industry, or authorty or application admin
                 // If the user is disabled for all programs
                 if (orpus.All(u => u.IsEnabled == false) || //--- user is disabled for all industry and authority 
-                    applicationUser.IsInternalAccount == false //--- user is diabled for Application admin.
+                    userProfile.IsInternalAccount == false //--- user is diabled for Application admin.
                 )
                 {
-                    // TODO: Log failed login because user disabled to Audit (UC-2)
+                    // TODO: Log failed login because userProfile disabled to Audit (UC-2)
                     signInResultDto.AutehticationResult = AuthenticationResult.UserIsDisabled;
                     return false;
                 }
@@ -538,7 +554,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             var lastNumberPasswordInHistory = _dbContext.UserPasswordHistories
                 .Where(i => i.UserProfileId == userProfileId)
-                .OrderByDescending(i => i.LastModificationDateTime).Take(numberOfPasswordsInHistory);
+                .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(numberOfPasswordsInHistory);
             if (lastNumberPasswordInHistory.Any(i=>i.PasswordHash == passwordHash))
             {
                 return false; 
@@ -551,7 +567,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             var lastestUserPassword = _dbContext.UserPasswordHistories
                 .Where(i => i.UserProfileId == userProfileId)
-                .OrderByDescending(i => i.LastModificationDateTime).FirstOrDefault();
+                .OrderByDescending(i => i.LastModificationDateTimeUtc).FirstOrDefault();
 
             if (lastestUserPassword == null || lastestUserPassword.UserProfileId == 0)
             {
@@ -560,7 +576,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             // Get password expiration setting
             var passwordExpiredDays = GetStrictestLengthPasswordExpiredDays(organizationSettings);
-            if (DateTime.UtcNow > lastestUserPassword.LastModificationDateTime.AddDays(passwordExpiredDays))
+            if (DateTime.UtcNow > lastestUserPassword.LastModificationDateTimeUtc.AddDays(passwordExpiredDays))
             {
                 return true;
             }
@@ -579,16 +595,16 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
         }
 
-        private ApplicationUser AssignUser(string userName, string email)
+        private UserProfile AssignUser(string userName, string email)
         {
-            return new ApplicationUser
+            return new UserProfile
             {
                 UserName = userName,
                 Email = email
             };
         } 
          
-        private void GetUserIdentity(ApplicationUser applicationUser)
+        private void GetUserIdentity(UserProfile userProfile)
         { 
             //TODO: to replace using real claims  
             // get userDto's role, organizations, programs, current organization, current program.....
@@ -604,7 +620,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             claims.Add(new Claim("IndustryName", "This is  a very loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong industry name"));
             claims.Add(new Claim("ProgramName", "This is a very looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong program name"));
 
-            SaveClaims(applicationUser.Id, claims);
+            SaveClaims(userProfile.Id, claims);
         }
 
         private void SaveClaims(string userId, IList<Claim> claims)
@@ -718,9 +734,9 @@ namespace Linko.LinkoExchange.Services.Authentication
             return orgnizations.Select(i => i.OrganizationId).ToArray();
         }
 
-        void SendResetPasswordConfirmationEmail(ApplicationUser user)
+        void SendResetPasswordConfirmationEmail(UserProfile userProfile)
         {
-            var code = _userManager.GeneratePasswordResetTokenAsync(user.Id).Result; 
+            var code = _userManager.GeneratePasswordResetTokenAsync(userProfile.Id).Result; 
 
             string baseUrl = GetBaseUrl();
             string link = baseUrl + "?code=" + code;
@@ -733,7 +749,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
             contentReplacements.Add("supportEmail", supportEmail);
 
-            _emailService.SendEmail(new[] { user.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
+            _emailService.SendEmail(new[] { userProfile.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
         }
 
         string GetBaseUrl()

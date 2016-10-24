@@ -12,17 +12,23 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasKey(i => i.AuditLogTemplateId);
 
-            HasKey(i => i.Name);
+            Property(i => i.Name).HasMaxLength(100);
 
-            Property(i => i.TemplateType); 
+            Property(i => i.TemplateType).HasMaxLength(30); 
 
-            Property(i => i.EventCategory);
+            Property(i => i.EventCategory).HasMaxLength(20);
 
-            Property(i => i.EventType);
+            Property(i => i.EventType).HasMaxLength(50);
 
-            Property(i => i.SubjectTemplate); 
+            Property(i => i.SubjectTemplate).HasMaxLength(500); 
 
-            Property(i => i.MessageTemplate); 
-        }
+            Property(i => i.MessageTemplate).IsRequired();
+
+            Property(i => i.CreationDateTimeUtc).IsRequired();
+
+            Property(i => i.LastModicationDateTimeUtc).IsOptional();
+
+            Property(i => i.LastModifierUserId).IsOptional();
+         }
     }
 }

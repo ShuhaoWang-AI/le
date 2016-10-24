@@ -8,13 +8,14 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data
 {
-    public class LinkoExchangeContext : IdentityDbContext<ApplicationUser>
+    public class LinkoExchangeContext : IdentityDbContext<UserProfile>
     {
         #region constructor
 
         public LinkoExchangeContext(string nameOrConnectionString)
             : base(nameOrConnectionString)
         {
+
         }
 
         //public static LinkoExchangeContext Create()
@@ -32,7 +33,9 @@ namespace Linko.LinkoExchange.Data
         public DbSet<Invitation> Invitations { get; set; }
         public DbSet<EmailTemplate> EmailTemplates { get; set; }
         public DbSet<Organization> Organizations { get; set; }
-        public DbSet<UserProfile> UserProfiles { get; set; }
+         
+//        public DbSet<UserProfile> UserProfiles { get; set; } 
+
         public DbSet<UserPasswordHistory> UserPasswordHistories { get; set; }
         public DbSet<OrganizationRegulatoryProgramUser> OrganizationRegulatoryProgramUsers { get; set; }
         public DbSet<UserQuestionAnswer> UserQuestionAnswers { get; set; }
@@ -60,6 +63,8 @@ namespace Linko.LinkoExchange.Data
             }
 
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<UserProfile>().ToTable("tUserProfile"); 
         }
         #endregion
     }

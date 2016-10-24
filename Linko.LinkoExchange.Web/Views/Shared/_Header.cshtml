@@ -37,7 +37,7 @@
             <div class="navbar-custom-menu">
                 @using (Html.BeginForm(actionName: "SignOff", controllerName: "Account", method: FormMethod.Post, htmlAttributes: new { id = "formSignOut", @class = "navbar-right" }))
                 {
-                    @Html.AntiForgeryToken()
+@*                    @Html.AntiForgeryToken()*@
                     <ul class="nav navbar-nav">
                         @* BEGIN User Account Menu *@
                         <li class="dropdown user user-menu">
