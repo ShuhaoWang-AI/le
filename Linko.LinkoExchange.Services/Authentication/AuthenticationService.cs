@@ -189,13 +189,14 @@ namespace Linko.LinkoExchange.Services.Authentication
             var authenticationResult = new AuthenticationResultDto();
             
             var invitationDto = _invitationService.GetInvitation(registrationToken);
+    
             if (invitationDto == null)
             {
                 authenticationResult.Success = false;
                 authenticationResult.Result = AuthenticationResult.InvalidateRegistrationToken;
                 return Task.FromResult(authenticationResult);
             }
-//             
+            
 //            // TODO  check token is expired or not? from organization settings
             var invitationRecipientProgram =
                 _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
@@ -211,6 +212,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Result = AuthenticationResult.ExpiredRegistrationToken;
                 return Task.FromResult(authenticationResult);
             } 
+ 
             
             var applicationUser = AssignUser(userInfo.UserName, userInfo.Email);
             try
@@ -226,7 +228,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 applicationUser.IsInternalAccount = false;
                 applicationUser.AddressLine1 = userInfo.AddressLine1;
                 applicationUser.AddressLine2 = userInfo.AddressLine2;
-                applicationUser.CityName = userInfo.City;
+                applicationUser.CityName = userInfo.CityName;
                 applicationUser.ZipCode = userInfo.ZipCode;
                 applicationUser.IsIdentityProofed = false; 
 
@@ -571,7 +573,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             if (lastestUserPassword == null || lastestUserPassword.UserProfileId == 0)
             {
-                return true;
+                return false;
             }
 
             // Get password expiration setting

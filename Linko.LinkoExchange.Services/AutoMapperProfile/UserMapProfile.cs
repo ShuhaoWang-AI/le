@@ -21,7 +21,7 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
                .ForMember(d => d.IndustryId, o => o.Ignore())
                .ForMember(d => d.IndustryName, o => o.Ignore())
                .ForMember(d => d.Password, o => o.Ignore())
-               .ForMember(d=>d.City,o=>o.Ignore())
+               .ForMember(d=>d.CityName,o=>o.Ignore())
                .ForMember(d => d.AddressLine1, o => o.Ignore())
                .ForMember(d => d.AddressLine2, o => o.Ignore())
                .ForMember(d => d.ZipCode, o => o.Ignore())

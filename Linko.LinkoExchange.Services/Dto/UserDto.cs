@@ -16,7 +16,7 @@
         public bool IsEnabled { get; set; }
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
-        public string City { get; set; }
+        public string CityName { get; set; }
         public string ZipCode { get; set; }
 
 

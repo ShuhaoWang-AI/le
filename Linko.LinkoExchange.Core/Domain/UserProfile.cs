@@ -11,10 +11,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 namespace Linko.LinkoExchange.Core.Domain
 {
     public class UserProfile : IdentityUser
-    {
-        [Key]
-        public string Id { get; set; }
-
+    {  
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserProfileId { get; private set; }
 
