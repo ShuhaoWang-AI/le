@@ -10,7 +10,7 @@ namespace Linko.LinkoExchange.Services.Dto
             get;set;
         }
 
-        public int OragnizationRegulatoryProgramId
+        public int OrganizationRegulatoryProgramId
         {
             get;set;
         }

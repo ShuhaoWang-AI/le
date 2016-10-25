@@ -8,7 +8,7 @@ namespace Linko.LinkoExchange.Core.Domain
     {
         [Key]
         public int OrganizationRegulatoryProgramUserId { get; set; }
-        public int OrganizationRegulatoryProgramId { get; set; }
+        public int OrganizationRegulatoryProgramId { get; set; } 
         public bool IsRegistrationApproved { get; set; }
         public bool IsRegistrationDenied { get; set; }
         public bool IsEnabled { get; set; }
@@ -17,6 +17,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
         public int? LastModifierUserId { get; set; } 
         public int UserProfileId { get;set; }
+        [Required]
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
         public virtual PermissionGroup PermissionGroup { get; set; }
         public int PermissionGroupId { get; set; }

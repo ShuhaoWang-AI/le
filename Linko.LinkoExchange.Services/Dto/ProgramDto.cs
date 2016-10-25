@@ -2,8 +2,9 @@
 {
     public class ProgramDto
     {
-        public int ProgramId { get; set; }
-        public string ProgramName { get; set; }
+        public int RegulatoryProgramId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
 
         //TODO: add other properties
     }

@@ -12,10 +12,13 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
                 .ForAllMembers(opts => opts.Ignore()); //We should be explicitly ignoring each property we don't map to prevent silent failures!
 
             CreateMap<OrganizationRegulatoryProgramUser, OrganizationRegulatoryProgramUserDto>()
-                .ForAllMembers(opts => opts.Ignore()); //We should be explicitly ignoring each property we don't map to prevent silent failures!
+                .ForMember(d => d.UserProfileDto, o => o.Ignore())
+                .ForMember(d => d.OrganizationRegulatoryProgramDto, o => o.MapFrom(s => s.OrganizationRegulatoryProgram)); 
+                //.ForMember(d => d.OrganizationRegulatoryProgramDto, o => o.Ignore()); 
+                
+               // .ForAllMembers(opts => opts.Ignore()); //We should be explicitly ignoring each property we don't map to prevent silent failures!
 
-            CreateMap<OrganizationRegulatoryProgram, OrganizationRegulatoryProgramDto>()
-                .ForMember(d => d.HasSignatory, o => o.Ignore());
+
 
             CreateMap<OrganizationRegulatoryProgramUser, UserDto>()
 

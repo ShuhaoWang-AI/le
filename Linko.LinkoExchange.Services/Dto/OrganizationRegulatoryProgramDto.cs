@@ -18,12 +18,22 @@ namespace Linko.LinkoExchange.Services.Dto
             get;set;
         }
 
+        public ProgramDto RegulatoryProgramDto
+        {
+            get;set;
+        }
+
         public int OrganizationId
         {
             get;set;
         }
 
         public int RegulatorOrganizationId
+        {
+            get;set;
+        }
+
+        public OrganizationDto OrganizationDto
         {
             get;set;
         }

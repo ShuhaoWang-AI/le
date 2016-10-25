@@ -23,7 +23,7 @@ using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.RequestCache;
-using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -82,6 +82,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IUserService, UserService>();
             container.RegisterType<ICurrentUser, CurrentUser>();
             container.RegisterType<IRequestCache, RequestCache>();
+            container.RegisterType<ISessionCache, SessionCache>();
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
@@ -96,8 +97,7 @@ namespace Linko.LinkoExchange.Web
                 typeof(EmailAuditLogService), 
                 typeof(IProgramService),
                 typeof(ISettingService),
-                typeof(IRequestCache)));
-
+                typeof(IRequestCache))); 
 
 
             //var config = new MapperConfiguration(cfg =>
@@ -112,6 +112,8 @@ namespace Linko.LinkoExchange.Web
                 cfg.AddProfile(new InvitationMapProfile());
                 cfg.AddProfile(new OrganizationRegulatoryProgramUserDtoMapProfile());
                 cfg.AddProfile(new OrganizationMapProfile());
+                cfg.AddProfile(new OrganizationRegulatoryProgramMapProfile());
+                cfg.AddProfile(new RegulatoryProgramMapperProfile());
 //                cfg.AddProfile(new SettingMapProfile());
             });
 
