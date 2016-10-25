@@ -2,7 +2,8 @@
 {
     public enum CurrentUserInfo
     {
-        UserID,
+        UserId,
+        UserProfileId,
         UserFullName,
         UserRole,
         OrganizationRegulatoryProgramId,

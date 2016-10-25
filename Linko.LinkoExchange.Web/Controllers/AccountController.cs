@@ -12,6 +12,8 @@ using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Core.Extensions;
+using Linko.LinkoExchange.Services.User;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -25,13 +27,16 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IOrganizationService _organizationService;
         private readonly IRequestCache _requestCache;
         private readonly ILogger _logger;
+        private readonly ICurrentUser _currentUser;
 
-        public AccountController(IAuthenticationService authenticateService, IOrganizationService organizationService, IRequestCache requestCache, ILogger logger)
+        public AccountController(IAuthenticationService authenticateService, IOrganizationService organizationService, 
+            IRequestCache requestCache, ILogger logger, ICurrentUser currentUser)
         {
             _authenticateService = authenticateService;
             _organizationService = organizationService;
             _requestCache = requestCache;
             _logger = logger;
+            _currentUser = currentUser;
         }
 
         #endregion
@@ -200,10 +205,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult PortalDirector()
         {
             //PortalDirectorViewModel model = new PortalDirectorViewModel();
-            int? currentUserId = 1; //(int) _requestCache.GetValue(key: "userId");
-            if (currentUserId.HasValue)
+            string currentUserId = _currentUser.GetClaimsValue(CurrentUserInfo.UserProfileId); ; // .1; //(int) _requestCache.GetValue(key: "userId");
+
+            if (!String.IsNullOrEmpty(currentUserId))
             {
-                var result = _organizationService.GetUserOrganizations(currentUserId.Value);
+                var result = _organizationService.GetUserOrganizations(Convert.ToInt32(currentUserId));
 
                 if (result.Count() == 1)
                 {

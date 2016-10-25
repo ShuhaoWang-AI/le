@@ -88,9 +88,7 @@
     <Compile Include="InvitationServiceTests.cs" />
     <Compile Include="OrganizationServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QuestionAnswerServiceTests.cs" />
     <Compile Include="SettingServiceTests.cs" />
-    <Compile Include="UserServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Linko.LinkoExchange.Core\Linko.LinkoExchange.Core.csproj">

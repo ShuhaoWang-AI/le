@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -32,7 +33,7 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            _questionAnswerService = new QuestionAnswerService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new CurrentUser());
+            _questionAnswerService = new QuestionAnswerService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new CurrentUser(new Services.Authentication.ApplicationUserManager, new SessionCache());
         }
 
         [TestMethod]
