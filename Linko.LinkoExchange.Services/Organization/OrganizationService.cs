@@ -26,6 +26,22 @@ namespace Linko.LinkoExchange.Services
             _mapper = mapper;
         }
 
+        public IEnumerable<OrganizationDto> GetUserOrganizationsByOrgRegProgUserId(int orgRegProgUserId)
+        {
+            var orgDtoList = new List<OrganizationDto>();
+            var orgRegProgramId = _dbContext.OrganizationRegulatoryProgramUsers.Single(o => o.OrganizationRegulatoryProgramUserId == orgRegProgUserId).OrganizationRegulatoryProgramId;
+            var regProgramId = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId).RegulatoryProgramId;
+            var orgList = _dbContext.OrganizationRegulatoryPrograms.Include("Organization").Where(o => o.RegulatoryProgramId == regProgramId);
+            if (orgList != null)
+            {
+                foreach (var org in orgList)
+                {
+                    orgDtoList.Add(_mapper.Map<Core.Domain.Organization, OrganizationDto>(org.Organization));
+                }
+            }
+            return orgDtoList;
+        }
+
         /// <summary>
         /// Get organizations that a user can access to (IU portal, AU portal, content MGT portal)
         /// </summary>

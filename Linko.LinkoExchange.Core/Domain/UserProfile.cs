@@ -44,5 +44,10 @@ namespace Linko.LinkoExchange.Core.Domain
             return userIdentity;
         }
 
+        //Extended Properties
+        public int? CurrentOrgRegProgUserId { get; set; }
+        public int? CurrentOrgRegProgramId { get; set; }
+        public int? CurrentOrganizationId { get; set; }
+
     }
 }

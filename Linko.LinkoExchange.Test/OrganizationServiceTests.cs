@@ -53,5 +53,11 @@ namespace Linko.LinkoExchange.Test
         {
             orgService.UpdateEnableDisableFlag(1, true);
         }
+
+        [TestMethod]
+        public void GetUserOrganizationsByOrgRegProgUserId()
+        {
+            var orgs = orgService.GetUserOrganizationsByOrgRegProgUserId(1);
+        }
     }
 }

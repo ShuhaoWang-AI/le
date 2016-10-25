@@ -5,6 +5,8 @@ namespace Linko.LinkoExchange.Services.Organization
 {
     public interface IOrganizationService
     {
+        IEnumerable<OrganizationDto> GetUserOrganizationsByOrgRegProgUserId(int orgRegProgUserId);
+
         /// <summary>
         /// Get organizations that a user can access to
         /// </summary>

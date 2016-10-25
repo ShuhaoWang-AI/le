@@ -10,10 +10,21 @@ namespace Linko.LinkoExchange.Services.User
 {
     public class CurrentUser : ICurrentUser
     {
-        public int? GetCurrentOrgRegProgramUserId()
+        public void SetCurrentOrgRegProgUserId(int orgRegProgUserId)
         {
-            return HttpContext.Current != null ? HttpContext.Current.User.Identity.GetOrganizationRegulatoryProgramUserId() : (int?)null;
+            if (HttpContext.Current != null)
+                HttpContext.Current.User.Identity.SetCurrentOrgRegProgUserId(orgRegProgUserId);
         }
+
+        public int? GetCurrentOrgRegProgUserId()
+        {
+            return HttpContext.Current != null ? HttpContext.Current.User.Identity.GetOrgRegProgUserId() : (int?)null;
+        }
+
+        //public void SetCurrentOrgRegProgramId(int orgRegProgramId);
+        //public int? GetCurrentOrgRegProgramId();
+        //public void SetCurrentOrganizationId(int organizationId);
+        //public int? GetCurrentOrganizationId();
 
     }
 }

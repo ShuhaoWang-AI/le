@@ -8,6 +8,13 @@ namespace Linko.LinkoExchange.Services.User
 {
     public interface ICurrentUser
     {
-        int? GetCurrentOrgRegProgramUserId();
+        void SetCurrentOrgRegProgUserId(int orgRegProgUserId);
+        int? GetCurrentOrgRegProgUserId();
+        //void SetCurrentOrgRegProgramId(int orgRegProgramId);
+        //int? GetCurrentOrgRegProgramId();
+        //void SetCurrentOrganizationId(int organizationId);
+        //int? GetCurrentOrganizationId();
+
+
     }
 }

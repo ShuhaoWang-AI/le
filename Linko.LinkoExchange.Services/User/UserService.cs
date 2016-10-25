@@ -133,7 +133,7 @@ namespace Linko.LinkoExchange.Services.User
 
                 //Persist modification date and modifier actor
                 user.LastModificationDateTimeUtc = DateTime.UtcNow;
-                user.LastModifierUserId = _currentUser.GetCurrentOrgRegProgramUserId();
+                user.LastModifierUserId = _currentUser.GetCurrentOrgRegProgUserId();
                 _dbContext.SaveChanges();
             }
             else
@@ -155,7 +155,7 @@ namespace Linko.LinkoExchange.Services.User
             OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
             user.IsSignatory = isSignatory;
             user.LastModificationDateTimeUtc = DateTime.UtcNow;
-            user.LastModifierUserId = _currentUser.GetCurrentOrgRegProgramUserId();
+            user.LastModifierUserId = _currentUser.GetCurrentOrgRegProgUserId();
             _dbContext.SaveChanges();
         }
 
@@ -205,7 +205,7 @@ namespace Linko.LinkoExchange.Services.User
 
                 //Persist modification date and modifier actor
                 user.LastModificationDateTimeUtc = DateTime.UtcNow;
-                user.LastModifierUserId = _currentUser.GetCurrentOrgRegProgramUserId();
+                user.LastModifierUserId = _currentUser.GetCurrentOrgRegProgUserId();
                 _dbContext.SaveChanges();
             }
             else

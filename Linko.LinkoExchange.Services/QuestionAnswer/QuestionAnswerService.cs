@@ -95,7 +95,7 @@ namespace Linko.LinkoExchange.Services
                 question = answer.Question;
                 question.Content = questionAnswer.Question.Content;
                 question.LastModificationDateTimeUtc = DateTime.UtcNow;
-                question.LastModifierUserId = _currentUser.GetCurrentOrgRegProgramUserId();
+                question.LastModifierUserId = _currentUser.GetCurrentOrgRegProgUserId();
             }
             else
             {
@@ -151,7 +151,7 @@ namespace Linko.LinkoExchange.Services
                 questionToUpdate.QuestionTypeId = (int)question.QuestionType;
                 questionToUpdate.IsActive = question.IsActive;
                 questionToUpdate.LastModificationDateTimeUtc = DateTime.UtcNow;
-                questionToUpdate.LastModifierUserId = _currentUser.GetCurrentOrgRegProgramUserId();
+                questionToUpdate.LastModifierUserId = _currentUser.GetCurrentOrgRegProgUserId();
 
                 try
                 {
