@@ -74,5 +74,11 @@ namespace Linko.LinkoExchange.Test
                     Content = "Color of your first bike?" });
         }
 
+        [TestMethod]
+        public void GetUsersQuestionAnswers()
+        {
+            var results = _questionAnswerService.GetUsersQuestionAnswers(1, QuestionType.KnowledgeBased);
+        }
+
     }
 }

@@ -44,5 +44,7 @@ namespace Linko.LinkoExchange.Services
         /// </summary>
         /// <param name="userQuestionAnswerId"></param>
         void DeleteQuestionAnswerPair(int userQuestionAnswerId);
+
+        ICollection<QuestionAnswerPairDto> GetUsersQuestionAnswers(int userProfileId, Dto.QuestionType questionType);
     }
 }

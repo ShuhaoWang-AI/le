@@ -277,5 +277,31 @@ namespace Linko.LinkoExchange.Services
                 throw new RuleViolationException("Validation errors", validationIssues);
             }
         }
+
+        public ICollection<QuestionAnswerPairDto> GetUsersQuestionAnswers(int userProfileId, Dto.QuestionType questionType)
+        {
+            var usersQAList = new List<Dto.QuestionAnswerPairDto>();
+            var foundQAs = _dbContext.UserQuestionAnswers.Include(a => a.Question)
+                .Where(a => a.UserProfileId == userProfileId
+                && a.Question.QuestionTypeId == (int)questionType);
+
+            if (foundQAs != null)
+            {
+                foreach (var foundQA in foundQAs)
+                {
+                    var newQADto = new QuestionAnswerPairDto() { Answer = new Dto.AnswerDto(), Question = new Dto.QuestionDto() };
+                    newQADto.Answer.UserQuestionAnswerId = foundQA.UserQuestionAnswerId;
+                    newQADto.Answer.Content = foundQA.Content;
+                    newQADto.Question.QuestionId = foundQA.Question.QuestionId;
+                    newQADto.Question.IsActive = foundQA.Question.IsActive;
+                    newQADto.Question.QuestionType = (Dto.QuestionType)foundQA.Question.QuestionTypeId;
+                    newQADto.Question.Content = foundQA.Question.Content;
+
+                    usersQAList.Add(newQADto);
+
+                }
+            }
+            return usersQAList;
+        }
     }
 }
