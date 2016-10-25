@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
 
-namespace Linko.LinkoExchange.Services
+namespace Linko.LinkoExchange.Services.Invitation
 {
     public interface IInvitationService
     {

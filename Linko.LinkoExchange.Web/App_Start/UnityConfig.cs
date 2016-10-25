@@ -23,6 +23,7 @@ using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.RequestCache;
+using Linko.LinkoExchange.Services.Invitation;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -89,6 +90,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IPermissionService, PermissionService>();
             container.RegisterType<IAuditLogEntry, EmailAuditLogEntryDto>();
             container.RegisterType<IPasswordHasher, PasswordHasher>();
+            container.RegisterType<IRequestCache, RequestCache>();
             container.RegisterType<IAuditLogService, EmailAuditLogService>(new InjectionConstructor(typeof(LinkoExchangeContext)));
             container.RegisterType<IEmailService, LinkoExchangeEmailService>(new InjectionConstructor(typeof(LinkoExchangeContext),
                 typeof(EmailAuditLogService), 

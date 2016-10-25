@@ -50,17 +50,6 @@ namespace Linko.LinkoExchange.Services
             }
 
             return orgs; 
-
-            /*            
-            {
-                new OrganizationDto
-                {
-                    OrganizationId = 1000,
-                    OrganizationName = "Mock organization name"
-                }
-            };
-            return list;
-            */
         }
 
         /// <summary>

@@ -9,7 +9,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (Request.IsAuthenticated)
             {
-                return RedirectToAction(actionName: "Index", controllerName: "User"); // ToDo: change with correct default controller
+                //TODO: Need service to know current portal
+                // if current portal is Authority
+                return RedirectToAction(actionName: "Index", controllerName: "Authority"); 
+                // if current portal is Industry
+                return RedirectToAction(actionName: "Index", controllerName: "Industry"); 
             }
             else
             {

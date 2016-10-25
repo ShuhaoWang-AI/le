@@ -14,6 +14,7 @@
 /// <reference path="jquery.inputmask/jquery.inputmask.bundle.js" />
 /// <reference path="jquery.inputmask/jquery.inputmask.js" />
 /// <reference path="jquery.slimscroll.js" />
+/// <reference path="jquery.unobtrusive-ajax.min.js" />
 /// <reference path="jquery.validate.js" />
 /// <reference path="jquery.validate.unobtrusive.js" />
 /// <reference path="jquery-3.1.1.min.js" />

@@ -117,14 +117,41 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="BoxTitleForgotPassword" xml:space="preserve">
+    <value>Enter your username and we'll send a password reset link to the email address we have on file.</value>
+  </data>
+  <data name="BoxTitleForgotUserName" xml:space="preserve">
+    <value>Enter your email address and we'll send it to you.</value>
+  </data>
+  <data name="BoxTitleSelectAuthority" xml:space="preserve">
+    <value>Select an Authority Portal</value>
+  </data>
+  <data name="BoxTitleSelectIndustry" xml:space="preserve">
+    <value>Select an Industry Portal</value>
+  </data>
+  <data name="ButtonCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ButtonGo" xml:space="preserve">
+    <value>Go</value>
+  </data>
   <data name="ButtonProfile" xml:space="preserve">
     <value>Profile</value>
+  </data>
+  <data name="ButtonResetPassword" xml:space="preserve">
+    <value>Reset Password</value>
+  </data>
+  <data name="ButtonSend" xml:space="preserve">
+    <value>Send</value>
   </data>
   <data name="ButtonSignIn" xml:space="preserve">
     <value>Sign in</value>
   </data>
   <data name="ButtonSignOut" xml:space="preserve">
     <value>Sign out</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email Address</value>
   </data>
   <data name="ForgotPassword" xml:space="preserve">
     <value>Forgot Password</value>
@@ -140,6 +167,12 @@
   </data>
   <data name="RememberMe" xml:space="preserve">
     <value>Remember Me</value>
+  </data>
+  <data name="TitleForgotPassword" xml:space="preserve">
+    <value>Forgot Password</value>
+  </data>
+  <data name="TitleForgotUserName" xml:space="preserve">
+    <value>Forgot User Name</value>
   </data>
   <data name="TitleLinkoExchangeSignIn" xml:space="preserve">
     <value>LinkoExchange Sign In</value>

@@ -9,17 +9,14 @@
 
 <div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-5">
     <div>
-        <h1 class="h2">@ViewBag.SubTitle</h1>
+        <h1 class="h3">@ViewBag.SubTitle</h1>
     </div>
-    <div class="box box-default">
-        @*<div class="box-header with-border">
-                <h3 class="box-title"></h3>
-            </div>*@<!-- /.box-header -->
+    <div class="box box-primary">
         <section id="SignInForm" class="box-body">
             @using (Html.BeginForm(actionName: "SignIn", controllerName: "Account", routeValues: new { ReturnUrl = ViewBag.ReturnUrl }, method: FormMethod.Post, htmlAttributes: new { @class = "form-horizontal", role = "form" }))
             {
-@*                @Html.AntiForgeryToken()*@
-                @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
 
                 <div class="form-group">
                     @Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })
@@ -51,7 +48,7 @@
         <div class="box-footer">
             <div class="form-group">
                 <div class="col-md-offset-2">
-                    @Html.ActionLink(linkText: @Label.ForgotUserName, actionName: "ForgotUser")
+                    @Html.ActionLink(linkText: @Label.ForgotUserName, actionName: "ForgotUserName")
                     <span class="col-xs-offset-1">
                     </span>
                     @Html.ActionLink(linkText: @Label.ForgotPassword, actionName: "ForgotPassword")

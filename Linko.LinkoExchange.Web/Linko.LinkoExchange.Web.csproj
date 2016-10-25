@@ -379,6 +379,8 @@
     <Content Include="Scripts\jquery-3.1.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.1.1.min.map" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -462,6 +464,8 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AuthorityController.cs" />
+    <Compile Include="Controllers\IndustryController.cs" />
     <Compile Include="Mvc\CommonInfoAttribute.cs" />
     <Compile Include="Controllers\CommonController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -473,7 +477,12 @@
     <Compile Include="Mvc\CustomHandleErrorAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\Account\ForgotPasswordViewModel.cs" />
+    <Compile Include="ViewModels\Account\ForgotUserNameViewModel.cs" />
+    <Compile Include="ViewModels\Account\PortalDirectorViewModel.cs" />
+    <Compile Include="ViewModels\Account\RegisterViewModel.cs" />
     <Compile Include="ViewModels\Account\SignInViewModel.cs" />
+    <Compile Include="ViewModels\Shared\ConfirmationViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config">
@@ -491,6 +500,9 @@
     <Content Include="Views\Account\SignIn.cshtml" />
     <Content Include="Views\Shared\Confirmation.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Account\PortalDirector.cshtml" />
+    <Content Include="Views\Account\ForgotPassword.cshtml" />
+    <Content Include="Views\Account\ForgotUserName.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -501,7 +513,9 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="ViewModels\Common\" />
+    <Folder Include="Views\Authority\" />
     <Folder Include="Views\Home\" />
+    <Folder Include="Views\Industry\" />
     <Folder Include="Views\User\" />
   </ItemGroup>
   <ItemGroup>

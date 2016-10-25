@@ -31,7 +31,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Account
     {
         public SigInValidator()
         {
-            //Email
+            //UserName
             RuleFor(x => x.UserName).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
             RuleFor(x => x.UserName.Length).LessThanOrEqualTo(valueToCompare: 256).WithMessage(errorMessage: "{PropertyName} must be less than or equal to 256 characters long.");
 

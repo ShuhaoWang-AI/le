@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.Invitation;
 using AutoMapper;
 using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Data;

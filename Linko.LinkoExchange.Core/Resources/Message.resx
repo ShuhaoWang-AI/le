@@ -138,4 +138,10 @@
   <data name="ExceedMaximumLoginAttempt" xml:space="preserve">
     <value>Your account has been locked because you exceeded the maximum login attempts.</value>
   </data>
+  <data name="EmailNotFound" xml:space="preserve">
+    <value>Email not found.</value>
+  </data>
+  <data name="UserNameNotFound" xml:space="preserve">
+    <value>User name not found.</value>
+  </data>
 </root>

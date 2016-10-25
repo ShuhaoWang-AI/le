@@ -2327,7 +2327,7 @@ a:focus {
 .nav > li > a:active,
 .nav > li > a:focus {
   color: #444;
-  background: #f7f7f7;
+  background: #99c5de;
 }
 /* NAV PILLS */
 .nav-pills > li > a {

@@ -61,11 +61,83 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter your username and we&apos;ll send a password reset link to the email address we have on file..
+        /// </summary>
+        public static string BoxTitleForgotPassword {
+            get {
+                return ResourceManager.GetString("BoxTitleForgotPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter your email address and we&apos;ll send it to you..
+        /// </summary>
+        public static string BoxTitleForgotUserName {
+            get {
+                return ResourceManager.GetString("BoxTitleForgotUserName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select an Authority Portal.
+        /// </summary>
+        public static string BoxTitleSelectAuthority {
+            get {
+                return ResourceManager.GetString("BoxTitleSelectAuthority", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select an Industry Portal.
+        /// </summary>
+        public static string BoxTitleSelectIndustry {
+            get {
+                return ResourceManager.GetString("BoxTitleSelectIndustry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string ButtonCancel {
+            get {
+                return ResourceManager.GetString("ButtonCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go.
+        /// </summary>
+        public static string ButtonGo {
+            get {
+                return ResourceManager.GetString("ButtonGo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Profile.
         /// </summary>
         public static string ButtonProfile {
             get {
                 return ResourceManager.GetString("ButtonProfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset Password.
+        /// </summary>
+        public static string ButtonResetPassword {
+            get {
+                return ResourceManager.GetString("ButtonResetPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Send.
+        /// </summary>
+        public static string ButtonSend {
+            get {
+                return ResourceManager.GetString("ButtonSend", resourceCulture);
             }
         }
         
@@ -84,6 +156,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         public static string ButtonSignOut {
             get {
                 return ResourceManager.GetString("ButtonSignOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Email Address.
+        /// </summary>
+        public static string Email {
+            get {
+                return ResourceManager.GetString("Email", resourceCulture);
             }
         }
         
@@ -129,6 +210,24 @@ namespace Linko.LinkoExchange.Core.Resources {
         public static string RememberMe {
             get {
                 return ResourceManager.GetString("RememberMe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forgot Password.
+        /// </summary>
+        public static string TitleForgotPassword {
+            get {
+                return ResourceManager.GetString("TitleForgotPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forgot User Name.
+        /// </summary>
+        public static string TitleForgotUserName {
+            get {
+                return ResourceManager.GetString("TitleForgotUserName", resourceCulture);
             }
         }
         

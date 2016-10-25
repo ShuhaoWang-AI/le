@@ -1,5 +1,7 @@
-﻿<div class="alert alert-info alert-dismissible">
-    <h4><i class="icon fa fa-info"></i> @ViewBag.SubTitle </h4>
-    @ViewBag.Message
-    @Html.Raw(ViewBag.HtmlStr)
+﻿@using Linko.LinkoExchange.Web.ViewModels.Shared
+@model ConfirmationViewModel
+<div class="alert alert-info alert-dismissible">
+    <h4><i class="icon fa fa-info"></i> @Model.Title </h4>
+    @Model.Message
+    @Html.Raw(Model.HtmlStr)
 </div>

@@ -70,6 +70,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Email not found..
+        /// </summary>
+        public static string EmailNotFound {
+            get {
+                return ResourceManager.GetString("EmailNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your account has been locked because you exceeded the maximum login attempts..
         /// </summary>
         public static string ExceedMaximumLoginAttempt {
@@ -120,6 +129,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         public static string UserAccountDisabled {
             get {
                 return ResourceManager.GetString("UserAccountDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User name not found..
+        /// </summary>
+        public static string UserNameNotFound {
+            get {
+                return ResourceManager.GetString("UserNameNotFound", resourceCulture);
             }
         }
     }

@@ -33,7 +33,8 @@ namespace Linko.LinkoExchange.Web
                 .Include(virtualPath: "~/Scripts/AdminLTE/init.js"));
 
             bundles.Add(new ScriptBundle(virtualPath: "~/bundles/jquery")
-                .Include(virtualPath: "~/Scripts/jquery-{version}.js"));
+                .Include(virtualPath: "~/Scripts/jquery-{version}.js")
+                .Include(virtualPath: "~/Scripts/jquery.unobtrusive-ajax.js"));
 
             bundles.Add(new ScriptBundle(virtualPath: "~/bundles/jqueryval")
                 .Include(virtualPath: "~/Scripts/jquery.validate*"));

@@ -9,7 +9,7 @@ using Linko.LinkoExchange.Core.Validation;
 using System.Data.Entity.Validation;
 using System.Data.Entity.Infrastructure;
 
-namespace Linko.LinkoExchange.Services
+namespace Linko.LinkoExchange.Services.Invitation
 {
     public class InvitationService : IInvitationService
     {
@@ -82,7 +82,7 @@ namespace Linko.LinkoExchange.Services
                         !_dbContext.Invitations.Any(i => i.EmailAddress == inviteDto.EmailAddress))
                     {
                         var newInvitation = _dbContext.Invitations.Create();
-                        newInvitation = _mapper.Map<InvitationDto, Invitation>(inviteDto);
+                        newInvitation = _mapper.Map<InvitationDto, Core.Domain.Invitation>(inviteDto);
                         _dbContext.Invitations.Add(newInvitation);
                         _dbContext.SaveChanges();
 
@@ -128,7 +128,7 @@ namespace Linko.LinkoExchange.Services
             if (invites != null)
             {
                 foreach (var invite in invites)
-                    dtos.Add(_mapper.Map<Invitation, InvitationDto>(invite));
+                    dtos.Add(_mapper.Map<Core.Domain.Invitation, InvitationDto>(invite));
             }
             return dtos;
         }

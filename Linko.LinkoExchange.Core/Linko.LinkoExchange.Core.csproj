@@ -91,6 +91,7 @@
     <Compile Include="Domain\UserProfile.cs" />
     <Compile Include="Domain\UserQuestionAnswer.cs" />
     <Compile Include="Enum\AuthenticationResult.cs" />
+    <Compile Include="Enum\CurrentUserInfo.cs" />
     <Compile Include="Enum\EmailType.cs" />
     <Compile Include="Enum\InvitationError.cs" />
     <Compile Include="Extensions\IdentityExtensions.cs" />
