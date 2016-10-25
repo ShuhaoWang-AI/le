@@ -43,7 +43,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly TokenGenerator _tokenGenerator = new TokenGenerator();
         private readonly IAuditLogService _auditLogService = new CrommerAuditLogService();
 
-        private readonly IDictionary<SettingType, string> _globalSettings;
+        private readonly IDictionary<SettingType, string> _globalSettings; 
 
         public AuthenticationService(ApplicationUserManager userManager,
             ApplicationSignInManager signInManager, 
@@ -89,12 +89,12 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         public IList<Claim> GetClaims()
         {
-            var claims = _sessionCache.GetValue("claims")  as IEnumerable<Claim>;
+            var claims = _sessionCache.GetValue(CacheKey.OwinClaims)  as IEnumerable<Claim>;
             if (claims == null)
             {
-                var userId = _sessionCache.GetValue("userId") as string;
+                var userId = _sessionCache.GetValue(CacheKey.OwinUserId) as string;
                 claims = string.IsNullOrWhiteSpace(userId) ? null : _userManager.GetClaims(userId);
-                _sessionCache.SetValue("claims",claims);
+                _sessionCache.SetValue(CacheKey.OwinClaims, claims);
             }
             return claims?.ToList();
         }
@@ -111,7 +111,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             var currentClaims = GetClaims();
             if (currentClaims != null)
             {
-                var userId = _sessionCache.GetValue("userId") as string;
+                var userId = _sessionCache.GetValue(CacheKey.OwinUserId) as string;
                 var itor = claims.GetEnumerator();
 
                 while (itor.MoveNext())
@@ -491,7 +491,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 signInResultDto.AutehticationResult = AuthenticationResult.Success;
                 signInResultDto.Token = _tokenGenerator.GenToken(userName);
 
-                _sessionCache.SetValue("userId", applicationUser.Id);
+                _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.Id);
 
                 //Set user's claims
                 GetUserIdentity(applicationUser);  
@@ -548,7 +548,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         public void SignOff()
         {
-            var userId = _sessionCache.GetValue("userid") as string;
+            var userId = _sessionCache.GetValue(CacheKey.UserProfileId) as string;
             ClearClaims(userId);
             _sessionCache.Clear();
             _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie); 
@@ -621,15 +621,13 @@ namespace Linko.LinkoExchange.Services.Authentication
             // get userDto's role, organizations, programs, current organization, current program.....
              
             var claims = new List<Claim>(); 
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, "userId"));
-            claims.Add(new Claim(ClaimTypes.Name, "Shuhao Wang"));
-            claims.Add(new Claim(ClaimTypes.Role, "IU-Standard"));
-            claims.Add(new Claim("OrganizationId","12345"));
-            claims.Add(new Claim("ProgramId", "678910"));
-            claims.Add(new Claim("CurrentProgramId", "678910"));
-            claims.Add(new Claim("OrganizationName", "This is a very looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog orgnaization name"));
-            claims.Add(new Claim("IndustryName", "This is  a very loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong industry name"));
-            claims.Add(new Claim("ProgramName", "This is a very looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong program name"));
+             
+            claims.Add(new Claim(CacheKey.OwinUserId, userProfile.Id)); 
+            claims.Add(new Claim(CacheKey.UserProfileId, userProfile.UserProfileId.ToString()));
+            claims.Add(new Claim(CacheKey.FirstName, userProfile.FirstName));
+            claims.Add(new Claim(CacheKey.LastName, userProfile.LastName));
+            claims.Add(new Claim(CacheKey.UserName, userProfile.UserName));
+            claims.Add(new Claim(CacheKey.Email, userProfile.Email));
 
             SaveClaims(userProfile.Id, claims);
         }
@@ -759,6 +757,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             contentReplacements.Add("link", link);
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
             contentReplacements.Add("supportEmail", supportEmail);
+
+            //_sessionCache.SetValue("ddd") ='''sss'
 
             _emailService.SendEmail(new[] { userProfile.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
         }

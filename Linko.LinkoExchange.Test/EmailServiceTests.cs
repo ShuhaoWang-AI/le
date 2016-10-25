@@ -14,7 +14,7 @@ using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.Program;
-using Linko.LinkoExchange.Services.RequestCache;
+using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting; 
 using Moq;
@@ -46,7 +46,9 @@ namespace Linko.LinkoExchange.Test
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             var dbContext = new LinkoExchangeContext(connectionString);
 
-            var emailAuditLogService = new EmailAuditLogService(dbContext);
+            var requestCacheT = Mock.Of<IRequestCache>(i => i.GetValue("Token") == "Fake token");
+
+            var emailAuditLogService = new EmailAuditLogService(dbContext, requestCacheT);
 
             var orpu = Mock.Of<OrganizationRegulatoryProgramUserDto>(
                 p => p.IsEnabled == true &&
@@ -65,17 +67,17 @@ namespace Linko.LinkoExchange.Test
                 .Returns(new List<OrganizationRegulatoryProgramUserDto> {orpu});
 
 
-            var globalSetting = new Dictionary<string, string>();
-            globalSetting.Add("PasswordRequireLength", "6");
-            globalSetting.Add("PasswordRequireDigit", "true");
-            globalSetting.Add("PasswordExpiredDays", "90");
-            globalSetting.Add("NumberOfPasswordsInHistory", "10");
-            globalSetting.Add("supportPhoneNumber", "+1-604-418-3201");
-            globalSetting.Add("supportEmail", "support@linkoExchange.com");
-            globalSetting.Add("SystemEmailEmailAddress", "shuhao.wang@watertrax.com");
-            globalSetting.Add("SystemEmailFirstName", "LinkoExchange ");
-            globalSetting.Add("SystemEmailLastName", "System");
-            globalSetting.Add("EmailServer", "wtraxadc2.watertrax.local");
+            var globalSetting = new Dictionary<SettingType, string>();
+            globalSetting.Add(SettingType.PasswordRequireLength, "6");
+            globalSetting.Add(SettingType.PasswordRequireDigit, "true");
+            globalSetting.Add(SettingType.PasswordExpiredDays, "90");
+            globalSetting.Add(SettingType.PasswordHistoryCount, "10");
+            globalSetting.Add(SettingType.SupportPhoneNumber, "+1-604-418-3201");
+            globalSetting.Add(SettingType.SupportEmail, "support@linkoExchange.com");
+            globalSetting.Add(SettingType.SystemEmailEmailAddress, "shuhao.wang@watertrax.com");
+            globalSetting.Add(SettingType.SystemEmailFirstName, "LinkoExchange ");
+            globalSetting.Add(SettingType.SystemEmailLastName, "System");
+            globalSetting.Add(SettingType.EmailServer, "wtraxadc2.watertrax.local");
 
             var settingService = Mock.Of<ISettingService>(
                 s => s.GetGlobalSettings() == globalSetting
@@ -84,7 +86,8 @@ namespace Linko.LinkoExchange.Test
             var requestCache = Mock.Of<IRequestCache>(i =>
                     i.GetValue("EmailRecipientRegulatoryProgramId") == "1" &&
                     i.GetValue("EmailRecipientOrganizationId") == "2" &&
-                    i.GetValue("EmailRecipientOrganizationId") == "3"
+                    i.GetValue("EmailRecipientOrganizationId") == "3" && 
+                    i.GetValue("Token") == "Fake token ..."
             );
 
             _emailService = new LinkoExchangeEmailService(dbContext, emailAuditLogService, psMockObject.Object,

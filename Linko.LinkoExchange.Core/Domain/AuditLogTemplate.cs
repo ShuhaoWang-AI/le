@@ -38,19 +38,19 @@ namespace Linko.LinkoExchange.Core.Domain
         public string MessageTemplate
         {
             set;get;
-        }
+        } 
 
-        public DateTime CreationDateTimeUtc
+        public DateTimeOffset CreationDateTimeUtc
         {
             get; set; 
             
         }
 
-        public DateTime LastModicationDateTimeUtc
+        public DateTimeOffset? LastModificationDateTimeUtc
         {
             get; set;
         }
 
-        public int LastModifierUserId { get; set; }
+        public int? LastModifierUserId { get; set; }
     }
 }

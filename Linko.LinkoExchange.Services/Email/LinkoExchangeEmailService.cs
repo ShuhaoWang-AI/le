@@ -15,7 +15,7 @@ using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Program;
-using Linko.LinkoExchange.Services.RequestCache;
+using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Settings;
 
 namespace Linko.LinkoExchange.Services.Email
@@ -150,7 +150,7 @@ namespace Linko.LinkoExchange.Services.Email
 
                             RecipientRegulatoryProgramId = user.OrganizationRegulatoryProgramId,
                             RecipientOrganizationId = user.OrganizationRegulatoryProgramDto.OrganizationId,
-                            RecipientRegulatoryOrganizationid = user.OrganizationRegulatoryProgramDto.RegulatorOrganizationId
+                            RecipientRegulatorOrganizationId = user.OrganizationRegulatoryProgramDto.RegulatorOrganizationId
                         };
 
                         emailAuditLogs.Add(auditLog);
@@ -184,11 +184,11 @@ namespace Linko.LinkoExchange.Services.Email
                     RecipientUserName = userName,
 
                     RecipientRegulatoryProgramId =
-                        ValueParser.TryParseInt(_requestCache.GetValue("EmailRecipientRegulatoryProgramId")as string, 0),
+                        ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientRegulatoryProgramId)as string, 0),
                     RecipientOrganizationId =
-                        ValueParser.TryParseInt(_requestCache.GetValue("EmailRecipientOrganizationId")as string, 0),
-                    RecipientRegulatoryOrganizationid =
-                        ValueParser.TryParseInt(_requestCache.GetValue("EmailRecipientOrganizationId") as string, 0)
+                        ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientOrganizationId)as string, 0),
+                    RecipientRegulatorOrganizationId =
+                        ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientRegulatoryOrganizationId) as string, 0)
                 };
 
                 emailAuditLogs.Add(auditLog);

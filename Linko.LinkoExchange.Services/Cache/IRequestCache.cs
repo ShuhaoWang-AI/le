@@ -1,4 +1,4 @@
-﻿namespace Linko.LinkoExchange.Services.RequestCache
+﻿namespace Linko.LinkoExchange.Services.Cache
 {
     public interface IRequestCache
     {

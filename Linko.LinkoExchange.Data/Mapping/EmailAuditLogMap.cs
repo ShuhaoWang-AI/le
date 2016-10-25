@@ -24,7 +24,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(i => i.RecipientRegulatoryProgramId);
             Property(i => i.RecipientOrganizationId);
-            Property(i => i.RecipientRegulatoryOrganizationid);
+            Property(i => i.RecipientRegulatorOrganizationId);
 
             Property(i => i.RecipientUserName); 
             Property(i => i.RecipientFirstName);
@@ -34,6 +34,7 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(i => i.Subject);
             Property(i => i.Body);
             Property(i => i.SentDateTimeUtc);
+            Property(i => i.Token);
         }
     }
 }

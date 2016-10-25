@@ -1,11 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
      public class EmailAuditLog
      {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int EmailAuditLogId
         {
             get;set;
@@ -54,7 +56,7 @@ namespace Linko.LinkoExchange.Core.Domain
         {
             get; set;
         }
-        public int RecipientRegulatoryOrganizationid
+        public int RecipientRegulatorOrganizationId
         {
             get; set;
         }
@@ -87,6 +89,10 @@ namespace Linko.LinkoExchange.Core.Domain
             get; set;
         }
         public DateTime SentDateTimeUtc
+        {
+            get; set;
+        }
+        public string Token
         {
             get; set;
         }

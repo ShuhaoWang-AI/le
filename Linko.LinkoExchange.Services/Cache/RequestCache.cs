@@ -1,6 +1,6 @@
 using System.Web;
 
-namespace Linko.LinkoExchange.Services.RequestCache
+namespace Linko.LinkoExchange.Services.Cache
 {
     public class RequestCache : IRequestCache
     {

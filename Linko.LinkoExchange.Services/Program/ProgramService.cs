@@ -106,6 +106,12 @@ namespace Linko.LinkoExchange.Services.Program
             {
                 organziationRegulatoryProgramUserDtos
                     .AddRange(regulatoryProgramUsers.Select(user => _mapper.Map<OrganizationRegulatoryProgramUserDto>(user)));
+
+                foreach(var u in organziationRegulatoryProgramUserDtos)
+                {
+                    u.UserProfileDto = _userService.GetUserProfileById(u.UserProfileId);
+                }
+
             }
             return organziationRegulatoryProgramUserDtos;
         }

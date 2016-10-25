@@ -123,6 +123,7 @@
     <Compile Include="AutoMapperProfile\RegulatoryProgramMapperProfile.cs" />
     <Compile Include="AutoMapperProfile\SettingMapProfile.cs" />
     <Compile Include="AutoMapperProfile\UserMapProfile.cs" />
+    <Compile Include="Cache\CacheKey.cs" />
     <Compile Include="Cache\ISessionCache.cs" />
     <Compile Include="Cache\SessionCache.cs" />
     <Compile Include="Dto\CrommerAuditLogEntry.cs" />
