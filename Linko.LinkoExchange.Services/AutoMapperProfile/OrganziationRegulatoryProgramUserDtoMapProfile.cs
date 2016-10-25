@@ -34,7 +34,7 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
                .ForMember(d => d.PasswordHash, o => o.Ignore())
 
                .ForMember(d => d.BusinessName, o => o.Ignore())
-               .ForMember(d => d.Jurisdictionid, o => o.Ignore())
+               .ForMember(d => d.JurisdictionId, o => o.Ignore())
                .ForMember(d => d.PhoneExt, o => o.Ignore())
                .ForMember(d => d.IsAccountLocked, o => o.Ignore())
                .ForMember(d => d.IsAccountResetRequired, o => o.Ignore())

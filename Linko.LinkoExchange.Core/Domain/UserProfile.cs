@@ -23,7 +23,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public string AddressLine2 { get; set; }
         public string CityName { get; set; }
         public string ZipCode { get; set; }
-        public string Jurisdictionid { get; set; }
+        public int JurisdictionId { get; set; }
 
         public int? PhoneExt { get; set; }
         public bool IsAccountLocked { get; set; }
