@@ -440,12 +440,15 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return Task.FromResult(signInResultDto);
             }
 
+            var regulatoryList = _organizationService.GetUserRegulatories(applicationUser.UserProfileId);
+            signInResultDto.RegulatoryList = regulatoryList;
+
             // UC-29, 2.c
             // Check if the user is in 'passowrd lock' status
             if (_userManager.IsLockedOut(applicationUser.Id))
             {
                 //TODO: log failed login because of Locked to Audit (UC-2) 
-                signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
+                signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut; 
                 return Task.FromResult(signInResultDto);
             }
 
@@ -454,7 +457,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (applicationUser.IsAccountLocked)
             {
                 //TODO: log failed login because of Locked to Audit (UC-2) 
-                signInResultDto.AutehticationResult = AuthenticationResult.UserIsLocked; 
+                signInResultDto.AutehticationResult = AuthenticationResult.UserIsLocked;
                 return Task.FromResult(signInResultDto);
             }
              
@@ -477,7 +480,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             // Check if user's password is expired or not   
             if (IsUserPasswordExpired(userId, organizationSettings))
             {
-                signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
                 return Task.FromResult(signInResultDto); 
             }
 
