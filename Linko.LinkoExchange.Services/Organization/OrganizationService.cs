@@ -85,9 +85,9 @@ namespace Linko.LinkoExchange.Services
             var orgs = new List<OrganizationDto>();
             foreach (var orpUser in orpUsers)
             {
-                if(orpUser.OrganizationRegulatoryProgram.RegulatorOrganizationId !=null &&
-                    orpUser.OrganizationRegulatoryProgram?.Organization != null &&
-                    ! orgs.Any(i=>i.OrganizationId == orpUser.OrganizationRegulatoryProgram.RegulatorOrganizationId) )
+                if( orpUser.OrganizationRegulatoryProgram?.Organization != null &&
+                    orpUser.OrganizationRegulatoryProgram?.Organization.OrganizationType.Name =="Authority" && 
+                    !orgs.Any(i=>i.OrganizationId == orpUser.OrganizationRegulatoryProgram.RegulatorOrganizationId) )
                     orgs.Add(_mapper.Map<OrganizationDto>(orpUser.OrganizationRegulatoryProgram.Organization)); 
             }
 
