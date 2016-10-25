@@ -93,10 +93,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IAuditLogEntry, EmailAuditLogEntryDto>();
             container.RegisterType<IPasswordHasher, PasswordHasher>();
             container.RegisterType<IRequestCache, RequestCache>();
-            container.RegisterType<IAuditLogService, EmailAuditLogService>(
-                new InjectionConstructor(typeof(LinkoExchangeContext),
-                new InjectionConstructor(typeof(IRequestCache))
-                ));
+            container.RegisterType<IAuditLogService, EmailAuditLogService>();
             container.RegisterType<IEmailService, LinkoExchangeEmailService>(new InjectionConstructor(typeof(LinkoExchangeContext),
                 typeof(EmailAuditLogService), 
                 typeof(IProgramService),
