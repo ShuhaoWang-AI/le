@@ -18,11 +18,13 @@ namespace Linko.LinkoExchange.Test
             Mapper.Initialize(cfg =>
             {
                 cfg.AddProfile(new UserMapProfile());
-                //cfg.AddProfile(new EmailAuditLogEntryMapProfile());
+                cfg.AddProfile(new EmailAuditLogEntryMapProfile());
                 cfg.AddProfile(new InvitationMapProfile());
                 cfg.AddProfile(new OrganizationRegulatoryProgramUserDtoMapProfile());
                 cfg.AddProfile(new OrganizationMapProfile());
-            });
+                cfg.AddProfile(new OrganizationRegulatoryProgramMapProfile());
+                cfg.AddProfile(new RegulatoryProgramMapperProfile());
+            }); 
 
             //Make sure there no methods were missing in the mappings loaded above via profiles
             Mapper.AssertConfigurationIsValid();
@@ -58,6 +60,13 @@ namespace Linko.LinkoExchange.Test
         public void GetUserOrganizationsByOrgRegProgUserId()
         {
             var orgs = orgService.GetUserOrganizationsByOrgRegProgUserId(1);
+        }
+
+        [TestMethod]
+        public void Test_GetUserOrganizations()
+        {
+            var orgs = orgService.GetUserOrganizations(7); 
+
         }
     }
 }
