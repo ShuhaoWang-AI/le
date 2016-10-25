@@ -47,7 +47,7 @@ namespace Linko.LinkoExchange.Services
         /// </summary>
         /// <param name="userId">User id</param>
         /// <returns>Collection of organization</returns>
-        public IEnumerable<OrganizationDto> GetUserOrganizations(int userId)
+        public IEnumerable<OrganizationRegulatoryProgramDto> GetUserOrganizations(int userId)
         { 
             var orpUsers = _dbContext.OrganizationRegulatoryProgramUsers.ToList()
                 .FindAll(u => u.UserProfileId == userId &&
@@ -55,17 +55,16 @@ namespace Linko.LinkoExchange.Services
                             u.IsEnabled == true &&
                             u.IsRegistrationApproved &&
                             u.OrganizationRegulatoryProgram.IsEnabled &&
-                            u.OrganizationRegulatoryProgram.IsRemoved == false);
-                             
-            var orgs = new List<OrganizationDto>();
-            foreach (var orpUser in orpUsers)
+                            u.OrganizationRegulatoryProgram.IsRemoved == false);                             
+            
+            if (orpUsers == null)
             {
-                if (orpUser.OrganizationRegulatoryProgram?.Organization != null &&
-                    !orgs.Any(i => i.OrganizationId == orpUser.OrganizationRegulatoryProgram.OrganizationId))
-                    orgs.Add(_mapper.Map<OrganizationDto>(orpUser.OrganizationRegulatoryProgram.Organization));
+                return null;
             }
-
-            return orgs; 
+            return  orpUsers.Select(i =>
+            {
+                return _mapper.Map<OrganizationRegulatoryProgramDto>(i.OrganizationRegulatoryProgram);
+            }); 
         }
 
         /// <summary>
