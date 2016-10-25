@@ -23,7 +23,10 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool IsRegistrationApproved { get; set; }
         public bool IsRegistrationDenied { get; set; }
         public bool IsRemoved { get; set; } 
-
+        public PermissionGroupDto PermissionGroup
+        {
+            get;set;
+        }
         public UserDto UserProfileDto
         {
             get; set;

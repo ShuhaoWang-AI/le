@@ -19,6 +19,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public int UserProfileId { get;set; }
         [Required]
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
+        [Required]
         public virtual PermissionGroup PermissionGroup { get; set; }
         public int PermissionGroupId { get; set; }
         public DateTimeOffset? CreationDateTimeUtc { get;set; }

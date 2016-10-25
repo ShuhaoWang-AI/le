@@ -24,6 +24,7 @@ namespace Linko.LinkoExchange.Test
                 cfg.AddProfile(new OrganizationMapProfile());
                 cfg.AddProfile(new OrganizationRegulatoryProgramMapProfile());
                 cfg.AddProfile(new RegulatoryProgramMapperProfile());
+                cfg.AddProfile(new PermissionGroupMapProfile());
             }); 
 
             //Make sure there no methods were missing in the mappings loaded above via profiles

@@ -115,6 +115,7 @@ namespace Linko.LinkoExchange.Web
                 cfg.AddProfile(new OrganizationMapProfile());
                 cfg.AddProfile(new OrganizationRegulatoryProgramMapProfile());
                 cfg.AddProfile(new RegulatoryProgramMapperProfile());
+                cfg.AddProfile(new PermissionGroupMapProfile());
 //                cfg.AddProfile(new SettingMapProfile());
             });
 

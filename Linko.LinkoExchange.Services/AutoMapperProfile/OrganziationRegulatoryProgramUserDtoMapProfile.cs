@@ -13,7 +13,9 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
 
             CreateMap<OrganizationRegulatoryProgramUser, OrganizationRegulatoryProgramUserDto>()
                 .ForMember(d => d.UserProfileDto, o => o.Ignore())
+                //.ForMember(d=> d.PermissionGroup, o=>o.MapFrom(s=>s.PermissionGroup))
                 .ForMember(d => d.OrganizationRegulatoryProgramDto, o => o.MapFrom(s => s.OrganizationRegulatoryProgram)); 
+                
                 //.ForMember(d => d.OrganizationRegulatoryProgramDto, o => o.Ignore()); 
                 
                // .ForAllMembers(opts => opts.Ignore()); //We should be explicitly ignoring each property we don't map to prevent silent failures!

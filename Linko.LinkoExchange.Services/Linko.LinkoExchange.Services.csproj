@@ -115,6 +115,7 @@
     <Compile Include="Authentication\IAuthenticationService.cs" />
     <Compile Include="Authentication\IdentityConfig.cs" />
     <Compile Include="Authentication\TokenGenerator.cs" />
+    <Compile Include="AutoMapperProfile\PermissionGroupMapProfile.cs" />
     <Compile Include="AutoMapperProfile\EmailAuditLogEntryMapProfile.cs" />
     <Compile Include="AutoMapperProfile\InvitationMapProfile.cs" />
     <Compile Include="AutoMapperProfile\OrganizationMapProfile.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Dto\OrganizationDto.cs" />
     <Compile Include="Dto\OrganizationSettingDto.cs" />
     <Compile Include="Dto\OrganizationTypeDto.cs" />
+    <Compile Include="Dto\PermissionGroupDto.cs" />
     <Compile Include="Dto\ProgramDto.cs" />
     <Compile Include="Dto\ProgramSettingDto.cs" />
     <Compile Include="Dto\QuestionAnswerDtos.cs" />
