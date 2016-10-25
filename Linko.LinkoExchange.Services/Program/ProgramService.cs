@@ -35,8 +35,8 @@ namespace Linko.LinkoExchange.Services.Program
             {
                 new ProgramDto
                 {
-                    ProgramId = 1000,
-                    ProgramName = "Mock program name"
+                    RegulatoryProgramId = 1000,
+                   Name = "Mock program name"
                 }
             };
 
@@ -54,8 +54,8 @@ namespace Linko.LinkoExchange.Services.Program
             {
                 new ProgramDto
                 {
-                    ProgramId = 1000,
-                    ProgramName = "Mock program name"
+                    RegulatoryProgramId = 1000,
+                    Name = "Mock program name"
                 }
             };
         }

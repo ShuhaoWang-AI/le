@@ -41,8 +41,8 @@ namespace Linko.LinkoExchange.Services.Invitation
             // TODO
             return new ProgramDto
             {
-                ProgramId = 1000,
-                ProgramName = "Mock program name"
+                RegulatoryProgramId = 1000,
+                Name = "Mock program name"
             };
         }
 

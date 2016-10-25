@@ -148,7 +148,7 @@ namespace Linko.LinkoExchange.Services.Email
                             RecipientLastName = user.UserProfileDto.LastName,
                             RecipientUserName = user.UserProfileDto.UserName,
 
-                            RecipientRegulatoryProgramId = user.OragnizationRegulatoryProgramId,
+                            RecipientRegulatoryProgramId = user.OrganizationRegulatoryProgramId,
                             RecipientOrganizationId = user.OrganizationRegulatoryProgramDto.OrganizationId,
                             RecipientRegulatoryOrganizationid = user.OrganizationRegulatoryProgramDto.RegulatorOrganizationId
                         };

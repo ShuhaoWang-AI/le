@@ -118,9 +118,13 @@
     <Compile Include="AutoMapperProfile\EmailAuditLogEntryMapProfile.cs" />
     <Compile Include="AutoMapperProfile\InvitationMapProfile.cs" />
     <Compile Include="AutoMapperProfile\OrganizationMapProfile.cs" />
+    <Compile Include="AutoMapperProfile\OrganizationRegulatoryProgramMapProfile.cs" />
     <Compile Include="AutoMapperProfile\OrganziationRegulatoryProgramUserDtoMapProfile.cs" />
+    <Compile Include="AutoMapperProfile\RegulatoryProgramMapperProfile.cs" />
     <Compile Include="AutoMapperProfile\SettingMapProfile.cs" />
     <Compile Include="AutoMapperProfile\UserMapProfile.cs" />
+    <Compile Include="Cache\ISessionCache.cs" />
+    <Compile Include="Cache\SessionCache.cs" />
     <Compile Include="Dto\CrommerAuditLogEntry.cs" />
     <Compile Include="Dto\EmailAuditLogEntryDto.cs" />
     <Compile Include="Dto\IAuditLogEntry.cs" />
@@ -141,7 +145,7 @@
     <Compile Include="Dto\UserDto.cs" />
     <Compile Include="Dto\SignInResultDto.cs" />
     <Compile Include="Dto\AuthenticationResultDto.cs" />
-    <Compile Include="RequestCache\IRequestCache.cs" />
+    <Compile Include="Cache\IRequestCache.cs" />
     <Compile Include="Email\LinkoExchangeEmailService.cs" />
     <Compile Include="Invitation\IInvitationService.cs" />
     <Compile Include="Invitation\InvitationService.cs" />
@@ -150,7 +154,7 @@
     <Compile Include="Permission\IPermissionService.cs" />
     <Compile Include="Program\IProgramService.cs" />
     <Compile Include="Program\ProgramService.cs" />
-    <Compile Include="RequestCache\RequestCache.cs" />
+    <Compile Include="Cache\RequestCache.cs" />
     <Compile Include="Settings\ISettingService.cs" />
     <Compile Include="Settings\SettingService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

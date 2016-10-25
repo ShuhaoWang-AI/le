@@ -20,6 +20,7 @@ using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
@@ -37,7 +38,8 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IAuthenticationManager _authenticationManager;
         private readonly IPermissionService _permissionService;
         private readonly IEmailService _emailService;
-        private readonly IUserService _userService; 
+        private readonly IUserService _userService;
+        private readonly ISessionCache _sessionCache;
         private readonly TokenGenerator _tokenGenerator = new TokenGenerator();
         private readonly IAuditLogService _auditLogService = new CrommerAuditLogService();
 
@@ -53,7 +55,9 @@ namespace Linko.LinkoExchange.Services.Authentication
             IEmailService emailService,
             IPermissionService permissionService,
             LinkoExchangeContext linkoExchangeContext,
-            IUserService userService )
+            IUserService userService
+           ,ISessionCache sessionCache 
+            )
         {
             if (linkoExchangeContext == null) throw new ArgumentNullException(paramName: "linkoExchangeContext");
             if (userManager == null) throw new ArgumentNullException(paramName: "userManager");
@@ -66,6 +70,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (emailService == null) throw new ArgumentNullException(paramName: "emailService");
             if (permissionService == null) throw new ArgumentNullException(paramName: "permissionService");
             if( userService == null) throw new ArgumentNullException("userService");
+            if (sessionCache == null) throw new ArgumentNullException("sessionCache");
 
             _dbContext = linkoExchangeContext;
             _userManager = userManager;
@@ -79,16 +84,17 @@ namespace Linko.LinkoExchange.Services.Authentication
             _emailService = emailService;
             _permissionService = permissionService;
             _userService = userService;
+            _sessionCache = sessionCache;
         }
 
         public IList<Claim> GetClaims()
         {
-            var claims = HttpContext.Current.Session["claims"] as IEnumerable<Claim>;
+            var claims = _sessionCache.GetValue("claims")  as IEnumerable<Claim>;
             if (claims == null)
             {
-                var userId = HttpContext.Current.Session["userId"] as string;
+                var userId = _sessionCache.GetValue("userId") as string;
                 claims = string.IsNullOrWhiteSpace(userId) ? null : _userManager.GetClaims(userId);
-                HttpContext.Current.Session["claims"] = claims;
+                _sessionCache.SetValue("claims",claims);
             }
             return claims?.ToList();
         }
@@ -105,7 +111,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             var currentClaims = GetClaims();
             if (currentClaims != null)
             {
-                var userId = HttpContext.Current.Session["userId"] as string;
+                var userId = _sessionCache.GetValue("userId") as string;
                 var itor = claims.GetEnumerator();
 
                 while (itor.MoveNext())
@@ -468,8 +474,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList(); 
 
             // UC-29 7.a
-            // Check if user's password is expired or not  
-            //TODO
+            // Check if user's password is expired or not   
             if (IsUserPasswordExpired(userId, organizationSettings))
             {
                 signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
@@ -486,7 +491,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 signInResultDto.AutehticationResult = AuthenticationResult.Success;
                 signInResultDto.Token = _tokenGenerator.GenToken(userName);
 
-                HttpContext.Current.Session["userId"] = applicationUser.Id; 
+                _sessionCache.SetValue("userId", applicationUser.Id);
 
                 //Set user's claims
                 GetUserIdentity(applicationUser);  
@@ -517,8 +522,8 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 // UC-29 5.a, User account is disabled for all industry, or authorty or application admin
                 // If the user is disabled for all programs
-                if (orpus.All(u => u.IsEnabled == false) || //--- user is disabled for all industry and authority 
-                    userProfile.IsInternalAccount == false  //--- user is diabled for Application admin.
+                if (orpus.All(u => u.IsEnabled == false) &&  //--- user is disabled for all industry and authority 
+                    userProfile.IsInternalAccount == false   //--- user is diabled for Application admin.
                 )
                 {
                     // TODO: Log failed login because userProfile disabled to Audit (UC-2)
@@ -543,9 +548,9 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         public void SignOff()
         {
-            var userId = HttpContext.Current.Session["userid"] as string;
+            var userId = _sessionCache.GetValue("userid") as string;
             ClearClaims(userId);
-            HttpContext.Current.Session.Clear();
+            _sessionCache.Clear();
             _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie); 
         }
 
@@ -731,7 +736,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         private IEnumerable<int> GetUserProgramIds(int userId)
         {
             var programs = _programService.GetUserRegulatoryPrograms(userId);
-            return programs.Select(i => i.ProgramId).ToArray();
+            return programs.Select(i => i.RegulatoryProgramId).ToArray();
         }
 
         private IEnumerable<int> GetUserOrganizationIds(int userid)

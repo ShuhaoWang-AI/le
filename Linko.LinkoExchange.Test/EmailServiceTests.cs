@@ -52,7 +52,7 @@ namespace Linko.LinkoExchange.Test
                 p => p.IsEnabled == true &&
                      p.IsRegistrationApproved == true &&
                      p.IsRemoved == false &&
-                     p.OragnizationRegulatoryProgramId == 1 &&
+                     p.OrganizationRegulatoryProgramId == 1 &&
                      p.UserProfileDto == new UserDto
                      {
                          FirstName = "test first name",

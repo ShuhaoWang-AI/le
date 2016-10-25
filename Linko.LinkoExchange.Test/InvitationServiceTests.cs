@@ -7,6 +7,7 @@ using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using Microsoft.AspNet.Identity;
 using System.Configuration;
+using Linko.LinkoExchange.Services.Invitation;
 
 namespace Linko.LinkoExchange.Test
 {
