@@ -24,23 +24,22 @@ namespace Linko.LinkoExchange.Services.User
             _sessionCache = sessionCache;
         }
 
-        public string GetClaimsValue(CurrentUserInfo claimType)
+        public string GetClaimsValue(string claimType)
         {
             string claimsValue = null;
-           
-            var claims = _sessionCache.GetValue("claims") as IEnumerable<Claim>;
+
+            var claims = _sessionCache.GetValue(CacheKey.OwinClaims) as IEnumerable<Claim>;
             if (claims == null)
             {
-                var userId = _sessionCache.GetValue("userId") as string;
+                var userId = _sessionCache.GetValue(CacheKey.UserProfileId) as string;
                 claims = string.IsNullOrWhiteSpace(userId) ? null : _userManager.GetClaims(userId);
-                _sessionCache.SetValue("claims", claims);
+                _sessionCache.SetValue(CacheKey.OwinClaims, claims);
             }
 
             //return claims?.ToList();
             if (claims != null)
             {
-                string typeString = claimType.ToString();
-                var claim = claims.FirstOrDefault(c => c.Type == typeString);
+                var claim = claims.FirstOrDefault(c => c.Type == claimType);
                 if (claim != null)
                     claimsValue = claim.Value;
             }
@@ -48,7 +47,7 @@ namespace Linko.LinkoExchange.Services.User
             return claimsValue;
         }
 
-        public void SetClaimsValue(CurrentUserInfo claimType, string value)
+        public void SetClaimsValue(string claimType, string value)
         {
             //TODO
         }

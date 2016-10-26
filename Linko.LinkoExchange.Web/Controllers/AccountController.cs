@@ -203,7 +203,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             PortalDirectorViewModel model = new PortalDirectorViewModel();
             //PortalDirectorViewModel model = new PortalDirectorViewModel();
-            string currentUserId = _currentUser.GetClaimsValue(CurrentUserInfo.UserProfileId);
+            string currentUserId = _currentUser.GetClaimsValue(CacheKey.UserProfileId); ; // .1; //(int) _requestCache.GetValue(key: "userId");
 
             if (!string.IsNullOrEmpty(currentUserId))
             {

@@ -11,6 +11,7 @@ using Linko.LinkoExchange.Core.Extensions;
 using Linko.LinkoExchange.Services.Dto;
 using AutoMapper;
 using System.Web;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -133,7 +134,7 @@ namespace Linko.LinkoExchange.Services.User
 
                 //Persist modification date and modifier actor
                 user.LastModificationDateTimeUtc = DateTime.UtcNow;
-                user.LastModifierUserId = Convert.ToInt32(_currentUser.GetClaimsValue(Core.Enum.CurrentUserInfo.UserProfileId));
+                user.LastModifierUserId = Convert.ToInt32(_currentUser.GetClaimsValue(CacheKey.UserProfileId));
                 _dbContext.SaveChanges();
             }
             else
@@ -155,7 +156,7 @@ namespace Linko.LinkoExchange.Services.User
             OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
             user.IsSignatory = isSignatory;
             user.LastModificationDateTimeUtc = DateTime.UtcNow;
-            user.LastModifierUserId = Convert.ToInt32(_currentUser.GetClaimsValue(Core.Enum.CurrentUserInfo.UserProfileId));
+            user.LastModifierUserId = Convert.ToInt32(_currentUser.GetClaimsValue(CacheKey.UserProfileId));
             _dbContext.SaveChanges();
         }
 
@@ -205,7 +206,7 @@ namespace Linko.LinkoExchange.Services.User
 
                 //Persist modification date and modifier actor
                 user.LastModificationDateTimeUtc = DateTime.UtcNow;
-                user.LastModifierUserId = Convert.ToInt32(_currentUser.GetClaimsValue(Core.Enum.CurrentUserInfo.UserProfileId));
+                user.LastModifierUserId = Convert.ToInt32(_currentUser.GetClaimsValue(CacheKey.UserProfileId));
                 _dbContext.SaveChanges();
             }
             else

@@ -9,8 +9,8 @@ namespace Linko.LinkoExchange.Services.User
 {
     public interface ICurrentUser
     {
-        string GetClaimsValue(CurrentUserInfo claimType);
-        void SetClaimsValue(CurrentUserInfo claimType, string value);
+        string GetClaimsValue(string claimType);
+        void SetClaimsValue(string claimType, string value);
         void SetClaimsForOrgRegProgramSelection(int orgRegProgId);
     }
 }

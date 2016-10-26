@@ -92,7 +92,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             var claims = _sessionCache.GetValue(CacheKey.OwinClaims)  as IEnumerable<Claim>;
             if (claims == null)
             {
-                var userId = _sessionCache.GetValue(CacheKey.OwinUserId) as string;
+                var userId = _sessionCache.GetValue(CacheKey.UserProfileId) as string;
                 claims = string.IsNullOrWhiteSpace(userId) ? null : _userManager.GetClaims(userId);
                 _sessionCache.SetValue(CacheKey.OwinClaims, claims);
             }

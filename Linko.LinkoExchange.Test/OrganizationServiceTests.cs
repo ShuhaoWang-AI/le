@@ -5,6 +5,7 @@ using Linko.LinkoExchange.Data;
 using AutoMapper;
 using Linko.LinkoExchange.Services.AutoMapperProfile;
 using System.Configuration;
+using Linko.LinkoExchange.Services.User;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -35,7 +36,7 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            orgService = new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance);
+            //orgService = new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance, new CurrentUser());
         }
 
         [TestMethod]

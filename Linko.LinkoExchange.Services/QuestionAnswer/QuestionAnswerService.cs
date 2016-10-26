@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Services
 {
@@ -95,7 +96,7 @@ namespace Linko.LinkoExchange.Services
                 question = answer.Question;
                 question.Content = questionAnswer.Question.Content;
                 question.LastModificationDateTimeUtc = DateTime.UtcNow;
-                question.LastModifierUserId = Convert.ToInt32(_currentUser.GetClaimsValue(Core.Enum.CurrentUserInfo.UserProfileId));
+                question.LastModifierUserId = Convert.ToInt32(_currentUser.GetClaimsValue(CacheKey.UserProfileId));
             }
             else
             {
@@ -151,7 +152,7 @@ namespace Linko.LinkoExchange.Services
                 questionToUpdate.QuestionTypeId = (int)question.QuestionType;
                 questionToUpdate.IsActive = question.IsActive;
                 questionToUpdate.LastModificationDateTimeUtc = DateTime.UtcNow;
-                questionToUpdate.LastModifierUserId = Convert.ToInt32(_currentUser.GetClaimsValue(Core.Enum.CurrentUserInfo.UserProfileId));
+                questionToUpdate.LastModifierUserId = Convert.ToInt32(_currentUser.GetClaimsValue(CacheKey.UserProfileId));
 
                 try
                 {
