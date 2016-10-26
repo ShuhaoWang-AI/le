@@ -15,13 +15,14 @@
         public static string EmailRecipientOrganizationId = "EmailRecipientOrganizationId";
         public static string EmailRecipientRegulatoryOrganizationId = "EmailRecipientRegulatoryOrganizationId";
         public static string EmailSenderUserProfileId = "EmailSenderUserProfileId";
-        public static string EmailRecipientUserProfileId = "EmailRecipientUserProfileId"; 
+        public static string EmailRecipientUserProfileId = "EmailRecipientUserProfileId";
 
-        internal static string UserRole;
-        internal static string RegulatoryProgramName;
-        internal static string OrganizationRegulatoryProgramId;
-        internal static string OrganizationName;
-        internal static string OrganizationId;
-        internal static string PortalName;
+        public static string UserRole;
+        public static string RegulatoryProgramName;
+        public static string OrganizationRegulatoryProgramId;
+        public static string OrganizationRegulatoryProgramUserId;
+        public static string OrganizationName;
+        public static string OrganizationId;
+        public static string PortalName;
     }
 }
