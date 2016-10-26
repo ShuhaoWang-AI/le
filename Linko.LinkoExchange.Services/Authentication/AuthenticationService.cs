@@ -548,6 +548,56 @@ namespace Linko.LinkoExchange.Services.Authentication
             return true;
         }
 
+        public string GetClaimsValue(string claimType)
+        {
+            string claimsValue = null;
+
+            var claims = GetClaims();
+
+            //return claims?.ToList();
+            if (claims != null)
+            {
+                var claim = claims.FirstOrDefault(c => c.Type == claimType);
+                if (claim != null)
+                    claimsValue = claim.Value;
+            }
+
+            return claimsValue;
+        }
+
+        public void SetClaimsForOrgRegProgramSelection(int orgRegProgId, int permissionGroupId)
+        {
+            //We already have: UserId, UserProfileId, UserFullName,
+            var userProfileId = Convert.ToInt32(GetClaimsValue(CacheKey.UserProfileId));
+
+            //Now we set UserRole, OrganizationRegulatoryProgramId, OrganizationName, OrgRegProgUserId, PortalName
+            //UserRole <=> PermissionGroup.Name
+            //PortalName <=> OrganizationType.Name
+
+            var orgRegProgUser = _dbContext.OrganizationRegulatoryProgramUsers.Include("OrganizationRegulatoryProgram.RegulatoryProgram")
+                .Single(o => o.UserProfileId == userProfileId && o.OrganizationRegulatoryProgramId == orgRegProgId
+                && o.PermissionGroupId == permissionGroupId);
+            var orgRegProgUserId = orgRegProgUser.OrganizationRegulatoryProgramUserId;
+            var orgRegProgramId = orgRegProgUser.OrganizationRegulatoryProgramId;
+            var regProgramName = orgRegProgUser.OrganizationRegulatoryProgram.RegulatoryProgram.Name;
+            var userRole = _dbContext.PermissionGroups.Single(p => p.PermissionGroupId == permissionGroupId).Name;
+            var organization = _dbContext.OrganizationRegulatoryPrograms.Include("Organization.OrganizationType")
+                .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId).Organization;
+            var organizationName = organization.Name;
+            var organizationId = organization.OrganizationId;
+            var portalName = organization.OrganizationType.Name;
+
+            var claims = new Dictionary<string, string>();
+            claims.Add(CacheKey.UserRole, userRole);
+            claims.Add(CacheKey.RegulatoryProgramName, regProgramName);
+            claims.Add(CacheKey.OrganizationRegulatoryProgramId, orgRegProgramId.ToString());
+            claims.Add(CacheKey.OrganizationName, organizationName);
+            claims.Add(CacheKey.OrganizationId, organizationId.ToString());
+            claims.Add(CacheKey.PortalName, portalName);
+
+            SetCurrentUserClaims(claims);
+        }
+
         public void SignOff()
         {
             var userId = _sessionCache.GetValue(CacheKey.UserProfileId) as string;

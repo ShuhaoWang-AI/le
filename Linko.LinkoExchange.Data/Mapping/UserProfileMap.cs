@@ -29,10 +29,6 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(i => i.IsInternalAccount);
             Property(i => i.IsIdentityProofed);
 
-            Ignore(i => i.CurrentOrganizationId);
-            Ignore(i => i.CurrentOrgRegProgramId);
-            Ignore(i => i.CurrentOrgRegProgUserId);
-
         }
     }
 }

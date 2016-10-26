@@ -10,16 +10,18 @@ namespace Linko.LinkoExchange.Core.Extensions
 {
     public static class IdentityExtensions
     {
-        public static void SetCurrentOrgRegProgUserId(this IIdentity identity, int orgRegProgUserId)
+        public static string UserProfileId(this IIdentity identity)
         {
-            ((ClaimsIdentity)identity).AddClaim(new Claim("OrgRegProgUserId", orgRegProgUserId.ToString()));
+            var claim = ((ClaimsIdentity)identity).FindFirst("UserProfileId");
+            // Test for null to avoid issues during local testing
+            return (claim != null) ? claim.Value : string.Empty;
         }
 
-        public static int GetOrgRegProgUserId(this IIdentity identity)
+        public static string UserFullName(this IIdentity identity)
         {
-            var claim = ((ClaimsIdentity) identity).FindFirst("OrgRegProgUserId");
+            var claim = ((ClaimsIdentity)identity).FindFirst("UserFullName");
             // Test for null to avoid issues during local testing
-            return (claim != null) ? Convert.ToInt32(claim.Value) : -1;
+            return (claim != null) ? claim.Value : string.Empty;
         }
     }
 }

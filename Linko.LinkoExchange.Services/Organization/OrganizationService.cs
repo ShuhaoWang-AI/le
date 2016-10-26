@@ -49,7 +49,7 @@ namespace Linko.LinkoExchange.Services
 
         public IEnumerable<OrganizationRegulatoryProgramDto> GetUserOrganizations()
         {
-            int userProfileId = Convert.ToInt32(_currentUser.GetClaimsValue(CacheKey.UserProfileId));
+            int userProfileId = Convert.ToInt32(_currentUser.UserProfileId());
             return GetUserOrganizations(userProfileId);
         }
 

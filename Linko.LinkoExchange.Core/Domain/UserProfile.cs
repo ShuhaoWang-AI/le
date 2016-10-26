@@ -39,15 +39,13 @@ namespace Linko.LinkoExchange.Core.Domain
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
             var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
             // Add custom user claims here
-            //            userIdentity.AddClaim(new Claim("OrganizationRegulatoryProgramUserId", this.OrganizationRegulatoryProgramUserId.ToString()));
+            userIdentity.AddClaim(new Claim("UserFullName", this.FirstName + " " + this.LastName));
+            userIdentity.AddClaim(new Claim("UserProfileId", this.UserProfileId.ToString()));
+            userIdentity.AddClaim(new Claim("UserName", this.UserName));
+            userIdentity.AddClaim(new Claim("Email", this.Email));
 
             return userIdentity;
         }
-
-        //Extended Properties 
-        public int? CurrentOrgRegProgUserId { get; set; }
-        public int? CurrentOrgRegProgramId { get; set; }
-        public int? CurrentOrganizationId { get; set; }
 
     }
 }

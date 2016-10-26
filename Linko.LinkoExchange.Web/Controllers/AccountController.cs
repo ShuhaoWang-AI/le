@@ -15,6 +15,7 @@ using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.ViewModels.Account;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
+using Linko.LinkoExchange.Core.Extensions;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -28,7 +29,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IOrganizationService _organizationService;
         private readonly IRequestCache _requestCache;
         private readonly ILogger _logger;
-        private readonly ICurrentUser _currentUser;
+        //private readonly ICurrentUser _currentUser;
 
         public AccountController(IAuthenticationService authenticateService, IOrganizationService organizationService, 
             IRequestCache requestCache, ILogger logger, ICurrentUser currentUser)
@@ -37,7 +38,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _organizationService = organizationService;
             _requestCache = requestCache;
             _logger = logger;
-            _currentUser = currentUser;
+            //_currentUser = currentUser;
         }
 
         #endregion
@@ -203,7 +204,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             PortalDirectorViewModel model = new PortalDirectorViewModel();
             //PortalDirectorViewModel model = new PortalDirectorViewModel();
-            string currentUserId = _currentUser.GetClaimsValue(CacheKey.UserProfileId); ; // .1; //(int) _requestCache.GetValue(key: "userId");
+            string currentUserId = "1"; //_currentUser.GetClaimsValue(CacheKey.UserProfileId);
+            string userFullName = HttpContext.User.Identity.UserFullName();
 
             if (!string.IsNullOrEmpty(currentUserId))
             {

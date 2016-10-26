@@ -14,5 +14,11 @@
         public static string EmailRecipientRegulatoryProgramId = "EmailRecipientRegulatoryProgramId";
         public static string EmailRecipientOrganizationId = "EmailRecipientOrganizationId";
         public static string EmailRecipientRegulatoryOrganizationId = "EmailRecipientRegulatoryOrganizationId";
+        internal static string UserRole;
+        internal static string RegulatoryProgramName;
+        internal static string OrganizationRegulatoryProgramId;
+        internal static string OrganizationName;
+        internal static string OrganizationId;
+        internal static string PortalName;
     }
 }

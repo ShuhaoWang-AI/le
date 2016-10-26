@@ -96,7 +96,7 @@ namespace Linko.LinkoExchange.Services
                 question = answer.Question;
                 question.Content = questionAnswer.Question.Content;
                 question.LastModificationDateTimeUtc = DateTime.UtcNow;
-                question.LastModifierUserId = Convert.ToInt32(_currentUser.GetClaimsValue(CacheKey.UserProfileId));
+                question.LastModifierUserId = Convert.ToInt32(_currentUser.UserProfileId());
             }
             else
             {
@@ -152,7 +152,7 @@ namespace Linko.LinkoExchange.Services
                 questionToUpdate.QuestionTypeId = (int)question.QuestionType;
                 questionToUpdate.IsActive = question.IsActive;
                 questionToUpdate.LastModificationDateTimeUtc = DateTime.UtcNow;
-                questionToUpdate.LastModifierUserId = Convert.ToInt32(_currentUser.GetClaimsValue(CacheKey.UserProfileId));
+                questionToUpdate.LastModifierUserId = Convert.ToInt32(_currentUser.UserProfileId());
 
                 try
                 {

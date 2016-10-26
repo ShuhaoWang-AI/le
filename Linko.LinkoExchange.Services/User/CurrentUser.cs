@@ -1,5 +1,6 @@
 ﻿using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Extensions;
+using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Microsoft.AspNet.Identity;
@@ -15,47 +16,13 @@ namespace Linko.LinkoExchange.Services.User
 {
     public class CurrentUser : ICurrentUser
     {
-        private readonly ApplicationUserManager _userManager;
-        private readonly ISessionCache _sessionCache;
-
-        public CurrentUser(ApplicationUserManager userManage, ISessionCache sessionCache)
+        public int UserProfileId()
         {
-            _userManager = userManage;
-            _sessionCache = sessionCache;
+            if (HttpContext.Current != null)
+                return Convert.ToInt32(HttpContext.Current.User.Identity.UserProfileId());
+            else
+                throw new Exception("ERROR: HttpContext.Current does not exist");
+
         }
-
-        public string GetClaimsValue(string claimType)
-        {
-            string claimsValue = null;
-
-            var claims = _sessionCache.GetValue(CacheKey.OwinClaims) as IEnumerable<Claim>;
-            if (claims == null)
-            {
-                var userId = _sessionCache.GetValue(CacheKey.UserProfileId) as string;
-                claims = string.IsNullOrWhiteSpace(userId) ? null : _userManager.GetClaims(userId);
-                _sessionCache.SetValue(CacheKey.OwinClaims, claims);
-            }
-
-            //return claims?.ToList();
-            if (claims != null)
-            {
-                var claim = claims.FirstOrDefault(c => c.Type == claimType);
-                if (claim != null)
-                    claimsValue = claim.Value;
-            }
-
-            return claimsValue;
-        }
-
-        public void SetClaimsValue(string claimType, string value)
-        {
-            //TODO
-        }
-
-        public void SetClaimsForOrgRegProgramSelection(int orgRegProgId)
-        {
-            //TODO
-        }
-
     }
 }

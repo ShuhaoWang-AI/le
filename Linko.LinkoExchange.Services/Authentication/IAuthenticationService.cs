@@ -55,5 +55,9 @@ namespace Linko.LinkoExchange.Services.Authentication
         IList<Claim> GetClaims();
         //sign off
         void SignOff();
+
+        void SetClaimsForOrgRegProgramSelection(int orgRegProgId, int permissionGroupId);
+
+        string GetClaimsValue(string claimType);
     }
 }
