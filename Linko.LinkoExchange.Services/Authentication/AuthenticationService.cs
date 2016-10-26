@@ -21,6 +21,7 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Cache;
+using System.Configuration;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
@@ -42,6 +43,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly ISessionCache _sessionCache;
         private readonly TokenGenerator _tokenGenerator = new TokenGenerator();
         private readonly IAuditLogService _auditLogService = new CrommerAuditLogService();
+        private readonly IPasswordHasher _passwordHasher;
 
         private readonly IDictionary<SettingType, string> _globalSettings; 
 
@@ -55,8 +57,9 @@ namespace Linko.LinkoExchange.Services.Authentication
             IEmailService emailService,
             IPermissionService permissionService,
             LinkoExchangeContext linkoExchangeContext,
-            IUserService userService
-           ,ISessionCache sessionCache 
+            IUserService userService,
+            ISessionCache sessionCache,
+            IPasswordHasher passwordHasher
             )
         {
             if (linkoExchangeContext == null) throw new ArgumentNullException(paramName: "linkoExchangeContext");
@@ -85,6 +88,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             _permissionService = permissionService;
             _userService = userService;
             _sessionCache = sessionCache;
+            _passwordHasher = passwordHasher;
         }
 
         public IList<Claim> GetClaims()
@@ -337,57 +341,79 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="resetPasswordToken">The reset password token</param>
         /// <param name="newPassword">The new password</param>
         /// <returns></returns>
-        public async Task<AuthenticationResultDto> ResetPasswordAsync(string email, string resetPasswordToken,
-            string newPassword)
+        public async Task<AuthenticationResultDto> ResetPasswordAsync(string resetPasswordToken, int userQuestionAnswerId, 
+            string answer, int attemptCount, string newPassword)
         {
-            AuthenticationResultDto authenticationResult = new AuthenticationResultDto();
-            try
+            int userProfileId = Convert.ToInt32(_sessionCache.GetValue(CacheKey.UserProfileId));
+            int orgRegProgUserId = Convert.ToInt32(_sessionCache.GetValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            int orgRegProgramId = Convert.ToInt32(_sessionCache.GetValue(CacheKey.OrganizationRegulatoryProgramId));
+            string passwordHash = _passwordHasher.HashPassword(newPassword);
+            string answerHash = _passwordHasher.HashPassword(answer);
+            var organizationIds = GetUserOrganizationIds(userProfileId);
+            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
+            int resetPasswordTokenValidateInterval = Convert.ToInt32(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"]);
+
+            var authenticationResult = new AuthenticationResultDto();
+           
+            
+            var emailAuditLog = _dbContext.EmailAuditLog.SingleOrDefault(e => e.Token == resetPasswordToken);
+            if (emailAuditLog == null)
+                throw new Exception(string.Format("ERROR: Cannot find email audit log associated with token={0}", resetPasswordToken));
+            DateTimeOffset tokenCreated = emailAuditLog.SentDateTimeUtc;
+            if (DateTimeOffset.Now.AddHours(-resetPasswordTokenValidateInterval) > tokenCreated)
             {
-                // Step 1: Determine if the user by email address exists 
-                var applicationUser = await _userManager.FindByEmailAsync(email);
-                if (applicationUser == null)
-                {
-                    authenticationResult.Success = false;
-                    authenticationResult.Result = AuthenticationResult.UserNotFound;
-                }
-                else if (applicationUser.EmailConfirmed == false)
-                {
-                    authenticationResult.Success = false;
-                    authenticationResult.Result = AuthenticationResult.EmailIsNotConfirmed;
-                }
-                else
-                {
-                    var userId = applicationUser.UserProfileId; 
-                    var organizationIds = GetUserOrganizationIds(userId);
+                //Check token expiry (5.1.a)
 
-                    var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList(); 
-
-                    SetPasswordPolicy(organizationSettings); 
-
-                    // Step 2: reset the password
-                    var identityResult =
-                        await _userManager.ResetPasswordAsync(applicationUser.Id, resetPasswordToken, newPassword);
-
-                    if (identityResult.Succeeded)
-                    {
-                        authenticationResult.Success = true;
-                    }
-                    else
-                    {
-                        authenticationResult.Success = false;
-                        authenticationResult.Errors = identityResult.Errors;
-                    }
-                }
-
-                return authenticationResult;
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.ExpiredRegistrationToken;
             }
-            catch (Exception ex)
+            else if (!(_dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content == answerHash))
             {
-                var errors = new List<string> {ex.Message};
-                authenticationResult.Errors = errors;
+                //Check hashed answer (5.3.a)
+
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.IncorrectAnswerToQuestion;
+
+                //3rd incorrect attempt (5.3.b) => lockout
+                if (attemptCount == 3) //Which setting? Web.config?
+                {
+                    _userService.LockUnlockUserAccount(userProfileId, true);
+                    //Get all associated authorities
+                    List<string> authorityList = new List<string>();
+                    var userOrgs = _organizationService.GetUserOrganizationsByOrgRegProgUserId(orgRegProgUserId);
+                    foreach (var org in userOrgs)
+                    {
+                        if (org.OrganizationType.Name == "Authority")// Make sure get regulator industries
+                        {
+                            var email = _settingService.GetOrganizationSettingsById(org.OrganizationId) 
+                                .ProgramSettings.Single(s => s.OrgRegProgId == orgRegProgramId)
+                                .Settings.Single(s => s.Type == SettingType.SupportEmail).Value;
+                            authorityList.Add(string.Format("{0} {1} {2}", org.OrganizationName, email, org.PhoneNumber));
+                        }
+                    }
+                    authenticationResult.Errors = authorityList;
+
+                }
+            }
+            else if (IsValidPasswordCheckInHistory(passwordHash, userProfileId, organizationSettings))
+            {
+                //Password used before (6.a)
+
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
+                authenticationResult.Errors = new string[] { "Can not use old password." };
+            }
+            else
+            {
+
+                //Password not meet pass requirements? -- done at View level via PasswordValidator/data annotations
+
+                _userService.SetHashedPassword(userProfileId, passwordHash);
+                authenticationResult.Success = true;
             }
 
             return authenticationResult;
+
         }
 
         /// <summary>
@@ -398,11 +424,12 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// </summary>
         /// <param name="email">The user address </param>
         /// <returns></returns>
-        public async Task<AuthenticationResultDto> RequestResetPassword(string email)
+        public async Task<AuthenticationResultDto> RequestResetPassword(string username)
         {
             AuthenticationResultDto authenticationResult = new AuthenticationResultDto();
 
-            var user = _userManager.FindByEmail(email);
+            //var user = _userManager.FindByEmail(email);
+            var user = _dbContext.Users.SingleOrDefault(u => u.UserName == username);
             if(user == null)
             {
                 authenticationResult.Success = false;  
@@ -564,7 +591,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             return claimsValue;
         }
 
-        public void SetClaimsForOrgRegProgramSelection(int orgRegProgId, int permissionGroupId)
+        public void SetClaimsForOrgRegProgramSelection(int orgRegProgId)
         {
             //We already have: UserId, UserProfileId, UserFullName,
             var userProfileId = Convert.ToInt32(GetClaimsValue(CacheKey.UserProfileId));
@@ -574,10 +601,12 @@ namespace Linko.LinkoExchange.Services.Authentication
             //PortalName <=> OrganizationType.Name
 
             var orgRegProgUser = _dbContext.OrganizationRegulatoryProgramUsers.Include("OrganizationRegulatoryProgram.RegulatoryProgram")
-                .Single(o => o.UserProfileId == userProfileId && o.OrganizationRegulatoryProgramId == orgRegProgId
-                && o.PermissionGroupId == permissionGroupId);
+                .SingleOrDefault(o => o.UserProfileId == userProfileId && o.OrganizationRegulatoryProgramId == orgRegProgId);
+            if (orgRegProgUser == null)
+                throw new Exception(string.Format("ERROR: UserProfileId={0} does not have access to Organization Regulatory Program={1}.", userProfileId, orgRegProgId));
+
+            var permissionGroupId = orgRegProgUser.PermissionGroupId;
             var orgRegProgUserId = orgRegProgUser.OrganizationRegulatoryProgramUserId;
-            var orgRegProgramId = orgRegProgUser.OrganizationRegulatoryProgramId;
             var regProgramName = orgRegProgUser.OrganizationRegulatoryProgram.RegulatoryProgram.Name;
             var userRole = _dbContext.PermissionGroups.Single(p => p.PermissionGroupId == permissionGroupId).Name;
             var organization = _dbContext.OrganizationRegulatoryPrograms.Include("Organization.OrganizationType")
@@ -589,7 +618,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             var claims = new Dictionary<string, string>();
             claims.Add(CacheKey.UserRole, userRole);
             claims.Add(CacheKey.RegulatoryProgramName, regProgramName);
-            claims.Add(CacheKey.OrganizationRegulatoryProgramId, orgRegProgramId.ToString());
+            claims.Add(CacheKey.OrganizationRegulatoryProgramUserId, orgRegProgUserId.ToString());
+            claims.Add(CacheKey.OrganizationRegulatoryProgramId, orgRegProgId.ToString());
             claims.Add(CacheKey.OrganizationName, organizationName);
             claims.Add(CacheKey.OrganizationId, organizationId.ToString());
             claims.Add(CacheKey.PortalName, portalName);

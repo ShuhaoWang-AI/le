@@ -427,8 +427,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             //TODO: Call proper service and replace following code accordingly... 
-            // AuthenticationResultDto ResetPassword (model.Token, UserQuestionAnswerId:  model.Id, model.answer, model.FailedCount, model.Password);
-            var resultFromService = new AuthenticationResultDto();
+            //AuthenticationResultDto ResetPassword (model.Token, UserQuestionAnswerId:  model.Id, model.answer, model.FailedCount, model.Password);
+            var resultFromService = await _authenticateService.ResetPasswordAsync(model.Token, model.Id, model.Answer, model.FailedCount, model.Password);
+
             resultFromService.Errors = new List<string> { "You cannot use the last <?> passwords." };
             resultFromService.Result = AuthenticationResult.CanNotUseOldPassword;
 

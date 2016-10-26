@@ -16,6 +16,7 @@
         CanNotUseOldPassword,
         InvalidateRegistrationToken,
         ExpiredRegistrationToken,
-        AccountIsNotAssociated
+        AccountIsNotAssociated,
+        IncorrectAnswerToQuestion
     }
 }

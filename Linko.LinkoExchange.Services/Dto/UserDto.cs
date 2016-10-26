@@ -25,7 +25,7 @@ namespace Linko.LinkoExchange.Services.Dto
         
         public string Email { get; set; }
         public string OldEmailAddress { get; set; }
-        public string EmailConfirmed { get; set; }
+        public bool EmailConfirmed { get; set; }
         public string PasswordHash { get; set; } 
         public string PhoneNumber { get; set; } 
         public DateTime LockoutEndDateUtc { get; set; } 

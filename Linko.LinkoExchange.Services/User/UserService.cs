@@ -197,6 +197,20 @@ namespace Linko.LinkoExchange.Services.User
             }
         }
 
+        public void LockUnlockUserAccount(int userProfileId, bool isLocked)
+        {
+            var user = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
+            user.IsAccountLocked = isLocked;
+            _dbContext.SaveChanges();
+        }
+
+        public void SetHashedPassword(int userProfileId, string passwordHash)
+        {
+            var user = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
+            user.PasswordHash = passwordHash;
+            _dbContext.SaveChanges();
+        }
+
         public void RemoveUser(int orgRegProgUserId)
         {
             OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);

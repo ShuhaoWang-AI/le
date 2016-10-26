@@ -23,7 +23,6 @@ using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Cache;
-using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Invitation;
 
 namespace Linko.LinkoExchange.Web

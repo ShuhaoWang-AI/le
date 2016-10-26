@@ -32,7 +32,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="resetPasswordToken">The reset password token</param>
         /// <param name="newPassword">The new password</param>
         /// <returns></returns>
-        Task<AuthenticationResultDto> ResetPasswordAsync(string email, string resetPasswordToken, string newPassword);
+        Task<AuthenticationResultDto> ResetPasswordAsync(string token, int userQuestionAnswerId, string answer, int attempCount, string password);
 
         /// <summary>
         /// To request a password reset. This will do follow:
@@ -40,9 +40,9 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// 2. send a reset password email
         /// 3. log to system 
         /// </summary>
-        /// <param name="email">The email address </param>
+        /// <param name="username">UserName entered by user</param>
         /// <returns></returns>
-        Task<AuthenticationResultDto> RequestResetPassword(string email); 
+        Task<AuthenticationResultDto> RequestResetPassword(string username); 
 
         // Sign in  
         Task<SignInResultDto> SignInByUserName(string userName, string password, bool isPersistent);
@@ -56,7 +56,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         //sign off
         void SignOff();
 
-        void SetClaimsForOrgRegProgramSelection(int orgRegProgId, int permissionGroupId);
+        void SetClaimsForOrgRegProgramSelection(int orgRegProgId);
 
         string GetClaimsValue(string claimType);
     }
