@@ -36,7 +36,7 @@ namespace Linko.LinkoExchange.Data
          
 //        public DbSet<UserProfile> UserProfiles { get; set; } 
 
-        public DbSet<UserPasswordHistory> UserPasswordHistories { get; set; }
+        public virtual DbSet<UserPasswordHistory> UserPasswordHistories { get; set; }
         public DbSet<OrganizationRegulatoryProgramUser> OrganizationRegulatoryProgramUsers { get; set; }
         public DbSet<UserQuestionAnswer> UserQuestionAnswers { get; set; }
         public DbSet<Question> Questions { get; set; }

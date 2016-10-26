@@ -469,8 +469,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             // clear claims from db if there are   
             ClearClaims(applicationUser.Id);
-            applicationUser.Claims.Clear();
-            
+            applicationUser.Claims.Clear(); 
             var userId = applicationUser.UserProfileId; 
             var organizationIds = GetUserOrganizationIds(userId);
 
@@ -515,7 +514,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 // UC-29 4.a
                 // System confirms user has status “Registration Pending” (and no access to any other portal where registration is not pending or portal is not disabled)
                 if (orpus.All(i => i.IsRegistrationApproved == false) ||
-                    orpus.All(i => i.IsRegistrationApproved && i.OrganizationRegulatoryProgramDto.IsEnabled == false))
+                    ! orpus.Any(i => i.IsRegistrationApproved && i.OrganizationRegulatoryProgramDto.IsEnabled))
                 {
                     // TODO: Log failed login because of registration pending to Audit (UC-2)
                     signInResultDto.AutehticationResult = AuthenticationResult.RegistrationApprovalPending;

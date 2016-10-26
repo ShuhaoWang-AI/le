@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AutoMapper;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Services.Dto;
@@ -18,15 +12,6 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Linko.LinkoExchange.Services.Authentication;
-using Linko.LinkoExchange.Core.Domain;
-using Microsoft.Owin.Security;
-using Linko.LinkoExchange.Services.Organization;
-using Linko.LinkoExchange.Services.Invitation;
-using Linko.LinkoExchange.Services.Permission;
-using Linko.LinkoExchange.Services.User;
-using Microsoft.AspNet.Identity;
-using System.Security.Claims;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -48,8 +33,7 @@ namespace Linko.LinkoExchange.Test
 
             //Make sure there no methods were missing in the mappings loaded above via profiles
             Mapper.AssertConfigurationIsValid();
-        }
-         
+        } 
 
         [TestInitialize]
         public void Initialize()

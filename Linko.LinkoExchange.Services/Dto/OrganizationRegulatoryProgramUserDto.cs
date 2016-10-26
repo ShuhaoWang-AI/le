@@ -32,7 +32,7 @@ namespace Linko.LinkoExchange.Services.Dto
             get; set;
         }
 
-        public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgramDto
+        public virtual OrganizationRegulatoryProgramDto OrganizationRegulatoryProgramDto
         {
             get; set;
         }
