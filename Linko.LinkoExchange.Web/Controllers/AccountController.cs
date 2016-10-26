@@ -1,19 +1,20 @@
-﻿using System.Threading.Tasks;
-using System.Web.Mvc;
-using Linko.LinkoExchange.Services.Authentication;
-using Linko.LinkoExchange.Web.ViewModels.Account;
-using Linko.LinkoExchange.Core.Enum;
-using NLog;
-using System.Web;
+﻿using System;
 using System.Collections.Generic;
-using Linko.LinkoExchange.Services.Organization;
 using System.Linq;
-using Linko.LinkoExchange.Web.Extensions;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Mvc;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
-using Linko.LinkoExchange.Web.ViewModels.Shared;
+using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
-using Linko.LinkoExchange.Core.Extensions;
+using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Web.Extensions;
+using Linko.LinkoExchange.Web.ViewModels.Account;
+using Linko.LinkoExchange.Web.ViewModels.Shared;
+using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -40,8 +41,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         #endregion
-
-
+        
         #region default action
 
         [AllowAnonymous]
@@ -58,8 +58,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         #endregion
-
-
+        
         #region sign in action
 
 
@@ -88,8 +87,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             try
             {
-
-                var result = await _authenticateService.SignInByUserName(model.UserName, model.Password, model.RememberMe);
+                var result = await _authenticateService.SignInByUserName(model.UserName, model.Password, false);
 
                 switch (result.AutehticationResult)
                 {
@@ -142,7 +140,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.HtmlStr = Core.Resources.Message.AccountLocked + "<br/>";
             // need authority list
 
-            return View(viewName: "Confirmation");
+            return View(viewName: "Confirmation", model: model);
         }
 
         // account locked out due to several failure login attempt
@@ -156,7 +154,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.HtmlStr += "Use <span class='alert-link'> <a href= " + Url.Action(actionName: "ForgotPassword", controllerName: "Account");
             model.HtmlStr += ">Forgot Password </a></span> to reset your password or try again later.";
 
-            return View(viewName: "Confirmation");
+            return View(viewName: "Confirmation", model: model);
         }
 
         // user registration approval pending
@@ -168,7 +166,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.Title = "Registration Approval Pending";
             model.Message = Core.Resources.Message.RegistrationApprovalPending;
 
-            return View(viewName: "Confirmation");
+            return View(viewName: "Confirmation", model: model);
         }
 
         // user account is disabled
@@ -181,7 +179,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.HtmlStr = Core.Resources.Message.UserAccountDisabled + "<br/>";
             // need authority list
 
-            return View(viewName: "Confirmation");
+            return View(viewName: "Confirmation", model: model);
         }
 
         // TODO: change password will be in same page
@@ -196,18 +194,18 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.HtmlStr += "Use <span class='alert-link'> <a href= " + Url.Action(actionName: "ChangePassword", controllerName: "Account");
             model.HtmlStr += ">Change Password </a></span> to change your password.";
 
-            return View(viewName: "Confirmation");
+            return View(viewName: "Confirmation", model: model);
         }
-
-        // TODO: remove allowAnonymus
+        
         // show Portal Director
-        // GET: /Account/PasswordExpired
+        // GET: /Account/PortalDirector
         public ActionResult PortalDirector()
         {
+            PortalDirectorViewModel model = new PortalDirectorViewModel();
             //PortalDirectorViewModel model = new PortalDirectorViewModel();
-            string currentUserId = _currentUser.GetClaimsValue(CurrentUserInfo.UserProfileId); ; // .1; //(int) _requestCache.GetValue(key: "userId");
+            string currentUserId = _currentUser.GetClaimsValue(CurrentUserInfo.UserProfileId);
 
-            if (!String.IsNullOrEmpty(currentUserId))
+            if (!string.IsNullOrEmpty(currentUserId))
             {
                 var result = _organizationService.GetUserOrganizations(Convert.ToInt32(currentUserId));
 
@@ -218,27 +216,25 @@ namespace Linko.LinkoExchange.Web.Controllers
                 }
                 else if (result.Count() > 1)
                 {
-                    PortalDirectorViewModel model = new PortalDirectorViewModel();
-
                     model.Authorities =
                         result
-                        .Where(o => o.OrganizationType.Name.Equals(value: "Authority"))
+                        .Where(o => o.OrganizationDto.OrganizationType.Name.Equals(value: "Authority"))
                         .Select(
                             o => new SelectListItem
                             {
-                                Value = o.OrganizationId.ToString(), // need to change with OrganizationRegulatoryProgramId
-                                Text = o.OrganizationName
+                                Value = o.OrganizationRegulatoryProgramId.ToString(),
+                                Text = o.OrganizationDto.OrganizationName
                             }
                         ).ToList();
 
                     model.Industries =
                         result
-                        .Where(o => o.OrganizationType.Name.Equals(value: "Industry"))
+                        .Where(o => o.OrganizationDto.OrganizationType.Name.Equals(value: "Industry"))
                         .Select(
                             o => new SelectListItem
                             {
-                                Value = o.OrganizationId.ToString(), // need to change with OrganizationRegulatoryProgramId
-                                Text = o.OrganizationName
+                                Value = o.OrganizationRegulatoryProgramId.ToString(), 
+                                Text = o.OrganizationDto.OrganizationName
                             }
                         ).ToList();
                 }
@@ -248,7 +244,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 }
             }
 
-            return View();
+            return View(model);
         }
 
         [HttpPost]
@@ -329,7 +325,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.Title = "Forgot password confirmation";
             model.Message = "Please check your email to reset your password.";
 
-            return View(viewName: "Confirmation");
+            return View(viewName: "Confirmation", model: model);
         }
         #endregion
 
@@ -386,15 +382,104 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.Title = "Forgot user name confirmation";
             model.Message = "Please check your email for your User Name.";
 
-            return View(viewName: "Confirmation");
+            return View(viewName: "Confirmation", model: model);
         }
+        #endregion
+
+        #region Reset Password
+
+        //
+        // GET: /Account/ResetPassword
+        [AllowAnonymous]
+        public ActionResult ResetPassword(string token)
+        {
+            if (token == null)
+            {
+               return View(viewName: "Error");
+            }
+            else
+            {
+                ResetPasswordViewModel model = new ResetPasswordViewModel();
+                model.Token = token;
+                model.Id = 1; // TODO: call service to set UserQuestionAnswerId as Id
+                model.Question = "test question?";
+                model.Answer = "";
+                model.Password = "";
+                model.ConfirmPassword = "";
+                model.FailedCount = 0;
+
+                return View(model);
+            }
+        }
+
+        //
+        // POST: /Account/ResetPassword
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            //TODO: Call proper service and replace following code accordingly... 
+            // AuthenticationResultDto ResetPassword (model.Token, UserQuestionAnswerId:  model.Id, model.answer, model.FailedCount, model.Password);
+            var resultFromService = new AuthenticationResultDto();
+            resultFromService.Errors = new List<string> { "You cannot use the last <?> passwords." };
+            resultFromService.Result = AuthenticationResult.CanNotUseOldPassword;
+
+            var result = resultFromService;
+
+            switch (result.Result)
+            {
+                case AuthenticationResult.Success:
+                    _logger.Info(string.Format(format: "ResetPassword. Password for {0} has been successfully reset.", arg0: model.Token));
+                    return RedirectToAction(actionName: "ResetPasswordConfirmation", controllerName: "Account");
+
+                // Can Not Use Old Password
+                case AuthenticationResult.CanNotUseOldPassword:
+                    _logger.Info(string.Format(format: "ResetPassword. Can not use old password for Token = {0}.", arg0: model.Token));
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(key: "", errorMessage: error);
+                    }
+                    return View(model);
+
+                // incorrect answer
+                    //model.FailedCount++;
+
+                // User is got locked
+                // Token invalid
+                // Token expired
+                case AuthenticationResult.Failed:
+                default:
+                    _logger.Info(string.Format(format: "ResetPassword. Failed for Token = {0}.", arg0: model.Token));
+                    ModelState.AddModelError(key: "", errorMessage: ""); // should come from service as ErrorMessage
+                    return View(model);
+            }
+        }
+
+        //
+        // GET: /User/ResetPasswordConfirmation
+        [AllowAnonymous]
+        public ActionResult ResetPasswordConfirmation()
+        {
+            ConfirmationViewModel model = new ConfirmationViewModel();
+            model.Title = "Reset password confirmation";
+            model.HtmlStr = "Your password has been successfully reset. Please click <a href= ";
+            model.HtmlStr += Url.Action(actionName: "SignIn", controllerName: "Account") + ">here </a> to Sign in.";
+
+            return View(viewName: "Confirmation", model: model);
+        }
+
+
         #endregion
 
         #region SignOut
         //
         // POST: /Account/SignOut
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult SignOut()
         {
             _authenticateService.SignOff();

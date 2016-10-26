@@ -177,6 +177,9 @@
   <data name="TitleLinkoExchangeSignIn" xml:space="preserve">
     <value>LinkoExchange Sign In</value>
   </data>
+  <data name="TitleResetPassword" xml:space="preserve">
+    <value>Reset Password</value>
+  </data>
   <data name="UserName" xml:space="preserve">
     <value>User Name</value>
   </data>

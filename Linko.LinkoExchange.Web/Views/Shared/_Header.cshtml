@@ -75,7 +75,7 @@
                                         <a href="#" class="btn .btn-sm btn-primary">@Label.ButtonProfile (need to update link)</a>
                                     </div>
                                     <div class="pull-right">
-                                        <a href="javascript:document.getElementById('formSignOut').submit()" class="btn .btn-sm btn-primary">@Label.ButtonSignOut</a>
+                                        <a onclick="location.href='@Url.Action(actionName: "SignOut", controllerName: "Account")'" class="btn .btn-sm btn-primary">@Label.ButtonSignOut</a>
                                     </div>
                                 </li>
                             </ul>
@@ -101,7 +101,7 @@
             });
 
             function showPopup() {
-                var message = @Message.SessionTimeOutPopupMessage;
+                var message = "@Message.SessionTimeOutPopupMessage";
 
                 $('body').append('<div class="popup" data-popup="popup-1">' +
                                     '<div class="popup-inner">' +

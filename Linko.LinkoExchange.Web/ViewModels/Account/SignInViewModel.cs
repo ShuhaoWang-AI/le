@@ -19,12 +19,6 @@ namespace Linko.LinkoExchange.Web.ViewModels.Account
         {
             get; set;
         }
-
-        [Display(Name = "RememberMe", ResourceType = typeof(Core.Resources.Label))]
-        public bool RememberMe
-        {
-            get; set;
-        }
     }
 
     public partial class SigInValidator : AbstractValidator<SignInViewModel>

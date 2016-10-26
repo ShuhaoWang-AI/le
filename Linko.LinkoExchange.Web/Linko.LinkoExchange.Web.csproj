@@ -481,6 +481,7 @@
     <Compile Include="ViewModels\Account\ForgotUserNameViewModel.cs" />
     <Compile Include="ViewModels\Account\PortalDirectorViewModel.cs" />
     <Compile Include="ViewModels\Account\RegisterViewModel.cs" />
+    <Compile Include="ViewModels\Account\ResetPasswordViewModel.cs" />
     <Compile Include="ViewModels\Account\SignInViewModel.cs" />
     <Compile Include="ViewModels\Shared\ConfirmationViewModel.cs" />
   </ItemGroup>
@@ -503,6 +504,7 @@
     <Content Include="Views\Account\PortalDirector.cshtml" />
     <Content Include="Views\Account\ForgotPassword.cshtml" />
     <Content Include="Views\Account\ForgotUserName.cshtml" />
+    <Content Include="Views\Account\ResetPassword.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
