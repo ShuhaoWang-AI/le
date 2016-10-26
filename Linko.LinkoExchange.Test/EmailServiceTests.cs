@@ -12,6 +12,7 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -40,11 +41,7 @@ namespace Linko.LinkoExchange.Test
         {
           
             var dbContext = new LinkoExchangeContext(connectionString);
-
-            var requestCacheT = Mock.Of<IRequestCache>(i => i.GetValue("Token") == "Fake token");
-
-            var emailAuditLogService = new EmailAuditLogService(dbContext, requestCacheT);
-
+   
             var orpu = Mock.Of<OrganizationRegulatoryProgramUserDto>(
                 p => p.IsEnabled == true &&
                      p.IsRegistrationApproved == true &&
@@ -82,8 +79,13 @@ namespace Linko.LinkoExchange.Test
                     i.GetValue("EmailRecipientRegulatoryProgramId") == "1" &&
                     i.GetValue("EmailRecipientOrganizationId") == "2" &&
                     i.GetValue("EmailRecipientOrganizationId") == "3" && 
-                    i.GetValue("Token") == "Fake token ..."
+                    i.GetValue("Token") == Guid.NewGuid().ToString() && 
+                    i.GetValue(CacheKey.EmailRecipientUserProfileId) == "1000" && 
+                    i.GetValue(CacheKey.EmailSenderUserProfileId) == "2000"
             );
+             
+            var emailAuditLogService = new EmailAuditLogService(dbContext, requestCache);
+
 
             _emailService = new LinkoExchangeEmailService(dbContext, emailAuditLogService, psMockObject.Object,
                 settingService, requestCache);

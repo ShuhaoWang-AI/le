@@ -132,7 +132,7 @@ namespace Linko.LinkoExchange.Services.Email
         /// <param name="email">The email address of recipient.</param>
         /// <param name="programFilters">Filter collection of program IDs</param>
         /// <returns></returns>
-        private IEnumerable<EmailAuditLogEntryDto> PopulateRecipientLogDataForAllPrograms(string email, IEnumerable<int> programFilters = null)
+        private IEnumerable<EmailAuditLogEntryDto> PopulateRecipientLogDataForAllPrograms(string email, ICollection<int> programFilters = null)
         {
             var emailAuditLogs = new List<EmailAuditLogEntryDto>();
             var oRpUs = _programService.GetUserRegulatoryPrograms(email);
@@ -160,7 +160,7 @@ namespace Linko.LinkoExchange.Services.Email
 
             if (programFilters != null && programFilters.Any())
             {
-                return emailAuditLogs.Where(i => programFilters.Contains(i.RecipientRegulatoryProgramId));
+                return emailAuditLogs.Where(i => programFilters.Contains(i.RecipientRegulatoryProgramId.Value));
             }
 
             return emailAuditLogs;

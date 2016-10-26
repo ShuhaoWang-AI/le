@@ -17,6 +17,7 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(i => i.SenderOrganizationId);
             Property(i => i.SenderRegulatorOrganizationId);
 
+            Property(i => i.SenderUserProfileId);
             Property(i => i.SenderUserName);
             Property(i => i.SenderFirstName);
             Property(i => i.SenderLastName);
@@ -26,6 +27,7 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(i => i.RecipientOrganizationId);
             Property(i => i.RecipientRegulatorOrganizationId);
 
+            Property(i => i.RecipientUserProfileId);
             Property(i => i.RecipientUserName); 
             Property(i => i.RecipientFirstName);
             Property(i => i.RecipientLastName);

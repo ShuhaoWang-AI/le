@@ -17,19 +17,24 @@ namespace Linko.LinkoExchange.Core.Domain
             get; set;
         }
 
-        public int SenderRegulatoryProgramId
+        public int? SenderRegulatoryProgramId
         {
             get; set;
         }
 
-        public int SenderOrganizationId
+        public int? SenderOrganizationId
         {
             get; set;
         }
 
-        public int SenderRegulatorOrganizationId
+        public int? SenderRegulatorOrganizationId
         {
             get; set;
+        }
+
+        public int? SenderUserProfileId
+        {
+            get;set;
         }
 
         public string SenderUserName
@@ -52,18 +57,26 @@ namespace Linko.LinkoExchange.Core.Domain
             get; set;
         } 
  
-        public int RecipientOrganizationId
+        public int? RecipientOrganizationId
         {
             get; set;
         }
-        public int RecipientRegulatorOrganizationId
+
+        public int? RecipientRegulatorOrganizationId
         {
             get; set;
         }
-        public int RecipientRegulatoryProgramId
+
+        public int? RecipientRegulatoryProgramId
         {
             get; set;
         }
+
+        public int? RecipientUserProfileId
+        {
+            get;set;
+        }
+
         public string RecipientUserName
         {
             get; set;
