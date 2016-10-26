@@ -16,8 +16,17 @@ using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Settings;
-using Microsoft.VisualStudio.TestTools.UnitTesting; 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Linko.LinkoExchange.Services.Authentication;
+using Linko.LinkoExchange.Core.Domain;
+using Microsoft.Owin.Security;
+using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.Permission;
+using Linko.LinkoExchange.Services.User;
+using Microsoft.AspNet.Identity;
+using System.Security.Claims;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -25,6 +34,7 @@ namespace Linko.LinkoExchange.Test
     public class EmailServiceTests
     {
         private IEmailService _emailService;
+        string connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
 
         public EmailServiceTests()
         {
@@ -39,11 +49,12 @@ namespace Linko.LinkoExchange.Test
             //Make sure there no methods were missing in the mappings loaded above via profiles
             Mapper.AssertConfigurationIsValid();
         }
+         
 
         [TestInitialize]
         public void Initialize()
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
+          
             var dbContext = new LinkoExchangeContext(connectionString);
 
             var requestCacheT = Mock.Of<IRequestCache>(i => i.GetValue("Token") == "Fake token");

@@ -13,7 +13,7 @@ namespace Linko.LinkoExchange.Core.Domain
     public class UserProfile : IdentityUser
     {  
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int UserProfileId { get; private set; }
+        public int UserProfileId { get; set; }
 
         public string FirstName { get; set; }
         public string LastName { get; set; } 
