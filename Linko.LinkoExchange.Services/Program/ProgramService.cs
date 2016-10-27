@@ -64,7 +64,7 @@ namespace Linko.LinkoExchange.Services.Program
         public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int organizationRegulatoryProgramId)
         {
             var  orp =  _linkoExchangeDbContext.OrganizationRegulatoryPrograms.SingleOrDefault(
-                i => i.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId);
+                i => i.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId && i.IsRemoved == false);
 
             return orp == null ? null : _mapper.Map<OrganizationRegulatoryProgramDto>(orp);
         }

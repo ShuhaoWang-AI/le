@@ -142,6 +142,7 @@
     <Compile Include="Dto\ProgramDto.cs" />
     <Compile Include="Dto\ProgramSettingDto.cs" />
     <Compile Include="Dto\QuestionAnswerDtos.cs" />
+    <Compile Include="Dto\RegistrationResultDto.cs" />
     <Compile Include="Dto\SettingDto.cs" />
     <Compile Include="Email\IEmailService.cs" />
     <Compile Include="Email\EmailService.cs" />

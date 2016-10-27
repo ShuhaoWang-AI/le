@@ -129,6 +129,8 @@ namespace Linko.LinkoExchange.Services
             {
                 var foundOrg = _dbContext.Organizations.Single(o => o.OrganizationId == organizationId);
                 returnDto = _mapper.Map<Core.Domain.Organization, OrganizationDto>(foundOrg);
+                var jurisdiction = GetJurisdictionById(foundOrg.JurisdictionId);
+                returnDto.State = jurisdiction == null ? "" : jurisdiction.Name;
             }
             catch (DbEntityValidationException ex)
             {
@@ -211,7 +213,7 @@ namespace Linko.LinkoExchange.Services
                 //_logger.Info("???");
                 throw new RuleViolationException("Validation errors", validationIssues);
             }
-        }
+        } 
 
         public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int orgRegProgId)
         {

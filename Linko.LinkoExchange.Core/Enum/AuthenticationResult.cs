@@ -13,10 +13,19 @@
         PasswordLockedOut,
         PasswordExpired,
         UserAlreadyExists,
-        CanNotUseOldPassword,
-        InvalidateRegistrationToken,
+        CanNotUseOldPassword, 
         ExpiredRegistrationToken,
         AccountIsNotAssociated,
         IncorrectAnswerToQuestion
+    } 
+
+    public enum RegistrationResult
+    {
+        Success,
+        Failed,
+        InvitationExpired,
+        ProgramNotFound, 
+        ProgramDisabled,
+        InvalidateRegistrationToken
     }
 }

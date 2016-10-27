@@ -203,17 +203,16 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="userInfo"></param>
         /// <param name="registrationToken"></param>
         /// <returns></returns>
-        public async Task<AuthenticationResultDto> CreateUserAsync(UserDto userInfo, string registrationToken)
+        public async Task<RegistrationResultDto> CreateUserAsync(UserDto userInfo, string registrationToken)
         {
-            var authenticationResult = new AuthenticationResultDto();
+            var registrationResult = new RegistrationResultDto();
 
             var invitationDto = _invitationService.GetInvitation(registrationToken);
 
             if (invitationDto == null)
             {
-                authenticationResult.Success = false;
-                authenticationResult.Result = AuthenticationResult.InvalidateRegistrationToken;
-                return authenticationResult;
+                registrationResult.Result = RegistrationResult.InvalidateRegistrationToken;
+                return registrationResult;
             }
 
             // TODO  check token is expired or not? from organization settings
@@ -232,9 +231,8 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             if (DateTime.UtcNow > invitationDto.InvitationDateTimeUtc.AddHours(invitationExpirationHours))
             {
-                authenticationResult.Success = false;
-                authenticationResult.Result = AuthenticationResult.ExpiredRegistrationToken;
-                return authenticationResult;
+                registrationResult.Result = RegistrationResult.InvitationExpired;
+                return registrationResult;
             }
              
             using (var transaction = _dbContext.Database.BeginTransaction())
@@ -244,7 +242,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 try
                 {
                     // Only check the organization settings of invitation regulatory program
-                    //SetPasswordPolicy(inivitationRecipintOrganizationSettings.Settings); 
+                    SetPasswordPolicy(inivitationRecipintOrganizationSettings.Settings);
                     applicationUser.FirstName = userInfo.UserName;
                     applicationUser.LastName = userInfo.LastName;
                     applicationUser.UserName = userInfo.UserName;
@@ -262,8 +260,6 @@ namespace Linko.LinkoExchange.Services.Authentication
                     applicationUser.EmailConfirmed = true;
                     applicationUser.IsInternalAccount = false;
                     applicationUser.IsIdentityProofed = false;
-
-                    //        var userProfile = _mapper.Map<UserProfile>(userInfo);
 
                     var result = _userManager.CreateAsync(applicationUser, userInfo.Password).Result;
                     if (result == IdentityResult.Success)
@@ -294,23 +290,61 @@ namespace Linko.LinkoExchange.Services.Authentication
                         var approvalPeople = _permissionService.GetApprovalPeople(applicationUser.UserProfileId, organizationId);
                         var sendTo = approvalPeople.Select(i => i.Email);
 
-                        // TODO:  to determine if user is authority user or is industry user;
-                        var isUserAuthorityUser = true;
+                        // TODO: to determine if user is authority user or is industry user;
+                        var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
+                        // TODO:  1. No recipientProgram found, or program is disabled
+
+                        var senderProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.SenderOrganizationRegulatoryProgramId);
+                        // TODO:  2. Check program found or is not diabled.
+                        
+                        if(recipientProgram == null || senderProgram == null)
+                        {
+                            registrationResult.Result = RegistrationResult.ProgramNotFound;
+                            return registrationResult;
+                        }
+                        else if (!recipientProgram.IsEnabled || !senderProgram.IsEnabled)
+                        {
+                            registrationResult.Result = RegistrationResult.ProgramDisabled;
+                            return registrationResult;
+                        }
+
+                        var inviteAuthorityUser = true;
+                        // Invites authority user
+                        if (recipientProgram.RegulatorOrganizationId.HasValue == false)
+                        {
+                            inviteAuthorityUser = false;
+                        }
+
+                        _requestCache.SetValue(CacheKey.Token, registrationToken);
+
+                        var authorityOrg = _organizationService.GetOrganization(recipientProgram.RegulatorOrganizationId.Value);
+
+                        // Setup emailContentReplacement 
                         var emailContentReplacements = new Dictionary<string, string>();
+                        emailContentReplacements.Add("firstName", applicationUser.FirstName);
+                        emailContentReplacements.Add("lastName", applicationUser.LastName);
+                        emailContentReplacements.Add("emailAddress", _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress));
+                        emailContentReplacements.Add("phoneNumber", _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone));
 
-                        // TODO  to prepare email audit log entry information 
+                        emailContentReplacements.Add("authorityName", authorityOrg.OrganizationName);
+                        emailContentReplacements.Add("organziationName", recipientProgram.OrganizationDto.OrganizationName);
+                        
+                        if (! inviteAuthorityUser) { 
+                            // Bad data in database
+                            if(recipientProgram.RegulatorOrganizationId.HasValue == false)
+                            {
+                                registrationResult.Result = RegistrationResult.Failed;
+                                return registrationResult;
+                            }
+                        
+                            var receipientOrg = _organizationService.GetOrganization(recipientProgram.OrganizationId); 
 
-                        var logEntry = new EmailAuditLogEntryDto();
-                        logEntry.RecipientFirstName = userInfo.FirstName;
-                        logEntry.RecipientLastName = userInfo.LastName;
-                        logEntry.RecipientUserName = userInfo.UserName;
-                        _requestCache.SetValue(CacheKey.EmailRecipientUserProfileId, applicationUser.UserProfileId.ToString());
-                        _requestCache.SetValue(CacheKey.Token, registrationToken);  
+                            emailContentReplacements.Add("addressLine1", receipientOrg.AddressLine1);
+                            emailContentReplacements.Add("cityName", receipientOrg.CityName);
+                            emailContentReplacements.Add("stateName", receipientOrg.State);
+                        }
 
-                        //logEntry.SenderFirstName = "Linko support";
-                        //logEntry.SenderLastName = "Linko support";
-
-                        if (isUserAuthorityUser)
+                        if (inviteAuthorityUser)
                         {
                            await _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements);
                         }
@@ -318,36 +352,34 @@ namespace Linko.LinkoExchange.Services.Authentication
                         {
                             await _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
                         }
-
-                        // 5 TODO logs invite email  
-                        // UC-1 
-
+                        
                         // 6 TODO logs invite to Audit 
                         // UC-2 
+
+                        // All succeed
                         await _dbContext.SaveChangesAsync();
-                        authenticationResult.Success = true;
+                        registrationResult.Result = RegistrationResult.Success; 
                         SendRegistrationConfirmationEmail(applicationUser.Id, userInfo);
 
                         transaction.Commit();
-                        //transaction.Rollback();
-                        return authenticationResult;
+                        return registrationResult;
                     }
 
-                    authenticationResult.Success = false;
-                    authenticationResult.Errors = result.Errors;
+                    registrationResult.Result = RegistrationResult.Failed;
+                    registrationResult.Errors = result.Errors;
                     transaction.Rollback();
-                    return authenticationResult;
+                    return registrationResult;
                 }
                 catch (Exception ex)
                 {
                     var errors = new List<string> { ex.Message };
-                    authenticationResult.Success = false;
-                    authenticationResult.Errors = errors;
+                    registrationResult.Result = RegistrationResult.Failed;
+                    registrationResult.Errors = errors;
                     transaction.Rollback();
                 }
             }
 
-            return authenticationResult;
+            return registrationResult;
         }
 
         /// <summary>
