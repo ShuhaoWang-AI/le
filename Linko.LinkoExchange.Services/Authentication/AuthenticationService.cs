@@ -408,10 +408,11 @@ namespace Linko.LinkoExchange.Services.Authentication
             else if (IsValidPasswordCheckInHistory(passwordHash, userProfileId, organizationSettings))
             {
                 //Password used before (6.a)
+                var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings);
 
                 authenticationResult.Success = false;
                 authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
-                authenticationResult.Errors = new string[] { "Can not use old password." };
+                authenticationResult.Errors = new string[] { string.Format("You cannot use the last {0} passwords.", numberOfPasswordsInHistory) };
             }
             else
             {
