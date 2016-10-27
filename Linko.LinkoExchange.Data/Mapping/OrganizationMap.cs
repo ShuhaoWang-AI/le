@@ -24,6 +24,7 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(i => i.PhoneExt);
             Property(i => i.FaxNumber);
             Property(i => i.WebsiteURL);
+            Property(i => i.JurisdictionId);
 
         }
     }

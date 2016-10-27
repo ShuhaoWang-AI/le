@@ -5,7 +5,7 @@
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
         public string CityName { get; set; }
-        //public string State { get; set; }
+        public string State { get; set; }
         public int OrganizationId { get; set; }
         public int OrganizationTypeId { get; set; }
         public OrganizationTypeDto OrganizationType { get; set; }

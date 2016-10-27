@@ -45,6 +45,7 @@ namespace Linko.LinkoExchange.Data
         public DbSet<OrganizationRegulatoryProgram> OrganizationRegulatoryPrograms { get; set; }
         public DbSet<OrganizationRegulatoryProgramSetting> OrganizationRegulatoryProgramSettings { get; set; }
         public DbSet<OrganizationSetting> OrganizationSettings { get; set; }
+        public DbSet<Jurisdiction> Jurisdictions { get; set; }
 
         #endregion
 

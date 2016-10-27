@@ -74,6 +74,7 @@
     <Compile Include="Domain\EmailAuditLog.cs" />
     <Compile Include="Domain\EmailTemplate.cs" />
     <Compile Include="Domain\Invitation.cs" />
+    <Compile Include="Domain\Jurisdiction.cs" />
     <Compile Include="Domain\Organization.cs" />
     <Compile Include="Domain\OrganizationRegulatoryProgram.cs" />
     <Compile Include="Domain\OrganizationRegulatoryProgramSetting.cs" />

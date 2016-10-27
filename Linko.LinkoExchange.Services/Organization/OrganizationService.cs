@@ -220,6 +220,7 @@ namespace Linko.LinkoExchange.Services
             dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
                 .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
                 && o.IsSignatory == true) > 0;
+            dto.OrganizationDto.State = GetJurisdictionById(orgRegProgram.Organization.JurisdictionId).Name;
 
             return dto;
         }
@@ -240,6 +241,7 @@ namespace Linko.LinkoExchange.Services
                         dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
                             .Count(o => o.OrganizationRegulatoryProgramId == orgRegProg.OrganizationRegulatoryProgramId
                             && o.IsSignatory == true) > 0;
+                        dto.OrganizationDto.State = GetJurisdictionById(orgRegProg.Organization.JurisdictionId).Name;
                         dtoList.Add(dto);
 
                     }
@@ -301,6 +303,11 @@ namespace Linko.LinkoExchange.Services
                 //_logger.Info("???");
                 throw new RuleViolationException("Validation errors", validationIssues);
             }
+        }
+
+        public Jurisdiction GetJurisdictionById(int jurisdictionId)
+        {
+            return _dbContext.Jurisdictions.Single(j => j.JurisdictionId == jurisdictionId);
         }
 
     }

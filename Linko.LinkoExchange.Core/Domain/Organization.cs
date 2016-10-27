@@ -22,10 +22,10 @@ namespace Linko.LinkoExchange.Core.Domain
         public string PhoneNumber { get; set; }
         public string PhoneExt { get; set; }
         public string FaxNumber { get; set; }
-        public string WebsiteURL { get; set; } 
+        public string WebsiteURL { get; set; }
+        public int JurisdictionId { get; set; }
 
         public virtual List<OrganizationSetting> OrganizationSettings { get; set; }
-
     }
 
 }
