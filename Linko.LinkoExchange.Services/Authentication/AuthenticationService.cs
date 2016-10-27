@@ -361,19 +361,16 @@ namespace Linko.LinkoExchange.Services.Authentication
         public async Task<AuthenticationResultDto> ResetPasswordAsync(string resetPasswordToken, int userQuestionAnswerId, 
             string answer, int attemptCount, string newPassword)
         {
-            int userProfileId = Convert.ToInt32(_sessionCache.GetValue(CacheKey.UserProfileId));
-            int orgRegProgUserId = Convert.ToInt32(_sessionCache.GetValue(CacheKey.OrganizationRegulatoryProgramUserId));
-            int orgRegProgramId = Convert.ToInt32(_sessionCache.GetValue(CacheKey.OrganizationRegulatoryProgramId));
+            int userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
+            //int orgRegProgramId = Convert.ToInt32(_sessionCache.GetValue(CacheKey.OrganizationRegulatoryProgramId));
             string passwordHash = _passwordHasher.HashPassword(newPassword);
             string answerHash = _passwordHasher.HashPassword(answer);
             var organizationIds = GetUserOrganizationIds(userProfileId);
             var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
             int resetPasswordTokenValidateInterval = Convert.ToInt32(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"]);
-            int maxAnswerAttempts = Convert.ToInt32(ConfigurationManager.AppSettings["KBQMaxAnswerAttempts"]);
 
             var authenticationResult = new AuthenticationResultDto();
            
-            
             var emailAuditLog = _dbContext.EmailAuditLog.SingleOrDefault(e => e.Token == resetPasswordToken);
             if (emailAuditLog == null)
                 throw new Exception(string.Format("ERROR: Cannot find email audit log associated with token={0}", resetPasswordToken));
@@ -393,6 +390,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Result = AuthenticationResult.IncorrectAnswerToQuestion;
 
                 //3rd incorrect attempt (5.3.b) => lockout
+                int maxAnswerAttempts = Convert.ToInt32(_settingService.GetOrganizationSettingValueByUserId(userProfileId, SettingType.MaxKBQAttempts, true, null));
                 if (attemptCount++ >= maxAnswerAttempts) // from web.config
                 {
                     _userService.LockUnlockUserAccount(userProfileId, true);
@@ -401,10 +399,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     var userOrgs = _organizationService.GetUserRegulatories(userProfileId);
                     foreach (var org in userOrgs)
                     {
-                        var email = _settingService.GetOrganizationSettingsById(org.OrganizationId) 
-                            .ProgramSettings.Single(s => s.OrgRegProgId == orgRegProgramId)
-                            .Settings.Single(s => s.Type == SettingType.SupportEmail).Value;
-                        authorityList.Add(string.Format("{0} {1} {2}", org.OrganizationName, email, org.PhoneNumber));
+                        authorityList.Add(string.Format("{0} {1} {2}", org.EmailContactInfoName, org.EmailContactInfoEmailAddress, org.EmailContactInfoPhone));
                     }
                     authenticationResult.Errors = authorityList;
 

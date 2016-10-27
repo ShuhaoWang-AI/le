@@ -324,7 +324,68 @@ namespace Linko.LinkoExchange.Services.Settings
 			 };
 		}
 
-		private SettingDto[] GetMockData()
+        public string GetOrganizationSettingValueByUserId(int userProfileId, SettingType settingType, bool? isChooseMin, bool? isChooseMax)
+        {
+            var orgIds = _dbContext.OrganizationRegulatoryProgramUsers.Where(o => o.UserProfileId == userProfileId).Select(o => o.OrganizationRegulatoryProgram.OrganizationId).Distinct();
+            if (orgIds != null)
+            {
+                var orgSettingDtos = this.GetOrganizationSettingsByIds(orgIds);
+                var settings = orgSettingDtos.SelectMany(o => o.Settings).Where(s => s.Type == settingType);
+                if (settings == null || settings.Count() < 1)
+                    throw new Exception(string.Format("ERROR: Could not find organization settings for user profile id={0} and setting type={1}", userProfileId, settingType.ToString()));
+                else if (settings.Count() == 1)
+                    return settings.ElementAt(0).Value;
+                else
+                {
+                    if (isChooseMin.HasValue && isChooseMin.Value)
+                    {
+                        //can't use LINQ .Min and .Max b/c values are string! #argh
+                        int minValue = int.MaxValue;
+                        foreach (var setting in settings)
+                        {
+                            if (Convert.ToInt32(setting.Value) < minValue)
+                            {
+                                minValue = Convert.ToInt32(setting.Value);
+                                break;
+                            }
+                        }
+                        return minValue.ToString();
+                    }
+                    else if (isChooseMin.HasValue && isChooseMin.Value)
+                    {
+                        //can't use LINQ .Min and .Max b/c values are string! #argh
+                        int maxValue = int.MinValue;
+                        foreach (var setting in settings)
+                        {
+                            if (Convert.ToInt32(setting.Value) > maxValue)
+                            {
+                                maxValue = Convert.ToInt32(setting.Value);
+                                break;
+                            }
+                        }
+                        return maxValue.ToString();
+                    }
+                    else
+                    {
+                        return settings.ElementAt(0).Value; //Return first item by default
+                    }
+
+                }
+            }
+
+            throw new Exception(string.Format("ERROR: Could not find any associated organizations for user profile id={0}", userProfileId));
+
+        }
+
+        public string GetOrgRegProgramSettingValue(int orgRegProgramId, SettingType settingType)
+        {
+            return _dbContext.OrganizationRegulatoryProgramSettings
+                .Single(s => s.OrganizationRegulatoryProgramId == orgRegProgramId
+                && s.SettingTemplateId == (int)settingType).Value;
+        }
+
+
+        private SettingDto[] GetMockData()
 		{
 			return new[] {
 						 new SettingDto

@@ -16,4 +16,13 @@
         public string WebsiteURL { get; set; } 
         //TODO others...
     }
+
+    public class AuthorityDto : OrganizationDto
+    {
+        public string EmailContactInfoName { get; set; }
+        public string EmailContactInfoPhone { get; set; }
+        public string EmailContactInfoEmailAddress { get; set; }
+        public int RegulatoryProgramId { get; set; }
+        public int OrganizationRegulatoryProgramId { get; set; }
+    }
 }

@@ -20,7 +20,7 @@ namespace Linko.LinkoExchange.Services.Organization
         /// </summary>
         /// <param name="userId">The user Id.</param>
         /// <returns></returns>
-        IEnumerable<OrganizationDto> GetUserRegulatories(int userId);
+        IEnumerable<AuthorityDto> GetUserRegulatories(int userId);
 
             /// <summary>
         /// Get the organization by organization id

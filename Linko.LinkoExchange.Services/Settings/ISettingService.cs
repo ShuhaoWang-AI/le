@@ -18,6 +18,10 @@ namespace Linko.LinkoExchange.Services.Settings
         /// <returns>Collection of organization settings</returns>
         IEnumerable<OrganizationSettingDto> GetOrganizationSettingsByUserId(int userId);
 
+        string GetOrganizationSettingValueByUserId(int userProfileId, SettingType settingType, bool? isChooseMin, bool? isChooseMax);
+
+        string GetOrgRegProgramSettingValue(int orgRegProgramId, SettingType settingType);
+
         /// <summary>
         /// Get organization settings for a collection of organization Ids
         /// </summary>

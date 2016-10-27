@@ -12,6 +12,7 @@ using System.Linq;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Settings;
 
 namespace Linko.LinkoExchange.Services
 {
@@ -21,14 +22,16 @@ namespace Linko.LinkoExchange.Services
         //private readonly IAuditLogEntry _logger;
         private readonly IMapper _mapper;
         private readonly ICurrentUser _currentUser;
+        private readonly ISettingService _settingService;
 
         public OrganizationService(LinkoExchangeContext dbContext, IMapper mapper,
-            ICurrentUser currentUser)//, IAuditLogEntry logger)
+            ICurrentUser currentUser, ISettingService settingService)//, IAuditLogEntry logger)
         {
             _dbContext = dbContext;
             //_logger = logger;
             _mapper = mapper;
             _currentUser = currentUser;
+            _settingService = settingService;
         }
 
         public IEnumerable<OrganizationDto> GetUserOrganizationsByOrgRegProgUserId(int orgRegProgUserId)
@@ -83,7 +86,7 @@ namespace Linko.LinkoExchange.Services
         /// </summary>
         /// <param name="userId">The user Id</param>
         /// <returns>The organizationId </returns>
-        public IEnumerable<OrganizationDto> GetUserRegulatories(int userId)
+        public IEnumerable<AuthorityDto> GetUserRegulatories(int userId)
         {
             var orpUsers = _dbContext.OrganizationRegulatoryProgramUsers.ToList()
                 .FindAll(u => u.UserProfileId == userId && 
@@ -93,13 +96,22 @@ namespace Linko.LinkoExchange.Services
                             u.OrganizationRegulatoryProgram.IsEnabled && 
                             u.OrganizationRegulatoryProgram.IsRemoved == false);
 
-            var orgs = new List<OrganizationDto>();
+            var orgs = new List<AuthorityDto>();
             foreach (var orpUser in orpUsers)
             {
-                if( orpUser.OrganizationRegulatoryProgram?.Organization != null &&
-                    orpUser.OrganizationRegulatoryProgram?.Organization.OrganizationType.Name =="Authority" && 
-                    !orgs.Any(i=>i.OrganizationId == orpUser.OrganizationRegulatoryProgram.RegulatorOrganizationId) )
-                    orgs.Add(_mapper.Map<OrganizationDto>(orpUser.OrganizationRegulatoryProgram.Organization)); 
+                if (orpUser.OrganizationRegulatoryProgram?.Organization != null &&
+                    orpUser.OrganizationRegulatoryProgram?.Organization.OrganizationType.Name == "Authority" &&
+                    !orgs.Any(i => i.OrganizationId == orpUser.OrganizationRegulatoryProgram.RegulatorOrganizationId))
+                {
+                    AuthorityDto authority = _mapper.Map<Core.Domain.Organization, AuthorityDto>((Core.Domain.Organization)orpUser.OrganizationRegulatoryProgram.Organization);
+                    authority.RegulatoryProgramId = orpUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+                    authority.OrganizationRegulatoryProgramId = orpUser.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId;
+                    authority.EmailContactInfoName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+                    authority.EmailContactInfoEmailAddress = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+                    authority.EmailContactInfoPhone = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+                    orgs.Add(authority);
+                }
+
             }
 
             return orgs;

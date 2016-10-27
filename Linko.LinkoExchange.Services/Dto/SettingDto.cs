@@ -27,7 +27,11 @@
         SupportEmail = 20,
         SystemEmailEmailAddress = 21,
         SystemEmailFirstName = 22,
-        SystemEmailLastName = 23
+        SystemEmailLastName = 23,
+
+        EmailContactInfoName = 13,
+        EmailContactInfoPhone = 14,
+        EmailContactInfoEmailAddress = 15
     }
 
     public class SettingDto
