@@ -39,6 +39,7 @@ namespace Linko.LinkoExchange.Test
         IPermissionService permService = Mock.Of<IPermissionService>();
         IUserService userService = Mock.Of<IUserService>();
         ISessionCache sessionCache = Mock.Of<ISessionCache>();
+        IPasswordHasher passwordHasher = new PasswordHasher();
         Mock<IAuthenticationManager> authManger = new Mock<IAuthenticationManager>();
         Mock<ApplicationSignInManager> signmanager;
         Mock<LinkoExchangeContext> dbContext;
@@ -107,7 +108,8 @@ namespace Linko.LinkoExchange.Test
                 permService,
                 dbContext.Object,
                 userService,
-                sessionCache
+                sessionCache,
+                passwordHasher
                 );
 
             userManagerObj.Setup(
@@ -390,6 +392,34 @@ namespace Linko.LinkoExchange.Test
             var result = _authenticationService.SignInByUserName("shuhao", "password", true);
 
             Assert.AreEqual(AuthenticationResult.Success, result.Result.AutehticationResult);
+        }
+
+        [TestMethod]
+        public void Test_SetClaimsForOrgRegProgramSelection()
+        {
+            userManagerObj.Setup(p => p.FindByNameAsync(It.IsAny<string>())).
+                 Returns(
+                    Task.FromResult(userProfile)
+                 );
+
+
+            var authService = new AuthenticationService(
+                userManagerObj.Object,
+                signmanager.Object,
+                authManger.Object,
+                settService,
+                orgService,
+                progService,
+                invitService,
+                emailService,
+                permService,
+                new LinkoExchangeContext(connectionString),
+                userService,
+                sessionCache,
+                passwordHasher
+                );
+
+            authService.SetClaimsForOrgRegProgramSelection(1);
         }
     }
 }

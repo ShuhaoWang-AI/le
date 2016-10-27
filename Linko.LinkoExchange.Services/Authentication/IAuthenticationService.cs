@@ -42,7 +42,9 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// </summary>
         /// <param name="username">UserName entered by user</param>
         /// <returns></returns>
-        Task<AuthenticationResultDto> RequestResetPassword(string username); 
+        Task<AuthenticationResultDto> RequestResetPassword(string username);
+
+        Task<AuthenticationResultDto> RequestUsernameEmail(string email);
 
         // Sign in  
         Task<SignInResultDto> SignInByUserName(string userName, string password, bool isPersistent);

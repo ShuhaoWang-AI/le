@@ -352,6 +352,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             var organizationIds = GetUserOrganizationIds(userProfileId);
             var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
             int resetPasswordTokenValidateInterval = Convert.ToInt32(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"]);
+            int maxAnswerAttempts = Convert.ToInt32(ConfigurationManager.AppSettings["KBQMaxAnswerAttempts"]);
 
             var authenticationResult = new AuthenticationResultDto();
            
@@ -367,7 +368,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Success = false;
                 authenticationResult.Result = AuthenticationResult.ExpiredRegistrationToken;
             }
-            else if (!(_dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content == answerHash))
+            else if (!(_dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content.ToLower() == answerHash))
             {
                 //Check hashed answer (5.3.a)
 
@@ -375,21 +376,18 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Result = AuthenticationResult.IncorrectAnswerToQuestion;
 
                 //3rd incorrect attempt (5.3.b) => lockout
-                if (attemptCount == 3) //Which setting? Web.config?
+                if (attemptCount++ >= maxAnswerAttempts) // from web.config
                 {
                     _userService.LockUnlockUserAccount(userProfileId, true);
                     //Get all associated authorities
                     List<string> authorityList = new List<string>();
-                    var userOrgs = _organizationService.GetUserOrganizationsByOrgRegProgUserId(orgRegProgUserId);
+                    var userOrgs = _organizationService.GetUserRegulatories(userProfileId);
                     foreach (var org in userOrgs)
                     {
-                        if (org.OrganizationType.Name == "Authority")// Make sure get regulator industries
-                        {
-                            var email = _settingService.GetOrganizationSettingsById(org.OrganizationId) 
-                                .ProgramSettings.Single(s => s.OrgRegProgId == orgRegProgramId)
-                                .Settings.Single(s => s.Type == SettingType.SupportEmail).Value;
-                            authorityList.Add(string.Format("{0} {1} {2}", org.OrganizationName, email, org.PhoneNumber));
-                        }
+                        var email = _settingService.GetOrganizationSettingsById(org.OrganizationId) 
+                            .ProgramSettings.Single(s => s.OrgRegProgId == orgRegProgramId)
+                            .Settings.Single(s => s.Type == SettingType.SupportEmail).Value;
+                        authorityList.Add(string.Format("{0} {1} {2}", org.OrganizationName, email, org.PhoneNumber));
                     }
                     authenticationResult.Errors = authorityList;
 
@@ -428,7 +426,6 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             AuthenticationResultDto authenticationResult = new AuthenticationResultDto();
 
-            //var user = _userManager.FindByEmail(email);
             var user = _dbContext.Users.SingleOrDefault(u => u.UserName == username);
             if(user == null)
             {
@@ -444,6 +441,31 @@ namespace Linko.LinkoExchange.Services.Authentication
             else
             {
                 SendResetPasswordConfirmationEmail(user);
+            }
+
+            return authenticationResult;
+        }
+
+        public async Task<AuthenticationResultDto> RequestUsernameEmail(string email)
+        {
+            AuthenticationResultDto authenticationResult = new AuthenticationResultDto();
+
+            var user = _userManager.FindByEmail(email);
+            if (user == null)
+            {
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.UserNotFound;
+                authenticationResult.Errors = new[] { "UserNotFound" };
+            }
+            else if (!await _userManager.IsEmailConfirmedAsync(user.Id))
+            {
+                authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.EmailIsNotConfirmed;
+                authenticationResult.Errors = new[] { "EmailIsNotConfirmed" };
+            }
+            else
+            {
+                SendRequestUsernameEmail(user);
             }
 
             return authenticationResult;
@@ -824,7 +846,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             return orgnizations.Select(i => i.OrganizationId).ToArray();
         }
 
-        void SendResetPasswordConfirmationEmail(UserProfile userProfile)
+        private void SendResetPasswordConfirmationEmail(UserProfile userProfile)
         {
             var code = _userManager.GeneratePasswordResetTokenAsync(userProfile.Id).Result; 
 
@@ -842,6 +864,23 @@ namespace Linko.LinkoExchange.Services.Authentication
             //_sessionCache.SetValue("ddd") ='''sss'
 
             _emailService.SendEmail(new[] { userProfile.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
+        }
+
+        private void SendRequestUsernameEmail(UserProfile userProfile)
+        {
+            string baseUrl = GetBaseUrl();
+            string link = baseUrl + "/Account/SignIn";
+
+            string supportPhoneNumber = _globalSettings[SettingType.SupportPhoneNumber];
+            string supportEmail = _globalSettings[SettingType.SupportEmail];
+
+            var contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("userName", userProfile.UserName);
+            contentReplacements.Add("link", link);
+            contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
+            contentReplacements.Add("supportEmail", supportEmail);
+
+            _emailService.SendEmail(new[] { userProfile.Email }, EmailType.ForgotUserName_ForgotUserName, contentReplacements);
         }
 
         string GetBaseUrl()
