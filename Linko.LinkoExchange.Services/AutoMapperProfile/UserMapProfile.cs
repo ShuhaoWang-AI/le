@@ -14,7 +14,8 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
         public UserMapProfile()
         {
             CreateMap<UserProfile, UserDto>()
-               .ForMember(d => d.Password, o => o.Ignore()); 
+               .ForMember(d => d.Password, o => o.Ignore())
+               .ReverseMap(); 
         }
     }
 }

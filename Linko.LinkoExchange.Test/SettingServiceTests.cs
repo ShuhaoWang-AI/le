@@ -41,7 +41,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetOrganizationSettingsById_actual()
         {
-            OrganizationSettingDto orgSettings = _settingService.GetOrganizationSettingsById_actual(1001);
+            OrganizationSettingDto orgSettings = _settingService.GetOrganizationSettingsById(1001);
         }
 
         [TestMethod]

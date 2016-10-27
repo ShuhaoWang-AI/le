@@ -17,11 +17,9 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
         public int? LastModifierUserId { get; set; } 
         public int UserProfileId { get;set; }
-        [Required]
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
-        [Required]
         public virtual PermissionGroup PermissionGroup { get; set; }
-        public int PermissionGroupId { get; set; }
+        public int? PermissionGroupId { get; set; }
         public DateTimeOffset? CreationDateTimeUtc { get;set; }
         public DateTimeOffset? RegistrationDateTime { get;set;}
     }

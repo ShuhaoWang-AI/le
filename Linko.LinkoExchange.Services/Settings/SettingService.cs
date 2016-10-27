@@ -73,7 +73,7 @@ namespace Linko.LinkoExchange.Services.Settings
             {
                 foreach (var orgId in organizationIds)
                 {
-                    var orgSettingDto = GetOrganizationSettingsById_actual(orgId);
+                    var orgSettingDto = GetOrganizationSettingsById(orgId);
                     orgSettingsDtoList.Add(orgSettingDto);
                 }
             }
@@ -85,15 +85,16 @@ namespace Linko.LinkoExchange.Services.Settings
         /// </summary>
         /// <param name="organizationId"></param>
         /// <returns>OrganizationSettingDto object</returns>
+  //      public OrganizationSettingDto GetOrganizationSettingsById(int organizationId)
+		//{
+		//	return new OrganizationSettingDto
+		//	{
+		//		OrganizationId = 100,
+		//		Settings = GetMockData()
+		//	};
+		//}
         public OrganizationSettingDto GetOrganizationSettingsById(int organizationId)
-		{
-			return new OrganizationSettingDto
-			{
-				OrganizationId = 100,
-				Settings = GetMockData()
-			};
-		}
-        public OrganizationSettingDto GetOrganizationSettingsById_actual(int organizationId)
+        //GetOrganizationSettingsById_actual(int organizationId)
         {
             var orgSettingDto = new OrganizationSettingDto() { OrganizationId = organizationId };
             orgSettingDto.Settings = new List<SettingDto>();

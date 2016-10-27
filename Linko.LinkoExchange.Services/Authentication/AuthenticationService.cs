@@ -21,6 +21,7 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Cache;
+using AutoMapper;
 using System.Configuration;
 
 namespace Linko.LinkoExchange.Services.Authentication
@@ -41,11 +42,13 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IEmailService _emailService;
         private readonly IUserService _userService;
         private readonly ISessionCache _sessionCache;
+        private readonly IRequestCache _requestCache;
         private readonly TokenGenerator _tokenGenerator = new TokenGenerator();
         private readonly IAuditLogService _auditLogService = new CrommerAuditLogService();
         private readonly IPasswordHasher _passwordHasher;
 
-        private readonly IDictionary<SettingType, string> _globalSettings; 
+        private readonly IDictionary<SettingType, string> _globalSettings;
+        private readonly IMapper _mapper;
 
         public AuthenticationService(ApplicationUserManager userManager,
             ApplicationSignInManager signInManager, 
@@ -57,9 +60,11 @@ namespace Linko.LinkoExchange.Services.Authentication
             IEmailService emailService,
             IPermissionService permissionService,
             LinkoExchangeContext linkoExchangeContext,
-            IUserService userService,
-            ISessionCache sessionCache,
-            IPasswordHasher passwordHasher
+            IUserService userService
+           ,ISessionCache sessionCache
+           ,IRequestCache requestCache
+           ,IMapper mapper
+           ,IPasswordHasher passwordHasher
             )
         {
             if (linkoExchangeContext == null) throw new ArgumentNullException(paramName: "linkoExchangeContext");
@@ -72,8 +77,10 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (invitationService == null) throw new ArgumentNullException(paramName: "invitationService");
             if (emailService == null) throw new ArgumentNullException(paramName: "emailService");
             if (permissionService == null) throw new ArgumentNullException(paramName: "permissionService");
-            if( userService == null) throw new ArgumentNullException("userService");
+            if (userService == null) throw new ArgumentNullException("userService");
             if (sessionCache == null) throw new ArgumentNullException("sessionCache");
+            if (requestCache == null) throw new ArgumentNullException("requestCache");
+            if (mapper == null) throw new ArgumentNullException("mapper");
 
             _dbContext = linkoExchangeContext;
             _userManager = userManager;
@@ -88,6 +95,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             _permissionService = permissionService;
             _userService = userService;
             _sessionCache = sessionCache;
+            _requestCache = requestCache;
+            _mapper = mapper;
             _passwordHasher = passwordHasher;
         }
 
@@ -194,143 +203,151 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="userInfo"></param>
         /// <param name="registrationToken"></param>
         /// <returns></returns>
-        public Task<AuthenticationResultDto> CreateUserAsync(UserDto userInfo, string registrationToken)
+        public async Task<AuthenticationResultDto> CreateUserAsync(UserDto userInfo, string registrationToken)
         {
             var authenticationResult = new AuthenticationResultDto();
-            
+
             var invitationDto = _invitationService.GetInvitation(registrationToken);
-    
+
             if (invitationDto == null)
             {
                 authenticationResult.Success = false;
                 authenticationResult.Result = AuthenticationResult.InvalidateRegistrationToken;
-                return Task.FromResult(authenticationResult);
+                return authenticationResult;
             }
-            
-//            // TODO  check token is expired or not? from organization settings
+
+            // TODO  check token is expired or not? from organization settings
             var invitationRecipientProgram =
                 _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
             var inivitationRecipintOrganizationSettings =
                 _settingService.GetOrganizationSettingsById(invitationRecipientProgram.OrganizationId);
 
-            var invitationExpirationHours = ValueParser.TryParseInt(inivitationRecipintOrganizationSettings
-                .Settings.Single(i => i.Type == SettingType.InvitationExpiryHours).Value, 0);
+            // -- If nowhere defines this value, set it as 24 hrs.
+            var invitationExpirationHours = 24;
+            if (inivitationRecipintOrganizationSettings.Settings.Any())
+            {
+                invitationExpirationHours = ValueParser.TryParseInt(inivitationRecipintOrganizationSettings
+                  .Settings.Single(i => i.Type == SettingType.InvitationExpiryHours).Value, invitationExpirationHours);
+            }
 
             if (DateTime.UtcNow > invitationDto.InvitationDateTimeUtc.AddHours(invitationExpirationHours))
             {
                 authenticationResult.Success = false;
                 authenticationResult.Result = AuthenticationResult.ExpiredRegistrationToken;
-                return Task.FromResult(authenticationResult);
-            } 
- 
-            
-            var applicationUser = AssignUser(userInfo.UserName, userInfo.Email);
-            try
-            {  
-                // Only check the organization settings of invitation regulatory program
-                //SetPasswordPolicy(inivitationRecipintOrganizationSettings.Settings);
-                applicationUser.FirstName = userInfo.FirstName;
-                applicationUser.LastName = userInfo.LastName;
-                applicationUser.IsAccountLocked = false;
-                applicationUser.IsAccountResetRequired = false;
-                applicationUser.LockoutEnabled = true;
-                applicationUser.EmailConfirmed = true;
-                applicationUser.IsInternalAccount = false;
-                applicationUser.AddressLine1 = userInfo.AddressLine1;
-                applicationUser.AddressLine2 = userInfo.AddressLine2;
-                applicationUser.CityName = userInfo.CityName;
-                applicationUser.ZipCode = userInfo.ZipCode;
-                applicationUser.IsIdentityProofed = false; 
-
-
-
-                var result = _userManager.CreateAsync(applicationUser, userInfo.Password).Result;  
-                
-                if (result == IdentityResult.Success)
-                {
-                    // Retrieve user again to get userProfile Id. 
-                    applicationUser = _userManager.FindById(applicationUser.Id);
-
-                    // 1. Create a new row in userProfile password history table 
-                    _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
-                    {
-                         LastModificationDateTimeUtc = DateTime.UtcNow,
-                         PasswordHash = applicationUser.PasswordHash,
-                         UserProfileId = applicationUser.UserProfileId
-                    });
-
-                    // Save into user profile? 
-                    var userProfile = _userService.GetUserProfileByEmail(applicationUser.Email);
-                    // TODO more..... 
-                    
-
-                    // 2 // Create organziation regulatory program userProfile, and set the approved statue to false  
-                    // TODO change user status to  Registration Pending
-                    // UC-42 6
-                    //_userService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId, false);
-
-
-                    // 3 TODO send email to all users who have rights to approve a registrant 
-                    // UC-42 7
-                    // find out who have the approve permission
-
-
-                    // 4 TODO remove the invitation from table
-                    // UC-42 8
-
-                    var organizationId = 100;
-                    var approvalPeople = _permissionService.GetApprovalPeople(applicationUser.UserProfileId, organizationId);
-                    var sendTo = approvalPeople.Select(i => i.Email);
-
-                    // TODO:  to determine if user is authority user or is industry user;
-                    var isUserAuthorityUser = true;
-                    var emailContentReplacements = new Dictionary<string, string>(); 
-
-                    // TODO  to prepare email audit log entry information 
-                     
-                    var logEntry = new EmailAuditLogEntryDto();
-                    logEntry.RecipientFirstName = "First Name";
-                    logEntry.RecipientLastName = "last name";
-                    logEntry.RecipientUserName = "Fist name, lastName";
-                    logEntry.SenderFirstName = "Linko support";
-                    logEntry.SenderLastName = "Linko support"; 
-
-                    if (isUserAuthorityUser)
-                    {
-                        _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements);
-                    }
-                    else
-                    {  
-                        _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
-                    }
-
-                    // 5 TODO logs invite email  
-                    // UC-1 
-
-                    // 6 TODO logs invite to Audit 
-                    // UC-2 
-
-                    _dbContext.SaveChangesAsync();
-
-                    authenticationResult.Success = true;
-
-
-                    SendRegistrationConfirmationEmail(applicationUser.Id, userInfo);  
-                    return Task.FromResult(authenticationResult);
-                }
-
-                authenticationResult.Success = false;
-                authenticationResult.Errors = result.Errors;
-                return Task.FromResult(authenticationResult);
+                return authenticationResult;
             }
-            catch (Exception ex)
+             
+            using (var transaction = _dbContext.Database.BeginTransaction())
             {
-                var errors = new List<string> {ex.Message};
-                authenticationResult.Success = false;
-                authenticationResult.Errors = errors;
+
+                var applicationUser = AssignUser(userInfo.UserName, userInfo.Email);
+                try
+                {
+                    // Only check the organization settings of invitation regulatory program
+                    //SetPasswordPolicy(inivitationRecipintOrganizationSettings.Settings); 
+                    applicationUser.FirstName = userInfo.UserName;
+                    applicationUser.LastName = userInfo.LastName;
+                    applicationUser.UserName = userInfo.UserName;
+                    applicationUser.AddressLine1 = userInfo.AddressLine1;
+                    applicationUser.AddressLine2 = userInfo.AddressLine2;
+                    applicationUser.CityName = userInfo.CityName;
+                    applicationUser.ZipCode = userInfo.ZipCode;
+                    applicationUser.PhoneNumber = userInfo.PhoneNumber;
+                    applicationUser.PhoneExt = userInfo.PhoneExt;
+                    applicationUser.PhoneNumberConfirmed = true;
+
+                    applicationUser.IsAccountLocked = false;
+                    applicationUser.IsAccountResetRequired = false;
+                    applicationUser.LockoutEnabled = true;
+                    applicationUser.EmailConfirmed = true;
+                    applicationUser.IsInternalAccount = false;
+                    applicationUser.IsIdentityProofed = false;
+
+                    //        var userProfile = _mapper.Map<UserProfile>(userInfo);
+
+                    var result = _userManager.CreateAsync(applicationUser, userInfo.Password).Result;
+                    if (result == IdentityResult.Success)
+                    {
+                        // Retrieve user again to get userProfile Id. 
+                        applicationUser = _userManager.FindById(applicationUser.Id);
+
+                        // 1. Create a new row in userProfile password history table 
+                        _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
+                        {
+                            LastModificationDateTimeUtc = DateTime.UtcNow,
+                            PasswordHash = applicationUser.PasswordHash,
+                            UserProfileId = applicationUser.UserProfileId
+                        });
+
+                        // UC-42 6
+                        // 2 Create organziation regulatory program userProfile, and set the approved statue to false  
+                        var orpu = _programService.CreateOrganizationRegulatoryProgramForUser(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId);
+
+                        // 3 TODO send email to all users who have rights to approve a registrant 
+                        // UC-42 7
+                        // find out who have the approve permission
+
+
+                        // 4 TODO remove the invitation from table
+                        // UC-42 8
+                        var organizationId = 100;
+                        var approvalPeople = _permissionService.GetApprovalPeople(applicationUser.UserProfileId, organizationId);
+                        var sendTo = approvalPeople.Select(i => i.Email);
+
+                        // TODO:  to determine if user is authority user or is industry user;
+                        var isUserAuthorityUser = true;
+                        var emailContentReplacements = new Dictionary<string, string>();
+
+                        // TODO  to prepare email audit log entry information 
+
+                        var logEntry = new EmailAuditLogEntryDto();
+                        logEntry.RecipientFirstName = userInfo.FirstName;
+                        logEntry.RecipientLastName = userInfo.LastName;
+                        logEntry.RecipientUserName = userInfo.UserName;
+                        _requestCache.SetValue(CacheKey.EmailRecipientUserProfileId, applicationUser.UserProfileId.ToString());
+                        _requestCache.SetValue(CacheKey.Token, registrationToken);  
+
+                        //logEntry.SenderFirstName = "Linko support";
+                        //logEntry.SenderLastName = "Linko support";
+
+                        if (isUserAuthorityUser)
+                        {
+                           await _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements);
+                        }
+                        else
+                        {
+                            await _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
+                        }
+
+                        // 5 TODO logs invite email  
+                        // UC-1 
+
+                        // 6 TODO logs invite to Audit 
+                        // UC-2 
+                        await _dbContext.SaveChangesAsync();
+                        authenticationResult.Success = true;
+                        SendRegistrationConfirmationEmail(applicationUser.Id, userInfo);
+
+                        transaction.Commit();
+                        //transaction.Rollback();
+                        return authenticationResult;
+                    }
+
+                    authenticationResult.Success = false;
+                    authenticationResult.Errors = result.Errors;
+                    transaction.Rollback();
+                    return authenticationResult;
+                }
+                catch (Exception ex)
+                {
+                    var errors = new List<string> { ex.Message };
+                    authenticationResult.Success = false;
+                    authenticationResult.Errors = errors;
+                    transaction.Rollback();
+                }
             }
 
-            return Task.FromResult(authenticationResult);
+            return authenticationResult;
         }
 
         /// <summary>
@@ -528,6 +545,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             // Check if user's password is expired or not   
             if (IsUserPasswordExpired(userId, organizationSettings))
             {
+                signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
                 return Task.FromResult(signInResultDto); 
             }
 

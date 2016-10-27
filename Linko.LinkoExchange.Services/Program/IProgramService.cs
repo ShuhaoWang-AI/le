@@ -26,5 +26,7 @@ namespace Linko.LinkoExchange.Services.Program
         /// <param name="organizationRegulatoryProgramId">The organziation regulatory program Id</param>
         /// <returns></returns>
         OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int organizationRegulatoryProgramId);
+
+        OrganizationRegulatoryProgramUserDto CreateOrganizationRegulatoryProgramForUser(int userProfileId, int regulatoryProgramId);
     }
 }

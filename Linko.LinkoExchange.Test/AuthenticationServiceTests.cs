@@ -24,6 +24,7 @@ using System.Security.Claims;
 using System.Data.Entity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
+using AutoMapper;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -40,14 +41,16 @@ namespace Linko.LinkoExchange.Test
         IUserService userService = Mock.Of<IUserService>();
         ISessionCache sessionCache = Mock.Of<ISessionCache>();
         IPasswordHasher passwordHasher = new PasswordHasher();
+        IRequestCache requestCache = Mock.Of<IRequestCache>();
+
         Mock<IAuthenticationManager> authManger = new Mock<IAuthenticationManager>();
         Mock<ApplicationSignInManager> signmanager;
         Mock<LinkoExchangeContext> dbContext;
         Mock<ApplicationUserManager> userManagerObj;
         UserProfile userProfile;
         AuthenticationService _authenticationService;
-        Dictionary<SettingType, string> settingDict = new Dictionary<SettingType, string>(); 
-
+        Dictionary<SettingType, string> settingDict = new Dictionary<SettingType, string>();
+         
         [TestInitialize]
         public void TestInitialize()
         {
@@ -65,6 +68,8 @@ namespace Linko.LinkoExchange.Test
                   i.Email == "test@watertrax.com" &&
                   i.Claims == new List<IdentityUserClaim>()
               );
+
+            AutoMapperConfig.Setup(); 
 
             var userMock = Mock.Get(userProfile);
             userMock.SetupProperty(i => i.Id, "owin-user-id");
@@ -109,6 +114,8 @@ namespace Linko.LinkoExchange.Test
                 dbContext.Object,
                 userService,
                 sessionCache,
+                requestCache,
+                AutoMapper.Mapper.Instance,
                 passwordHasher
                 );
 
@@ -416,6 +423,8 @@ namespace Linko.LinkoExchange.Test
                 new LinkoExchangeContext(connectionString),
                 userService,
                 sessionCache,
+                requestCache,
+                Mapper.Instance,
                 passwordHasher
                 );
 

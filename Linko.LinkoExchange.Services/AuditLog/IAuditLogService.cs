@@ -1,5 +1,6 @@
 ﻿
 using Linko.LinkoExchange.Services.Dto;
+using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services.AuditLog
 {
@@ -9,6 +10,6 @@ namespace Linko.LinkoExchange.Services.AuditLog
         /// Write log
         /// </summary>
         /// <param name="logEntry">The log information</param>
-        void Log(IAuditLogEntry logEntry);
+        Task Log(IAuditLogEntry logEntry);
     }
 }

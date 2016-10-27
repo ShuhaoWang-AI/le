@@ -61,8 +61,7 @@ namespace Linko.LinkoExchange.Services.User
             }
             else
             {
-                //_logger.Log("ERROR")
-                throw new Exception();
+                return null;
             }
         }
 
@@ -116,8 +115,7 @@ namespace Linko.LinkoExchange.Services.User
                 throw new Exception();
             }
         }
-
-
+        
         public void UpdateUserState(int orgRegProgUserId, bool? isRegApproved, bool? isRegDenied, bool? isEnabled, bool? isRemoved)
         {
             OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);

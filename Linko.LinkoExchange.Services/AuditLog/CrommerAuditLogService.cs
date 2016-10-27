@@ -2,6 +2,7 @@
 using System;
 using System.Web;
 using Linko.LinkoExchange.Data;
+using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services.AuditLog
 { 
@@ -11,7 +12,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
         /// Write CrommerAuditLog
         /// </summary>
         /// <param name="logEntry">CrommerAuditLog object</param>
-        public void Log(IAuditLogEntry logEntry)
+        public async Task Log(IAuditLogEntry logEntry)
         {
 //            var crommerLogEntry = logEntry as CrommerAuditLogEntry;
 //

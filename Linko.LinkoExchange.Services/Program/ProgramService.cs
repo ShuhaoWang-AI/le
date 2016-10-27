@@ -5,6 +5,7 @@ using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.User;
 using System.Linq;
 using AutoMapper;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Services.Program
 {
@@ -114,6 +115,26 @@ namespace Linko.LinkoExchange.Services.Program
 
             }
             return organziationRegulatoryProgramUserDtos;
+        }
+
+        public OrganizationRegulatoryProgramUserDto CreateOrganizationRegulatoryProgramForUser(int userProfileId, int organizationRegulatoryProgramId)
+        {
+            var orpu = new OrganizationRegulatoryProgramUser();
+            orpu.IsEnabled = true;
+            orpu.IsRegistrationApproved = false;
+            orpu.IsRegistrationDenied = false;
+            orpu.IsSignatory = false;
+            orpu.UserProfileId = userProfileId;
+            //orpu.LastModificationDateTimeUtc = DateTime.UtcNow;
+            orpu.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+            orpu.RegistrationDateTime = DateTimeOffset.UtcNow;
+            orpu.OrganizationRegulatoryProgramId = organizationRegulatoryProgramId;
+
+            _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Add(orpu);
+            _linkoExchangeDbContext.SaveChanges();
+
+            return _mapper.Map<OrganizationRegulatoryProgramUserDto>(orpu);
+
         }
     }
 }

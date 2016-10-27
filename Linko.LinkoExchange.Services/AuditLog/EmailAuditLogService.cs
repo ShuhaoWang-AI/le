@@ -4,6 +4,7 @@ using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using System;
+using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services.AuditLog
 {
@@ -24,7 +25,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
         /// Write email audit log
         /// </summary>
         /// <param name="logEntry">Email audit log entry</param>
-        public void Log(IAuditLogEntry logEntry)
+        public async Task Log(IAuditLogEntry logEntry)
         {
             var emailLogEntryDto = logEntry as EmailAuditLogEntryDto;
             if (emailLogEntryDto == null)
@@ -32,11 +33,9 @@ namespace Linko.LinkoExchange.Services.AuditLog
 
             var emailLogEntry = AutoMapper.Mapper.Map<EmailAuditLog>(emailLogEntryDto);
             emailLogEntry.Token = _requestCache.GetValue(CacheKey.Token) as string;
-            emailLogEntry.SenderUserProfileId = _requestCache.GetValue(CacheKey.EmailSenderUserProfileId) == null ? null : (int?)(ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailSenderUserProfileId) as string, 0));
-            emailLogEntry.RecipientUserProfileId = _requestCache.GetValue(CacheKey.EmailRecipientUserProfileId) == null ? null : (int?)(ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientUserProfileId) as string, 0));
 
             this._dbContext.EmailAuditLog.Add(emailLogEntry);
-            this._dbContext.SaveChangesAsync();
+            await this._dbContext.SaveChangesAsync();
         }
     }
 }

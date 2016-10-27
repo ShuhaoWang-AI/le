@@ -53,7 +53,7 @@ namespace Linko.LinkoExchange.Services.Email
             _senderLastName = _settingService.GetGlobalSettings()[SettingType.SystemEmailLastName]; 
         }
 
-        public async void SendEmail(IEnumerable<string> recipients, EmailType emailType,
+        public async Task SendEmail(IEnumerable<string> recipients, EmailType emailType,
             IDictionary<string, string> contentReplacements)
         {
             string sendTo = string.Join(separator: ",", values: recipients); 
@@ -82,7 +82,7 @@ namespace Linko.LinkoExchange.Services.Email
                 var logEntries = GetEmailAuditLog(_senderEmailAddres, receipientEmail, emailType, msg.Subject, msg.Body, template.AuditLogTemplateId);
                 foreach (var log in logEntries)
                 {
-                    _emailAuditLogService.Log(log);
+                   await _emailAuditLogService.Log(log);
                 } 
             }  
         }
@@ -147,6 +147,7 @@ namespace Linko.LinkoExchange.Services.Email
                             RecipientFirstName = user.UserProfileDto.FirstName,
                             RecipientLastName = user.UserProfileDto.LastName,
                             RecipientUserName = user.UserProfileDto.UserName,
+                            RecipientUserProfileId = user.UserProfileId,
 
                             RecipientRegulatoryProgramId = user.OrganizationRegulatoryProgramId,
                             RecipientOrganizationId = user.OrganizationRegulatoryProgramDto.OrganizationId,
@@ -169,10 +170,10 @@ namespace Linko.LinkoExchange.Services.Email
         private IEnumerable<EmailAuditLogEntryDto> PopulateSingleRecipientProgramData(string email)
         {
             var emailAuditLogs = new List<EmailAuditLogEntryDto>();
-            var oRpUs = _programService.GetUserRegulatoryPrograms(email).ToArray();
-            if (oRpUs.Any())
+            var oRpUs = _programService.GetUserRegulatoryPrograms(email);
+            if (oRpUs != null && oRpUs.Any())
             {
-                var user = oRpUs[0]; // get the first one to get user first name, last, and user name; 
+                var user = oRpUs.ToArray()[0]; // get the first one to get user first name, last, and user name; 
                 var firstName = user.UserProfileDto.FirstName;
                 var lastName = user.UserProfileDto.LastName;
                 var userName = user.UserProfileDto.UserName;
@@ -184,14 +185,18 @@ namespace Linko.LinkoExchange.Services.Email
                     RecipientUserName = userName,
 
                     RecipientRegulatoryProgramId =
-                        ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientRegulatoryProgramId)as string, 0),
+                        ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientRegulatoryProgramId) as string, 0),
                     RecipientOrganizationId =
-                        ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientOrganizationId)as string, 0),
+                        ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientOrganizationId) as string, 0),
                     RecipientRegulatorOrganizationId =
                         ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientRegulatoryOrganizationId) as string, 0)
                 };
 
                 emailAuditLogs.Add(auditLog);
+            }
+            else
+            {
+                emailAuditLogs.Add(new EmailAuditLogEntryDto());
             }
 
             return emailAuditLogs;
