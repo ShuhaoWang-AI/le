@@ -30,7 +30,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public bool IsAccountResetRequired { get; set; }
         public bool IsIdentityProofed { get; set; }
         public bool IsInternalAccount { get; set; }
-        public DateTime? LastModificationDateTimeUtc { get; set; }
+        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public string OldEmailAddress { get; set; }  
 
