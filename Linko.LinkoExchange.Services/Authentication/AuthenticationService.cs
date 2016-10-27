@@ -608,8 +608,11 @@ namespace Linko.LinkoExchange.Services.Authentication
                     return false;
                 }
 
-                // 6.b returned in the intermediate page call.... 
-
+                // 6.b returned in the intermediate page call....  
+            } else {
+                // If user dosen't have any program, return below message
+                signInResultDto.AutehticationResult = AuthenticationResult.AccountIsNotAssociated;
+                return false;
             }
             return true;
         }
