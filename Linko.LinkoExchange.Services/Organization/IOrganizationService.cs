@@ -43,8 +43,11 @@ namespace Linko.LinkoExchange.Services.Organization
         /// Otherwise throw exception
         void UpdateEnableDisableFlag(int orgRegProgId, bool isEnabled);
 
+        OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int orgRegProgId);
+
         List<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int orgRegProgId);
 
-        void AddChildOrganization(int parentRegOrdId, OrganizationDto childOrganization);  
+        void AddChildOrganization(int parentRegOrdId, OrganizationDto childOrganization);
+
     }
 }

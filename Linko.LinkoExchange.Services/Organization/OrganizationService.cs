@@ -213,6 +213,17 @@ namespace Linko.LinkoExchange.Services
             }
         }
 
+        public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int orgRegProgId)
+        {
+            var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId);
+            OrganizationRegulatoryProgramDto dto = _mapper.Map<OrganizationRegulatoryProgram, OrganizationRegulatoryProgramDto>(orgRegProgram);
+            dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
+                .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
+                && o.IsSignatory == true) > 0;
+
+            return dto;
+        }
+
         public List<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int orgRegProgId)
         {
             try
