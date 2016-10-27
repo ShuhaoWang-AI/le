@@ -46,5 +46,7 @@ namespace Linko.LinkoExchange.Services
         void DeleteQuestionAnswerPair(int userQuestionAnswerId);
 
         ICollection<QuestionAnswerPairDto> GetUsersQuestionAnswers(int userProfileId, Dto.QuestionType questionType);
+
+        QuestionAnswerPairDto GetRandomQuestionAnswerFromToken(string token, Dto.QuestionType questionType);
     }
 }

@@ -304,5 +304,21 @@ namespace Linko.LinkoExchange.Services
             }
             return usersQAList;
         }
+
+        public QuestionAnswerPairDto GetRandomQuestionAnswerFromToken(string token, Dto.QuestionType questionType)
+        {
+            //Find UserProfileId from EmailAuditLog.Recipient
+            var emailAuditLog = _dbContext.EmailAuditLog.SingleOrDefault(e => e.Token == token);
+            if (emailAuditLog != null && emailAuditLog.RecipientUserProfileId.HasValue)
+            {
+                var userProfileId = emailAuditLog.RecipientUserProfileId;
+
+                var qAndAs = GetUsersQuestionAnswers(userProfileId.Value, questionType);
+                return qAndAs.OrderBy(qu => Guid.NewGuid()).First();
+            }
+            else
+                throw new Exception(string.Format("ERROR: Cannot find email audit log for token={0}", token));
+
+        }
     }
 }
