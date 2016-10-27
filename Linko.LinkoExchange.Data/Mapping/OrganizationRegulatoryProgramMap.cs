@@ -27,6 +27,7 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .HasForeignKey(i => i.RegulatorOrganizationId);
 
             Property(i => i.IsEnabled);
+            Property(i => i.AssignedTo);
         }
     }
 }

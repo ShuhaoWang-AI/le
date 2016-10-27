@@ -22,5 +22,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual Organization RegulatorOrganization { get; set; }
         public bool IsEnabled { get; set; }
         public bool IsRemoved { get; set; }
+
+        public string AssignedTo { get; set; }
     }
 }
