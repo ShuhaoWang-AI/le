@@ -103,7 +103,7 @@ namespace Linko.LinkoExchange.Services
                     orpUser.OrganizationRegulatoryProgram?.Organization.OrganizationType.Name == "Authority" &&
                     !orgs.Any(i => i.OrganizationId == orpUser.OrganizationRegulatoryProgram.RegulatorOrganizationId))
                 {
-                    AuthorityDto authority = _mapper.Map<Core.Domain.Organization, AuthorityDto>((Core.Domain.Organization)orpUser.OrganizationRegulatoryProgram.Organization);
+                    AuthorityDto authority = _mapper.Map<Core.Domain.Organization, AuthorityDto>(orpUser.OrganizationRegulatoryProgram.Organization);
                     authority.RegulatoryProgramId = orpUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
                     authority.OrganizationRegulatoryProgramId = orpUser.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId;
                     authority.EmailContactInfoName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);

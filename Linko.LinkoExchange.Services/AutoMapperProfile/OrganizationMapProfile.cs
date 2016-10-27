@@ -19,6 +19,16 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
 
             CreateMap<OrganizationType, OrganizationTypeDto>()
                 .ReverseMap();
+
+
+            CreateMap<Core.Domain.Organization, AuthorityDto>()
+            .ForMember(d => d.OrganizationName, o => o.MapFrom(s => s.Name))
+            .ForMember(i => i.EmailContactInfoName, o => o.Ignore())
+            .ForMember(i => i.EmailContactInfoPhone, o => o.Ignore())
+            .ForMember(i => i.EmailContactInfoEmailAddress, o => o.Ignore())
+            .ForMember(i => i.RegulatoryProgramId, o => o.Ignore())
+            .ForMember(i => i.OrganizationRegulatoryProgramId, o => o.Ignore());
+
         }
     }
 
