@@ -25,6 +25,7 @@ using System.Data.Entity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using AutoMapper;
+using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -50,7 +51,8 @@ namespace Linko.LinkoExchange.Test
         UserProfile userProfile;
         AuthenticationService _authenticationService;
         Dictionary<SettingType, string> settingDict = new Dictionary<SettingType, string>();
-         
+        Mock<IHttpContextService> _httpContext;
+
         [TestInitialize]
         public void TestInitialize()
         {
@@ -116,7 +118,8 @@ namespace Linko.LinkoExchange.Test
                 sessionCache,
                 requestCache,
                 AutoMapper.Mapper.Instance,
-                passwordHasher
+                passwordHasher,
+                _httpContext.Object
                 );
 
             userManagerObj.Setup(
@@ -459,7 +462,8 @@ namespace Linko.LinkoExchange.Test
                 sessionCache,
                 requestCache,
                 Mapper.Instance,
-                passwordHasher
+                passwordHasher,
+                _httpContext.Object
                 );
 
             authService.SetClaimsForOrgRegProgramSelection(1);

@@ -49,6 +49,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private readonly IDictionary<SettingType, string> _globalSettings;
         private readonly IMapper _mapper;
+        private readonly IHttpContextService _httpContext;
 
         public AuthenticationService(ApplicationUserManager userManager,
             ApplicationSignInManager signInManager,
@@ -65,6 +66,7 @@ namespace Linko.LinkoExchange.Services.Authentication
            , IRequestCache requestCache
            , IMapper mapper
            , IPasswordHasher passwordHasher
+           , IHttpContextService httpContext
             )
         {
             if (linkoExchangeContext == null) throw new ArgumentNullException(paramName: "linkoExchangeContext");
@@ -81,6 +83,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (sessionCache == null) throw new ArgumentNullException("sessionCache");
             if (requestCache == null) throw new ArgumentNullException("requestCache");
             if (mapper == null) throw new ArgumentNullException("mapper");
+            if (httpContext == null) throw new ArgumentNullException("httpContext");
 
             _dbContext = linkoExchangeContext;
             _userManager = userManager;
@@ -98,6 +101,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             _requestCache = requestCache;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
+            _httpContext = httpContext;
         }
 
         public IList<Claim> GetClaims()
@@ -1004,9 +1008,9 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         string GetBaseUrl()
         {
-            return System.Web.HttpContext.Current.Request.Url.Scheme + "://" 
-                + System.Web.HttpContext.Current.Request.Url.Authority 
-                + System.Web.HttpContext.Current.Request.ApplicationPath.TrimEnd('/') + "/";
+            return _httpContext.Current().Request.Url.Scheme + "://" 
+                + _httpContext.Current().Request.Url.Authority 
+                + _httpContext.Current().Request.ApplicationPath.TrimEnd('/') + "/";
         }
         #endregion
     }

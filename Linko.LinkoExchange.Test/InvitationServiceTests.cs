@@ -7,7 +7,6 @@ using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using Microsoft.AspNet.Identity;
 using System.Configuration;
-using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.User;
