@@ -316,7 +316,7 @@ namespace Linko.LinkoExchange.Test
                 new UserPasswordHistory
                 {
                     UserProfileId = userProfile.UserProfileId,
-                    LastModificationDateTimeUtc = DateTime.Now.AddDays(-1)
+                    LastModificationDateTimeUtc = DateTime.Now.AddDays(-2)
                 } 
 
             }.AsQueryable();
@@ -340,10 +340,34 @@ namespace Linko.LinkoExchange.Test
                            }
                       }
                 );
-            IEnumerable<OrganizationSettingDto> settings = new List<OrganizationSettingDto> { orgSettingDto }; 
+            var settings = new List<OrganizationSettingDto> { orgSettingDto }; 
 
             var setMock = Mock.Get(settService);
-            setMock.Setup(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>())).Returns(settings); 
+            setMock.Setup(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>())).Returns(settings);
+
+
+            var orpu1 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
+                  p => p.IsRegistrationApproved == false
+               );
+
+            var orpu2 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
+                p => p.IsRegistrationApproved == true &&
+                     p.IsEnabled == true &&
+                    p.OrganizationRegulatoryProgramDto.IsEnabled == false
+
+              );
+
+            var orpu3 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
+             p => p.IsRegistrationApproved == true &&
+                  p.IsEnabled == true &&
+                 p.OrganizationRegulatoryProgramDto.IsEnabled == true
+
+           );
+
+            var progMock = Mock.Get(progService);
+            progMock.Setup(i=>i.GetUserRegulatoryPrograms(It.IsAny<string>())).Returns(new[] {
+                 orpu1, orpu2, orpu3
+            });
 
             var result = _authenticationService.SignInByUserName("shuhao", "password", true);
 
@@ -388,10 +412,20 @@ namespace Linko.LinkoExchange.Test
                       i.Settings == settings 
                       ); 
 
-            IEnumerable<OrganizationSettingDto> orgSettings = new List<OrganizationSettingDto> { orgSettingDto };
+            var orgSettings = new List<OrganizationSettingDto> { orgSettingDto };
 
             var setMock = Mock.Get(settService);
-            setMock.Setup(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>())).Returns(orgSettings);
+            setMock.Setup(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>())).Returns(orgSettings); 
+
+            var orpu = Mock.Of<OrganizationRegulatoryProgramUserDto>(
+                    p => p.IsRegistrationApproved == true &&
+                    p.IsEnabled == true &&
+                    p.OrganizationRegulatoryProgramDto.IsEnabled == true
+
+         );
+
+            var progMock = Mock.Get(progService);
+            progMock.Setup(i => i.GetUserRegulatoryPrograms(It.IsAny<string>())).Returns(new[] {orpu}); 
 
             signmanager.Setup(i => i.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), true,  true))
                .Returns(Task.FromResult(SignInStatus.Success)); 
