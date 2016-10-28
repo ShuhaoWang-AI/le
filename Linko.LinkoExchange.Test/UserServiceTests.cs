@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
 using Microsoft.AspNet.Identity;
 using System.Configuration;
+using Linko.LinkoExchange.Services;
+using Moq;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -15,6 +17,7 @@ namespace Linko.LinkoExchange.Test
     public class UserServiceTests
     {
         private UserService _userService;
+        IHttpContextService _httpContext = Mock.Of<IHttpContextService>();
 
         public UserServiceTests()
         {
@@ -36,7 +39,7 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, new CurrentUser());
+            _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, _httpContext);
         }
 
         [TestMethod]

@@ -11,6 +11,9 @@ using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Email;
+using Moq;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -18,7 +21,8 @@ namespace Linko.LinkoExchange.Test
     public class InvitationServiceTests
     {
         private InvitationService invitationService;
-       
+        IEmailService _emailService = Mock.Of<IEmailService>();
+
         public InvitationServiceTests()
         {
             Mapper.Initialize(cfg =>
@@ -39,11 +43,14 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            invitationService = new InvitationService(new LinkoExchangeContext(connectionString),
+            invitationService = new InvitationService(
+                new LinkoExchangeContext(connectionString),
                 Mapper.Instance,
                 new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance),
-                new UserService(),
-                new EmailService(),
+                new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, new HttpContextService()),
+                new RequestCache(),
+                _emailService,
+                new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance), new HttpContextService()),
                 new HttpContextService());
         }
 
