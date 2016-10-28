@@ -11,6 +11,7 @@ using System.Linq;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Core.Extensions;
 using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Enum;
 
@@ -21,17 +22,16 @@ namespace Linko.LinkoExchange.Services
         private readonly LinkoExchangeContext _dbContext;
         //private readonly IAuditLogEntry _logger;
         private readonly IMapper _mapper;
-        private readonly ICurrentUser _currentUser;
         private readonly ISettingService _settingService;
+        private readonly IHttpContextService _httpContext;
 
         public OrganizationService(LinkoExchangeContext dbContext, IMapper mapper,
-            ICurrentUser currentUser, ISettingService settingService)//, IAuditLogEntry logger)
+            ISettingService settingService, IHttpContextService httpContext)
         {
             _dbContext = dbContext;
-            //_logger = logger;
             _mapper = mapper;
-            _currentUser = currentUser;
             _settingService = settingService;
+            _httpContext = httpContext;
         }
 
         public IEnumerable<OrganizationDto> GetUserOrganizationsByOrgRegProgUserId(int orgRegProgUserId)
@@ -52,7 +52,7 @@ namespace Linko.LinkoExchange.Services
 
         public IEnumerable<OrganizationRegulatoryProgramDto> GetUserOrganizations()
         {
-            int userProfileId = Convert.ToInt32(_currentUser.UserProfileId());
+            int userProfileId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
             return GetUserOrganizations(userProfileId);
         }
 

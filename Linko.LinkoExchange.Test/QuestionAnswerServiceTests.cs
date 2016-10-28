@@ -33,7 +33,10 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            _questionAnswerService = new QuestionAnswerService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new CurrentUser(new Services.Authentication.ApplicationUserManager, new SessionCache());
+            _questionAnswerService = new QuestionAnswerService(new LinkoExchangeContext(connectionString),
+                                                               new EmailAuditLogEntryDto(),
+                                                               new HttpContextService());
+                                                               
         }
 
         [TestMethod]

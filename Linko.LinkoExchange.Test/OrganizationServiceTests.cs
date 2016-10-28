@@ -38,7 +38,7 @@ namespace Linko.LinkoExchange.Test
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             orgService = new OrganizationService(new LinkoExchangeContext(connectionString), 
-                Mapper.Instance, new CurrentUser(), new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance));
+                Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance), new HttpContextService());
         }
 
         [TestMethod]

@@ -9,6 +9,8 @@ using Microsoft.AspNet.Identity;
 using System.Configuration;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.User;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -37,8 +39,12 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            invitationService = new InvitationService(new LinkoExchangeContext(connectionString), Mapper.Instance,
-                new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance));
+            invitationService = new InvitationService(new LinkoExchangeContext(connectionString),
+                Mapper.Instance,
+                new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance),
+                new UserService(),
+                new EmailService(),
+                new HttpContextService());
         }
 
         [TestMethod]

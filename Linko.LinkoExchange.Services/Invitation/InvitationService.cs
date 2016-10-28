@@ -9,6 +9,12 @@ using Linko.LinkoExchange.Core.Validation;
 using System.Data.Entity.Validation;
 using System.Data.Entity.Infrastructure;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Email;
+using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Services.Invitation
 {
@@ -17,12 +23,24 @@ namespace Linko.LinkoExchange.Services.Invitation
         private readonly LinkoExchangeContext _dbContext; 
         private readonly IMapper _mapper;
         private readonly ISettingService _settingService;
+        private readonly IUserService _userService;
+        private readonly IRequestCache _requestCache;
+        private readonly IEmailService _emailService;
+        private readonly IOrganizationService _organizationService;
+        private readonly IHttpContextService _httpContext;
 
-        public InvitationService(LinkoExchangeContext dbContext, IMapper mapper, ISettingService settingService) 
+        public InvitationService(LinkoExchangeContext dbContext, IMapper mapper, 
+            ISettingService settingService, IUserService userService, IRequestCache requestCache,
+            IEmailService emailService, IOrganizationService organizationService, IHttpContextService httpContext) 
         {
             _dbContext = dbContext; 
             _mapper = mapper;
             _settingService = settingService;
+            _userService = userService;
+            _requestCache = requestCache;
+            _emailService = emailService;
+            _organizationService = organizationService;
+            _httpContext = httpContext;
         }
  
 
@@ -145,12 +163,18 @@ namespace Linko.LinkoExchange.Services.Invitation
         public int GetRemainingUserLicenseCount(int orgRegProgramId, bool isForAuthority)
         {
             int maxCount;
-            
+
             if (isForAuthority)
                 maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.AuthorityUserLicenseTotalCount));
             else
-                maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.IndustryUserLicenseTotalCount));
-
+            {
+                //Setting will be at the Authority of this Industry
+                var thisIndustry = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
+                var authority = _dbContext.OrganizationRegulatoryPrograms
+                    .Single(o => o.OrganizationId == thisIndustry.RegulatorOrganizationId &&
+                    o.RegulatoryProgramId == thisIndustry.RegulatoryProgramId);
+                maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.IndustryUserLicenseTotalCount));
+            }
             var currentProgramUserCount = _dbContext.OrganizationRegulatoryProgramUsers.Count(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
             var remaining = maxCount - currentProgramUserCount;
 
@@ -159,6 +183,139 @@ namespace Linko.LinkoExchange.Services.Invitation
 
             return remaining;
             
+        }
+
+        public int GetRemainingIndustryLicenseCount(int orgRegProgramId)
+        {
+            var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
+            var currentChildIndustryCount = _dbContext.OrganizationRegulatoryPrograms
+                .Count(u => u.RegulatorOrganizationId == orgRegProgram.OrganizationId 
+                && u.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
+
+            int maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.IndustryLicenseTotalCount));
+            var remaining = maxCount - currentChildIndustryCount;
+
+            if (remaining < 0)
+                throw new Exception(string.Format("ERROR: Remaining industry license count is a negative number (={0}) for Org Reg Program={1}", remaining, orgRegProgramId));
+
+            return remaining;
+
+        }
+
+
+        public InvitationServiceResultDto SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType)
+        {
+            //See if any existing users belong to this program
+            var existingProgramUsers = _userService.GetProgramUsersByEmail(email);
+            if (existingProgramUsers != null && existingProgramUsers.Count() > 0)
+            {
+                var existingUserForThisProgram = existingProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
+                if (existingUserForThisProgram != null)
+                {
+                    return new InvitationServiceResultDto()
+                    {
+                        Success = false,
+                        ErrorType = Core.Enum.InvitationError.Duplicated,
+                        Errors = new string[] { existingUserForThisProgram.UserProfileDto.FirstName, existingUserForThisProgram.UserProfileDto.LastName }
+                    };
+                }
+
+                //Found match(es) for user not yet part of this program (4.a)
+                List<string> userList = new List<string>();
+                foreach (var user in existingProgramUsers)
+                {
+                    userList.Add(string.Format("", user.OrganizationRegulatoryProgramId,
+                        user.UserProfileDto.FirstName,
+                        user.UserProfileDto.LastName,
+                        user.UserProfileDto.PhoneNumber,
+                        user.OrganizationRegulatoryProgramDto.RegulatoryProgramDto.Name,
+                        user.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName)); //Add additional as needed
+                }
+                return new InvitationServiceResultDto()
+                {
+                    Success = false,
+                    ErrorType = Core.Enum.InvitationError.MatchingUsersInOtherPrograms,
+                    Errors = userList
+                };
+
+            }
+
+            //Check available license count
+            bool isNoMoreRemaining = false;
+            if (invitationType == InvitationType.AuthorityToIndustry)
+                isNoMoreRemaining = GetRemainingIndustryLicenseCount(orgRegProgramId) < 1;
+            else
+                isNoMoreRemaining = GetRemainingUserLicenseCount(orgRegProgramId, invitationType == InvitationType.AuthorityToAuthority) < 1;
+            
+            if (isNoMoreRemaining)
+            {
+                return new InvitationServiceResultDto()
+                {
+                    Success = false,
+                    ErrorType = Core.Enum.InvitationError.NoMoreRemainingUserLicenses
+                };
+
+            }
+
+            var invitationId = Guid.NewGuid().ToString();
+
+            _requestCache.SetValue(CacheKey.Token, invitationId);
+
+            var newInvitation = _dbContext.Invitations.Create();
+            newInvitation.InvitationId = invitationId;
+            newInvitation.InvitationDateTimeUtc = DateTimeOffset.Now;
+            newInvitation.EmailAddress = email;
+            newInvitation.FirstName = firstName;
+            newInvitation.LastName = lastName;
+            newInvitation.RecipientOrganizationRegulatoryProgramId = orgRegProgramId;
+            newInvitation.SenderOrganizationRegulatoryProgramId = orgRegProgramId;
+            _dbContext.Invitations.Add(newInvitation);
+            _dbContext.SaveChanges();
+
+            //Send invite with link
+            var contentReplacements = new Dictionary<string, string>();
+            OrganizationRegulatoryProgram authority;
+            var thisOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
+            contentReplacements.Add("userName", firstName + " " + lastName);
+
+            if (invitationType == InvitationType.AuthorityToAuthority)
+                authority = thisOrgRegProgram;
+            else
+            {
+                //Sending to an Industry therefore need to lookup Authority
+                authority = _dbContext.OrganizationRegulatoryPrograms
+                    .Single(o => o.OrganizationId == thisOrgRegProgram.RegulatorOrganizationId &&
+                    o.RegulatoryProgramId == thisOrgRegProgram.RegulatoryProgramId);
+            }
+
+            var authorityName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+            var authorityEmail = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+            var authorityPhone = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+
+            contentReplacements.Add("authorityName", authorityName);
+            contentReplacements.Add("emailAddress", authorityEmail);
+            contentReplacements.Add("phoneNumber", authorityPhone);
+
+            if (invitationType == InvitationType.AuthorityToIndustry
+                || invitationType == InvitationType.IndustryToIndustry)
+            {
+                contentReplacements.Add("organizationName", thisOrgRegProgram.Organization.Name);
+                contentReplacements.Add("addressLine1", thisOrgRegProgram.Organization.AddressLine1);
+                contentReplacements.Add("cityName", thisOrgRegProgram.Organization.CityName);
+                contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == thisOrgRegProgram.Organization.JurisdictionId).Name);
+            }
+
+            string baseUrl = _httpContext.Current().Request.Url.Scheme + "://" + _httpContext.Current().Request.Url.Authority + _httpContext.Current().Request.ApplicationPath.TrimEnd('/') + "/";
+            string url = baseUrl + "?token=" + invitationId;
+            contentReplacements.Add("link", url);
+
+            _emailService.SendEmail(new[] { email }, EmailType.Registration_AuthorityInviteIndustryUser, contentReplacements);
+
+            return new InvitationServiceResultDto()
+            {
+                Success = true
+            };
+
         }
 
         public void DeleteInvitation(string invitationId)

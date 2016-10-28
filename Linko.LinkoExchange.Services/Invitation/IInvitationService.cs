@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Invitation
 {
@@ -33,12 +34,6 @@ namespace Linko.LinkoExchange.Services.Invitation
         IEnumerable<OrganizationDto> GetInvitationrRecipientOrganization(string invitationId);
 
         /// <summary>
-        /// Creates record in Invitation table
-        /// </summary>
-        /// <param name="invite"></param>
-        void CreateInvitation(InvitationDto inviteDto);
-
-        /// <summary>
         /// Returns all records in the Invitation table 
         /// where recipient program id matches
         /// </summary>
@@ -48,6 +43,7 @@ namespace Linko.LinkoExchange.Services.Invitation
 
         int GetRemainingUserLicenseCount(int orgRegProgramId, bool isForAuthority);
 
+        InvitationServiceResultDto SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType);
 
     }
 }

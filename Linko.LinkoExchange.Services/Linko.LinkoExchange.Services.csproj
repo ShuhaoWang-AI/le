@@ -151,6 +151,8 @@
     <Compile Include="Dto\AuthenticationResultDto.cs" />
     <Compile Include="Cache\IRequestCache.cs" />
     <Compile Include="Email\LinkoExchangeEmailService.cs" />
+    <Compile Include="HttpContext\HttpContextService.cs" />
+    <Compile Include="HttpContext\IHttpContextService.cs" />
     <Compile Include="Invitation\IInvitationService.cs" />
     <Compile Include="Invitation\InvitationService.cs" />
     <Compile Include="Organization\IOrganizationService.cs" />
@@ -163,8 +165,6 @@
     <Compile Include="Settings\SettingService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QuestionAnswer\IQuestionAnswerService.cs" />
-    <Compile Include="User\CurrentUser.cs" />
-    <Compile Include="User\ICurrentUser.cs" />
     <Compile Include="User\IUserService.cs" />
     <Compile Include="QuestionAnswer\QuestionAnswerService.cs" />
     <Compile Include="User\UserService.cs" />

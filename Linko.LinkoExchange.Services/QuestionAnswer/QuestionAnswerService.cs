@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Services
 {
@@ -23,13 +24,13 @@ namespace Linko.LinkoExchange.Services
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly IAuditLogEntry _logger;
-        private readonly ICurrentUser _currentUser;
+        private readonly IHttpContextService _httpContext;
 
-        public QuestionAnswerService(LinkoExchangeContext dbContext, IAuditLogEntry logger, ICurrentUser currentUser)
+        public QuestionAnswerService(LinkoExchangeContext dbContext, IAuditLogEntry logger, IHttpContextService httpContext)
         {
             _dbContext = dbContext;
             _logger = logger;
-            _currentUser = currentUser;
+            _httpContext = httpContext;
         }
 
         public void AddQuestionAnswerPair(int userProfileId, QuestionDto question, AnswerDto answer)
@@ -96,7 +97,7 @@ namespace Linko.LinkoExchange.Services
                 question = answer.Question;
                 question.Content = questionAnswer.Question.Content;
                 question.LastModificationDateTimeUtc = DateTime.UtcNow;
-                question.LastModifierUserId = Convert.ToInt32(_currentUser.UserProfileId());
+                question.LastModifierUserId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
             }
             else
             {
@@ -152,7 +153,7 @@ namespace Linko.LinkoExchange.Services
                 questionToUpdate.QuestionTypeId = (int)question.QuestionType;
                 questionToUpdate.IsActive = question.IsActive;
                 questionToUpdate.LastModificationDateTimeUtc = DateTime.UtcNow;
-                questionToUpdate.LastModifierUserId = Convert.ToInt32(_currentUser.UserProfileId());
+                questionToUpdate.LastModifierUserId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
 
                 try
                 {
@@ -312,13 +313,19 @@ namespace Linko.LinkoExchange.Services
             if (emailAuditLog != null && emailAuditLog.RecipientUserProfileId.HasValue)
             {
                 var userProfileId = emailAuditLog.RecipientUserProfileId;
+                return GetRandomQuestionAnswerFromUserProfileId(userProfileId.Value, questionType);
 
-                var qAndAs = GetUsersQuestionAnswers(userProfileId.Value, questionType);
-                return qAndAs.OrderBy(qu => Guid.NewGuid()).First();
             }
             else
                 throw new Exception(string.Format("ERROR: Cannot find email audit log for token={0}", token));
 
         }
+
+        public QuestionAnswerPairDto GetRandomQuestionAnswerFromUserProfileId(int userProfileId, Dto.QuestionType questionType)
+        {
+            var qAndAs = GetUsersQuestionAnswers(userProfileId, questionType);
+            return qAndAs.OrderBy(qu => Guid.NewGuid()).First();
+        }
+
     }
 }

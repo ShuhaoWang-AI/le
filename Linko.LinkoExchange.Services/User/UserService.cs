@@ -12,6 +12,7 @@ using Linko.LinkoExchange.Services.Dto;
 using AutoMapper;
 using System.Web;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -23,19 +24,20 @@ namespace Linko.LinkoExchange.Services.User
         private readonly IAuditLogEntry _logger;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IMapper _mapper;
-        private readonly ICurrentUser _currentUser;
+        private readonly IHttpContextService _httpContext;
+
         #endregion
 
         #region constructor
 
         public UserService(LinkoExchangeContext dbContext, IAuditLogEntry logger,
-            IPasswordHasher passwordHasher, IMapper mapper, ICurrentUser currentUser)
+            IPasswordHasher passwordHasher, IMapper mapper, IHttpContextService httpContext)
         {
             this._dbContext = dbContext;
             _logger = logger;
             _passwordHasher = passwordHasher;
             _mapper = mapper;
-            _currentUser = currentUser;
+            _httpContext = httpContext;
         }
 
         #endregion
@@ -151,7 +153,7 @@ namespace Linko.LinkoExchange.Services.User
 
                 //Persist modification date and modifier actor
                 user.LastModificationDateTimeUtc = DateTime.UtcNow;
-                user.LastModifierUserId = Convert.ToInt32(_currentUser.UserProfileId());
+                user.LastModifierUserId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
                 _dbContext.SaveChanges();
             }
             else
@@ -173,7 +175,7 @@ namespace Linko.LinkoExchange.Services.User
             OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
             user.IsSignatory = isSignatory;
             user.LastModificationDateTimeUtc = DateTime.UtcNow;
-            user.LastModifierUserId = Convert.ToInt32(_currentUser.UserProfileId());
+            user.LastModifierUserId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
             _dbContext.SaveChanges();
         }
 
@@ -237,7 +239,7 @@ namespace Linko.LinkoExchange.Services.User
 
                 //Persist modification date and modifier actor
                 user.LastModificationDateTimeUtc = DateTime.UtcNow;
-                user.LastModifierUserId = Convert.ToInt32(_currentUser.UserProfileId());
+                user.LastModifierUserId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
                 _dbContext.SaveChanges();
             }
             else

@@ -415,14 +415,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             return registrationResult;
         }
 
-        /// <summary>
-        /// Reset password happens when user request a 'reset password', and system generates a reset password token and sends to userProfile's email
-        /// And user click the link in the email to reset the password.
-        /// </summary>
-        /// <param name="email">User email address</param>
-        /// <param name="resetPasswordToken">The reset password token</param>
-        /// <param name="newPassword">The new password</param>
-        /// <returns></returns>
         public async Task<AuthenticationResultDto> ResetPasswordAsync(string resetPasswordToken, int userQuestionAnswerId, 
             string answer, int attemptCount, string newPassword)
         {
@@ -452,8 +444,25 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Success = false;
                 authenticationResult.Result = AuthenticationResult.ExpiredRegistrationToken;
                 authenticationResult.Errors = new string[] { "The password reset link has expired.  Please use Forgot Password." };
+
+                return authenticationResult;
             }
-            else if (!(_dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content.ToLower() == answerHash))
+
+            return await ResetPasswordAsync(userQuestionAnswerId, answer, attemptCount, newPassword);
+        }
+
+        public async Task<AuthenticationResultDto> ResetPasswordAsync(int userQuestionAnswerId,
+            string answer, int attemptCount, string newPassword)
+        {
+            int userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
+            string passwordHash = _passwordHasher.HashPassword(newPassword);
+            string answerHash = _passwordHasher.HashPassword(answer);
+            var organizationIds = GetUserOrganizationIds(userProfileId);
+            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
+
+            var authenticationResult = new AuthenticationResultDto();
+
+            if (!(_dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content.ToLower() == answerHash))
             {
                 //Check hashed answer (5.3.a)
 
@@ -471,7 +480,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     errorString += "<table class=\"table no-margin\">";
                     errorString += "<tbody>";
 
-                    foreach(var org in userOrgs)
+                    foreach (var org in userOrgs)
                     {
                         errorString += "<tr><td>" + org.EmailContactInfoName + "</td><td>" + org.EmailContactInfoEmailAddress + "</td><td>" + org.EmailContactInfoPhone + " </td></tr>";
                     }
@@ -996,9 +1005,9 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         string GetBaseUrl()
         {
-            return HttpContext.Current.Request.Url.Scheme + "://" 
-                + HttpContext.Current.Request.Url.Authority 
-                + HttpContext.Current.Request.ApplicationPath.TrimEnd('/') + "/";
+            return System.Web.HttpContext.Current.Request.Url.Scheme + "://" 
+                + System.Web.HttpContext.Current.Request.Url.Authority 
+                + System.Web.HttpContext.Current.Request.ApplicationPath.TrimEnd('/') + "/";
         }
         #endregion
     }

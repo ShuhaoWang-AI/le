@@ -3,9 +3,11 @@
     public enum InvitationError
     {
         Duplicated,
+        MatchingUsersInOtherPrograms,
         NotFound,
         InvalidData,
         NullObject,
+        NoMoreRemainingUserLicenses,
         Others
     }
 }

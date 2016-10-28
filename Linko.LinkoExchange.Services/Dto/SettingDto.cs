@@ -9,9 +9,9 @@
         PasswordChangeDays = 5,
         PasswordHistoryCount = 6,
 
-        AuthorityUserLicenseTotalCount = 6,
-        IndustryUserLicenseTotalCount = 16,
-        
+        AuthorityUserLicenseTotalCount = 6, //need to sync with DB
+        IndustryUserLicenseTotalCount = 16, //need to sync with DB
+        IndustryLicenseTotalCount = -1, //need to sync with DB
         //CurrentUserLicenseCount = 8,
 
         TimeZoneId = 9,
