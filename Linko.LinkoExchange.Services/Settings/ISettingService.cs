@@ -20,6 +20,8 @@ namespace Linko.LinkoExchange.Services.Settings
 
         string GetOrganizationSettingValueByUserId(int userProfileId, SettingType settingType, bool? isChooseMin, bool? isChooseMax);
 
+        string GetOrganizationSettingValue(int organizationId, SettingType settingType);
+
         string GetOrgRegProgramSettingValue(int orgRegProgramId, SettingType settingType);
 
         /// <summary>

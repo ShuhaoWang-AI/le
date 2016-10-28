@@ -6,6 +6,7 @@ using AutoMapper;
 using Linko.LinkoExchange.Services.AutoMapperProfile;
 using System.Configuration;
 using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Services.Settings;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -36,7 +37,8 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            //orgService = new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance, new CurrentUser());
+            orgService = new OrganizationService(new LinkoExchangeContext(connectionString), 
+                Mapper.Instance, new CurrentUser(), new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance));
         }
 
         [TestMethod]
@@ -74,7 +76,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_GetUserRegulatories()
         {
-            var orgs = orgService.GetUserRegulatories(7); 
+            var orgs = orgService.GetUserRegulatories(1); 
 
         }
     }

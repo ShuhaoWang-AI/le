@@ -377,6 +377,13 @@ namespace Linko.LinkoExchange.Services.Settings
 
         }
 
+        public string GetOrganizationSettingValue(int organizationId, SettingType settingType)
+        {
+            return _dbContext.OrganizationSettings
+               .Single(s => s.OrganizationId == organizationId
+               && s.SettingTemplateId == (int)settingType).Value;
+        }
+
         public string GetOrgRegProgramSettingValue(int orgRegProgramId, SettingType settingType)
         {
             return _dbContext.OrganizationRegulatoryProgramSettings

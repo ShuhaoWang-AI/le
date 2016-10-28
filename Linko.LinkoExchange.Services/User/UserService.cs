@@ -65,6 +65,25 @@ namespace Linko.LinkoExchange.Services.User
             }
         }
 
+        public ICollection<OrganizationRegulatoryProgramUserDto> GetProgramUsersByEmail(string emailAddress)
+        {
+            var dtos = new List<OrganizationRegulatoryProgramUserDto>();
+            UserProfile userProfile = _dbContext.Users.SingleOrDefault(u => u.Email == emailAddress);
+            if (userProfile != null)
+            {
+                var programUsers = _dbContext.OrganizationRegulatoryProgramUsers.Where(o => o.UserProfileId == userProfile.UserProfileId);
+                if (programUsers != null)
+                {
+                    foreach (var programUser in programUsers)
+                    {
+                        dtos.Add(_mapper.Map<OrganizationRegulatoryProgramUser, OrganizationRegulatoryProgramUserDto>(programUser));
+                    }
+                }
+            }
+
+            return dtos;
+        }
+
         public List<UserDto> GetUserProfilesForOrgRegProgram(int orgRegProgramId,
                              bool? isRegApproved,
                              bool? isRegDenied,

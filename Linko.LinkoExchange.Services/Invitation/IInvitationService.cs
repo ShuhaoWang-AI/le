@@ -40,5 +40,9 @@ namespace Linko.LinkoExchange.Services.Invitation
         /// <param name="orgRegProgramId"></param>
         /// <returns></returns>
         ICollection<InvitationDto> GetInvitationsForOrgRegProgram(int orgRegProgramId);
+
+        int GetRemainingUserLicenseCount(int orgRegProgramId, bool isForAuthority);
+
+
     }
 }

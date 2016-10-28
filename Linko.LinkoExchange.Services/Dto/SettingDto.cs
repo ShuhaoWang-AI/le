@@ -8,8 +8,12 @@
         InvitationExpiryHours = 4,
         PasswordChangeDays = 5,
         PasswordHistoryCount = 6,
-        MaxUserLicenseCount = 7,
-        CurrentUserLicenseCount = 8,
+
+        AuthorityUserLicenseTotalCount = 6,
+        IndustryUserLicenseTotalCount = 16,
+        
+        //CurrentUserLicenseCount = 8,
+
         TimeZoneId = 9,
         ReportRepudiatedDays = 9,
         PasswordRequireLength = 10,

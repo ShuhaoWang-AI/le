@@ -16,7 +16,8 @@ namespace Linko.LinkoExchange.Services.Dto
         public OrganizationDto OrganizationDto { get; set; }
         public bool IsEnabled { get; set; }
         public bool IsRemoved { get; set; }
-        //public string AssignedTo { get; set; }
+        public string AssignedTo { get; set; }
         public bool HasSignatory { get; set; }
+        public bool HasAdmin { get; set; }
     }
 }

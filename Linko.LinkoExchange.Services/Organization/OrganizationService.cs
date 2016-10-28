@@ -222,6 +222,10 @@ namespace Linko.LinkoExchange.Services
             dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
                 .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
                 && o.IsSignatory == true) > 0;
+
+            dto.HasAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
+                .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
+                && o.PermissionGroup.Name == "Administrator") > 0;
             dto.OrganizationDto.State = GetJurisdictionById(orgRegProgram.Organization.JurisdictionId).Name;
 
             return dto;
@@ -243,6 +247,9 @@ namespace Linko.LinkoExchange.Services
                         dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
                             .Count(o => o.OrganizationRegulatoryProgramId == orgRegProg.OrganizationRegulatoryProgramId
                             && o.IsSignatory == true) > 0;
+                        dto.HasAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
+                            .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
+                            && o.PermissionGroup.Name == "Administrator") > 0;
                         dto.OrganizationDto.State = GetJurisdictionById(orgRegProg.Organization.JurisdictionId).Name;
                         dtoList.Add(dto);
 
