@@ -2,7 +2,6 @@
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Dto;
 using System;
 using System.Collections.Generic;
@@ -11,8 +10,9 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.User;
-using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Core.Common;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services
 {
@@ -88,33 +88,48 @@ namespace Linko.LinkoExchange.Services
         /// <returns>The organizationId </returns>
         public IEnumerable<AuthorityDto> GetUserRegulatories(int userId)
         {
-            var orpUsers = _dbContext.OrganizationRegulatoryProgramUsers.ToList()
-                .FindAll(u => u.UserProfileId == userId && 
-                            u.IsRemoved == false && 
-                            u.IsEnabled == true && 
-                            u.IsRegistrationApproved && 
-                            u.OrganizationRegulatoryProgram.IsEnabled && 
-                            u.OrganizationRegulatoryProgram.IsRemoved == false);
-
-            var orgs = new List<AuthorityDto>();
-            foreach (var orpUser in orpUsers)
+            try
             {
-                if (orpUser.OrganizationRegulatoryProgram?.Organization != null &&
-                    orpUser.OrganizationRegulatoryProgram?.Organization.OrganizationType.Name == "Authority" &&
-                    !orgs.Any(i => i.OrganizationId == orpUser.OrganizationRegulatoryProgram.RegulatorOrganizationId))
+                var orpUsers = _dbContext.OrganizationRegulatoryProgramUsers.ToList()
+                    .FindAll(u => u.UserProfileId == userId &&
+                                u.IsRemoved == false &&
+                                u.IsEnabled == true &&
+                                u.IsRegistrationApproved &&
+                                u.OrganizationRegulatoryProgram.IsEnabled &&
+                                u.OrganizationRegulatoryProgram.IsRemoved == false);
+
+                var orgs = new List<AuthorityDto>();
+                foreach (var orpUser in orpUsers)
                 {
-                    AuthorityDto authority = _mapper.Map<Core.Domain.Organization, AuthorityDto>(orpUser.OrganizationRegulatoryProgram.Organization);
-                    authority.RegulatoryProgramId = orpUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
-                    authority.OrganizationRegulatoryProgramId = orpUser.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId;
-                    authority.EmailContactInfoName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
-                    authority.EmailContactInfoEmailAddress = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
-                    authority.EmailContactInfoPhone = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
-                    orgs.Add(authority);
+                    if (orpUser.OrganizationRegulatoryProgram?.Organization != null &&
+                        orpUser.OrganizationRegulatoryProgram?.Organization.OrganizationType.Name == "Authority" &&
+                        !orgs.Any(i => i.OrganizationId == orpUser.OrganizationRegulatoryProgram.RegulatorOrganizationId))
+                    {
+                        AuthorityDto authority = _mapper.Map<Core.Domain.Organization, AuthorityDto>(orpUser.OrganizationRegulatoryProgram.Organization);
+                        authority.RegulatoryProgramId = orpUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+                        authority.OrganizationRegulatoryProgramId = orpUser.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId;
+                        authority.EmailContactInfoName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+                        authority.EmailContactInfoEmailAddress = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+                        authority.EmailContactInfoPhone = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+                        orgs.Add(authority);
+                    }
+
                 }
 
+                return orgs;
             }
-
-            return orgs;
+            catch (DbEntityValidationException ex)
+            {
+                HandleEntityException(ex);
+            }
+            catch (Exception e)
+            {
+                var linkoException = new LinkoExchangeException();
+                linkoException.ErrorType = LinkoExchangeError.DatabaseSetting;
+                linkoException.Errors = new List<string> { e.Message };
+                throw linkoException;
+            }
+            return null;
         }
 
         /// <summary>
@@ -134,21 +149,14 @@ namespace Linko.LinkoExchange.Services
             }
             catch (DbEntityValidationException ex)
             {
-                List<RuleViolation> validationIssues = new List<RuleViolation>();
-                foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
-                {
-                    DbEntityEntry entry = item.Entry;
-                    string entityTypeName = entry.Entity.GetType().Name;
-
-                    foreach (DbValidationError subItem in item.ValidationErrors)
-                    {
-                        string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
-                        validationIssues.Add(new RuleViolation(string.Empty, null, message));
-
-                    }
-                }
-                //_logger.Info("???");
-                throw new RuleViolationException("Validation errors", validationIssues);
+                HandleEntityException(ex);
+            }
+            catch(Exception e)
+            {
+                var linkoException = new LinkoExchangeException();
+                linkoException.ErrorType = LinkoExchangeError.OrganizationSetting;
+                linkoException.Errors = new List<string> { e.Message };
+                throw linkoException;
             }
 
             return returnDto;
@@ -296,22 +304,15 @@ namespace Linko.LinkoExchange.Services
             }
             catch (DbEntityValidationException ex)
             {
-                List<RuleViolation> validationIssues = new List<RuleViolation>();
-                foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
-                {
-                    DbEntityEntry entry = item.Entry;
-                    string entityTypeName = entry.Entity.GetType().Name;
-
-                    foreach (DbValidationError subItem in item.ValidationErrors)
-                    {
-                        string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
-                        validationIssues.Add(new RuleViolation(string.Empty, null, message));
-
-                    }
-                }
-                //_logger.Info("???");
-                throw new RuleViolationException("Validation errors", validationIssues);
+                HandleEntityException(ex);
             }
+            catch (Exception e)
+            {
+                var linkoException = new LinkoExchangeException();
+                linkoException.ErrorType = LinkoExchangeError.OrganizationSetting;
+                linkoException.Errors = new List<string> { e.Message };
+                throw linkoException;
+            } 
         }
 
         public Jurisdiction GetJurisdictionById(int jurisdictionId)
@@ -319,6 +320,25 @@ namespace Linko.LinkoExchange.Services
             return _dbContext.Jurisdictions.Single(j => j.JurisdictionId == jurisdictionId);
         }
 
+
+        private void HandleEntityException(DbEntityValidationException ex)
+        {
+            List<RuleViolation> validationIssues = new List<RuleViolation>();
+            foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+            {
+                DbEntityEntry entry = item.Entry;
+                string entityTypeName = entry.Entity.GetType().Name;
+
+                foreach (DbValidationError subItem in item.ValidationErrors)
+                {
+                    string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                    validationIssues.Add(new RuleViolation(string.Empty, null, message));
+
+                }
+            }
+            //_logger.Info("???");
+            throw new RuleViolationException("Validation errors", validationIssues);
+        }
     }
 }
  

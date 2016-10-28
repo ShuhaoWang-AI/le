@@ -160,5 +160,11 @@ namespace Linko.LinkoExchange.Services.Invitation
             return remaining;
             
         }
+
+        public void DeleteInvitation(string invitationId)
+        {             
+            var obj = _dbContext.Invitations.Find(invitationId);  
+            _dbContext.Invitations.Remove(obj);
+        }
     }
 }

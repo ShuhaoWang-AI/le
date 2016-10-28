@@ -6,6 +6,10 @@ using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
 using System;
 using Linko.LinkoExchange.Core.Common;
+using Linko.LinkoExchange.Core.Validation;
+using System.Data.Entity.Validation;
+using System.Data.Entity.Infrastructure;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Settings
 {
@@ -386,9 +390,26 @@ namespace Linko.LinkoExchange.Services.Settings
 
         public string GetOrgRegProgramSettingValue(int orgRegProgramId, SettingType settingType)
         {
+            try
+            {
+
            return _dbContext.OrganizationRegulatoryProgramSettings
                 .Single(s => s.OrganizationRegulatoryProgramId == orgRegProgramId
-                && s.SettingTemplateId == (int)settingType).Value; 
+                && s.SettingTemplateId == (int)settingType).Value;
+
+            }
+            catch (DbEntityValidationException ex)
+            {
+                HandleEntityException(ex);
+            }
+            catch (Exception e)
+            {
+                var linkoException = new LinkoExchangeException();
+                linkoException.ErrorType = LinkoExchangeError.OrganizationSetting;
+                linkoException.Errors = new List<string> { e.Message };
+                throw linkoException;
+            }
+            return null;
         }
 
 
@@ -455,5 +476,24 @@ namespace Linko.LinkoExchange.Services.Settings
                          }
 				};
 		}
-	}
+
+        private void HandleEntityException(DbEntityValidationException ex)
+        {
+            List<RuleViolation> validationIssues = new List<RuleViolation>();
+            foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+            {
+                DbEntityEntry entry = item.Entry;
+                string entityTypeName = entry.Entity.GetType().Name;
+
+                foreach (DbValidationError subItem in item.ValidationErrors)
+                {
+                    string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                    validationIssues.Add(new RuleViolation(string.Empty, null, message));
+
+                }
+            }
+            //_logger.Info("???");
+            throw new RuleViolationException("Validation errors", validationIssues);
+        }
+    }
 }

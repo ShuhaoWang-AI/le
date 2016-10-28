@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\LinkoExchangeException.cs" />
     <Compile Include="Common\ValueParser.cs" />
     <Compile Include="Domain\AuditLogTemplate.cs" />
     <Compile Include="Domain\EmailAuditLog.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Enum\CurrentUserInfo.cs" />
     <Compile Include="Enum\EmailType.cs" />
     <Compile Include="Enum\InvitationError.cs" />
+    <Compile Include="Enum\LinkoExchangeError.cs" />
     <Compile Include="Extensions\IdentityExtensions.cs" />
     <Compile Include="Logging\CreationStackTrackerExtension.cs" />
     <Compile Include="Logging\CreationStackTrackerPolicy.cs" />

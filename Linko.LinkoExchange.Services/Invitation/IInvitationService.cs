@@ -5,6 +5,11 @@ namespace Linko.LinkoExchange.Services.Invitation
 {
     public interface IInvitationService
     {
+        /// <summary>
+        /// Delete an invitation from db.
+        /// </summary>
+        /// <param name="invitation">The invitation id to be deleted.</param>
+        void DeleteInvitation(string invitationId);
 
         /// <summary>
         /// Get the invitation by ID

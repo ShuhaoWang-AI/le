@@ -203,7 +203,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="userInfo"></param>
         /// <param name="registrationToken"></param>
         /// <returns></returns>
-        public async Task<RegistrationResultDto> CreateUserAsync(UserDto userInfo, string registrationToken)
+        public async Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken)
         {
             var registrationResult = new RegistrationResultDto();
 
@@ -249,6 +249,14 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return registrationResult;
             }
 
+            // Check if user is already in the program 
+            var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
+            if (recipientProgram != null)
+            {
+                registrationResult.Result = RegistrationResult.UserAlreadyInTheProgram;
+                return registrationResult;
+            }
+
             bool newUserRegistration = true;
             if (applicationUser != null)
             {
@@ -263,10 +271,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                     if (newUserRegistration)
                     {
                         applicationUser = AssignUser(userInfo.UserName, userInfo.Email);
+                        
+                        #region update user profile  
 
-                        // Only check the organization settings of invitation regulatory program
-                        SetPasswordPolicy(inivitationRecipintOrganizationSettings.Settings);
-                        #region update user profile 
                         applicationUser.FirstName = userInfo.UserName;
                         applicationUser.LastName = userInfo.LastName;
                         applicationUser.UserName = userInfo.UserName;
@@ -307,40 +314,39 @@ namespace Linko.LinkoExchange.Services.Authentication
                     // UC-42 6
                     // 2 Create organziation regulatory program userProfile, and set the approved statue to false  
                     var orpu = _programService.CreateOrganizationRegulatoryProgramForUser(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId);
-
+ 
                     // 3 TODO send email to all users who have rights to approve a registrant 
-                    // UC-42 7
-                    // find out who have the approve permission 
-
-                    // 4 TODO remove the invitation from table
-                    // UC-42 8
-                    var organizationId = 100;
-                    var approvalPeople = _permissionService.GetApprovalPeople(applicationUser.UserProfileId, organizationId);
+                    // UC-42 7, 8
+                    // find out who have the approve permission   
+                    var approvalPeople = _permissionService.GetApprovalPeople(applicationUser.UserProfileId, orpu.OrganizationRegulatoryProgramId);
                     var sendTo = approvalPeople.Select(i => i.Email);
 
-                    // TODO: to determine if user is authority user or is industry user;
-                    var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
-                    // TODO:  1. No recipientProgram found, or program is disabled
-
+                    //  Determine if user is authority user or is industry user;
+                    // 
                     var senderProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.SenderOrganizationRegulatoryProgramId);
-                    // TODO:  2. Check program found or is not diabled.
 
-                    if (recipientProgram == null || senderProgram == null)
+                    //  Program is disabled or not found  
+                    if (recipientProgram == null || senderProgram == null ||
+                         !recipientProgram.IsEnabled || !senderProgram.IsEnabled)
                     {
-                        registrationResult.Result = RegistrationResult.ProgramNotFound;
+                        registrationResult.Result = RegistrationResult.InvitationExpired;
                         return registrationResult;
-                    }
-                    else if (!recipientProgram.IsEnabled || !senderProgram.IsEnabled)
-                    {
-                        registrationResult.Result = RegistrationResult.ProgramDisabled;
-                        return registrationResult;
-                    }
+                    }                     
 
-                    var inviteAuthorityUser = false;
+                    var inviteIndustryUser = true;
                     // Invites authority user
                     if (! recipientProgram.RegulatorOrganizationId.HasValue)
                     {
-                        inviteAuthorityUser = true;
+                        inviteIndustryUser = false;
+                    }
+                    else
+                    {
+                        // AU invite authority user, but RegulatorOrganizationId has value
+                        if (recipientProgram.RegulatorOrganizationId.HasValue)
+                        {
+                            registrationResult.Result = RegistrationResult.Failed;
+                            return registrationResult;
+                        }
                     }
 
                     _requestCache.SetValue(CacheKey.Token, registrationToken);
@@ -359,15 +365,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                     emailContentReplacements.Add("authorityName", authorityOrg.OrganizationName);
                     emailContentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
 
-                    if (!inviteAuthorityUser)
+                    if (inviteIndustryUser)
                     {
-                        // Bad data in database
-                        if (recipientProgram.RegulatorOrganizationId.HasValue == false)
-                        {
-                            registrationResult.Result = RegistrationResult.Failed;
-                            return registrationResult;
-                        }
-
                         var receipientOrg = _organizationService.GetOrganization(recipientProgram.OrganizationId);
 
                         emailContentReplacements.Add("addressLine1", receipientOrg.AddressLine1);
@@ -377,24 +376,32 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     #endregion
 
-                    if (inviteAuthorityUser)
+                    if (inviteIndustryUser)
                     {
-                        await _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements);
+                        await _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
                     }
                     else
                     {
-                        await _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
+                        await _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements);
                     }
 
                     // 6 TODO logs invite to Audit 
                     // UC-2 
 
                     // All succeed
+                    // 4 Remove the invitation from table 
+                    _invitationService.DeleteInvitation(invitationDto.InvitationId);
+
                     await _dbContext.SaveChangesAsync();
                     registrationResult.Result = RegistrationResult.Success;
                     SendRegistrationConfirmationEmail(applicationUser.Id, userInfo);
                     transaction.Commit();
                     return registrationResult;
+                }
+                catch(LinkoExchangeException lex)
+                {
+                    transaction.Rollback();
+                    throw lex;
                 }
                 catch (Exception ex)
                 {
@@ -402,7 +409,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     registrationResult.Result = RegistrationResult.Failed;
                     registrationResult.Errors = errors;
                     transaction.Rollback();
-                }
+                } 
             }
 
             return registrationResult;
