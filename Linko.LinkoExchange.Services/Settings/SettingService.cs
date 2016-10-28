@@ -41,9 +41,9 @@ namespace Linko.LinkoExchange.Services.Settings
             _globalSettings.Add(SettingType.PasswordRequireDigit, "true");
             _globalSettings.Add(SettingType.PasswordExpiredDays, "90");
 
-            _globalSettings.Add(SettingType.MaxFailedPasswordAttempts, "3");
+            _globalSettings.Add(SettingType.FailedPasswordAttemptMaxCount, "3");
 
-            _globalSettings.Add(SettingType.PasswordHistoryCount, "10");
+            _globalSettings.Add(SettingType.PasswordHistoryMaxCount, "10");
             _globalSettings.Add(SettingType.EmailServer, "6");
             _globalSettings.Add(SettingType.SupportPhoneNumber, "+1-604-418-3201");
             _globalSettings.Add(SettingType.SupportEmail, "support@linkoExchange.com");
@@ -58,19 +58,7 @@ namespace Linko.LinkoExchange.Services.Settings
         /// </summary>
         /// <param name="organizationIds">The organization Ids.</param>
         /// <returns>Collection of organization settings</returns>
-        public IEnumerable<OrganizationSettingDto> GetOrganizationSettingsByIds(IEnumerable<int> organizationIds)
-		{
-			return new[]
-			{
-				new OrganizationSettingDto
-				{
-					OrganizationId = 100,
-					Settings = GetMockData()
-				}
-			};
-		}
-
-        public ICollection<OrganizationSettingDto> GetOrganizationSettingsByIds_actual(IEnumerable<int> organizationIds)
+        public ICollection<OrganizationSettingDto> GetOrganizationSettingsByIds(IEnumerable<int> organizationIds)
         {
             var orgSettingsDtoList = new List<OrganizationSettingDto>();
             if (organizationIds != null)
@@ -224,19 +212,7 @@ namespace Linko.LinkoExchange.Services.Settings
 
             _dbContext.SaveChanges();
         }
-
-        public IEnumerable<ProgramSettingDto> GetProgramSettingsByIds(IEnumerable<int> orgRegProgIds)
-		{
-			return new[]
-			{
-				new ProgramSettingDto
-				{
-					OrgRegProgId = 100,
-					Settings = GetMockData()
-				}
-			};
-		}
-
+ 
 	    public bool PasswordRequireDigital()
 	    {
             if (!_globalSettings.ContainsKey(SettingType.PasswordRequireDigit))
@@ -309,23 +285,6 @@ namespace Linko.LinkoExchange.Services.Settings
         public IDictionary<SettingType, string> GetGlobalSettings()
 		{
             return _globalSettings;
-		}
-
-		/// <summary>
-		/// Get all organization settings for one user identified by userId.
-		/// </summary>
-		/// <param name="userId">The user id to get organization setting for.</param>
-		/// <returns>A collection of organization settings</returns>
-		public IEnumerable<OrganizationSettingDto> GetOrganizationSettingsByUserId(int userId)
-		{
-			return new[]
-			{
-				 new OrganizationSettingDto
-				 {
-					 OrganizationId= 100,
-					 Settings =  GetMockData()
-				 }
-			 };
 		}
 
         public string GetOrganizationSettingValueByUserId(int userProfileId, SettingType settingType, bool? isChooseMin, bool? isChooseMax)
@@ -410,72 +369,7 @@ namespace Linko.LinkoExchange.Services.Settings
                 throw linkoException;
             }
             return null;
-        }
-
-
-        private SettingDto[] GetMockData()
-		{
-			return new[] {
-						 new SettingDto
-						 {
-                             Type=SettingType.PasswordRequireLength,
-							 Value="6"
-						 },
-
-						 new SettingDto
-						 {
-                             Type=SettingType.PasswordRequireDigit,
-							 Value = "true"
-						 },
-
-						 new SettingDto
-						 {
-                             Type=SettingType.PasswordRequireLowerCase,
-							 Value = "true"
-						 },
-
-						 new SettingDto
-						 {
-                             Type=SettingType.PasswordRequireUpperCase,
-							 Value = "true"
-						 },
-						 new SettingDto
-						 {
-                             Type=SettingType.UserLockoutEnabledByDefault,
-							 Value = "true"
-						 },
-
-						 new SettingDto
-						 {
-                             Type = SettingType.DefaultAccountLockoutTimeSpan,   // lock out days
-							 Value = "1"
-						 },
-
-						 new SettingDto
-						 {
-                             Type = SettingType.MaxFailedPasswordAttempts,
-							 Value = "2"
-						 },
-
-						 new SettingDto
-						 {
-                             Type=SettingType.PasswordExpiredDays,
-							 Value="90"
-						 },
-
-						 new SettingDto
-						 {
-                             Type=SettingType.DaysBeforeRequirePasswordChanging,
-							 Value="10"
-						 },
-
-                         new SettingDto
-                         {
-                             Type =SettingType.PasswordHistoryCount,
-                             Value = "10"
-                         }
-				};
-		}
+        } 
 
         private void HandleEntityException(DbEntityValidationException ex)
         {
@@ -494,6 +388,6 @@ namespace Linko.LinkoExchange.Services.Settings
             }
             //_logger.Info("???");
             throw new RuleViolationException("Validation errors", validationIssues);
-        }
+        } 
     }
 }

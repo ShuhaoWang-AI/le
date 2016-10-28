@@ -11,13 +11,6 @@ namespace Linko.LinkoExchange.Services.Settings
         /// <returns></returns>
         IDictionary<SettingType, string > GetGlobalSettings(); 
 
-        /// <summary>
-        /// Get the organizationSetting by UserId
-        /// </summary>
-        /// <param name="userId">UserDto Id</param>
-        /// <returns>Collection of organization settings</returns>
-        IEnumerable<OrganizationSettingDto> GetOrganizationSettingsByUserId(int userId);
-
         string GetOrganizationSettingValueByUserId(int userProfileId, SettingType settingType, bool? isChooseMin, bool? isChooseMax);
 
         string GetOrganizationSettingValue(int organizationId, SettingType settingType);
@@ -29,7 +22,7 @@ namespace Linko.LinkoExchange.Services.Settings
         /// </summary>
         /// <param name="organizationIds">The organization Ids.</param>
         /// <returns>Collection of organization settings</returns>
-        IEnumerable<OrganizationSettingDto> GetOrganizationSettingsByIds(IEnumerable<int> organizationIds);
+        ICollection<OrganizationSettingDto> GetOrganizationSettingsByIds(IEnumerable<int> organizationIds);
 
         /// <summary>
         /// Get settings for one organization
@@ -44,14 +37,6 @@ namespace Linko.LinkoExchange.Services.Settings
         /// <param name="programId">The program Id to get for</param>
         /// <returns>The PrrogramSetting object</returns>
         ProgramSettingDto GetProgramSettingsById(int programId);
-
-        /// <summary>
-        /// Get the program settings for a collection of program Ids
-        /// </summary>
-        /// <param name="programIds">The program Ids</param>
-        /// <returns></returns>
-        IEnumerable<ProgramSettingDto> GetProgramSettingsByIds(IEnumerable<int> programIds);
-
 
         bool PasswordRequireDigital();
         bool PassowrdRequireLowerCase();

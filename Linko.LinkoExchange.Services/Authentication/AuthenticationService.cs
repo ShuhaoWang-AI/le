@@ -164,8 +164,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 var organizationIds = GetUserOrganizationIds(applicationUser.UserProfileId);
 
                 var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
-                var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings).ToList();
-
+          
                 SetPasswordPolicy(organizationSettings);
                 // Use PasswordValidator
                 var validateResult = _userManager.PasswordValidator.ValidateAsync(newPassword).Result;
@@ -215,18 +214,18 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return registrationResult;
             }
 
-            // TODO  check token is expired or not? from organization settings
+            // Check token is expired or not? from organization settings
             var invitationRecipientProgram =
                 _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
             var inivitationRecipintOrganizationSettings =
                 _settingService.GetOrganizationSettingsById(invitationRecipientProgram.OrganizationId);
 
-            // -- If nowhere defines this value, set it as 24 hrs.
+            // If nowhere defines this value, set it as 24 hrs.
             var invitationExpirationHours = 24;
             if (inivitationRecipintOrganizationSettings.Settings.Any())
             {
                 invitationExpirationHours = ValueParser.TryParseInt(inivitationRecipintOrganizationSettings
-                  .Settings.Single(i => i.Type == SettingType.InvitationExpiryHours).Value, invitationExpirationHours);
+                  .Settings.Single(i => i.Type == SettingType.InvitationExpiredHours).Value, invitationExpirationHours);
             }
 
             if (DateTime.UtcNow > invitationDto.InvitationDateTimeUtc.AddHours(invitationExpirationHours))
@@ -469,7 +468,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Success = false;
 
                 //3rd incorrect attempt (5.3.b) => lockout
-                int maxAnswerAttempts = Convert.ToInt32(_settingService.GetOrganizationSettingValueByUserId(userProfileId, SettingType.MaxKBQAttempts, true, null));
+                int maxAnswerAttempts = Convert.ToInt32(_settingService.GetOrganizationSettingValueByUserId(userProfileId, SettingType.FailedKBQAttemptMaxCount, true, null));
                 if (attemptCount++ >= maxAnswerAttempts) // from web.config
                 {
                     _userService.LockUnlockUserAccount(userProfileId, true);
@@ -919,7 +918,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private int GetStrictestPasswordHistoryCounts(IEnumerable<SettingDto> organizationSettings)
         {
-            return GetSettingIntValue(SettingType.PasswordHistoryCount, organizationSettings, isMax: false);
+            return GetSettingIntValue(SettingType.PasswordHistoryMaxCount, organizationSettings, isMax: false);
         } 
 
         private int GetStrictestLengthPasswordExpiredDays(IEnumerable<SettingDto> organizationSettings)
@@ -929,7 +928,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private int MaxFailedPasswordAttempts(IEnumerable<SettingDto> organizationSettings)
         {
-            return GetSettingIntValue(SettingType.MaxFailedPasswordAttempts, organizationSettings, isMax: false);
+            return GetSettingIntValue(SettingType.FailedPasswordAttemptMaxCount, organizationSettings, isMax: false);
         } 
 
         #endregion

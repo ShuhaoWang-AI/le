@@ -89,9 +89,9 @@ namespace Linko.LinkoExchange.Test
             settingDict.Add(SettingType.PasswordRequireLength, "6");
             settingDict.Add(SettingType.PasswordRequireDigit, "true");
             settingDict.Add(SettingType.PasswordExpiredDays, "90");
-            settingDict.Add(SettingType.MaxFailedPasswordAttempts, "3");
+            settingDict.Add(SettingType.FailedPasswordAttemptMaxCount, "1");
 
-            settingDict.Add(SettingType.PasswordHistoryCount, "10");
+            settingDict.Add(SettingType.PasswordHistoryMaxCount, "10");
             settingDict.Add(SettingType.EmailServer, "6");
             settingDict.Add(SettingType.SupportPhoneNumber, "+1-604-418-3201");
             settingDict.Add(SettingType.SupportEmail, "support@linkoExchange.com");

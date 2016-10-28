@@ -63,7 +63,7 @@ namespace Linko.LinkoExchange.Test
             globalSetting.Add(SettingType.PasswordRequireLength, "6");
             globalSetting.Add(SettingType.PasswordRequireDigit, "true");
             globalSetting.Add(SettingType.PasswordExpiredDays, "90");
-            globalSetting.Add(SettingType.PasswordHistoryCount, "10");
+            globalSetting.Add(SettingType.PasswordHistoryMaxCount, "10");
             globalSetting.Add(SettingType.SupportPhoneNumber, "+1-604-418-3201");
             globalSetting.Add(SettingType.SupportEmail, "support@linkoExchange.com");
             globalSetting.Add(SettingType.SystemEmailEmailAddress, "shuhao.wang@watertrax.com");

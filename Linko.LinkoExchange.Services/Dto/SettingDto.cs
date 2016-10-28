@@ -2,16 +2,16 @@
 {
     public enum SettingType
     {
-        MaxPasswordAttempts = 1,
-        MaxKBQAttempts = 2,
-        MaxFailedPasswordAttempts = 3,
-        InvitationExpiryHours = 4,
-        PasswordChangeDays = 5,
-        PasswordHistoryCount = 6,
+        FailedPasswordAttemptMaxCount = 1,
+        FailedKBQAttemptMaxCount = 2, 
+        InvitationExpiredHours = 3,
+        PasswordChangeRequiredDays = 4,
+        PasswordHistoryMaxCount = 6,
 
-        AuthorityUserLicenseTotalCount = 6, //need to sync with DB
-        IndustryUserLicenseTotalCount = 16, //need to sync with DB
-        IndustryLicenseTotalCount = -1, //need to sync with DB
+        AuthorityUserLicenseTotalCount = 6,
+        IndustryUserLicenseTotalCount = 16, 
+        IndustryUserLicenseUsedCount = 17,
+
         //CurrentUserLicenseCount = 8,
 
         TimeZoneId = 9,
@@ -35,7 +35,14 @@
 
         EmailContactInfoName = 13,
         EmailContactInfoPhone = 14,
-        EmailContactInfoEmailAddress = 15
+        EmailContactInfoEmailAddress = 15, 
+        AuthorityUserLicenseUsedCount,
+             
+        TimeZone, 
+        MassLoadingResultToUseLessThanSign,
+        MassLoadingCalculationDecimalPlaces, 
+        UserPerIndustryMaxCount
+
     }
 
     public class SettingDto
