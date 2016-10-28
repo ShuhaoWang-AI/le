@@ -1,18 +1,32 @@
 ﻿using System.Web.Mvc;
+using Linko.LinkoExchange.Services.Authentication;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {
     public class CommonInfoAttribute : ActionFilterAttribute
     {
+        #region constructor
+
+        private readonly IAuthenticationService _authenticationService;
+        
+        public CommonInfoAttribute(IAuthenticationService authenticationService)
+        {
+            _authenticationService = authenticationService;
+        }
+
+        #endregion
+
+
+        #region default action
         public override void OnResultExecuting(ResultExecutingContext filterContext)
         {
             if (filterContext.HttpContext.User.Identity.IsAuthenticated)
             {
-                // ToDo: update the values with proper service
-                filterContext.Controller.ViewBag.PortalName = "PortalName";
-                filterContext.Controller.ViewBag.OrganizationName = "OrganizationName";
-                filterContext.Controller.ViewBag.UserName = "UserName";
-                filterContext.Controller.ViewBag.UserRole = "UserRole";
+                filterContext.Controller.ViewBag.PortalName = _authenticationService.GetClaimsValue(CacheKey.PortalName);
+                filterContext.Controller.ViewBag.OrganizationName = _authenticationService.GetClaimsValue(CacheKey.OrganizationName);
+                filterContext.Controller.ViewBag.UserName = _authenticationService.GetClaimsValue(CacheKey.UserName);
+                filterContext.Controller.ViewBag.UserRole = _authenticationService.GetClaimsValue(CacheKey.UserRole);
             }
             else
             {
@@ -22,5 +36,6 @@ namespace Linko.LinkoExchange.Web.Mvc
                 filterContext.Controller.ViewBag.UserRole = "";
             }
         }
+        #endregion
     }
 }

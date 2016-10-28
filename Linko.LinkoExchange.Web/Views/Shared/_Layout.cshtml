@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <title>
-        @if (!string.IsNullOrWhiteSpace(ViewBag.Title))
+        @if(!string.IsNullOrWhiteSpace(ViewBag.Title))
         {
             @ViewBag.Title@: -
         }
@@ -31,10 +31,14 @@
     @* TODO: add Telerik scripts *@
 
 </head>
-<body class="hold-transition skin-blue-light fixed sidebar-collapse sidebar-mini">
+<body class="hold-transition skin-blue-light fixed">
     <div class="wrapper">
         @Html.Partial(partialViewName: "_Header")
-        @Html.Partial(partialViewName: "_Sidebar")
+
+        @if(Request.IsAuthenticated)
+        {
+            @Html.Partial(partialViewName: "_Sidebar")
+        }
 
         <div class="content-wrapper">
             <section class="content-header">
@@ -44,25 +48,32 @@
             </section>
             <section class="content"> @RenderBody() </section>
         </div>
-        @if (!Request.IsAuthenticated)
-        {
-            <footer class="main-footer">
-                <div class="pull-right hidden-xs">
-                    <b>Version</b> 2.3.6
-                </div>
-                <strong>
-                    Copyright &copy; @DateTime.Now.Year - <a href="#" target="_blank">@Label.LinkoExchange</a>.
-                </strong> All rights reserved.
-            </footer>
-        }
-        else
-        {
 
-        }
+        <footer class="main-footer">
+            <div class="pull-right hidden-xs">
+                <b>Version</b> 2.3.6
+            </div>
+            <strong>
+                Copyright &copy; @DateTime.Now.Year - <a href="#" target="_blank">@Label.LinkoExchange</a>.
+            </strong> All rights reserved.
+        </footer>
     </div>
 
     @*<script src="@RouteJs.RouteJsHandler.HandlerUrl"></script>*@
     @Scripts.Render(paths: "~/Bundles/js")
     @RenderSection(name: "scripts", required: false)
+
+    @if(Request.IsAuthenticated)
+    {
+        <script type="text/javascript">
+            $('body').addClass('sidebar-mini');
+        </script>
+    }
+    else
+    {
+        <script type="text/javascript">
+            $('body').removeClass('sidebar-mini').addClass('sidebar-collapse');
+        </script>
+    }
 </body>
 </html>

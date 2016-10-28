@@ -52,7 +52,7 @@ $.AdminLTE.options = {
   //Enable sidebar expand on hover effect for sidebar mini
   //This option is forced to true if both the fixed layout and sidebar mini
   //are used together
-  sidebarExpandOnHover: false,
+  sidebarExpandOnHover: true,
   //BoxRefresh Plugin
   enableBoxRefresh: true,
   //Bootstrap.js tooltip
@@ -62,9 +62,9 @@ $.AdminLTE.options = {
   //native touch experience with touch devices. If you
   //choose to enable the plugin, make sure you load the script
   //before AdminLTE's app.js
-  enableFastclick: false,
+  enableFastclick: true,
   //Control Sidebar Options
-  enableControlSidebar: true,
+  enableControlSidebar: false,
   controlSidebarOptions: {
     //Which button should trigger the open/close event
     toggleBtnSelector: "[data-toggle='control-sidebar']",
@@ -103,7 +103,7 @@ $.AdminLTE.options = {
   //Define the set of colors to use globally around the website
   colors: {
     lightBlue: "#3c8dbc",
-    red: "#f56954",
+    red: "#dd4b39",
     green: "#00a65a",
     aqua: "#00c0ef",
     yellow: "#f39c12",
@@ -114,9 +114,9 @@ $.AdminLTE.options = {
     lime: "#01FF70",
     orange: "#FF851B",
     fuchsia: "#F012BE",
-    purple: "#8E24AA",
+    purple: "#605ca8",
     maroon: "#D81B60",
-    black: "#222222",
+    black: "#111",
     gray: "#d2d6de"
   },
   //The standard screen sizes that bootstrap uses.
@@ -171,7 +171,7 @@ $(function () {
   if (o.navbarMenuSlimscroll && typeof $.fn.slimscroll != 'undefined') {
     $(".navbar .menu").slimscroll({
       height: o.navbarMenuHeight,
-      alwaysVisible: false,
+      alwaysVisible: true,
       size: o.navbarMenuSlimscrollWidth
     }).css("width", "100%");
   }

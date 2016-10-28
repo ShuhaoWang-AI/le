@@ -18,6 +18,30 @@ module.exports = function (grunt) {
                     src: 'app.js',
                     dest: '../Linko.LinkoExchange.Web/scripts/AdminLTE/',
                     expand: true
+                }
+                , {
+                    cwd: 'plugins/slimScroll/',
+                    src: 'jquery.slimscroll.js',
+                    dest: '../Linko.LinkoExchange.Web/scripts/AdminLTE/',
+                    expand: true
+                }
+                , {
+                    cwd: 'plugins/slimScroll/',
+                    src: 'jquery.slimscroll.min.js',
+                    dest: '../Linko.LinkoExchange.Web/scripts/AdminLTE/',
+                    expand: true
+                }
+                , {
+                    cwd: 'plugins/datepicker/',
+                    src: 'bootstrap-datepicker.js',
+                    dest: '../Linko.LinkoExchange.Web/scripts/AdminLTE/',
+                    expand: true
+                }
+                , {
+                    cwd: 'plugins/datepicker/',
+                    src: 'datepicker3.css',
+                    dest: '../Linko.LinkoExchange.Web/Content/AdminLTE/css/',
+                    expand: true
                 }]
             }
         },

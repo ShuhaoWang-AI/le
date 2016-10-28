@@ -1,22 +1,193 @@
-﻿@if (Request.IsAuthenticated)
+﻿@if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.PortalName.ToLower().Equals(value: "authority"))
 {
     <aside class="main-sidebar">
         <section class="sidebar">
             @* BEGIN Menu *@
             <ul class="sidebar-menu">
-                <li class="header">HEADER</li>
-                <li class="active"><a href="#"><i class="fa fa-link"></i> <span>Link</span></a></li>
-                <li><a href="#"><i class="fa fa-link"></i> <span>Another Link</span></a></li>
+                <li class="active">
+                    <a href="#">
+                        <i class="fa fa-industry"></i>
+                        <span>Industries</span>
+                    </a>
+                </li>
+
                 <li class="treeview">
                     <a href="#">
-                        <i class="fa fa-link"></i> <span>Multilevel</span>
-                        <span class="pull-right-container">
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </span>
+                        <i class="fa glyphicon glyphicon-duplicate"></i>
+                        <span>Report Packages</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><a href="#">Link in level 2</a></li>
-                        <li><a href="#">Link in level 2</a></li>
+                        <li>
+                            <a href="#">
+                                <i class="fa text-green"></i>
+                                <span>Pending Review</span>
+                                @*<span class="pull-right-container">
+                                <span class="label label-success pull-right">2</span>
+                            </span>*@
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fa text-red"></i>
+                                <span>New Repudiations</span>
+                                @*<span class="pull-right-container">
+                                <span class="label label-danger pull-right">1</span>
+                            </span>*@
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fa text-yellow"></i>
+                                <span>All</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fa text-blue"></i>
+                                <span>Manage Templates</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-user-plus"></i>
+                        <span>Pending Registrations</span>
+                    </a>
+                </li>
+
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-file-text"></i>
+                        <span>Audit Logs </span>
+                    </a>
+                </li>
+
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-bank"></i>
+                        <span>Authority Account</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="#">
+                                <i class="fa text-green"></i>
+                                <span>Users</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fa text-green"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            @* END Menu *@
+        </section>
+    </aside>
+    <!-- The sidebar's background -->
+}
+
+else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.PortalName.ToLower().Equals(value: "industry"))
+{
+    <aside class="main-sidebar">
+        <section class="sidebar">
+            @* BEGIN Menu *@
+            <ul class="sidebar-menu">
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-th-list"></i>
+                        <span>Data Entry Forms</span>
+                        @*<span class="pull-right-container">
+                            <span class="label bg-orange pull-right">2</span>
+                        </span>*@
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="#">
+                                <i class="fa"></i>
+                                <span>Drafts</span>
+                                @*<span class="pull-right-container">
+                                    <span class="label bg-orange pull-right">2</span>
+                                </span>*@
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fa"></i>
+                                <span>Submitted</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa glyphicon glyphicon-duplicate"></i>
+                        <span>Report Packages</span>
+                        @*<span class="pull-right-container">
+                            <span class="label bg-orange pull-right">2</span>
+                            <span class="label label-success pull-right">1</span>
+                        </span>*@
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="#">
+                                <i class="fa text-green"></i>
+                                <span>Drafts</span>
+                                @*<span class="pull-right-container">
+                                        <span class="label label-success pull-right">2</span>
+                                    </span>*@
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fa text-red"></i>
+                                <span>Ready to Submit</span>
+                                @*<span class="pull-right-container">
+                                        <span class="label label-danger pull-right">1</span>
+                                    </span>*@
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fa text-yellow"></i>
+                                <span>Submitted</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-bank"></i>
+                        <span>Industry Account</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="#">
+                                <i class="fa text-green"></i>
+                                <span>Users</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fa text-green"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li class="treeview">
+                            <a href="#">
+                                <i class="fa fa-user-plus"></i>
+                                <span>Pending Registrations</span>
+                                @*<span class="pull-right-container">
+                                    <span class="label bg-primary pull-right">1</span>
+                                </span>*@
+                            </a>
+                        </li>
                     </ul>
                 </li>
             </ul>

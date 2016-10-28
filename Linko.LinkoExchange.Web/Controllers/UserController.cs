@@ -19,7 +19,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult Index()
         {
             // TODO: to test get claims 
-            //var claims = _authenticateService.GetClaims();
+            //var claims = _authenticationService.GetClaims();
             //var organization = claims?.FirstOrDefault(i => i.Type == "OrganizationName");
             //if (organization != null)
             //{

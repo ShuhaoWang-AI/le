@@ -404,22 +404,27 @@ namespace Linko.LinkoExchange.Services.Authentication
             var authenticationResult = new AuthenticationResultDto();
            
             var emailAuditLog = _dbContext.EmailAuditLog.SingleOrDefault(e => e.Token == resetPasswordToken);
-            if (emailAuditLog == null)
+
+            if(emailAuditLog == null)
+            {
                 throw new Exception(string.Format("ERROR: Cannot find email audit log associated with token={0}", resetPasswordToken));
+            }
+
             DateTimeOffset tokenCreated = emailAuditLog.SentDateTimeUtc;
+
             if (DateTimeOffset.Now.AddHours(-resetPasswordTokenValidateInterval) > tokenCreated)
             {
                 //Check token expiry (5.1.a)
 
                 authenticationResult.Success = false;
                 authenticationResult.Result = AuthenticationResult.ExpiredRegistrationToken;
+                authenticationResult.Errors = new string[] { "The password reset link has expired.  Please use Forgot Password." };
             }
             else if (!(_dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content.ToLower() == answerHash))
             {
                 //Check hashed answer (5.3.a)
 
                 authenticationResult.Success = false;
-                authenticationResult.Result = AuthenticationResult.IncorrectAnswerToQuestion;
 
                 //3rd incorrect attempt (5.3.b) => lockout
                 int maxAnswerAttempts = Convert.ToInt32(_settingService.GetOrganizationSettingValueByUserId(userProfileId, SettingType.MaxKBQAttempts, true, null));
@@ -427,14 +432,29 @@ namespace Linko.LinkoExchange.Services.Authentication
                 {
                     _userService.LockUnlockUserAccount(userProfileId, true);
                     //Get all associated authorities
-                    List<string> authorityList = new List<string>();
                     var userOrgs = _organizationService.GetUserRegulatories(userProfileId);
-                    foreach (var org in userOrgs)
-                    {
-                        authorityList.Add(string.Format("{0} {1} {2}", org.EmailContactInfoName, org.EmailContactInfoEmailAddress, org.EmailContactInfoPhone));
-                    }
-                    authenticationResult.Errors = authorityList;
 
+                    string errorString = "<div class=\"table - responsive\">";
+                    errorString += "<table class=\"table no-margin\">";
+                    errorString += "<tbody>";
+
+                    foreach(var org in userOrgs)
+                    {
+                        errorString += "<tr><td>" + org.EmailContactInfoName + "</td><td>" + org.EmailContactInfoEmailAddress + "</td><td>" + org.EmailContactInfoPhone + " </td></tr>";
+                    }
+
+                    errorString += "</tbody>";
+                    errorString += "</table>";
+                    errorString += "</div>";
+                    errorString += "</table>";
+
+                    authenticationResult.Result = AuthenticationResult.UserIsLocked;
+                    authenticationResult.Errors = new string[] { errorString };
+                }
+                else
+                {
+                    authenticationResult.Result = AuthenticationResult.IncorrectAnswerToQuestion;
+                    authenticationResult.Errors = new string[] { "The answer is incorrect.  Please try again." };
                 }
             }
             else if (IsValidPasswordCheckInHistory(passwordHash, userProfileId, organizationSettings))
@@ -448,11 +468,11 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
             else
             {
-
                 //Password not meet pass requirements? -- done at View level via PasswordValidator/data annotations
 
                 _userService.SetHashedPassword(userProfileId, passwordHash);
                 authenticationResult.Success = true;
+                authenticationResult.Result = AuthenticationResult.Success;
             }
 
             return authenticationResult;
@@ -485,6 +505,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
             else
             {
+                authenticationResult.Success = true;
+                authenticationResult.Result = AuthenticationResult.Success;
                 SendResetPasswordConfirmationEmail(user);
             }
 
@@ -510,6 +532,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
             else
             {
+                authenticationResult.Success = true;
+                authenticationResult.Result = AuthenticationResult.Success;
                 SendRequestUsernameEmail(user);
             }
 

@@ -1,7 +1,7 @@
 ﻿
 @using Linko.LinkoExchange.Core.Resources
 <header class="main-header">
-    @if (Request.IsAuthenticated)
+    @if(Request.IsAuthenticated)
     {
         @* BEGIN Logo *@
         <a href="@Url.RouteUrl(routeName:"Default")" class="logo">
@@ -22,29 +22,28 @@
                 <span class="sr-only">Toggle navigation</span>
             </a>
             <span class="navbar-brand program-font">
-                @if (!string.IsNullOrWhiteSpace(ViewBag.PortalName))
+                @if(!string.IsNullOrWhiteSpace(ViewBag.PortalName))
                 {
                     @ViewBag.PortalName
                 }
             </span>
-            <span class="navbar-brand">-</span>
-            <span class="navbar-brand  program-font">
-                @if (!string.IsNullOrWhiteSpace(ViewBag.OrganizationName))
-                {
+            @if(!string.IsNullOrWhiteSpace(ViewBag.OrganizationName))
+            {
+                <span class="navbar-brand">-</span>
+                <span class="navbar-brand  program-font">
                     @ViewBag.OrganizationName
-                }
-            </span>
+                </span>
+            }
             <div class="navbar-custom-menu">
-                @using (Html.BeginForm(actionName: "SignOff", controllerName: "Account", method: FormMethod.Post, htmlAttributes: new { id = "formSignOut", @class = "navbar-right" }))
+                @using(Html.BeginForm(actionName: "SignOff", controllerName: "Account", method: FormMethod.Post, htmlAttributes: new { id = "formSignOut", @class = "navbar-right" }))
                 {
-@*                    @Html.AntiForgeryToken()*@
                     <ul class="nav navbar-nav">
                         @* BEGIN User Account Menu *@
                         <li class="dropdown user user-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <i class="fa fa-user"></i>
                                 <span class="hidden-xs">
-                                    @if (!string.IsNullOrWhiteSpace(ViewBag.UserName))
+                                    @if(!string.IsNullOrWhiteSpace(ViewBag.UserName))
                                     {
                                         @ViewBag.UserName
                                     }
@@ -55,14 +54,14 @@
                                     <div class="row">
                                         <div class="col-xs-12 text-center">
 
-                                            @if (!string.IsNullOrWhiteSpace(ViewBag.UserName))
+                                            @if(!string.IsNullOrWhiteSpace(ViewBag.UserName))
                                             {
                                                 @ViewBag.UserName
                                             }
                                         </div>
                                         <div class="col-xs-12 text-center">
                                             <small>
-                                                @if (!string.IsNullOrWhiteSpace(ViewBag.UserRole))
+                                                @if(!string.IsNullOrWhiteSpace(ViewBag.UserRole))
                                                 {
                                                     @ViewBag.UserRole
                                                 }
@@ -72,10 +71,10 @@
                                 </li>
                                 <li class="user-footer">
                                     <div class="pull-left">
-                                        <a href="#" class="btn .btn-sm btn-primary">@Label.ButtonProfile (need to update link)</a>
+                                        <a href="#" class="btn btn-sm btn-primary">@Label.ButtonProfile (need to update link)</a>
                                     </div>
                                     <div class="pull-right">
-                                        <a onclick="location.href='@Url.Action(actionName: "SignOut", controllerName: "Account")'" class="btn .btn-sm btn-primary">@Label.ButtonSignOut</a>
+                                        <a onclick="location.href='@Url.Action(actionName: "SignOut", controllerName: "Account")'" class="btn btn-sm btn-primary">@Label.ButtonSignOut</a>
                                     </div>
                                 </li>
                             </ul>
@@ -127,7 +126,7 @@
     }
     else
     {
-        <a href="#" class="logo hidden-xs">&nbsp;</a>
+        <div class="logo hidden-xs">&nbsp;</div>
         <nav class="navbar navbar-static-top" role="navigation">
             @* BEGIN Logo *@
             <span>

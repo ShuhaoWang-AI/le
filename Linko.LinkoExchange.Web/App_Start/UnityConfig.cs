@@ -67,9 +67,10 @@ namespace Linko.LinkoExchange.Web
 
             // Logger
             container.AddNewExtension<NLogExtension>();
-
+            
             // Custom filter
             container.RegisterType<CustomHandleErrorAttribute>(new InjectionConstructor(typeof(ILogger)));
+            //  container.RegisterType<CommonInfoAttribute>(new InjectionConstructor(typeof(IAuthenticationService)));
 
             // Services
             container.RegisterType<IAuthenticationManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));
@@ -97,8 +98,10 @@ namespace Linko.LinkoExchange.Web
                 typeof(EmailAuditLogService), 
                 typeof(IProgramService),
                 typeof(ISettingService),
-                typeof(IRequestCache))); 
+                typeof(IRequestCache)));
 
+
+            container.RegisterType<CommonInfoAttribute>();
 
             //var config = new MapperConfiguration(cfg =>
             //{

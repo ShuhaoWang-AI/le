@@ -28,6 +28,7 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
             .ForMember(i => i.EmailContactInfoPhone, o => o.Ignore())
             .ForMember(i => i.EmailContactInfoEmailAddress, o => o.Ignore())
             .ForMember(i => i.RegulatoryProgramId, o => o.Ignore())
+            .ForMember(i => i.State, o => o.Ignore())
             .ForMember(i => i.OrganizationRegulatoryProgramId, o => o.Ignore());
 
         }

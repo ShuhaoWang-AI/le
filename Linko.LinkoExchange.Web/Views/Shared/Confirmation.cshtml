@@ -1,7 +1,13 @@
 ﻿@using Linko.LinkoExchange.Web.ViewModels.Shared
 @model ConfirmationViewModel
-<div class="alert alert-info alert-dismissible">
-    <h4><i class="icon fa fa-info"></i> @Model.Title </h4>
-    @Model.Message
-    @Html.Raw(Model.HtmlStr)
+<div class="col-md-offset-2 col-md-8">
+    <div class="box box-primary">
+        <section class="box-body">
+            <div class="alert alert-info alert-dismissible">
+                <h4><i class="icon fa fa-info"></i> @Model.Title </h4>
+                @Model.Message
+                @Html.Raw(Model.HtmlStr)
+            </div>
+        </section><!-- /.box-body -->
+    </div><!-- /.box -->
 </div>

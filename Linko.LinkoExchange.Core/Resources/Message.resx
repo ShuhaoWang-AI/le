@@ -144,4 +144,7 @@
   <data name="UserNameNotFound" xml:space="preserve">
     <value>User name not found.</value>
   </data>
+  <data name="AccountIsNotAssociated" xml:space="preserve">
+    <value>Your account is not associated with any active Organization.  Please contact your Authority for assistance.</value>
+  </data>
 </root>

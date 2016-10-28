@@ -61,6 +61,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your account is not associated with any active Organization.  Please contact your Authority for assistance..
+        /// </summary>
+        public static string AccountIsNotAssociated {
+            get {
+                return ResourceManager.GetString("AccountIsNotAssociated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your account is locked. Please contact your Authority for assistance..
         /// </summary>
         public static string AccountLocked {
