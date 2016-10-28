@@ -7,6 +7,6 @@ namespace Linko.LinkoExchange.Services.Dto
     {
         public string Token { get; set; }
         public AuthenticationResult AutehticationResult;
-        public IEnumerable<OrganizationDto> RegulatoryList { get; set; } 
+        public IEnumerable<AuthorityDto> RegulatoryList { get; set; } 
     }
 }

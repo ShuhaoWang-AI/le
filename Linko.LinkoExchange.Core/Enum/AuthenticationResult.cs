@@ -23,6 +23,7 @@
     {
         Success,
         Failed,
+        UserIsLocked,
         InvitationExpired,
         ProgramNotFound, 
         ProgramDisabled,

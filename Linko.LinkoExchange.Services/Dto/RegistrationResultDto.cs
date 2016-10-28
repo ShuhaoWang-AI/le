@@ -8,5 +8,6 @@ namespace Linko.LinkoExchange.Services.Dto
     {
         public IEnumerable<string> Errors { get; set; }
         public RegistrationResult Result { get; set; }
+        public IEnumerable<AuthorityDto> RegulatoryList { get; set; }
     }
 }

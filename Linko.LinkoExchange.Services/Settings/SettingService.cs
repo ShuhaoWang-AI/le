@@ -386,9 +386,9 @@ namespace Linko.LinkoExchange.Services.Settings
 
         public string GetOrgRegProgramSettingValue(int orgRegProgramId, SettingType settingType)
         {
-            return _dbContext.OrganizationRegulatoryProgramSettings
+           return _dbContext.OrganizationRegulatoryProgramSettings
                 .Single(s => s.OrganizationRegulatoryProgramId == orgRegProgramId
-                && s.SettingTemplateId == (int)settingType).Value;
+                && s.SettingTemplateId == (int)settingType).Value; 
         }
 
 

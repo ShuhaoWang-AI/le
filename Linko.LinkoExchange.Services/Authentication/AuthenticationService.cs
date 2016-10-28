@@ -29,10 +29,10 @@ namespace Linko.LinkoExchange.Services.Authentication
     public class AuthenticationService : IAuthenticationService
     {
         private readonly LinkoExchangeContext _dbContext;
-        
+
         private readonly ApplicationSignInManager _signInManager;
         private readonly ApplicationUserManager _userManager;
-        
+
         private readonly ISettingService _settingService;
         private readonly IOrganizationService _organizationService;
         private readonly IProgramService _programService;
@@ -51,7 +51,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IMapper _mapper;
 
         public AuthenticationService(ApplicationUserManager userManager,
-            ApplicationSignInManager signInManager, 
+            ApplicationSignInManager signInManager,
             IAuthenticationManager authenticationManager,
             ISettingService settingService,
             IOrganizationService organizationService,
@@ -61,10 +61,10 @@ namespace Linko.LinkoExchange.Services.Authentication
             IPermissionService permissionService,
             LinkoExchangeContext linkoExchangeContext,
             IUserService userService
-           ,ISessionCache sessionCache
-           ,IRequestCache requestCache
-           ,IMapper mapper
-           ,IPasswordHasher passwordHasher
+           , ISessionCache sessionCache
+           , IRequestCache requestCache
+           , IMapper mapper
+           , IPasswordHasher passwordHasher
             )
         {
             if (linkoExchangeContext == null) throw new ArgumentNullException(paramName: "linkoExchangeContext");
@@ -85,11 +85,11 @@ namespace Linko.LinkoExchange.Services.Authentication
             _dbContext = linkoExchangeContext;
             _userManager = userManager;
             _signInManager = signInManager;
-            _authenticationManager = authenticationManager; 
+            _authenticationManager = authenticationManager;
             _settingService = settingService;
             _organizationService = organizationService;
             _programService = programService;
-            _invitationService = invitationService; 
+            _invitationService = invitationService;
             _globalSettings = _settingService.GetGlobalSettings();
             _emailService = emailService;
             _permissionService = permissionService;
@@ -102,7 +102,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         public IList<Claim> GetClaims()
         {
-            var claims = _sessionCache.GetValue(CacheKey.OwinClaims)  as IEnumerable<Claim>;
+            var claims = _sessionCache.GetValue(CacheKey.OwinClaims) as IEnumerable<Claim>;
             if (claims == null)
             {
                 var userId = _sessionCache.GetValue(CacheKey.UserProfileId) as string;
@@ -119,7 +119,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         public void SetCurrentUserClaims(IDictionary<string, string> claims)
         {
             if (claims == null || claims.Count < 1)
-                return; 
+                return;
 
             var currentClaims = GetClaims();
             if (currentClaims != null)
@@ -129,12 +129,12 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 while (itor.MoveNext())
                 {
-                    currentClaims.Add(new Claim(itor.Current.Key, itor.Current.Value)); 
+                    currentClaims.Add(new Claim(itor.Current.Key, itor.Current.Value));
                 }
 
                 ClearClaims(userId);
                 SaveClaims(userId, currentClaims);
-            } 
+            }
         }
 
         // Change or reset password
@@ -156,7 +156,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 if (applicationUser == null)
                 {
                     authenticationResult.Success = false;
-                    authenticationResult.Result = AuthenticationResult.UserNotFound; 
+                    authenticationResult.Result = AuthenticationResult.UserNotFound;
                     return Task.FromResult(authenticationResult);
                 }
 
@@ -166,7 +166,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
                 var programSettings = _settingService.GetProgramSettingsByIds(programIds).SelectMany(i => i.Settings).ToList();
 
-                SetPasswordPolicy(organizationSettings); 
+                SetPasswordPolicy(organizationSettings);
                 // Use PasswordValidator
                 var validateResult = _userManager.PasswordValidator.ValidateAsync(newPassword).Result;
                 if (validateResult.Succeeded == false)
@@ -184,7 +184,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     authenticationResult.Errors = new string[] { "Can not use old password." };
                     return Task.FromResult(authenticationResult);
                 }
-                 
+
                 _userManager.RemovePassword(userId);
                 _userManager.AddPassword(userId, newPassword);
             }
@@ -234,140 +234,166 @@ namespace Linko.LinkoExchange.Services.Authentication
                 registrationResult.Result = RegistrationResult.InvitationExpired;
                 return registrationResult;
             }
-             
+
+            // User exists but he is locked.  
+            UserProfile applicationUser = _userManager.FindByName(userInfo.UserName);
+            if (applicationUser != null && applicationUser.IsAccountLocked)
+            {
+                registrationResult.Result = RegistrationResult.UserIsLocked;
+                var authorities = _organizationService.GetUserRegulatories(applicationUser.UserProfileId); 
+                if(authorities == null)
+                {
+                    authorities = new List<AuthorityDto>();
+                }
+                registrationResult.RegulatoryList = _organizationService.GetUserRegulatories(applicationUser.UserProfileId);
+                return registrationResult;
+            }
+
+            bool newUserRegistration = true;
+            if (applicationUser != null)
+            {
+                newUserRegistration = false;
+            }
+
             using (var transaction = _dbContext.Database.BeginTransaction())
             {
-
-                var applicationUser = AssignUser(userInfo.UserName, userInfo.Email);
                 try
                 {
-                    // Only check the organization settings of invitation regulatory program
-                    SetPasswordPolicy(inivitationRecipintOrganizationSettings.Settings);
-                    applicationUser.FirstName = userInfo.UserName;
-                    applicationUser.LastName = userInfo.LastName;
-                    applicationUser.UserName = userInfo.UserName;
-                    applicationUser.AddressLine1 = userInfo.AddressLine1;
-                    applicationUser.AddressLine2 = userInfo.AddressLine2;
-                    applicationUser.CityName = userInfo.CityName;
-                    applicationUser.ZipCode = userInfo.ZipCode;
-                    applicationUser.PhoneNumber = userInfo.PhoneNumber;
-                    applicationUser.PhoneExt = userInfo.PhoneExt;
-                    applicationUser.PhoneNumberConfirmed = true;
-
-                    applicationUser.IsAccountLocked = false;
-                    applicationUser.IsAccountResetRequired = false;
-                    applicationUser.LockoutEnabled = true;
-                    applicationUser.EmailConfirmed = true;
-                    applicationUser.IsInternalAccount = false;
-                    applicationUser.IsIdentityProofed = false;
-
-                    var result = _userManager.CreateAsync(applicationUser, userInfo.Password).Result;
-                    if (result == IdentityResult.Success)
+                    #region new user registration 
+                    if (newUserRegistration)
                     {
-                        // Retrieve user again to get userProfile Id. 
-                        applicationUser = _userManager.FindById(applicationUser.Id);
+                        applicationUser = AssignUser(userInfo.UserName, userInfo.Email);
 
-                        // 1. Create a new row in userProfile password history table 
-                        _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
+                        // Only check the organization settings of invitation regulatory program
+                        SetPasswordPolicy(inivitationRecipintOrganizationSettings.Settings);
+                        #region update user profile 
+                        applicationUser.FirstName = userInfo.UserName;
+                        applicationUser.LastName = userInfo.LastName;
+                        applicationUser.UserName = userInfo.UserName;
+                        applicationUser.AddressLine1 = userInfo.AddressLine1;
+                        applicationUser.AddressLine2 = userInfo.AddressLine2;
+                        applicationUser.CityName = userInfo.CityName;
+                        applicationUser.ZipCode = userInfo.ZipCode;
+                        applicationUser.PhoneNumber = userInfo.PhoneNumber;
+                        applicationUser.PhoneExt = userInfo.PhoneExt;
+                        applicationUser.PhoneNumberConfirmed = true;
+
+                        applicationUser.IsAccountLocked = false;
+                        applicationUser.IsAccountResetRequired = false;
+                        applicationUser.LockoutEnabled = true;
+                        applicationUser.EmailConfirmed = true;
+                        applicationUser.IsInternalAccount = false;
+                        applicationUser.IsIdentityProofed = false;
+
+                        #endregion
+
+                        var result = _userManager.CreateAsync(applicationUser, userInfo.Password).Result;
+                        if (result == IdentityResult.Success)
                         {
-                            LastModificationDateTimeUtc = DateTime.UtcNow,
-                            PasswordHash = applicationUser.PasswordHash,
-                            UserProfileId = applicationUser.UserProfileId
-                        });
+                            // Retrieve user again to get userProfile Id. 
+                            applicationUser = _userManager.FindById(applicationUser.Id);
 
-                        // UC-42 6
-                        // 2 Create organziation regulatory program userProfile, and set the approved statue to false  
-                        var orpu = _programService.CreateOrganizationRegulatoryProgramForUser(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId);
-
-                        // 3 TODO send email to all users who have rights to approve a registrant 
-                        // UC-42 7
-                        // find out who have the approve permission
-
-
-                        // 4 TODO remove the invitation from table
-                        // UC-42 8
-                        var organizationId = 100;
-                        var approvalPeople = _permissionService.GetApprovalPeople(applicationUser.UserProfileId, organizationId);
-                        var sendTo = approvalPeople.Select(i => i.Email);
-
-                        // TODO: to determine if user is authority user or is industry user;
-                        var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
-                        // TODO:  1. No recipientProgram found, or program is disabled
-
-                        var senderProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.SenderOrganizationRegulatoryProgramId);
-                        // TODO:  2. Check program found or is not diabled.
-                        
-                        if(recipientProgram == null || senderProgram == null)
-                        {
-                            registrationResult.Result = RegistrationResult.ProgramNotFound;
-                            return registrationResult;
-                        }
-                        else if (!recipientProgram.IsEnabled || !senderProgram.IsEnabled)
-                        {
-                            registrationResult.Result = RegistrationResult.ProgramDisabled;
-                            return registrationResult;
-                        }
-
-                        var inviteAuthorityUser = true;
-                        // Invites authority user
-                        if (recipientProgram.RegulatorOrganizationId.HasValue == false)
-                        {
-                            inviteAuthorityUser = false;
-                        }
-
-                        _requestCache.SetValue(CacheKey.Token, registrationToken);
-
-                        var authorityOrg = _organizationService.GetOrganization(recipientProgram.RegulatorOrganizationId.Value);
-
-                        // Setup emailContentReplacement 
-                        var emailContentReplacements = new Dictionary<string, string>();
-                        emailContentReplacements.Add("firstName", applicationUser.FirstName);
-                        emailContentReplacements.Add("lastName", applicationUser.LastName);
-                        emailContentReplacements.Add("emailAddress", _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress));
-                        emailContentReplacements.Add("phoneNumber", _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone));
-
-                        emailContentReplacements.Add("authorityName", authorityOrg.OrganizationName);
-                        emailContentReplacements.Add("organziationName", recipientProgram.OrganizationDto.OrganizationName);
-                        
-                        if (! inviteAuthorityUser) { 
-                            // Bad data in database
-                            if(recipientProgram.RegulatorOrganizationId.HasValue == false)
+                            // 1. Create a new row in userProfile password history table 
+                            _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
                             {
-                                registrationResult.Result = RegistrationResult.Failed;
-                                return registrationResult;
-                            }
-                        
-                            var receipientOrg = _organizationService.GetOrganization(recipientProgram.OrganizationId); 
-
-                            emailContentReplacements.Add("addressLine1", receipientOrg.AddressLine1);
-                            emailContentReplacements.Add("cityName", receipientOrg.CityName);
-                            emailContentReplacements.Add("stateName", receipientOrg.State);
+                                LastModificationDateTimeUtc = DateTime.UtcNow,
+                                PasswordHash = applicationUser.PasswordHash,
+                                UserProfileId = applicationUser.UserProfileId
+                            });
                         }
+                    }
+                    #endregion
 
-                        if (inviteAuthorityUser)
-                        {
-                           await _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements);
-                        }
-                        else
-                        {
-                            await _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
-                        }
-                        
-                        // 6 TODO logs invite to Audit 
-                        // UC-2 
+                    // UC-42 6
+                    // 2 Create organziation regulatory program userProfile, and set the approved statue to false  
+                    var orpu = _programService.CreateOrganizationRegulatoryProgramForUser(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId);
 
-                        // All succeed
-                        await _dbContext.SaveChangesAsync();
-                        registrationResult.Result = RegistrationResult.Success; 
-                        SendRegistrationConfirmationEmail(applicationUser.Id, userInfo);
+                    // 3 TODO send email to all users who have rights to approve a registrant 
+                    // UC-42 7
+                    // find out who have the approve permission 
 
-                        transaction.Commit();
+                    // 4 TODO remove the invitation from table
+                    // UC-42 8
+                    var organizationId = 100;
+                    var approvalPeople = _permissionService.GetApprovalPeople(applicationUser.UserProfileId, organizationId);
+                    var sendTo = approvalPeople.Select(i => i.Email);
+
+                    // TODO: to determine if user is authority user or is industry user;
+                    var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
+                    // TODO:  1. No recipientProgram found, or program is disabled
+
+                    var senderProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.SenderOrganizationRegulatoryProgramId);
+                    // TODO:  2. Check program found or is not diabled.
+
+                    if (recipientProgram == null || senderProgram == null)
+                    {
+                        registrationResult.Result = RegistrationResult.ProgramNotFound;
+                        return registrationResult;
+                    }
+                    else if (!recipientProgram.IsEnabled || !senderProgram.IsEnabled)
+                    {
+                        registrationResult.Result = RegistrationResult.ProgramDisabled;
                         return registrationResult;
                     }
 
-                    registrationResult.Result = RegistrationResult.Failed;
-                    registrationResult.Errors = result.Errors;
-                    transaction.Rollback();
+                    var inviteAuthorityUser = false;
+                    // Invites authority user
+                    if (! recipientProgram.RegulatorOrganizationId.HasValue)
+                    {
+                        inviteAuthorityUser = true;
+                    }
+
+                    _requestCache.SetValue(CacheKey.Token, registrationToken);
+
+                    var authorityOrg = _organizationService.GetOrganization(recipientProgram.RegulatorOrganizationId.Value);
+
+                    #region Setup emailContentReplacement  
+                    var emailContentReplacements = new Dictionary<string, string>();
+                    emailContentReplacements.Add("firstName", applicationUser.FirstName);
+                    emailContentReplacements.Add("lastName", applicationUser.LastName);
+                    var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+                    var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+                    emailContentReplacements.Add("emailAddress", emailAddressOnEmail);
+                    emailContentReplacements.Add("phoneNumber", phoneNumberOnEmail);
+
+                    emailContentReplacements.Add("authorityName", authorityOrg.OrganizationName);
+                    emailContentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
+
+                    if (!inviteAuthorityUser)
+                    {
+                        // Bad data in database
+                        if (recipientProgram.RegulatorOrganizationId.HasValue == false)
+                        {
+                            registrationResult.Result = RegistrationResult.Failed;
+                            return registrationResult;
+                        }
+
+                        var receipientOrg = _organizationService.GetOrganization(recipientProgram.OrganizationId);
+
+                        emailContentReplacements.Add("addressLine1", receipientOrg.AddressLine1);
+                        emailContentReplacements.Add("cityName", receipientOrg.CityName);
+                        emailContentReplacements.Add("stateName", receipientOrg.State);
+                    }
+
+                    #endregion
+
+                    if (inviteAuthorityUser)
+                    {
+                        await _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements);
+                    }
+                    else
+                    {
+                        await _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
+                    }
+
+                    // 6 TODO logs invite to Audit 
+                    // UC-2 
+
+                    // All succeed
+                    await _dbContext.SaveChangesAsync();
+                    registrationResult.Result = RegistrationResult.Success;
+                    SendRegistrationConfirmationEmail(applicationUser.Id, userInfo);
+                    transaction.Commit();
                     return registrationResult;
                 }
                 catch (Exception ex)
@@ -559,6 +585,11 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             var regulatoryList = _organizationService.GetUserRegulatories(applicationUser.UserProfileId);
+            if (regulatoryList == null)
+            {
+                regulatoryList = new List<AuthorityDto>();
+            }
+
             signInResultDto.RegulatoryList = regulatoryList;
 
             // UC-29, 2.c
@@ -858,7 +889,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             var defaultValueStr = _globalSettings[settingType];
             var defaultValue = int.Parse(defaultValueStr);
-            if (organizationSettings != null)
+            if (organizationSettings != null && organizationSettings.Any())
             {
                 defaultValue = isMax
                     ? organizationSettings
