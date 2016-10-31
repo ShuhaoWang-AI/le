@@ -239,13 +239,19 @@ namespace Linko.LinkoExchange.Services
             return dto;
         }
 
-        public List<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int orgRegProgId)
+        public List<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int orgRegProgId, string startsWith = null)
         {
             try
             {
                 var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId);
                 var childOrgRegProgs = _dbContext.OrganizationRegulatoryPrograms.Where(o => o.RegulatorOrganizationId == orgRegProgram.OrganizationId
                     && o.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
+
+                if (childOrgRegProgs != null && !String.IsNullOrEmpty(startsWith))
+                {
+                    childOrgRegProgs = childOrgRegProgs.Where(x => x.Organization.Name.StartsWith(startsWith));
+                }
+
                 if (childOrgRegProgs != null)
                 {
                     var dtoList = new List<OrganizationRegulatoryProgramDto>();

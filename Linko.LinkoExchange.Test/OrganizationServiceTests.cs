@@ -79,5 +79,12 @@ namespace Linko.LinkoExchange.Test
             var orgs = orgService.GetUserRegulatories(1); 
 
         }
+
+        [TestMethod]
+        public void Test_GetChildOrganizationRegulatoryPrograms()
+        {
+            var orgs = orgService.GetChildOrganizationRegulatoryPrograms(1, "M");
+
+        }
     }
 }
