@@ -37,7 +37,8 @@
         EmailContactInfoPhone = 14,
         EmailContactInfoEmailAddress = 15, 
         AuthorityUserLicenseUsedCount,
-             
+        IndustryLicenseTotalCount, 
+
         TimeZone, 
         MassLoadingResultToUseLessThanSign,
         MassLoadingCalculationDecimalPlaces, 

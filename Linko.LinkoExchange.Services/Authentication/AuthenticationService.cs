@@ -109,8 +109,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             var claims = _sessionCache.GetValue(CacheKey.OwinClaims) as IEnumerable<Claim>;
             if (claims == null)
             {
-                var userId = _sessionCache.GetValue(CacheKey.UserProfileId) as string;
-                claims = string.IsNullOrWhiteSpace(userId) ? null : _userManager.GetClaims(userId);
+                var owinUserId = _sessionCache.GetValue(CacheKey.OwinUserId) as string;
+                claims = string.IsNullOrWhiteSpace(owinUserId) ? null : _userManager.GetClaims(owinUserId);
                 _sessionCache.SetValue(CacheKey.OwinClaims, claims);
             }
             return claims?.ToList();
@@ -128,7 +128,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             var currentClaims = GetClaims();
             if (currentClaims != null)
             {
-                var userId = _sessionCache.GetValue(CacheKey.OwinUserId) as string;
+                var owinUserId = _sessionCache.GetValue(CacheKey.OwinUserId) as string;
                 var itor = claims.GetEnumerator();
 
                 while (itor.MoveNext())
@@ -136,8 +136,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                     currentClaims.Add(new Claim(itor.Current.Key, itor.Current.Value));
                 }
 
-                ClearClaims(userId);
-                SaveClaims(userId, currentClaims);
+                ClearClaims(owinUserId);
+                SaveClaims(owinUserId, currentClaims);
             }
         }
 
@@ -661,7 +661,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                 signInResultDto.AutehticationResult = AuthenticationResult.Success;
                 signInResultDto.Token = _tokenGenerator.GenToken(userName);
 
-                _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.Id);
+                _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId);
+                _sessionCache.SetValue(CacheKey.OwinUserId, applicationUser.Id);
 
                 //Set user's claims
                 GetUserIdentity(applicationUser);  
@@ -773,9 +774,9 @@ namespace Linko.LinkoExchange.Services.Authentication
         }
 
         public void SignOff()
-        {
-            var userId = _sessionCache.GetValue(CacheKey.UserProfileId) as string;
-            ClearClaims(userId);
+        { 
+            var owinUserId = _sessionCache.GetValue(CacheKey.OwinUserId) as string;
+            ClearClaims(owinUserId);
             _sessionCache.Clear();
             _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie); 
         }

@@ -43,6 +43,7 @@ namespace Linko.LinkoExchange.Test
         ISessionCache sessionCache = Mock.Of<ISessionCache>();
         IPasswordHasher passwordHasher = new PasswordHasher();
         IRequestCache requestCache = Mock.Of<IRequestCache>();
+        IHttpContextService httpContextService = Mock.Of<IHttpContextService>();
 
         Mock<IAuthenticationManager> authManger = new Mock<IAuthenticationManager>();
         Mock<ApplicationSignInManager> signmanager;
@@ -119,7 +120,7 @@ namespace Linko.LinkoExchange.Test
                 requestCache,
                 AutoMapper.Mapper.Instance,
                 passwordHasher,
-                _httpContext.Object
+                httpContextService
                 );
 
             userManagerObj.Setup(
@@ -463,7 +464,7 @@ namespace Linko.LinkoExchange.Test
                 requestCache,
                 Mapper.Instance,
                 passwordHasher,
-                _httpContext.Object
+                httpContextService
                 );
 
             authService.SetClaimsForOrgRegProgramSelection(1);

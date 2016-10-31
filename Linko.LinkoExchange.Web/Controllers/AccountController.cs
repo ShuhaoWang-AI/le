@@ -39,6 +39,16 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
+
+        [AllowAnonymous]
+        public ActionResult Register(UserDto userInfo, string registrationToken)
+        {
+
+            var ret = _authenticationService.Register(userInfo, registrationToken);
+            return View();
+        }
+
+
         #region default action
 
         [AllowAnonymous]
