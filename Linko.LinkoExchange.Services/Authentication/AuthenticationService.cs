@@ -272,7 +272,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             // Check if user is already in the program 
             var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
-            if (recipientProgram != null)
+            if (recipientProgram != null && applicationUser != null)
             {
                 registrationResult.Result = RegistrationResult.UserAlreadyInTheProgram;
                 return registrationResult;
@@ -354,16 +354,16 @@ namespace Linko.LinkoExchange.Services.Authentication
                         return registrationResult;
                     }                     
 
-                    var inviteIndustryUser = true;
+                    var inviteIndustryUser = false;
                     // Invites authority user
-                    if (! recipientProgram.RegulatorOrganizationId.HasValue)
+                    if (recipientProgram.RegulatorOrganizationId.HasValue)
                     {
-                        inviteIndustryUser = false;
+                        inviteIndustryUser = true;
                     }
                     else
                     {
                         // AU invite authority user, but RegulatorOrganizationId has value
-                        if (recipientProgram.RegulatorOrganizationId.HasValue)
+                        if (senderProgram.RegulatorOrganizationId.HasValue)
                         {
                             registrationResult.Result = RegistrationResult.Failed;
                             return registrationResult;
