@@ -665,6 +665,9 @@ namespace Linko.LinkoExchange.Services.Authentication
             // Check if user's password is expired or not   
             if (IsUserPasswordExpired(userId, organizationSettings))
             {
+                // Put user profile Id into session, to request user change their password. 
+                _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId); 
+
                 signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
                 return Task.FromResult(signInResultDto); 
             }
@@ -862,11 +865,10 @@ namespace Linko.LinkoExchange.Services.Authentication
          
         private void GetUserIdentity(UserProfile userProfile)
         { 
-            //TODO: to replace using real claims  
             // get userDto's role, organizations, programs, current organization, current program.....
              
-            var claims = new List<Claim>(); 
-             
+            var claims = new List<Claim>();
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, userProfile.Id));
             claims.Add(new Claim(CacheKey.OwinUserId, userProfile.Id)); 
             claims.Add(new Claim(CacheKey.UserProfileId, userProfile.UserProfileId.ToString()));
             claims.Add(new Claim(CacheKey.FirstName, userProfile.FirstName));
