@@ -40,7 +40,9 @@ namespace Linko.LinkoExchange.Test
         IEmailService emailService = Mock.Of<IEmailService>();
         IPermissionService permService = Mock.Of<IPermissionService>();
         IUserService userService = Mock.Of<IUserService>();
-        ISessionCache sessionCache = Mock.Of<ISessionCache>();
+        ISessionCache sessionCache = new  SessionCache(new HttpContextServiceMock());
+        //Mock.Of<ISessionCache>();
+
         IPasswordHasher passwordHasher = new PasswordHasher();
         IRequestCache requestCache = Mock.Of<IRequestCache>();
         IHttpContextService httpContextService = Mock.Of<IHttpContextService>();
@@ -53,6 +55,7 @@ namespace Linko.LinkoExchange.Test
         AuthenticationService _authenticationService;
         Dictionary<SettingType, string> settingDict = new Dictionary<SettingType, string>();
         Mock<IHttpContextService> _httpContext;
+  
 
         [TestInitialize]
         public void TestInitialize()
@@ -376,6 +379,9 @@ namespace Linko.LinkoExchange.Test
             var result = _authenticationService.SignInByUserName("shuhao", "password", true);
 
             Assert.AreEqual(AuthenticationResult.PasswordExpired, result.Result.AutehticationResult);
+
+            var userProfileId = sessionCache.GetValue(CacheKey.UserProfileId);
+            Assert.AreEqual(userProfile.UserProfileId, userProfileId);
         }
 
 
@@ -469,5 +475,34 @@ namespace Linko.LinkoExchange.Test
 
             authService.SetClaimsForOrgRegProgramSelection(1);
         }
+    }
+}
+
+
+public class HttpContextServiceMock : IHttpContextService
+{
+    private Dictionary<string, object> session = new Dictionary<string, object>();
+    public System.Web.HttpContext Current()
+    {
+        throw new NotImplementedException();
+    }
+
+    public string GetRequestBaseUrl()
+    {
+        return "";
+    }
+
+    public object GetSessionValue(string key)
+    {
+        if(session.ContainsKey(key))
+        {
+            return session[key];
+        }
+        return "";
+    }
+
+    public void SetSessionValue(string key, object value)
+    {
+        session[key] = value;
     }
 }

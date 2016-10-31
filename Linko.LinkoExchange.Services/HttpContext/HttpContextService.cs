@@ -13,6 +13,16 @@ namespace Linko.LinkoExchange.Services
             return System.Web.HttpContext.Current;
         }
 
+        public object GetSessionValue(string key)
+        {
+            return System.Web.HttpContext.Current.Session[key];
+        }
+
+        public void SetSessionValue(string key, object value)
+        {
+            System.Web.HttpContext.Current.Session[key] = value;
+        }
+
         public string GetRequestBaseUrl()
         {
             return Current().Request.Url.Scheme + "://"

@@ -10,5 +10,8 @@ namespace Linko.LinkoExchange.Services
     {
         System.Web.HttpContext Current();
         string GetRequestBaseUrl();
+
+        object GetSessionValue(string key);
+        void SetSessionValue(string key, object value);
     } 
 }

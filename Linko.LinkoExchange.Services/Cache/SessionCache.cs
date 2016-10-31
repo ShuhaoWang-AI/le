@@ -6,15 +6,21 @@ using System.Web;
 namespace Linko.LinkoExchange.Services.Cache
 {
     public class SessionCache : ISessionCache
-    {  
+    {
+        private readonly IHttpContextService _httpContextService;  
+        public SessionCache(IHttpContextService httpContext)
+        {
+            _httpContextService = httpContext;  
+        }
+
         public void SetValue(string key, object value)
         {
-            HttpContext.Current.Session[key] = value;
+            _httpContextService.SetSessionValue(key, value);
         }
 
         public object GetValue(string key)
         {
-            var value = HttpContext.Current.Session[key];
+            var value = _httpContextService.GetSessionValue(key);
             if (value != null) return value;
 
             return string.Empty; 
