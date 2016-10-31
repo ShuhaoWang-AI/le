@@ -11,7 +11,7 @@ For more information on how to configure your ASP.NET application, please visit 
     <section name="entityFramework" type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false" />
   <section name="glimpse" type="Glimpse.Core.Configuration.Section, Glimpse.Core" /></configSections>
   <connectionStrings>
-    <add name="LinkoExchangeContext" connectionString="data source=wtxodev07;initial catalog=LinkoExchange;user id=exnet;password=test;MultipleActiveResultSets=True;App=LinkoExchange" providerName="System.Data.SqlClient" />
+    <add name="LinkoExchangeContext" connectionString="data source=localhost;initial catalog=LinkoExchange;user id=exnet;password=test;MultipleActiveResultSets=True;App=LinkoExchange" providerName="System.Data.SqlClient" />
   </connectionStrings>
   <nlog autoReload="true" throwExceptions="true">
     <targets async="true">
@@ -32,9 +32,9 @@ For more information on how to configure your ASP.NET application, please visit 
               layout="${longdate} [${threadid:padding=5}] ${level:padding=-5:uppercase=true} [${logger:padding=40:fixedLength=true:alignmentOnTruncation=right}] - ${message}${onexception:${newline}EXCEPTION\: ${exception:format=ToString}}"
               smtpServer="127.0.0.1"
               smtpPort="25"
-              subject="192.168.60.74 Linko Exchange Error"
-              from="rSaha74@LinkoEnchange.com"
-              to="rajeeb.saha@watertrax.com"
+              subject="Localhost Linko Exchange Error"
+              from="alert@linkoexchange.com"
+              to="support@linkoexchange.com"
               smtpAuthentication="None"
               html="true"
               replaceNewlineWithBrTagInHtml="true" />
@@ -46,7 +46,7 @@ For more information on how to configure your ASP.NET application, please visit 
   </nlog>
   <appSettings>
     <add key="EmailServer" value="wtraxadc2.watertrax.local" /> 
-    <add key="EmailSenderFromEmail" value="shuhao.wang@watertrax.com" />
+    <add key="EmailSenderFromEmail" value="noreply@linkoexchange.com" />
     <!--minutes -->
     <add key="CookieValidateInterval" value="50" /> 
     <!-- hours  7 days 7 * 24 -->
