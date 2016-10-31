@@ -106,12 +106,30 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         public IList<Claim> GetClaims()
         {
-            var claims = _sessionCache.GetValue(CacheKey.OwinClaims) as IEnumerable<Claim>;
+            var claims = _sessionCache.GetValue(CacheKey.OwinClaims) as IList<Claim>;
             if (claims == null)
             {
                 var owinUserId = _sessionCache.GetValue(CacheKey.OwinUserId) as string;
-                claims = string.IsNullOrWhiteSpace(owinUserId) ? null : _userManager.GetClaims(owinUserId);
+                if (!string.IsNullOrWhiteSpace(owinUserId))
+                {
+                    claims = string.IsNullOrWhiteSpace(owinUserId) ? null : _userManager.GetClaims(owinUserId); 
+                }
+                else
+                {
+                    // Current session is restored from cookie 
+                    if (_httpContext.Current().User.Identity.IsAuthenticated)
+                    {
+                        var identity = _httpContext.Current().User.Identity as ClaimsIdentity;
+                        claims = identity.Claims.ToList<Claim>();
+                        owinUserId = claims.FirstOrDefault(i => i.Type == CacheKey.OwinUserId).Value;
+                        var userProfileId = claims.FirstOrDefault(i => i.Type == CacheKey.UserProfileId);
+                        _sessionCache.SetValue(CacheKey.OwinUserId, owinUserId);
+                        _sessionCache.SetValue(CacheKey.UserProfileId, userProfileId); 
+                    } 
+                }
+
                 _sessionCache.SetValue(CacheKey.OwinClaims, claims);
+
             }
             return claims?.ToList();
         }
@@ -873,6 +891,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             {
                 _userManager.AddClaim(userId, claim);
             }
+
+            _sessionCache.SetValue(CacheKey.OwinClaims, claims);
 
             _authenticationManager.SignIn(authProperties, identity);  
         }
