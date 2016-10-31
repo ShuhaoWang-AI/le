@@ -59,17 +59,17 @@ namespace Linko.LinkoExchange.Test
                 .Returns(new List<OrganizationRegulatoryProgramUserDto> {orpu});
 
 
-            var globalSetting = new Dictionary<SettingType, string>();
-            globalSetting.Add(SettingType.PasswordRequireLength, "6");
-            globalSetting.Add(SettingType.PasswordRequireDigit, "true");
-            globalSetting.Add(SettingType.PasswordExpiredDays, "90");
-            globalSetting.Add(SettingType.PasswordHistoryMaxCount, "10");
-            globalSetting.Add(SettingType.SupportPhoneNumber, "+1-604-418-3201");
-            globalSetting.Add(SettingType.SupportEmail, "support@linkoExchange.com");
-            globalSetting.Add(SettingType.SystemEmailEmailAddress, "shuhao.wang@watertrax.com");
-            globalSetting.Add(SettingType.SystemEmailFirstName, "LinkoExchange ");
-            globalSetting.Add(SettingType.SystemEmailLastName, "System");
-            globalSetting.Add(SettingType.EmailServer, "wtraxadc2.watertrax.local");
+            var globalSetting = new Dictionary<SystemSettingType, string>();
+            globalSetting.Add(SystemSettingType.PasswordRequiredLength, "6");
+            globalSetting.Add(SystemSettingType.PasswordRequiredDigit, "true");
+            globalSetting.Add(SystemSettingType.PasswordExpiredDays, "90");
+            //globalSetting.Add(SystemSettingType.PasswordHistoryMaxCount, "10"); //Organization Setting
+            globalSetting.Add(SystemSettingType.SupportPhoneNumber, "+1-604-418-3201");
+            globalSetting.Add(SystemSettingType.SupportEmailAddress, "support@linkoExchange.com");
+            globalSetting.Add(SystemSettingType.SystemEmailEmailAddress, "shuhao.wang@watertrax.com");
+            globalSetting.Add(SystemSettingType.SystemEmailFirstName, "LinkoExchange ");
+            globalSetting.Add(SystemSettingType.SystemEmailLastName, "System");
+            globalSetting.Add(SystemSettingType.EmailServer, "wtraxadc2.watertrax.local");
 
             var settingService = Mock.Of<ISettingService>(
                 s => s.GetGlobalSettings() == globalSetting

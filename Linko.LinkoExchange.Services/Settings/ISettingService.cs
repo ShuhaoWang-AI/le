@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Settings
 {
@@ -9,7 +10,7 @@ namespace Linko.LinkoExchange.Services.Settings
         /// Ge the system global settings;
         /// </summary>
         /// <returns></returns>
-        IDictionary<SettingType, string > GetGlobalSettings(); 
+        IDictionary<SystemSettingType, string > GetGlobalSettings(); 
 
         string GetOrganizationSettingValueByUserId(int userProfileId, SettingType settingType, bool? isChooseMin, bool? isChooseMax);
 

@@ -17,6 +17,7 @@ namespace Linko.LinkoExchange.Data.Mapping
             HasKey(i => i.SettingTemplateId);
             Property(i => i.Name);
             Property(i => i.Description);
+            Property(i => i.DefaultValue);
         }
     }
 }

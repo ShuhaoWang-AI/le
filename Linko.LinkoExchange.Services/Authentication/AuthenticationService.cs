@@ -47,7 +47,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IAuditLogService _auditLogService = new CrommerAuditLogService();
         private readonly IPasswordHasher _passwordHasher;
 
-        private readonly IDictionary<SettingType, string> _globalSettings;
+        private readonly IDictionary<SystemSettingType, string> _globalSettings;
         private readonly IMapper _mapper;
         private readonly IHttpContextService _httpContext;
 
@@ -929,7 +929,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private int GetSettingIntValue(SettingType settingType, IEnumerable<SettingDto> organizationSettings, bool isMax = true)
         {
-            var defaultValueStr = _globalSettings[settingType];
+            var defaultValueStr = _dbContext.SettingTemplates.Single(s => s.SettingTemplateId == (int)settingType).DefaultValue;
             var defaultValue = int.Parse(defaultValueStr);
             if (organizationSettings != null && organizationSettings.Any())
             {
@@ -950,7 +950,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private int GetStrictestLengthPasswordExpiredDays(IEnumerable<SettingDto> organizationSettings)
         {
-            return GetSettingIntValue(SettingType.PasswordExpiredDays, organizationSettings, isMax:false); 
+            return GetSettingIntValue(SettingType.PasswordChangeRequiredDays, organizationSettings, isMax:false); 
         }
 
         private int MaxFailedPasswordAttempts(IEnumerable<SettingDto> organizationSettings)
@@ -999,8 +999,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             string baseUrl = _httpContext.GetRequestBaseUrl();
             string link = baseUrl + "?code=" + code;
 
-            string supportPhoneNumber = _globalSettings[SettingType.SupportPhoneNumber]; 
-            string supportEmail = _globalSettings[SettingType.SupportEmail];
+            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber]; 
+            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
 
             var contentReplacements = new Dictionary<string, string>();
             contentReplacements.Add("link", link);
@@ -1017,8 +1017,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             string baseUrl = _httpContext.GetRequestBaseUrl();
             string link = baseUrl + "/Account/SignIn";
 
-            string supportPhoneNumber = _globalSettings[SettingType.SupportPhoneNumber];
-            string supportEmail = _globalSettings[SettingType.SupportEmail];
+            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
+            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
 
             var contentReplacements = new Dictionary<string, string>();
             contentReplacements.Add("userName", userProfile.UserName);

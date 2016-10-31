@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Dto;
 using System;
 using System.Collections.Generic;

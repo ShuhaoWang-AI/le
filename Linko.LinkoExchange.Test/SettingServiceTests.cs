@@ -7,6 +7,7 @@ using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using System.Collections.Generic;
 using System.Configuration;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -59,7 +60,7 @@ namespace Linko.LinkoExchange.Test
         {
             var settings = new OrganizationSettingDto() { OrganizationId = 1001 };
             settings.Settings = new List<SettingDto>();
-            settings.Settings.Add(new SettingDto() { Type = SettingType.TimeZoneId, Value = "2" });
+            settings.Settings.Add(new SettingDto() { Type = SettingType.TimeZone, Value = "2" });
             settings.Settings.Add(new SettingDto() { Type = SettingType.FailedPasswordAttemptMaxCount, Value = "5" });
             _settingService.CreateOrUpdateOrganizationSettings(settings);
         }

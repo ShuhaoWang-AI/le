@@ -99,6 +99,8 @@
     <Compile Include="Enum\InvitationError.cs" />
     <Compile Include="Enum\LinkoExchangeError.cs" />
     <Compile Include="Enum\InvitationType.cs" />
+    <Compile Include="Enum\SettingType.cs" />
+    <Compile Include="Enum\SystemSettingType.cs" />
     <Compile Include="Extensions\IdentityExtensions.cs" />
     <Compile Include="Logging\CreationStackTrackerExtension.cs" />
     <Compile Include="Logging\CreationStackTrackerPolicy.cs" />

@@ -53,6 +53,7 @@ namespace Linko.LinkoExchange.Test
         Mock<ApplicationUserManager> userManagerObj;
         UserProfile userProfile;
         AuthenticationService _authenticationService;
+        Dictionary<SystemSettingType, string> systemSettingDict = new Dictionary<SystemSettingType, string>();
         Dictionary<SettingType, string> settingDict = new Dictionary<SettingType, string>();
         Mock<IHttpContextService> _httpContext;
   
@@ -90,22 +91,21 @@ namespace Linko.LinkoExchange.Test
 
             // Set up for setting service
             var settingMock = Mock.Get(settService);
-            settingDict = new Dictionary<SettingType, string>();
+            systemSettingDict = new Dictionary<SystemSettingType, string>();
 
-            settingDict.Add(SettingType.PasswordRequireLength, "6");
-            settingDict.Add(SettingType.PasswordRequireDigit, "true");
-            settingDict.Add(SettingType.PasswordExpiredDays, "90");
-            settingDict.Add(SettingType.FailedPasswordAttemptMaxCount, "1");
+            systemSettingDict.Add(SystemSettingType.PasswordRequiredLength, "6");
+            systemSettingDict.Add(SystemSettingType.PasswordRequiredDigit, "true");
+            //settingDict.Add(SystemSettingType.FailedPasswordAttemptMaxCount, "1"); //Does not exist in system settings
 
-            settingDict.Add(SettingType.PasswordHistoryMaxCount, "10");
-            settingDict.Add(SettingType.EmailServer, "6");
-            settingDict.Add(SettingType.SupportPhoneNumber, "+1-604-418-3201");
-            settingDict.Add(SettingType.SupportEmail, "support@linkoExchange.com");
-            settingDict.Add(SettingType.SystemEmailEmailAddress, "shuhao.wang@watertrax.com");
-            settingDict.Add(SettingType.SystemEmailFirstName, "LinkoExchange");
-            settingDict.Add(SettingType.SystemEmailLastName, "System");
+            //settingDict.Add(SystemSettingType.PasswordHistoryMaxCount, "10"); //Does not exist in system settings
+            systemSettingDict.Add(SystemSettingType.EmailServer, "6");
+            systemSettingDict.Add(SystemSettingType.SupportPhoneNumber, "+1-604-418-3201");
+            systemSettingDict.Add(SystemSettingType.SupportEmailAddress, "support@linkoExchange.com");
+            systemSettingDict.Add(SystemSettingType.SystemEmailEmailAddress, "shuhao.wang@watertrax.com");
+            systemSettingDict.Add(SystemSettingType.SystemEmailFirstName, "LinkoExchange");
+            systemSettingDict.Add(SystemSettingType.SystemEmailLastName, "System");
 
-            settingMock.Setup(i => i.GetGlobalSettings()).Returns(settingDict); 
+            settingMock.Setup(i => i.GetGlobalSettings()).Returns(systemSettingDict); 
 
             _authenticationService = new AuthenticationService(
                 userManagerObj.Object,
@@ -342,7 +342,7 @@ namespace Linko.LinkoExchange.Test
                       i.Settings == new List<SettingDto> {
                            new SettingDto
                            {
-                               Type = SettingType.PasswordExpiredDays,
+                               Type = SettingType.PasswordChangeRequiredDays,
                                Value = "1"
                            }
                       }
