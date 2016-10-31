@@ -9,5 +9,6 @@ namespace Linko.LinkoExchange.Services
     public interface IHttpContextService
     {
         System.Web.HttpContext Current();
-    }
+        string GetRequestBaseUrl();
+    } 
 }

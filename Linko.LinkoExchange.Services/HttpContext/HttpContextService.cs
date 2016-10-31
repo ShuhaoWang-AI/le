@@ -12,5 +12,12 @@ namespace Linko.LinkoExchange.Services
         {
             return System.Web.HttpContext.Current;
         }
+
+        public string GetRequestBaseUrl()
+        {
+            return Current().Request.Url.Scheme + "://"
+             + Current().Request.Url.Authority
+             + Current().Request.ApplicationPath.TrimEnd('/') + "/";
+        }
     }
 }

@@ -974,7 +974,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             var code = _userManager.GeneratePasswordResetTokenAsync(userProfile.Id).Result; 
 
-            string baseUrl = GetBaseUrl();
+            string baseUrl = _httpContext.GetRequestBaseUrl();
             string link = baseUrl + "?code=" + code;
 
             string supportPhoneNumber = _globalSettings[SettingType.SupportPhoneNumber]; 
@@ -992,7 +992,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private void SendRequestUsernameEmail(UserProfile userProfile)
         {
-            string baseUrl = GetBaseUrl();
+            string baseUrl = _httpContext.GetRequestBaseUrl();
             string link = baseUrl + "/Account/SignIn";
 
             string supportPhoneNumber = _globalSettings[SettingType.SupportPhoneNumber];
@@ -1005,13 +1005,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             contentReplacements.Add("supportEmail", supportEmail);
 
             _emailService.SendEmail(new[] { userProfile.Email }, EmailType.ForgotUserName_ForgotUserName, contentReplacements);
-        }
-
-        string GetBaseUrl()
-        {
-            return _httpContext.Current().Request.Url.Scheme + "://" 
-                + _httpContext.Current().Request.Url.Authority 
-                + _httpContext.Current().Request.ApplicationPath.TrimEnd('/') + "/";
         }
         #endregion
     }
