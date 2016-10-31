@@ -13,6 +13,7 @@ using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Email;
 using Moq;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -21,6 +22,7 @@ namespace Linko.LinkoExchange.Test
     {
         private InvitationService invitationService;
         IEmailService _emailService = Mock.Of<IEmailService>();
+        IRequestCache _requestCache = Mock.Of<IRequestCache>();
 
         public InvitationServiceTests()
         {
@@ -29,8 +31,11 @@ namespace Linko.LinkoExchange.Test
                 cfg.AddProfile(new UserMapProfile());
                 //cfg.AddProfile(new EmailAuditLogEntryMapProfile());
                 cfg.AddProfile(new InvitationMapProfile());
-                cfg.AddProfile(new OrganizationRegulatoryProgramUserDtoMapProfile());
                 cfg.AddProfile(new OrganizationMapProfile());
+                cfg.AddProfile(new PermissionGroupMapProfile());
+                cfg.AddProfile(new RegulatoryProgramMapperProfile());
+                cfg.AddProfile(new OrganizationRegulatoryProgramMapProfile());
+                cfg.AddProfile(new OrganizationRegulatoryProgramUserDtoMapProfile());
                 cfg.AddProfile(new SettingMapProfile());
             });
 
@@ -47,7 +52,7 @@ namespace Linko.LinkoExchange.Test
                 Mapper.Instance,
                 new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance),
                 new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, new HttpContextService()),
-                new RequestCache(),
+                _requestCache,//new RequestCache(),
                 _emailService,
                 new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance), new HttpContextService()),
                 new HttpContextService());
@@ -61,7 +66,7 @@ namespace Linko.LinkoExchange.Test
                                                          FirstName = "Ryan",
                                                          LastName = "Lee",
                                                          InvitationId = Guid.NewGuid().ToString(),
-                                                         InvitationDateTimeUtc = DateTime.Now,
+                                                         InvitationDateTimeUtc = DateTimeOffset.Now,
                                                          SenderOrganizationRegulatoryProgramId = 1,
                                                          RecipientOrganizationRegulatoryProgramId = 1});
         }
@@ -71,5 +76,42 @@ namespace Linko.LinkoExchange.Test
         {
             var dto = invitationService.GetInvitationsForOrgRegProgram(1);
         }
+
+        [TestMethod]
+        public void GetRemainingIndustryLicenseCount()
+        {
+            var dto = invitationService.GetRemainingIndustryLicenseCount(1);
+        }
+
+        [TestMethod]
+        public void GetRemainingUserLicenseCount_ForAuthority()
+        {
+            var dto = invitationService.GetRemainingUserLicenseCount(1, true);
+        }
+
+        [TestMethod]
+        public void GetRemainingUserLicenseCount_ForIndustry()
+        {
+            var dto = invitationService.GetRemainingUserLicenseCount(2, false);
+        }
+
+        [TestMethod]
+        public void SendUserInvite_AuthorityToAuthority_UnknownEmail()
+        {
+            var dto = invitationService.SendUserInvite(1, "unknown@test.com", "Bob", "Smith", InvitationType.AuthorityToAuthority);
+        }
+
+        [TestMethod]
+        public void SendUserInvite_AuthorityToAuthority_EmailExists()
+        {
+            var dto = invitationService.SendUserInvite(1, "support@linkotechnology.com", "Jen", "Lee", InvitationType.AuthorityToAuthority);
+        }
+
+        [TestMethod]
+        public void SendUserInvite_AuthorityToAuthority_EmailExistsInDifferentProgram()
+        {
+            var dto = invitationService.SendUserInvite(1, "jbourne@test.com", "Jen", "Lee", InvitationType.AuthorityToAuthority);
+        }
+
     }
 }

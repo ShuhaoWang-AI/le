@@ -92,7 +92,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             return list;
         }
 
-        public void CreateInvitation(InvitationDto inviteDto)
+        public void CreateInvitation_OLD(InvitationDto inviteDto)
         {
             using (var dbContextTransaction = _dbContext.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead))
             {
@@ -173,6 +173,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                 var authority = _dbContext.OrganizationRegulatoryPrograms
                     .Single(o => o.OrganizationId == thisIndustry.RegulatorOrganizationId &&
                     o.RegulatoryProgramId == thisIndustry.RegulatoryProgramId);
+
                 maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.UserPerIndustryMaxCount));
             }
             var currentProgramUserCount = _dbContext.OrganizationRegulatoryProgramUsers.Count(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
@@ -224,7 +225,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                 List<string> userList = new List<string>();
                 foreach (var user in existingProgramUsers)
                 {
-                    userList.Add(string.Format("", user.OrganizationRegulatoryProgramId,
+                    userList.Add(string.Format("{0}|{1}|{2}|{3}|{4}|{5}", user.OrganizationRegulatoryProgramId,
                         user.UserProfileDto.FirstName,
                         user.UserProfileDto.LastName,
                         user.UserProfileDto.PhoneNumber,
@@ -241,13 +242,13 @@ namespace Linko.LinkoExchange.Services.Invitation
             }
 
             //Check available license count
-            bool isNoMoreRemaining = false;
+            int remaining;
             if (invitationType == InvitationType.AuthorityToIndustry)
-                isNoMoreRemaining = GetRemainingIndustryLicenseCount(orgRegProgramId) < 1;
+                remaining = GetRemainingIndustryLicenseCount(orgRegProgramId);
             else
-                isNoMoreRemaining = GetRemainingUserLicenseCount(orgRegProgramId, invitationType == InvitationType.AuthorityToAuthority) < 1;
+                remaining = GetRemainingUserLicenseCount(orgRegProgramId, invitationType == InvitationType.AuthorityToAuthority);
             
-            if (isNoMoreRemaining)
+            if (remaining < 1)
             {
                 return new InvitationServiceResultDto()
                 {
@@ -261,16 +262,16 @@ namespace Linko.LinkoExchange.Services.Invitation
 
             _requestCache.SetValue(CacheKey.Token, invitationId);
 
-            var newInvitation = _dbContext.Invitations.Create();
-            newInvitation.InvitationId = invitationId;
-            newInvitation.InvitationDateTimeUtc = DateTimeOffset.Now;
-            newInvitation.EmailAddress = email;
-            newInvitation.FirstName = firstName;
-            newInvitation.LastName = lastName;
-            newInvitation.RecipientOrganizationRegulatoryProgramId = orgRegProgramId;
-            newInvitation.SenderOrganizationRegulatoryProgramId = orgRegProgramId;
-            _dbContext.Invitations.Add(newInvitation);
-            _dbContext.SaveChanges();
+            CreateInvitation(new Dto.InvitationDto()
+            {
+                InvitationId = invitationId,
+                InvitationDateTimeUtc = DateTimeOffset.Now,
+                EmailAddress = email,
+                FirstName = firstName,
+                LastName = lastName,
+                RecipientOrganizationRegulatoryProgramId = orgRegProgramId,
+                SenderOrganizationRegulatoryProgramId = orgRegProgramId,
+            });
 
             //Send invite with link
             var contentReplacements = new Dictionary<string, string>();
@@ -315,6 +316,21 @@ namespace Linko.LinkoExchange.Services.Invitation
             {
                 Success = true
             };
+
+        }
+
+        public void CreateInvitation(InvitationDto dto)
+        {
+            var newInvitation = _dbContext.Invitations.Create();
+            newInvitation.InvitationId = dto.InvitationId;
+            newInvitation.InvitationDateTimeUtc = DateTimeOffset.Now;
+            newInvitation.EmailAddress = dto.EmailAddress;
+            newInvitation.FirstName = dto.FirstName;
+            newInvitation.LastName = dto.LastName;
+            newInvitation.RecipientOrganizationRegulatoryProgramId = dto.RecipientOrganizationRegulatoryProgramId;
+            newInvitation.SenderOrganizationRegulatoryProgramId = dto.SenderOrganizationRegulatoryProgramId;
+            _dbContext.Invitations.Add(newInvitation);
+            _dbContext.SaveChanges();
 
         }
 

@@ -73,12 +73,17 @@ namespace Linko.LinkoExchange.Services.User
             UserProfile userProfile = _dbContext.Users.SingleOrDefault(u => u.Email == emailAddress);
             if (userProfile != null)
             {
-                var programUsers = _dbContext.OrganizationRegulatoryProgramUsers.Where(o => o.UserProfileId == userProfile.UserProfileId);
+                var programUsers = _dbContext.OrganizationRegulatoryProgramUsers.Where(o => o.UserProfileId == userProfile.UserProfileId).ToList();
                 if (programUsers != null)
                 {
                     foreach (var programUser in programUsers)
                     {
-                        dtos.Add(_mapper.Map<OrganizationRegulatoryProgramUser, OrganizationRegulatoryProgramUserDto>(programUser));
+                        var dto = _mapper.Map<OrganizationRegulatoryProgramUser, OrganizationRegulatoryProgramUserDto>(programUser);
+                        //Need to map UserProfileDto manually here
+                        dto.UserProfileDto = this.GetUserProfileById(programUser.UserProfileId);
+                        dtos.Add(dto);
+
+
                     }
                 }
             }

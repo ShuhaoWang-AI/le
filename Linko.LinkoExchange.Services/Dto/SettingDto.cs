@@ -42,7 +42,7 @@
         TimeZone, 
         MassLoadingResultToUseLessThanSign,
         MassLoadingCalculationDecimalPlaces, 
-        UserPerIndustryMaxCount
+        UserPerIndustryMaxCount = 18
 
     }
 
