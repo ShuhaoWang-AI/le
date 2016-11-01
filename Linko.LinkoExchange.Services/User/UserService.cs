@@ -31,7 +31,6 @@ namespace Linko.LinkoExchange.Services.User
         private readonly IHttpContextService _httpContext;
         private readonly IEmailService _emailService;
         private readonly ISettingService _settingService;
-        private readonly IAuthenticationService _authService;
 
         #endregion
 
@@ -39,7 +38,7 @@ namespace Linko.LinkoExchange.Services.User
 
         public UserService(LinkoExchangeContext dbContext, IAuditLogEntry logger,
             IPasswordHasher passwordHasher, IMapper mapper, IHttpContextService httpContext,
-            IEmailService emailService, ISettingService settingService, IAuthenticationService authService)
+            IEmailService emailService, ISettingService settingService)
         {
             this._dbContext = dbContext;
             _logger = logger;
@@ -48,7 +47,6 @@ namespace Linko.LinkoExchange.Services.User
             _httpContext = httpContext;
             _emailService = emailService;
             _settingService = settingService;
-            _authService = authService;
         }
 
         #endregion
@@ -346,10 +344,10 @@ namespace Linko.LinkoExchange.Services.User
 
         public bool EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable)
         {
-            //Check user is not THIS user's own account
-            int thisUserOrgRegProgUserId = Convert.ToInt32(_authService.GetClaimsValue(CacheKey.OrganizationRegulatoryProgramUserId));
-            if (orgRegProgramUserId == thisUserOrgRegProgUserId)
-                return false;
+            ////Check user is not THIS user's own account
+            //int thisUserOrgRegProgUserId = Convert.ToInt32(_authService.GetClaimsValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            //if (orgRegProgramUserId == thisUserOrgRegProgUserId)
+            //    return false;
 
             var user = _dbContext.OrganizationRegulatoryProgramUsers
                 .Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgramUserId);

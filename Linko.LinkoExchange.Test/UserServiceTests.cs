@@ -56,8 +56,7 @@ namespace Linko.LinkoExchange.Test
             _authService.Setup(x => x.GetClaimsValue(It.IsAny<string>())).Returns("1");
 
             _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
-                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService,
-                _authService.Object);
+                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService);
         }
 
         [TestMethod]
