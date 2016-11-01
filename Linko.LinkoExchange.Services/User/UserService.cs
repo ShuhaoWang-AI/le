@@ -16,6 +16,7 @@ using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.Authentication;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -30,6 +31,7 @@ namespace Linko.LinkoExchange.Services.User
         private readonly IHttpContextService _httpContext;
         private readonly IEmailService _emailService;
         private readonly ISettingService _settingService;
+        private readonly IAuthenticationService _authService;
 
         #endregion
 
@@ -37,7 +39,7 @@ namespace Linko.LinkoExchange.Services.User
 
         public UserService(LinkoExchangeContext dbContext, IAuditLogEntry logger,
             IPasswordHasher passwordHasher, IMapper mapper, IHttpContextService httpContext,
-            IEmailService emailService, ISettingService settingService)
+            IEmailService emailService, ISettingService settingService, IAuthenticationService authService)
         {
             this._dbContext = dbContext;
             _logger = logger;
@@ -46,6 +48,7 @@ namespace Linko.LinkoExchange.Services.User
             _httpContext = httpContext;
             _emailService = emailService;
             _settingService = settingService;
+            _authService = authService;
         }
 
         #endregion
@@ -339,6 +342,23 @@ namespace Linko.LinkoExchange.Services.User
             {
                 IsSuccess = true
             };
+        }
+
+        public bool EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable)
+        {
+            //Check user is not THIS user's own account
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_authService.GetClaimsValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            if (orgRegProgramUserId == thisUserOrgRegProgUserId)
+                return false;
+
+            var user = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgramUserId);
+            user.IsEnabled = isAttemptingDisable;
+            _dbContext.SaveChanges();
+
+            //TO DO: Log user access enable to Audit (UC-2)
+
+            return true;
         }
 
         public void SetHashedPassword(int userProfileId, string passwordHash)

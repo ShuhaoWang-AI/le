@@ -34,7 +34,9 @@ namespace Linko.LinkoExchange.Services.User
 
         void ResetUser(int userProfileId, string newEmailAddress);
 
-        AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isLocked);
+        AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock);
+
+        bool EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable);
 
         void SetHashedPassword(int userProfileId, string passwordHash);
 
