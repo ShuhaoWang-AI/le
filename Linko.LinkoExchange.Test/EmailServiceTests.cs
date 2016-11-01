@@ -41,16 +41,25 @@ namespace Linko.LinkoExchange.Test
         {
           
             var dbContext = new LinkoExchangeContext(connectionString);
-   
+
             var orpu = Mock.Of<OrganizationRegulatoryProgramUserDto>(
                 p => p.IsEnabled == true &&
                      p.IsRegistrationApproved == true &&
                      p.IsRemoved == false &&
                      p.OrganizationRegulatoryProgramId == 1 &&
+                     p.OrganizationRegulatoryProgramDto == new OrganizationRegulatoryProgramDto
+                     {
+                         OrganizationRegulatoryProgramId = 90001,
+                         OrganizationId = 90000,
+                         RegulatorOrganizationId = 90000
+                     }  &&  
+
                      p.UserProfileDto == new UserDto
                      {
                          FirstName = "test first name",
-                         LastName = "test last name"
+                         LastName = "test last name",
+                         UserName = "tes user name",
+                         UserProfileId = 10000
                      }
             );
 
@@ -63,7 +72,6 @@ namespace Linko.LinkoExchange.Test
             globalSetting.Add(SystemSettingType.PasswordRequiredLength, "6");
             globalSetting.Add(SystemSettingType.PasswordRequiredDigit, "true");
             globalSetting.Add(SystemSettingType.PasswordExpiredDays, "90");
-            //globalSetting.Add(SystemSettingType.PasswordHistoryMaxCount, "10"); //Organization Setting
             globalSetting.Add(SystemSettingType.SupportPhoneNumber, "+1-604-418-3201");
             globalSetting.Add(SystemSettingType.SupportEmailAddress, "support@linkoExchange.com");
             globalSetting.Add(SystemSettingType.SystemEmailEmailAddress, "shuhao.wang@watertrax.com");
@@ -94,69 +102,446 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Registration_AuthorityRegistrationDenied()
         {
-            SendEmail(EmailType.Registration_AuthorityRegistrationDenied);
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"authorityName", "Grand Rapids"},
+                {"userName", "Shuhao Wang"},
+           
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Registration_AuthorityRegistrationDenied, contentReplacements); 
         }
 
 
         [TestMethod]
         public void Test_Registration_IndustryRegistrationDenied()
         {
-            SendEmail(EmailType.Registration_IndustryRegistrationDenied);
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"organizationName", "Green Vally Plant"},
+                {"authorityName", "Grand Rapids"},
+                {"userName", "test-username"},
+                {"addressLine1", "1055 Pender Street"},
+                {"cityName", "Vancouver"}, 
+                {"stateName", "BC"},
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Registration_IndustryRegistrationDenied, contentReplacements); 
         }
 
         [TestMethod]
         public void Test_Registration_IndustryRegistrationApproved()
-        {  
-            SendEmail(EmailType.Registration_IndustryRegistrationApproved);
+        {
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"organizationName", "Green Vally Plant"},
+                {"authorityName", "Grand Rapids"},
+                {"userName", "test-username"},
+                {"addressLine1", "1055 Pender Street"},
+                {"cityName", "Vancouver"},
+                {"link", "http://localhost:71" },
+                {"stateName", "BC"},
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Registration_IndustryRegistrationApproved, contentReplacements); 
         }
 
         [TestMethod]
         public void Test_Registration_AuthorityRegistrationApproved()
-        { 
-            SendEmail(EmailType.Registration_AuthorityRegistrationApproved);
+        {
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"authorityName", "Grand Rapids"},
+                {"userName", "Shuhao Wang"},
+                {"link", "http://localhost:71" },
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Registration_AuthorityRegistrationApproved, contentReplacements);
+             
         }
 
         [TestMethod]
         public void Test_Registration_AuthorityInviteIndustryUser()
-        {   
-            SendEmail(EmailType.Registration_AuthorityInviteIndustryUser);
+        {
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"organizationName", "Green Vally Plant"},
+                {"authorityName", "Grand Rapids"},
+                {"userName", "Shuhao Wang"},
+                {"addressLine1", "1055 Pender Street"},
+                {"cityName", "Vancouver"},
+                {"stateName", "BC"},
+                {"link", "http://localhost:71" },
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" } 
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Registration_AuthorityInviteIndustryUser, contentReplacements); 
+        }
+
+        [TestMethod]
+        public void Test_UserAccess_AccountLockOut()
+        {
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" }; 
+
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"authorityName", "Grand Rapids"},  
+                {"authoritySupportEmail", "linkoexchange@grand-rapids.mi.us" },
+                {"authoritySupportPhoneNumber","616-456-3260" }
+            };
+
+            _emailService.SendEmail(receivers, EmailType.UserAccess_AccountLockOut, contentReplacements); 
+        }
+
+        [TestMethod]
+        public void Test_UserAccess_LockOutToSysAdmins()
+        {
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"firstName", "Registrant_firstName" },
+                {"lastName", "Registrant_lastName" },
+                {"userName", "test-user-name" },
+                {"email","locked-account-email@watertrax.com" },
+                {"authorityName", "Grand Rapids"},
+                {"link", "http://localhost:71" },
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+            };
+
+            _emailService.SendEmail(receivers, EmailType.UserAccess_LockOutToSysAdmins, contentReplacements); 
+        }
+
+        [TestMethod]
+        public void Test_Registration_resetRequired()
+        {
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"authorityName", "Grand Rapids"}, 
+                {"link", "http://localhost:71" },
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Registration_ResetRequired, contentReplacements); 
+        }
+
+        [TestMethod]
+        public void Test_Registration_InviteAuthorityUser()
+        {
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"authorityName", "Grand Rapids"},
+                {"userName", "Shuhao Wang"},
+                {"link", "http://localhost:71" },
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Registration_InviteAuthorityUser, contentReplacements); 
         }
 
         [TestMethod]
         public void Test_Signature_SignatoryGranted()
         {
-            SendEmail(EmailType.Signature_SignatoryGranted);
-        }
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"organizationName", "Green Vally Plant"},
+                {"authorityName", "Grand Rapids"},
+                {"userName", "Shuhao Wang"},
+                {"addressLine1", "1055 Pender Street"},
+                {"cityName", "Vancouver"},
+                {"stateName", "BC"},
+                {"link", "http://localhost:71" },
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+            };
 
+            _emailService.SendEmail(receivers, EmailType.Signature_SignatoryGranted, contentReplacements); 
+        }
 
         [TestMethod]
         public void Test_Signature_SignatoryRevoked()
         {
-            SendEmail(EmailType.Signature_SignatoryRevoked);
-        }
 
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"organizationName", "Green Vally Plant"},
+                {"authorityName", "Grand Rapids"},
+                {"userName", "Shuhao Wang"},
+                {"addressLine1", "1055 Pender Street"},
+                {"cityName", "Vancouver"},
+                {"stateName", "BC"},
+                {"link", "http://localhost:71" },
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Signature_SignatoryRevoked, contentReplacements); 
+        } 
 
         [TestMethod]
-        public void Test_Registration_AuthorityUserRegistrationPendingToApprovers()
-        {  
+        public void Test_Profile_KBQFailedLockOut()
+        {
+            var authorityList = Environment.NewLine +
+                     "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 " + Environment.NewLine +
+                     "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 ";
 
-            SendEmail(EmailType.Registration_AuthorityUserRegistrationPendingToApprovers);
+            List <string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"authorityList", authorityList},
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Profile_KBQFailedLockOut, contentReplacements); 
+        } 
+
+        [TestMethod]
+        public void Test_Profile_PrifileChanged()
+        {
+            var authorityList = Environment.NewLine +
+                    "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 " + Environment.NewLine +
+                    "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 ";
+
+
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                { "userName", "test-user-name" },
+                { "authorityList", authorityList},
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+
+            };
+            _emailService.SendEmail(receivers, EmailType.Profile_ProfileChanged, contentReplacements); 
         }
 
+        [TestMethod]
+        public void Test_Profile_EmailChanged()
+        {
+            var authorityList = Environment.NewLine +
+                     "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 " + Environment.NewLine +
+                     "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 ";
+
+
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                { "userName", "test-user-name" },
+                { "oldEmail", "oldEmail@test.com" },
+                { "newEmail", "newEmail@test.com" },
+                { "authorityList", authorityList}, 
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Profile_EmailChanged, contentReplacements); 
+        }
+
+        [TestMethod]
+        public void Test_Profile_KBQChanged()
+        {
+            var authorityList = Environment.NewLine +
+                       "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 " + Environment.NewLine +
+                       "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 ";
+
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                { "userName", "test-user-name" },
+                { "authorityList", authorityList}, 
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" } 
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Profile_KBQChanged, contentReplacements); 
+        }
+
+        [TestMethod]
+        public void Test_Profile_SecurityQuestionsChanged()
+        {
+            var authorityList = Environment.NewLine +
+                                  "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 " + Environment.NewLine +
+                                  "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 ";
+
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                { "userName", "test-user-name" },
+                { "authorityList", authorityList},
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Profile_SecurityQuestionsChanged, contentReplacements); 
+        }
+
+        [TestMethod]
+        public void Test_Profile_PasswordChanged()
+        {
+            var authorityList = Environment.NewLine +
+                    "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 " + Environment.NewLine +
+                    "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 ";
+
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                { "userName", "test-user-name" },
+                { "authorityList", authorityList},
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Profile_PasswordChanged, contentReplacements);
+
+        }
+
+        [TestMethod]
+        public void Test_ForgetPassword_ForgetPassword()
+        {
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                { "link", "http://localhost:71?token=this-is-the-token"  },
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+
+            };
+
+            _emailService.SendEmail(receivers, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
+        }
+
+        [TestMethod]
+        public void Test_Profile_ResetProfileRequired()
+        {
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                { "link", "http://localhost:71"  },
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Profile_ResetProfileRequired, contentReplacements); 
+        }
 
         [TestMethod]
         public void Test_Registration_IndustryUserRegistrationPendingToApprovers()
-        {   
-            SendEmail(EmailType.Registration_IndustryUserRegistrationPendingToApprovers);
+        {
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"organizationName", "Green Vally Plant"},
+                {"authorityName", "Grand Rapids"},
+                { "firstName","test-first-name" },
+                {"lastName", "test-last-name" },
+                {"addressLine1", "1055 Pender Street"},
+                {"cityName", "Vancouver"},
+                {"stateName", "BC"},
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" } 
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, contentReplacements); 
         }
+
+        [TestMethod]
+        public void Test_Registration_AuthorityUserRegistrationPendingToApprovers()
+        {
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"organizationName", "Green Vally Plant"},
+                {"authorityName", "Grand Rapids"},
+                { "firstName","test-first-name" },
+                {"lastName", "test-last-name" },
+
+                { "link", "http://localhost:71"  },
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, contentReplacements);
+        }
+
+        [TestMethod]
+        public void Test_ForgotUserName_ForgotUserName()
+        {
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                { "userName","test-userName"},
+                { "link", "http://localhost:71"  },
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+
+            };
+
+            _emailService.SendEmail(receivers, EmailType.ForgotUserName_ForgotUserName, contentReplacements); 
+        }
+        
+        [TestMethod]
+        public void Test_Registration_RegistrationResetPending()
+        {
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"authorityName", "Grand Rapids"},
+                { "firstName","test-first-name" },
+                {"lastName", "test-last-name" },
+
+                { "supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" }
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Registration_RegistrationResetPending, contentReplacements); 
+        } 
 
         [TestMethod]
         public void Test_Registration_IndustryInviteIndustryUser()
         {
-           
-            SendEmail(EmailType.Registration_IndustryInviteIndustryUser);
-        }
-         
+            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            Dictionary<string, string> contentReplacements = new Dictionary<string, string>
+            {
+                {"organizationName", "Green Vally Plant"},
+                {"authorityName", "Grand Rapids"},
+                {"userName", "Shuhao Wang"},
+                {"addressLine1", "1055 Pender Street"},
+                {"cityName", "Vancouver"},
+                {"link", "http://localhost:71" },
+                {"stateName", "BC"}, 
+                {"supportEmail", "support@linkoexchange.com" },
+                {"supportPhoneNumber","616-456-3260" } 
+            };
+
+            _emailService.SendEmail(receivers, EmailType.Registration_IndustryInviteIndustryUser, contentReplacements); 
+        } 
 
         private void SendEmail(EmailType emailType)
         {
@@ -172,13 +557,12 @@ namespace Linko.LinkoExchange.Test
                 {"stateName", "BC"},
                 {"link", "http://localhost:71" },
                 {"emailAddress", "support@linkoexchange.com" },
-                {"phoneNumber","Linko_Support_PhoneNumber" },
+                {"phoneNumber","616-456-3260" },
                 {"firstName", "Registrant_firstName" },
                 {"lastName", "Registrant_lastName" }
             };
 
-            _emailService.SendEmail(receivers, emailType, contentReplacements);
-
+            _emailService.SendEmail(receivers, emailType, contentReplacements); 
         }
     }
 }

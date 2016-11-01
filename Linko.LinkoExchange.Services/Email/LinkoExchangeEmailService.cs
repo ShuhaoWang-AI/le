@@ -82,7 +82,7 @@ namespace Linko.LinkoExchange.Services.Email
                 var logEntries = GetEmailAuditLog(_senderEmailAddres, receipientEmail, emailType, msg.Subject, msg.Body, template.AuditLogTemplateId);
                 foreach (var log in logEntries)
                 {
-                   await _emailAuditLogService.Log(log);
+                    await _emailAuditLogService.Log(log);
                 } 
             }  
         }
@@ -213,6 +213,7 @@ namespace Linko.LinkoExchange.Services.Email
                 case EmailType.Registration_IndustryRegistrationDenied: 
                 case EmailType.Registration_IndustryRegistrationApproved:
                 case EmailType.Registration_AuthorityRegistrationApproved:
+                case EmailType.Registration_InviteAuthorityUser:
                 case EmailType.Registration_AuthorityInviteIndustryUser:
                 case EmailType.Registration_IndustryInviteIndustryUser: 
                 case EmailType.Signature_SignatoryGranted:
@@ -225,13 +226,13 @@ namespace Linko.LinkoExchange.Services.Email
                 // Below type needs to log for all programs 
                 case EmailType.UserAccess_AccountLockOut:    
                 case EmailType.UserAccess_LockOutToSysAdmins: 
-                case EmailType.Registration_RegistratioinResetRequired:    
+                case EmailType.Registration_ResetRequired:    
                 case EmailType.Profile_KBQFailedLockOut: 
                 case EmailType.Profile_KBQChanged:  
-                case EmailType.Profile_ProfileEmailChanged:  
+                case EmailType.Profile_EmailChanged:  
                 case EmailType.Profile_ProfileChanged:  
                 case EmailType.Profile_SecurityQuestionsChanged:  
-                case EmailType.Profile_ProfilePasswordChanged: 
+                case EmailType.Profile_PasswordChanged: 
                 case EmailType.ForgotPassword_ForgotPassword:
                 case EmailType.Profile_ResetProfileRequired:
                 case EmailType.ForgotUserName_ForgotUserName:

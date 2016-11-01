@@ -25,7 +25,7 @@
         UserAccess_LockOutToSysAdmins,
 
         // UC-5.6 UC-7.6 Reset Authority User Account/Reset IU User Account
-        Registration_RegistratioinResetRequired,
+        Registration_ResetRequired,
 
         // UC-5.7  Authority Invites Authority User 
         Registration_InviteAuthorityUser,
@@ -46,7 +46,7 @@
         Profile_ProfileChanged,
 
         // UC-30 Manage My Profile-Email Changed
-        Profile_ProfileEmailChanged,
+        Profile_EmailChanged,
 
         // UC-30 Manage My Profile-KBQs Changed
         Profile_KBQChanged,
@@ -55,7 +55,7 @@
         Profile_SecurityQuestionsChanged,
 
         // UC-30 Manage My Profile-Password Changed
-        Profile_ProfilePasswordChanged,
+        Profile_PasswordChanged,
 
         // UC-33 Forgot Password 
         ForgotPassword_ForgotPassword,

@@ -76,25 +76,6 @@ namespace Linko.LinkoExchange.Services.Program
         /// <returns></returns>
         public IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string  email)
         {
-            //TODO 
-
-//            var t = new OrganizationRegulatoryProgramUserDto
-//             {
-//                UserProfileDto = new UserDto
-//                {
-//                    FirstName = "test first name",
-//                    LastName = "test last name",
-//                    UserName = "the user name"
-//                }
-//            };
-//
-//            var list = new List<OrganizationRegulatoryProgramUserDto>();
-//            list.Add(t);
-//
-//            return list;
-
-           
-
             var userProfile = _userService.GetUserProfileByEmail(email);
             if (userProfile == null)
                 return null;
