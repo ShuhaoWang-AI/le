@@ -13,5 +13,7 @@ namespace Linko.LinkoExchange.Services
 
         object GetSessionValue(string key);
         void SetSessionValue(string key, object value);
+
+        int CurrentUserProfileId();
     } 
 }

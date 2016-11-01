@@ -505,4 +505,9 @@ public class HttpContextServiceMock : IHttpContextService
     {
         session[key] = value;
     }
+
+    public int CurrentUserProfileId()
+    {
+        return 1;
+    }
 }

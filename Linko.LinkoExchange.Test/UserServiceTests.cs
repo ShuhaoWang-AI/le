@@ -10,6 +10,8 @@ using Microsoft.AspNet.Identity;
 using System.Configuration;
 using Linko.LinkoExchange.Services;
 using Moq;
+using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.Email;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -17,7 +19,9 @@ namespace Linko.LinkoExchange.Test
     public class UserServiceTests
     {
         private UserService _userService;
-        IHttpContextService _httpContext = Mock.Of<IHttpContextService>();
+        Mock<IHttpContextService> _httpContext;
+        ISettingService _settingService = Mock.Of<ISettingService>();
+        IEmailService _emailService = Mock.Of<IEmailService>();
 
         public UserServiceTests()
         {
@@ -26,6 +30,9 @@ namespace Linko.LinkoExchange.Test
                 cfg.AddProfile(new UserMapProfile());
                 //cfg.AddProfile(new EmailAuditLogEntryMapProfile());
                 //cfg.AddProfile(new InvitationMapProfile());
+                cfg.AddProfile(new PermissionGroupMapProfile());
+                cfg.AddProfile(new RegulatoryProgramMapperProfile());
+                cfg.AddProfile(new OrganizationRegulatoryProgramMapProfile());
                 cfg.AddProfile(new OrganizationRegulatoryProgramUserDtoMapProfile());
                 cfg.AddProfile(new OrganizationMapProfile());
                 cfg.AddProfile(new SettingMapProfile());
@@ -39,7 +46,12 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, _httpContext);
+
+            _httpContext = new Mock<IHttpContextService>();
+            _httpContext.Setup(x => x.CurrentUserProfileId()).Returns(2);
+
+            _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
+                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService);
         }
 
         [TestMethod]
@@ -106,6 +118,12 @@ namespace Linko.LinkoExchange.Test
             var orgRegProgUserId = 1;
             _userService.RemoveUser(orgRegProgUserId);
             _userService.UpdateUserState(orgRegProgUserId, null, null, null, false);
+        }
+
+        [TestMethod]
+        public void LockUnlockUserAccount()
+        {
+            var resultDto = _userService.LockUnlockUserAccount(13, true);
         }
     }
 }

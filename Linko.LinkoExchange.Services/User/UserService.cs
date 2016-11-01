@@ -13,6 +13,9 @@ using AutoMapper;
 using System.Web;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Services.Email;
+using Linko.LinkoExchange.Services.Settings;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -25,19 +28,24 @@ namespace Linko.LinkoExchange.Services.User
         private readonly IPasswordHasher _passwordHasher;
         private readonly IMapper _mapper;
         private readonly IHttpContextService _httpContext;
+        private readonly IEmailService _emailService;
+        private readonly ISettingService _settingService;
 
         #endregion
 
         #region constructor
 
         public UserService(LinkoExchangeContext dbContext, IAuditLogEntry logger,
-            IPasswordHasher passwordHasher, IMapper mapper, IHttpContextService httpContext)
+            IPasswordHasher passwordHasher, IMapper mapper, IHttpContextService httpContext,
+            IEmailService emailService, ISettingService settingService)
         {
             this._dbContext = dbContext;
             _logger = logger;
             _passwordHasher = passwordHasher;
             _mapper = mapper;
             _httpContext = httpContext;
+            _emailService = emailService;
+            _settingService = settingService;
         }
 
         #endregion
@@ -221,11 +229,116 @@ namespace Linko.LinkoExchange.Services.User
             }
         }
 
-        public void LockUnlockUserAccount(int userProfileId, bool isLocked)
+        private void SendAccountLockoutEmails(UserProfile user)
+        {
+            //Email industry admins and authority admins
+            //
+            //1. Find all organization reg programs user is associated with
+            //2. Email all IU Admin users of those org reg programs
+            //3. Find all regulator orgs of those orgs (if exist)
+            //4. Email all Authority Admin users of those org reg programs
+            var programs = _dbContext.OrganizationRegulatoryProgramUsers
+                .Where(o => o.UserProfileId == user.UserProfileId)
+                .Select(o => o.OrganizationRegulatoryProgram).Distinct();
+            var authorityList = new List<OrganizationRegulatoryProgram>(); //distinct authorities
+            Dictionary<string, string> contentReplacements;
+
+            foreach (var program in programs.ToList())
+            {
+                //Find admin users in each of these
+                var admins = _dbContext.OrganizationRegulatoryProgramUsers
+                    .Where(o => o.PermissionGroup.Name == "Administrator" 
+                    && o.OrganizationRegulatoryProgramId == program.OrganizationRegulatoryProgramId);
+                foreach (var admin in admins.ToList())
+                {
+                    string adminEmail = GetUserProfileById(admin.UserProfileId).Email;
+                    contentReplacements = new Dictionary<string, string>();
+                    contentReplacements.Add("firstName", user.FirstName);
+                    contentReplacements.Add("lastName", user.LastName);
+                    contentReplacements.Add("userName", user.UserName);
+                    contentReplacements.Add("email", user.Email);
+                    _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockOutToSysAdmins, contentReplacements);
+
+                }
+
+                if (program.RegulatorOrganizationId != null)
+                {
+                    //Find distinct authorities
+                    var authority = _dbContext.OrganizationRegulatoryPrograms
+                        .Single(o => o.OrganizationId == program.RegulatorOrganizationId
+                            && o.RegulatoryProgramId == program.RegulatoryProgramId);
+                    if (!(authorityList.Exists(a => a.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId)))
+                        authorityList.Add(authority);
+
+                }
+            }
+
+            foreach (var authority in authorityList)
+            {
+                //Find admin users in each of these
+                var admins = _dbContext.OrganizationRegulatoryProgramUsers
+                    .Where(o => o.PermissionGroup.Name == "Administrator"
+                    && o.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId);
+                foreach (var admin in admins.ToList())
+                {
+                    string adminEmail = GetUserProfileById(admin.UserProfileId).Email;
+                    contentReplacements = new Dictionary<string, string>();
+                    contentReplacements.Add("firstName", user.FirstName);
+                    contentReplacements.Add("lastName", user.LastName);
+                    contentReplacements.Add("userName", user.UserName);
+                    contentReplacements.Add("email", user.Email);
+                    _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockOutToSysAdmins, contentReplacements);
+
+                }
+
+
+                //Send to user on behalf of each program's authority
+                var authorityName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+                var authorityEmail = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+                var authorityPhone = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+
+                contentReplacements = new Dictionary<string, string>();
+                contentReplacements.Add("authorityName", authorityName);
+                contentReplacements.Add("emailAddress", authorityEmail);
+                contentReplacements.Add("phoneNumber", authorityPhone);
+                _emailService.SendEmail(new[] { user.Email }, EmailType.UserAccess_AccountLockOut, contentReplacements);
+
+            }
+
+
+        }
+
+        public AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock)
         {
             var user = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
-            user.IsAccountLocked = isLocked;
+            //Check user is not support role
+            if (user.IsInternalAccount && isAttemptingLock)
+                return new Dto.AccountLockoutResultDto()
+                {
+                    IsSuccess = false,
+                    FailureReason = AccountLockoutFailureReason.CannotLockoutSupportRole
+                };
+
+            //Check user is not THIS user's own account
+            int thisUserProfileId = _httpContext.CurrentUserProfileId();
+            if (userProfileId == thisUserProfileId)
+                return new Dto.AccountLockoutResultDto()
+                {
+                    IsSuccess = false,
+                    FailureReason = AccountLockoutFailureReason.CannotLockoutOwnAccount
+                };
+
+            user.IsAccountLocked = isAttemptingLock;
             _dbContext.SaveChanges();
+
+            if (isAttemptingLock)
+                SendAccountLockoutEmails(user);
+
+            //Success
+            return new Dto.AccountLockoutResultDto()
+            {
+                IsSuccess = true
+            };
         }
 
         public void SetHashedPassword(int userProfileId, string passwordHash)

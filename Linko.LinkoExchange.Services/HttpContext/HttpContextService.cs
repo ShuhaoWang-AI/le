@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Linko.LinkoExchange.Core.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,6 +29,11 @@ namespace Linko.LinkoExchange.Services
             return Current().Request.Url.Scheme + "://"
              + Current().Request.Url.Authority
              + Current().Request.ApplicationPath.TrimEnd('/') + "/";
+        }
+
+        public int CurrentUserProfileId()
+        {
+            return Convert.ToInt32(System.Web.HttpContext.Current.User.Identity.UserProfileId());
         }
     }
 }
