@@ -121,9 +121,16 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
-        public void LockUnlockUserAccount()
+        public void LockLockUserAccount()
         {
             var resultDto = _userService.LockUnlockUserAccount(13, true);
         }
+
+        [TestMethod]
+        public void LockUnLockUserAccount()
+        {
+            var resultDto = _userService.LockUnlockUserAccount(13, false);
+        }
+
     }
 }
