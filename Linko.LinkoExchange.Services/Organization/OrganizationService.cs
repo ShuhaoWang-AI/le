@@ -202,15 +202,9 @@ namespace Linko.LinkoExchange.Services
             if (isEnabled)
             {
                 //check for number of licenses exceeds limit (different for Industry and Authority)
-                var remainingLicenses = 0;
-                if (isAuthority)
-                    remainingLicenses = GetRemainingUserLicenseCount(orgRegProgId, true);
-                else
-                    remainingLicenses = GetRemainingIndustryLicenseCount(orgRegProgId);
-                
+                var remainingLicenses = GetRemainingUserLicenseCount(orgRegProgId, isAuthority);
                 if (remainingLicenses < 1)
                     return false;
-
             }
 
             orgRegProg.IsEnabled = isEnabled;
@@ -343,12 +337,7 @@ namespace Linko.LinkoExchange.Services
         }
 
 
-        /// <summary>
-        /// Get remaining users for either program or total users across all programs for the entire organization
-        /// </summary>
-        /// <param name="isForProgramOnly"></param>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        
         public int GetRemainingUserLicenseCount(int orgRegProgramId, bool isForAuthority)
         {
             int maxCount;
