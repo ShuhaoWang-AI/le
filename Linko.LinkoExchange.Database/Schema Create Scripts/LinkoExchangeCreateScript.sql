@@ -4964,6 +4964,36 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         </html>'
     ) 
      
+    -- UC-7.8 Grant/Remove Signatory To Admin (2.3)
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'Email_Signature_SignatoryGrantedToAdmin' , 
+        'Email',
+        'Signature',
+        'SignatoryGranted',
+         
+        'Signatory Rights Granted for {organizationName}({authorityName})',
+        '<html>
+    <body> 
+	<pre>
+	    Hello {adminFirstName} {adminLastName},
+
+	    Signatory rights have been granted for:
+
+		User:  	{firstName} {lastName}
+		Authority:	{authorityName}
+		Facility:	{organizationName}
+				{addressLine1}
+				{cityName}, {stateName} 
+	     
+	    This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
+	    If you have questions or concerns, please contact {authorityName} at {emailAddress} or {phoneNumber}.
+	</pre>
+    </body>
+</html>'
+    ) 
+
     -- UC-7.8 Grant/Revoke Signatory 
     INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
     VALUES 
@@ -4993,6 +5023,36 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
                 </pre>
             </body>
         </html>'  
+    )
+
+    -- UC-7.8 Grant/Revoke Signatory (2.3)
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    ( 
+        'Email_Signature_SignatoryRevokedToAdmin' , 
+        'Email',
+        'Signature',
+        'SignatoryRevoked', 
+        
+        'Signatory Rights Revoked for {organizationName}({authorityName})',
+        '<html>
+    <body> 
+	<pre>
+	    Hello {adminFirstName} {adminLastName},
+
+	    Signatory rights have been revoked for:
+
+		User:  	{firstName} {lastName}
+		Authority:	{authorityName}
+		Facility:	{organizationName}
+				{addressLine1}
+				{cityName}, {stateName} 
+	     
+	    This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
+	    If you have questions or concerns, please contact {authorityName} at {emailAddress} or {phoneNumber}.
+	</pre>
+    </body>
+</html>'  
     )
 
     --UC-13.1 Industry Approves/Denies Industry User Registration
