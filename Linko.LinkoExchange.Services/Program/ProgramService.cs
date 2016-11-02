@@ -73,7 +73,7 @@ namespace Linko.LinkoExchange.Services.Program
         /// <returns></returns>
         public IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string email)
         {
-            var userProfile = _linkoExchangeDbContext.Users.Single(u => u.Email == email);
+            var userProfile = _linkoExchangeDbContext.Users.SingleOrDefault(u => u.Email == email);
             if (userProfile == null)
                 return null;
 
@@ -88,7 +88,7 @@ namespace Linko.LinkoExchange.Services.Program
 
                 foreach(var u in organziationRegulatoryProgramUserDtos)
                 {
-                    u.UserProfileDto = _mapper.Map<UserProfile, UserDto>(_linkoExchangeDbContext.Users.Single(user => user.UserProfileId == u.UserProfileId));
+                    u.UserProfileDto = _mapper.Map<UserProfile, UserDto>(_linkoExchangeDbContext.Users.SingleOrDefault(user => user.UserProfileId == u.UserProfileId));
                 }
 
             }
