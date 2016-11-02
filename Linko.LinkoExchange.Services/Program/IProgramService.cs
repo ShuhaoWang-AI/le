@@ -11,7 +11,7 @@ namespace Linko.LinkoExchange.Services.Program
         /// </summary>
         /// <param name="userId">User id</param>
         /// <returns>A collection of programs</returns>
-        IEnumerable<ProgramDto> GetUserRegulatoryPrograms(int userId); 
+        IEnumerable<OrganizationRegulatoryProgramDto> GetUserRegulatoryPrograms(int userId); 
 
         /// <summary>
         /// Get the organziation regulatory program 

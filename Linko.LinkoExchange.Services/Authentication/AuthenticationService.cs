@@ -687,7 +687,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             SetPasswordPolicy(organizationSettings); 
 
-            _signInManager.UserManager = _userManager;
+            _signInManager.UserManager = _userManager; 
             var signInStatus = _signInManager.PasswordSignIn(userName, password, isPersistent, true);
 
             if (signInStatus == SignInStatus.Success)
@@ -996,7 +996,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         private IEnumerable<int> GetUserProgramIds(int userId)
         {
             var programs = _programService.GetUserRegulatoryPrograms(userId);
-            return programs.Select(i => i.RegulatoryProgramId).ToArray();
+            return programs.Select(i => i.RegulatoryProgramId).Distinct().ToArray();
         }
 
         private IEnumerable<int> GetUserOrganizationIds(int userid)

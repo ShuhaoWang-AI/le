@@ -27,18 +27,13 @@ namespace Linko.LinkoExchange.Services.Program
         /// </summary>
         /// <param name="userId">User id</param>
         /// <returns>A collection of programs</returns>
-        public IEnumerable<ProgramDto> GetUserRegulatoryPrograms(int userId)
+        public IEnumerable<OrganizationRegulatoryProgramDto> GetUserRegulatoryPrograms(int userId)
         {
-            var list = new List<ProgramDto>
+            var orp = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Include("OrganizationRegulatoryProgram").Where(i => i.UserProfileId == userId).ToList();
+            return orp.Select(i=>
             {
-                new ProgramDto
-                {
-                    RegulatoryProgramId = 1000,
-                   Name = "Mock program name"
-                }
-            };
-
-            return list;
+                return _mapper.Map<OrganizationRegulatoryProgramDto>(i);
+            });
         }
 
         public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int organizationRegulatoryProgramId)
