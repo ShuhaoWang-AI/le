@@ -38,7 +38,7 @@ namespace Linko.LinkoExchange.Services.User
 
         void SetHashedPassword(int userProfileId, string passwordHash);
 
-        void RemoveUser(int orgRegProgUserId);
+        bool RemoveUser(int orgRegProgUserId);
 
         void UpdateUser(UserDto request);
 

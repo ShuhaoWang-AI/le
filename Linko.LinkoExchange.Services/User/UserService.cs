@@ -432,23 +432,23 @@ namespace Linko.LinkoExchange.Services.User
             _dbContext.SaveChanges();
         }
 
-        public void RemoveUser(int orgRegProgUserId)
+        public bool RemoveUser(int orgRegProgUserId)
         {
-            OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
-            if (user != null)
-            {
-                user.IsRemoved = true;
+            //Ensure this is not the calling User's account
+            var thisUsersOrgRegProgUserId = Convert.ToInt32(_httpContext.GetSessionValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            if (thisUsersOrgRegProgUserId == orgRegProgUserId)
+                return false;
 
-                //Persist modification date and modifier actor
-                user.LastModificationDateTimeUtc = DateTime.UtcNow;
-                user.LastModifierUserId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
-                _dbContext.SaveChanges();
-            }
-            else
-            {
-                //_logger.Log("ERROR")
-                throw new Exception();
-            }
+            OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers
+                .SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+
+            user.IsRemoved = true;
+            //Persist modification date and modifier actor
+            user.LastModificationDateTimeUtc = DateTime.UtcNow;
+            user.LastModifierUserId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
+            _dbContext.SaveChanges();
+
+            return true;
         }
 
         public void UpdateUser(UserDto request)
