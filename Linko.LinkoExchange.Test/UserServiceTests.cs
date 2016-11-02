@@ -14,6 +14,7 @@ using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Organization;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -23,6 +24,7 @@ namespace Linko.LinkoExchange.Test
         private UserService _userService;
         Mock<IHttpContextService> _httpContext;
         Mock<ISessionCache> _sessionCache;
+        Mock<IOrganizationService> _orgService;
         ISettingService _settingService = Mock.Of<ISettingService>();
         IEmailService _emailService = Mock.Of<IEmailService>();
 
@@ -56,8 +58,11 @@ namespace Linko.LinkoExchange.Test
             _sessionCache = new Mock<ISessionCache>();
             _sessionCache.Setup(x => x.GetClaimValue(It.IsAny<string>())).Returns("2");
 
+            _orgService = new Mock<IOrganizationService>();
+            _orgService.Setup(x => x.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });
+
             _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
-                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService, _sessionCache.Object);
+                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService, _sessionCache.Object, _orgService.Object);
         }
 
         [TestMethod]

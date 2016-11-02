@@ -15,6 +15,7 @@ using Linko.LinkoExchange.Services.Email;
 using Moq;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Authentication;
+using Linko.LinkoExchange.Services.Organization;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -26,6 +27,7 @@ namespace Linko.LinkoExchange.Test
         IRequestCache _requestCache = Mock.Of<IRequestCache>();
         ISettingService _settingService = Mock.Of<ISettingService>();
         Mock<ISessionCache> _sessionCache;
+        Mock<IOrganizationService> _orgService;
 
         public InvitationServiceTests()
         {
@@ -52,12 +54,13 @@ namespace Linko.LinkoExchange.Test
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             _sessionCache = new Mock<ISessionCache>();
             _sessionCache.Setup(x => x.GetClaimValue(It.IsAny<string>())).Returns("1");
+            _orgService = new Mock<IOrganizationService>();
 
             invitationService = new InvitationService(
                 new LinkoExchangeContext(connectionString),
                 Mapper.Instance,
                 new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance),
-                new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, new HttpContextService(), _emailService, _settingService, _sessionCache.Object),
+                new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, new HttpContextService(), _emailService, _settingService, _sessionCache.Object, _orgService.Object),
                 _requestCache,//new RequestCache(),
                 _emailService,
                 new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance), new HttpContextService()),

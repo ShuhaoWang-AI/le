@@ -53,6 +53,8 @@ namespace Linko.LinkoExchange.Services.Organization
 
         int GetRemainingIndustryLicenseCount(int orgRegProgramId);
 
+        OrganizationRegulatoryProgramDto GetAuthority(int orgRegProgramId);
+
 
     }
 }

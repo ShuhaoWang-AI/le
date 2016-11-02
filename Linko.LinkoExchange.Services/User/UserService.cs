@@ -17,6 +17,7 @@ using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.Authentication;
+using Linko.LinkoExchange.Services.Organization;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -32,6 +33,7 @@ namespace Linko.LinkoExchange.Services.User
         private readonly IEmailService _emailService;
         private readonly ISettingService _settingService;
         private readonly ISessionCache _sessionCache;
+        private readonly IOrganizationService _orgService;
 
         #endregion
 
@@ -39,8 +41,8 @@ namespace Linko.LinkoExchange.Services.User
 
         public UserService(LinkoExchangeContext dbContext, IAuditLogEntry logger,
             IPasswordHasher passwordHasher, IMapper mapper, IHttpContextService httpContext,
-            IEmailService emailService, 
-            ISettingService settingService, ISessionCache sessionCache)
+            IEmailService emailService, ISettingService settingService, ISessionCache sessionCache,
+            IOrganizationService orgService)
         {
             this._dbContext = dbContext;
             _logger = logger;
@@ -50,6 +52,7 @@ namespace Linko.LinkoExchange.Services.User
             _emailService = emailService;
             _settingService = settingService;
             _sessionCache = sessionCache;
+            _orgService = orgService;
         }
 
         #endregion
@@ -111,6 +114,9 @@ namespace Linko.LinkoExchange.Services.User
         {
             var dtos = new List<OrganizationRegulatoryProgramUserDto>();
             var users = _dbContext.OrganizationRegulatoryProgramUsers.Where(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
+            var authority = _orgService.GetAuthority(orgRegProgramId);
+            string timeZone = _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.TimeZone);
+            TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
 
             if (isRegApproved.HasValue)
                 users = users.Where(u => u.IsRegistrationApproved == isRegApproved);
@@ -126,6 +132,10 @@ namespace Linko.LinkoExchange.Services.User
                 var dto = _mapper.Map<OrganizationRegulatoryProgramUser, OrganizationRegulatoryProgramUserDto>(user);
                 //manually map user profile child
                 var userProfileDto = GetUserProfileById(user.UserProfileId);
+                
+                //Need to modify datetime to local
+                userProfileDto.CreationDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(userProfileDto.CreationDateTimeUtc.Value.UtcDateTime, authorityLocalZone);
+
                 dto.UserProfileDto = userProfileDto;
                 dtos.Add(dto);
             }
@@ -495,6 +505,12 @@ namespace Linko.LinkoExchange.Services.User
             var user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
             var dto = _mapper.Map<OrganizationRegulatoryProgramUserDto>(user);
             dto.UserProfileDto = GetUserProfileById(user.UserProfileId);
+
+            //Need to modify datetime to local
+            var authority = _orgService.GetAuthority(dto.OrganizationRegulatoryProgramId);
+            string timeZone = _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.TimeZone);
+            TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+            dto.UserProfileDto.CreationDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(dto.UserProfileDto.CreationDateTimeUtc.Value.UtcDateTime, authorityLocalZone);
 
             return dto;
         }
