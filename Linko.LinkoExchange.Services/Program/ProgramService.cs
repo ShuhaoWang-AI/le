@@ -41,23 +41,6 @@ namespace Linko.LinkoExchange.Services.Program
             return list;
         }
 
-        /// <summary>
-        /// The programs that fulfilled by an organization
-        /// </summary>
-        /// <param name="organizationId">Organization Id</param>
-        /// <returns>A collection of programs</returns>
-        public IEnumerable<ProgramDto> GetOrganization(int organizationId)
-        {
-            return new[]
-            {
-                new ProgramDto
-                {
-                    RegulatoryProgramId = 1000,
-                    Name = "Mock program name"
-                }
-            };
-        }
-
         public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int organizationRegulatoryProgramId)
         {
             var  orp =  _linkoExchangeDbContext.OrganizationRegulatoryPrograms.SingleOrDefault(
