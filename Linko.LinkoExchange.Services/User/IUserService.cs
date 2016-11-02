@@ -30,8 +30,6 @@ namespace Linko.LinkoExchange.Services.User
 
         void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory);
 
-        void RequestSignatoryStatus(int orgRegProgUserId);
-
         void ResetUser(int userProfileId, string newEmailAddress);
 
         AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock);

@@ -35,9 +35,11 @@
 
         // UC-7.8 Grant/Remove Signatory 
         Signature_SignatoryGranted,
+        Signature_SignatoryGrantedToAdmin, //for 7.8 (sub item 2.3) 
 
         // UC-7.8 Grant/Revoke Signatory
         Signature_SignatoryRevoked,
+        Signature_SignatoryRevokedToAdmin, //for 7.8 (sub item 2.3) 
 
         // UC-30 Manage My Profile-Profile LockOut
         Profile_KBQFailedLockOut,

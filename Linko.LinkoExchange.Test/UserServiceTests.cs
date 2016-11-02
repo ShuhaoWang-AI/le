@@ -84,7 +84,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void UpdateUserSignatoryStatus()
         {
-            var orgRegProgUserId = 1;
+            var orgRegProgUserId = 7;
             _userService.UpdateUserSignatoryStatus(orgRegProgUserId, true);
         }
 

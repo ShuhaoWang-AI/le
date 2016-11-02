@@ -189,15 +189,53 @@ namespace Linko.LinkoExchange.Services.User
 
         public void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory)
         {
-            OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
-            user.IsSignatory = isSignatory;
-            user.LastModificationDateTimeUtc = DateTime.UtcNow;
-            user.LastModifierUserId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
+            OrganizationRegulatoryProgramUser programUser = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+            programUser.IsSignatory = isSignatory;
+            programUser.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+            programUser.LastModifierUserId = _httpContext.CurrentUserProfileId();
             _dbContext.SaveChanges();
-        }
 
-        public void RequestSignatoryStatus(int orgRegProgUserId)
-        {
+            var user = GetUserProfileById(programUser.UserProfileId);
+            var org = programUser.OrganizationRegulatoryProgram.Organization;
+            var authority = programUser.OrganizationRegulatoryProgram.RegulatorOrganization;
+            if (authority == null)
+            {
+                //This IS an authority
+                authority = org;
+            }
+
+            var contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("userName", user.UserName);
+            contentReplacements.Add("authorityName", _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoName));
+            contentReplacements.Add("organizationName", org.Name);
+            contentReplacements.Add("addressLine1", org.AddressLine1);
+            contentReplacements.Add("cityName", org.CityName);
+            contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == org.JurisdictionId).Name);
+            contentReplacements.Add("emailAddress", _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoEmailAddress));
+            contentReplacements.Add("phoneNumber", _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoPhone));
+
+            //Email user
+            EmailType emailType = isSignatory ? EmailType.Signature_SignatoryGranted : EmailType.Signature_SignatoryRevoked;
+            _emailService.SendEmail(new[] { user.Email }, emailType, contentReplacements);
+
+            //Email all IU Admins
+            var admins = _dbContext.OrganizationRegulatoryProgramUsers
+                .Where(o => o.PermissionGroup.Name == "Administrator"
+                && o.OrganizationRegulatoryProgramId == programUser.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId);
+            foreach (var admin in admins.ToList())
+            {
+                string adminEmail = GetUserProfileById(admin.UserProfileId).Email;
+                contentReplacements = new Dictionary<string, string>();
+                contentReplacements.Add("firstName", user.FirstName);
+                contentReplacements.Add("lastName", user.LastName);
+                contentReplacements.Add("userName", user.UserName);
+                contentReplacements.Add("email", user.Email);
+                _emailService.SendEmail(new[] { adminEmail }, EmailType.Signature_SignatoryGrantedForAdmin, contentReplacements);
+
+            }
+
+            //Cromerr Log TO DO
+
         }
 
         public void ResetUser(int userProfileId, string newEmailAddress)
