@@ -7,7 +7,8 @@ using FluentValidation.Mvc;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Web.Controllers;
 using Microsoft.Practices.Unity;
-using Linko.LinkoExchange.Services;
+using System.Web.Helpers;
+using System.Security.Claims;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -25,6 +26,7 @@ namespace Linko.LinkoExchange.Web
             FluentValidationModelValidatorProvider.Configure();
             UnityConfig.RegisterTypes(UnityConfig.GetConfiguredContainer());
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;
         }
 
         /// <summary>

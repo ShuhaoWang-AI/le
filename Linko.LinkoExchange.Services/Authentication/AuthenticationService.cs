@@ -121,9 +121,22 @@ namespace Linko.LinkoExchange.Services.Authentication
                     {
                         var identity = _httpContext.Current().User.Identity as ClaimsIdentity;
                         claims = identity.Claims.ToList<Claim>();
-                        owinUserId = claims.FirstOrDefault(i => i.Type == CacheKey.OwinUserId).Value;
-                        var userProfileId = claims.FirstOrDefault(i => i.Type == CacheKey.UserProfileId);
-                        _sessionCache.SetValue(CacheKey.OwinUserId, owinUserId);
+                        var owinUserIdClaim = claims.FirstOrDefault(i => i.Type == CacheKey.OwinUserId); 
+                        if(owinUserIdClaim != null)
+                        {
+                            owinUserId = owinUserIdClaim.Value;
+                        }
+                        else
+                        {
+                            owinUserId = claims.FirstOrDefault(i => i.Type.IndexOf("nameidentifier") > 0).Value; 
+                        }
+
+                        if(owinUserId != null)
+                        {
+                            _sessionCache.SetValue(CacheKey.OwinUserId, owinUserId);
+                        }
+
+                        var userProfileId = claims.FirstOrDefault(i => i.Type == CacheKey.UserProfileId);                        
                         _sessionCache.SetValue(CacheKey.UserProfileId, userProfileId); 
                     } 
                 }
@@ -315,7 +328,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                         #endregion
 
-                        var result = _userManager.CreateAsync(applicationUser, userInfo.Password).Result;
+                        var result = _userManager.Create(applicationUser, userInfo.Password);
                         if (result == IdentityResult.Success)
                         {
                             // Retrieve user again to get userProfile Id. 
@@ -674,8 +687,8 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             SetPasswordPolicy(organizationSettings); 
 
-            _signInManager.UserManager = _userManager; 
-            var signInStatus = _signInManager.PasswordSignInAsync(userName, password, isPersistent, true).Result;
+            _signInManager.UserManager = _userManager;
+            var signInStatus = _signInManager.PasswordSignIn(userName, password, isPersistent, true);
 
             if (signInStatus == SignInStatus.Success)
             {
