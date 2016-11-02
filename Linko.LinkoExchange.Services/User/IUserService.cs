@@ -16,7 +16,7 @@ namespace Linko.LinkoExchange.Services.User
 
         ICollection<OrganizationRegulatoryProgramUserDto> GetProgramUsersByEmail(string emailAddress);
 
-        List<UserDto> GetUserProfilesForOrgRegProgram(int orgRegProgramId,
+        List<OrganizationRegulatoryProgramUserDto> GetUserProfilesForOrgRegProgram(int orgRegProgramId,
                              bool? isRegApproved,
                              bool? isRegDenied,
                              bool? isEnabled,
@@ -44,7 +44,7 @@ namespace Linko.LinkoExchange.Services.User
 
         void ChangePassword(int userProfileId, string oldPassword, string newPassword);
 
-        OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int userProfileId);
+        OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId);
 
         void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, int organizationRegulatoryProgramId, bool isApproved);
 

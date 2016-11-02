@@ -28,6 +28,7 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(i => i.ZipCode);
             Property(i => i.IsInternalAccount);
             Property(i => i.IsIdentityProofed);
+            Property(i => i.CreationDateTimeUtc);
 
         }
     }

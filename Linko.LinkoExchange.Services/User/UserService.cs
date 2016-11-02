@@ -103,13 +103,13 @@ namespace Linko.LinkoExchange.Services.User
             return dtos;
         }
 
-        public List<UserDto> GetUserProfilesForOrgRegProgram(int orgRegProgramId,
+        public List<OrganizationRegulatoryProgramUserDto> GetUserProfilesForOrgRegProgram(int orgRegProgramId,
                              bool? isRegApproved,
                              bool? isRegDenied,
                              bool? isEnabled,
                              bool? isRemoved)
         {
-            var dtos = new List<UserDto>();
+            var dtos = new List<OrganizationRegulatoryProgramUserDto>();
             var users = _dbContext.OrganizationRegulatoryProgramUsers.Where(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
 
             if (isRegApproved.HasValue)
@@ -123,7 +123,10 @@ namespace Linko.LinkoExchange.Services.User
 
             foreach (var user in users.ToList())
             {
-                UserDto dto = _mapper.Map<OrganizationRegulatoryProgramUser, UserDto>(user);
+                var dto = _mapper.Map<OrganizationRegulatoryProgramUser, OrganizationRegulatoryProgramUserDto>(user);
+                //manually map user profile child
+                var userProfileDto = GetUserProfileById(user.UserProfileId);
+                dto.UserProfileDto = userProfileDto;
                 dtos.Add(dto);
             }
 
@@ -216,6 +219,7 @@ namespace Linko.LinkoExchange.Services.User
 
             //Email user
             EmailType emailType = isSignatory ? EmailType.Signature_SignatoryGranted : EmailType.Signature_SignatoryRevoked;
+            EmailType adminEmailType = isSignatory ? EmailType.Signature_SignatoryGrantedToAdmin : EmailType.Signature_SignatoryRevokedToAdmin;
             _emailService.SendEmail(new[] { user.Email }, emailType, contentReplacements);
 
             //Email all IU Admins
@@ -224,13 +228,24 @@ namespace Linko.LinkoExchange.Services.User
                 && o.OrganizationRegulatoryProgramId == programUser.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId);
             foreach (var admin in admins.ToList())
             {
-                string adminEmail = GetUserProfileById(admin.UserProfileId).Email;
+                var adminProfile = GetUserProfileById(admin.UserProfileId);
+
                 contentReplacements = new Dictionary<string, string>();
+                contentReplacements.Add("adminFirstName", adminProfile.FirstName);
+                contentReplacements.Add("adminLastName", adminProfile.FirstName);
                 contentReplacements.Add("firstName", user.FirstName);
                 contentReplacements.Add("lastName", user.LastName);
                 contentReplacements.Add("userName", user.UserName);
+                contentReplacements.Add("authorityName", _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoName));
                 contentReplacements.Add("email", user.Email);
-                _emailService.SendEmail(new[] { adminEmail }, EmailType.Signature_SignatoryGrantedForAdmin, contentReplacements);
+                contentReplacements.Add("organizationName", org.Name);
+                contentReplacements.Add("addressLine1", org.AddressLine1);
+                contentReplacements.Add("cityName", org.CityName);
+                contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == org.JurisdictionId).Name);
+                contentReplacements.Add("emailAddress", _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoEmailAddress));
+                contentReplacements.Add("phoneNumber", _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoPhone));
+
+                _emailService.SendEmail(new[] { adminProfile.Email }, adminEmailType, contentReplacements);
 
             }
 
@@ -475,12 +490,13 @@ namespace Linko.LinkoExchange.Services.User
 
         }
 
-        public OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int userProfileId)
+        public OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId)
         {
-            var user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.UserProfileId == userProfileId);
-            if (user == null) return null;
+            var user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+            var dto = _mapper.Map<OrganizationRegulatoryProgramUserDto>(user);
+            dto.UserProfileDto = GetUserProfileById(user.UserProfileId);
 
-            return _mapper.Map<OrganizationRegulatoryProgramUserDto>(user); 
+            return dto;
         }
 
         public void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, int organizationRegulatoryProgramId,

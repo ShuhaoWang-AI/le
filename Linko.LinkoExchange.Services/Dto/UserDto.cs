@@ -20,8 +20,9 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool IsAccountLocked { get; set; }
         public bool IsAccountResetRequired { get; set; }
         public bool IsIdentityProofed { get; set; }
-        public bool IsInternalAccount { get; set; } 
-        public DateTime LastModificationDateTimeUtc { get; set; }
+        public bool IsInternalAccount { get; set; }
+        public DateTimeOffset? CreationDateTimeUtc { get; set; }
+        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
         
         public string Email { get; set; }
         public string OldEmailAddress { get; set; }

@@ -63,13 +63,13 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetUserProfilesForOrgRegProgram()
         {
-            List<UserDto> userDtoList = _userService.GetUserProfilesForOrgRegProgram(1, null, null, null, null);
+            var userDtoList = _userService.GetUserProfilesForOrgRegProgram(1, null, null, null, null);
         }
 
         [TestMethod]
         public void GetPendingRegistrationPendingUsersOrgRegProgram()
         {
-            List<UserDto> userDtoList = _userService.GetUserProfilesForOrgRegProgram(1, false, false, true, false);
+            var userDtoList = _userService.GetUserProfilesForOrgRegProgram(1, false, false, true, false);
         }
 
         [TestMethod]
