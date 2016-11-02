@@ -27,6 +27,7 @@
         InvitationExpired,
         ProgramNotFound, 
         ProgramDisabled,
+        NotValidData,
         InvalidateRegistrationToken,
         UserAlreadyInTheProgram
     }
