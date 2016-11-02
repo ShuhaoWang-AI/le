@@ -7,12 +7,12 @@ namespace Linko.LinkoExchange.Web.Mvc
     public class CommonInfoAttribute : ActionFilterAttribute
     {
         #region constructor
-
-        private readonly IAuthenticationService _authenticationService;
         
-        public CommonInfoAttribute(IAuthenticationService authenticationService)
-        {
-            _authenticationService = authenticationService;
+        private readonly ISessionCache _sessionCache; 
+        public CommonInfoAttribute()
+        { 
+            var sessionCache = UnityConfig.GetConfiguredContainer().Resolve(typeof(ISessionCache),null) as ISessionCache;
+            _sessionCache = sessionCache; 
         }
 
         #endregion
@@ -23,10 +23,10 @@ namespace Linko.LinkoExchange.Web.Mvc
         {
             if (filterContext.HttpContext.User.Identity.IsAuthenticated)
             {
-                filterContext.Controller.ViewBag.PortalName = _authenticationService.GetClaimsValue(CacheKey.PortalName);
-                filterContext.Controller.ViewBag.OrganizationName = _authenticationService.GetClaimsValue(CacheKey.OrganizationName);
-                filterContext.Controller.ViewBag.UserName = _authenticationService.GetClaimsValue(CacheKey.UserName);
-                filterContext.Controller.ViewBag.UserRole = _authenticationService.GetClaimsValue(CacheKey.UserRole);
+                filterContext.Controller.ViewBag.PortalName = _sessionCache.GetClaimValue(CacheKey.PortalName);
+                filterContext.Controller.ViewBag.OrganizationName = _sessionCache.GetClaimValue(CacheKey.OrganizationName);
+                filterContext.Controller.ViewBag.UserName = _sessionCache.GetClaimValue(CacheKey.UserName);
+                filterContext.Controller.ViewBag.UserRole = _sessionCache.GetClaimValue(CacheKey.UserRole); 
             }
             else
             {
