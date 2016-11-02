@@ -1,5 +1,4 @@
 ﻿using System.Web.Mvc;
-using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Web.Mvc
@@ -9,9 +8,8 @@ namespace Linko.LinkoExchange.Web.Mvc
         #region constructor
         
         private readonly ISessionCache _sessionCache; 
-        public CommonInfoAttribute()
-        { 
-            var sessionCache = UnityConfig.GetConfiguredContainer().Resolve(typeof(ISessionCache),null) as ISessionCache;
+        public CommonInfoAttribute(ISessionCache sessionCache)
+        {  
             _sessionCache = sessionCache; 
         }
 
