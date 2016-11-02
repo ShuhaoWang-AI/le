@@ -39,7 +39,8 @@ namespace Linko.LinkoExchange.Services.User
 
         public UserService(LinkoExchangeContext dbContext, IAuditLogEntry logger,
             IPasswordHasher passwordHasher, IMapper mapper, IHttpContextService httpContext,
-            IEmailService emailService, ISettingService settingService, ISessionCache sessionCache)
+            IEmailService emailService, 
+            ISettingService settingService, ISessionCache sessionCache)
         {
             this._dbContext = dbContext;
             _logger = logger;

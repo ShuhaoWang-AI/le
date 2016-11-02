@@ -39,7 +39,8 @@ namespace Linko.LinkoExchange.Services.Email
             IAuditLogService emailAuditLogService,
             IProgramService programService,
             ISettingService settingService,
-            IRequestCache requestCache)
+            IRequestCache requestCache
+            )
         {
             _dbContext = linkoExchangeContext;
             _emailAuditLogService = emailAuditLogService;

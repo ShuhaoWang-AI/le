@@ -12,15 +12,12 @@ namespace Linko.LinkoExchange.Services.Program
     public class ProgramService : IProgramService
     {
         private readonly LinkoExchangeContext _linkoExchangeDbContext;
-        private readonly IUserService _userService;
         private readonly IMapper _mapper; 
         public ProgramService(
             LinkoExchangeContext applicationDbContext, 
-            IUserService userService,
             IMapper mapper
             )
         {
-            _userService = userService;
             _linkoExchangeDbContext = applicationDbContext;
             _mapper = mapper; 
         }
@@ -74,9 +71,9 @@ namespace Linko.LinkoExchange.Services.Program
         /// </summary>
         /// <param name="email">The email address.</param>
         /// <returns></returns>
-        public IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string  email)
+        public IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string email)
         {
-            var userProfile = _userService.GetUserProfileByEmail(email);
+            var userProfile = _linkoExchangeDbContext.Users.Single(u => u.Email == email);
             if (userProfile == null)
                 return null;
 
@@ -91,7 +88,7 @@ namespace Linko.LinkoExchange.Services.Program
 
                 foreach(var u in organziationRegulatoryProgramUserDtos)
                 {
-                    u.UserProfileDto = _userService.GetUserProfileById(u.UserProfileId);
+                    u.UserProfileDto = _mapper.Map<UserProfile, UserDto>(_linkoExchangeDbContext.Users.Single(user => user.UserProfileId == u.UserProfileId));
                 }
 
             }
