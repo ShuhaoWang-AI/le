@@ -84,24 +84,6 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
-        public void GetRemainingIndustryLicenseCount()
-        {
-            var dto = invitationService.GetRemainingIndustryLicenseCount(1);
-        }
-
-        [TestMethod]
-        public void GetRemainingUserLicenseCount_ForAuthority()
-        {
-            var dto = invitationService.GetRemainingUserLicenseCount(1, true);
-        }
-
-        [TestMethod]
-        public void GetRemainingUserLicenseCount_ForIndustry()
-        {
-            var dto = invitationService.GetRemainingUserLicenseCount(2, false);
-        }
-
-        [TestMethod]
         public void SendUserInvite_AuthorityToAuthority_UnknownEmail()
         {
             var dto = invitationService.SendUserInvite(1, "unknown@test.com", "Bob", "Smith", InvitationType.AuthorityToAuthority);

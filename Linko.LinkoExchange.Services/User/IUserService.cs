@@ -49,5 +49,6 @@ namespace Linko.LinkoExchange.Services.User
         void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, int organizationRegulatoryProgramId, bool isApproved);
 
         void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int orgRegProgUserId, bool isApproved);
+
     }
 }

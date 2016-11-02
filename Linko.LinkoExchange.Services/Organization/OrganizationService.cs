@@ -195,32 +195,28 @@ namespace Linko.LinkoExchange.Services
         /// to see if there are any available licenses left
         ///
         /// Otherwise throw exception
-        public void UpdateEnableDisableFlag(int orgRegProgId, bool isEnabled)
+        public bool UpdateEnableDisableFlag(int orgRegProgId, bool isEnabled)
         {
-            try
+            var orgRegProg = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId);
+            bool isAuthority = orgRegProg.RegulatorOrganizationId == null;
+            if (isEnabled)
             {
-                var orgRegProg = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId);
-                orgRegProg.IsEnabled = isEnabled;
-                _dbContext.SaveChanges();
-            }
-            catch (DbEntityValidationException ex)
-            {
-                List<RuleViolation> validationIssues = new List<RuleViolation>();
-                foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
-                {
-                    DbEntityEntry entry = item.Entry;
-                    string entityTypeName = entry.Entity.GetType().Name;
+                //check for number of licenses exceeds limit (different for Industry and Authority)
+                var remainingLicenses = 0;
+                if (isAuthority)
+                    remainingLicenses = GetRemainingUserLicenseCount(orgRegProgId, true);
+                else
+                    remainingLicenses = GetRemainingIndustryLicenseCount(orgRegProgId);
+                
+                if (remainingLicenses < 1)
+                    return false;
 
-                    foreach (DbValidationError subItem in item.ValidationErrors)
-                    {
-                        string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
-                        validationIssues.Add(new RuleViolation(string.Empty, null, message));
-
-                    }
-                }
-                //_logger.Info("???");
-                throw new RuleViolationException("Validation errors", validationIssues);
             }
+
+            orgRegProg.IsEnabled = isEnabled;
+            _dbContext.SaveChanges();
+
+            return true;
         } 
 
         public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int orgRegProgId)
@@ -345,6 +341,57 @@ namespace Linko.LinkoExchange.Services
             //_logger.Info("???");
             throw new RuleViolationException("Validation errors", validationIssues);
         }
+
+
+        /// <summary>
+        /// Get remaining users for either program or total users across all programs for the entire organization
+        /// </summary>
+        /// <param name="isForProgramOnly"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public int GetRemainingUserLicenseCount(int orgRegProgramId, bool isForAuthority)
+        {
+            int maxCount;
+
+            if (isForAuthority)
+                maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.AuthorityUserLicenseTotalCount));
+            else
+            {
+                //Setting will be at the Authority of this Industry
+                var thisIndustry = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
+                var authority = _dbContext.OrganizationRegulatoryPrograms
+                    .Single(o => o.OrganizationId == thisIndustry.RegulatorOrganizationId &&
+                    o.RegulatoryProgramId == thisIndustry.RegulatoryProgramId);
+
+                maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.UserPerIndustryMaxCount));
+            }
+            var currentProgramUserCount = _dbContext.OrganizationRegulatoryProgramUsers.Count(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
+            var remaining = maxCount - currentProgramUserCount;
+
+            if (remaining < 0)
+                throw new Exception(string.Format("ERROR: Remaining user license count is a negative number (={0}) for Org Reg Program={1}, IsForAuthority={2}", remaining, orgRegProgramId, isForAuthority));
+
+            return remaining;
+
+        }
+
+        public int GetRemainingIndustryLicenseCount(int orgRegProgramId)
+        {
+            var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
+            var currentChildIndustryCount = _dbContext.OrganizationRegulatoryPrograms
+                .Count(u => u.RegulatorOrganizationId == orgRegProgram.OrganizationId
+                && u.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
+
+            int maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.IndustryUserLicenseTotalCount));
+            var remaining = maxCount - currentChildIndustryCount;
+
+            if (remaining < 0)
+                throw new Exception(string.Format("ERROR: Remaining industry license count is a negative number (={0}) for Org Reg Program={1}", remaining, orgRegProgramId));
+
+            return remaining;
+
+        }
+
     }
 }
  

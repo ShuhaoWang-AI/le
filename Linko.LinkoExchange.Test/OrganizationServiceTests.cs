@@ -86,5 +86,23 @@ namespace Linko.LinkoExchange.Test
             var orgs = orgService.GetChildOrganizationRegulatoryPrograms(1, "M");
 
         }
+
+        [TestMethod]
+        public void GetRemainingIndustryLicenseCount()
+        {
+            var dto = orgService.GetRemainingIndustryLicenseCount(1);
+        }
+
+        [TestMethod]
+        public void GetRemainingUserLicenseCount_ForAuthority()
+        {
+            var dto = orgService.GetRemainingUserLicenseCount(1, true);
+        }
+
+        [TestMethod]
+        public void GetRemainingUserLicenseCount_ForIndustry()
+        {
+            var dto = orgService.GetRemainingUserLicenseCount(2, false);
+        }
     }
 }

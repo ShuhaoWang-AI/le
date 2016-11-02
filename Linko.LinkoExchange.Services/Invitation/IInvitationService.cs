@@ -41,8 +41,6 @@ namespace Linko.LinkoExchange.Services.Invitation
         /// <returns></returns>
         ICollection<InvitationDto> GetInvitationsForOrgRegProgram(int orgRegProgramId);
 
-        int GetRemainingUserLicenseCount(int orgRegProgramId, bool isForAuthority);
-
         void CreateInvitation(InvitationDto dto);
 
         InvitationServiceResultDto SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType);

@@ -173,56 +173,6 @@ namespace Linko.LinkoExchange.Services.Invitation
             return dtos;
         }
 
-        /// <summary>
-        /// Get remaining users for either program or total users across all programs for the entire organization
-        /// </summary>
-        /// <param name="isForProgramOnly"></param>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public int GetRemainingUserLicenseCount(int orgRegProgramId, bool isForAuthority)
-        {
-            int maxCount;
-
-            if (isForAuthority)
-                maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.AuthorityUserLicenseTotalCount));
-            else
-            {
-                //Setting will be at the Authority of this Industry
-                var thisIndustry = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
-                var authority = _dbContext.OrganizationRegulatoryPrograms
-                    .Single(o => o.OrganizationId == thisIndustry.RegulatorOrganizationId &&
-                    o.RegulatoryProgramId == thisIndustry.RegulatoryProgramId);
-
-                maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.UserPerIndustryMaxCount));
-            }
-            var currentProgramUserCount = _dbContext.OrganizationRegulatoryProgramUsers.Count(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
-            var remaining = maxCount - currentProgramUserCount;
-
-            if (remaining < 0)
-                throw new Exception(string.Format("ERROR: Remaining user license count is a negative number (={0}) for Org Reg Program={1}, IsForAuthority={2}", remaining, orgRegProgramId, isForAuthority));
-
-            return remaining;
-            
-        }
-
-        public int GetRemainingIndustryLicenseCount(int orgRegProgramId)
-        {
-            var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
-            var currentChildIndustryCount = _dbContext.OrganizationRegulatoryPrograms
-                .Count(u => u.RegulatorOrganizationId == orgRegProgram.OrganizationId 
-                && u.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
-
-            int maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.IndustryUserLicenseTotalCount));
-            var remaining = maxCount - currentChildIndustryCount;
-
-            if (remaining < 0)
-                throw new Exception(string.Format("ERROR: Remaining industry license count is a negative number (={0}) for Org Reg Program={1}", remaining, orgRegProgramId));
-
-            return remaining;
-
-        }
-
-
         public InvitationServiceResultDto SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType)
         {
             //See if any existing users belong to this program
@@ -263,9 +213,9 @@ namespace Linko.LinkoExchange.Services.Invitation
             //Check available license count
             int remaining;
             if (invitationType == InvitationType.AuthorityToIndustry)
-                remaining = GetRemainingIndustryLicenseCount(orgRegProgramId);
+                remaining = _organizationService.GetRemainingIndustryLicenseCount(orgRegProgramId);
             else
-                remaining = GetRemainingUserLicenseCount(orgRegProgramId, invitationType == InvitationType.AuthorityToAuthority);
+                remaining = _organizationService.GetRemainingUserLicenseCount(orgRegProgramId, invitationType == InvitationType.AuthorityToAuthority);
             
             if (remaining < 1)
             {
