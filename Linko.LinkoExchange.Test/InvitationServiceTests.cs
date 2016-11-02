@@ -80,7 +80,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetInvitationsForOrgRegProgram()
         {
-            var dto = invitationService.GetInvitationsForOrgRegProgram(1);
+            var dto = invitationService.GetInvitationsForOrgRegProgram(7);
         }
 
         [TestMethod]

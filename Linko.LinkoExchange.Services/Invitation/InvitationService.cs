@@ -145,11 +145,30 @@ namespace Linko.LinkoExchange.Services.Invitation
         public ICollection<InvitationDto> GetInvitationsForOrgRegProgram(int orgRegProgramId)
         {
             var dtos = new List<InvitationDto>();
+            var org = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
+            //var authority = _dbContext.OrganizationRegulatoryPrograms
+            //    .Single(o => o.OrganizationId == org.RegulatorOrganizationId
+            //    && o.RegulatoryProgramId == org.RegulatoryProgramId);
+
+            Core.Domain.Organization authority;
+            if (org.RegulatorOrganization != null)
+                authority = org.RegulatorOrganization;
+            else
+                authority = org.Organization;
+
             var invites = _dbContext.Invitations.Where(i => i.RecipientOrganizationRegulatoryProgramId == orgRegProgramId);
             if (invites != null)
             {
                 foreach (var invite in invites)
-                    dtos.Add(_mapper.Map<Core.Domain.Invitation, InvitationDto>(invite));
+                {
+                    var dto = _mapper.Map<Core.Domain.Invitation, InvitationDto>(invite);
+
+                    //Get expiry
+                    int addExpiryHours = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.InvitationExpiredHours));
+                    dto.ExpiryDateTimeUtc = dto.InvitationDateTimeUtc.AddHours(addExpiryHours);
+                    dtos.Add(dto);
+
+                }
             }
             return dtos;
         }
