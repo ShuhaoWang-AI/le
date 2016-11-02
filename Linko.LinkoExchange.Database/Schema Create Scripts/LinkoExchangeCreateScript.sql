@@ -4975,22 +4975,22 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
          
         'Signatory Rights Granted for {organizationName}({authorityName})',
         '<html>
-    <body> 
-	<pre>
-	    Hello {adminFirstName} {adminLastName},
+			<body> 
+				<pre>
+Hello {adminFirstName} {adminLastName},
 
-	    Signatory rights have been granted for:
+Signatory rights have been granted for:
 
-		User:  	{firstName} {lastName}
-		Authority:	{authorityName}
-		Facility:	{organizationName}
+	User:  		{firstName} {lastName}
+	Authority:	{authorityName}
+	Facility:	{organizationName}
 				{addressLine1}
 				{cityName}, {stateName} 
 	     
-	    This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-	    If you have questions or concerns, please contact {authorityName} at {emailAddress} or {phoneNumber}.
-	</pre>
-    </body>
+This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
+If you have questions or concerns, please contact {authorityName} at {emailAddress} or {phoneNumber}.
+				</pre>
+			</body>
 </html>'
     ) 
 
@@ -5036,22 +5036,22 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         
         'Signatory Rights Revoked for {organizationName}({authorityName})',
         '<html>
-    <body> 
-	<pre>
-	    Hello {adminFirstName} {adminLastName},
+			<body> 
+				<pre>
+Hello {adminFirstName} {adminLastName},
 
-	    Signatory rights have been revoked for:
+Signatory rights have been revoked for:
 
-		User:  	{firstName} {lastName}
-		Authority:	{authorityName}
-		Facility:	{organizationName}
+	User:		{firstName} {lastName}
+	Authority:	{authorityName}
+	Facility:	{organizationName}
 				{addressLine1}
 				{cityName}, {stateName} 
 	     
-	    This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-	    If you have questions or concerns, please contact {authorityName} at {emailAddress} or {phoneNumber}.
-	</pre>
-    </body>
+This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
+If you have questions or concerns, please contact {authorityName} at {emailAddress} or {phoneNumber}.
+				</pre>
+			</body>
 </html>'  
     )
 
