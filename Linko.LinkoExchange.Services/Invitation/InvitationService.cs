@@ -43,7 +43,6 @@ namespace Linko.LinkoExchange.Services.Invitation
             _httpContext = httpContext;
         }
  
-
         public InvitationDto GetInvitation(string invitationId)
         {
             var invitation = _dbContext.Invitations.SingleOrDefault(i => i.InvitationId == invitationId);   
@@ -166,6 +165,13 @@ namespace Linko.LinkoExchange.Services.Invitation
                     //Get expiry
                     int addExpiryHours = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.InvitationExpiredHours));
                     dto.ExpiryDateTimeUtc = dto.InvitationDateTimeUtc.AddHours(addExpiryHours);
+
+                    //Need to modify datetime to local
+                    string timeZone = _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.TimeZone);
+                    TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+                    dto.InvitationDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(dto.InvitationDateTimeUtc.UtcDateTime, authorityLocalZone);
+                    dto.ExpiryDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(dto.ExpiryDateTimeUtc.UtcDateTime, authorityLocalZone);
+
                     dtos.Add(dto);
 
                 }
