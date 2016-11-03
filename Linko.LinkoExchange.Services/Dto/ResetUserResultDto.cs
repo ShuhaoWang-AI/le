@@ -9,7 +9,8 @@ namespace Linko.LinkoExchange.Services.Dto
     public enum ResetUserFailureReason
     {
         CannotResetSupportRole,
-        CannotResetOwnAccount
+        CannotResetOwnAccount,
+        NewEmailAddressAlreadyInUse
     }
 
     public class ResetUserResultDto

@@ -34,6 +34,9 @@ namespace Linko.LinkoExchange.Services.User
         private readonly ISettingService _settingService;
         private readonly ISessionCache _sessionCache;
         private readonly IOrganizationService _orgService;
+        private readonly IRequestCache _requestCache;
+        private readonly IDictionary<SystemSettingType, string> _globalSettings;
+
 
         #endregion
 
@@ -42,7 +45,7 @@ namespace Linko.LinkoExchange.Services.User
         public UserService(LinkoExchangeContext dbContext, IAuditLogEntry logger,
             IPasswordHasher passwordHasher, IMapper mapper, IHttpContextService httpContext,
             IEmailService emailService, ISettingService settingService, ISessionCache sessionCache,
-            IOrganizationService orgService)
+            IOrganizationService orgService, IRequestCache requestCache)
         {
             this._dbContext = dbContext;
             _logger = logger;
@@ -53,6 +56,8 @@ namespace Linko.LinkoExchange.Services.User
             _settingService = settingService;
             _sessionCache = sessionCache;
             _orgService = orgService;
+            _requestCache = requestCache;
+            _globalSettings = _settingService.GetGlobalSettings();
         }
 
         #endregion
@@ -283,14 +288,35 @@ namespace Linko.LinkoExchange.Services.User
                     FailureReason = ResetUserFailureReason.CannotResetOwnAccount
                 };
 
+
+            var sendEmailChangedNotifications = new List<string>();
+            if (String.IsNullOrEmpty(newEmailAddress) || user.Email == newEmailAddress)
+            {
+                // no change
+            }
+            else
+            {
+                //Check if new address is in use
+                if (GetUserProfileByEmail(newEmailAddress) == null)
+                    return new ResetUserResultDto()
+                    {
+                        IsSuccess = false,
+                        FailureReason = ResetUserFailureReason.NewEmailAddressAlreadyInUse
+                    };
+
+                user.OldEmailAddress = user.Email;
+                user.Email = newEmailAddress;
+                sendEmailChangedNotifications.Add(user.OldEmailAddress);
+                sendEmailChangedNotifications.Add(user.Email);
+            }
+
+            //reset flags
             user.IsAccountLocked = false;
             user.PasswordHash = null;
-            user.OldEmailAddress = user.Email;
-            user.Email = newEmailAddress;
             user.EmailConfirmed = false;
             user.PhoneNumberConfirmed = false;
 
-            //Delete KBQs
+            //Delete SQs and KBQs
             var answers = _dbContext.UserQuestionAnswers.Where(a => a.UserProfileId == userProfileId);
             if (answers != null && answers.Count() > 0)
             {
@@ -303,7 +329,53 @@ namespace Linko.LinkoExchange.Services.User
                 }
             }
 
-            //Send emails
+            _dbContext.SaveChanges();
+
+            //Send all email types
+            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
+            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
+
+
+            //1) Send "Email Changed" emails
+            var contentReplacements = new Dictionary<string, string>();
+
+            //Find all possible authorities
+            var authorities = _orgService.GetUserRegulatories(userProfileId);
+            var authorityList = "";
+            var newLine = "";
+            foreach (var authority in authorities)
+            {
+                authorityList += newLine + authority.OrganizationName + 
+                    " at " + authority.EmailContactInfoEmailAddress + 
+                    " or " + authority.PhoneNumber;
+                if (!String.IsNullOrEmpty(authority.PhoneExt))
+                    authorityList += " ext." + authority.PhoneExt;
+                newLine = Environment.NewLine;
+            }
+
+            foreach (var email in sendEmailChangedNotifications)
+            {
+                contentReplacements = new Dictionary<string, string>();
+                contentReplacements.Add("userName", user.UserName);
+                contentReplacements.Add("oldEmail", user.OldEmailAddress);
+                contentReplacements.Add("newEmail", user.Email);
+                contentReplacements.Add("authorityList", authorityList);
+                contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
+                contentReplacements.Add("supportEmail", supportEmail);
+                _emailService.SendEmail(new[] { email }, EmailType.Profile_EmailChanged, contentReplacements);
+            }
+
+            //2) Send "Reg Reset" Email
+            var token = Guid.NewGuid().ToString();
+            string baseUrl = _httpContext.GetRequestBaseUrl();
+            string link = baseUrl + "Account/ResetRegistration/?token=" + token;
+            contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("link", link);
+            contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
+            contentReplacements.Add("supportEmail", supportEmail);
+            _requestCache.SetValue(CacheKey.Token, token);
+            _emailService.SendEmail(new[] { user.Email }, EmailType.Profile_ResetProfileRequired, contentReplacements);
+
 
             return new ResetUserResultDto()
             {

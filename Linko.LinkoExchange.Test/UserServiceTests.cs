@@ -24,6 +24,7 @@ namespace Linko.LinkoExchange.Test
         private UserService _userService;
         Mock<IHttpContextService> _httpContext;
         Mock<ISessionCache> _sessionCache;
+        IRequestCache _requestCache = Mock.Of<IRequestCache>();
         Mock<IOrganizationService> _orgService;
         ISettingService _settingService = Mock.Of<ISettingService>();
         IEmailService _emailService = Mock.Of<IEmailService>();
@@ -62,7 +63,7 @@ namespace Linko.LinkoExchange.Test
             _orgService.Setup(x => x.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });
 
             _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
-                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService, _sessionCache.Object, _orgService.Object);
+                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService, _sessionCache.Object, _orgService.Object, _requestCache);
         }
 
         [TestMethod]
