@@ -317,7 +317,8 @@ namespace Linko.LinkoExchange.Services.User
             user.PhoneNumberConfirmed = false;
 
             //Delete SQs and KBQs
-            var answers = _dbContext.UserQuestionAnswers.Where(a => a.UserProfileId == userProfileId);
+            var answers = _dbContext.UserQuestionAnswers
+                .Include("Question").Where(a => a.UserProfileId == userProfileId);
             if (answers != null && answers.Count() > 0)
             {
                 foreach (var answer in answers)
