@@ -15,6 +15,7 @@ namespace Linko.LinkoExchange.Core.Domain
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserProfileId { get; set; }
 
+        public string TitleRole { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; } 
         public string BusinessName { get; set; }

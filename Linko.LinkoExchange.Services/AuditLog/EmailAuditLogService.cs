@@ -25,7 +25,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
         /// Write email audit log
         /// </summary>
         /// <param name="logEntry">Email audit log entry</param>
-        public async Task Log(IAuditLogEntry logEntry)
+        public void Log(IAuditLogEntry logEntry)
         {
             var emailLogEntryDto = logEntry as EmailAuditLogEntryDto;
             if (emailLogEntryDto == null)

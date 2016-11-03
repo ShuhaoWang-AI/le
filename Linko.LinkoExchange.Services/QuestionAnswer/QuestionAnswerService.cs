@@ -1,9 +1,7 @@
-﻿using AutoMapper;
-using Linko.LinkoExchange.Core.Domain;
+﻿using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Extensions;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Dto;
 using System;
 using System.Collections.Generic;
@@ -11,12 +9,6 @@ using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using Linko.LinkoExchange.Services.User;
-using Linko.LinkoExchange.Services.Cache;
-using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Services
 {
@@ -93,24 +85,24 @@ namespace Linko.LinkoExchange.Services
                     .Single(a => a.UserQuestionAnswerId == questionAnswer.Answer.UserQuestionAnswerId.Value);
 
                 answer.Content = questionAnswer.Answer.Content;
-                answer.LastModificationDateTimeUtc = DateTime.UtcNow;
+                answer.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;  // DateTime.UtcNow;
                 question = answer.Question;
                 question.Content = questionAnswer.Question.Content;
-                question.LastModificationDateTimeUtc = DateTime.UtcNow;
+                question.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                 question.LastModifierUserId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
             }
             else
             {
                 answer = _dbContext.UserQuestionAnswers.Create();
                 answer.Content = questionAnswer.Answer.Content;
-                answer.CreationDateTimeUtc = DateTime.UtcNow;
+                answer.CreationDateTimeUtc = DateTimeOffset.UtcNow;
                 answer.UserProfileId = userProfileId;
 
                 question = _dbContext.Questions.Create();
                 question.Content = questionAnswer.Question.Content;
                 question.IsActive = questionAnswer.Question.IsActive;
                 question.QuestionTypeId = (int)questionAnswer.Question.QuestionType;
-                question.CreationDateTimeUtc = DateTime.UtcNow;
+                question.CreationDateTimeUtc = DateTimeOffset.UtcNow;
                 question.LastModificationDateTimeUtc = null;
                 question.LastModifierUserId = null;
                 answer.Question = question;
@@ -327,5 +319,15 @@ namespace Linko.LinkoExchange.Services
             return qAndAs.OrderBy(qu => Guid.NewGuid()).First();
         }
 
+        public void CreateQuestionAnswerPairs(int userProfileId, IEnumerable<QuestionAnswerPairDto> questionAnswers)
+        { 
+            if(questionAnswers != null && questionAnswers.Any())
+            {
+                 foreach(var qa in questionAnswers)
+                {
+                    CreateOrUpdateQuestionAnswerPair(userProfileId, qa);
+                }
+            }
+        }
     }
 }

@@ -23,6 +23,7 @@ using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Cache;
 using AutoMapper;
 using System.Configuration;
+using NLog;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
@@ -50,6 +51,8 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IDictionary<SystemSettingType, string> _globalSettings;
         private readonly IMapper _mapper;
         private readonly IHttpContextService _httpContext;
+        private readonly ILogger _logger;
+        private readonly IQuestionAnswerService _questionAnswerService; 
 
         public AuthenticationService(ApplicationUserManager userManager,
             ApplicationSignInManager signInManager,
@@ -67,6 +70,8 @@ namespace Linko.LinkoExchange.Services.Authentication
            , IMapper mapper
            , IPasswordHasher passwordHasher
            , IHttpContextService httpContext
+           , ILogger logger
+           , IQuestionAnswerService questionAnswerService
             )
         {
             if (linkoExchangeContext == null) throw new ArgumentNullException(paramName: "linkoExchangeContext");
@@ -84,6 +89,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (requestCache == null) throw new ArgumentNullException("requestCache");
             if (mapper == null) throw new ArgumentNullException("mapper");
             if (httpContext == null) throw new ArgumentNullException("httpContext");
+            if (logger == null) throw new ArgumentNullException("logger");
+            if (questionAnswerService == null) throw new ArgumentNullException("questionAnswerService");
 
             _dbContext = linkoExchangeContext;
             _userManager = userManager;
@@ -102,6 +109,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             _mapper = mapper;
             _passwordHasher = passwordHasher;
             _httpContext = httpContext;
+            _logger = logger;
+            _questionAnswerService = questionAnswerService;
         }
 
         public IList<Claim> GetClaims()
@@ -234,12 +243,22 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <summary>
         /// Create a new user for registration
         /// </summary>
-        /// <param name="userInfo"></param>
-        /// <param name="registrationToken"></param>
-        /// <returns></returns>
-        public async Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken)
-        {
+        /// <param name="userInfo">The registration user information.</param>
+        /// <param name="registrationToken">Registration token</param>
+        /// <param name="securityQuestions">Security questions</param>
+        /// <param name="kbqQuestions">KBQ questions</param>
+        /// <returns>Registration results.</returns>
+        public async Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<QuestionAnswerPairDto> securityQuestions, IEnumerable<QuestionAnswerPairDto> kbqQuestions)
+        { 
+            _logger.Info("Register. userName={0}, email={1}",userInfo.UserName, registrationToken); 
+
             var registrationResult = new RegistrationResultDto();
+
+            if (!ValidateRegistrationUserData(userInfo, securityQuestions, kbqQuestions))
+            {
+                registrationResult.Result = RegistrationResult.NotValidData;
+                return registrationResult; 
+            } 
 
             var invitationDto = _invitationService.GetInvitation(registrationToken);
 
@@ -263,7 +282,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                   .Settings.Single(i => i.Type == SettingType.InvitationExpiredHours).Value, invitationExpirationHours);
             }
 
-            if (DateTime.UtcNow > invitationDto.InvitationDateTimeUtc.AddHours(invitationExpirationHours))
+            if (DateTimeOffset.UtcNow > invitationDto.InvitationDateTimeUtc.AddHours(invitationExpirationHours))
             {
                 registrationResult.Result = RegistrationResult.InvitationExpired;
                 return registrationResult;
@@ -305,9 +324,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                     if (newUserRegistration)
                     {
                         applicationUser = AssignUser(userInfo.UserName, userInfo.Email);
-                        
-                        #region update user profile  
 
+                        #region update user profile  
+                        applicationUser.TitleRole = userInfo.TitleRole;
                         applicationUser.FirstName = userInfo.UserName;
                         applicationUser.LastName = userInfo.LastName;
                         applicationUser.UserName = userInfo.UserName;
@@ -318,13 +337,14 @@ namespace Linko.LinkoExchange.Services.Authentication
                         applicationUser.PhoneNumber = userInfo.PhoneNumber;
                         applicationUser.PhoneExt = userInfo.PhoneExt;
                         applicationUser.PhoneNumberConfirmed = true;
-
+                        
                         applicationUser.IsAccountLocked = false;
                         applicationUser.IsAccountResetRequired = false;
                         applicationUser.LockoutEnabled = true;
                         applicationUser.EmailConfirmed = true;
                         applicationUser.IsInternalAccount = false;
                         applicationUser.IsIdentityProofed = false;
+                        applicationUser.CreationDateTimeUtc = DateTimeOffset.UtcNow; 
 
                         #endregion
 
@@ -341,6 +361,10 @@ namespace Linko.LinkoExchange.Services.Authentication
                                 PasswordHash = applicationUser.PasswordHash,
                                 UserProfileId = applicationUser.UserProfileId
                             });
+
+                            // Save Security questions and kbq questions
+                            var combined = securityQuestions.Concat(kbqQuestions);
+                            _questionAnswerService.CreateQuestionAnswerPairs(applicationUser.UserProfileId, combined);
                         }
                     }
                     #endregion
@@ -393,8 +417,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                     emailContentReplacements.Add("lastName", applicationUser.LastName);
                     var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
                     var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
-                    emailContentReplacements.Add("emailAddress", emailAddressOnEmail);
-                    emailContentReplacements.Add("phoneNumber", phoneNumberOnEmail);
+                    emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
+                    emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
 
                     emailContentReplacements.Add("authorityName", authorityOrg.OrganizationName);
                     emailContentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
@@ -406,7 +430,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                         emailContentReplacements.Add("addressLine1", receipientOrg.AddressLine1);
                         emailContentReplacements.Add("cityName", receipientOrg.CityName);
                         emailContentReplacements.Add("stateName", receipientOrg.State);
-                    }
+                    } 
 
                     #endregion
 
@@ -418,7 +442,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     {
                         await _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements);
                     }
-
+                     
                     // 6 TODO logs invite to Audit 
                     // UC-2 
 
@@ -426,25 +450,36 @@ namespace Linko.LinkoExchange.Services.Authentication
                     // 4 Remove the invitation from table 
                     _invitationService.DeleteInvitation(invitationDto.InvitationId);
 
-                    await _dbContext.SaveChangesAsync();
+                    _dbContext.SaveChanges();
                     registrationResult.Result = RegistrationResult.Success;
-                    SendRegistrationConfirmationEmail(applicationUser.Id, userInfo);
                     transaction.Commit();
                     return registrationResult;
                 }
                 catch(LinkoExchangeException lex)
                 {
+                    _logger.Error(lex.Errors.ToString());
                     transaction.Rollback();
                     throw lex;
                 }
                 catch (Exception ex)
                 {
-                    var errors = new List<string> { ex.Message };
+                    var errors = new List<string>() { ex.Message };
+                    
+                    while(ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors)); 
+
                     registrationResult.Result = RegistrationResult.Failed;
                     registrationResult.Errors = errors;
                     transaction.Rollback();
                 } 
             }
+
+            _logger.Info("Register. userName={0}, email={1}, registrationResult{2}", userInfo.UserName, registrationToken, registrationResult.ToString()); 
 
             return registrationResult;
         }
@@ -625,6 +660,8 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <returns></returns>
         public Task<SignInResultDto> SignInByUserName(string userName, string password, bool isPersistent)
         {
+            _logger.Info("SignInByUserName. userName={0}", userName); 
+
             SignInResultDto signInResultDto = new SignInResultDto();
              
             var applicationUser = _userManager.FindByName(userName);
@@ -699,13 +736,14 @@ namespace Linko.LinkoExchange.Services.Authentication
                 _sessionCache.SetValue(CacheKey.OwinUserId, applicationUser.Id);
 
                 //Set user's claims
-                GetUserIdentity(applicationUser);  
+                GetUserIdentity(applicationUser); 
             }
             else if (signInStatus == SignInStatus.Failure)
             {
                 signInResultDto.AutehticationResult = AuthenticationResult.InvalidUserNameOrPassword;
             }
 
+            _logger.Info("SignInByUserName. signInStatus={0}", signInStatus.ToString());
             return Task.FromResult(signInResultDto);
         }
 
@@ -972,27 +1010,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         } 
 
         #endregion
-
-        private void SendRegistrationConfirmationEmail(string userId, UserDto userDto)
-        {
-            //var token = _userManager.GenerateEmailConfirmationTokenAsync(userId).Result;
-            //var code = HttpUtility.UrlEncode(token);
-
-            //var subject = "Confirm your account";
-            //var html = HttpUtility.HtmlEncode(code); 
-
-            // TODO to use real email templates
-            //var replacements = new ListDictionary
-            //{
-            //    {"{name}", userDto.FirstName + " " + userDto.LastName},
-            //    {"{code}", code},
-            //    {"{copyCode}", html}
-            //};
-
-            //_emailService.SendEmail(EmailType.regi)
-            // LinkoExchangeEmailService.SendEmail(userDto.Email, subject, EmailType.RegistrationConfirmation, replacements);
-        }
-
+         
         private IEnumerable<int> GetUserProgramIds(int userId)
         {
             var programs = _programService.GetUserRegulatoryPrograms(userId);
@@ -1023,6 +1041,31 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             _requestCache.SetValue(CacheKey.Token, token);
             _emailService.SendEmail(new[] { userProfile.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
+        }
+
+        private bool ValidateRegistrationUserData(UserDto userProfile, IEnumerable<QuestionAnswerPairDto> securityQuestions, IEnumerable<QuestionAnswerPairDto> kbqQuestions)
+        {
+            if (userProfile == null ||
+                string.IsNullOrWhiteSpace(userProfile.FirstName) ||
+                string.IsNullOrWhiteSpace(userProfile.LastName) ||
+                string.IsNullOrWhiteSpace(userProfile.AddressLine1) ||
+                string.IsNullOrWhiteSpace(userProfile.CityName) ||
+                string.IsNullOrWhiteSpace(userProfile.ZipCode) ||
+                string.IsNullOrWhiteSpace(userProfile.Email) ||
+                string.IsNullOrWhiteSpace(userProfile.UserName) || 
+                securityQuestions == null ||securityQuestions.Count()<2 || 
+                kbqQuestions == null  || kbqQuestions.Count()<5)
+            {
+                return false;
+            }
+
+            // To validate each question has an answer
+            if(securityQuestions.Any(i=>i.Answer == null) || kbqQuestions.Any(i=>i.Answer == null))
+            {
+                return false;
+            } 
+
+            return true;
         }
 
         private void SendRequestUsernameEmail(UserProfile userProfile)

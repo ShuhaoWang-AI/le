@@ -5,6 +5,8 @@ namespace Linko.LinkoExchange.Services.Dto
     public class UserDto
     { 
         public int UserProfileId { get; set; }
+
+        public string TitleRole { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string UserName { get; set; }
@@ -32,6 +34,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTime LockoutEndDateUtc { get; set; } 
         public bool LockoutEnabled { get; set; }
 
-        public string Password { get; set; } 
+        public string Password { get; set; }
+        
     }
 }

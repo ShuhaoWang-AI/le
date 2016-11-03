@@ -21,6 +21,7 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
                 .ForMember(d => d.LastName, o => o.Ignore())
                 .ForMember(d => d.UserName, o => o.Ignore())
                 .ForMember(d => d.Email, o => o.Ignore())
+                .ForMember(d => d.TitleRole, o=>o.Ignore())
                 .ForMember(d => d.Password, o => o.Ignore())
                 .ForMember(d => d.CityName, o => o.Ignore())
                .ForMember(d => d.AddressLine1, o => o.Ignore())

@@ -83,7 +83,7 @@ namespace Linko.LinkoExchange.Services.Email
                 var logEntries = GetEmailAuditLog(_senderEmailAddres, receipientEmail, emailType, msg.Subject, msg.Body, template.AuditLogTemplateId);
                 foreach (var log in logEntries)
                 {
-                    await _emailAuditLogService.Log(log);
+                    _emailAuditLogService.Log(log);
                 } 
             }  
         }

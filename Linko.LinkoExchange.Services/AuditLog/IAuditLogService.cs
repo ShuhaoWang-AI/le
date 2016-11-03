@@ -10,6 +10,6 @@ namespace Linko.LinkoExchange.Services.AuditLog
         /// Write log
         /// </summary>
         /// <param name="logEntry">The log information</param>
-        Task Log(IAuditLogEntry logEntry);
+        void Log(IAuditLogEntry logEntry);
     }
 }

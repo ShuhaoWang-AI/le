@@ -12,7 +12,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
         /// Write CrommerAuditLog
         /// </summary>
         /// <param name="logEntry">CrommerAuditLog object</param>
-        public async Task Log(IAuditLogEntry logEntry)
+        public void Log(IAuditLogEntry logEntry)
         {
 //            var crommerLogEntry = logEntry as CrommerAuditLogEntry;
 //

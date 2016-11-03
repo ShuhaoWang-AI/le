@@ -13,7 +13,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="userInfo">The user information</param>
         /// <param name="registrationToken">The registration token</param>
         /// <returns>The authentication result</returns>
-        Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken); 
+        Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<QuestionAnswerPairDto> securityQuestions, IEnumerable<QuestionAnswerPairDto> kbqQuestions); 
 
         // Change or reset password
         /// <summary>
