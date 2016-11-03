@@ -30,10 +30,7 @@ namespace Linko.LinkoExchange.Core.Enum
 
 
         //TimeZoneId = 9,
-        //PasswordRequireLength = 10,
-        //PasswordRequireDigit = 11,
-        //PasswordRequireLowerCase = 12,
-        //PasswordRequireUpperCase = 13,
+        
         //UserLockoutEnabledByDefault = 14,
         //DefaultAccountLockoutTimeSpan = 15,
 

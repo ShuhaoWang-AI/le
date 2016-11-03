@@ -69,8 +69,6 @@ namespace Linko.LinkoExchange.Test
 
 
             var globalSetting = new Dictionary<SystemSettingType, string>();
-            globalSetting.Add(SystemSettingType.PasswordRequiredLength, "6");
-            globalSetting.Add(SystemSettingType.PasswordRequiredDigit, "true");
             globalSetting.Add(SystemSettingType.PasswordExpiredDays, "90");
             globalSetting.Add(SystemSettingType.SupportPhoneNumber, "+1-604-418-3201");
             globalSetting.Add(SystemSettingType.SupportEmailAddress, "support@linkoExchange.com");

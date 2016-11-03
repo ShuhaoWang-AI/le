@@ -93,9 +93,7 @@ namespace Linko.LinkoExchange.Test
             // Set up for setting service
             var settingMock = Mock.Get(settService);
             systemSettingDict = new Dictionary<SystemSettingType, string>();
-
-            systemSettingDict.Add(SystemSettingType.PasswordRequiredLength, "6");
-            systemSettingDict.Add(SystemSettingType.PasswordRequiredDigit, "true");
+            
             //settingDict.Add(SystemSettingType.FailedPasswordAttemptMaxCount, "1"); //Does not exist in system settings
 
             //settingDict.Add(SystemSettingType.PasswordHistoryMaxCount, "10"); //Does not exist in system settings

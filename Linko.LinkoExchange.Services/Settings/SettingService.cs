@@ -36,9 +36,6 @@ namespace Linko.LinkoExchange.Services.Settings
 
 
             //TODO: get system global settings 
-
-            _globalSettings.Add(SystemSettingType.PasswordRequiredLength, "6");
-            _globalSettings.Add(SystemSettingType.PasswordRequiredDigit, "true");
             _globalSettings.Add(SystemSettingType.PasswordExpiredDays, "90");
             //_globalSettings.Add(SystemSettingType.FailedPasswordAttemptMaxCount, "3"); Organization Setting!
             //_globalSettings.Add(SystemSettingType.PasswordHistoryMaxCount, "10"); Organization Setting!
