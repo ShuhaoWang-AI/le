@@ -47,7 +47,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult Register(UserDto userInfo, string registrationToken)
         {
 
-            var ret = _authenticationService.Register(userInfo, registrationToken);
+            //TODO: to provide security questions and kbq questions
+            var ret = _authenticationService.Register(userInfo, registrationToken, null, null);
             return View();
         }
 
