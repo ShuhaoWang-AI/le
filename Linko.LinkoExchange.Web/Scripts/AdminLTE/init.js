@@ -5,7 +5,7 @@
         autoclose: true
     });
 
-    $('input[type="checkbox"], input[type="radio"]').iCheck({
+    $('input[type="checkbox"], input[type="radio"]').not('[name="onOffSwitchSearchControl"]').iCheck({
         checkboxClass: "icheckbox_minimal-blue",
         radioClass: "iradio_minimal-blue"
     });

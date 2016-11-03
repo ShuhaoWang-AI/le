@@ -123,6 +123,9 @@
   <data name="BoxTitleForgotUserName" xml:space="preserve">
     <value>Enter your email address and we'll send it to you.</value>
   </data>
+  <data name="BoxTitleIndustryInformation" xml:space="preserve">
+    <value>Industry Information</value>
+  </data>
   <data name="BoxTitleSelectAuthority" xml:space="preserve">
     <value>Select an Authority Portal</value>
   </data>
@@ -173,6 +176,9 @@
   </data>
   <data name="TitleForgotUserName" xml:space="preserve">
     <value>Forgot User Name</value>
+  </data>
+  <data name="TitleIndustryDetails" xml:space="preserve">
+    <value>Industry Details</value>
   </data>
   <data name="TitleLinkoExchangeSignIn" xml:space="preserve">
     <value>LinkoExchange Sign In</value>

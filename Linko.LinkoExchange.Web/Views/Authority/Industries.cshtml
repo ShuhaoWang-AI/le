@@ -1,0 +1,141 @@
+﻿@using Linko.LinkoExchange.Core.Resources
+
+@{
+    ViewBag.Title = "Industries";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <section class="">
+            <ol class="breadcrumb">
+                <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
+                <li class="active">Industries</li>
+            </ol>
+    </section>
+    <div class="box box-primary">
+        <section class="box-body form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-3 col-md-1">
+                    <input type="checkbox" name="onOffSwitchSearchControl" class="onoffswitch" checked="checked"
+                            data-on-text="Advanced" 
+                            data-off-text="Basic"
+                            data-size="large" />
+                </div>
+                <div class="col-sm-1">
+                </div>
+                <div id="basicSearch" class="col-sm-6">
+                    <div class="input-group">
+                        <input type="text" name="SearchString" id="searchString" value="@ViewBag.SearchString" class="form-control text-box single-line"
+                                placeholder="Search for Industry Number, Industry, Address">
+                        <div class="input-group-btn">
+                            <button class="btn btn-primary" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Authority.IndustryViewModel>()
+                          .Name(componentName: "grid")
+                          .Columns(columns =>
+                          {
+                              columns.Bound(c => c.IndustryNo)
+                                     .HtmlAttributes(new { @class = "col-sm-1" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.IndustryName)
+                                     .HtmlAttributes(new { @class = "col-sm-3" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-3" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.Address)
+                                     .HtmlAttributes(new { @class = "col-sm-4" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-4" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.IsEnabledText)
+                                     .HtmlAttributes(new { @class = "col-sm-1" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.HasSignatoryText)
+                                     .HtmlAttributes(new { @class = "col-sm-1" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.AssignedTo)
+                                     .HtmlAttributes(new { @class = "col-sm-1" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Template(m => { })
+                                     .ClientTemplate(value: "<div class='fa fa-chevron-circle-right fa-lg pull-right'></div>")
+                                     .Width(pixelWidth: 60);
+                          })
+                          .Pageable(pageable => pageable
+                                    .PageSizes(enabled: true)
+                                    .Refresh(enabled: true)
+                                    .Input(enabled: true)
+                                    .Numeric(enabled: false)
+                            )
+                          .Selectable(selectable =>
+                          {
+                              selectable.Mode(GridSelectionMode.Single);
+                              selectable.Type(GridSelectionType.Row);
+                          })
+                          .Sortable(sortable =>
+                          {
+                              sortable.SortMode(GridSortMode.MultipleColumn);
+                          })
+                          .Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                          .Resizable(resizable => resizable.Columns(value: true))
+                          .Scrollable(s => s.Height(value: "auto"))
+                          .Groupable()
+                          .Events(events =>
+                          {
+                              events.Change(handler: "gotoNextPage");
+                          })
+                          .DataSource(dataSource => dataSource
+                              .Ajax()
+                              .ServerOperation(enabled: false)
+                              .Batch(enabled: true)
+                              .Read(read => read.Action(actionName: "Industries_Read", controllerName: "Authority", routeValues: new
+                              {
+                                  searchString = @ViewBag.SearchString
+                              }))
+                              .PageSize(pageSize: 15)
+                          )
+                    )
+                </div>
+            </div>
+        </section>@*.box-body*@
+    </div><!-- /.box -->
+}
+
+
+@section Scripts {
+    @Scripts.Render(paths: "~/bundles/jqueryval")
+    <script type="text/javascript">
+        $(document).ready(function ()
+        {
+            $("#grid .k-filter-row").hide();
+        });
+
+        $("[name='onOffSwitchSearchControl']").bootstrapSwitch();
+        $("[name='onOffSwitchSearchControl']").on('switchChange.bootstrapSwitch', function (event, state)
+        {
+            $("[id='basicSearch']").toggle(500);
+            $("#grid .k-filter-row").toggle(500);
+
+            //console.log($("#grid .k-filter-row")); // DOM element
+            //console.log(this); // DOM element
+            //console.log(event); // jQuery event
+            //console.log(state); // true | false
+        });
+
+        gotoNextPage = function ()
+        {
+            var grid = $("#grid").data("kendoGrid");
+            var postUrl = "/Authority/Industries_Select";
+
+            doAjaxAction(grid, postUrl, "", "Select an industry");
+        }
+
+    </script>
+}

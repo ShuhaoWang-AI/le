@@ -51,3 +51,5 @@ obj
 node_modules
 
 *.vsext
+
+lib

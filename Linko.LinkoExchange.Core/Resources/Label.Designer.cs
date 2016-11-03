@@ -79,6 +79,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Industry Information.
+        /// </summary>
+        public static string BoxTitleIndustryInformation {
+            get {
+                return ResourceManager.GetString("BoxTitleIndustryInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select an Authority Portal.
         /// </summary>
         public static string BoxTitleSelectAuthority {
@@ -228,6 +237,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         public static string TitleForgotUserName {
             get {
                 return ResourceManager.GetString("TitleForgotUserName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Industry Details.
+        /// </summary>
+        public static string TitleIndustryDetails {
+            get {
+                return ResourceManager.GetString("TitleIndustryDetails", resourceCulture);
             }
         }
         

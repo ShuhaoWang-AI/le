@@ -84,7 +84,8 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IHttpContextService, HttpContextService>();
             container.RegisterType<IRequestCache, RequestCache>();
             container.RegisterType<ISessionCache, SessionCache>();
-
+            container.RegisterType<IQuestionAnswerService, QuestionAnswerService>();
+            
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
             container.RegisterType<ApplicationUserManager>(); 

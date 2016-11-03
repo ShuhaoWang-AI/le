@@ -5,21 +5,21 @@
             @* BEGIN Menu *@
             <ul class="sidebar-menu">
                 <li class="active">
-                    <a href="#">
-                        <i class="fa fa-industry"></i>
+                    <a href="#" onclick="location.href = '@Url.Action(actionName: "Industries", controllerName: "Authority")'">
+                        <i class="fa fa-industry fa-fw"></i>
                         <span>Industries</span>
                     </a>
                 </li>
 
                 <li class="treeview">
                     <a href="#">
-                        <i class="fa glyphicon glyphicon-duplicate"></i>
+                        <i class="fa glyphicon glyphicon-duplicate fa-fw"></i>
                         <span>Report Packages</span>
                     </a>
                     <ul class="treeview-menu">
                         <li>
                             <a href="#">
-                                <i class="fa text-green"></i>
+                                <i class="fa fa-fw"></i>
                                 <span>Pending Review</span>
                                 @*<span class="pull-right-container">
                                 <span class="label label-success pull-right">2</span>
@@ -28,7 +28,7 @@
                         </li>
                         <li>
                             <a href="#">
-                                <i class="fa text-red"></i>
+                                <i class="fa fa-fw"></i>
                                 <span>New Repudiations</span>
                                 @*<span class="pull-right-container">
                                 <span class="label label-danger pull-right">1</span>
@@ -37,13 +37,13 @@
                         </li>
                         <li>
                             <a href="#">
-                                <i class="fa text-yellow"></i>
+                                <i class="fa fa-fw"></i>
                                 <span>All</span>
                             </a>
                         </li>
                         <li>
                             <a href="#">
-                                <i class="fa text-blue"></i>
+                                <i class="fa fa-fw"></i>
                                 <span>Manage Templates</span>
                             </a>
                         </li>
@@ -52,33 +52,33 @@
 
                 <li class="treeview">
                     <a href="#">
-                        <i class="fa fa-user-plus"></i>
+                        <i class="fa fa-user-plus fa-fw"></i>
                         <span>Pending Registrations</span>
                     </a>
                 </li>
 
                 <li class="treeview">
                     <a href="#">
-                        <i class="fa fa-file-text"></i>
+                        <i class="fa fa-file-text fa-fw"></i>
                         <span>Audit Logs </span>
                     </a>
                 </li>
 
                 <li class="treeview">
                     <a href="#">
-                        <i class="fa fa-bank"></i>
+                        <i class="fa fa-bank fa-fw"></i>
                         <span>Authority Account</span>
                     </a>
                     <ul class="treeview-menu">
                         <li>
                             <a href="#">
-                                <i class="fa text-green"></i>
+                                <i class="fa fa-users fa-fw"></i>
                                 <span>Users</span>
                             </a>
                         </li>
                         <li>
                             <a href="#">
-                                <i class="fa text-green"></i>
+                                <i class="fa fa-cog fa-fw"></i>
                                 <span>Settings</span>
                             </a>
                         </li>
@@ -99,7 +99,7 @@ else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.Porta
             <ul class="sidebar-menu">
                 <li class="treeview">
                     <a href="#">
-                        <i class="fa fa-th-list"></i>
+                        <i class="fa fa-th-list fa-fw"></i>
                         <span>Data Entry Forms</span>
                         @*<span class="pull-right-container">
                             <span class="label bg-orange pull-right">2</span>
@@ -108,7 +108,7 @@ else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.Porta
                     <ul class="treeview-menu">
                         <li>
                             <a href="#">
-                                <i class="fa"></i>
+                                <i class="fa fa-fw"></i>
                                 <span>Drafts</span>
                                 @*<span class="pull-right-container">
                                     <span class="label bg-orange pull-right">2</span>
@@ -117,7 +117,7 @@ else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.Porta
                         </li>
                         <li>
                             <a href="#">
-                                <i class="fa"></i>
+                                <i class="fa fa-fw"></i>
                                 <span>Submitted</span>
                             </a>
                         </li>
@@ -126,7 +126,7 @@ else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.Porta
 
                 <li class="treeview">
                     <a href="#">
-                        <i class="fa glyphicon glyphicon-duplicate"></i>
+                        <i class="fa glyphicon glyphicon-duplicate fa-fw"></i>
                         <span>Report Packages</span>
                         @*<span class="pull-right-container">
                             <span class="label bg-orange pull-right">2</span>
@@ -136,7 +136,7 @@ else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.Porta
                     <ul class="treeview-menu">
                         <li>
                             <a href="#">
-                                <i class="fa text-green"></i>
+                                <i class="fa fa-fw"></i>
                                 <span>Drafts</span>
                                 @*<span class="pull-right-container">
                                         <span class="label label-success pull-right">2</span>
@@ -145,7 +145,7 @@ else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.Porta
                         </li>
                         <li>
                             <a href="#">
-                                <i class="fa text-red"></i>
+                                <i class="fa fa-fw"></i>
                                 <span>Ready to Submit</span>
                                 @*<span class="pull-right-container">
                                         <span class="label label-danger pull-right">1</span>
@@ -154,7 +154,7 @@ else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.Porta
                         </li>
                         <li>
                             <a href="#">
-                                <i class="fa text-yellow"></i>
+                                <i class="fa fa-fw"></i>
                                 <span>Submitted</span>
                             </a>
                         </li>
@@ -163,25 +163,25 @@ else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.Porta
 
                 <li class="treeview">
                     <a href="#">
-                        <i class="fa fa-bank"></i>
+                        <i class="fa fa-bank fa-fw"></i>
                         <span>Industry Account</span>
                     </a>
                     <ul class="treeview-menu">
                         <li>
                             <a href="#">
-                                <i class="fa text-green"></i>
+                                <i class="fa fa-users fa-fw"></i>
                                 <span>Users</span>
                             </a>
                         </li>
                         <li>
                             <a href="#">
-                                <i class="fa text-green"></i>
+                                <i class="fa fa-cog fa-fw"></i>
                                 <span>Settings</span>
                             </a>
                         </li>
                         <li class="treeview">
                             <a href="#">
-                                <i class="fa fa-user-plus"></i>
+                                <i class="fa fa-user-plus fa-fw"></i>
                                 <span>Pending Registrations</span>
                                 @*<span class="pull-right-container">
                                     <span class="label bg-primary pull-right">1</span>

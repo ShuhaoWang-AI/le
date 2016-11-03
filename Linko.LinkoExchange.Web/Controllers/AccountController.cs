@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
+using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
@@ -25,14 +26,16 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private readonly IAuthenticationService _authenticationService;
         private readonly IOrganizationService _organizationService;
+        private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IRequestCache _requestCache;
         private readonly ILogger _logger;
 
         public AccountController(IAuthenticationService authenticationService, IOrganizationService organizationService,
-            IRequestCache requestCache, ILogger logger)
+            IQuestionAnswerService questionAnswerService, IRequestCache requestCache, ILogger logger)
         {
             _authenticationService = authenticationService;
             _organizationService = organizationService;
+            _questionAnswerService = questionAnswerService;
             _requestCache = requestCache;
             _logger = logger;
         }
@@ -82,7 +85,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
 
         // POST: Account/SignIn
-        [HttpPost]
+        [AcceptVerbs(HttpVerbs.Post)]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> SignIn(SignInViewModel model, string returnUrl = null)
@@ -156,7 +159,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 var regulatoryList = TempData["RegulatoryList"] as IEnumerable<OrganizationDto>;
 
-                model.HtmlStr += "<div class=\"table - responsive\">";
+                model.HtmlStr += "<div class=\"table-responsive\">";
                 model.HtmlStr += "<table class=\"table no-margin\">";
                 model.HtmlStr += "<tbody>";
 
@@ -216,7 +219,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 var regulatoryList = TempData["RegulatoryList"] as IEnumerable<OrganizationDto>;
 
-                model.HtmlStr += "<div class=\"table - responsive\">";
+                model.HtmlStr += "<div class=\"table-responsive\">";
                 model.HtmlStr += "<table class=\"table no-margin\">";
                 model.HtmlStr += "<tbody>";
 
@@ -247,7 +250,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 var regulatoryList = TempData["RegulatoryList"] as IEnumerable<OrganizationDto>;
 
-                model.HtmlStr += "<div class=\"table - responsive\">";
+                model.HtmlStr += "<div class=\"table-responsive\">";
                 model.HtmlStr += "<table class=\"table no-margin\">";
                 model.HtmlStr += "<tbody>";
 
@@ -325,7 +328,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(model);
         }
 
-        [HttpPost]
+        [AcceptVerbs(HttpVerbs.Post)]
         public ActionResult PortalDirector(string id)
         {
             try
@@ -360,7 +363,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         // POST: /Account/ForgotPassword
-        [HttpPost]
+        [AcceptVerbs(HttpVerbs.Post)]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
@@ -416,7 +419,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         // POST: /Account/ForgotUserName
-        [HttpPost]
+        [AcceptVerbs(HttpVerbs.Post)]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ForgotUserName(ForgotUserNameViewModel model)
@@ -475,10 +478,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             else
             {
+                var userQuestion = _questionAnswerService.GetRandomQuestionAnswerFromToken(token, QuestionType.KnowledgeBased);
+
                 ResetPasswordViewModel model = new ResetPasswordViewModel();
                 model.Token = token;
-                model.Id = 1; // TODO: call service to set UserQuestionAnswerId as Id
-                model.Question = "test question?";
+                model.Id = userQuestion.Answer.UserQuestionAnswerId.Value;
+                model.Question = userQuestion.Question.Content;
                 model.Answer = "";
                 model.Password = "";
                 model.ConfirmPassword = "";
@@ -490,7 +495,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         //
         // POST: /Account/ResetPassword
-        [HttpPost]
+        [AcceptVerbs(HttpVerbs.Post)]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)

@@ -25,17 +25,28 @@
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+
     @*<!--This bundle was moved by the Telerik VS Extensions for compatibility reasons-->*@
     @Scripts.Render(paths: "~/bundles/jquery")
 
-    @* TODO: add Telerik scripts *@
+    @* Telerik scripts *@
 
+	<link href="https://kendo.cdn.telerik.com/2016.3.1028/styles/kendo.common.min.css" rel="stylesheet" type="text/css" />
+	<link href="https://kendo.cdn.telerik.com/2016.3.1028/styles/kendo.mobile.all.min.css" rel="stylesheet" type="text/css" />
+	<link href="https://kendo.cdn.telerik.com/2016.3.1028/styles/kendo.dataviz.min.css" rel="stylesheet" type="text/css" />
+	<link href="https://kendo.cdn.telerik.com/2016.3.1028/styles/kendo.blueopal.min.css" rel="stylesheet" type="text/css" />
+	<link href="https://kendo.cdn.telerik.com/2016.3.1028/styles/kendo.dataviz.blueopal.min.css" rel="stylesheet" type="text/css" />
+	<script src="https://kendo.cdn.telerik.com/2016.3.1028/js/jquery.min.js"></script>
+	<script src="https://kendo.cdn.telerik.com/2016.3.1028/js/jszip.min.js"></script>
+	<script src="https://kendo.cdn.telerik.com/2016.3.1028/js/kendo.all.min.js"></script>
+	<script src="https://kendo.cdn.telerik.com/2016.3.1028/js/kendo.aspnetmvc.min.js"></script>
+	<script src="@Url.Content(contentPath: "~/Scripts/kendo.modernizr.custom.js")"></script>
 </head>
 <body class="hold-transition skin-blue-light fixed">
     <div class="wrapper">
         @Html.Partial(partialViewName: "_Header")
 
-        @if(Request.IsAuthenticated)
+        @if(Request.IsAuthenticated && (ViewBag.PortalName != null))
         {
             @Html.Partial(partialViewName: "_Sidebar")
         }
@@ -63,7 +74,7 @@
     @Scripts.Render(paths: "~/Bundles/js")
     @RenderSection(name: "scripts", required: false)
 
-    @if(Request.IsAuthenticated)
+    @if(Request.IsAuthenticated && (ViewBag.PortalName != null))
     {
         <script type="text/javascript">
             $('body').addClass('sidebar-mini');

@@ -197,7 +197,11 @@ namespace Linko.LinkoExchange.Services
         /// Otherwise throw exception
         public bool UpdateEnableDisableFlag(int orgRegProgId, bool isEnabled)
         {
-            var orgRegProg = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId);
+            var orgRegProg = _dbContext.OrganizationRegulatoryPrograms
+                    .Include(path: "RegulatoryProgram")
+                    .Include(path: "Organization")
+                    .Include(path: "RegulatorOrganization")
+                    .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId);
             bool isAuthority = orgRegProg.RegulatorOrganizationId == null;
             if (isEnabled)
             {
