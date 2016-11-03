@@ -953,9 +953,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         private void SetPasswordPolicy(IEnumerable<SettingDto> organizationSettings)
         {
             // Password policy is only defined on system global level 
-            // Failed trial times is defined on organization level
-
-            var passwordValidator = new PasswordValidator();
+            // Failed trial times is defined on organization level 
 
             // userDto might belong to multiple organizations, and multiple programs 
             // 1: get all multiple programs policies 
@@ -964,16 +962,9 @@ namespace Linko.LinkoExchange.Services.Authentication
             // 
             // If one setting has multiple definitions, choose the strictest one
             _userManager.UserLockoutEnabledByDefault = true;
-            _userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromHours(_settingService.PasswordLockoutHours()); 
+            _userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromHours(_settingService.PasswordLockoutHours());
 
-            passwordValidator.RequiredLength =     _settingService.PasswordRequireLength();
-            passwordValidator.RequireDigit = _settingService.PasswordRequireDigital();
-            passwordValidator.RequireLowercase = _settingService.PassowrdRequireLowerCase();
-            passwordValidator.RequireUppercase = _settingService.PasswordRequireUpperCase();
-            
-            _userManager.MaxFailedAccessAttemptsBeforeLockout = MaxFailedPasswordAttempts(organizationSettings);
-
-            _userManager.PasswordValidator = passwordValidator; 
+            _userManager.MaxFailedAccessAttemptsBeforeLockout = MaxFailedPasswordAttempts(organizationSettings); 
         }
 
 
@@ -1052,6 +1043,11 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             // To verify user's password 
+            if(userProfile.Password.Length < 8 || userProfile.Password.Length > 15)
+            {
+                return RegistrationResult.BadPassword;
+            }
+
             var validPassword = _userManager.PasswordValidator.ValidateAsync(userProfile.Password).Result; 
             if(validPassword.Succeeded == false)
             {

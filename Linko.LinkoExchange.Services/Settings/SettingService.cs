@@ -210,52 +210,7 @@ namespace Linko.LinkoExchange.Services.Settings
 
             _dbContext.SaveChanges();
         }
- 
-	    public bool PasswordRequireDigital()
-	    {
-            if (!_globalSettings.ContainsKey(SystemSettingType.PasswordRequiredDigit))
-            {
-                return false;
-            }
-
-            return _globalSettings[SystemSettingType.PasswordRequiredDigit] == "true";
-        }
-
-	    public bool PassowrdRequireLowerCase()
-	    {
-            return true;
-
-            //if (!_globalSettings.ContainsKey(SettingType.PasswordRequireLowerCase)) // setting does not currently exist
-            //{
-            //    return false;
-            //}
-
-            //return _globalSettings[SettingType.PasswordRequireLowerCase] == "true";
-        }
-
-	    public bool PasswordRequireUpperCase()
-	    {
-            return true;
-
-            //if (!_globalSettings.ContainsKey(SettingType.PasswordRequireUpperCase)) // setting does not currently exist
-            //{
-            //    return false;
-            //}
-
-            //return _globalSettings[SettingType.PasswordRequiredLowerCase] == "true";
-        }
-
-	    public int PasswordRequireLength()
-	    {
-            var settingKey = SystemSettingType.PasswordRequiredLength;
-            if (!_globalSettings.ContainsKey(settingKey))
-            {
-                return 6;
-            }
-
-            return ValueParser.TryParseInt(_globalSettings[settingKey], 6);
-        }
-
+  
 	    public int PasswordLockoutHours()
 	    {
             return 24;

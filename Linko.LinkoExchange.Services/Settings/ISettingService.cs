@@ -38,14 +38,8 @@ namespace Linko.LinkoExchange.Services.Settings
         /// <param name="programId">The program Id to get for</param>
         /// <returns>The PrrogramSetting object</returns>
         ProgramSettingDto GetProgramSettingsById(int programId);
-
-        bool PasswordRequireDigital();
-        bool PassowrdRequireLowerCase();
-        bool PasswordRequireUpperCase();
-        int PasswordRequireLength();
-
+        
         int PasswordLockoutHours();
-
 
         void CreateOrUpdateProgramSettings(ProgramSettingDto settingDtos);
         void CreateOrUpdateProgramSettings(int orgRegProgId, IEnumerable<SettingDto> settingDtos);
