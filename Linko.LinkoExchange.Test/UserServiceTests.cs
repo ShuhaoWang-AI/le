@@ -15,6 +15,7 @@ using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -26,7 +27,7 @@ namespace Linko.LinkoExchange.Test
         Mock<ISessionCache> _sessionCache;
         IRequestCache _requestCache = Mock.Of<IRequestCache>();
         Mock<IOrganizationService> _orgService;
-        ISettingService _settingService = Mock.Of<ISettingService>();
+        Mock<ISettingService> _settingService;
         IEmailService _emailService = Mock.Of<IEmailService>();
 
         public UserServiceTests()
@@ -62,8 +63,16 @@ namespace Linko.LinkoExchange.Test
             _orgService = new Mock<IOrganizationService>();
             _orgService.Setup(x => x.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });
 
+            //_settingService.GetGlobalSettings()
+            var globalSettingLookup = new Dictionary<SystemSettingType, string>();
+            globalSettingLookup.Add(SystemSettingType.SupportPhoneNumber, "555-555-5555");
+            globalSettingLookup.Add(SystemSettingType.SupportEmailAddress, "test@test.com");
+            _settingService = new Mock<ISettingService>();
+            _settingService.Setup(x => x.GetGlobalSettings()).Returns(globalSettingLookup);
+
+
             _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
-                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService, _sessionCache.Object, _orgService.Object, _requestCache);
+                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService.Object, _sessionCache.Object, _orgService.Object, _requestCache);
         }
 
         [TestMethod]
@@ -150,7 +159,11 @@ namespace Linko.LinkoExchange.Test
             var result = _userService.EnableDisableUserAccount(1, true);
         }
 
-       
+        [TestMethod]
+        public void ResetUser()
+        {
+            var result = _userService.ResetUser(1, "markus.jeon@watertrax.com");
+        }
 
     }
 }

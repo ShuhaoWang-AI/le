@@ -308,13 +308,15 @@ namespace Linko.LinkoExchange.Services.User
                 user.Email = newEmailAddress;
                 sendEmailChangedNotifications.Add(user.OldEmailAddress);
                 sendEmailChangedNotifications.Add(user.Email);
+
+                user.EmailConfirmed = false;
             }
 
             //reset flags
             user.IsAccountLocked = false;
             user.PasswordHash = null;
-            user.EmailConfirmed = false;
             user.PhoneNumberConfirmed = false;
+            user.IsAccountResetRequired = true;
 
             //Delete SQs and KBQs
             var answers = _dbContext.UserQuestionAnswers
