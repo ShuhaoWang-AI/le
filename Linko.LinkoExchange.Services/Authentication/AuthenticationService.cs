@@ -254,9 +254,10 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             var registrationResult = new RegistrationResultDto();
 
-            if (!ValidateRegistrationUserData(userInfo, securityQuestions, kbqQuestions))
+            var validatResult = ValidateRegistrationUserData(userInfo, securityQuestions, kbqQuestions);
+            if (validatResult != RegistrationResult.Success)
             {
-                registrationResult.Result = RegistrationResult.NotValidData;
+                registrationResult.Result = validatResult;
                 return registrationResult; 
             } 
 
@@ -1043,8 +1044,20 @@ namespace Linko.LinkoExchange.Services.Authentication
             _emailService.SendEmail(new[] { userProfile.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
         }
 
-        private bool ValidateRegistrationUserData(UserDto userProfile, IEnumerable<QuestionAnswerPairDto> securityQuestions, IEnumerable<QuestionAnswerPairDto> kbqQuestions)
+        private RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<QuestionAnswerPairDto> securityQuestions, IEnumerable<QuestionAnswerPairDto> kbqQuestions)
         {
+            if(userProfile.AgreeTermsAndConditions == false)
+            {
+                return RegistrationResult.NotAgreedTermsAndConditions; 
+            }
+
+            // To verify user's password 
+            var validPassword = _userManager.PasswordValidator.ValidateAsync(userProfile.Password).Result; 
+            if(validPassword.Succeeded == false)
+            {
+                return RegistrationResult.BadPassword;
+            }
+
             if (userProfile == null ||
                 string.IsNullOrWhiteSpace(userProfile.FirstName) ||
                 string.IsNullOrWhiteSpace(userProfile.LastName) ||
@@ -1052,20 +1065,55 @@ namespace Linko.LinkoExchange.Services.Authentication
                 string.IsNullOrWhiteSpace(userProfile.CityName) ||
                 string.IsNullOrWhiteSpace(userProfile.ZipCode) ||
                 string.IsNullOrWhiteSpace(userProfile.Email) ||
-                string.IsNullOrWhiteSpace(userProfile.UserName) || 
-                securityQuestions == null ||securityQuestions.Count()<2 || 
-                kbqQuestions == null  || kbqQuestions.Count()<5)
+                string.IsNullOrWhiteSpace(userProfile.UserName)
+              )
             {
-                return false;
+                return RegistrationResult.BadUserProfileData;
             }
 
-            // To validate each question has an answer
-            if(securityQuestions.Any(i=>i.Answer == null) || kbqQuestions.Any(i=>i.Answer == null))
+            if (securityQuestions == null || securityQuestions.Count() < 2)
+               
             {
-                return false;
-            } 
+                return RegistrationResult.MissingSecurityQuestion;
+            }
 
-            return true;
+            if (kbqQuestions == null || kbqQuestions.Count() < 5)
+            {
+                return RegistrationResult.MissingKBQ;
+            }
+
+            // To validate each question has an answer 
+            if(securityQuestions.GroupBy(i=>i.Question.QuestionId).Any(i=>i.Count() > 1))
+            {
+                return RegistrationResult.DuplicatedSecurityQuestion;
+            }
+
+            if (kbqQuestions.GroupBy(i => i.Question.QuestionId).Any(i => i.Count() > 1))
+            {
+                return RegistrationResult.DuplicatedKBQ;
+            }
+
+            if (securityQuestions.GroupBy(i => i.Answer.Content).Any(i => i.Count() > 1))
+            {
+                return RegistrationResult.DuplicatedSecurityQuestionAnswer;
+            }
+
+            if (kbqQuestions.GroupBy(i => i.Answer.Content).Any(i => i.Count() > 1))
+            {
+                return RegistrationResult.DuplicatedKBQAnswer;
+            }
+
+            if (securityQuestions.Any(i=>i.Answer == null))
+            {
+                return RegistrationResult.MissingSecurityQuestionAnswer;
+            }
+
+            if (kbqQuestions.Any(i => i.Answer == null))
+            {
+                return RegistrationResult.MissingKBQAnswer; 
+            }
+
+            return RegistrationResult.Success;
         }
 
         private void SendRequestUsernameEmail(UserProfile userProfile)

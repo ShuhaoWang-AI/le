@@ -41,6 +41,7 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
                .ForMember(d => d.LockoutEndDateUtc, o => o.Ignore())
                .ForMember(d => d.LockoutEnabled, o => o.Ignore())
                .ForMember(d => d.OldEmailAddress, o => o.Ignore())
+               .ForMember(d=>d.AgreeTermsAndConditions, o=>o.Ignore())
                 ;
         }
     }

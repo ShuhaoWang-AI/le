@@ -27,8 +27,20 @@
         InvitationExpired,
         ProgramNotFound, 
         ProgramDisabled,
-        NotValidData,
+        BadUserProfileData,
+        BadPassword,
+        BadSecurityQuestionAndAnswer,
+        BadKBQAndAnswer,
+        NotAgreedTermsAndConditions,
         InvalidateRegistrationToken,
-        UserAlreadyInTheProgram
+        UserAlreadyInTheProgram,
+        MissingKBQAnswer,
+        MissingSecurityQuestionAnswer,
+        DuplicatedKBQAnswer,
+        DuplicatedSecurityQuestionAnswer,
+        DuplicatedKBQ,
+        DuplicatedSecurityQuestion,
+        MissingKBQ,
+        MissingSecurityQuestion
     }
 }

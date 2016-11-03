@@ -35,6 +35,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool LockoutEnabled { get; set; }
 
         public string Password { get; set; }
-        
+        public bool AgreeTermsAndConditions { get; set; }
     }
 }
