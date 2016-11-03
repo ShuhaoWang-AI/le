@@ -101,18 +101,33 @@ namespace Linko.LinkoExchange.Services
                 var orgs = new List<AuthorityDto>();
                 foreach (var orpUser in orpUsers)
                 {
-                    if (orpUser.OrganizationRegulatoryProgram?.Organization != null &&
-                        orpUser.OrganizationRegulatoryProgram?.Organization.OrganizationType.Name == "Authority" &&
-                        !orgs.Any(i => i.OrganizationId == orpUser.OrganizationRegulatoryProgram.RegulatorOrganizationId))
+                    OrganizationRegulatoryProgram authority;
+                    var thisOrgRegProgram = orpUser.OrganizationRegulatoryProgram;
+                    if (thisOrgRegProgram.RegulatorOrganization != null)
+                        authority = _dbContext.OrganizationRegulatoryPrograms
+                            .Single(o => o.OrganizationId == thisOrgRegProgram.RegulatorOrganization.OrganizationId
+                            && o.RegulatoryProgramId == thisOrgRegProgram.RegulatoryProgramId);
+                    else
+                        authority = thisOrgRegProgram;
+
+                    if (authority?.Organization.OrganizationType.Name == "Authority")
                     {
-                        AuthorityDto authority = _mapper.Map<Core.Domain.Organization, AuthorityDto>(orpUser.OrganizationRegulatoryProgram.Organization);
-                        authority.RegulatoryProgramId = orpUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
-                        authority.OrganizationRegulatoryProgramId = orpUser.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId;
-                        authority.EmailContactInfoName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
-                        authority.EmailContactInfoEmailAddress = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
-                        authority.EmailContactInfoPhone = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
-                        orgs.Add(authority);
+                        //Check for duplicates before adding
+                        if (!orgs.Any(i => i.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId))
+                        {
+                            AuthorityDto authorityDto = _mapper.Map<Core.Domain.Organization, AuthorityDto>(authority.Organization);
+                            authorityDto.RegulatoryProgramId = authority.RegulatoryProgramId;
+                            authorityDto.OrganizationRegulatoryProgramId = authority.OrganizationRegulatoryProgramId;
+                            authorityDto.EmailContactInfoName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+                            authorityDto.EmailContactInfoEmailAddress = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+                            authorityDto.EmailContactInfoPhone = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+                            orgs.Add(authorityDto);
+
+                        }
                     }
+                    else
+                        throw new Exception(string.Format("ERROR: Organization {0} in Program {1} does not have a regulator and is not itself of type 'Authority'. ",
+                            authority.OrganizationId, orpUser.OrganizationRegulatoryProgram.RegulatoryProgramId));
 
                 }
 

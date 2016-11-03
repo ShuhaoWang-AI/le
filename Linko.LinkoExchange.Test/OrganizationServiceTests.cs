@@ -104,5 +104,13 @@ namespace Linko.LinkoExchange.Test
         {
             var dto = orgService.GetRemainingUserLicenseCount(2, false);
         }
+
+        //
+        [TestMethod]
+        public void GetUserRegulatories()
+        {
+            var dto = orgService.GetUserRegulatories(13);
+        }
+
     }
 }
