@@ -98,7 +98,7 @@ namespace Linko.LinkoExchange.Services.Dto
         {
             get; set;
         }
-        public DateTime SentDateTimeUtc
+        public DateTimeOffset SentDateTimeUtc
         {
             get; set;
         }

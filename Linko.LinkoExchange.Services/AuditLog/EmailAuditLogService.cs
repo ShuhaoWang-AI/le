@@ -35,7 +35,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
             emailLogEntry.Token = _requestCache.GetValue(CacheKey.Token) as string;
 
             this._dbContext.EmailAuditLog.Add(emailLogEntry);
-            await this._dbContext.SaveChangesAsync();
+            this._dbContext.SaveChanges();
         }
     }
 }

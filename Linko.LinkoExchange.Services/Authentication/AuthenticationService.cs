@@ -454,10 +454,10 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             int userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
             //int orgRegProgramId = Convert.ToInt32(_sessionCache.GetValue(CacheKey.OrganizationRegulatoryProgramId));
-            string passwordHash = _passwordHasher.HashPassword(newPassword);
-            string answerHash = _passwordHasher.HashPassword(answer);
-            var organizationIds = GetUserOrganizationIds(userProfileId);
-            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
+            //string passwordHash = _passwordHasher.HashPassword(newPassword);
+            //string answerHash = _passwordHasher.HashPassword(answer);
+            //var organizationIds = GetUserOrganizationIds(userProfileId);
+            //var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
             int resetPasswordTokenValidateInterval = Convert.ToInt32(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"]);
 
             var authenticationResult = new AuthenticationResultDto();
@@ -533,7 +533,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     authenticationResult.Errors = new string[] { "The answer is incorrect.  Please try again." };
                 }
             }
-            else if (IsValidPasswordCheckInHistory(passwordHash, userProfileId, organizationSettings))
+            else if (!IsValidPasswordCheckInHistory(passwordHash, userProfileId, organizationSettings))
             {
                 //Password used before (6.a)
                 var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings);
@@ -1007,10 +1007,11 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private void SendResetPasswordConfirmationEmail(UserProfile userProfile)
         {
-            var code = _userManager.GeneratePasswordResetTokenAsync(userProfile.Id).Result; 
+            //var token = _userManager.GeneratePasswordResetTokenAsync(userProfile.Id).Result; 
+            var token = Guid.NewGuid().ToString();
 
             string baseUrl = _httpContext.GetRequestBaseUrl();
-            string link = baseUrl + "?code=" + code;
+            string link = baseUrl + "Account/ResetPassword/?token=" + token;
 
             string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber]; 
             string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
@@ -1020,8 +1021,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
             contentReplacements.Add("supportEmail", supportEmail);
 
-            //_sessionCache.SetValue("ddd") ='''sss'
-
+            _requestCache.SetValue(CacheKey.Token, token);
             _emailService.SendEmail(new[] { userProfile.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
         }
 

@@ -101,7 +101,7 @@ namespace Linko.LinkoExchange.Core.Domain
         {
             get; set;
         }
-        public DateTime SentDateTimeUtc
+        public DateTimeOffset SentDateTimeUtc
         {
             get; set;
         }
