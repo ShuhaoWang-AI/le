@@ -1028,7 +1028,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         private void SendRequestUsernameEmail(UserProfile userProfile)
         {
             string baseUrl = _httpContext.GetRequestBaseUrl();
-            string link = baseUrl + "/Account/SignIn";
+            string link = baseUrl + "Account/SignIn";
 
             string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
             string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
