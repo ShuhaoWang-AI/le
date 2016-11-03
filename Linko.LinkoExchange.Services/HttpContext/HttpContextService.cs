@@ -33,7 +33,16 @@ namespace Linko.LinkoExchange.Services
 
         public int CurrentUserProfileId()
         {
-            return Convert.ToInt32(System.Web.HttpContext.Current.User.Identity.UserProfileId());
+            if (System.Web.HttpContext.Current?.User?.Identity != null)
+            {
+                string userProfileIdString = System.Web.HttpContext.Current.User.Identity.UserProfileId();
+                if (!String.IsNullOrEmpty(userProfileIdString))
+                {
+                    return Convert.ToInt32(userProfileIdString);
+                }
+            }
+
+            return -1;
         }
     }
 }

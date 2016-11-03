@@ -479,7 +479,7 @@ namespace Linko.LinkoExchange.Services.User
 
             //Check user is not THIS user's own account
             int thisUserProfileId = _httpContext.CurrentUserProfileId();
-            if (userProfileId == thisUserProfileId)
+            if (thisUserProfileId > 0 && userProfileId == thisUserProfileId)
                 return new Dto.AccountLockoutResultDto()
                 {
                     IsSuccess = false,
