@@ -263,37 +263,53 @@ namespace Linko.LinkoExchange.Services.User
 
         }
 
-        public void ResetUser(int userProfileId, string newEmailAddress)
+        public ResetUserResultDto ResetUser(int userProfileId, string newEmailAddress)
         {
-            UserProfile user = _dbContext.Users.SingleOrDefault(u => u.UserProfileId == userProfileId);
-            if (user != null)
-            {
-                user.IsAccountLocked = false;
-                user.PasswordHash = null;
-                user.OldEmailAddress = user.Email;
-                user.Email = newEmailAddress;
-                user.EmailConfirmed = false;
-                user.PhoneNumberConfirmed = false;
-
-                var answers = _dbContext.UserQuestionAnswers.Where(a => a.UserProfileId == userProfileId);
-                if (answers != null && answers.Count() > 0)
+            var user = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
+            //Check user is not support role
+            if (user.IsInternalAccount)
+                return new ResetUserResultDto()
                 {
-                    foreach (var answer in answers)
-                    {
-                        //get question too
-                        _dbContext.Questions.Remove(answer.Question);
+                    IsSuccess = false,
+                    FailureReason = ResetUserFailureReason.CannotResetSupportRole
+                };
 
-                        _dbContext.UserQuestionAnswers.Remove(answer);
-                    }
-                }
+            //Check user is not THIS user's own account
+            int thisUserProfileId = _httpContext.CurrentUserProfileId();
+            if (userProfileId == thisUserProfileId)
+                return new ResetUserResultDto()
+                {
+                    IsSuccess = false,
+                    FailureReason = ResetUserFailureReason.CannotResetOwnAccount
+                };
 
-                _dbContext.SaveChanges();
-            }
-            else
+            user.IsAccountLocked = false;
+            user.PasswordHash = null;
+            user.OldEmailAddress = user.Email;
+            user.Email = newEmailAddress;
+            user.EmailConfirmed = false;
+            user.PhoneNumberConfirmed = false;
+
+            //Delete KBQs
+            var answers = _dbContext.UserQuestionAnswers.Where(a => a.UserProfileId == userProfileId);
+            if (answers != null && answers.Count() > 0)
             {
-                //_logger.Log("ERROR")
-                throw new Exception();
+                foreach (var answer in answers)
+                {
+                    //get question too
+                    _dbContext.Questions.Remove(answer.Question);
+
+                    _dbContext.UserQuestionAnswers.Remove(answer);
+                }
             }
+
+            //Send emails
+
+            return new ResetUserResultDto()
+            {
+                IsSuccess = true
+            };
+
         }
 
         private void SendAccountLockoutEmails(UserProfile user)
