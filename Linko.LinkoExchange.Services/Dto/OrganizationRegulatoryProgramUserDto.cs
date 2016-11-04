@@ -6,6 +6,7 @@ namespace Linko.LinkoExchange.Services.Dto
 {
     public class OrganizationRegulatoryProgramUserDto
     {
+        public int OrganizationRegulatoryProgramUserId { get; set; }
         public int UserProfileId { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
         public bool IsEnabled { get; set; }
