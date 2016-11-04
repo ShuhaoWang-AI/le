@@ -168,6 +168,9 @@
     <Compile Include="Program\IProgramService.cs" />
     <Compile Include="Program\ProgramService.cs" />
     <Compile Include="Cache\RequestCache.cs" />
+    <Compile Include="QuestionAnswer\EncryptionService.cs" />
+    <Compile Include="QuestionAnswer\IEncryptionService.cs" />
+    <Compile Include="QuestionAnswer\StringCipher.cs" />
     <Compile Include="Settings\ISettingService.cs" />
     <Compile Include="Settings\SettingService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

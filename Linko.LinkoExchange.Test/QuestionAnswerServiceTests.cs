@@ -10,6 +10,7 @@ using System.Configuration;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.QuestionAnswer;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -17,6 +18,7 @@ namespace Linko.LinkoExchange.Test
     public class QuestionAnswerServiceTests
     {
         private QuestionAnswerService _questionAnswerService;
+        private EncryptionService _encrypter;
 
         public QuestionAnswerServiceTests()
         {
@@ -36,7 +38,7 @@ namespace Linko.LinkoExchange.Test
             _questionAnswerService = new QuestionAnswerService(new LinkoExchangeContext(connectionString),
                                                                new EmailAuditLogEntryDto(),
                                                                new HttpContextService());
-                                                               
+            _encrypter = new EncryptionService();
         }
 
         [TestMethod]
@@ -84,5 +86,15 @@ namespace Linko.LinkoExchange.Test
             var results = _questionAnswerService.GetUsersQuestionAnswers(1, QuestionType.KnowledgeBased);
         }
 
+
+        [TestMethod]
+        public void EncryptDecryptTest()
+        {
+            var answer = "Test answer";
+            var encryptedString = _encrypter.EncryptString(answer);
+            var deccryptedString = _encrypter.DecryptString(encryptedString);
+
+            Assert.AreEqual(answer, deccryptedString);
+        }
     }
 }
