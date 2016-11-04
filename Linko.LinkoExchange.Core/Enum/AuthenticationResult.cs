@@ -16,14 +16,14 @@
         CanNotUseOldPassword, 
         ExpiredRegistrationToken,
         AccountIsNotAssociated,
-        IncorrectAnswerToQuestion
+        IncorrectAnswerToQuestion,
+        AccountResetRequired
     } 
 
     public enum RegistrationResult
     {
         Success,
-        Failed,
-        UserIsLocked,
+        Failed, 
         InvitationExpired,
         ProgramNotFound, 
         ProgramDisabled,

@@ -242,6 +242,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         /// <summary>
         /// Create a new user for registration
+        /// Confirmed: No possible for one user being invited to a program that he is in already. 
         /// </summary>
         /// <param name="userInfo">The registration user information.</param>
         /// <param name="registrationToken">Registration token</param>
@@ -269,6 +270,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return registrationResult;
             }
 
+            #region Check invitation expiration 
+
+            // UC-42 1.a 
             // Check token is expired or not? from organization settings
             var invitationRecipientProgram =
                 _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
@@ -288,45 +292,33 @@ namespace Linko.LinkoExchange.Services.Authentication
                 registrationResult.Result = RegistrationResult.InvitationExpired;
                 return registrationResult;
             }
+            
+            #endregion  End of Checking invitation expiration 
+            
+            UserProfile applicationUser = _userManager.FindByName(userInfo.UserName); 
 
-            // User exists but he is locked.  
-            UserProfile applicationUser = _userManager.FindByName(userInfo.UserName);
-            if (applicationUser != null && applicationUser.IsAccountLocked)
-            {
-                registrationResult.Result = RegistrationResult.UserIsLocked;
-                var authorities = _organizationService.GetUserRegulatories(applicationUser.UserProfileId); 
-                if(authorities == null)
-                {
-                    authorities = new List<AuthorityDto>();
-                }
-                registrationResult.RegulatoryList = _organizationService.GetUserRegulatories(applicationUser.UserProfileId);
-                return registrationResult;
-            }
-
-            // Check if user is already in the program 
-            var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
-            if (recipientProgram != null && applicationUser != null)
-            {
-                registrationResult.Result = RegistrationResult.UserAlreadyInTheProgram;
-                return registrationResult;
-            }
-
+            // 2.a  Actor is already registrated with LinkoExchange  
             bool newUserRegistration = true;
             if (applicationUser != null)
             {
                 newUserRegistration = false;
-            }
 
+                // Set IsRestRequired to be false  
+                applicationUser.IsAccountResetRequired = false;
+            }
+ 
             using (var transaction = _dbContext.Database.BeginTransaction())
             {
                 try
                 {
-                    #region new user registration 
+                    #region Create a new user registration 
+
                     if (newUserRegistration)
                     {
                         applicationUser = AssignUser(userInfo.UserName, userInfo.Email);
 
-                        #region update user profile  
+                        #region Update the new user profile  
+
                         applicationUser.TitleRole = userInfo.TitleRole;
                         applicationUser.FirstName = userInfo.UserName;
                         applicationUser.LastName = userInfo.LastName;
@@ -355,7 +347,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                             // Retrieve user again to get userProfile Id. 
                             applicationUser = _userManager.FindById(applicationUser.Id);
 
-                            // 1. Create a new row in userProfile password history table 
+                            // Create a new row in userProfile password history table 
                             _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
                             {
                                 LastModificationDateTimeUtc = DateTime.UtcNow,
@@ -368,29 +360,32 @@ namespace Linko.LinkoExchange.Services.Authentication
                             _questionAnswerService.CreateQuestionAnswerPairs(applicationUser.UserProfileId, combined);
                         }
                     }
+
                     #endregion
 
                     // UC-42 6
                     // 2 Create organziation regulatory program userProfile, and set the approved statue to false  
                     var orpu = _programService.CreateOrganizationRegulatoryProgramForUser(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId);
- 
-                    // 3 TODO send email to all users who have rights to approve a registrant 
+
                     // UC-42 7, 8
-                    // find out who have the approve permission   
+                    // Find out who have approval permission   
                     var approvalPeople = _permissionService.GetApprovalPeople(applicationUser.UserProfileId, orpu.OrganizationRegulatoryProgramId);
                     var sendTo = approvalPeople.Select(i => i.Email);
 
-                    //  Determine if user is authority user or is industry user;
-                    // 
+                    //  Determine if user is authority user or is industry user; 
                     var senderProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.SenderOrganizationRegulatoryProgramId);
-
-                    //  Program is disabled or not found  
+                                                           
+                    var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId); 
+                    //  Program is disabled or not found
+                    //  UC-42 2.c, 2.d, 2.e
                     if (recipientProgram == null || senderProgram == null ||
-                         !recipientProgram.IsEnabled || !senderProgram.IsEnabled)
+                         !recipientProgram.IsEnabled || !senderProgram.IsEnabled  || 
+                         recipientProgram.OrganizationDto == null
+                         )
                     {
                         registrationResult.Result = RegistrationResult.InvitationExpired;
                         return registrationResult;
-                    }                     
+                    }              
 
                     var inviteIndustryUser = false;
                     // Invites authority user
@@ -412,7 +407,8 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     var authorityOrg = _organizationService.GetOrganization(recipientProgram.RegulatorOrganizationId.Value);
 
-                    #region Setup emailContentReplacement  
+                    #region Send registration email to approvals
+
                     var emailContentReplacements = new Dictionary<string, string>();
                     emailContentReplacements.Add("firstName", applicationUser.FirstName);
                     emailContentReplacements.Add("lastName", applicationUser.LastName);
@@ -432,9 +428,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                         emailContentReplacements.Add("cityName", receipientOrg.CityName);
                         emailContentReplacements.Add("stateName", receipientOrg.State);
                     } 
-
-                    #endregion
-
+                    
                     if (inviteIndustryUser)
                     {
                         await _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
@@ -443,7 +437,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                     {
                         await _emailService.SendEmail(sendTo, EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, emailContentReplacements);
                     }
-                     
+
+                    #endregion
+
                     // 6 TODO logs invite to Audit 
                     // UC-2 
 
@@ -587,8 +583,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Result = AuthenticationResult.Success;
             }
 
-            return authenticationResult;
-
+            return authenticationResult; 
         }
 
         /// <summary>
@@ -669,6 +664,12 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (applicationUser == null)
             {
                 signInResultDto.AutehticationResult = AuthenticationResult.UserNotFound;
+                return Task.FromResult(signInResultDto);
+            }
+
+            if (applicationUser.IsAccountResetRequired)
+            {
+                signInResultDto.AutehticationResult = AuthenticationResult.AccountResetRequired; 
                 return Task.FromResult(signInResultDto);
             }
 
@@ -887,7 +888,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             // Get password expiration setting
             var passwordExpiredDays = GetStrictestLengthPasswordExpiredDays(organizationSettings);
-            if (DateTime.UtcNow > lastestUserPassword.LastModificationDateTimeUtc.AddDays(passwordExpiredDays))
+            if (DateTimeOffset.UtcNow > lastestUserPassword.LastModificationDateTimeUtc.AddDays(passwordExpiredDays))
             {
                 return true;
             }
