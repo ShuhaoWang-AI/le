@@ -9,6 +9,8 @@ using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Data.Entity;
 using System.Linq;
+using Linko.LinkoExchange.Services.QuestionAnswer;
+using Microsoft.AspNet.Identity;
 
 namespace Linko.LinkoExchange.Services
 {
@@ -17,12 +19,17 @@ namespace Linko.LinkoExchange.Services
         private readonly LinkoExchangeContext _dbContext;
         private readonly IAuditLogEntry _logger;
         private readonly IHttpContextService _httpContext;
+        private readonly IEncryptionService _encryption;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public QuestionAnswerService(LinkoExchangeContext dbContext, IAuditLogEntry logger, IHttpContextService httpContext)
+        public QuestionAnswerService(LinkoExchangeContext dbContext, IAuditLogEntry logger, IHttpContextService httpContext,
+            IEncryptionService encryption, IPasswordHasher passwordHasher)
         {
             _dbContext = dbContext;
             _logger = logger;
             _httpContext = httpContext;
+            _encryption = encryption;
+            _passwordHasher = passwordHasher;
         }
 
         public void AddQuestionAnswerPair(int userProfileId, QuestionDto question, AnswerDto answer)
@@ -36,6 +43,18 @@ namespace Linko.LinkoExchange.Services
                 newQuestion.CreationDateTimeUtc = DateTime.UtcNow;
                 newQuestion.LastModificationDateTimeUtc = null;
                 newQuestion.LastModifierUserId = null;
+
+                if (question.QuestionType == Dto.QuestionType.KnowledgeBased)
+                {
+                    //Hash answer
+                    answer.Content = _passwordHasher.HashPassword(answer.Content);
+                }
+                else if (question.QuestionType == Dto.QuestionType.Security)
+                {
+                    //Encrypt answer
+                    answer.Content = _encryption.EncryptString(answer.Content);
+                }
+
 
                 UserQuestionAnswer newAnswer = _dbContext.UserQuestionAnswers.Create();
                 newAnswer.Content = answer.Content;
@@ -76,6 +95,17 @@ namespace Linko.LinkoExchange.Services
 
         public void CreateOrUpdateQuestionAnswerPair(int userProfileId, QuestionAnswerPairDto questionAnswer)
         {
+            if (questionAnswer.Question.QuestionType == Dto.QuestionType.KnowledgeBased)
+            {
+                //Hash answer
+                questionAnswer.Answer.Content = _passwordHasher.HashPassword(questionAnswer.Answer.Content);
+            }
+            else if (questionAnswer.Question.QuestionType == Dto.QuestionType.Security)
+            {
+                //Encrypt answer
+                questionAnswer.Answer.Content = _encryption.EncryptString(questionAnswer.Answer.Content);
+            }
+
             UserQuestionAnswer answer;
             Question question;
             if (questionAnswer.Answer.UserQuestionAnswerId.HasValue)
@@ -186,6 +216,18 @@ namespace Linko.LinkoExchange.Services
             if (answer != null && answer.UserQuestionAnswerId.HasValue && answer.UserQuestionAnswerId > 0)
             {
                 var answerToUpdate = _dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == answer.UserQuestionAnswerId);
+
+                if (answerToUpdate.Question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
+                {
+                    //Hash answer
+                    answer.Content = _passwordHasher.HashPassword(answer.Content);
+                }
+                else if (answerToUpdate.Question.QuestionTypeId == (int)Dto.QuestionType.Security)
+                {
+                    //Encrypt answer
+                    answer.Content = _encryption.EncryptString(answer.Content);
+                }
+
                 answerToUpdate.Content = answer.Content;
                 answerToUpdate.LastModificationDateTimeUtc = DateTime.UtcNow;
 
@@ -285,6 +327,13 @@ namespace Linko.LinkoExchange.Services
                 {
                     var newQADto = new QuestionAnswerPairDto() { Answer = new Dto.AnswerDto(), Question = new Dto.QuestionDto() };
                     newQADto.Answer.UserQuestionAnswerId = foundQA.UserQuestionAnswerId;
+
+                    if (questionType == Dto.QuestionType.Security)
+                    {
+                        //Encrypt answer
+                        foundQA.Content = _encryption.DecryptString(foundQA.Content);
+                    }
+
                     newQADto.Answer.Content = foundQA.Content;
                     newQADto.Question.QuestionId = foundQA.Question.QuestionId;
                     newQADto.Question.IsActive = foundQA.Question.IsActive;

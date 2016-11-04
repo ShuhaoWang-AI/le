@@ -11,6 +11,7 @@ using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.QuestionAnswer;
+using Microsoft.AspNet.Identity;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -37,7 +38,9 @@ namespace Linko.LinkoExchange.Test
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             _questionAnswerService = new QuestionAnswerService(new LinkoExchangeContext(connectionString),
                                                                new EmailAuditLogEntryDto(),
-                                                               new HttpContextService());
+                                                               new HttpContextService(),
+                                                               new EncryptionService(),
+                                                               new PasswordHasher());
             _encrypter = new EncryptionService();
         }
 
