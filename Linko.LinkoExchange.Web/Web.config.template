@@ -88,14 +88,14 @@ For more information on how to configure your ASP.NET application, please visit 
                   mode="RemoteOnly" />
     <authentication mode="None" />
     <compilation debug="true"
-                 targetFramework="4.5.1" />
+                 targetFramework="4.6.1" />
     <!--
     If the request (i.e. file) length is less than maxAllowedContentLength but more than maxRequestLength, the user will get your standard (ASPX) error page, if you have one. 
     If it's the other way around, the user will get an IIS error page instead. 
     For that reason, you might want to have maxAllowedContentLength to a very large value (just for this website/folder) and then have the limiting value be maxRequestLength.
     -->
     <!-- maxRequestLength is in KB; maximum file upload size supported by ASP.NET -->
-    <httpRuntime targetFramework="4.5.1"
+    <httpRuntime targetFramework="4.6.1"
                  maxRequestLength="10240" />
     <httpCookies httpOnlyCookies="true" />
     <trace enabled="false"
