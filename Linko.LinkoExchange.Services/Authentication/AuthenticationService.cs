@@ -450,12 +450,6 @@ namespace Linko.LinkoExchange.Services.Authentication
                     transaction.Commit();
                     return registrationResult;
                 }
-                catch(LinkoExchangeException lex)
-                {
-                    _logger.Error(lex.Errors.ToString());
-                    transaction.Rollback();
-                    throw lex;
-                }
                 catch (Exception ex)
                 {
                     var errors = new List<string>() { ex.Message };
@@ -471,6 +465,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     registrationResult.Result = RegistrationResult.Failed;
                     registrationResult.Errors = errors;
                     transaction.Rollback();
+                    throw;
                 } 
             }
 

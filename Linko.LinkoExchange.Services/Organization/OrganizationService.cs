@@ -166,13 +166,6 @@ namespace Linko.LinkoExchange.Services
             {
                 HandleEntityException(ex);
             }
-            catch(Exception e)
-            {
-                var linkoException = new LinkoExchangeException();
-                linkoException.ErrorType = LinkoExchangeError.OrganizationSetting;
-                linkoException.Errors = new List<string> { e.Message };
-                throw linkoException;
-            }
 
             return returnDto;
         }
