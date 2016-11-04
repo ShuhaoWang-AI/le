@@ -43,7 +43,6 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IUserService _userService;
         private readonly ISessionCache _sessionCache;
         private readonly IRequestCache _requestCache;
-        private readonly TokenGenerator _tokenGenerator = new TokenGenerator();
         private readonly IAuditLogService _auditLogService = new CrommerAuditLogService();
         private readonly IPasswordHasher _passwordHasher;
 
@@ -731,7 +730,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (signInStatus == SignInStatus.Success)
             {
                 signInResultDto.AutehticationResult = AuthenticationResult.Success;
-                signInResultDto.Token = _tokenGenerator.GenToken(userName);
 
                 _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId);
                 _sessionCache.SetValue(CacheKey.OwinUserId, applicationUser.Id);
@@ -957,11 +955,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             // Password policy is only defined on system global level 
             // Failed trial times is defined on organization level 
 
-            // userDto might belong to multiple organizations, and multiple programs 
-            // 1: get all multiple programs policies 
-            // 2: get all multiple organization policies if there is no definition from program policies 
-            // 3: get setting from global settings if there is no definitions from programs and organizations 
-            // 
             // If one setting has multiple definitions, choose the strictest one
             _userManager.UserLockoutEnabledByDefault = true;
             _userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromHours(_settingService.PasswordLockoutHours());
