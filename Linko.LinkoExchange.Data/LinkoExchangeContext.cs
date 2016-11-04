@@ -48,6 +48,8 @@ namespace Linko.LinkoExchange.Data
         public DbSet<Jurisdiction> Jurisdictions { get; set; }
         public DbSet<SettingTemplate> SettingTemplates { get; set; }
 
+        public DbSet<Core.Domain.TimeZone> TimeZones { get; set; }
+
         #endregion
 
 

@@ -90,6 +90,7 @@
     <Compile Include="Domain\SettingTemplate.cs" />
     <Compile Include="Domain\SignatoryRequest.cs" />
     <Compile Include="Domain\SignatoryRequestStatus.cs" />
+    <Compile Include="Domain\TimeZone.cs" />
     <Compile Include="Domain\UserPasswordHistory.cs" />
     <Compile Include="Domain\UserProfile.cs" />
     <Compile Include="Domain\UserQuestionAnswer.cs" />

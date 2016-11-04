@@ -16,6 +16,7 @@ using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Services.TimeZone;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -29,7 +30,7 @@ namespace Linko.LinkoExchange.Test
         Mock<IOrganizationService> _orgService;
         Mock<ISettingService> _settingService;
         IEmailService _emailService = Mock.Of<IEmailService>();
-
+        Mock<ITimeZoneService> _timeZones;
         public UserServiceTests()
         {
             Mapper.Initialize(cfg =>
@@ -72,7 +73,8 @@ namespace Linko.LinkoExchange.Test
 
 
             _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
-                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService.Object, _sessionCache.Object, _orgService.Object, _requestCache);
+                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService.Object, 
+                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones.Object);
         }
 
         [TestMethod]

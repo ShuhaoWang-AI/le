@@ -15,6 +15,7 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.TimeZone;
 
 namespace Linko.LinkoExchange.Services.Invitation
 {
@@ -28,10 +29,12 @@ namespace Linko.LinkoExchange.Services.Invitation
         private readonly IEmailService _emailService;
         private readonly IOrganizationService _organizationService;
         private readonly IHttpContextService _httpContext;
+        private readonly ITimeZoneService _timeZones;
 
         public InvitationService(LinkoExchangeContext dbContext, IMapper mapper, 
             ISettingService settingService, IUserService userService, IRequestCache requestCache,
-            IEmailService emailService, IOrganizationService organizationService, IHttpContextService httpContext) 
+            IEmailService emailService, IOrganizationService organizationService, IHttpContextService httpContext,
+            ITimeZoneService timeZones) 
         {
             _dbContext = dbContext; 
             _mapper = mapper;
@@ -41,6 +44,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             _emailService = emailService;
             _organizationService = organizationService;
             _httpContext = httpContext;
+            _timeZones = timeZones;
         }
  
         public InvitationDto GetInvitation(string invitationId)
@@ -132,8 +136,9 @@ namespace Linko.LinkoExchange.Services.Invitation
                     dto.ExpiryDateTimeUtc = dto.InvitationDateTimeUtc.AddHours(addExpiryHours);
 
                     //Need to modify datetime to local
-                    string timeZone = _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.TimeZone);
-                    TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(timeZone);
+                    int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.TimeZone));
+
+                    TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(_timeZones.GetTimeZoneName(timeZoneId));
                     dto.InvitationDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(dto.InvitationDateTimeUtc.UtcDateTime, authorityLocalZone);
                     dto.ExpiryDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(dto.ExpiryDateTimeUtc.UtcDateTime, authorityLocalZone);
 
