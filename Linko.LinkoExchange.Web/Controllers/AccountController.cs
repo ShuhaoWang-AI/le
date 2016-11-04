@@ -295,7 +295,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             if(result.Count() == 1)
             {
                 _authenticationService.SetClaimsForOrgRegProgramSelection(result.First().OrganizationRegulatoryProgramId);
-                RedirectToAction(actionName: "Index", controllerName: "Home");
+                return RedirectToAction(actionName: "Index", controllerName: "Home");
             }
             else if(result.Count() > 1)
             {
