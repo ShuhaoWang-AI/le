@@ -59,6 +59,8 @@ namespace Linko.LinkoExchange.Test
         Mock<IHttpContextService> _httpContext;
         ILogger logger = Mock.Of<ILogger>();
 
+        private IQuestionAnswerService questionAnswerService = Mock.Of <IQuestionAnswerService>();
+
         [TestInitialize]
         public void TestInitialize()
         {
@@ -91,7 +93,7 @@ namespace Linko.LinkoExchange.Test
             userManagerObj.Setup(p => p.GetClaimsAsync(It.IsAny<string>())).Returns(tc);
 
             // Set up for setting service
-            var settingMock = Mock.Get(settService);
+            var settingServiceMock = Mock.Get(settService);
             systemSettingDict = new Dictionary<SystemSettingType, string>();
             
             //settingDict.Add(SystemSettingType.FailedPasswordAttemptMaxCount, "1"); //Does not exist in system settings
@@ -104,7 +106,10 @@ namespace Linko.LinkoExchange.Test
             systemSettingDict.Add(SystemSettingType.SystemEmailFirstName, "LinkoExchange");
             systemSettingDict.Add(SystemSettingType.SystemEmailLastName, "System");
 
-            settingMock.Setup(i => i.GetGlobalSettings()).Returns(systemSettingDict); 
+            settingServiceMock.Setup(i => i.GetGlobalSettings()).Returns(systemSettingDict);
+            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordHistoryMaxCount)).Returns("10");
+            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordChangeRequiredDays)).Returns("90");
+            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.FailedPasswordAttemptMaxCount)).Returns("3");
 
             _authenticationService = new AuthenticationService(
                 userManagerObj.Object,
@@ -123,7 +128,8 @@ namespace Linko.LinkoExchange.Test
                 AutoMapper.Mapper.Instance,
                 passwordHasher,
                 httpContextService,
-                logger,null
+                logger,
+                questionAnswerService
                 );
 
             userManagerObj.Setup(
@@ -445,7 +451,10 @@ namespace Linko.LinkoExchange.Test
             Assert.AreEqual(AuthenticationResult.Success, result.Result.AutehticationResult);
         }
 
-        [TestMethod]
+
+
+
+
         public void Test_SetClaimsForOrgRegProgramSelection()
         {
             userManagerObj.Setup(p => p.FindByNameAsync(It.IsAny<string>())).

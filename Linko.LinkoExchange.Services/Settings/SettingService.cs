@@ -286,6 +286,15 @@ namespace Linko.LinkoExchange.Services.Settings
             return null;
         } 
 
+        public string GetSettingTemplateValue(SettingType settingType)
+        {
+            var setting = _dbContext.SettingTemplates.SingleOrDefault(i => i.Name == settingType.ToString());
+            if (setting == null)
+                return string.Empty;
+
+            return setting.DefaultValue;
+        }
+
         private void HandleEntityException(DbEntityValidationException ex)
         {
             List<RuleViolation> validationIssues = new List<RuleViolation>();
@@ -303,6 +312,7 @@ namespace Linko.LinkoExchange.Services.Settings
             }
             //_logger.Info("???");
             throw new RuleViolationException("Validation errors", validationIssues);
-        } 
+        }
+
     }
 }

@@ -967,8 +967,8 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private int GetSettingIntValue(SettingType settingType, IEnumerable<SettingDto> organizationSettings, bool isMax = true)
         {
-            var defaultValueStr = _dbContext.SettingTemplates.Single(s => s.SettingTemplateId == (int)settingType).DefaultValue;
-            var defaultValue = int.Parse(defaultValueStr);
+            var defaultValueStr = _settingService.GetSettingTemplateValue(settingType);
+            var defaultValue = ValueParser.TryParseInt(defaultValueStr, 0);
             if (organizationSettings != null && organizationSettings.Any())
             {
                 defaultValue = isMax

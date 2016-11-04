@@ -17,7 +17,12 @@ namespace Linko.LinkoExchange.Test
                 cfg.AddProfile(new UserMapProfile());
                 cfg.AddProfile(new EmailAuditLogEntryMapProfile());
                 cfg.AddProfile(new InvitationMapProfile());
+                cfg.AddProfile(new OrganizationRegulatoryProgramUserDtoMapProfile());
                 cfg.AddProfile(new OrganizationMapProfile());
+                cfg.AddProfile(new OrganizationRegulatoryProgramMapProfile());
+                cfg.AddProfile(new RegulatoryProgramMapperProfile());
+                cfg.AddProfile(new PermissionGroupMapProfile());
+                cfg.AddProfile(new SettingMapProfile());
             });
 
             //Make sure there no methods were missing in the mappings loaded above via profiles

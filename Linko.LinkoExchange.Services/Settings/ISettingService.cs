@@ -10,7 +10,14 @@ namespace Linko.LinkoExchange.Services.Settings
         /// Ge the system global settings;
         /// </summary>
         /// <returns></returns>
-        IDictionary<SystemSettingType, string > GetGlobalSettings(); 
+        IDictionary<SystemSettingType, string > GetGlobalSettings();
+
+        /// <summary>
+        /// Get the default Setting template value
+        /// </summary>
+        /// <param name="settingType"></param>
+        /// <returns></returns>
+        string GetSettingTemplateValue(SettingType settingType);
 
         string GetOrganizationSettingValueByUserId(int userProfileId, SettingType settingType, bool? isChooseMin, bool? isChooseMax);
 
