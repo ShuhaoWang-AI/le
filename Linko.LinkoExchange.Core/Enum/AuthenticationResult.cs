@@ -19,28 +19,4 @@
         IncorrectAnswerToQuestion,
         AccountResetRequired
     } 
-
-    public enum RegistrationResult
-    {
-        Success,
-        Failed, 
-        InvitationExpired,
-        ProgramNotFound, 
-        ProgramDisabled,
-        BadUserProfileData,
-        BadPassword,
-        BadSecurityQuestionAndAnswer,
-        BadKBQAndAnswer,
-        NotAgreedTermsAndConditions,
-        InvalidateRegistrationToken,
-        UserAlreadyInTheProgram,
-        MissingKBQAnswer,
-        MissingSecurityQuestionAnswer,
-        DuplicatedKBQAnswer,
-        DuplicatedSecurityQuestionAnswer,
-        DuplicatedKBQ,
-        DuplicatedSecurityQuestion,
-        MissingKBQ,
-        MissingSecurityQuestion
-    }
 }

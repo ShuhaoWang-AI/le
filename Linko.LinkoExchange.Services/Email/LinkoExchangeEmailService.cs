@@ -10,10 +10,8 @@ using System.Threading.Tasks;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Dto;
 using System;
-using System.Web;
 using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
-using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Settings;
@@ -47,7 +45,6 @@ namespace Linko.LinkoExchange.Services.Email
             _programService = programService;
             _settingService = settingService;
             _requestCache = requestCache;
-
 
             _senderEmailAddres = _settingService.GetGlobalSettings()[SystemSettingType.SystemEmailEmailAddress];
             _senderFistName = _settingService.GetGlobalSettings()[SystemSettingType.SystemEmailFirstName];
@@ -128,7 +125,7 @@ namespace Linko.LinkoExchange.Services.Email
         }
         
         /// <summary>
-        /// Return receiptian log data.  If programFilters has value,  only return programIDs that exist in programFilters
+        /// Return recipient log data.  If programFilters has value,  only return programIDs that exist in programFilters
         /// </summary>
         /// <param name="email">The email address of recipient.</param>
         /// <param name="programFilters">Filter collection of program IDs</param>
@@ -254,7 +251,7 @@ namespace Linko.LinkoExchange.Services.Email
                 log.Body = body;
                 log.Subject = subject;
                 log.RecipientEmailAddress = receipientEmail;
-                log.SentDateTimeUtc = DateTime.UtcNow;
+                log.SentDateTimeUtc = DateTimeOffset.UtcNow;
             }
 
             return emailAuditLogs;

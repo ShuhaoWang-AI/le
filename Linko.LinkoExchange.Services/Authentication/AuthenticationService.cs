@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Web;
 using Microsoft.AspNet.Identity.Owin;
 using System.Threading.Tasks;
 using Linko.LinkoExchange.Services.Dto;
@@ -279,8 +278,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             var inivitationRecipintOrganizationSettings =
                 _settingService.GetOrganizationSettingsById(invitationRecipientProgram.OrganizationId);
 
-            // If nowhere defines this value, set it as 24 hrs.
-            var invitationExpirationHours = 24;
+            // If nowhere defines this value, set it as 72 hrs.
+            var invitationExpirationHours = 72;
             if (inivitationRecipintOrganizationSettings.Settings.Any())
             {
                 invitationExpirationHours = ValueParser.TryParseInt(inivitationRecipintOrganizationSettings
@@ -297,7 +296,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             
             UserProfile applicationUser = _userManager.FindByName(userInfo.UserName); 
 
-            // 2.a  Actor is already registrated with LinkoExchange  
+            // 2.a  Actor is already registration with LinkoExchange  
             bool newUserRegistration = true;
             if (applicationUser != null)
             {
@@ -350,7 +349,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                             // Create a new row in userProfile password history table 
                             _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
                             {
-                                LastModificationDateTimeUtc = DateTime.UtcNow,
+                                LastModificationDateTimeUtc = DateTimeOffset.UtcNow,
                                 PasswordHash = applicationUser.PasswordHash,
                                 UserProfileId = applicationUser.UserProfileId
                             });
@@ -364,7 +363,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     #endregion
 
                     // UC-42 6
-                    // 2 Create organziation regulatory program userProfile, and set the approved statue to false  
+                    // 2 Create organization regulatory program userProfile, and set the approved statue to false  
                     var orpu = _programService.CreateOrganizationRegulatoryProgramForUser(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId);
 
                     // UC-42 7, 8
@@ -540,7 +539,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 {
                     _userService.LockUnlockUserAccount(userProfileId, true);
                     //Get all associated authorities
-                    var userOrgs = _organizationService.GetUserRegulatories(userProfileId);
+                    var userOrgs = _organizationService.GetUserRegulators(userProfileId);
 
                     string errorString = "<div class=\"table - responsive\">";
                     errorString += "<table class=\"table no-margin\">";
@@ -656,7 +655,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <returns></returns>
         public Task<SignInResultDto> SignInByUserName(string userName, string password, bool isPersistent)
         {
-            _logger.Info("SignInByUserName. userName={0}", userName); 
+            _logger.Info(message: "SignInByUserName. userName={0}", argument: userName); 
 
             SignInResultDto signInResultDto = new SignInResultDto();
              
@@ -673,7 +672,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return Task.FromResult(signInResultDto);
             }
 
-            var regulatoryList = _organizationService.GetUserRegulatories(applicationUser.UserProfileId);
+            var regulatoryList = _organizationService.GetUserRegulators(applicationUser.UserProfileId);
             if (regulatoryList == null)
             {
                 regulatoryList = new List<AuthorityDto>();
@@ -682,7 +681,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             signInResultDto.RegulatoryList = regulatoryList;
 
             // UC-29, 2.c
-            // Check if the user is in 'passowrd lock' status
+            // Check if the user is in 'password lock' status
             if (_userManager.IsLockedOut(applicationUser.Id))
             {
                 //TODO: log failed login because of Locked to Audit (UC-2) 
@@ -745,7 +744,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 signInResultDto.AutehticationResult = AuthenticationResult.InvalidUserNameOrPassword;
             }
 
-            _logger.Info("SignInByUserName. signInStatus={0}", signInStatus.ToString());
+            _logger.Info(message: "SignInByUserName. signInStatus={0}", argument: signInStatus.ToString());
             return Task.FromResult(signInResultDto);
         }
 
@@ -765,10 +764,10 @@ namespace Linko.LinkoExchange.Services.Authentication
                     return false;
                 }
 
-                // UC-29 5.a, User account is disabled for all industry, or authorty or application admin
+                // UC-29 5.a, User account is disabled for all industry, or authority or application administrator
                 // If the user is disabled for all programs
                 if (orpus.All(u => u.IsEnabled == false) &&  //--- user is disabled for all industry and authority 
-                    userProfile.IsInternalAccount == false   //--- user is diabled for Application admin.
+                    userProfile.IsInternalAccount == false   //--- user is disabled for Application administrator.
                 )
                 {
                     // TODO: Log failed login because userProfile disabled to Audit (UC-2)
@@ -785,9 +784,11 @@ namespace Linko.LinkoExchange.Services.Authentication
                     return false;
                 }
 
-                // 6.b returned in the intermediate page call....  
+                // 6.b returned in the intermediate page call from here. 
+
             } else {
-                // If user dosen't have any program, return below message
+
+                // If user doesn't have any program, return below message
                 signInResultDto.AutehticationResult = AuthenticationResult.AccountIsNotAssociated;
                 return false;
             }
@@ -1079,32 +1080,37 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return RegistrationResult.MissingKBQ;
             }
 
-            // To validate each question has an answer 
+            // Test duplicated security questions
             if(securityQuestions.GroupBy(i=>i.Question.QuestionId).Any(i=>i.Count() > 1))
             {
                 return RegistrationResult.DuplicatedSecurityQuestion;
             }
 
+            // Test duplicated KBQ questions
             if (kbqQuestions.GroupBy(i => i.Question.QuestionId).Any(i => i.Count() > 1))
             {
                 return RegistrationResult.DuplicatedKBQ;
             }
 
+            // Test duplicated security question answers
             if (securityQuestions.GroupBy(i => i.Answer.Content).Any(i => i.Count() > 1))
             {
                 return RegistrationResult.DuplicatedSecurityQuestionAnswer;
             }
 
+            // Test duplicated KBQ question answers
             if (kbqQuestions.GroupBy(i => i.Answer.Content).Any(i => i.Count() > 1))
             {
                 return RegistrationResult.DuplicatedKBQAnswer;
             }
 
+            // Test security questions mush have answer
             if (securityQuestions.Any(i=>i.Answer == null))
             {
                 return RegistrationResult.MissingSecurityQuestionAnswer;
             }
 
+            // Test KBQ questions mush have answer
             if (kbqQuestions.Any(i => i.Answer == null))
             {
                 return RegistrationResult.MissingKBQAnswer; 

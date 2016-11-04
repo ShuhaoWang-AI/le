@@ -41,7 +41,9 @@ namespace Linko.LinkoExchange.Services.Permission
             try
             {
                 var users = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
-                .Where(u => u.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId && u.PermissionGroup.Name == "Administrator");
+                .Where(u => u.IsRemoved == false && 
+                            u.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId && 
+                            u.PermissionGroup.Name == "Administrator");
 
                 var userProfileIds = users.Select(i => i.UserProfileId).Distinct();
                 var userProfiles = _dbContext.Users.Where(i => userProfileIds.Contains(i.UserProfileId)).ToList();

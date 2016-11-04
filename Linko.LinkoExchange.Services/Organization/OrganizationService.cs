@@ -82,11 +82,11 @@ namespace Linko.LinkoExchange.Services
         }
 
         /// <summary>
-        /// Return all the programs' regulatory list for the user
+        /// Return all the programs' regulators list for the user
         /// </summary>
         /// <param name="userId">The user Id</param>
         /// <returns>The organizationId </returns>
-        public IEnumerable<AuthorityDto> GetUserRegulatories(int userId)
+        public IEnumerable<AuthorityDto> GetUserRegulators(int userId)
         {
             try
             {
@@ -334,8 +334,7 @@ namespace Linko.LinkoExchange.Services
         {
             return _dbContext.Jurisdictions.Single(j => j.JurisdictionId == jurisdictionId);
         }
-
-
+        
         private void HandleEntityException(DbEntityValidationException ex)
         {
             List<RuleViolation> validationIssues = new List<RuleViolation>();
@@ -354,9 +353,7 @@ namespace Linko.LinkoExchange.Services
             //_logger.Info("???");
             throw new RuleViolationException("Validation errors", validationIssues);
         }
-
-
-        
+                
         public int GetRemainingUserLicenseCount(int orgRegProgramId, bool isForAuthority)
         {
             int maxCount;

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.User;
 using System.Linq;
 using AutoMapper;
 using Linko.LinkoExchange.Core.Domain;
@@ -29,7 +28,10 @@ namespace Linko.LinkoExchange.Services.Program
         /// <returns>A collection of programs</returns>
         public IEnumerable<OrganizationRegulatoryProgramDto> GetUserRegulatoryPrograms(int userId)
         {
-            var orp = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Include("OrganizationRegulatoryProgram").Where(i => i.UserProfileId == userId).ToList();
+            var orp = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Include("OrganizationRegulatoryProgram")
+                                    .Where(i => i.IsRemoved == false && 
+                                           i.OrganizationRegulatoryProgram.IsRemoved == false && 
+                                           i.UserProfileId == userId).ToList();
             return orp.Select(i=>
             {
                 return _mapper.Map<OrganizationRegulatoryProgramDto>(i);

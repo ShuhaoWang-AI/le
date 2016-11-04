@@ -36,14 +36,7 @@ namespace Linko.LinkoExchange.Core.Enum
 
         //PasswordExpiredDays = 16,
         //DaysBeforeRequirePasswordChanging = 17,
-        //EmailServer = 18,
-        //SupportPhoneNumber = 19,
-        //SupportEmail = 20,
-        //SystemEmailEmailAddress = 21,
-        //SystemEmailFirstName = 22,
-        //SystemEmailLastName = 23,
-
-
+        //EmailServer = 18,  
     }
 
 }

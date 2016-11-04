@@ -8,11 +8,13 @@ namespace Linko.LinkoExchange.Services.Authentication
     public interface IAuthenticationService
     {
         /// <summary>
-        /// Create a new user
+        /// Register a new user
         /// </summary>
-        /// <param name="userInfo">The user information</param>
-        /// <param name="registrationToken">The registration token</param>
-        /// <returns>The authentication result</returns>
+        /// <param name="userInfo">The user information object</param>
+        /// <param name="registrationToken">The registration token string</param>
+        /// <param name="securityQuestions">Security questions and answers</param>
+        /// <param name="kbqQuestions">KBQ question and answers</param>
+        /// <returns></returns>
         Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<QuestionAnswerPairDto> securityQuestions, IEnumerable<QuestionAnswerPairDto> kbqQuestions); 
 
         // Change or reset password

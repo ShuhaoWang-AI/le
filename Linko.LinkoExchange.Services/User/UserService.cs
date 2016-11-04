@@ -344,7 +344,7 @@ namespace Linko.LinkoExchange.Services.User
             var contentReplacements = new Dictionary<string, string>();
 
             //Find all possible authorities
-            var authorities = _orgService.GetUserRegulatories(userProfileId);
+            var authorities = _orgService.GetUserRegulators(userProfileId);
             var authorityList = "";
             var newLine = "";
             foreach (var authority in authorities)

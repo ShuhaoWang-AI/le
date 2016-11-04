@@ -16,11 +16,11 @@ namespace Linko.LinkoExchange.Services.Organization
         IEnumerable<OrganizationRegulatoryProgramDto> GetUserOrganizations(int userId);
 
         /// <summary>
-        /// Get the regulatories list that the user belonged to.
+        /// Get the regulators list that the user belonged to.
         /// </summary>
         /// <param name="userId">The user Id.</param>
         /// <returns></returns>
-        IEnumerable<AuthorityDto> GetUserRegulatories(int userId);
+        IEnumerable<AuthorityDto> GetUserRegulators(int userId);
 
             /// <summary>
         /// Get the organization by organization id
@@ -54,7 +54,5 @@ namespace Linko.LinkoExchange.Services.Organization
         int GetRemainingIndustryLicenseCount(int orgRegProgramId);
 
         OrganizationRegulatoryProgramDto GetAuthority(int orgRegProgramId);
-
-
     }
 }

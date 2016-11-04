@@ -26,26 +26,20 @@ namespace Linko.LinkoExchange.Services.Settings
 
         #endregion
 
-        public SettingService(LinkoExchangeContext dbContext
-            //, IAuditLogEntry logger
-            , IMapper mapper)
+        public SettingService(LinkoExchangeContext dbContext, IMapper mapper)
         {
-            _dbContext = dbContext;
-         //   _logger = logger;
+            _dbContext = dbContext; 
             _mapper = mapper;
+            
 
-
-            //TODO: get system global settings 
-            _globalSettings.Add(SystemSettingType.PasswordExpiredDays, "90");
-            //_globalSettings.Add(SystemSettingType.FailedPasswordAttemptMaxCount, "3"); Organization Setting!
-            //_globalSettings.Add(SystemSettingType.PasswordHistoryMaxCount, "10"); Organization Setting!
+            //TODO get from DB
+            _globalSettings.Add(SystemSettingType.PasswordExpiredDays, "90"); 
             _globalSettings.Add(SystemSettingType.EmailServer, "6");
             _globalSettings.Add(SystemSettingType.SupportPhoneNumber, "+1-604-418-3201");
             _globalSettings.Add(SystemSettingType.SupportEmailAddress, "support@linkoExchange.com");
             _globalSettings.Add(SystemSettingType.SystemEmailEmailAddress, "shuhao.wang@watertrax.com");
             _globalSettings.Add(SystemSettingType.SystemEmailFirstName, "LinkoExchange");
-            _globalSettings.Add(SystemSettingType.SystemEmailLastName, "System"); 
-
+            _globalSettings.Add(SystemSettingType.SystemEmailLastName, "System");  
         }
 
         /// <summary>
@@ -67,21 +61,7 @@ namespace Linko.LinkoExchange.Services.Settings
             return orgSettingsDtoList;
         }
 
-        /// <summary>
-        /// Get the organization settings by organization Id
-        /// </summary>
-        /// <param name="organizationId"></param>
-        /// <returns>OrganizationSettingDto object</returns>
-  //      public OrganizationSettingDto GetOrganizationSettingsById(int organizationId)
-		//{
-		//	return new OrganizationSettingDto
-		//	{
-		//		OrganizationId = 100,
-		//		Settings = GetMockData()
-		//	};
-		//}
         public OrganizationSettingDto GetOrganizationSettingsById(int organizationId)
-        //GetOrganizationSettingsById_actual(int organizationId)
         {
             var orgSettingDto = new OrganizationSettingDto() { OrganizationId = organizationId };
             orgSettingDto.Settings = new List<SettingDto>();
@@ -211,28 +191,8 @@ namespace Linko.LinkoExchange.Services.Settings
 	    public int PasswordLockoutHours()
 	    {
             return 24;
-            //var settingType = SettingType.DefaultAccountLockoutTimeSpan; // setting does not currently exist 
-            //if (!_globalSettings.ContainsKey(settingType))
-            //{
-            //    return 24;
-            //}
-
-            //return int.Parse(_globalSettings[settingType]);
         }
-
-	    public ICollection<ProgramSettingDto> GetProgramSettingsByIds_actual(IEnumerable<int> programIds)
-        {
-            var settingDtoList = new List<ProgramSettingDto>();
-            if (programIds != null)
-            {
-                foreach (var programId in programIds)
-                {
-                    settingDtoList.Add(GetProgramSettingsById(programId));
-                }
-            }
-            return settingDtoList;
-        }
-
+        
         /// <summary>
         /// Get application global settings.
         /// </summary>

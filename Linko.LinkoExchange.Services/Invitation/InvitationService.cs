@@ -51,44 +51,9 @@ namespace Linko.LinkoExchange.Services.Invitation
             return _mapper.Map<InvitationDto>(invitation); 
         }
 
-        /// <summary>
-        /// Get the program of the invitation
-        /// </summary>
-        /// <param name="invitationId">Invitation id</param>
-        /// <returns>The program of the invitation</returns>
-        public ProgramDto GetInvitationProgram(string invitationId)
-        {
-            // TODO
-            return new ProgramDto
-            {
-                RegulatoryProgramId = 1000,
-                Name = "Mock program name"
-            };
-        }
-
         public IEnumerable<OrganizationDto> GetInvitationrRecipientOrganization(string invitationId)
         {
             throw new System.NotImplementedException();
-        }
-
-        /// <summary>
-        /// Get the organization of the invitation
-        /// </summary>
-        /// <param name="invitationId">Invitation id</param>
-        /// <returns>The organization of the invitation</returns>
-        public IEnumerable<OrganizationDto> GetInvitationrOrganizations(string invitationId)
-        {
-            // TODO
-            var list = new List<OrganizationDto>
-            {
-                new OrganizationDto
-                {
-                    OrganizationId = 1000,
-                    OrganizationName = "Mock organization name"
-                }
-            };
-
-            return list;
         }
 
         public void CreateInvitation_OLD(InvitationDto inviteDto)

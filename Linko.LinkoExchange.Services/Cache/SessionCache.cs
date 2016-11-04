@@ -1,5 +1,4 @@
-﻿using Linko.LinkoExchange.Services.Authentication;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Security.Claims;
 using System.Web;
 
@@ -24,8 +23,7 @@ namespace Linko.LinkoExchange.Services.Cache
             if (value != null) return value;
 
             return string.Empty; 
-        }
-         
+        }         
 
         public string GetClaimValue(string claimType)
         {

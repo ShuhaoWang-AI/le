@@ -94,12 +94,12 @@
     <Compile Include="Domain\UserProfile.cs" />
     <Compile Include="Domain\UserQuestionAnswer.cs" />
     <Compile Include="Enum\AuthenticationResult.cs" />
-    <Compile Include="Enum\CacheKey.cs" />
     <Compile Include="Enum\CurrentUserInfo.cs" />
     <Compile Include="Enum\EmailType.cs" />
     <Compile Include="Enum\InvitationError.cs" />
     <Compile Include="Enum\LinkoExchangeError.cs" />
     <Compile Include="Enum\InvitationType.cs" />
+    <Compile Include="Enum\RegistrationResult.cs" />
     <Compile Include="Enum\SettingType.cs" />
     <Compile Include="Enum\SystemSettingType.cs" />
     <Compile Include="Enum\UserRole.cs" />

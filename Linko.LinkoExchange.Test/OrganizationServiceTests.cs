@@ -76,7 +76,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_GetUserRegulatories()
         {
-            var orgs = orgService.GetUserRegulatories(1); 
+            var orgs = orgService.GetUserRegulators(1); 
 
         }
 
@@ -109,7 +109,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetUserRegulatories()
         {
-            var dto = orgService.GetUserRegulatories(13);
+            var dto = orgService.GetUserRegulators(13);
         }
 
     }
