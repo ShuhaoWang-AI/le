@@ -426,7 +426,9 @@
     <Compile Include="ViewModels\Account\RegisterViewModel.cs" />
     <Compile Include="ViewModels\Account\ResetPasswordViewModel.cs" />
     <Compile Include="ViewModels\Account\SignInViewModel.cs" />
+    <Compile Include="ViewModels\Authority\IndustryUserPendingInvitationViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
+    <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
     <Compile Include="ViewModels\Industry\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Shared\ConfirmationViewModel.cs" />
   </ItemGroup>
@@ -452,7 +454,8 @@
     <Content Include="Views\Account\ResetPassword.cshtml" />
     <Content Include="Views\Authority\Industries.cshtml" />
     <Content Include="Views\Authority\IndustryDetails.cshtml" />
-    <Content Include="Views\Industry\IndustrySettings.cshtml" />
+    <Content Include="Views\Industry\Settings.cshtml" />
+    <Content Include="Views\Authority\IndustryUsers.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

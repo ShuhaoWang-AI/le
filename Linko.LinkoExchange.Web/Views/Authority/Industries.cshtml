@@ -19,8 +19,7 @@
                 <div class="col-sm-3 col-md-1">
                     <input type="checkbox" name="onOffSwitchSearchControl" class="onoffswitch" checked="checked"
                             data-on-text="Advanced" 
-                            data-off-text="Basic"
-                            data-size="large" />
+                            data-off-text="Basic" />
                 </div>
                 <div class="col-sm-1">
                 </div>
@@ -36,6 +35,7 @@
             </div>
             <div class="form-group">
                 <div class="col-md-12">
+                    @* grid name should be start with grid for centralized error handling *@
                     @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Authority.IndustryViewModel>()
                           .Name(componentName: "grid")
                           .Columns(columns =>
@@ -65,7 +65,7 @@
                                      .HeaderHtmlAttributes(new { @class = "col-sm-1" })
                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
                               columns.Template(m => { })
-                                     .ClientTemplate(value: "<div class='fa fa-chevron-circle-right fa-lg pull-right'></div>")
+                                     .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
                                      .Width(pixelWidth: 60);
                           })
                           .Pageable(pageable => pageable
@@ -100,6 +100,7 @@
                                   searchString = @ViewBag.SearchString
                               }))
                               .PageSize(pageSize: 15)
+                              .Events(events => events.Error(handler: "error_handler"))
                           )
                     )
                 </div>
@@ -110,7 +111,6 @@
 
 
 @section Scripts {
-    @Scripts.Render(paths: "~/bundles/jqueryval")
     <script type="text/javascript">
         $(document).ready(function ()
         {

@@ -1,11 +1,7 @@
-﻿using Linko.LinkoExchange.Services.Dto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Linko.LinkoExchange.Services.Dto;
 
-namespace Linko.LinkoExchange.Services
+namespace Linko.LinkoExchange.Services.QuestionAnswer
 {
     /// <summary>
     /// 

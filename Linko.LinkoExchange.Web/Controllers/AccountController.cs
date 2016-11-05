@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
-using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.ViewModels.Account;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
@@ -58,7 +57,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AllowAnonymous]
         public ActionResult Index()
         {
-            if(Request.IsAuthenticated)
+            if (Request.IsAuthenticated)
             {
                 return RedirectToAction(actionName: "UpdateUser"); // TODO: change to appropriate action
             }
@@ -91,7 +90,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> SignIn(SignInViewModel model, string returnUrl = null)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(model);
             }
@@ -100,7 +99,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 var result = await _authenticationService.SignInByUserName(model.UserName, model.Password, false);
 
-                switch(result.AutehticationResult)
+                switch (result.AutehticationResult)
                 {
                     case AuthenticationResult.Success:
                         HttpCookie cookie = new HttpCookie(name: "lastSignInName", value: model.UserName);
@@ -138,7 +137,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 }
 
             }
-            catch(RuleViolationException rve)
+            catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
             }
@@ -156,15 +155,15 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.Title = "Account Locked";
             model.HtmlStr = Core.Resources.Message.AccountLocked + "<br/>";
 
-            if(TempData["RegulatoryList"] != null)
+            if (TempData["RegulatoryList"] != null)
             {
-                var regulatoryList = TempData["RegulatoryList"] as IEnumerable<OrganizationDto>;
+                var regulatoryList = TempData["RegulatoryList"] as IEnumerable<AuthorityDto>;
 
                 model.HtmlStr += "<div class=\"table-responsive\">";
                 model.HtmlStr += "<table class=\"table no-margin\">";
                 model.HtmlStr += "<tbody>";
 
-                foreach(AuthorityDto regulator in regulatoryList)
+                foreach (AuthorityDto regulator in regulatoryList)
                 {
                     model.HtmlStr += "<tr><td>" + regulator.EmailContactInfoName + "</td><td>" + regulator.EmailContactInfoEmailAddress + "</td><td>" + regulator.EmailContactInfoPhone + " </td></tr>";
                 }
@@ -173,7 +172,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 model.HtmlStr += "</table>";
                 model.HtmlStr += "</div>";
             }
-            else if(TempData["Message"] != null)
+            else if (TempData["Message"] != null)
             {
                 model.HtmlStr += TempData["Message"] as string;
             }
@@ -216,15 +215,15 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.Title = "Account Disabled";
             model.HtmlStr = Core.Resources.Message.UserAccountDisabled + "<br/>";
 
-            if(TempData["RegulatoryList"] != null)
+            if (TempData["RegulatoryList"] != null)
             {
-                var regulatoryList = TempData["RegulatoryList"] as IEnumerable<OrganizationDto>;
+                var regulatoryList = TempData["RegulatoryList"] as IEnumerable<AuthorityDto>;
 
                 model.HtmlStr += "<div class=\"table-responsive\">";
                 model.HtmlStr += "<table class=\"table no-margin\">";
                 model.HtmlStr += "<tbody>";
 
-                foreach(AuthorityDto regulator in regulatoryList)
+                foreach (AuthorityDto regulator in regulatoryList)
                 {
                     model.HtmlStr += "<tr><td>" + regulator.EmailContactInfoName + "</td><td>" + regulator.EmailContactInfoEmailAddress + "</td><td>" + regulator.EmailContactInfoPhone + " </td></tr>";
                 }
@@ -247,15 +246,15 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.Title = "Account Is Not Associated";
             model.HtmlStr = Core.Resources.Message.AccountIsNotAssociated + "<br/>";
 
-            if(TempData["RegulatoryList"] != null)
+            if (TempData["RegulatoryList"] != null)
             {
-                var regulatoryList = TempData["RegulatoryList"] as IEnumerable<OrganizationDto>;
+                var regulatoryList = TempData["RegulatoryList"] as IEnumerable<AuthorityDto>;
 
                 model.HtmlStr += "<div class=\"table-responsive\">";
                 model.HtmlStr += "<table class=\"table no-margin\">";
                 model.HtmlStr += "<tbody>";
 
-                foreach(AuthorityDto regulator in regulatoryList)
+                foreach (AuthorityDto regulator in regulatoryList)
                 {
                     model.HtmlStr += "<tr><td>" + regulator.EmailContactInfoName + "</td><td>" + regulator.EmailContactInfoEmailAddress + "</td><td>" + regulator.EmailContactInfoPhone + " </td></tr>";
                 }
@@ -292,12 +291,12 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             var result = _organizationService.GetUserOrganizations();
 
-            if(result.Count() == 1)
+            if (result.Count() == 1)
             {
                 _authenticationService.SetClaimsForOrgRegProgramSelection(result.First().OrganizationRegulatoryProgramId);
                 return RedirectToAction(actionName: "Index", controllerName: "Home");
             }
-            else if(result.Count() > 1)
+            else if (result.Count() > 1)
             {
                 model.Authorities =
                     result
@@ -343,7 +342,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     newurl = Url.Action(actionName: "Index", controllerName: "Home")
                 });
             }
-            catch(RuleViolationException rve)
+            catch (RuleViolationException rve)
             {
                 return Json(new
                 {
@@ -369,13 +368,13 @@ namespace Linko.LinkoExchange.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
                     var result = await _authenticationService.RequestResetPassword(model.UserName);
 
-                    switch(result.Result)
+                    switch (result.Result)
                     {
                         case AuthenticationResult.Success:
                             _logger.Info(string.Format(format: "ForgotPassword. successfully sent reset email for User={0}.", arg0: model.UserName));
@@ -388,7 +387,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                             break;
                     }
                 }
-                catch(RuleViolationException rve)
+                catch (RuleViolationException rve)
                 {
                     MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
                 }
@@ -425,13 +424,13 @@ namespace Linko.LinkoExchange.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ForgotUserName(ForgotUserNameViewModel model)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
                     var result = await _authenticationService.RequestUsernameEmail(model.EmailAddress);
 
-                    switch(result.Result)
+                    switch (result.Result)
                     {
                         case AuthenticationResult.Success:
                             _logger.Info(string.Format(format: "ForgotUserName. Successfully sent reset email for {0}.", arg0: model.EmailAddress));
@@ -444,7 +443,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                             break;
                     }
                 }
-                catch(RuleViolationException rve)
+                catch (RuleViolationException rve)
                 {
                     MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
                 }
@@ -473,7 +472,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AllowAnonymous]
         public ActionResult ResetPassword(string token)
         {
-            if(token == null)
+            if (token == null)
             {
                 return View(viewName: "Error");
             }
@@ -501,14 +500,14 @@ namespace Linko.LinkoExchange.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
             var result = await _authenticationService.ResetPasswordAsync(model.Token, model.Id, model.Answer, model.FailedCount, model.Password);
 
-            switch(result.Result)
+            switch (result.Result)
             {
                 case AuthenticationResult.Success:
                     _logger.Info(string.Format(format: "ResetPassword. Password for {0} has been successfully reset.", arg0: model.Token));
@@ -517,7 +516,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 // Can Not Use Old Password
                 case AuthenticationResult.CanNotUseOldPassword:
                     _logger.Info(string.Format(format: "ResetPassword. Can not use old password for Token = {0}.", arg0: model.Token));
-                    foreach(var error in result.Errors)
+                    foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(key: "", errorMessage: error);
                     }
@@ -525,9 +524,13 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 // incorrect answer
                 case AuthenticationResult.IncorrectAnswerToQuestion:
+                    ModelState.Remove(key: "FailedCount"); // if you don't remove then hidden field does not update on post-back 
                     model.FailedCount++;
                     _logger.Info(string.Format(format: "ResetPassword. Failed for Token = {0}.", arg0: model.Token));
-                    ModelState.AddModelError(key: "", errorMessage: ""); // should come from service as ErrorMessage
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(key: "", errorMessage: error);
+                    }
                     return View(model);
 
                 // User is got locked
@@ -540,7 +543,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                 case AuthenticationResult.ExpiredRegistrationToken:
                 default:
                     _logger.Info(string.Format(format: "ResetPassword. Failed for Token = {0}.", arg0: model.Token));
-                    ModelState.AddModelError(key: "", errorMessage: ""); // should come from service as ErrorMessage
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(key: "", errorMessage: error);
+                    }
                     return View(model);
             }
         }
@@ -576,7 +582,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private void AddErrors(IEnumerable<string> errors)
         {
-            foreach(var error in errors)
+            foreach (var error in errors)
             {
                 ModelState.AddModelError(key: "", errorMessage: error);
             }
@@ -584,7 +590,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult RedirectToLocal(string returnUrl)
         {
-            if(Url.IsLocalUrl(returnUrl))
+            if (Url.IsLocalUrl(returnUrl))
             {
                 return Redirect(returnUrl);
             }

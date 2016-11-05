@@ -6,7 +6,9 @@ using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.ViewModels.Authority;
 using NLog;
@@ -19,12 +21,16 @@ namespace Linko.LinkoExchange.Web.Controllers
         #region constructor
         
         private readonly IOrganizationService _organizationService;
+        private readonly IUserService _userService;
+        private readonly IInvitationService _invitationService;        
         private readonly ISessionCache _sessionCache;
         private readonly ILogger _logger;
 
-        public AuthorityController(IOrganizationService organizationService, ISessionCache sessionCache, ILogger logger)
+        public AuthorityController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService, ISessionCache sessionCache, ILogger logger)
         {
             _organizationService = organizationService;
+            _userService = userService;
+            _invitationService = invitationService;
             _sessionCache = sessionCache;
             _logger = logger;
         }
@@ -118,7 +124,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     return Json(new
                     {
                         redirect = false,
-                        message = "Please select a Industry."
+                        message = "Please select an industry."
                     });
                 }
             }
@@ -227,5 +233,142 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
         #endregion
 
+
+
+        #region Show Industry Users
+
+        // GET: /Authority/IndustryUsers
+        [Route("Industry/{id:int}/Users")]
+        public ActionResult IndustryUsers(int id=2)
+        {
+            ViewBag.IndustryId = id;
+            var industry = _organizationService.GetOrganizationRegulatoryProgram(id);
+            ViewBag.Title = industry.OrganizationDto.OrganizationName;
+            return View();
+        }
+        
+        public ActionResult IndustryUsers_Read([DataSourceRequest] DataSourceRequest request, string industryId)
+        {
+            var organizationRegulatoryProgramId = int.Parse(industryId);
+            var users = _userService.GetUserProfilesForOrgRegProgram(organizationRegulatoryProgramId, isRegApproved: true, isRegDenied: false, isEnabled: null, isRemoved: false);
+
+            var viewModels = users.Select(vm => new IndustryUserViewModel
+            {
+                ID = vm.OrganizationRegulatoryProgramUserId,
+                FirstName = vm.UserProfileDto.FirstName,
+                LastName = vm.UserProfileDto.LastName,
+                PhoneNumber = vm.UserProfileDto.PhoneNumber,
+                Email = vm.UserProfileDto.Email,
+                DateRegistered = vm.RegistrationDateTime.Value.DateTime,
+                Status = vm.IsEnabled,
+                AccountLocked = vm.UserProfileDto.IsAccountLocked
+            });
+
+            DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
+            {
+                ID = vm.ID,
+                FirstName = vm.FirstName,
+                LastName = vm.LastName,
+                PhoneNumber = vm.PhoneNumber,
+                Email = vm.Email,
+                DateRegistered = vm.DateRegistered,
+                StatusText = vm.StatusText,
+                AccountLockedText = vm.AccountLockedText
+            });
+
+            return Json(result);
+        }
+        
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult IndustryUsers_Select(IEnumerable<IndustryUserViewModel> items)
+        {
+            try
+            {
+                if (items != null && ModelState.IsValid)
+                {
+                    var item = items.First();
+                    return Json(new
+                    {
+                        redirect = true,
+                        newurl = Url.Action(actionName: "IndustryUserDetails", controllerName: "Authority", routeValues: new
+                        {
+                            id = item.ID
+                        })
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        redirect = false,
+                        message = "Please select an user."
+                    });
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                return Json(new
+                {
+                    redirect = false,
+                    message = MvcValidationExtensions.GetViolationMessages(rve)
+                });
+            }
+        }
+        
+        public ActionResult IndustryUsers_PendingInvitations_Read([DataSourceRequest] DataSourceRequest request, string industryId)
+        {
+            var organizationRegulatoryProgramId = int.Parse(industryId);
+            var invitations = _invitationService.GetInvitationsForOrgRegProgram(organizationRegulatoryProgramId);
+
+            var viewModels = invitations.Select(vm => new IndustryUserPendingInvitationViewModel
+            {
+                ID = vm.InvitationId,
+                FirstName = vm.FirstName,
+                LastName = vm.LastName,
+                Email = vm.EmailAddress,
+                DateInvited = vm.InvitationDateTimeUtc.DateTime,
+                InviteExpires = vm.ExpiryDateTimeUtc.DateTime,
+                CanInvite = true
+            });
+
+            DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
+            {
+                ID = vm.ID,
+                FirstName = vm.FirstName,
+                LastName = vm.LastName,
+                Email = vm.Email,
+                DateInvited = vm.DateInvited,
+                InviteExpires = vm.InviteExpires,
+                CanInvite = true
+            });
+
+            return Json(result);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult IndustryUsers_PendingInvitations_Delete([DataSourceRequest] DataSourceRequest request, [Bind(Prefix = "models")]IEnumerable<IndustryUserPendingInvitationViewModel> items)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(items.ToDataSourceResult(request, ModelState));
+            }
+
+            try
+            {
+                if (items.Any())
+                {
+                    var item = items.First();
+
+                    _invitationService.DeleteInvitation(item.ID);
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
+            }
+
+            return Json(items.ToDataSourceResult(request, ModelState));
+        }
+        #endregion
     }
 }

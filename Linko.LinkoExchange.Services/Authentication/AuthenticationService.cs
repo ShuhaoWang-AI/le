@@ -1,27 +1,28 @@
 ﻿using System;
-using Microsoft.AspNet.Identity.Owin;
-using System.Threading.Tasks;
-using Linko.LinkoExchange.Services.Dto;
-using Linko.LinkoExchange.Services.AuditLog;
-using Microsoft.AspNet.Identity;
-using Microsoft.Owin.Security;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Security.Claims;
-using Linko.LinkoExchange.Services.Email;
-using Linko.LinkoExchange.Services.Settings;
+using System.Threading.Tasks;
+using AutoMapper;
 using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
-using Linko.LinkoExchange.Services.Invitation;
-using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Email;
+using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Permission;
+using Linko.LinkoExchange.Services.Program;
+using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.User;
-using Linko.LinkoExchange.Services.Cache;
-using AutoMapper;
-using System.Configuration;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
 using NLog;
 
 namespace Linko.LinkoExchange.Services.Authentication
@@ -487,7 +488,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             var authenticationResult = new AuthenticationResultDto();
            
-            var emailAuditLog = _dbContext.EmailAuditLog.SingleOrDefault(e => e.Token == resetPasswordToken);
+            var emailAuditLog = _dbContext.EmailAuditLog.FirstOrDefault(e => e.Token == resetPasswordToken);
 
             if(emailAuditLog == null)
             {

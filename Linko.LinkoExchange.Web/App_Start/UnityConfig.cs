@@ -1,29 +1,31 @@
 using System;
+using System.Configuration;
 using System.Web;
-using Microsoft.Practices.Unity;
-using Linko.LinkoExchange.Services.Authentication;
-using Microsoft.Owin.Security;
+using AutoMapper;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Core.Logging;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services;
-using Linko.LinkoExchange.Services.Settings;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.AspNet.Identity;
-using Linko.LinkoExchange.Services.Program;
-using Linko.LinkoExchange.Core.Logging;
-using NLog;
-using AutoMapper;
-using Linko.LinkoExchange.Services.Permission;
-using Linko.LinkoExchange.Services.Email;
-using System.Configuration;
-using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.AutoMapperProfile;
-using Linko.LinkoExchange.Services.User;
-using Linko.LinkoExchange.Services.Dto;
-using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Permission;
+using Linko.LinkoExchange.Services.Program;
+using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.TimeZone;
+using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Web.Mvc;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.Owin.Security;
+using Microsoft.Practices.Unity;
+using NLog;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -85,7 +87,9 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IRequestCache, RequestCache>();
             container.RegisterType<ISessionCache, SessionCache>();
             container.RegisterType<IQuestionAnswerService, QuestionAnswerService>();
-            
+            container.RegisterType<ITimeZoneService, TimeZoneService>();
+            container.RegisterType<IEncryptionService, EncryptionService>();
+
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
             container.RegisterType<ApplicationUserManager>(); 

@@ -1,21 +1,19 @@
-﻿using AutoMapper;
-using Linko.LinkoExchange.Core.Domain;
-using Linko.LinkoExchange.Core.Validation;
-using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.Dto;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
-using Linko.LinkoExchange.Services.Organization;
-using Linko.LinkoExchange.Services.User;
-using Linko.LinkoExchange.Services.Settings;
-using Linko.LinkoExchange.Core.Extensions;
+using AutoMapper;
 using Linko.LinkoExchange.Core.Common;
+using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Extensions;
+using Linko.LinkoExchange.Core.Validation;
+using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Settings;
 
-namespace Linko.LinkoExchange.Services
+namespace Linko.LinkoExchange.Services.Organization
 {
     public class OrganizationService : IOrganizationService
     {

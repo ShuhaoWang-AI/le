@@ -1,12 +1,11 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Linko.LinkoExchange.Services;
-using Linko.LinkoExchange.Data;
+﻿using System.Configuration;
 using AutoMapper;
+using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.AutoMapperProfile;
-using System.Configuration;
-using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Linko.LinkoExchange.Test
 {

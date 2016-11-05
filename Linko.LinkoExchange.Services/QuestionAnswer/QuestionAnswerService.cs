@@ -1,18 +1,17 @@
-﻿using Linko.LinkoExchange.Core.Domain;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
+using System.Linq;
+using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Extensions;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity.Infrastructure;
-using System.Data.Entity.Validation;
-using System.Data.Entity;
-using System.Linq;
-using Linko.LinkoExchange.Services.QuestionAnswer;
 using Microsoft.AspNet.Identity;
 
-namespace Linko.LinkoExchange.Services
+namespace Linko.LinkoExchange.Services.QuestionAnswer
 {
     public class QuestionAnswerService : IQuestionAnswerService
     {
@@ -350,7 +349,7 @@ namespace Linko.LinkoExchange.Services
         public QuestionAnswerPairDto GetRandomQuestionAnswerFromToken(string token, Dto.QuestionType questionType)
         {
             //Find UserProfileId from EmailAuditLog.Recipient
-            var emailAuditLog = _dbContext.EmailAuditLog.SingleOrDefault(e => e.Token == token);
+            var emailAuditLog = _dbContext.EmailAuditLog.FirstOrDefault(e => e.Token == token);
             if (emailAuditLog != null && emailAuditLog.RecipientUserProfileId.HasValue)
             {
                 var userProfileId = emailAuditLog.RecipientUserProfileId;

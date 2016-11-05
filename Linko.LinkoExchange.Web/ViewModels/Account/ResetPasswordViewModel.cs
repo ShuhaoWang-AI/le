@@ -7,6 +7,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Account
     [Validator(typeof(ResetPasswordValidator))]
     public class ResetPasswordViewModel
     {
+        [ScaffoldColumn(false)]
         public int Id
         {
             get; set;
@@ -36,10 +37,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Account
             get; set;
         }
 
+        [ScaffoldColumn(false)]
         public string Token
         {
             get; set;
         }
+
+        [ScaffoldColumn(false)]
         public int FailedCount
         {
             get; set;

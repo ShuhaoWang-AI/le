@@ -1,21 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
 using System.Linq;
 using AutoMapper;
-using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Core.Domain;
-using System;
-using Linko.LinkoExchange.Core.Validation;
-using System.Data.Entity.Validation;
-using System.Data.Entity.Infrastructure;
-using Linko.LinkoExchange.Services.Settings;
-using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Validation;
+using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.Organization;
-using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
+using Linko.LinkoExchange.Services.User;
 
 namespace Linko.LinkoExchange.Services.Invitation
 {
@@ -283,6 +282,7 @@ namespace Linko.LinkoExchange.Services.Invitation
         {             
             var obj = _dbContext.Invitations.Find(invitationId);  
             _dbContext.Invitations.Remove(obj);
+            _dbContext.SaveChanges();
         }
     }
 }

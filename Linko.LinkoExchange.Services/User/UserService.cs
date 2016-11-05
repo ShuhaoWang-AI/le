@@ -1,24 +1,18 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.AuditLog;
-using Microsoft.AspNet.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Linko.LinkoExchange.Core.Extensions;
-using Linko.LinkoExchange.Services.Dto;
 using AutoMapper;
-using System.Web;
-using Linko.LinkoExchange.Services.Cache;
-using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Extensions;
+using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
-using Linko.LinkoExchange.Services.Settings;
-using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
+using Microsoft.AspNet.Identity;
 
 namespace Linko.LinkoExchange.Services.User
 {

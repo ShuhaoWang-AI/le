@@ -89,7 +89,8 @@ error_handler = function (e)
 {
     if (e.errors)
     {
-        var message = "Errors:\n";
+        var message = "There are some errors:\n";
+        // Create a message containing all errors.
         $.each(e.errors, function (key, value)
         {
             if ('errors' in value)
@@ -101,7 +102,12 @@ error_handler = function (e)
             }
         });
 
+        // Display the message.
         showPopupMessage(message);
+
+        // Cancel the changes.
+        var grid = $("[name^='grid']").data("kendoGrid");
+        grid.cancelChanges();
     }
 }
 
