@@ -249,10 +249,22 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="kbqQuestions">KBQ questions</param>
         /// <returns>Registration results.</returns>
         public async Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<QuestionAnswerPairDto> securityQuestions, IEnumerable<QuestionAnswerPairDto> kbqQuestions)
-        { 
+        {
+            var registrationResult = new RegistrationResultDto(); 
+            if( userInfo == null)
+            {
+                registrationResult.Result = RegistrationResult.BadUserProfileData;
+                return registrationResult; 
+            }
+
+            if (string.IsNullOrWhiteSpace(registrationToken))
+            {
+                registrationResult.Result = RegistrationResult.InvalidateRegistrationToken;
+                return registrationResult;
+            }
+
             _logger.Info("Register. userName={0}, email={1}",userInfo.UserName, registrationToken); 
 
-            var registrationResult = new RegistrationResultDto();
 
             var validatResult = ValidateRegistrationUserData(userInfo, securityQuestions, kbqQuestions);
             if (validatResult != RegistrationResult.Success)
