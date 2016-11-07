@@ -10,6 +10,10 @@ using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using Microsoft.AspNet.Identity;
+using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Email;
 
 namespace Linko.LinkoExchange.Services.QuestionAnswer
 {
@@ -20,15 +24,24 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         private readonly IHttpContextService _httpContext;
         private readonly IEncryptionService _encryption;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly ISettingService _settingService;
+        private readonly IDictionary<SystemSettingType, string> _globalSettings;
+        private readonly IOrganizationService _orgService;
+        private readonly IEmailService _emailService;
 
         public QuestionAnswerService(LinkoExchangeContext dbContext, IAuditLogEntry logger, IHttpContextService httpContext,
-            IEncryptionService encryption, IPasswordHasher passwordHasher)
+            IEncryptionService encryption, IPasswordHasher passwordHasher, ISettingService settingService,
+            IOrganizationService orgService, IEmailService emailService)
         {
             _dbContext = dbContext;
             _logger = logger;
             _httpContext = httpContext;
             _encryption = encryption;
             _passwordHasher = passwordHasher;
+            _settingService = settingService;
+            _globalSettings = _settingService.GetGlobalSettings();
+            _orgService = orgService;
+            _emailService = emailService;
         }
 
         public void AddQuestionAnswerPair(int userProfileId, QuestionDto question, AnswerDto answer)
@@ -162,6 +175,66 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
                 throw new RuleViolationException("Validation errors", validationIssues);
             }
+
+        }
+
+        /// <summary>
+        /// Should be used when creating or updating the entire collection of user's questions.
+        /// Performs checks for duplicated questions and/or same answers used for more than 1 question.
+        /// Also sends email as per the use case(s).
+        /// </summary>
+        /// <param name="userProfileId">User</param>
+        /// <param name="questionAnswers">Collection of Dtos</param>
+        public bool CreateOrUpdateQuestionAnswerPairs(int userProfileId, ICollection<QuestionAnswerPairDto> questionAnswers)
+        {
+            //Check for duplicates answers
+            var duplicateAnswers = questionAnswers.GroupBy(x => new { x.Answer.Content, x.Question.QuestionType })
+                                .Where(g => g.Count() > 1)
+                                .Select(y => y.Key)
+                                .ToList();
+
+            if (duplicateAnswers.Count() > 0)
+                return false;
+
+            //Check for duplicate questions
+            var duplicateQuestions = questionAnswers.GroupBy(x => new { x.Question.Content, x.Question.QuestionType })
+                    .Where(g => g.Count() > 1)
+                    .Select(y => y.Key)
+                    .ToList();
+
+            if (duplicateQuestions.Count() > 0)
+                return false;
+
+            //Persist to DB
+            int questionCountKBQ = 0;
+            int questionCountSQ = 0;
+            foreach (var pair in questionAnswers)
+            {
+                questionCountKBQ += pair.Question.QuestionType == Dto.QuestionType.KnowledgeBased ? 1 : 0;
+                questionCountSQ += pair.Question.QuestionType == Dto.QuestionType.Security ? 1 : 0;
+
+                CreateOrUpdateQuestionAnswerPair(userProfileId, pair);
+            }
+
+            var userProfile = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
+
+            //Send Emails
+            var contentReplacements = new Dictionary<string, string>();
+            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
+            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
+
+            var authorityList = _orgService.GetUserAuthorityListForEmailContent(userProfileId);
+            contentReplacements.Add("userName", userProfile.UserName);
+            contentReplacements.Add("authorityList", authorityList);
+            contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
+            contentReplacements.Add("supportEmail", supportEmail);
+
+            if (questionCountKBQ > 0)
+                _emailService.SendEmail(new[] { userProfile.Email }, EmailType.Profile_KBQChanged, contentReplacements);
+            if (questionCountSQ > 0)
+                _emailService.SendEmail(new[] { userProfile.Email }, EmailType.Profile_SecurityQuestionsChanged, contentReplacements);
+
+            return true;
 
         }
 

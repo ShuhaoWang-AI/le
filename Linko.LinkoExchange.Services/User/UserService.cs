@@ -30,7 +30,7 @@ namespace Linko.LinkoExchange.Services.User
         private readonly ISessionCache _sessionCache;
         private readonly IOrganizationService _orgService;
         private readonly IRequestCache _requestCache;
-        private readonly IDictionary<SystemSettingType, string> _globalSettings;
+        private readonly IDictionary<SystemSettingType, string> _globalSettings;  
         private readonly ITimeZoneService _timeZones;
 
 

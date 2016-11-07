@@ -23,6 +23,8 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         /// <param name="questionAnswer"></param>
         void CreateOrUpdateQuestionAnswerPair(int userProfileId, QuestionAnswerPairDto questionAnswer);
 
+        bool CreateOrUpdateQuestionAnswerPairs(int userProfileId, ICollection<QuestionAnswerPairDto> questionAnswers);
+
         /// <summary>
         /// Add a collection of question and answer pairs.
         /// </summary>
