@@ -46,6 +46,8 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="dto">Profile DTO</param>
         void UpdateProfile(UserDto dto);
 
+        bool UpdateEmail(int userProfileId, string newEmailAddress);
+
         void ChangePassword(int userProfileId, string oldPassword, string newPassword);
 
         OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId);

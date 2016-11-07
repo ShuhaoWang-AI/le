@@ -206,5 +206,11 @@ namespace Linko.LinkoExchange.Test
 
             _userService.UpdateProfile(dto);
         }
+
+        [TestMethod]
+        public void UpdateEmail()
+        {
+            var isWorked = _userService.UpdateEmail(1, "jbourne@test.com");
+        }
     }
 }

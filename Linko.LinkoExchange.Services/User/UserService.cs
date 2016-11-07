@@ -531,7 +531,7 @@ namespace Linko.LinkoExchange.Services.User
 
         public void UpdateUser(UserDto dto)
         {
-            UserProfile userProfile = _dbContext.Users.SingleOrDefault(up => up.UserProfileId == dto.UserProfileId);
+            UserProfile userProfile = _dbContext.Users.Single(up => up.UserProfileId == dto.UserProfileId);
             userProfile = _mapper.Map<UserDto, UserProfile>(dto);
 
             //Additional manual mappings here
@@ -554,6 +554,53 @@ namespace Linko.LinkoExchange.Services.User
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
             contentReplacements.Add("supportEmail", supportEmail);
             _emailService.SendEmail(new[] { dto.Email }, EmailType.Profile_ProfileChanged, contentReplacements);
+        }
+
+        public bool UpdateEmail(int userProfileId, string newEmailAddress)
+        {
+            UserProfile userProfile;
+            string oldEmailAddress;
+            //Check if email in use
+            var dbContextTransaction = _dbContext.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead);
+            try
+            {
+                var isExistsAlready = _dbContext.Users.Any(u => u.Email == newEmailAddress);
+
+                if (isExistsAlready)
+                    return false;
+
+                userProfile = _dbContext.Users.Single(up => up.UserProfileId == userProfileId);
+                oldEmailAddress = userProfile.Email;
+                userProfile.Email = newEmailAddress;
+                _dbContext.SaveChanges();
+                dbContextTransaction.Commit();
+            }
+            catch (Exception)
+            {
+                dbContextTransaction.Rollback();
+                return false;
+            }
+            finally
+            {
+                dbContextTransaction.Dispose();
+            }
+
+            //Send emails (to old and new address)
+            var contentReplacements = new Dictionary<string, string>();
+            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
+            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
+
+            var authorityList = _orgService.GetUserAuthorityListForEmailContent(userProfileId);
+            contentReplacements.Add("userName", userProfile.UserName);
+            contentReplacements.Add("oldEmail", oldEmailAddress);
+            contentReplacements.Add("newEmail", newEmailAddress);
+            contentReplacements.Add("authorityList", authorityList);
+            contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
+            contentReplacements.Add("supportEmail", supportEmail);
+            _emailService.SendEmail(new[] { oldEmailAddress }, EmailType.Profile_EmailChanged, contentReplacements);
+            _emailService.SendEmail(new[] { newEmailAddress }, EmailType.Profile_EmailChanged, contentReplacements);
+
+            return true;
         }
 
         public void ChangePassword(int userProfileId, string oldPassword, string newPassword)
