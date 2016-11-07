@@ -603,32 +603,6 @@ namespace Linko.LinkoExchange.Services.User
             return true;
         }
 
-        public void ChangePassword(int userProfileId, string oldPassword, string newPassword)
-        {
-            UserProfile userProfile = _dbContext.Users.SingleOrDefault(up => up.UserProfileId == userProfileId);
-            if (userProfile != null)
-            {
-                //Check old password matches
-                if (userProfile.PasswordHash == _passwordHasher.HashPassword(oldPassword))
-                {
-                    userProfile.PasswordHash = _passwordHasher.HashPassword(newPassword);
-
-                    //create history record
-                    UserPasswordHistory history = _dbContext.UserPasswordHistories.Create();
-                    history.UserProfileId = userProfileId;
-                    history.PasswordHash = userProfile.PasswordHash;
-                    history.LastModificationDateTimeUtc = DateTime.UtcNow;
-
-                    _dbContext.SaveChanges();
-                }
-            }
-            else
-            {
-                throw new Exception("ERROR: Old password does not match");
-            }
-
-        }
-
         public OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId)
         {
             var user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);

@@ -230,6 +230,13 @@ namespace Linko.LinkoExchange.Services.Authentication
                 _userManager.RemovePassword(userId);
                 _userManager.AddPassword(userId, newPassword);
 
+                //create history record
+                UserPasswordHistory history = _dbContext.UserPasswordHistories.Create();
+                history.UserProfileId = applicationUser.UserProfileId;
+                history.PasswordHash = newPassword;
+                history.LastModificationDateTimeUtc = DateTime.UtcNow;
+                _dbContext.SaveChanges();
+
                 //Send Email
                 var contentReplacements = new Dictionary<string, string>();
                 string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];

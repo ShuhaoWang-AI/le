@@ -48,8 +48,6 @@ namespace Linko.LinkoExchange.Services.User
 
         bool UpdateEmail(int userProfileId, string newEmailAddress);
 
-        void ChangePassword(int userProfileId, string oldPassword, string newPassword);
-
         OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId);
 
         void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, int organizationRegulatoryProgramId, bool isApproved);
