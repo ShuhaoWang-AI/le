@@ -72,6 +72,8 @@ namespace Linko.LinkoExchange.Test
             _settingService.Setup(x => x.GetGlobalSettings()).Returns(globalSettingLookup);
 
 
+            _timeZones = new Mock<ITimeZoneService>();
+
             _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
                 new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService.Object, 
                 _sessionCache.Object, _orgService.Object, _requestCache, _timeZones.Object);
@@ -167,5 +169,42 @@ namespace Linko.LinkoExchange.Test
             var result = _userService.ResetUser(1, "markus.jeon@watertrax.com");
         }
 
+        [TestMethod]
+        public void UpdateUser()
+        {
+            var dto = new UserDto()
+            {
+                FirstName = "Billy",
+                LastName = "Goat",
+                TitleRole = "President",
+                BusinessName = "Acme Corp.",
+                UserProfileId = 1,
+                AddressLine1 = "1234 Main St",
+                AddressLine2 = "Apt 102",
+                CityName = "Toronto",
+                ZipCode = "55555",
+            };
+
+            _userService.UpdateUser(dto);
+        }
+
+        [TestMethod]
+        public void UpdateProfile()
+        {
+            var dto = new UserDto()
+            {
+                FirstName = "Billy",
+                LastName = "Goat",
+                TitleRole = "President",
+                BusinessName = "Acme Corp.",
+                UserProfileId = 1,
+                AddressLine1 = "1234 Main St",
+                AddressLine2 = "Apt 102",
+                CityName = "Toronto",
+                ZipCode = "55555",
+            };
+
+            _userService.UpdateProfile(dto);
+        }
     }
 }

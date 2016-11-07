@@ -341,18 +341,7 @@ namespace Linko.LinkoExchange.Services.User
             var contentReplacements = new Dictionary<string, string>();
 
             //Find all possible authorities
-            var authorities = _orgService.GetUserRegulators(userProfileId);
-            var authorityList = "";
-            var newLine = "";
-            foreach (var authority in authorities)
-            {
-                authorityList += newLine + authority.OrganizationName + 
-                    " at " + authority.EmailContactInfoEmailAddress + 
-                    " or " + authority.PhoneNumber;
-                if (!String.IsNullOrEmpty(authority.PhoneExt))
-                    authorityList += " ext." + authority.PhoneExt;
-                newLine = Environment.NewLine;
-            }
+            var authorityList = _orgService.GetUserAuthorityListForEmailContent(userProfileId);
 
             foreach (var email in sendEmailChangedNotifications)
             {
@@ -540,27 +529,31 @@ namespace Linko.LinkoExchange.Services.User
             return true;
         }
 
-        public void UpdateUser(UserDto request)
+        public void UpdateUser(UserDto dto)
         {
-            if (request != null)
-            {
-                UserProfile userProfile = _dbContext.Users.SingleOrDefault(up => up.UserProfileId == request.UserProfileId);
-                if (userProfile != null)
-                {
-                    userProfile.FirstName = request.FirstName;
-                    //TODO: map other fields
-                    _dbContext.SaveChanges();
-                }
-                else
-                {
-                    //_logger.Log("ERROR")
-                    throw new Exception();
-                }
-            }
-            {
-                //_logger.Log("ERROR")
-                throw new Exception();
-            }
+            UserProfile userProfile = _dbContext.Users.SingleOrDefault(up => up.UserProfileId == dto.UserProfileId);
+            userProfile = _mapper.Map<UserDto, UserProfile>(dto);
+
+            //Additional manual mappings here
+
+            _dbContext.SaveChanges();
+        }
+
+        public void UpdateProfile(UserDto dto)
+        {
+            UpdateUser(dto);
+
+            //Send email
+            var contentReplacements = new Dictionary<string, string>();
+            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
+            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
+
+            var authorityList = _orgService.GetUserAuthorityListForEmailContent(dto.UserProfileId);
+            contentReplacements.Add("userName", dto.UserName);
+            contentReplacements.Add("authorityList", authorityList);
+            contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
+            contentReplacements.Add("supportEmail", supportEmail);
+            _emailService.SendEmail(new[] { dto.Email }, EmailType.Profile_ProfileChanged, contentReplacements);
         }
 
         public void ChangePassword(int userProfileId, string oldPassword, string newPassword)

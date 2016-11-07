@@ -22,6 +22,8 @@ namespace Linko.LinkoExchange.Services.Organization
         /// <returns></returns>
         IEnumerable<AuthorityDto> GetUserRegulators(int userId);
 
+        string GetUserAuthorityListForEmailContent(int userProfileId);
+
             /// <summary>
         /// Get the organization by organization id
         /// </summary>

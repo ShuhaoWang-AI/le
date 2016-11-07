@@ -40,7 +40,11 @@ namespace Linko.LinkoExchange.Services.User
 
         bool RemoveUser(int orgRegProgUserId);
 
-        void UpdateUser(UserDto request);
+        /// <summary>
+        /// Method to be called by application layer to execute business logic.
+        /// </summary>
+        /// <param name="dto">Profile DTO</param>
+        void UpdateProfile(UserDto dto);
 
         void ChangePassword(int userProfileId, string oldPassword, string newPassword);
 

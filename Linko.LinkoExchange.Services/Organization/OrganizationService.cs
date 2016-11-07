@@ -145,6 +145,25 @@ namespace Linko.LinkoExchange.Services.Organization
             return null;
         }
 
+        public string GetUserAuthorityListForEmailContent(int userProfileId)
+        {
+            var authorities = GetUserRegulators(userProfileId);
+            //Find all possible authorities
+            var authorityList = "";
+            var newLine = "";
+            foreach (var authority in authorities)
+            {
+                authorityList += newLine + authority.OrganizationName +
+                    " at " + authority.EmailContactInfoEmailAddress +
+                    " or " + authority.PhoneNumber;
+                if (!String.IsNullOrEmpty(authority.PhoneExt))
+                    authorityList += " ext." + authority.PhoneExt;
+                newLine = Environment.NewLine;
+            }
+
+            return authorityList;
+        }
+
         /// <summary>
         /// Get the organization by organization id
         /// </summary>
