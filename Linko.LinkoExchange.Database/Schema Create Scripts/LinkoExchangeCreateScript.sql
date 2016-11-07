@@ -20,9 +20,9 @@ IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = 'LinkoExchange')
 BEGIN
 	CREATE DATABASE [LinkoExchange]
 	 ON  PRIMARY 
-	( NAME = N'LinkoExchange_Data', FILENAME = N'C:\mssql\data\LinkoExchange.mdf' , SIZE = 4096KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB )
+	( NAME = N'LinkoExchange_Data', FILENAME = N'D:\mssql\data\LinkoExchange.mdf' , SIZE = 4096KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB )
 	 LOG ON 
-	( NAME = N'LinkoExchange_Log', FILENAME = N'C:\mssql\logs\LinkoExchange_log.ldf' , SIZE = 1024KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB )
+	( NAME = N'LinkoExchange_Log', FILENAME = N'D:\mssql\logs\LinkoExchange_log.ldf' , SIZE = 1024KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB )
 	
 	-- SQL Server 2014
 	ALTER DATABASE [LinkoExchange] SET COMPATIBILITY_LEVEL = 120
@@ -39,7 +39,7 @@ GO
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT 1 FROM master.sys.server_principals WHERE name = 'exnet')
 BEGIN
-    CREATE LOGIN exnet WITH PASSWORD = N'test'
+    CREATE LOGIN exnet WITH PASSWORD = N'test$1234'
 END
 GO
 
@@ -4971,7 +4971,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Email_Signature_SignatoryGrantedToAdmin' , 
         'Email',
         'Signature',
-        'SignatoryGranted',
+        'SignatoryGrantedToAdmin',
          
         'Signatory Rights Granted for {organizationName}({authorityName})',
         '<html>
@@ -5032,7 +5032,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Email_Signature_SignatoryRevokedToAdmin' , 
         'Email',
         'Signature',
-        'SignatoryRevoked', 
+        'SignatoryRevokedToAdmin', 
         
         'Signatory Rights Revoked for {organizationName}({authorityName})',
         '<html>
