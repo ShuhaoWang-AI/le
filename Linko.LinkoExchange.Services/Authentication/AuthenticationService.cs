@@ -229,6 +229,19 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 _userManager.RemovePassword(userId);
                 _userManager.AddPassword(userId, newPassword);
+
+                //Send Email
+                var contentReplacements = new Dictionary<string, string>();
+                string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
+                string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
+
+                var authorityList = _organizationService.GetUserAuthorityListForEmailContent(applicationUser.UserProfileId);
+                contentReplacements.Add("userName", applicationUser.UserName);
+                contentReplacements.Add("authorityList", authorityList);
+                contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
+                contentReplacements.Add("supportEmail", supportEmail);
+
+                _emailService.SendEmail(new[] { applicationUser.Email }, EmailType.Profile_PasswordChanged, contentReplacements);
             }
             catch (Exception ex)
             {
@@ -238,6 +251,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
             return Task.FromResult(authenticationResult);
         }
+
+
 
         /// <summary>
         /// Create a new user for registration

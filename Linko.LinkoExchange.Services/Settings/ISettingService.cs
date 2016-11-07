@@ -44,7 +44,7 @@ namespace Linko.LinkoExchange.Services.Settings
         /// </summary>
         /// <param name="programId">The program Id to get for</param>
         /// <returns>The PrrogramSetting object</returns>
-        ProgramSettingDto GetProgramSettingsById(int programId);
+        ProgramSettingDto GetProgramSettingsById(int orgRegProgramId);
         
         int PasswordLockoutHours();
 
