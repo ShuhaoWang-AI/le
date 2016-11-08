@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Web;
 
@@ -23,7 +25,7 @@ namespace Linko.LinkoExchange.Services.Cache
             if (value != null) return value;
 
             return string.Empty; 
-        }         
+        }
 
         public string GetClaimValue(string claimType)
         {
@@ -31,7 +33,13 @@ namespace Linko.LinkoExchange.Services.Cache
             if (string.IsNullOrWhiteSpace(owinUserId)) return null;
 
             var owinClaims = GetValue(CacheKey.OwinClaims) as IList<Claim>;
-             
+            
+            // owinClaims == null,  restore session from identity 
+            if(owinClaims == null)
+            {
+                RestoreClaims();
+            } 
+
             if (owinClaims != null)
             {
                 foreach (var claim in owinClaims)
@@ -40,7 +48,7 @@ namespace Linko.LinkoExchange.Services.Cache
                     {
                         return claim.Value;
                     }
-                } 
+                }
             }
 
             return string.Empty;
@@ -49,6 +57,31 @@ namespace Linko.LinkoExchange.Services.Cache
         public void Clear()
         {
             HttpContext.Current.Session.Clear();
+        }
+
+        public void RestoreClaims()
+        {
+            if (_httpContextService.Current().User.Identity.IsAuthenticated)
+            {
+                string owinUserId; 
+                var identity = _httpContextService.Current().User.Identity as ClaimsIdentity;
+                var claims = identity.Claims.ToList<Claim>();
+                var owinUserIdClaim = claims.FirstOrDefault(i => i.Type == CacheKey.OwinUserId);
+                this.SetValue(CacheKey.OwinClaims, claims); 
+                if (owinUserIdClaim != null)
+                {
+                    owinUserId = owinUserIdClaim.Value;
+                }
+                else
+                {
+                    owinUserId = claims.FirstOrDefault(i => i.Type.IndexOf("nameidentifier") > 0).Value;
+                }
+
+                if (owinUserId != null)
+                {
+                    this.SetValue(CacheKey.OwinUserId, owinUserId);
+                }
+            }
         }
     }
 }

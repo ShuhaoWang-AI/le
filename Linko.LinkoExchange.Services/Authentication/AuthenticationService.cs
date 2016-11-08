@@ -121,36 +121,13 @@ namespace Linko.LinkoExchange.Services.Authentication
                 if (!string.IsNullOrWhiteSpace(owinUserId))
                 {
                     claims = string.IsNullOrWhiteSpace(owinUserId) ? null : _userManager.GetClaims(owinUserId);
+                    _sessionCache.SetValue(CacheKey.OwinClaims, claims);
                 }
                 else
                 {
-                    // Current session is restored from cookie 
-                    if (_httpContext.Current().User.Identity.IsAuthenticated)
-                    {
-                        var identity = _httpContext.Current().User.Identity as ClaimsIdentity;
-                        claims = identity.Claims.ToList<Claim>();
-                        var owinUserIdClaim = claims.FirstOrDefault(i => i.Type == CacheKey.OwinUserId);
-                        if (owinUserIdClaim != null)
-                        {
-                            owinUserId = owinUserIdClaim.Value;
-                        }
-                        else
-                        {
-                            owinUserId = claims.FirstOrDefault(i => i.Type.IndexOf("nameidentifier") > 0).Value;
-                        }
-
-                        if (owinUserId != null)
-                        {
-                            _sessionCache.SetValue(CacheKey.OwinUserId, owinUserId);
-                        }
-
-                        var userProfileId = claims.FirstOrDefault(i => i.Type == CacheKey.UserProfileId);
-                        _sessionCache.SetValue(CacheKey.UserProfileId, userProfileId);
-                    }
-                }
-
-                _sessionCache.SetValue(CacheKey.OwinClaims, claims);
-
+                    // Current session is restored from cookie
+                    _sessionCache.RestoreClaims(); 
+                } 
             }
             return claims?.ToList();
         }
