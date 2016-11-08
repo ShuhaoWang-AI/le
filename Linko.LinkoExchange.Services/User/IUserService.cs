@@ -1,4 +1,5 @@
-﻿using Linko.LinkoExchange.Services.Dto;
+﻿using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Services.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +54,8 @@ namespace Linko.LinkoExchange.Services.User
         void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, int organizationRegulatoryProgramId, bool isApproved);
 
         void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int orgRegProgUserId, bool isApproved);
+
+        void UpdateOrganizationRegulatoryProgramUserRole(int orgRegProgUserId, int permissionGroupId);
 
     }
 }

@@ -635,6 +635,16 @@ namespace Linko.LinkoExchange.Services.User
             _dbContext.SaveChangesAsync(); 
         }
 
+        public void UpdateOrganizationRegulatoryProgramUserRole(int orgRegProgUserId, int permissionGroupId)
+        {
+            var user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+            if (user == null) return;
+
+            user.PermissionGroupId = permissionGroupId;
+            _dbContext.SaveChangesAsync();
+
+        }
+
 
         #endregion
 
