@@ -165,6 +165,7 @@
     <Compile Include="Organization\IOrganizationService.cs" />
     <Compile Include="Organization\OrganizationService.cs" />
     <Compile Include="Permission\IPermissionService.cs" />
+    <Compile Include="Permission\PermissionService.cs" />
     <Compile Include="Program\IProgramService.cs" />
     <Compile Include="Program\ProgramService.cs" />
     <Compile Include="Cache\RequestCache.cs" />
