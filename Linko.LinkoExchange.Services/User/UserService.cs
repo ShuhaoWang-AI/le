@@ -315,19 +315,16 @@ namespace Linko.LinkoExchange.Services.User
             user.PasswordHash = null; 
             user.IsAccountResetRequired = true;
 
-            //Delete SQs and KBQs
-            var answers = _dbContext.UserQuestionAnswers
-                .Include("Question").Where(a => a.UserProfileId == userProfileId);
-            if (answers != null && answers.Count() > 0)
-            {
-                foreach (var answer in answers)
-                {
-                    //get question too
-                    _dbContext.Questions.Remove(answer.Question);
-
-                    _dbContext.UserQuestionAnswers.Remove(answer);
-                }
-            }
+            ////Delete SQs and KBQs //WE NO LONGER DELETE IN CASE INVITATIONS ARE LOST/EXPIRED AND WE NEED TO AUTHENTICATE ANOTHER INVITE REQUEST.
+            //var answers = _dbContext.UserQuestionAnswers
+            //    .Include("Question").Where(a => a.UserProfileId == userProfileId);
+            //if (answers != null && answers.Count() > 0)
+            //{
+            //    foreach (var answer in answers)
+            //    {
+            //        _dbContext.UserQuestionAnswers.Remove(answer);
+            //    }
+            //}
 
             _dbContext.SaveChanges();
 

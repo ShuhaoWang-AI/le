@@ -14,23 +14,23 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         /// <param name="userProfileId"></param>
         /// <param name="question"></param>
         /// <param name="answer"></param>
-        void AddQuestionAnswerPair(int userProfileId, QuestionDto question, AnswerDto answer);
+        void AddUserQuestionAnswer(int userProfileId, AnswerDto answer);
 
         /// <summary>
         /// Adds a question if no Id's are provided or updates if Id's are present
         /// </summary>
         /// <param name="userProfileId"></param>
         /// <param name="questionAnswer"></param>
-        void CreateOrUpdateQuestionAnswerPair(int userProfileId, QuestionAnswerPairDto questionAnswer);
+        void CreateOrUpdateUserQuestionAnswer(int userProfileId, AnswerDto questionAnswer);
 
-        bool CreateOrUpdateQuestionAnswerPairs(int userProfileId, ICollection<QuestionAnswerPairDto> questionAnswers);
+        bool CreateOrUpdateUserQuestionAnswers(int userProfileId, ICollection<AnswerDto> questionAnswers);
 
         /// <summary>
         /// Add a collection of question and answer pairs.
         /// </summary>
         /// <param name="userProfileId"></param>
         /// <param name="questionAnswers"></param>
-        void CreateQuestionAnswerPairs(int userProfileId, IEnumerable<QuestionAnswerPairDto> questionAnswers);
+        void CreateUserQuestionAnswers(int userProfileId, IEnumerable<AnswerDto> questionAnswers);
 
         /// <summary>
         /// 
@@ -48,7 +48,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         /// 
         /// </summary>
         /// <param name="userQuestionAnswerId"></param>
-        void DeleteQuestionAnswerPair(int userQuestionAnswerId);
+        void DeleteUserQuestionAnswer(int userQuestionAnswerId);
 
         /// <summary>
         /// Delete all user's KBQ an Security Questions and answsers

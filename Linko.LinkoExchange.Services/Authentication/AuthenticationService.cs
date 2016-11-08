@@ -270,7 +270,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="securityQuestions">Security questions</param>
         /// <param name="kbqQuestions">KBQ questions</param>
         /// <returns>Registration results.</returns>
-        public async Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<QuestionAnswerPairDto> securityQuestions, IEnumerable<QuestionAnswerPairDto> kbqQuestions)
+        public async Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions)
         {
             var registrationResult = new RegistrationResultDto();
             if (userInfo == null)
@@ -427,9 +427,11 @@ namespace Linko.LinkoExchange.Services.Authentication
                         UserProfileId = applicationUser.UserProfileId
                     });
 
-                    // Save Security questions and kbq questions
-                    var combined = securityQuestions.Concat(kbqQuestions);
-                    _questionAnswerService.CreateQuestionAnswerPairs(applicationUser.UserProfileId, combined);
+                            // Save Security questions and kbq questions
+                            var combined = securityQuestions.Concat(kbqQuestions);
+                            _questionAnswerService.CreateQuestionAnswerPairs(applicationUser.UserProfileId, combined);
+                        }
+                    }
 
                     #endregion 
 
@@ -1104,7 +1106,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             _emailService.SendEmail(new[] { userProfile.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
         }
 
-        private RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<QuestionAnswerPairDto> securityQuestions, IEnumerable<QuestionAnswerPairDto> kbqQuestions)
+        private RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions)
         {
             if (userProfile.AgreeTermsAndConditions == false)
             {
@@ -1147,37 +1149,37 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             // Test duplicated security questions
-            if(securityQuestions.GroupBy(i=>i.Question.QuestionId).Any(i=>i.Count() > 1))
+            if(securityQuestions.GroupBy(i=>i.QuestionId).Any(i=>i.Count() > 1))
             {
                 return RegistrationResult.DuplicatedSecurityQuestion;
             }
 
             // Test duplicated KBQ questions
-            if (kbqQuestions.GroupBy(i => i.Question.QuestionId).Any(i => i.Count() > 1))
+            if (kbqQuestions.GroupBy(i => i.QuestionId).Any(i => i.Count() > 1))
             {
                 return RegistrationResult.DuplicatedKBQ;
             }
 
             // Test duplicated security question answers
-            if (securityQuestions.GroupBy(i => i.Answer.Content).Any(i => i.Count() > 1))
+            if (securityQuestions.GroupBy(i => i.Content).Any(i => i.Count() > 1))
             {
                 return RegistrationResult.DuplicatedSecurityQuestionAnswer;
             }
 
             // Test duplicated KBQ question answers
-            if (kbqQuestions.GroupBy(i => i.Answer.Content).Any(i => i.Count() > 1))
+            if (kbqQuestions.GroupBy(i => i.Content).Any(i => i.Count() > 1))
             {
                 return RegistrationResult.DuplicatedKBQAnswer;
             }
 
             // Test security questions mush have answer
-            if (securityQuestions.Any(i=>i.Answer == null))
+            if (securityQuestions.Any(i=>i.Content == null))
             {
                 return RegistrationResult.MissingSecurityQuestionAnswer;
             }
 
             // Test KBQ questions mush have answer
-            if (kbqQuestions.Any(i => i.Answer == null))
+            if (kbqQuestions.Any(i => i.Content == null))
             {
                 return RegistrationResult.MissingKBQAnswer; 
             }

@@ -57,25 +57,19 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void CreateOrUpdateQuestionAnswerPair()
         {
-            var questionDto = new QuestionDto();
-            questionDto.QuestionType = QuestionType.KnowledgeBased;
-            questionDto.IsActive = true;
-            questionDto.Content = "What color is your car?";
-            //questionDto.QuestionId = 8;
             
             var answerDto = new AnswerDto();
             answerDto.Content = "Blue";
-            //answerDto.UserQuestionAnswerId = 6;
+            answerDto.QuestionId = 8;
 
-            var questionAnswersPair = new QuestionAnswerPairDto() { Question = questionDto, Answer = answerDto };
-            _questionAnswerService.CreateOrUpdateQuestionAnswerPair(1, questionAnswersPair);
+            _questionAnswerService.CreateOrUpdateUserQuestionAnswer(1, answerDto);
 
         }
 
         [TestMethod]
         public void DeleteQuestionAnswerPair()
         {
-            _questionAnswerService.DeleteQuestionAnswerPair(12);
+            _questionAnswerService.DeleteUserQuestionAnswer(12);
         }
         [TestMethod]
         public void UpdateAnswer()
@@ -113,15 +107,13 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void CreateOrUpdateQuestionAnswerPairs_Duplicate_Answers_Test()
         {
-            var qAndAs = new List<QuestionAnswerPairDto>();
-            var q1 = new QuestionDto() { QuestionType = QuestionType.KnowledgeBased, Content = "What color is your car?" };
+            var qAndAs = new List<AnswerDto>();
             var a1 = new AnswerDto() { Content = "Red" };
-            var q2 = new QuestionDto() { QuestionType = QuestionType.KnowledgeBased, Content = "What color is your bike?" };
             var a2 = new AnswerDto() { Content = "Red" };
-            qAndAs.Add(new QuestionAnswerPairDto() { Question = q1, Answer = a1 });
-            qAndAs.Add(new QuestionAnswerPairDto() { Question = q2, Answer = a2 });
+            qAndAs.Add(a1);
+            qAndAs.Add(a2);
 
-            var result = _questionAnswerService.CreateOrUpdateQuestionAnswerPairs(1, qAndAs);
+            var result = _questionAnswerService.CreateOrUpdateUserQuestionAnswers(1, qAndAs);
 
             Assert.AreEqual(result, false);
         }
@@ -129,15 +121,13 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void CreateOrUpdateQuestionAnswerPairs_Duplicate_Questions_Test()
         {
-            var qAndAs = new List<QuestionAnswerPairDto>();
-            var q1 = new QuestionDto() { QuestionType = QuestionType.KnowledgeBased, Content = "What color is your dog?" };
+            var qAndAs = new List<AnswerDto>();
             var a1 = new AnswerDto() { Content = "Black" };
-            var q2 = new QuestionDto() { QuestionType = QuestionType.KnowledgeBased, Content = "What color is your dog?" };
             var a2 = new AnswerDto() { Content = "Brown" };
-            qAndAs.Add(new QuestionAnswerPairDto() { Question = q1, Answer = a1 });
-            qAndAs.Add(new QuestionAnswerPairDto() { Question = q2, Answer = a2 });
+            qAndAs.Add(a1);
+            qAndAs.Add(a2);
 
-            var result = _questionAnswerService.CreateOrUpdateQuestionAnswerPairs(1, qAndAs);
+            var result = _questionAnswerService.CreateOrUpdateUserQuestionAnswers(1, qAndAs);
 
             Assert.AreEqual(result, false);
         }
@@ -145,15 +135,12 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void CreateOrUpdateQuestionAnswerPairs_Duplicate_Questions_Different_TypesTest()
         {
-            var qAndAs = new List<QuestionAnswerPairDto>();
-            var q1 = new QuestionDto() { QuestionType = QuestionType.KnowledgeBased, Content = "What color is your dog?" };
+            var qAndAs = new List<AnswerDto>();
             var a1 = new AnswerDto() { Content = "Black" };
-            var q2 = new QuestionDto() { QuestionType = QuestionType.Security, Content = "What color is your dog?" };
             var a2 = new AnswerDto() { Content = "Black" };
-            qAndAs.Add(new QuestionAnswerPairDto() { Question = q1, Answer = a1 });
-            qAndAs.Add(new QuestionAnswerPairDto() { Question = q2, Answer = a2 });
-
-            var result = _questionAnswerService.CreateOrUpdateQuestionAnswerPairs(1, qAndAs);
+            qAndAs.Add(a1);
+            qAndAs.Add(a2);
+            var result = _questionAnswerService.CreateOrUpdateUserQuestionAnswers(1, qAndAs);
 
             Assert.AreEqual(result, true);
         }

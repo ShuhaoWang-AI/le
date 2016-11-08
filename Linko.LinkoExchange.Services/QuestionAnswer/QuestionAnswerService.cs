@@ -44,24 +44,18 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             _emailService = emailService;
         }
 
-        public void AddQuestionAnswerPair(int userProfileId, QuestionDto question, AnswerDto answer)
+        public void AddUserQuestionAnswer(int userProfileId, AnswerDto answer)
         {
             try
             {
-                Question newQuestion = _dbContext.Questions.Create();
-                newQuestion.Content = question.Content;
-                newQuestion.QuestionTypeId = (int)question.QuestionType;
-                newQuestion.IsActive = question.IsActive;
-                newQuestion.CreationDateTimeUtc = DateTime.UtcNow;
-                newQuestion.LastModificationDateTimeUtc = null;
-                newQuestion.LastModifierUserId = null;
+                var question = _dbContext.Questions.Single(q => q.QuestionId == answer.QuestionId);
 
-                if (question.QuestionType == Dto.QuestionType.KnowledgeBased)
+                if (question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
                 {
                     //Hash answer
                     answer.Content = _passwordHasher.HashPassword(answer.Content);
                 }
-                else if (question.QuestionType == Dto.QuestionType.Security)
+                else if (question.QuestionTypeId == (int)Dto.QuestionType.Security)
                 {
                     //Encrypt answer
                     answer.Content = _encryption.EncryptString(answer.Content);
@@ -73,13 +67,12 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 newAnswer.UserProfileId = userProfileId;
                 newAnswer.CreationDateTimeUtc = DateTime.UtcNow;
                 newAnswer.LastModificationDateTimeUtc = null;
-                newAnswer.Question = newQuestion;
+                newAnswer.QuestionId = answer.QuestionId;
                 newAnswer.UserProfileId = userProfileId;
                 newAnswer.CreationDateTimeUtc = DateTime.UtcNow;
                 newAnswer.LastModificationDateTimeUtc = DateTime.UtcNow;
 
 
-                _dbContext.Questions.Add(newQuestion);
                 _dbContext.UserQuestionAnswers.Add(newAnswer);
                 _dbContext.SaveChanges();
             }
@@ -105,50 +98,37 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         }
 
-        public void CreateOrUpdateQuestionAnswerPair(int userProfileId, QuestionAnswerPairDto questionAnswer)
+        public void CreateOrUpdateUserQuestionAnswer(int userProfileId, AnswerDto answerDto)
         {
-            if (questionAnswer.Question.QuestionType == Dto.QuestionType.KnowledgeBased)
+            var question = _dbContext.Questions.Single(q => q.QuestionId == answerDto.QuestionId);
+            if (question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
             {
                 //Hash answer
-                questionAnswer.Answer.Content = _passwordHasher.HashPassword(questionAnswer.Answer.Content);
+                answerDto.Content = _passwordHasher.HashPassword(answerDto.Content);
             }
-            else if (questionAnswer.Question.QuestionType == Dto.QuestionType.Security)
+            else if (question.QuestionTypeId == (int)Dto.QuestionType.Security)
             {
                 //Encrypt answer
-                questionAnswer.Answer.Content = _encryption.EncryptString(questionAnswer.Answer.Content);
+                answerDto.Content = _encryption.EncryptString(answerDto.Content);
             }
 
             UserQuestionAnswer answer;
-            Question question;
-            if (questionAnswer.Answer.UserQuestionAnswerId.HasValue)
+            if (answerDto.UserQuestionAnswerId.HasValue)
             {
                 answer = _dbContext.UserQuestionAnswers
                     .Include(a => a.Question)
-                    .Single(a => a.UserQuestionAnswerId == questionAnswer.Answer.UserQuestionAnswerId.Value);
+                    .Single(a => a.UserQuestionAnswerId == answerDto.UserQuestionAnswerId.Value);
 
-                answer.Content = questionAnswer.Answer.Content;
+                answer.Content = answerDto.Content;
                 answer.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;  // DateTime.UtcNow;
-                question = answer.Question;
-                question.Content = questionAnswer.Question.Content;
-                question.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
-                question.LastModifierUserId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
             }
             else
             {
                 answer = _dbContext.UserQuestionAnswers.Create();
-                answer.Content = questionAnswer.Answer.Content;
+                answer.Content = answerDto.Content;
                 answer.CreationDateTimeUtc = DateTimeOffset.UtcNow;
                 answer.UserProfileId = userProfileId;
-
-                question = _dbContext.Questions.Create();
-                question.Content = questionAnswer.Question.Content;
-                question.IsActive = questionAnswer.Question.IsActive;
-                question.QuestionTypeId = (int)questionAnswer.Question.QuestionType;
-                question.CreationDateTimeUtc = DateTimeOffset.UtcNow;
-                question.LastModificationDateTimeUtc = null;
-                question.LastModifierUserId = null;
-                answer.Question = question;
-
+                answer.QuestionId = answerDto.QuestionId;
                 _dbContext.UserQuestionAnswers.Add(answer);
             }
 
@@ -185,10 +165,10 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         /// </summary>
         /// <param name="userProfileId">User</param>
         /// <param name="questionAnswers">Collection of Dtos</param>
-        public bool CreateOrUpdateQuestionAnswerPairs(int userProfileId, ICollection<QuestionAnswerPairDto> questionAnswers)
+        public bool CreateOrUpdateUserQuestionAnswers(int userProfileId, ICollection<AnswerDto> questionAnswers)
         {
             //Check for duplicates answers
-            var duplicateAnswers = questionAnswers.GroupBy(x => new { x.Answer.Content, x.Question.QuestionType })
+            var duplicateAnswers = questionAnswers.GroupBy(x => new { x.Content })
                                 .Where(g => g.Count() > 1)
                                 .Select(y => y.Key)
                                 .ToList();
@@ -197,7 +177,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 return false;
 
             //Check for duplicate questions
-            var duplicateQuestions = questionAnswers.GroupBy(x => new { x.Question.Content, x.Question.QuestionType })
+            var duplicateQuestions = questionAnswers.GroupBy(x => new { x.QuestionId })
                     .Where(g => g.Count() > 1)
                     .Select(y => y.Key)
                     .ToList();
@@ -208,12 +188,13 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             //Persist to DB
             int questionCountKBQ = 0;
             int questionCountSQ = 0;
-            foreach (var pair in questionAnswers)
+            foreach (var questionAnswer in questionAnswers)
             {
-                questionCountKBQ += pair.Question.QuestionType == Dto.QuestionType.KnowledgeBased ? 1 : 0;
-                questionCountSQ += pair.Question.QuestionType == Dto.QuestionType.Security ? 1 : 0;
+                var questionTypeId = _dbContext.Questions.Single(q => q.QuestionId == questionAnswer.QuestionId).QuestionTypeId;
+                questionCountKBQ += questionTypeId == (int)Dto.QuestionType.KnowledgeBased ? 1 : 0;
+                questionCountSQ += questionTypeId == (int)Dto.QuestionType.Security ? 1 : 0;
 
-                CreateOrUpdateQuestionAnswerPair(userProfileId, pair);
+                CreateOrUpdateUserQuestionAnswer(userProfileId, questionAnswer);
             }
 
             var userProfile = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
@@ -337,17 +318,13 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         }
 
-        public void DeleteQuestionAnswerPair(int userQuestionAnswerId)
+        public void DeleteUserQuestionAnswer(int userQuestionAnswerId)
         {
             var answerToDelete = _dbContext.UserQuestionAnswers
                 .Include(a => a.Question)
                 .Single(a => a.UserQuestionAnswerId == userQuestionAnswerId);
             if (answerToDelete != null)
             {
-                if (answerToDelete.Question != null)
-                {
-                    _dbContext.Questions.Remove(answerToDelete.Question);
-                }
                 _dbContext.UserQuestionAnswers.Remove(answerToDelete);
 
                 try
@@ -440,13 +417,13 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             return qAndAs.OrderBy(qu => Guid.NewGuid()).First();
         }
 
-        public void CreateQuestionAnswerPairs(int userProfileId, IEnumerable<QuestionAnswerPairDto> questionAnswers)
+        public void CreateUserQuestionAnswers(int userProfileId, IEnumerable<AnswerDto> questionAnswers)
         { 
             if(questionAnswers != null && questionAnswers.Any())
             {
                  foreach(var qa in questionAnswers)
                 {
-                    CreateOrUpdateQuestionAnswerPair(userProfileId, qa);
+                    CreateOrUpdateUserQuestionAnswer(userProfileId, qa);
                 }
             }
         }

@@ -15,7 +15,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="securityQuestions">Security questions and answers</param>
         /// <param name="kbqQuestions">KBQ question and answers</param>
         /// <returns></returns>
-        Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<QuestionAnswerPairDto> securityQuestions, IEnumerable<QuestionAnswerPairDto> kbqQuestions); 
+        Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions); 
 
         // Change or reset password
         /// <summary>

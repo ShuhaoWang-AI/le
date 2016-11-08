@@ -999,22 +999,21 @@ namespace Linko.LinkoExchange.Test
             };
         }
 
-        private List<QuestionAnswerPairDto> CreateQuestions(IEnumerable<QuestionDto> questions, IEnumerable<AnswerDto> answers)
+        private List<AnswerDto> CreateQuestions(IEnumerable<QuestionDto> questions, IEnumerable<AnswerDto> answers)
         {
-            var qap = new List<QuestionAnswerPairDto>();
+            var qap = new List<AnswerDto>();
             for (var i = 0; i < questions.Count(); i++)
             {
-                qap.Add(new QuestionAnswerPairDto
-                {
-                    Answer = answers.ElementAt(i),
-                    Question = questions.ElementAt(i)
-                });
+                var answer = answers.ElementAt(i);
+                var question = questions.ElementAt(i);
+
+                qap.Add(new AnswerDto() { QuestionId = question.QuestionId.Value, Content = answer.Content });
             }
 
             return qap;
         }
 
-        public List<QuestionAnswerPairDto> CreateQuestions(Services.Dto.QuestionType type, int count)
+        public List<AnswerDto> CreateQuestions(Services.Dto.QuestionType type, int count)
         {
             var qformat = type.ToString() + " #{0}";
             var aformat = type.ToString() + " #{0} answer.";
