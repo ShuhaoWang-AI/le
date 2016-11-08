@@ -28,9 +28,10 @@ namespace Linko.LinkoExchange.Test
         Mock<ISessionCache> _sessionCache;
         IRequestCache _requestCache = Mock.Of<IRequestCache>();
         Mock<IOrganizationService> _orgService;
+        IOrganizationService _realOrgService;
         Mock<ISettingService> _settingService;
         IEmailService _emailService = Mock.Of<IEmailService>();
-        Mock<ITimeZoneService> _timeZones;
+        ITimeZoneService _timeZones;
         public UserServiceTests()
         {
             Mapper.Initialize(cfg =>
@@ -72,11 +73,15 @@ namespace Linko.LinkoExchange.Test
             _settingService.Setup(x => x.GetGlobalSettings()).Returns(globalSettingLookup);
 
 
-            _timeZones = new Mock<ITimeZoneService>();
+            _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString));
+
+
+            _realOrgService = new OrganizationService(new LinkoExchangeContext(connectionString),
+                Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance), new HttpContextService());
 
             _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
                 new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService.Object, 
-                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones.Object);
+                _sessionCache.Object, _realOrgService, _requestCache, _timeZones);
         }
 
         [TestMethod]
@@ -88,16 +93,24 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetPendingRegistrationPendingUsersOrgRegProgram()
         {
-            var userDtoList = _userService.GetUserProfilesForOrgRegProgram(1, false, false, true, false);
+            var userDtoList = _userService.GetUserProfilesForOrgRegProgram(2, false, false, true, false);
         }
 
         [TestMethod]
         public void ApproveUserRegistrationWithPermissionsForProgram()
         {
-            var orgRegProgUserId = 1;
+            var orgRegProgUserId = 7;
             var permissionGroupId = 1;
-            _userService.UpdateUserPermissionGroupId(1, permissionGroupId);
+            _userService.UpdateUserPermissionGroupId(orgRegProgUserId, permissionGroupId);
             _userService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, true);
+        }
+
+        [TestMethod]
+        public void ApprovePendingRegistrationTransactionWithEmails()
+        {
+            var orgRegProgUserId = 7;
+            var permissionGroupId = 1;
+            _userService.ApprovePendingRegistration(orgRegProgUserId, permissionGroupId, true);
         }
 
         [TestMethod]

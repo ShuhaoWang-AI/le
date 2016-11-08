@@ -645,7 +645,86 @@ namespace Linko.LinkoExchange.Services.User
 
         }
 
+        public void ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved)
+        {
+            var transaction = _dbContext.BeginTransaction();
+            try
+            {
+                UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, isApproved);
+                UpdateOrganizationRegulatoryProgramUserRole(orgRegProgUserId, permissionGroupId);
+                transaction.Commit();
+            }
+            catch(Exception ex)
+            {
+                transaction.Rollback();
+                throw ex;
+            }
+            finally
+            {
+                transaction.Dispose();
+            }
 
+
+            EmailType emailType;
+            //var programUser = _dbContext.OrganizationRegulatoryProgramUsers.Single(o => o.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+            var programUser = GetOrganizationRegulatoryProgramUser(orgRegProgUserId);
+            int orgRegProgramId = programUser.OrganizationRegulatoryProgramId;
+            var authority = _orgService.GetAuthority(orgRegProgramId);
+            bool isAuthorityUser = true;
+            if (authority != null && authority.OrganizationRegulatoryProgramId != orgRegProgramId)
+            {
+                //We know this is "industry user", otherwise the authority would be the same THIS user's org.
+                isAuthorityUser = false;
+            }
+
+            if (isApproved)
+            {
+                //Authority or Industry?
+                if (isAuthorityUser)
+                    emailType = EmailType.Registration_AuthorityRegistrationApproved;
+                else
+                    emailType = EmailType.Registration_IndustryRegistrationApproved;
+            }
+            else
+            {
+                //Authority or Industry?
+                if (isAuthorityUser)
+                    emailType = EmailType.Registration_AuthorityRegistrationDenied;
+                else
+                    emailType = EmailType.Registration_IndustryRegistrationDenied;
+            }
+
+            //Send email
+            var contentReplacements = new Dictionary<string, string>();
+            string authorityName = _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoName);
+            string authorityPhoneNumber = _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoPhone);
+            string authorityEmail = _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoEmailAddress);
+
+            contentReplacements.Add("userName", programUser.UserProfileDto.UserName);
+            contentReplacements.Add("authorityName", authorityName);
+            contentReplacements.Add("phoneNumber", authorityPhoneNumber);
+            contentReplacements.Add("emailAddress", authorityEmail);
+
+            if (!isAuthorityUser)
+            {
+                var org = _dbContext.Organizations.Single(o => o.OrganizationId == programUser.OrganizationRegulatoryProgramDto.OrganizationId);
+
+                contentReplacements.Add("organizationName", org.Name);
+                contentReplacements.Add("addressLine1", org.AddressLine1);
+                contentReplacements.Add("cityName", org.CityName);
+                contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == org.JurisdictionId).Name);
+            }
+
+            if (isApproved)
+            {
+                string baseUrl = _httpContext.GetRequestBaseUrl();
+                string link = baseUrl + "Account/SignIn";
+                contentReplacements.Add("link", link);
+            }
+
+            _emailService.SendEmail(new[] { programUser.UserProfileDto.Email }, emailType, contentReplacements);
+
+        }
         #endregion
 
 

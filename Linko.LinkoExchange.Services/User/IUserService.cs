@@ -57,5 +57,16 @@ namespace Linko.LinkoExchange.Services.User
 
         void UpdateOrganizationRegulatoryProgramUserRole(int orgRegProgUserId, int permissionGroupId);
 
+        /// <summary>
+        /// Service method to be called from controller
+        /// - Updates the Approval flag (transaction)
+        /// - Saves the Role (transaction)
+        /// - Send emails out notfying user of approval/denial.
+        /// </summary>
+        /// <param name="orgRegProgUserId"></param>
+        /// <param name="permissionGroupId"></param>
+        /// <param name="isApproved"></param>
+        void ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved);
+
     }
 }
