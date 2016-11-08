@@ -219,7 +219,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
 
                 // Check if the new password is one of the password used last # numbers
-                if (IsValidPasswordCheckInHistory(applicationUser.PasswordHash, applicationUser.UserProfileId, organizationSettings))
+                if (IsValidPasswordCheckInHistory(newPassword, applicationUser.UserProfileId, organizationSettings))
                 {
                     authenticationResult.Success = false;
                     authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
@@ -398,7 +398,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                         var organizationIds = GetUserOrganizationIds(applicationUser.UserProfileId);
                         var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
 
-                        if (!IsValidPasswordCheckInHistory(passwordHash, applicationUser.UserProfileId, organizationSettings))
+                        if (!IsValidPasswordCheckInHistory(userInfo.Password, applicationUser.UserProfileId, organizationSettings))
                         {
                             var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings);
                             registrationResult.Result = RegistrationResult.CanNotUseLastNumberOfPasswords; 
@@ -627,7 +627,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     authenticationResult.Errors = new string[] { "The answer is incorrect.  Please try again." };
                 }
             }
-            else if (!IsValidPasswordCheckInHistory(passwordHash, userProfileId, organizationSettings))
+            else if (!IsValidPasswordCheckInHistory(newPassword, userProfileId, organizationSettings))
             {
                 //Password used before (6.a)
                 var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings);
@@ -923,19 +923,26 @@ namespace Linko.LinkoExchange.Services.Authentication
         // Check if password is in one of the last # passwords stores in UserPasswordHistory table
         // Return false means the new password is not validate because it has been used in the last #number of times
         // Return true means the new password is validate to use
-        private bool IsValidPasswordCheckInHistory(string passwordHash, int userProfileId, IEnumerable<SettingDto> organizationSettings)
+        private bool IsValidPasswordCheckInHistory(string password, int userProfileId, IEnumerable<SettingDto> organizationSettings)
         {
             var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings);
 
             var lastNumberPasswordInHistory = _dbContext.UserPasswordHistories
                 .Where(i => i.UserProfileId == userProfileId)
-                .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(numberOfPasswordsInHistory);
-            if (lastNumberPasswordInHistory.Any(i => i.PasswordHash == passwordHash))
+                .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(numberOfPasswordsInHistory)
+                .ToList();
+
+            if (lastNumberPasswordInHistory.Any(i => isValidPassword(i.PasswordHash, password) == true))
             {
                 return false;
             }
 
             return true;
+        } 
+
+        private bool isValidPassword(string passwordHash, string password)
+        {
+            return _userManager.PasswordHasher.VerifyHashedPassword(passwordHash, password) == PasswordVerificationResult.Success;
         }
 
         private bool IsUserPasswordExpired(int userProfileId, IEnumerable<SettingDto> organizationSettings)
