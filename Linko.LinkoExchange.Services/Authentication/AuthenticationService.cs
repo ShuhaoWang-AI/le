@@ -427,11 +427,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                         UserProfileId = applicationUser.UserProfileId
                     });
 
-                            // Save Security questions and kbq questions
-                            var combined = securityQuestions.Concat(kbqQuestions);
-                            _questionAnswerService.CreateQuestionAnswerPairs(applicationUser.UserProfileId, combined);
-                        }
-                    }
+                    // Save Security questions and kbq questions
+                    var combined = securityQuestions.Concat(kbqQuestions);
+                    _questionAnswerService.CreateUserQuestionAnswers(applicationUser.UserProfileId, combined);
 
                     #endregion 
 

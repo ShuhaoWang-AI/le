@@ -692,8 +692,8 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_CreateOrganizationRegulatoryProgramForUser()
         {
-            IEnumerable<QuestionAnswerPairDto> sqQuestions;
-            IEnumerable<QuestionAnswerPairDto> kbqQuestions;
+            IEnumerable<AnswerDto> sqQuestions;
+            IEnumerable<AnswerDto> kbqQuestions;
 
             SetRegistrations(out sqQuestions, out kbqQuestions); 
                 
@@ -712,7 +712,7 @@ namespace Linko.LinkoExchange.Test
             userManagerObj.Verify(i => i.CreateAsync(It.IsAny<UserProfile>(), It.IsAny<string>()));
             
             var qaServiceMock = Mock.Get(questionAnswerService);
-            qaServiceMock.Verify(i => i.CreateQuestionAnswerPairs(It.IsAny<int>(), It.IsAny<IEnumerable<QuestionAnswerPairDto>>()), Times.Once); 
+            qaServiceMock.Verify(i => i.CreateUserQuestionAnswers(It.IsAny<int>(), It.IsAny<IEnumerable<AnswerDto>>()), Times.Once); 
             progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>())); 
             permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>(), It.IsAny<int>()));  
         }
@@ -721,8 +721,8 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_re_registration()
         {
-            IEnumerable<QuestionAnswerPairDto> sqQuestions;
-            IEnumerable<QuestionAnswerPairDto> kbqQuestions;
+            IEnumerable<AnswerDto> sqQuestions;
+            IEnumerable<AnswerDto> kbqQuestions;
 
             SetRegistrations(out sqQuestions, out kbqQuestions);
   
@@ -732,7 +732,7 @@ namespace Linko.LinkoExchange.Test
             settingServiceMock.Verify(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>())); 
 
             var qaServiceMock = Mock.Get(questionAnswerService);
-            qaServiceMock.Verify(i => i.CreateQuestionAnswerPairs(It.IsAny<int>(), It.IsAny<IEnumerable<QuestionAnswerPairDto>>()), Times.Once);
+            qaServiceMock.Verify(i => i.CreateUserQuestionAnswers(It.IsAny<int>(), It.IsAny<IEnumerable<AnswerDto>>()), Times.Once);
             qaServiceMock.Verify(i => i.DeleteUserQuestionAndAnswers(It.IsAny<int>())); 
 
             progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>()));
@@ -743,8 +743,8 @@ namespace Linko.LinkoExchange.Test
         [ExpectedException(typeof(AggregateException))]
         public void Test_Register_CreateUser_Failed_Throw_Exception()
         {
-            IEnumerable<QuestionAnswerPairDto> sqQuestions;
-            IEnumerable<QuestionAnswerPairDto> kbqQuestions;
+            IEnumerable<AnswerDto> sqQuestions;
+            IEnumerable<AnswerDto> kbqQuestions;
 
             SetRegistrations(out sqQuestions, out kbqQuestions);
 
@@ -762,8 +762,8 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_SenderProgram_disabled_return_expired()
         {
-            IEnumerable<QuestionAnswerPairDto> sqQuestions;
-            IEnumerable<QuestionAnswerPairDto> kbqQuestions;
+            IEnumerable<AnswerDto> sqQuestions;
+            IEnumerable<AnswerDto> kbqQuestions;
 
             SetRegistrations(out sqQuestions, out kbqQuestions);
 
@@ -781,8 +781,8 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_RecipientProgram_disabled_return_expired()
         {
-            IEnumerable<QuestionAnswerPairDto> sqQuestions;
-            IEnumerable<QuestionAnswerPairDto> kbqQuestions;
+            IEnumerable<AnswerDto> sqQuestions;
+            IEnumerable<AnswerDto> kbqQuestions;
 
             SetRegistrations(out sqQuestions, out kbqQuestions);
 
@@ -800,8 +800,8 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_all_good()
         {
-            IEnumerable<QuestionAnswerPairDto> sqQuestions;
-            IEnumerable<QuestionAnswerPairDto> kbqQuestions;
+            IEnumerable<AnswerDto> sqQuestions;
+            IEnumerable<AnswerDto> kbqQuestions;
 
             SetRegistrations(out sqQuestions, out kbqQuestions); 
          
@@ -853,7 +853,7 @@ namespace Linko.LinkoExchange.Test
         }
 
 
-        private void SetRegistrations(out IEnumerable<QuestionAnswerPairDto>  sqQuestions, out IEnumerable<QuestionAnswerPairDto> kbqQuestions)
+        private void SetRegistrations(out IEnumerable<AnswerDto>  sqQuestions, out IEnumerable<AnswerDto> kbqQuestions)
         {
             kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 5);
             sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 3);
