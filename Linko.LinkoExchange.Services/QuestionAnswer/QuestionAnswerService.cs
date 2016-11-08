@@ -268,7 +268,9 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         {
             if (answer != null && answer.UserQuestionAnswerId.HasValue && answer.UserQuestionAnswerId > 0)
             {
-                var answerToUpdate = _dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == answer.UserQuestionAnswerId);
+                var answerToUpdate = _dbContext.UserQuestionAnswers
+                    .Include("Question")
+                    .Single(a => a.UserQuestionAnswerId == answer.UserQuestionAnswerId);
 
                 if (answerToUpdate.Question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
                 {

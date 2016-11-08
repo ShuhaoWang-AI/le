@@ -69,7 +69,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void DeleteQuestionAnswerPair()
         {
-            _questionAnswerService.DeleteUserQuestionAnswer(12);
+            _questionAnswerService.DeleteUserQuestionAnswer(4);
         }
         [TestMethod]
         public void UpdateAnswer()
@@ -132,17 +132,5 @@ namespace Linko.LinkoExchange.Test
             Assert.AreEqual(result, false);
         }
 
-        [TestMethod]
-        public void CreateOrUpdateQuestionAnswerPairs_Duplicate_Questions_Different_TypesTest()
-        {
-            var qAndAs = new List<AnswerDto>();
-            var a1 = new AnswerDto() { Content = "Black" };
-            var a2 = new AnswerDto() { Content = "Black" };
-            qAndAs.Add(a1);
-            qAndAs.Add(a2);
-            var result = _questionAnswerService.CreateOrUpdateUserQuestionAnswers(1, qAndAs);
-
-            Assert.AreEqual(result, true);
-        }
     }
 }
