@@ -450,5 +450,18 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 }
             }
         }
+
+        public void DeleteUserQuestionAndAnswers(int userProfileId)
+        {
+            var userQuestionAndAnswers = _dbContext.UserQuestionAnswers.Where(i => i.UserProfileId == userProfileId); 
+
+            if (userQuestionAndAnswers != null && userQuestionAndAnswers.Any())
+            {
+                foreach (var answer in userQuestionAndAnswers)
+                {
+                    _dbContext.UserQuestionAnswers.Remove(answer);
+                }
+            }
+        }
     }
 }

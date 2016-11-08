@@ -50,6 +50,12 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         /// <param name="userQuestionAnswerId"></param>
         void DeleteQuestionAnswerPair(int userQuestionAnswerId);
 
+        /// <summary>
+        /// Delete all user's KBQ an Security Questions and answsers
+        /// </summary>
+        /// <param name="userProfileId"></param>
+        void DeleteUserQuestionAndAnswers(int userProfileId);
+
         ICollection<QuestionAnswerPairDto> GetUsersQuestionAnswers(int userProfileId, Dto.QuestionType questionType);
 
         QuestionAnswerPairDto GetRandomQuestionAnswerFromToken(string token, Dto.QuestionType questionType);

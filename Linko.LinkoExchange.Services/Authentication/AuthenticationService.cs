@@ -410,6 +410,9 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                         // Set IsRestRequired to be false  
                         applicationUser.IsAccountResetRequired = false;
+
+                        // Clear KBQ questions and Security Questions for existing user re-registration 
+                        _questionAnswerService.DeleteUserQuestionAndAnswers(applicationUser.UserProfileId);  
                     }
 
                     #endregion
