@@ -62,6 +62,8 @@ namespace Linko.LinkoExchange.Test
         UserDto userInfo;
         string registrationToken = "TEST-REGISTRATION-TOKEN";
         private IQuestionAnswerService questionAnswerService = Mock.Of<IQuestionAnswerService>();
+        Mock<IProgramService> progServiceMock ;
+        Mock<IPermissionService> permissionMock; 
 
         [TestInitialize]
         public void TestInitialize()
@@ -83,6 +85,9 @@ namespace Linko.LinkoExchange.Test
               );
 
             AutoMapperConfig.Setup();
+
+            progServiceMock = Mock.Get(progService);
+            permissionMock = Mock.Get(permService);
 
             var userMock = Mock.Get(userProfile);
             userMock.SetupProperty(i => i.Id, "owin-user-id");
@@ -567,11 +572,10 @@ namespace Linko.LinkoExchange.Test
             Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
         }
 
-
         [TestMethod]
         public void Test_Register_Failed_UserProfile_Return_MisingKBQ2()
         {
-            var kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 3);
+            var kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 4);
             var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 2);
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
@@ -583,19 +587,19 @@ namespace Linko.LinkoExchange.Test
         public void Test_Register_Failed_UserProfile_Return_MissingSecurityQuestion2()
         {
             var kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 6);
-            var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 2);
+            var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 1);
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
 
             Assert.AreEqual(RegistrationResult.MissingSecurityQuestion, result.Result.Result);
         }
 
-
         // Test for duplicate questions  
         [TestMethod]
         public void Test_Register_UserProfile_Return_DuplicatedKBQ()
         {
             var kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 6);
+            kbqQuestions.AddRange(CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 1));
             var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 2);
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
@@ -608,14 +612,213 @@ namespace Linko.LinkoExchange.Test
         public void Test_Register_Failed_UserProfile_Return_DuplicatedSecurityQuestion()
         {
             var kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 6);
-            var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 2);
+            var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 1);
+            sqQuestions.AddRange(CreateQuestions(Services.Dto.QuestionType.Security, 1));
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
 
             Assert.AreEqual(RegistrationResult.DuplicatedSecurityQuestion, result.Result.Result);
         }
 
+        // Test for null inivtation 
+        [TestMethod]
+        public void Test_Register_Failed_Return_InvalidRegistrationToken()
+        {
+            var kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 5);
+            var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 3);
+  
+            var invitServiceMock = Mock.Get(invitService);
+            invitServiceMock.Setup(i => i.GetInvitation(It.IsAny<string>())).Returns((InvitationDto)null); 
 
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+
+            Assert.AreEqual(RegistrationResult.InvalidRegistrationToken, result.Result.Result);
+        }
+
+        // Test for expired invitation  
+        [TestMethod]
+        public void Test_Register_Failed_Return_Expired_Invitation()
+        {
+            var kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 5);
+            var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 3);
+
+            // set invitation 5 days ago
+            var invitationDto = Mock.Of<InvitationDto>(i => i.InvitationDateTimeUtc == DateTimeOffset.UtcNow.AddDays(-5)
+                &&  i.RecipientOrganizationRegulatoryProgramId == 1000
+            );  
+
+            var invitServiceMock = Mock.Get(invitService);
+            invitServiceMock.Setup(i => i.GetInvitation(It.IsAny<string>())).Returns(invitationDto);
+
+            // set invitationRecipientProgram 
+            var orgRegulatoryProgramDto = Mock.Of<OrganizationRegulatoryProgramDto>(i => i.OrganizationId == 2000); 
+                 
+            // set prgramService
+            var progServiceMock = Mock.Get(progService);
+            progServiceMock.Setup(i => i.GetOrganizationRegulatoryProgram(1000)).Returns(orgRegulatoryProgramDto);
+
+
+            // set setting service 
+            var settings = new List<SettingDto>();
+            settings.AddRange(
+                new[] { new SettingDto
+                        {
+                            Type = SettingType.InvitationExpiredHours,
+                            Value = "72"
+                        },
+
+                        new SettingDto
+                        {
+                            Type = SettingType.PasswordHistoryMaxCount,
+                            Value = "10"
+                        }
+                }); 
+
+            var orgSettingDto = Mock.Of<OrganizationSettingDto>(i=>i.Settings == settings );
+            var settingServiceMock = Mock.Get(settService);
+            settingServiceMock.Setup(i => i.GetOrganizationSettingsById(It.IsAny<int>()))
+                .Returns(orgSettingDto);
+
+
+            settingServiceMock.Setup(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>()))
+               .Returns(new[] { orgSettingDto } );
+            
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+
+            Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result.Result);
+        }
+
+        // Test new user register
+        [TestMethod]
+        public void Test_Register_CreateOrganizationRegulatoryProgramForUser()
+        {
+            IEnumerable<QuestionAnswerPairDto> sqQuestions;
+            IEnumerable<QuestionAnswerPairDto> kbqQuestions;
+
+            SetRegistrations(out sqQuestions, out kbqQuestions); 
+                
+            userManagerObj.Setup(i => i.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult((UserProfile)null));
+
+            IdentityResult createUserResult = IdentityResult.Success; 
+
+            userManagerObj.Setup(i => i.CreateAsync(It.IsAny<UserProfile>(), It.IsAny<string>())).
+                Returns(Task.FromResult(createUserResult));
+
+            userManagerObj.Setup(i => i.FindByIdAsync(It.IsAny<string>())).
+                Returns(Task.FromResult(userProfile));
+
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+
+            userManagerObj.Verify(i => i.CreateAsync(It.IsAny<UserProfile>(), It.IsAny<string>()));
+            
+            var qaServiceMock = Mock.Get(questionAnswerService);
+            qaServiceMock.Verify(i => i.CreateQuestionAnswerPairs(It.IsAny<int>(), It.IsAny<IEnumerable<QuestionAnswerPairDto>>()), Times.Once); 
+            progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>())); 
+            permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>(), It.IsAny<int>()));  
+        }
+
+        // Test new existing user re-register
+        [TestMethod]
+        public void Test_Register_re_registration()
+        {
+            IEnumerable<QuestionAnswerPairDto> sqQuestions;
+            IEnumerable<QuestionAnswerPairDto> kbqQuestions;
+
+            SetRegistrations(out sqQuestions, out kbqQuestions);
+  
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions); 
+
+            var settingServiceMock = Mock.Get(settService);
+            settingServiceMock.Verify(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>())); 
+
+            var qaServiceMock = Mock.Get(questionAnswerService);
+            qaServiceMock.Verify(i => i.CreateQuestionAnswerPairs(It.IsAny<int>(), It.IsAny<IEnumerable<QuestionAnswerPairDto>>()), Times.Once);
+            qaServiceMock.Verify(i => i.DeleteUserQuestionAndAnswers(It.IsAny<int>())); 
+
+            progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>()));
+            permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>(), It.IsAny<int>()));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AggregateException))]
+        public void Test_Register_CreateUser_Failed_Throw_Exception()
+        {
+            IEnumerable<QuestionAnswerPairDto> sqQuestions;
+            IEnumerable<QuestionAnswerPairDto> kbqQuestions;
+
+            SetRegistrations(out sqQuestions, out kbqQuestions);
+
+            // To test new user fails   
+            userManagerObj.Setup(i => i.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult((UserProfile)null));
+
+            IdentityResult createUserResult = null;
+
+            userManagerObj.Setup(i => i.CreateAsync(It.IsAny<UserProfile>(), It.IsAny<string>())).
+                Returns(Task.FromResult((IdentityResult)createUserResult));
+
+            var ret = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions).Result;
+        }
+
+        [TestMethod]
+        public void Test_Register_SenderProgram_disabled_return_expired()
+        {
+            IEnumerable<QuestionAnswerPairDto> sqQuestions;
+            IEnumerable<QuestionAnswerPairDto> kbqQuestions;
+
+            SetRegistrations(out sqQuestions, out kbqQuestions);
+
+            // sender program is disabled 
+            progServiceMock.Setup(i => i.GetOrganizationRegulatoryProgram(1001)).Returns(
+                Mock.Of<OrganizationRegulatoryProgramDto>(
+                      i => i.IsEnabled == false)
+                    ); 
+
+            // To test new user register    
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);   
+            Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result.Result);
+        }
+
+        [TestMethod]
+        public void Test_Register_RecipientProgram_disabled_return_expired()
+        {
+            IEnumerable<QuestionAnswerPairDto> sqQuestions;
+            IEnumerable<QuestionAnswerPairDto> kbqQuestions;
+
+            SetRegistrations(out sqQuestions, out kbqQuestions);
+
+            // sender program is disabled 
+            progServiceMock.Setup(i => i.GetOrganizationRegulatoryProgram(1000)).Returns(
+                Mock.Of<OrganizationRegulatoryProgramDto>(
+                      i => i.IsEnabled == false)
+                    );
+
+            // To test new user register    
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+            Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result.Result);
+        }
+
+        [TestMethod]
+        public void Test_Register_all_good()
+        {
+            IEnumerable<QuestionAnswerPairDto> sqQuestions;
+            IEnumerable<QuestionAnswerPairDto> kbqQuestions;
+
+            SetRegistrations(out sqQuestions, out kbqQuestions); 
+         
+            // To test new user register    
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+            var emailServiceMock = Mock.Get(emailService);
+
+            emailServiceMock.Verify(i => i.SendEmail(It.IsAny<IEnumerable<string>>(),
+                It.IsAny<EmailType>(), It.IsAny<IDictionary<string, string>>()));
+
+            var invitServiceMock = Mock.Get(invitService);
+
+            invitServiceMock.Verify(i => i.DeleteInvitation(It.IsAny<string>()));
+
+            Assert.AreEqual(RegistrationResult.Success, result.Result.Result);
+
+        }
 
         public void Test_SetClaimsForOrgRegProgramSelection()
         {
@@ -647,6 +850,110 @@ namespace Linko.LinkoExchange.Test
                 );
 
             authService.SetClaimsForOrgRegProgramSelection(1);
+        }
+
+
+        private void SetRegistrations(out IEnumerable<QuestionAnswerPairDto>  sqQuestions, out IEnumerable<QuestionAnswerPairDto> kbqQuestions)
+        {
+            kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 5);
+            sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 3);
+
+            // set invitation 5 days ago
+            var invitationDto = Mock.Of<InvitationDto>(i => i.InvitationDateTimeUtc == DateTimeOffset.UtcNow.AddDays(-5)
+                && i.RecipientOrganizationRegulatoryProgramId == 1000 && 
+                   i.SenderOrganizationRegulatoryProgramId == 1001
+            );
+
+            var invitServiceMock = Mock.Get(invitService);
+            invitServiceMock.Setup(i => i.GetInvitation(It.IsAny<string>())).Returns(invitationDto);
+
+            // set invitationRecipientProgram 
+            var orgRegulatoryProgramDto = Mock.Of<OrganizationRegulatoryProgramDto>(i => i.OrganizationId == 2000 
+                 && i.IsEnabled == true 
+                 && i.RegulatorOrganizationId == 1000
+                 && i.OrganizationDto == Mock.Of<OrganizationDto>(b=>b.OrganizationId== 5000)
+            );
+
+            // set prgramService 
+            // recipient
+            progServiceMock.Setup(i => i.GetOrganizationRegulatoryProgram(1000)).Returns(orgRegulatoryProgramDto);
+
+            // sender 
+            progServiceMock.Setup(i => i.GetOrganizationRegulatoryProgram(1001)).Returns(
+                Mock.Of<OrganizationRegulatoryProgramDto>(
+                      i => i.IsEnabled == true
+                      )
+                    );
+
+            var orgServiceMock = Mock.Get(orgService);
+            orgServiceMock.Setup(i => i.GetOrganization(It.IsAny<int>())).Returns(
+                    Mock.Of<OrganizationDto>(i=>i.OrganizationName=="test-org-name")
+                );
+
+            orgServiceMock.Setup(i => i.GetUserOrganizations(It.IsAny<int>())).
+                Returns(
+                  new[]
+                  {
+                      Mock.Of<OrganizationRegulatoryProgramDto>(i=>i.OrganizationId == 1000),
+                      Mock.Of<OrganizationRegulatoryProgramDto>(i=>i.OrganizationId == 1001)
+                  }); 
+
+            progServiceMock.Setup(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>())).Returns(
+                   Mock.Of<OrganizationRegulatoryProgramUserDto>(i=>i.IsEnabled == true && i.OrganizationRegulatoryProgramId == 100  
+                   )
+                );
+
+            permissionMock.Setup(i => i.GetApprovalPeople(It.IsAny<int>(), It.IsAny<int>())).Returns(
+                 new []{
+                           Mock.Of<UserDto>(i=>i.Email=="test@water.com"),
+                           Mock.Of<UserDto>(i=>i.Email=="test2@water.com"),
+                       } 
+                ); 
+            
+            // set setting service 
+            var settings = new List<SettingDto>();
+            settings.AddRange(
+                new[] {
+                    new SettingDto
+                    {
+                        Type = SettingType.InvitationExpiredHours,
+                        Value = "172"
+                    },
+                    new SettingDto
+                    {
+                        Type = SettingType.PasswordHistoryMaxCount,
+                        Value="10"
+                    }} ); 
+
+
+            var orgSettingDto = Mock.Of<OrganizationSettingDto>(i => i.Settings == settings);
+            var settingServiceMock = Mock.Get(settService);
+            settingServiceMock.Setup(i => i.GetOrganizationSettingsById(It.IsAny<int>()))
+                .Returns(orgSettingDto);
+
+            var orgSettings = new List<OrganizationSettingDto> { orgSettingDto };
+
+            settingServiceMock.Setup(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>())).Returns(orgSettings); 
+
+            // Setup for dbContext 
+            var passwordHistries = new List<UserPasswordHistory>
+            {
+                new UserPasswordHistory
+                {
+                    UserProfileId = userProfile.UserProfileId,
+                    LastModificationDateTimeUtc = DateTime.Now.AddDays(-1)
+                }
+
+            }.AsQueryable();
+
+            var passwordHistryMock = new Mock<DbSet<UserPasswordHistory>>();
+            passwordHistryMock.As<IQueryable<UserPasswordHistory>>().Setup(p => p.Provider).Returns(passwordHistries.Provider);
+            passwordHistryMock.As<IQueryable<UserPasswordHistory>>().Setup(p => p.Expression).Returns(passwordHistries.Expression);
+            passwordHistryMock.As<IQueryable<UserPasswordHistory>>().Setup(p => p.ElementType).Returns(passwordHistries.ElementType);
+            passwordHistryMock.As<IQueryable<UserPasswordHistory>>().Setup(p => p.GetEnumerator()).Returns(passwordHistries.GetEnumerator());
+
+            dbContext.Setup(p => p.UserPasswordHistories).Returns(passwordHistryMock.Object);
+
         }
 
         private UserDto GetUserInfo()
