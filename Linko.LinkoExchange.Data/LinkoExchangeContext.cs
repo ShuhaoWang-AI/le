@@ -26,6 +26,10 @@ namespace Linko.LinkoExchange.Data
 
         #endregion
 
+        public virtual DbContextTransaction BeginTransaction()
+        {
+            return Database.BeginTransaction();
+        }
 
         #region DBSets
         public DbSet<AuditLogTemplate> AuditLogTemplates { set; get; }
@@ -69,6 +73,18 @@ namespace Linko.LinkoExchange.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<UserProfile>().ToTable("tUserProfile"); 
+        }
+
+        public void Commit(DbContextTransaction transaction)
+        {
+            if(transaction!=null)
+                transaction.Commit();
+        }
+
+        public void Rollback(DbContextTransaction transaction)
+        {
+            if (transaction != null)
+                transaction.Commit();
         }
         #endregion
     }

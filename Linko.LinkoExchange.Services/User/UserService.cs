@@ -312,8 +312,7 @@ namespace Linko.LinkoExchange.Services.User
 
             //reset flags
             user.IsAccountLocked = false;
-            user.PasswordHash = null;
-            user.PhoneNumberConfirmed = false;
+            user.PasswordHash = null; 
             user.IsAccountResetRequired = true;
 
             //Delete SQs and KBQs

@@ -51,7 +51,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IMapper _mapper;
         private readonly IHttpContextService _httpContext;
         private readonly ILogger _logger;
-        private readonly IQuestionAnswerService _questionAnswerService; 
+        private readonly IQuestionAnswerService _questionAnswerService;
 
         public AuthenticationService(ApplicationUserManager userManager,
             ApplicationSignInManager signInManager,
@@ -120,7 +120,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 var owinUserId = _sessionCache.GetValue(CacheKey.OwinUserId) as string;
                 if (!string.IsNullOrWhiteSpace(owinUserId))
                 {
-                    claims = string.IsNullOrWhiteSpace(owinUserId) ? null : _userManager.GetClaims(owinUserId); 
+                    claims = string.IsNullOrWhiteSpace(owinUserId) ? null : _userManager.GetClaims(owinUserId);
                 }
                 else
                 {
@@ -129,24 +129,24 @@ namespace Linko.LinkoExchange.Services.Authentication
                     {
                         var identity = _httpContext.Current().User.Identity as ClaimsIdentity;
                         claims = identity.Claims.ToList<Claim>();
-                        var owinUserIdClaim = claims.FirstOrDefault(i => i.Type == CacheKey.OwinUserId); 
-                        if(owinUserIdClaim != null)
+                        var owinUserIdClaim = claims.FirstOrDefault(i => i.Type == CacheKey.OwinUserId);
+                        if (owinUserIdClaim != null)
                         {
                             owinUserId = owinUserIdClaim.Value;
                         }
                         else
                         {
-                            owinUserId = claims.FirstOrDefault(i => i.Type.IndexOf("nameidentifier") > 0).Value; 
+                            owinUserId = claims.FirstOrDefault(i => i.Type.IndexOf("nameidentifier") > 0).Value;
                         }
 
-                        if(owinUserId != null)
+                        if (owinUserId != null)
                         {
                             _sessionCache.SetValue(CacheKey.OwinUserId, owinUserId);
                         }
 
-                        var userProfileId = claims.FirstOrDefault(i => i.Type == CacheKey.UserProfileId);                        
-                        _sessionCache.SetValue(CacheKey.UserProfileId, userProfileId); 
-                    } 
+                        var userProfileId = claims.FirstOrDefault(i => i.Type == CacheKey.UserProfileId);
+                        _sessionCache.SetValue(CacheKey.UserProfileId, userProfileId);
+                    }
                 }
 
                 _sessionCache.SetValue(CacheKey.OwinClaims, claims);
@@ -207,7 +207,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 var organizationIds = GetUserOrganizationIds(applicationUser.UserProfileId);
 
                 var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
-          
+
                 SetPasswordPolicy(organizationSettings);
                 // Use PasswordValidator
                 var validateResult = _userManager.PasswordValidator.ValidateAsync(newPassword).Result;
@@ -272,34 +272,34 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <returns>Registration results.</returns>
         public async Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<QuestionAnswerPairDto> securityQuestions, IEnumerable<QuestionAnswerPairDto> kbqQuestions)
         {
-            var registrationResult = new RegistrationResultDto(); 
-            if( userInfo == null)
+            var registrationResult = new RegistrationResultDto();
+            if (userInfo == null)
             {
                 registrationResult.Result = RegistrationResult.BadUserProfileData;
-                return registrationResult; 
+                return registrationResult;
             }
 
             if (string.IsNullOrWhiteSpace(registrationToken))
             {
-                registrationResult.Result = RegistrationResult.InvalidateRegistrationToken;
+                registrationResult.Result = RegistrationResult.InvalidRegistrationToken;
                 return registrationResult;
             }
 
-            _logger.Info("Register. userName={0}, email={1}",userInfo.UserName, registrationToken); 
+            _logger.Info("Register. userName={0}, email={1}", userInfo.UserName, registrationToken);
 
 
             var validatResult = ValidateRegistrationUserData(userInfo, securityQuestions, kbqQuestions);
             if (validatResult != RegistrationResult.Success)
             {
                 registrationResult.Result = validatResult;
-                return registrationResult; 
-            } 
+                return registrationResult;
+            }
 
             var invitationDto = _invitationService.GetInvitation(registrationToken);
 
             if (invitationDto == null)
             {
-                registrationResult.Result = RegistrationResult.InvalidateRegistrationToken;
+                registrationResult.Result = RegistrationResult.InvalidRegistrationToken;
                 return registrationResult;
             }
 
@@ -325,22 +325,19 @@ namespace Linko.LinkoExchange.Services.Authentication
                 registrationResult.Result = RegistrationResult.InvitationExpired;
                 return registrationResult;
             }
-            
+
             #endregion  End of Checking invitation expiration 
-            
-            UserProfile applicationUser = _userManager.FindByName(userInfo.UserName); 
+
+            UserProfile applicationUser = _userManager.FindByName(userInfo.UserName);
 
             // 2.a  Actor is already registration with LinkoExchange  
             bool newUserRegistration = true;
             if (applicationUser != null)
             {
                 newUserRegistration = false;
-
-                // Set IsRestRequired to be false  
-                applicationUser.IsAccountResetRequired = false;
             }
- 
-            using (var transaction = _dbContext.Database.BeginTransaction())
+
+            using (var transaction = _dbContext.BeginTransaction())
             {
                 try
                 {
@@ -363,14 +360,14 @@ namespace Linko.LinkoExchange.Services.Authentication
                         applicationUser.PhoneNumber = userInfo.PhoneNumber;
                         applicationUser.PhoneExt = userInfo.PhoneExt;
                         applicationUser.PhoneNumberConfirmed = true;
-                        
+
                         applicationUser.IsAccountLocked = false;
                         applicationUser.IsAccountResetRequired = false;
                         applicationUser.LockoutEnabled = true;
                         applicationUser.EmailConfirmed = true;
                         applicationUser.IsInternalAccount = false;
                         applicationUser.IsIdentityProofed = false;
-                        applicationUser.CreationDateTimeUtc = DateTimeOffset.UtcNow; 
+                        applicationUser.CreationDateTimeUtc = DateTimeOffset.UtcNow;
 
                         #endregion
 
@@ -378,23 +375,60 @@ namespace Linko.LinkoExchange.Services.Authentication
                         if (result == IdentityResult.Success)
                         {
                             // Retrieve user again to get userProfile Id. 
-                            applicationUser = _userManager.FindById(applicationUser.Id);
-
-                            // Create a new row in userProfile password history table 
-                            _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
-                            {
-                                LastModificationDateTimeUtc = DateTimeOffset.UtcNow,
-                                PasswordHash = applicationUser.PasswordHash,
-                                UserProfileId = applicationUser.UserProfileId
-                            });
-
-                            // Save Security questions and kbq questions
-                            var combined = securityQuestions.Concat(kbqQuestions);
-                            _questionAnswerService.CreateQuestionAnswerPairs(applicationUser.UserProfileId, combined);
+                            applicationUser = _userManager.FindById(applicationUser.Id); 
+                        } 
+                        else
+                        {
+                            var errText = string.Format("Creating user failed. Email={0}, userName={1}", userInfo.Email, userInfo.UserName);
+                            _logger.Error(errText);
+                            throw new Exception(errText);
                         }
                     }
 
                     #endregion
+
+                    #region User is from re-registration 
+
+                    // Exsiting user re-register
+                    // Check if the password has been in # password in history
+                    if (!newUserRegistration)
+                    {
+                        string passwordHash = _passwordHasher.HashPassword(userInfo.Password); 
+
+                        var organizationIds = GetUserOrganizationIds(applicationUser.UserProfileId);
+                        var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
+
+                        if (!IsValidPasswordCheckInHistory(passwordHash, applicationUser.UserProfileId, organizationSettings))
+                        {
+                            var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings);
+                            registrationResult.Result = RegistrationResult.CanNotUseLastNumberOfPasswords; 
+                            registrationResult.Errors = new string[] { string.Format("You cannot use the last {0} passwords.", numberOfPasswordsInHistory) };
+                            return registrationResult; 
+                        }
+
+                        applicationUser.PasswordHash = passwordHash; 
+
+                        // Set IsRestRequired to be false  
+                        applicationUser.IsAccountResetRequired = false;
+                    }
+
+                    #endregion
+
+                    #region Save into passwordHistory and KBQ question, and Security Question 
+
+                    // Create a new row in userProfile password history table 
+                    _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
+                    {
+                        LastModificationDateTimeUtc = DateTimeOffset.UtcNow,
+                        PasswordHash = applicationUser.PasswordHash,
+                        UserProfileId = applicationUser.UserProfileId
+                    });
+
+                    // Save Security questions and kbq questions
+                    var combined = securityQuestions.Concat(kbqQuestions);
+                    _questionAnswerService.CreateQuestionAnswerPairs(applicationUser.UserProfileId, combined);
+
+                    #endregion 
 
                     // UC-42 6
                     // 2 Create organization regulatory program userProfile, and set the approved statue to false  
@@ -407,18 +441,18 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     //  Determine if user is authority user or is industry user; 
                     var senderProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.SenderOrganizationRegulatoryProgramId);
-                                                           
-                    var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId); 
+
+                    var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
                     //  Program is disabled or not found
                     //  UC-42 2.c, 2.d, 2.e
                     if (recipientProgram == null || senderProgram == null ||
-                         !recipientProgram.IsEnabled || !senderProgram.IsEnabled  || 
+                         !recipientProgram.IsEnabled || !senderProgram.IsEnabled ||
                          recipientProgram.OrganizationDto == null
                          )
                     {
                         registrationResult.Result = RegistrationResult.InvitationExpired;
                         return registrationResult;
-                    }              
+                    }
 
                     var inviteIndustryUser = false;
                     // Invites authority user
@@ -460,8 +494,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                         emailContentReplacements.Add("addressLine1", receipientOrg.AddressLine1);
                         emailContentReplacements.Add("cityName", receipientOrg.CityName);
                         emailContentReplacements.Add("stateName", receipientOrg.State);
-                    } 
-                    
+                    }
+
                     if (inviteIndustryUser)
                     {
                         await _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
@@ -482,34 +516,34 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     _dbContext.SaveChanges();
                     registrationResult.Result = RegistrationResult.Success;
-                    transaction.Commit();
+                    _dbContext.Commit(transaction); 
                     return registrationResult;
                 }
                 catch (Exception ex)
                 {
                     var errors = new List<string>() { ex.Message };
-                    
-                    while(ex.InnerException != null)
+
+                    while (ex.InnerException != null)
                     {
                         ex = ex.InnerException;
                         errors.Add(ex.Message);
                     }
 
-                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors)); 
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
 
                     registrationResult.Result = RegistrationResult.Failed;
                     registrationResult.Errors = errors;
-                    transaction.Rollback();
+                    _dbContext.Rollback(transaction);
                     throw;
-                } 
+                }
             }
 
-            _logger.Info("Register. userName={0}, email={1}, registrationResult{2}", userInfo.UserName, registrationToken, registrationResult.ToString()); 
+            _logger.Info("Register. userName={0}, email={1}, registrationResult{2}", userInfo.UserName, registrationToken, registrationResult.ToString());
 
             return registrationResult;
         }
 
-        public async Task<AuthenticationResultDto> ResetPasswordAsync(string resetPasswordToken, int userQuestionAnswerId, 
+        public async Task<AuthenticationResultDto> ResetPasswordAsync(string resetPasswordToken, int userQuestionAnswerId,
             string answer, int attemptCount, string newPassword)
         {
             int userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
@@ -521,10 +555,10 @@ namespace Linko.LinkoExchange.Services.Authentication
             int resetPasswordTokenValidateInterval = Convert.ToInt32(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"]);
 
             var authenticationResult = new AuthenticationResultDto();
-           
+
             var emailAuditLog = _dbContext.EmailAuditLog.FirstOrDefault(e => e.Token == resetPasswordToken);
 
-            if(emailAuditLog == null)
+            if (emailAuditLog == null)
             {
                 throw new Exception(string.Format("ERROR: Cannot find email audit log associated with token={0}", resetPasswordToken));
             }
@@ -611,7 +645,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Result = AuthenticationResult.Success;
             }
 
-            return authenticationResult; 
+            return authenticationResult;
         }
 
         /// <summary>
@@ -627,11 +661,11 @@ namespace Linko.LinkoExchange.Services.Authentication
             AuthenticationResultDto authenticationResult = new AuthenticationResultDto();
 
             var user = _dbContext.Users.SingleOrDefault(u => u.UserName == username);
-            if(user == null)
+            if (user == null)
             {
-                authenticationResult.Success = false;  
+                authenticationResult.Success = false;
                 authenticationResult.Result = AuthenticationResult.UserNotFound;
-                authenticationResult.Errors = new[] {"UserNotFound"};
+                authenticationResult.Errors = new[] { "UserNotFound" };
             } else if (!await _userManager.IsEmailConfirmedAsync(user.Id))
             {
                 authenticationResult.Success = false;
@@ -684,10 +718,10 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <returns></returns>
         public Task<SignInResultDto> SignInByUserName(string userName, string password, bool isPersistent)
         {
-            _logger.Info(message: "SignInByUserName. userName={0}", argument: userName); 
+            _logger.Info(message: "SignInByUserName. userName={0}", argument: userName);
 
             SignInResultDto signInResultDto = new SignInResultDto();
-             
+
             var applicationUser = _userManager.FindByName(userName);
             if (applicationUser == null)
             {
@@ -697,7 +731,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             if (applicationUser.IsAccountResetRequired)
             {
-                signInResultDto.AutehticationResult = AuthenticationResult.AccountResetRequired; 
+                signInResultDto.AutehticationResult = AuthenticationResult.AccountResetRequired;
                 return Task.FromResult(signInResultDto);
             }
 
@@ -714,7 +748,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (_userManager.IsLockedOut(applicationUser.Id))
             {
                 //TODO: log failed login because of Locked to Audit (UC-2) 
-                signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut; 
+                signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
                 return Task.FromResult(signInResultDto);
             }
 
@@ -726,7 +760,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 signInResultDto.AutehticationResult = AuthenticationResult.UserIsLocked;
                 return Task.FromResult(signInResultDto);
             }
-             
+
             // UC-29, 4.a, 5.a, 6.a
             if (!ValidateUserAccess(applicationUser, signInResultDto))
             {
@@ -735,26 +769,26 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             // clear claims from db if there are   
             ClearClaims(applicationUser.Id);
-            applicationUser.Claims.Clear(); 
-            var userId = applicationUser.UserProfileId; 
+            applicationUser.Claims.Clear();
+            var userId = applicationUser.UserProfileId;
             var organizationIds = GetUserOrganizationIds(userId);
 
-            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList(); 
+            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
 
             // UC-29 7.a
             // Check if user's password is expired or not   
             if (IsUserPasswordExpired(userId, organizationSettings))
             {
                 // Put user profile Id into session, to request user change their password. 
-                _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId); 
+                _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId);
 
                 signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
-                return Task.FromResult(signInResultDto); 
+                return Task.FromResult(signInResultDto);
             }
 
-            SetPasswordPolicy(organizationSettings); 
+            SetPasswordPolicy(organizationSettings);
 
-            _signInManager.UserManager = _userManager; 
+            _signInManager.UserManager = _userManager;
             var signInStatus = _signInManager.PasswordSignIn(userName, password, isPersistent, true);
 
             if (signInStatus == SignInStatus.Success)
@@ -765,7 +799,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 _sessionCache.SetValue(CacheKey.OwinUserId, applicationUser.Id);
 
                 //Set user's claims
-                GetUserIdentity(applicationUser); 
+                GetUserIdentity(applicationUser);
             }
             else if (signInStatus == SignInStatus.Failure)
             {
@@ -785,7 +819,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 // UC-29 4.a
                 // System confirms user has status “Registration Pending” (and no access to any other portal where registration is not pending or portal is not disabled)
                 if (orpus.All(i => i.IsRegistrationApproved == false) ||
-                    ! orpus.Any(i => i.IsRegistrationApproved && i.OrganizationRegulatoryProgramDto.IsEnabled))
+                    !orpus.Any(i => i.IsRegistrationApproved && i.OrganizationRegulatoryProgramDto.IsEnabled))
                 {
                     // TODO: Log failed login because of registration pending to Audit (UC-2)
                     signInResultDto.AutehticationResult = AuthenticationResult.RegistrationApprovalPending;
@@ -877,11 +911,11 @@ namespace Linko.LinkoExchange.Services.Authentication
         }
 
         public void SignOff()
-        { 
+        {
             var owinUserId = _sessionCache.GetValue(CacheKey.OwinUserId) as string;
             ClearClaims(owinUserId);
             _sessionCache.Clear();
-            _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie); 
+            _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
         }
 
         #region private section
@@ -896,13 +930,13 @@ namespace Linko.LinkoExchange.Services.Authentication
             var lastNumberPasswordInHistory = _dbContext.UserPasswordHistories
                 .Where(i => i.UserProfileId == userProfileId)
                 .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(numberOfPasswordsInHistory);
-            if (lastNumberPasswordInHistory.Any(i=>i.PasswordHash == passwordHash))
+            if (lastNumberPasswordInHistory.Any(i => i.PasswordHash == passwordHash))
             {
-                return false; 
+                return false;
             }
 
             return true;
-        } 
+        }
 
         private bool IsUserPasswordExpired(int userProfileId, IEnumerable<SettingDto> organizationSettings)
         {
@@ -922,7 +956,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return true;
             }
 
-            return false; 
+            return false;
         }
 
         private void ClearClaims(string userId)
@@ -943,15 +977,15 @@ namespace Linko.LinkoExchange.Services.Authentication
                 UserName = userName,
                 Email = email
             };
-        } 
-         
+        }
+
         private void GetUserIdentity(UserProfile userProfile)
-        { 
+        {
             // get userDto's role, organizations, programs, current organization, current program.....
-             
+
             var claims = new List<Claim>();
             claims.Add(new Claim(ClaimTypes.NameIdentifier, userProfile.Id));
-            claims.Add(new Claim(CacheKey.OwinUserId, userProfile.Id)); 
+            claims.Add(new Claim(CacheKey.OwinUserId, userProfile.Id));
             claims.Add(new Claim(CacheKey.UserProfileId, userProfile.UserProfileId.ToString()));
             claims.Add(new Claim(CacheKey.FirstName, userProfile.FirstName));
             claims.Add(new Claim(CacheKey.LastName, userProfile.LastName));
@@ -978,7 +1012,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             _sessionCache.SetValue(CacheKey.OwinClaims, claims);
 
-            _authenticationManager.SignIn(authProperties, identity);  
+            _authenticationManager.SignIn(authProperties, identity);
         }
         private void SetPasswordPolicy(IEnumerable<SettingDto> organizationSettings)
         {
@@ -989,7 +1023,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             _userManager.UserLockoutEnabledByDefault = true;
             _userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromHours(_settingService.PasswordLockoutHours());
 
-            _userManager.MaxFailedAccessAttemptsBeforeLockout = MaxFailedPasswordAttempts(organizationSettings); 
+            _userManager.MaxFailedAccessAttemptsBeforeLockout = MaxFailedPasswordAttempts(organizationSettings);
         }
 
 
@@ -1014,20 +1048,20 @@ namespace Linko.LinkoExchange.Services.Authentication
         private int GetStrictestPasswordHistoryCounts(IEnumerable<SettingDto> organizationSettings)
         {
             return GetSettingIntValue(SettingType.PasswordHistoryMaxCount, organizationSettings, isMax: false);
-        } 
+        }
 
         private int GetStrictestLengthPasswordExpiredDays(IEnumerable<SettingDto> organizationSettings)
         {
-            return GetSettingIntValue(SettingType.PasswordChangeRequiredDays, organizationSettings, isMax:false); 
+            return GetSettingIntValue(SettingType.PasswordChangeRequiredDays, organizationSettings, isMax: false);
         }
 
         private int MaxFailedPasswordAttempts(IEnumerable<SettingDto> organizationSettings)
         {
             return GetSettingIntValue(SettingType.FailedPasswordAttemptMaxCount, organizationSettings, isMax: false);
-        } 
+        }
 
         #endregion
-         
+
         private IEnumerable<int> GetUserProgramIds(int userId)
         {
             var programs = _programService.GetUserRegulatoryPrograms(userId);
@@ -1048,7 +1082,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             string baseUrl = _httpContext.GetRequestBaseUrl();
             string link = baseUrl + "Account/ResetPassword/?token=" + token;
 
-            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber]; 
+            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
             string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
 
             var contentReplacements = new Dictionary<string, string>();
@@ -1062,19 +1096,19 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<QuestionAnswerPairDto> securityQuestions, IEnumerable<QuestionAnswerPairDto> kbqQuestions)
         {
-            if(userProfile.AgreeTermsAndConditions == false)
+            if (userProfile.AgreeTermsAndConditions == false)
             {
-                return RegistrationResult.NotAgreedTermsAndConditions; 
+                return RegistrationResult.NotAgreedTermsAndConditions;
             }
 
             // To verify user's password 
-            if(userProfile.Password.Length < 8 || userProfile.Password.Length > 15)
+            if (userProfile.Password.Length < 8 || userProfile.Password.Length > 15)
             {
                 return RegistrationResult.BadPassword;
             }
 
-            var validPassword = _userManager.PasswordValidator.ValidateAsync(userProfile.Password).Result; 
-            if(validPassword.Succeeded == false)
+            var validPassword = _userManager.PasswordValidator.ValidateAsync(userProfile.Password).Result;
+            if (validPassword.Succeeded == false)
             {
                 return RegistrationResult.BadPassword;
             }
@@ -1086,19 +1120,18 @@ namespace Linko.LinkoExchange.Services.Authentication
                 string.IsNullOrWhiteSpace(userProfile.CityName) ||
                 string.IsNullOrWhiteSpace(userProfile.ZipCode) ||
                 string.IsNullOrWhiteSpace(userProfile.Email) ||
-                string.IsNullOrWhiteSpace(userProfile.UserName)
-              )
+                string.IsNullOrWhiteSpace(userProfile.UserName) ||
+                securityQuestions == null || kbqQuestions == null)  
             {
                 return RegistrationResult.BadUserProfileData;
             }
-
-            if (securityQuestions == null || securityQuestions.Count() < 2)
-               
+             
+            if (securityQuestions.Count() < 2)               
             {
                 return RegistrationResult.MissingSecurityQuestion;
             }
 
-            if (kbqQuestions == null || kbqQuestions.Count() < 5)
+            if ( kbqQuestions.Count() < 5)
             {
                 return RegistrationResult.MissingKBQ;
             }
