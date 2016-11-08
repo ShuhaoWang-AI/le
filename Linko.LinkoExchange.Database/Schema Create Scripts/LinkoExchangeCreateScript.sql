@@ -313,7 +313,6 @@ BEGIN
         OrganizationTypeRegulatoryProgramId int IDENTITY(1,1) NOT NULL  
         , RegulatoryProgramId               int NOT NULL  
         , OrganizationTypeId                int NOT NULL
-        , AssignedTo                        varchar(50) NULL  
         , CreationDateTimeUtc               datetimeoffset(0) NOT NULL  
         , LastModificationDateTimeUtc       datetimeoffset(0) NULL  
         , LastModifierUserId                int NULL  
@@ -366,6 +365,7 @@ BEGIN
         , RegulatoryProgramId           int NOT NULL  
         , OrganizationId                int NOT NULL  
         , RegulatorOrganizationId       int NULL  
+        , AssignedTo                    varchar(50) NULL  
         , IsEnabled                     bit NOT NULL  
         , IsRemoved                     bit NOT NULL  
         , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
