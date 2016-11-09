@@ -534,6 +534,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (validateResult.Succeeded == false)
             {
                 authenticationResult.Success = false;
+                authenticationResult.Result = AuthenticationResult.PasswordRequirementsNotMet;
                 authenticationResult.Errors = validateResult.Errors;
                 return authenticationResult;
             }

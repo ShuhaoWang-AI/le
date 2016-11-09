@@ -4,6 +4,7 @@
     {
         Success,
         Failed,
+        PasswordRequirementsNotMet,
         InvalidUserNameOrPassword,
         UserIsLocked,
         UserIsDisabled,

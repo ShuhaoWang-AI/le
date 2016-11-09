@@ -513,6 +513,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                     _logger.Info(string.Format(format: "ResetPassword. Password for {0} has been successfully reset.", arg0: model.Token));
                     return RedirectToAction(actionName: "ResetPasswordConfirmation", controllerName: "Account");
 
+                case AuthenticationResult.PasswordRequirementsNotMet:
+                    _logger.Info(string.Format(format: "ResetPassword. Password Requirements Not Met for Token = {0}.", arg0: model.Token));
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(key: "", errorMessage: error);
+                    }
+                    return View(model);
+
                 // Can Not Use Old Password
                 case AuthenticationResult.CanNotUseOldPassword:
                     _logger.Info(string.Format(format: "ResetPassword. Can not use old password for Token = {0}.", arg0: model.Token));

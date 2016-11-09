@@ -172,6 +172,12 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
+        public void ResetPassword_Test()
+        {
+            var result = _authenticationService.ResetPasswordAsync("TOKEN", 1, "test", 2, "1");
+        }
+
+        [TestMethod]
         public void Return_UserIsLocked()
         {
             userProfile.IsAccountLocked = true;
