@@ -259,7 +259,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 LastName = vm.UserProfileDto.LastName,
                 PhoneNumber = vm.UserProfileDto.PhoneNumber,
                 Email = vm.UserProfileDto.Email,
-                DateRegistered = vm.RegistrationDateTime.Value.DateTime,
+                DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime,
                 Status = vm.IsEnabled,
                 AccountLocked = vm.UserProfileDto.IsAccountLocked
             });

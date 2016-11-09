@@ -23,7 +23,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(i => i.OrganizationRegulatoryProgramId);
             Property(i => i.PermissionGroupId); 
-            Property(i => i.RegistrationDateTime);
+            Property(i => i.RegistrationDateTimeUtc);
             Property(i => i.IsRegistrationApproved);
             Property(i => i.IsRegistrationDenied);
             Property(i => i.IsRemoved);

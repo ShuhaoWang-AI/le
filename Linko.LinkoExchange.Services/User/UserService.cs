@@ -136,7 +136,7 @@ namespace Linko.LinkoExchange.Services.User
                 var userProfileDto = GetUserProfileById(user.UserProfileId);
                 
                 //Need to modify datetime to local
-                dto.RegistrationDateTime = TimeZoneInfo.ConvertTimeFromUtc(dto.RegistrationDateTime.Value.UtcDateTime, authorityLocalZone);
+                dto.RegistrationDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(dto.RegistrationDateTimeUtc.Value.UtcDateTime, authorityLocalZone);
                 userProfileDto.CreationDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(userProfileDto.CreationDateTimeUtc.Value.UtcDateTime, authorityLocalZone);
 
                 dto.UserProfileDto = userProfileDto;

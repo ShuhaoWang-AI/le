@@ -24,12 +24,14 @@ namespace Linko.LinkoExchange.Test
     public class UserServiceTests
     {
         private UserService _userService;
+        private UserService _realUserService;
         Mock<IHttpContextService> _httpContext;
         Mock<ISessionCache> _sessionCache;
         IRequestCache _requestCache = Mock.Of<IRequestCache>();
         Mock<IOrganizationService> _orgService;
         IOrganizationService _realOrgService;
         Mock<ISettingService> _settingService;
+        ISettingService _realSettingService;
         IEmailService _emailService = Mock.Of<IEmailService>();
         ITimeZoneService _timeZones;
         public UserServiceTests()
@@ -74,14 +76,16 @@ namespace Linko.LinkoExchange.Test
 
 
             _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString));
-
-
+            _realSettingService = new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance);
             _realOrgService = new OrganizationService(new LinkoExchangeContext(connectionString),
-                Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance), new HttpContextService());
+                Mapper.Instance, _realSettingService, new HttpContextService());
+            _realUserService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(),
+                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _realSettingService,
+                _sessionCache.Object, _realOrgService, _requestCache, _timeZones);
 
             _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
                 new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService.Object, 
-                _sessionCache.Object, _realOrgService, _requestCache, _timeZones);
+                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones);
         }
 
         [TestMethod]
@@ -101,8 +105,8 @@ namespace Linko.LinkoExchange.Test
         {
             var orgRegProgUserId = 7;
             var permissionGroupId = 1;
-            _userService.UpdateUserPermissionGroupId(orgRegProgUserId, permissionGroupId);
-            _userService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, true);
+            _realUserService.UpdateUserPermissionGroupId(orgRegProgUserId, permissionGroupId);
+            _realUserService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, true);
         }
 
         [TestMethod]
@@ -110,7 +114,7 @@ namespace Linko.LinkoExchange.Test
         {
             var orgRegProgUserId = 7;
             var permissionGroupId = 1;
-            _userService.ApprovePendingRegistration(orgRegProgUserId, permissionGroupId, true);
+            _realUserService.ApprovePendingRegistration(orgRegProgUserId, permissionGroupId, false);
         }
 
         [TestMethod]

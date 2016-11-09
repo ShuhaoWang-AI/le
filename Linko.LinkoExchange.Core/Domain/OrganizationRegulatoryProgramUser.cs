@@ -21,6 +21,6 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual PermissionGroup PermissionGroup { get; set; }
         public int? PermissionGroupId { get; set; }
         public DateTimeOffset? CreationDateTimeUtc { get;set; }
-        public DateTimeOffset? RegistrationDateTime { get;set;}
+        public DateTimeOffset? RegistrationDateTimeUtc { get;set;}
     }
 }

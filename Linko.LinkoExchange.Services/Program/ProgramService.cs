@@ -85,7 +85,7 @@ namespace Linko.LinkoExchange.Services.Program
             orpu.UserProfileId = userProfileId;
             //orpu.LastModificationDateTimeUtc = DateTime.UtcNow;
             orpu.CreationDateTimeUtc = DateTimeOffset.UtcNow;
-            orpu.RegistrationDateTime = DateTimeOffset.UtcNow;
+            orpu.RegistrationDateTimeUtc = DateTimeOffset.UtcNow;
             orpu.OrganizationRegulatoryProgramId = organizationRegulatoryProgramId;
 
             _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Add(orpu);
