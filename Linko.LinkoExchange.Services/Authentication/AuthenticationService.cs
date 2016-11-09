@@ -527,15 +527,18 @@ namespace Linko.LinkoExchange.Services.Authentication
         public async Task<AuthenticationResultDto> ResetPasswordAsync(string resetPasswordToken, int userQuestionAnswerId,
             string answer, int attemptCount, string newPassword)
         {
-            int userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
-            //int orgRegProgramId = Convert.ToInt32(_sessionCache.GetValue(CacheKey.OrganizationRegulatoryProgramId));
-            //string passwordHash = _passwordHasher.HashPassword(newPassword);
-            //string answerHash = _passwordHasher.HashPassword(answer);
-            //var organizationIds = GetUserOrganizationIds(userProfileId);
-            //var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
-            int resetPasswordTokenValidateInterval = Convert.ToInt32(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"]);
-
             var authenticationResult = new AuthenticationResultDto();
+            
+            // Use PasswordValidator
+            var validateResult = _userManager.PasswordValidator.ValidateAsync(newPassword).Result;
+            if (validateResult.Succeeded == false)
+            {
+                authenticationResult.Success = false;
+                authenticationResult.Errors = validateResult.Errors;
+                return authenticationResult;
+            }
+
+            int resetPasswordTokenValidateInterval = Convert.ToInt32(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"]);
 
             var emailAuditLog = _dbContext.EmailAuditLog.FirstOrDefault(e => e.Token == resetPasswordToken);
 
@@ -619,8 +622,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
             else
             {
-                //Password not meet pass requirements? -- done at View level via PasswordValidator/data annotations
-
                 _userService.SetHashedPassword(userProfileId, passwordHash);
                 authenticationResult.Success = true;
                 authenticationResult.Result = AuthenticationResult.Success;
