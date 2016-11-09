@@ -3,6 +3,7 @@
     public sealed class CacheKey
     {
         private CacheKey() { }
+        public static string SessionId = "SessionId";
         public static string OwinUserId = "OwinUserId";
         public static string OwinClaims = "OwinClaims";
         public static string UserProfileId = "UserProfileId";

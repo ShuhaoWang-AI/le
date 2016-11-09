@@ -24,6 +24,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using NLog;
+using System.Web;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
@@ -778,8 +779,17 @@ namespace Linko.LinkoExchange.Services.Authentication
                 _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId);
                 _sessionCache.SetValue(CacheKey.OwinUserId, applicationUser.Id);
 
-                //Set user's claims
-                GetUserIdentity(applicationUser);
+                var claims = GetUserIdentity(applicationUser);
+
+                var identity = new ClaimsIdentity(_httpContext.Current().User.Identity);    
+                identity.AddClaims(claims); 
+                _authenticationManager.AuthenticationResponseGrant = new AuthenticationResponseGrant
+                    (identity, new AuthenticationProperties { IsPersistent = true });
+
+                _authenticationManager.SignOut();
+                _authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
+                _signInManager.PasswordSignIn(userName, password, isPersistent, true);
+                
             }
             else if (signInStatus == SignInStatus.Failure)
             {
@@ -966,7 +976,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             };
         }
 
-        private void GetUserIdentity(UserProfile userProfile)
+        private List<Claim> GetUserIdentity(UserProfile userProfile)
         {
             // get userDto's role, organizations, programs, current organization, current program.....
 
@@ -978,18 +988,22 @@ namespace Linko.LinkoExchange.Services.Authentication
             claims.Add(new Claim(CacheKey.LastName, userProfile.LastName));
             claims.Add(new Claim(CacheKey.UserName, userProfile.UserName));
             claims.Add(new Claim(CacheKey.Email, userProfile.Email));
+            claims.Add(new Claim(CacheKey.SessionId, _httpContext.Current().Session.SessionID));
 
             SaveClaims(userProfile.Id, claims);
+            return claims;
         }
 
         private void SaveClaims(string userId, IList<Claim> claims)
         {
             var identity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
 
+            var cookieValidateInterval = ValueParser.TryParseInt(ConfigurationManager.AppSettings["CookieValidateInterval"], 30);
             var authProperties = new AuthenticationProperties
             {
                 IsPersistent = true,
-                ExpiresUtc = DateTime.UtcNow.AddDays(7)
+
+                ExpiresUtc = DateTime.UtcNow.AddDays(cookieValidateInterval)
             };
 
             foreach (var claim in claims)
