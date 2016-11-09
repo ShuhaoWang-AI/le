@@ -220,26 +220,36 @@ namespace Linko.LinkoExchange.Services.Organization
         /// to see if there are any available licenses left
         ///
         /// Otherwise throw exception
-        public bool UpdateEnableDisableFlag(int orgRegProgId, bool isEnabled)
+        public EnableOrganizationResultDto UpdateEnableDisableFlag(int orgRegProgId, bool isEnabled)
         {
             var orgRegProg = _dbContext.OrganizationRegulatoryPrograms
                     .Include(path: "RegulatoryProgram")
                     .Include(path: "Organization")
-                    .Include(path: "RegulatorOrganization")
                     .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId);
+
             bool isAuthority = orgRegProg.RegulatorOrganizationId == null;
-            if (isEnabled)
+            if (isEnabled && !isAuthority)
             {
-                //check for number of licenses exceeds limit (different for Industry and Authority)
-                var remainingLicenses = GetRemainingUserLicenseCount(orgRegProgId, isAuthority);
+                //check if violates max industries allowed for authority
+                var authority = _dbContext.OrganizationRegulatoryPrograms
+                    .Single(o => o.OrganizationId == orgRegProg.RegulatorOrganizationId
+                    && o.RegulatoryProgramId == orgRegProg.RegulatoryProgramId);
+
+                var remainingLicenses = GetRemainingIndustryLicenseCount(authority.OrganizationRegulatoryProgramId);
                 if (remainingLicenses < 1)
-                    return false;
+                    return new EnableOrganizationResultDto() { IsSuccess = false, FailureReason = EnableOrganizationFailureReason.TooManyIndustriesForAuthority };
+
+                //Check child organization doesn't have more user's than "UserPerIndustryMaxCount" setting of parent
+                var remainingUserCount = GetRemainingUserLicenseCount(orgRegProgId, false);
+                if (remainingUserCount < 1)
+                    return new EnableOrganizationResultDto() { IsSuccess = false, FailureReason = EnableOrganizationFailureReason.TooManyUsersForThisIndustry };
+
             }
 
             orgRegProg.IsEnabled = isEnabled;
             _dbContext.SaveChanges();
 
-            return true;
+            return new EnableOrganizationResultDto() { IsSuccess = true };
         } 
 
         public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int orgRegProgId)

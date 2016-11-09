@@ -132,6 +132,7 @@
     <Compile Include="Cache\CacheKey.cs" />
     <Compile Include="Cache\ISessionCache.cs" />
     <Compile Include="Cache\SessionCache.cs" />
+    <Compile Include="Dto\EnableOrganizationResultDto.cs" />
     <Compile Include="Dto\ResetUserResultDto.cs" />
     <Compile Include="Dto\AccountLockoutResultDto.cs" />
     <Compile Include="Dto\CrommerAuditLogEntry.cs" />

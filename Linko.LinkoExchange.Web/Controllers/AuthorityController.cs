@@ -181,7 +181,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             try
             {
-                bool isUpdated = _organizationService.UpdateEnableDisableFlag(model.ID, !model.IsEnabled);
+                var result = _organizationService.UpdateEnableDisableFlag(model.ID, !model.IsEnabled);
+                bool isUpdated = result.IsSuccess;
 
                 if (isUpdated)
                 {

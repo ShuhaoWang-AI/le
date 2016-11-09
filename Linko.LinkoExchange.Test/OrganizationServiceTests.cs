@@ -56,7 +56,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void UpdateEnableDisableFlag()
         {
-            orgService.UpdateEnableDisableFlag(1, true);
+            var result = orgService.UpdateEnableDisableFlag(2, true);
         }
 
         [TestMethod]
