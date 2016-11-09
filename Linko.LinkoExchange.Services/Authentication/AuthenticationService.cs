@@ -565,13 +565,13 @@ namespace Linko.LinkoExchange.Services.Authentication
         {
             int userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
             string passwordHash = _passwordHasher.HashPassword(newPassword);
-            string answerHash = _passwordHasher.HashPassword(answer);
+            string correctSavedHashedAnswer = _dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content;
             var organizationIds = GetUserOrganizationIds(userProfileId);
             var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
 
             var authenticationResult = new AuthenticationResultDto();
 
-            if (!(_dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content.ToLower() == answerHash))
+            if (_userManager.PasswordHasher.VerifyHashedPassword(correctSavedHashedAnswer, answer) != PasswordVerificationResult.Success)
             {
                 //Check hashed answer (5.3.a)
 
