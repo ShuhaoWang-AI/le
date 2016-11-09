@@ -4442,7 +4442,7 @@ BEGIN
 	INSERT INTO dbo.tSystemSetting (Name, Value, Description)
 		VALUES 
 		(
-		    'SuppportEmailAddress'
+		    'SupportEmailAddress'
 		    , 'support@linkoexchange.com'
 		    , ''
 		)
@@ -4822,7 +4822,7 @@ Hello,
 
 For security reasons, the following account has been locked by the Authority. Check the logs for more details about this user.
 
-    Fist Name: {firstName}
+   First Name: {firstName}
     Last Name: {lastName}
     User Name: {userName}
         Email: {email}
@@ -4981,9 +4981,9 @@ Hello {adminFirstName} {adminLastName},
 
 Signatory rights have been granted for:
 
-	User:  		{firstName} {lastName}
+	     User:	{firstName} {lastName}
 	Authority:	{authorityName}
-	Facility:	{organizationName}
+	 Facility:	{organizationName}
 				{addressLine1}
 				{cityName}, {stateName} 
 	     
@@ -5042,9 +5042,9 @@ Hello {adminFirstName} {adminLastName},
 
 Signatory rights have been revoked for:
 
-	User:		{firstName} {lastName}
+	     User:	{firstName} {lastName}
 	Authority:	{authorityName}
-	Facility:	{organizationName}
+	 Facility:	{organizationName}
 				{addressLine1}
 				{cityName}, {stateName} 
 	     
