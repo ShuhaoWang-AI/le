@@ -132,5 +132,11 @@ namespace Linko.LinkoExchange.Test
             Assert.AreEqual(result, false);
         }
 
+        [TestMethod]
+        public void GetQuestions_Test()
+        {
+            var result = _questionAnswerService.GetQuestions();
+        }
+
     }
 }

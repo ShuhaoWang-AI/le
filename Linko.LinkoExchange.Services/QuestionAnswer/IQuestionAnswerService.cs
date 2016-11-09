@@ -62,5 +62,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         QuestionAnswerPairDto GetRandomQuestionAnswerFromUserProfileId(int userProfileId, Dto.QuestionType questionType);
 
+        ICollection<QuestionDto> GetQuestions();
+
     }
 }

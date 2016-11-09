@@ -442,5 +442,29 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 }
             }
         }
+
+        public ICollection<QuestionDto> GetQuestions()
+        {
+            var list = new List<QuestionDto>();
+
+            var questions = _dbContext.Questions
+                .Where(q => q.IsActive == true);
+
+
+            foreach (var question in questions)
+            {
+                var dto = new Dto.QuestionDto()
+                {
+                    QuestionId = question.QuestionId,
+                    Content = question.Content
+                };
+                dto.QuestionType = (Dto.QuestionType)question.QuestionTypeId;
+                
+                list.Add(dto);
+            }
+
+            return list;
+
+        }
     }
 }
