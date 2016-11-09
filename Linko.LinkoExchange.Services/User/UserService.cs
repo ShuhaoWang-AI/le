@@ -645,8 +645,69 @@ namespace Linko.LinkoExchange.Services.User
 
         }
 
-        public void ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved)
+        public RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved)
         {
+            var programUser = GetOrganizationRegulatoryProgramUser(orgRegProgUserId);
+            int orgRegProgramId = programUser.OrganizationRegulatoryProgramId;
+            var authority = _orgService.GetAuthority(orgRegProgramId);
+            bool isAuthorityUser = true;
+            if (authority != null && authority.OrganizationRegulatoryProgramId != orgRegProgramId)
+            {
+                //We know this is "industry user", otherwise the authority would be the same THIS user's org.
+                isAuthorityUser = false;
+            }
+
+            if (!isAuthorityUser) // ALLOW THIS ACTION OR DISALLOW (UC-7.1, 5.b)
+            {
+                //Get the list of IU admin users for this industry user's organization
+                var allProgramUsers = GetUserProfilesForOrgRegProgram(orgRegProgramId, true, null, true, false);
+                var IUAdmins = allProgramUsers.Where(u => u.PermissionGroup.Name.StartsWith("Admin"));
+
+                //Is the logged in actor user in the set of IU admins?
+                var isCurrentUserIUAdmin = false;
+                int loggedInUsersOrgRegProgUserId = Convert.ToInt32(_httpContext.GetSessionValue(CacheKey.OrganizationRegulatoryProgramUserId));
+                if (IUAdmins != null && IUAdmins.Any(x => x.OrganizationRegulatoryProgramUserId == loggedInUsersOrgRegProgUserId))
+                {
+                    //Logged in user is one of the IU Admins
+                    isCurrentUserIUAdmin = true;
+                }
+
+                //Is the currently logged in user an Authority User?
+                var isCurrentUserAuthorityUser = false;
+                if (_dbContext.OrganizationRegulatoryProgramUsers
+                    .Any(o => o.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId
+                    && o.OrganizationRegulatoryProgramUserId == loggedInUsersOrgRegProgUserId))
+                    isCurrentUserAuthorityUser = true;
+
+                //Is this a re-reg from a reset? (UC-7.1, 5.c)
+                var isResetScenario = false;
+                if (programUser.UserProfileDto.IsAccountResetRequired)
+                    isResetScenario = true;
+
+                if (isResetScenario)
+                {
+                    if (!isCurrentUserAuthorityUser)
+                    {
+                        //ACTION BLOCKED -- ONLY AUTHORITY CAN APPROVE
+                        return new RegistrationResultDto() { Result = RegistrationResult.UnauthorizedApprovalAfterReset };
+                    }
+
+                    //AUTHORITY CANNOT CHANGE PREVIOUS ROLE
+                    if (programUser.PermissionGroup.PermissionGroupId != permissionGroupId)
+                        return new RegistrationResultDto() { Result = RegistrationResult.ApprovalAfterResetCannotChangeRole };
+                }
+                else
+                {
+                    if (IUAdmins != null && IUAdmins.Count() > 1 && !isCurrentUserIUAdmin)
+                    {
+                        //ACTION BLOCKED -- ONLY AUTHORITY CAN APPROVE
+                        return new RegistrationResultDto() { Result = RegistrationResult.UnauthorizedNotIUAdmin };
+                    }
+                }
+                
+
+            }
+
             var transaction = _dbContext.BeginTransaction();
             try
             {
@@ -665,18 +726,9 @@ namespace Linko.LinkoExchange.Services.User
             }
 
 
+            //Send email(s)
+            //
             EmailType emailType;
-            //var programUser = _dbContext.OrganizationRegulatoryProgramUsers.Single(o => o.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
-            var programUser = GetOrganizationRegulatoryProgramUser(orgRegProgUserId);
-            int orgRegProgramId = programUser.OrganizationRegulatoryProgramId;
-            var authority = _orgService.GetAuthority(orgRegProgramId);
-            bool isAuthorityUser = true;
-            if (authority != null && authority.OrganizationRegulatoryProgramId != orgRegProgramId)
-            {
-                //We know this is "industry user", otherwise the authority would be the same THIS user's org.
-                isAuthorityUser = false;
-            }
-
             if (isApproved)
             {
                 //Authority or Industry?
@@ -694,7 +746,6 @@ namespace Linko.LinkoExchange.Services.User
                     emailType = EmailType.Registration_IndustryRegistrationDenied;
             }
 
-            //Send email
             var contentReplacements = new Dictionary<string, string>();
             string authorityName = _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoName);
             string authorityPhoneNumber = _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoPhone);
@@ -723,6 +774,9 @@ namespace Linko.LinkoExchange.Services.User
             }
 
             _emailService.SendEmail(new[] { programUser.UserProfileDto.Email }, emailType, contentReplacements);
+
+
+            return new RegistrationResultDto() { Result = RegistrationResult.Success };
 
         }
         #endregion

@@ -66,7 +66,7 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="orgRegProgUserId"></param>
         /// <param name="permissionGroupId"></param>
         /// <param name="isApproved"></param>
-        void ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved);
+        RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved);
 
     }
 }

@@ -21,6 +21,9 @@ namespace Linko.LinkoExchange.Core.Enum
         DuplicatedKBQ,
         DuplicatedSecurityQuestion,
         MissingKBQ,
-        MissingSecurityQuestion
+        MissingSecurityQuestion,
+        UnauthorizedApprovalAfterReset,
+        UnauthorizedNotIUAdmin,
+        ApprovalAfterResetCannotChangeRole
     }
 }
