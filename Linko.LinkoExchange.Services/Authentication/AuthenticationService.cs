@@ -211,8 +211,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                 //create history record
                 UserPasswordHistory history = _dbContext.UserPasswordHistories.Create();
                 history.UserProfileId = applicationUser.UserProfileId;
-                history.PasswordHash = newPassword;
+                history.PasswordHash = _passwordHasher.HashPassword(newPassword); ;
                 history.LastModificationDateTimeUtc = DateTime.UtcNow;
+                _dbContext.UserPasswordHistories.Add(history);
                 _dbContext.SaveChanges();
 
                 //Send Email
@@ -623,6 +624,14 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
             else
             {
+                //create history record
+                UserPasswordHistory history = _dbContext.UserPasswordHistories.Create();
+                history.UserProfileId = userProfileId;
+                history.PasswordHash = passwordHash;
+                history.LastModificationDateTimeUtc = DateTime.UtcNow;
+                _dbContext.UserPasswordHistories.Add(history);
+                _dbContext.SaveChanges();
+
                 _userService.SetHashedPassword(userProfileId, passwordHash);
                 authenticationResult.Success = true;
                 authenticationResult.Result = AuthenticationResult.Success;
