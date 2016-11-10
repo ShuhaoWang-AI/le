@@ -229,5 +229,13 @@ namespace Linko.LinkoExchange.Test
         {
             var isWorked = _userService.UpdateEmail(1, "jbourne@test.com");
         }
+
+
+        [TestMethod]
+        public void UpdateUserSignatoryStatus_Test()
+        {
+            _userService.UpdateUserSignatoryStatus(1, true);
+        }
+
     }
 }

@@ -212,23 +212,25 @@ namespace Linko.LinkoExchange.Services.User
             _dbContext.SaveChanges();
 
             var user = GetUserProfileById(programUser.UserProfileId);
-            var org = programUser.OrganizationRegulatoryProgram.Organization;
-            var authority = programUser.OrganizationRegulatoryProgram.RegulatorOrganization;
+            var orgRegProgram = programUser.OrganizationRegulatoryProgram;
+            var authority = _dbContext.OrganizationRegulatoryPrograms
+                .SingleOrDefault(o => o.OrganizationId == programUser.OrganizationRegulatoryProgram.RegulatorOrganizationId
+                && o.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
             if (authority == null)
             {
                 //This IS an authority
-                authority = org;
+                authority = orgRegProgram;
             }
 
             var contentReplacements = new Dictionary<string, string>();
             contentReplacements.Add("userName", user.UserName);
-            contentReplacements.Add("authorityName", _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoName));
-            contentReplacements.Add("organizationName", org.Name);
-            contentReplacements.Add("addressLine1", org.AddressLine1);
-            contentReplacements.Add("cityName", org.CityName);
-            contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == org.JurisdictionId).Name);
-            contentReplacements.Add("emailAddress", _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoEmailAddress));
-            contentReplacements.Add("phoneNumber", _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoPhone));
+            contentReplacements.Add("authorityName", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName));
+            contentReplacements.Add("organizationName", orgRegProgram.Organization.Name);
+            contentReplacements.Add("addressLine1", orgRegProgram.Organization.AddressLine1);
+            contentReplacements.Add("cityName", orgRegProgram.Organization.CityName);
+            contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == orgRegProgram.Organization.JurisdictionId).Name);
+            contentReplacements.Add("emailAddress", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress));
+            contentReplacements.Add("phoneNumber", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone));
 
             //Email user
             EmailType emailType = isSignatory ? EmailType.Signature_SignatoryGranted : EmailType.Signature_SignatoryRevoked;
@@ -249,14 +251,14 @@ namespace Linko.LinkoExchange.Services.User
                 contentReplacements.Add("firstName", user.FirstName);
                 contentReplacements.Add("lastName", user.LastName);
                 contentReplacements.Add("userName", user.UserName);
-                contentReplacements.Add("authorityName", _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoName));
+                contentReplacements.Add("authorityName", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName));
                 contentReplacements.Add("email", user.Email);
-                contentReplacements.Add("organizationName", org.Name);
-                contentReplacements.Add("addressLine1", org.AddressLine1);
-                contentReplacements.Add("cityName", org.CityName);
-                contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == org.JurisdictionId).Name);
-                contentReplacements.Add("emailAddress", _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoEmailAddress));
-                contentReplacements.Add("phoneNumber", _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoPhone));
+                contentReplacements.Add("organizationName", orgRegProgram.Organization.Name);
+                contentReplacements.Add("addressLine1", orgRegProgram.Organization.AddressLine1);
+                contentReplacements.Add("cityName", orgRegProgram.Organization.CityName);
+                contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == orgRegProgram.Organization.JurisdictionId).Name);
+                contentReplacements.Add("emailAddress", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress));
+                contentReplacements.Add("phoneNumber", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone));
 
                 _emailService.SendEmail(new[] { adminProfile.Email }, adminEmailType, contentReplacements);
 
