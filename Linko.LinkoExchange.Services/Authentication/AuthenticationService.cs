@@ -1038,11 +1038,23 @@ namespace Linko.LinkoExchange.Services.Authentication
             var defaultValue = ValueParser.TryParseInt(defaultValueStr, 0);
             if (organizationSettings != null && organizationSettings.Any())
             {
-                defaultValue = isMax
-                    ? organizationSettings
-                        .Where(i => i.TemplateName == settingType && i.OrgTypeName == orgTypeName).Max(i => ValueParser.TryParseInt(i.Value, defaultValue))
-                    : organizationSettings.Where(i => i.TemplateName == settingType && i.OrgTypeName ==orgTypeName)
-                        .Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
+                if (orgTypeName != null)
+                {
+                    defaultValue = isMax
+                        ? organizationSettings
+                            .Where(i => i.TemplateName == settingType && i.OrgTypeName == orgTypeName).Max(i => ValueParser.TryParseInt(i.Value, defaultValue))
+                        : organizationSettings.Where(i => i.TemplateName == settingType && i.OrgTypeName == orgTypeName)
+                            .Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
+                }
+                else
+                {
+                    defaultValue = isMax
+                        ? organizationSettings
+                            .Where(i => i.TemplateName == settingType).Max(i => ValueParser.TryParseInt(i.Value, defaultValue))
+                        : organizationSettings.Where(i => i.TemplateName == settingType)
+                            .Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
+
+                }
             }
 
             return defaultValue;
