@@ -444,8 +444,8 @@ namespace Linko.LinkoExchange.Services.User
 
                     contentReplacements = new Dictionary<string, string>();
                     contentReplacements.Add("authorityName", authorityName);
-                    contentReplacements.Add("emailAddress", authorityEmail);
-                    contentReplacements.Add("phoneNumber", authorityPhone);
+                    contentReplacements.Add("authoritySupportEmail", authorityEmail);
+                    contentReplacements.Add("authoritySupportPhoneNumber", authorityPhone);
                     _emailService.SendEmail(new[] { user.Email }, EmailType.UserAccess_AccountLockOut, contentReplacements);
                 }
             
@@ -461,7 +461,7 @@ namespace Linko.LinkoExchange.Services.User
                 contentReplacements.Add("authorityList", authorityListString);
                 contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
                 contentReplacements.Add("supportEmail", supportEmail);
-                _emailService.SendEmail(new[] { user.Email }, EmailType.UserAccess_AccountLockOut, contentReplacements);
+                _emailService.SendEmail(new[] { user.Email }, EmailType.Profile_KBQFailedLockOut, contentReplacements);
 
             }
         }
