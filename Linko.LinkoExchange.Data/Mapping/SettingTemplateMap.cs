@@ -18,6 +18,10 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(i => i.Name);
             Property(i => i.Description);
             Property(i => i.DefaultValue);
+            Property(i => i.OrganizationTypeId);
+            HasRequired(i => i.OrganizationType)
+               .WithMany()
+               .HasForeignKey(i => i.OrganizationTypeId);
         }
     }
 }

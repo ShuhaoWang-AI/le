@@ -33,7 +33,7 @@ namespace Linko.LinkoExchange.Services.User
 
         ResetUserResultDto ResetUser(int userProfileId, string newEmailAddress);
 
-        AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock);
+        AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, bool isForFailedKBQs);
 
         bool EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable);
 

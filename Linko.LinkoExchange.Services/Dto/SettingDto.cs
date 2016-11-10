@@ -4,7 +4,8 @@ namespace Linko.LinkoExchange.Services.Dto
 {
     public class SettingDto
     {
-        public SettingType Type { get; set; }
+        public SettingType TemplateName { get; set; }
+        public OrganizationTypeName OrgTypeName { get; set; }
         public string Value { get; set; }
     }
 }

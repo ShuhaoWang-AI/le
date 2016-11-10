@@ -295,7 +295,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (inivitationRecipintOrganizationSettings.Settings.Any())
             {
                 invitationExpirationHours = ValueParser.TryParseInt(inivitationRecipintOrganizationSettings
-                  .Settings.Single(i => i.Type == SettingType.InvitationExpiredHours).Value, invitationExpirationHours);
+                  .Settings.Single(i => i.TemplateName == SettingType.InvitationExpiredHours).Value, invitationExpirationHours);
             }
 
             if (DateTimeOffset.UtcNow > invitationDto.InvitationDateTimeUtc.AddHours(invitationExpirationHours))
@@ -585,7 +585,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 int maxAnswerAttempts = Convert.ToInt32(_settingService.GetOrganizationSettingValueByUserId(userProfileId, SettingType.FailedKBQAttemptMaxCount, true, null));
                 if (attemptCount++ >= maxAnswerAttempts) // from web.config
                 {
-                    _userService.LockUnlockUserAccount(userProfileId, true);
+                    _userService.LockUnlockUserAccount(userProfileId, true, true);
                     //Get all associated authorities
                     var userOrgs = _organizationService.GetUserRegulators(userProfileId);
 
@@ -1040,8 +1040,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             {
                 defaultValue = isMax
                     ? organizationSettings
-                        .Where(i => i.Type == settingType).Max(i => ValueParser.TryParseInt(i.Value, defaultValue))
-                    : organizationSettings.Where(i => i.Type == settingType)
+                        .Where(i => i.TemplateName == settingType).Max(i => ValueParser.TryParseInt(i.Value, defaultValue))
+                    : organizationSettings.Where(i => i.TemplateName == settingType)
                         .Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
             }
 

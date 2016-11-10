@@ -135,7 +135,7 @@ namespace Linko.LinkoExchange.Services.Settings
         {
             var existingSetting = _dbContext.OrganizationRegulatoryProgramSettings
                 .SingleOrDefault(o => o.OrganizationRegulatoryProgramId == orgRegProgId
-                 && o.SettingTemplateId == (int)settingDto.Type);
+                 && o.SettingTemplate.Name == settingDto.TemplateName.ToString() && o.SettingTemplate.OrganizationType.Name == settingDto.OrgTypeName.ToString());
 
             if (existingSetting != null)
             {
@@ -145,7 +145,9 @@ namespace Linko.LinkoExchange.Services.Settings
             {
                 var newSetting = _dbContext.OrganizationRegulatoryProgramSettings.Create();
                 newSetting.OrganizationRegulatoryProgramId = orgRegProgId;
-                newSetting.SettingTemplateId = Convert.ToInt32(settingDto.Type);
+                newSetting.SettingTemplateId = _dbContext.SettingTemplates
+                    .Single(s => s.Name == settingDto.TemplateName.ToString()
+                    && s.OrganizationType.Name == settingDto.OrgTypeName.ToString()).SettingTemplateId;
                 newSetting.Value = settingDto.Value;
                 _dbContext.OrganizationRegulatoryProgramSettings.Add(newSetting);
             }
@@ -170,7 +172,7 @@ namespace Linko.LinkoExchange.Services.Settings
         {
             var existingSetting = _dbContext.OrganizationSettings
                 .SingleOrDefault(o => o.OrganizationId == organizationId
-                 && o.SettingTemplateId == (int)settingDto.Type);
+                 && o.SettingTemplate.Name == settingDto.TemplateName.ToString());
 
             if (existingSetting != null)
             {
@@ -180,7 +182,9 @@ namespace Linko.LinkoExchange.Services.Settings
             {
                 var newSetting = _dbContext.OrganizationSettings.Create();
                 newSetting.OrganizationId = organizationId;
-                newSetting.SettingTemplateId = Convert.ToInt32(settingDto.Type);
+                newSetting.SettingTemplateId = _dbContext.SettingTemplates
+                    .Single(s => s.Name == settingDto.TemplateName.ToString() 
+                    && s.OrganizationType.Name == settingDto.OrgTypeName.ToString()).SettingTemplateId;
                 newSetting.Value = settingDto.Value;
                 _dbContext.OrganizationSettings.Add(newSetting);
             }
@@ -208,7 +212,7 @@ namespace Linko.LinkoExchange.Services.Settings
             if (orgIds != null)
             {
                 var orgSettingDtos = this.GetOrganizationSettingsByIds(orgIds);
-                var settings = orgSettingDtos.SelectMany(o => o.Settings).Where(s => s.Type == settingType);
+                var settings = orgSettingDtos.SelectMany(o => o.Settings).Where(s => s.TemplateName == settingType);
                 if (settings == null || settings.Count() < 1)
                     throw new Exception(string.Format("ERROR: Could not find organization settings for user profile id={0} and setting type={1}", userProfileId, settingType.ToString()));
                 else if (settings.Count() == 1)
@@ -259,7 +263,7 @@ namespace Linko.LinkoExchange.Services.Settings
         {
             return _dbContext.OrganizationSettings
                .Single(s => s.OrganizationId == organizationId
-               && s.SettingTemplateId == (int)settingType).Value;
+               && s.SettingTemplate.Name == settingType.ToString()).Value;
         }
 
         public string GetOrgRegProgramSettingValue(int orgRegProgramId, SettingType settingType)
@@ -269,7 +273,7 @@ namespace Linko.LinkoExchange.Services.Settings
 
            return _dbContext.OrganizationRegulatoryProgramSettings
                 .Single(s => s.OrganizationRegulatoryProgramId == orgRegProgramId
-                && s.SettingTemplateId == (int)settingType).Value;
+                && s.SettingTemplate.Name == settingType.ToString()).Value;
 
             }
             catch (DbEntityValidationException ex)

@@ -370,7 +370,7 @@ namespace Linko.LinkoExchange.Services.User
 
         }
 
-        private void SendAccountLockoutEmails(UserProfile user)
+        private void SendAccountLockoutEmails(UserProfile user, bool isForFailedKBQs)
         {
             //Email industry admins and authority admins
             //
@@ -414,6 +414,7 @@ namespace Linko.LinkoExchange.Services.User
                 }
             }
 
+         
             foreach (var authority in authorityList)
             {
                 //Find admin users in each of these
@@ -432,24 +433,38 @@ namespace Linko.LinkoExchange.Services.User
 
                 }
 
+                if (!isForFailedKBQs)
+                {
+                    //Send to user on behalf of each program's authority
+                    var authorityName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+                    var authorityEmail = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+                    var authorityPhone = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
 
-                //Send to user on behalf of each program's authority
-                var authorityName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
-                var authorityEmail = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
-                var authorityPhone = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+                    contentReplacements = new Dictionary<string, string>();
+                    contentReplacements.Add("authorityName", authorityName);
+                    contentReplacements.Add("emailAddress", authorityEmail);
+                    contentReplacements.Add("phoneNumber", authorityPhone);
+                    _emailService.SendEmail(new[] { user.Email }, EmailType.UserAccess_AccountLockOut, contentReplacements);
+                }
+            
+            }
 
+            if (isForFailedKBQs)
+            {
+                string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
+                string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
+                var authorityListString = _orgService.GetUserAuthorityListForEmailContent(user.UserProfileId);
                 contentReplacements = new Dictionary<string, string>();
-                contentReplacements.Add("authorityName", authorityName);
-                contentReplacements.Add("emailAddress", authorityEmail);
-                contentReplacements.Add("phoneNumber", authorityPhone);
+                contentReplacements.Add("userName", user.UserName);
+                contentReplacements.Add("authorityList", authorityListString);
+                contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
+                contentReplacements.Add("supportEmail", supportEmail);
                 _emailService.SendEmail(new[] { user.Email }, EmailType.UserAccess_AccountLockOut, contentReplacements);
 
             }
-
-
         }
 
-        public AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock)
+        public AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, bool isForFailedKBQs)
         {
             var user = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
             //Check user is not support role
@@ -473,7 +488,7 @@ namespace Linko.LinkoExchange.Services.User
             _dbContext.SaveChanges();
 
             if (isAttemptingLock)
-                SendAccountLockoutEmails(user);
+                SendAccountLockoutEmails(user, isForFailedKBQs);
 
             //Success
             return new Dto.AccountLockoutResultDto()

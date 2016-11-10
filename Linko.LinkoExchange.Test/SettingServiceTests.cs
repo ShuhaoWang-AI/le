@@ -23,8 +23,9 @@ namespace Linko.LinkoExchange.Test
                 //cfg.AddProfile(new UserMapProfile());
                 //cfg.AddProfile(new EmailAuditLogEntryMapProfile());
                 //cfg.AddProfile(new InvitationMapProfile());
-                cfg.AddProfile(new OrganizationRegulatoryProgramUserDtoMapProfile());
+                cfg.AddProfile(new RegulatoryProgramMapperProfile());
                 cfg.AddProfile(new OrganizationMapProfile());
+                //cfg.AddProfile(new OrganizationRegulatoryProgramUserDtoMapProfile());
                 cfg.AddProfile(new SettingMapProfile());
             });
 
@@ -50,8 +51,8 @@ namespace Linko.LinkoExchange.Test
         {
             var settings = new ProgramSettingDto() { OrgRegProgId = 1 };
             settings.Settings = new List<SettingDto>();
-            settings.Settings.Add(new SettingDto() { Type = SettingType.FailedKBQAttemptMaxCount, Value = "10" });
-            settings.Settings.Add(new SettingDto() { Type = SettingType.FailedPasswordAttemptMaxCount, Value = "31" });
+            settings.Settings.Add(new SettingDto() { TemplateName = SettingType.FailedKBQAttemptMaxCount, Value = "10" });
+            settings.Settings.Add(new SettingDto() { TemplateName = SettingType.FailedPasswordAttemptMaxCount, Value = "31" });
             _settingService.CreateOrUpdateProgramSettings(settings);
         }
 
@@ -60,8 +61,8 @@ namespace Linko.LinkoExchange.Test
         {
             var settings = new OrganizationSettingDto() { OrganizationId = 1001 };
             settings.Settings = new List<SettingDto>();
-            settings.Settings.Add(new SettingDto() { Type = SettingType.TimeZone, Value = "2" });
-            settings.Settings.Add(new SettingDto() { Type = SettingType.FailedPasswordAttemptMaxCount, Value = "5" });
+            settings.Settings.Add(new SettingDto() { TemplateName = SettingType.TimeZone, Value = "2" });
+            settings.Settings.Add(new SettingDto() { TemplateName = SettingType.FailedPasswordAttemptMaxCount, Value = "5" });
             _settingService.CreateOrUpdateOrganizationSettings(settings);
         }
 

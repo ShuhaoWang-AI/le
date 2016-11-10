@@ -174,7 +174,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void ResetPassword_Test()
         {
-            var result = _authenticationService.ResetPasswordAsync("TOKEN", 1, "test", 2, "1");
+            var result = _authenticationService.ResetPasswordAsync("TOKEN", 1, "test", 2, "AAAABBBB");
         }
 
         [TestMethod]
@@ -362,7 +362,7 @@ namespace Linko.LinkoExchange.Test
                       i.Settings == new List<SettingDto> {
                            new SettingDto
                            {
-                               Type = SettingType.PasswordChangeRequiredDays,
+                               TemplateName = SettingType.PasswordChangeRequiredDays,
                                Value = "1"
                            }
                       }
@@ -432,7 +432,7 @@ namespace Linko.LinkoExchange.Test
 
             var settings = settingDict.Select(i => new SettingDto
             {
-                Type = i.Key,
+                TemplateName = i.Key,
                 Value = i.Value
             }).ToList();
 
@@ -669,13 +669,13 @@ namespace Linko.LinkoExchange.Test
             settings.AddRange(
                 new[] { new SettingDto
                         {
-                            Type = SettingType.InvitationExpiredHours,
+                            TemplateName = SettingType.InvitationExpiredHours,
                             Value = "72"
                         },
 
                         new SettingDto
                         {
-                            Type = SettingType.PasswordHistoryMaxCount,
+                            TemplateName = SettingType.PasswordHistoryMaxCount,
                             Value = "10"
                         }
                 }); 
@@ -922,12 +922,12 @@ namespace Linko.LinkoExchange.Test
                 new[] {
                     new SettingDto
                     {
-                        Type = SettingType.InvitationExpiredHours,
+                        TemplateName = SettingType.InvitationExpiredHours,
                         Value = "172"
                     },
                     new SettingDto
                     {
-                        Type = SettingType.PasswordHistoryMaxCount,
+                        TemplateName = SettingType.PasswordHistoryMaxCount,
                         Value="10"
                     }} ); 
 

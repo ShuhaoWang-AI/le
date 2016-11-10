@@ -407,7 +407,7 @@ namespace Linko.LinkoExchange.Services.Organization
                 .Count(u => u.RegulatorOrganizationId == orgRegProgram.OrganizationId
                 && u.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
 
-            int maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.IndustryUserLicenseTotalCount));
+            int maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.IndustryLicenseTotalCount));
             var remaining = maxCount - currentChildIndustryCount;
 
             if (remaining < 0)
