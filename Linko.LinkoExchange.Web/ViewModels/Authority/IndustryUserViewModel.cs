@@ -12,6 +12,20 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get; set;
         }
 
+        [ScaffoldColumn(false)]
+        [Display(Name = "iID")]
+        public int IID
+        {
+            get; set;
+        }
+
+        [ScaffoldColumn(false)]
+        [Display(Name = "pID")]
+        public int PID
+        {
+            get; set;
+        }
+
         [Editable(false)]
         [Display(Name = "First Name")]
         public string FirstName
@@ -36,7 +50,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 
         [Editable(false)]
         [Display(Name = "Ext")]
-        public int PhoneExt
+        public int? PhoneExt
         {
             get; set;
         }
@@ -49,8 +63,15 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get; set;
         }
 
+        [Display(Name = "Email")]
+        [EmailAddress]
+        public string ResetEmail
+        {
+            get; set;
+        }
+
         [Editable(false)]
-        [Display(Name = "Date Registered")]
+        [Display(Name = "Registration Date")]
         public DateTime? DateRegistered
         {
             get; set;
@@ -86,7 +107,16 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         {
             get
             {
-                return Status ? "Locked" : "No";
+                return AccountLocked ? "Locked" : "No";
+            }
+        }
+
+        [Editable(false)]
+        public string AccountLockedButtonText
+        {
+            get
+            {
+                return AccountLocked ? "Unlock" : "Lock";
             }
         }
 

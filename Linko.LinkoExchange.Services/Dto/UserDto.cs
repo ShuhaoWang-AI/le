@@ -18,7 +18,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string ZipCode { get; set; }
         public int JurisdictionId { get; set; } 
 
-        public int PhoneExt { get; set; }
+        public int? PhoneExt { get; set; }
         public bool IsAccountLocked { get; set; }
         public bool IsAccountResetRequired { get; set; }
         public bool IsIdentityProofed { get; set; }

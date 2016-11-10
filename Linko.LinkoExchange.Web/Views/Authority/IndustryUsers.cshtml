@@ -33,7 +33,7 @@
                         columns.Bound(c => c.Email)
                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
                         columns.Bound(c => c.DateRegistered).Format(value: "{0:MM-dd-yyyy}")
-                                .Filterable(filterable => filterable.Enabled(value: false));
+                                .Filterable(filterable => filterable.Enabled(value: true).Extra(value: true));
                         columns.Bound(c => c.StatusText)
                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
                         columns.Bound(c => c.AccountLockedText)
@@ -159,7 +159,7 @@
     <script type="text/javascript">
         gotoNextPage = function ()
         {
-            var grid = $("#userGrid").data("kendoGrid");
+            var grid = $("#gridUser").data("kendoGrid");
             var postUrl = "/Authority/IndustryUsers_Select";
 
             doAjaxAction(grid, postUrl, "", "Select an user");

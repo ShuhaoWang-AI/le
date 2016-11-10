@@ -456,6 +456,7 @@
     <Content Include="Views\Authority\IndustryDetails.cshtml" />
     <Content Include="Views\Industry\Settings.cshtml" />
     <Content Include="Views\Authority\IndustryUsers.cshtml" />
+    <Content Include="Views\Authority\IndustryUserDetails.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

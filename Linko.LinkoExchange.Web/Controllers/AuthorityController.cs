@@ -6,10 +6,13 @@ using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
+using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.Authority;
 using NLog;
 
@@ -22,15 +25,18 @@ namespace Linko.LinkoExchange.Web.Controllers
         
         private readonly IOrganizationService _organizationService;
         private readonly IUserService _userService;
+        private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IInvitationService _invitationService;        
         private readonly ISessionCache _sessionCache;
         private readonly ILogger _logger;
 
-        public AuthorityController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService, ISessionCache sessionCache, ILogger logger)
+        public AuthorityController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService,
+            IQuestionAnswerService questionAnswerService, ISessionCache sessionCache, ILogger logger)
         {
             _organizationService = organizationService;
             _userService = userService;
             _invitationService = invitationService;
+            _questionAnswerService = questionAnswerService;
             _sessionCache = sessionCache;
             _logger = logger;
         }
@@ -240,7 +246,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         // GET: /Authority/IndustryUsers
         [Route("Industry/{id:int}/Users")]
-        public ActionResult IndustryUsers(int id=2)
+        public ActionResult IndustryUsers(int id)
         {
             ViewBag.IndustryId = id;
             var industry = _organizationService.GetOrganizationRegulatoryProgram(id);
@@ -256,6 +262,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             var viewModels = users.Select(vm => new IndustryUserViewModel
             {
                 ID = vm.OrganizationRegulatoryProgramUserId,
+                IID = vm.OrganizationRegulatoryProgramId,
+                PID = vm.UserProfileId,
                 FirstName = vm.UserProfileDto.FirstName,
                 LastName = vm.UserProfileDto.LastName,
                 PhoneNumber = vm.UserProfileDto.PhoneNumber,
@@ -268,6 +276,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
             {
                 ID = vm.ID,
+                IID = vm.IID,
+                PID = vm.PID,
                 FirstName = vm.FirstName,
                 LastName = vm.LastName,
                 PhoneNumber = vm.PhoneNumber,
@@ -293,6 +303,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                         redirect = true,
                         newurl = Url.Action(actionName: "IndustryUserDetails", controllerName: "Authority", routeValues: new
                         {
+                            iid = item.IID,
                             id = item.ID
                         })
                     });
@@ -369,6 +380,143 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             return Json(items.ToDataSourceResult(request, ModelState));
+        }
+        #endregion
+
+
+
+        #region Show Industry Users
+
+        // GET: /Authority/IndustryUserDetails
+        [Route("Industry/{iid:int}/User/{id:int}/Details")]
+        public ActionResult IndustryUserDetails(int iid , int id)
+        {
+            IndustryUserViewModel viewModel = PrepareIndustryUserDetails(id);
+
+            return View(viewModel);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route("Industry/{iid:int}/User/{id:int}/IndustryUserUpdateSignatoryStatus")]
+        public ActionResult IndustryUserUpdateSignatoryStatus(int iid, int id, IndustryUserViewModel model)
+        {
+            try
+            {
+                _userService.UpdateUserSignatoryStatus(model.ID, model.IsSignatory);
+                return RedirectToAction(actionName: "IndustryUserDetails", controllerName: "Authority", routeValues: new
+                {
+                    iid = model.IID,
+                    id = model.ID
+                });
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
+            }
+
+            model = PrepareIndustryUserDetails(id);
+            return View(viewName: "IndustryUserDetails", model: model);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route("Industry/{iid:int}/User/{id:int}/IndustryUserLockUnLock")]
+        public ActionResult IndustryUserLockUnLock(int iid, int id, IndustryUserViewModel model)
+        {
+            try
+            {
+                _userService.LockUnlockUserAccount(model.PID, !model.AccountLocked, isForFailedKBQs: false);
+                return RedirectToAction(actionName: "IndustryUserDetails", controllerName: "Authority", routeValues: new
+                {
+                    iid = model.IID,
+                    id = model.ID
+                });
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
+            }
+
+            model = PrepareIndustryUserDetails(id);
+            return View(viewName: "IndustryUserDetails", model: model);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route("Industry/{iid:int}/User/{id:int}/IndustryUserReset")]
+        public ActionResult IndustryUserReset(int iid, int id, IndustryUserViewModel model)
+        {
+            string newEmail = model.ResetEmail;
+            try
+            {
+                var result = _userService.ResetUser(model.PID, newEmail);
+
+                if (result.IsSuccess)
+                {
+                    return RedirectToAction(actionName: "IndustryUserDetails", controllerName: "Authority", routeValues: new
+                    {
+                        iid = model.IID,
+                        id = model.ID
+                    });
+                }
+                else
+                {
+                    List<RuleViolation> validationIssues = new List<RuleViolation>();
+                    string message = "";
+
+                    switch (result.FailureReason)
+                    {
+                        case ResetUserFailureReason.NewEmailAddressAlreadyInUse:
+                            message = "Email is already in use on another account.";
+                            break;
+                        default:
+                            message = "User Account Reset Failed";
+                            break;
+                    }
+
+                    validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                    throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
+            }
+
+            model = PrepareIndustryUserDetails(id);
+            model.ResetEmail = newEmail;
+
+            return View(viewName: "IndustryUserDetails", model: model);
+        }
+
+        private IndustryUserViewModel PrepareIndustryUserDetails(int id)
+        {
+            var user = _userService.GetOrganizationRegulatoryProgramUser(id);
+            var userQuesAns = _questionAnswerService.GetUsersQuestionAnswers(user.UserProfileId, QuestionType.Security);
+
+            var viewModel = new IndustryUserViewModel
+            {
+                ID = user.OrganizationRegulatoryProgramUserId,
+                IID = user.OrganizationRegulatoryProgramId,
+                PID = user.UserProfileId,
+                FirstName = user.UserProfileDto.FirstName,
+                LastName = user.UserProfileDto.LastName,
+                PhoneNumber = user.UserProfileDto.PhoneNumber,
+                PhoneExt = user.UserProfileDto.PhoneExt,
+                Email = user.UserProfileDto.Email,
+                ResetEmail = user.UserProfileDto.Email,
+                DateRegistered = user.RegistrationDateTimeUtc.Value.DateTime,
+                Status = user.IsEnabled,
+                AccountLocked = user.UserProfileDto.IsAccountLocked,
+                Role = user.PermissionGroup.Name,
+                IsSignatory = user.IsSignatory,
+                SecurityQuestion1 = (userQuesAns.ElementAt(index: 0) != null) ? userQuesAns.ElementAt(index: 0).Question.Content : "",
+                Answer1 = (userQuesAns.ElementAt(index: 0) != null) ? userQuesAns.ElementAt(index: 0).Answer.Content : "",
+                SecurityQuestion2 = (userQuesAns.ElementAt(index: 1) != null) ? userQuesAns.ElementAt(index: 1).Question.Content : "",
+                Answer2 = (userQuesAns.ElementAt(index: 1) != null) ? userQuesAns.ElementAt(index: 1).Answer.Content : "",
+            };
+            return viewModel;
         }
         #endregion
     }

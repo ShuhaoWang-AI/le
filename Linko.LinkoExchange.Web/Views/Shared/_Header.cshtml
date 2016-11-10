@@ -4,7 +4,7 @@
     @if(Request.IsAuthenticated)
     {
         @* BEGIN Logo *@
-        <a href="@Url.RouteUrl(routeName:"Default")" class="logo">
+        <a href="@Url.Action(actionName: "Index", controllerName: "Home")" class="logo">
             <!-- mini logo for sidebar mini 50x50 pixels -->
             <span class="logo-mini">
                 <img title=" " alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo-min.png")" width="40" height="40" />
@@ -130,7 +130,7 @@
         <nav class="navbar navbar-static-top" role="navigation">
             @* BEGIN Logo *@
             <span>
-                <a href="@Url.RouteUrl(routeName:"Default")">
+                <a href="@Url.Action(actionName: "Index", controllerName: "Home")">
                     <img title=" " alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo.png")" class="img-responsive" width="200" height="40" />
                 </a>
             </span>

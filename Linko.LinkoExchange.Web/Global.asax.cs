@@ -19,7 +19,7 @@ namespace Linko.LinkoExchange.Web
     {
         protected void Application_Start()
         {
-            Database.SetInitializer <LinkoExchangeContext> (null);
+            Database.SetInitializer <LinkoExchangeContext> (strategy: null);
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
