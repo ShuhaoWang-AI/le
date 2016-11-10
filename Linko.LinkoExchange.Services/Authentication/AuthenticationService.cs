@@ -526,7 +526,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         }
 
         public async Task<AuthenticationResultDto> ResetPasswordAsync(string resetPasswordToken, int userQuestionAnswerId,
-            string answer, int attemptCount, string newPassword)
+            string answer, int failedCount, string newPassword)
         {
             var authenticationResult = new AuthenticationResultDto();
             
@@ -562,11 +562,11 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return authenticationResult;
             }
 
-            return await ResetPasswordAsync(userQuestionAnswerId, answer, attemptCount, newPassword);
+            return await ResetPasswordAsync(userQuestionAnswerId, answer, failedCount, newPassword);
         }
 
         public async Task<AuthenticationResultDto> ResetPasswordAsync(int userQuestionAnswerId,
-            string answer, int attemptCount, string newPassword)
+            string answer, int failedCount, string newPassword)
         {
             int userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
             string passwordHash = _passwordHasher.HashPassword(newPassword);
@@ -584,7 +584,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 //3rd incorrect attempt (5.3.b) => lockout
                 int maxAnswerAttempts = Convert.ToInt32(_settingService.GetOrganizationSettingValueByUserId(userProfileId, SettingType.FailedKBQAttemptMaxCount, true, null));
-                if (attemptCount++ >= maxAnswerAttempts) // from web.config
+                if ((failedCount+1) >= maxAnswerAttempts) // from web.config
                 {
                     _userService.LockUnlockUserAccount(userProfileId, true, true);
                     //Get all associated authorities
