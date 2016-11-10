@@ -30,8 +30,39 @@ namespace Linko.LinkoExchange.Services.Authentication
                     TokenLifespan = TimeSpan.FromHours(tokenLife)
                 };
 
+            this.UserValidator = new UserValidator<UserProfile>(this)
+            {
+                AllowOnlyAlphanumericUserNames = false
+            };
+
+            this.PasswordValidator = new PasswordValidator
+            {
+                RequiredLength = 8,
+                RequireNonLetterOrDigit = false,
+                RequireDigit = true,
+                RequireLowercase = true,
+                RequireUppercase = true,
+            };
+
+            // Configure user lockout defaults
+            this.UserLockoutEnabledByDefault = true;
+            this.DefaultAccountLockoutTimeSpan = TimeSpan.FromDays(1);
+            this.MaxFailedAccessAttemptsBeforeLockout = 3;
+
+            // Register two factor authentication providers. This application uses Phone and Emails as a step of receiving a code for verifying the userProfile
+            // You can write your own provider and plug it in here.
+            this.RegisterTwoFactorProvider("Phone Code", new PhoneNumberTokenProvider<UserProfile>
+            {
+                MessageFormat = "Your security code is {0}"
+            });
+            this.RegisterTwoFactorProvider("Email Code", new EmailTokenProvider<UserProfile>
+            {
+                Subject = "Security Code",
+                BodyFormat = "Your security code is {0}"
+            });
 
             EmailService = new EmailService();
+
         }
 
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context)
