@@ -135,7 +135,8 @@ namespace Linko.LinkoExchange.Services.Settings
         {
             var existingSetting = _dbContext.OrganizationRegulatoryProgramSettings
                 .SingleOrDefault(o => o.OrganizationRegulatoryProgramId == orgRegProgId
-                 && o.SettingTemplate.Name == settingDto.TemplateName.ToString() && o.SettingTemplate.OrganizationType.Name == settingDto.OrgTypeName.ToString());
+                 && o.SettingTemplate.Name == settingDto.TemplateName.ToString() 
+                 && o.SettingTemplate.OrganizationType.Name == settingDto.OrgTypeName.ToString());
 
             if (existingSetting != null)
             {
@@ -172,7 +173,8 @@ namespace Linko.LinkoExchange.Services.Settings
         {
             var existingSetting = _dbContext.OrganizationSettings
                 .SingleOrDefault(o => o.OrganizationId == organizationId
-                 && o.SettingTemplate.Name == settingDto.TemplateName.ToString());
+                 && o.SettingTemplate.Name == settingDto.TemplateName.ToString()
+                 && o.SettingTemplate.OrganizationType.Name == settingDto.OrgTypeName.ToString());
 
             if (existingSetting != null)
             {
@@ -270,10 +272,14 @@ namespace Linko.LinkoExchange.Services.Settings
         {
             try
             {
+                //get org type
+                int orgTypeId = _dbContext.OrganizationRegulatoryPrograms.Include("Organization.OrganizationType")
+                    .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId).Organization.OrganizationType.OrganizationTypeId;
 
            return _dbContext.OrganizationRegulatoryProgramSettings
                 .Single(s => s.OrganizationRegulatoryProgramId == orgRegProgramId
-                && s.SettingTemplate.Name == settingType.ToString()).Value;
+                && s.SettingTemplate.Name == settingType.ToString() 
+                && s.SettingTemplate.OrganizationTypeId == orgTypeId).Value;
 
             }
             catch (DbEntityValidationException ex)
@@ -290,11 +296,23 @@ namespace Linko.LinkoExchange.Services.Settings
             return null;
         } 
 
-        public string GetSettingTemplateValue(SettingType settingType)
+        public string GetSettingTemplateValue(SettingType settingType, OrganizationTypeName? orgType)
         {
-            var setting = _dbContext.SettingTemplates.SingleOrDefault(i => i.Name == settingType.ToString());
-            if (setting == null)
+            var settings = _dbContext.SettingTemplates.Include("OrganizationType")
+                .Where(i => i.Name == settingType.ToString());
+
+            if (settings == null || settings.Count() < 1)
                 return string.Empty;
+
+            SettingTemplate setting;
+            if (orgType.HasValue)
+            {
+                setting = settings.Single(s => s.OrganizationType.Name == orgType.ToString());
+            }
+            else
+            {
+                setting = settings.First();
+            }
 
             return setting.DefaultValue;
         }

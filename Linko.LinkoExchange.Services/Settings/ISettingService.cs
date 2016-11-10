@@ -17,7 +17,7 @@ namespace Linko.LinkoExchange.Services.Settings
         /// </summary>
         /// <param name="settingType"></param>
         /// <returns></returns>
-        string GetSettingTemplateValue(SettingType settingType);
+        string GetSettingTemplateValue(SettingType settingType, OrganizationTypeName? orgType = null);
 
         string GetOrganizationSettingValueByUserId(int userProfileId, SettingType settingType, bool? isChooseMin, bool? isChooseMax);
 

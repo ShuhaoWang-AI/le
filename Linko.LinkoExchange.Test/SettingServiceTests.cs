@@ -47,6 +47,12 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
+        public void GetOrgRegProgramSettingValue_Test()
+        {
+            var result = _settingService.GetOrgRegProgramSettingValue(1, SettingType.EmailContactInfoName);
+        }
+
+        [TestMethod]
         public void CreateOrUpdateProgramSettings()
         {
             var settings = new ProgramSettingDto() { OrgRegProgId = 1 };
@@ -65,6 +71,7 @@ namespace Linko.LinkoExchange.Test
             settings.Settings.Add(new SettingDto() { TemplateName = SettingType.FailedPasswordAttemptMaxCount, Value = "5" });
             _settingService.CreateOrUpdateOrganizationSettings(settings);
         }
+
 
     }
 }

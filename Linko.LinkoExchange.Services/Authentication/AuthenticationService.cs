@@ -378,7 +378,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                         if (!IsValidPasswordCheckInHistory(userInfo.Password, applicationUser.UserProfileId, organizationSettings))
                         {
-                            var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings);
+                            var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings, null);
                             registrationResult.Result = RegistrationResult.CanNotUseLastNumberOfPasswords; 
                             registrationResult.Errors = new string[] { string.Format("You cannot use the last {0} passwords.", numberOfPasswordsInHistory) };
                             return registrationResult; 
@@ -615,7 +615,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             else if (!IsValidPasswordCheckInHistory(newPassword, userProfileId, organizationSettings))
             {
                 //Password used before (6.a)
-                var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings);
+                var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings, null);
 
                 authenticationResult.Success = false;
                 authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
@@ -917,7 +917,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         // Return true means the new password is validate to use
         private bool IsValidPasswordCheckInHistory(string password, int userProfileId, IEnumerable<SettingDto> organizationSettings)
         {
-            var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings);
+            var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings, null);
 
             var lastNumberPasswordInHistory = _dbContext.UserPasswordHistories
                 .Where(i => i.UserProfileId == userProfileId)
@@ -949,7 +949,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             // Get password expiration setting
-            var passwordExpiredDays = GetStrictestLengthPasswordExpiredDays(organizationSettings);
+            var passwordExpiredDays = GetStrictestLengthPasswordExpiredDays(organizationSettings, null);
             if (DateTimeOffset.UtcNow > lastestUserPassword.LastModificationDateTimeUtc.AddDays(passwordExpiredDays))
             {
                 return true;
@@ -1026,41 +1026,41 @@ namespace Linko.LinkoExchange.Services.Authentication
             _userManager.UserLockoutEnabledByDefault = true;
             _userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromHours(_settingService.PasswordLockoutHours());
 
-            _userManager.MaxFailedAccessAttemptsBeforeLockout = MaxFailedPasswordAttempts(organizationSettings);
+            _userManager.MaxFailedAccessAttemptsBeforeLockout = MaxFailedPasswordAttempts(organizationSettings, null);
         }
 
 
         #region organization setting;
 
-        private int GetSettingIntValue(SettingType settingType, IEnumerable<SettingDto> organizationSettings, bool isMax = true)
+        private int GetSettingIntValue(SettingType settingType, IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName, bool isMax = true)
         {
-            var defaultValueStr = _settingService.GetSettingTemplateValue(settingType);
+            var defaultValueStr = _settingService.GetSettingTemplateValue(settingType, orgTypeName);
             var defaultValue = ValueParser.TryParseInt(defaultValueStr, 0);
             if (organizationSettings != null && organizationSettings.Any())
             {
                 defaultValue = isMax
                     ? organizationSettings
-                        .Where(i => i.TemplateName == settingType).Max(i => ValueParser.TryParseInt(i.Value, defaultValue))
-                    : organizationSettings.Where(i => i.TemplateName == settingType)
+                        .Where(i => i.TemplateName == settingType && i.OrgTypeName == orgTypeName).Max(i => ValueParser.TryParseInt(i.Value, defaultValue))
+                    : organizationSettings.Where(i => i.TemplateName == settingType && i.OrgTypeName ==orgTypeName)
                         .Min(i => ValueParser.TryParseInt(i.Value, defaultValue));
             }
 
             return defaultValue;
         }
 
-        private int GetStrictestPasswordHistoryCounts(IEnumerable<SettingDto> organizationSettings)
+        private int GetStrictestPasswordHistoryCounts(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
         {
-            return GetSettingIntValue(SettingType.PasswordHistoryMaxCount, organizationSettings, isMax: false);
+            return GetSettingIntValue(SettingType.PasswordHistoryMaxCount, organizationSettings, orgTypeName, isMax: false);
         }
 
-        private int GetStrictestLengthPasswordExpiredDays(IEnumerable<SettingDto> organizationSettings)
+        private int GetStrictestLengthPasswordExpiredDays(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
         {
-            return GetSettingIntValue(SettingType.PasswordChangeRequiredDays, organizationSettings, isMax: false);
+            return GetSettingIntValue(SettingType.PasswordChangeRequiredDays, organizationSettings, orgTypeName, isMax: false);
         }
 
-        private int MaxFailedPasswordAttempts(IEnumerable<SettingDto> organizationSettings)
+        private int MaxFailedPasswordAttempts(IEnumerable<SettingDto> organizationSettings, OrganizationTypeName? orgTypeName)
         {
-            return GetSettingIntValue(SettingType.FailedPasswordAttemptMaxCount, organizationSettings, isMax: false);
+            return GetSettingIntValue(SettingType.FailedPasswordAttemptMaxCount, organizationSettings, orgTypeName, isMax: false);
         }
 
         #endregion

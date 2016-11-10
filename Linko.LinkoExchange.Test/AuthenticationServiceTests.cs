@@ -115,9 +115,9 @@ namespace Linko.LinkoExchange.Test
             systemSettingDict.Add(SystemSettingType.SystemEmailLastName, "System");
 
             settingServiceMock.Setup(i => i.GetGlobalSettings()).Returns(systemSettingDict);
-            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordHistoryMaxCount)).Returns("10");
-            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordChangeRequiredDays)).Returns("90");
-            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.FailedPasswordAttemptMaxCount)).Returns("3");
+            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordHistoryMaxCount, OrganizationTypeName.Authority)).Returns("10");
+            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordChangeRequiredDays, OrganizationTypeName.Authority)).Returns("90");
+            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.FailedPasswordAttemptMaxCount, OrganizationTypeName.Authority)).Returns("3");
 
             _authenticationService = new AuthenticationService(
                 userManagerObj.Object,
