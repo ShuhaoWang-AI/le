@@ -153,11 +153,11 @@ namespace Linko.LinkoExchange.Services.Organization
             var newLine = "";
             foreach (var authority in authorities)
             {
-                authorityList += newLine + authority.OrganizationName +
+                authorityList += newLine + authority.EmailContactInfoName +
                     " at " + authority.EmailContactInfoEmailAddress +
-                    " or " + authority.PhoneNumber;
-                if (!String.IsNullOrEmpty(authority.PhoneExt))
-                    authorityList += " ext." + authority.PhoneExt;
+                    " or " + authority.EmailContactInfoPhone;
+                //if (!String.IsNullOrEmpty(authority.PhoneExt))
+                //    authorityList += " ext." + authority.PhoneExt;
                 newLine = Environment.NewLine;
             }
 
