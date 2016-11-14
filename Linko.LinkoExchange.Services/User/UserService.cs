@@ -649,7 +649,7 @@ namespace Linko.LinkoExchange.Services.User
             if (user == null) return;
 
             user.IsRegistrationApproved = isApproved;
-            _dbContext.SaveChangesAsync(); 
+            _dbContext.SaveChanges(); 
         }
 
         public void UpdateOrganizationRegulatoryProgramUserRole(int orgRegProgUserId, int permissionGroupId)
@@ -658,7 +658,7 @@ namespace Linko.LinkoExchange.Services.User
             if (user == null) return;
 
             user.PermissionGroupId = permissionGroupId;
-            _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
 
         }
 

@@ -57,6 +57,7 @@ namespace Linko.LinkoExchange.Test
             _sessionCache = new Mock<ISessionCache>();
             _sessionCache.Setup(x => x.GetClaimValue(It.IsAny<string>())).Returns("1");
             _orgService = new Mock<IOrganizationService>();
+            _timeZones = new Mock<ITimeZoneService>();
 
             invitationService = new InvitationService(
                 new LinkoExchangeContext(connectionString),
