@@ -10,6 +10,7 @@ using Linko.LinkoExchange.Core.Validation;
 using System.Data.Entity.Validation;
 using System.Data.Entity.Infrastructure;
 using Linko.LinkoExchange.Core.Enum;
+using System.Data.Entity;
 
 namespace Linko.LinkoExchange.Services.Settings
 {
@@ -66,8 +67,9 @@ namespace Linko.LinkoExchange.Services.Settings
             var orgSettingDto = new OrganizationSettingDto() { OrganizationId = organizationId };
             orgSettingDto.Settings = new List<SettingDto>();
             //Get Organization settings first
-            var org = _dbContext.Organizations.Single(o => o.OrganizationId == organizationId);
-            foreach (var orgSetting in org.OrganizationSettings)
+            var orgSettings = _dbContext.OrganizationSettings.Include(s => s.SettingTemplate.OrganizationType)
+                .Where(o => o.OrganizationId == organizationId);
+            foreach (var orgSetting in orgSettings)
             {
                 orgSettingDto.Settings.Add(_mapper.Map<OrganizationSetting, SettingDto>(orgSetting));
             }
