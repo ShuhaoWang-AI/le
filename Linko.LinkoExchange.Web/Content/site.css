@@ -78,3 +78,8 @@
   text-align: left;
   vertical-align: middle;
 }
+
+.control-label.required:before   {
+    content:"*";
+    color:red; 
+}

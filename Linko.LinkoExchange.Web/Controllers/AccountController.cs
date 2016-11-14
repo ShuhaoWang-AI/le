@@ -14,11 +14,12 @@ using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.ViewModels.Account;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
+using Linko.LinkoExchange.Web.Mvc;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
     [RoutePrefix("Account")]
-    [Route("{action=Index}")]
+    [Route("{action=Index}")] 
     public class AccountController : Controller
     {
         #region constructor
@@ -41,13 +42,132 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
+        public ActionResult Test()
+        {
+            return View();
+        }
 
         [AllowAnonymous]
         public ActionResult Register(UserDto userInfo, string registrationToken)
         {
+            var kbq = new List<QuestionAnswerPairDto>()
+            {
+                new QuestionAnswerPairDto
+                {
+                    Question = new QuestionDto
+                    {
+                        QuestionId = 1,
+                        Content ="What is the first and middle name of your oldest sibling?",
+                         QuestionType =  QuestionType.KnowledgeBased,
+                          IsActive =true
+                    },
 
-            //TODO: to provide security questions and kbq questions
-            var ret = _authenticationService.Register(userInfo, registrationToken, null, null);
+                    Answer = new AnswerDto
+                    {
+                         Content ="test answer 1"
+                    }
+                },
+
+                new QuestionAnswerPairDto
+                {
+                    Question = new QuestionDto
+                    {
+                        QuestionId = 2,
+                        Content ="What is your favorite vacation destination??",
+                        QuestionType =  QuestionType.KnowledgeBased,
+                       IsActive =true
+                    },
+
+                    Answer = new AnswerDto
+                    {
+                         Content ="test answer 2"
+                    }
+                },
+
+                new QuestionAnswerPairDto
+                {
+                    Question = new QuestionDto
+                    {
+                        QuestionId = 3,
+                        Content ="What year and model (yyyy-name) was your first car?",
+                        QuestionType =  QuestionType.KnowledgeBased,
+                       IsActive =true
+                    },
+
+                    Answer = new AnswerDto
+                    {
+                         Content ="test answer 3"
+                    }
+                },
+                new QuestionAnswerPairDto
+                {
+                    Question = new QuestionDto
+                    {
+                        QuestionId = 4,
+                        Content ="What is your favorite TV show?",
+                        QuestionType =  QuestionType.KnowledgeBased,
+                       IsActive =true
+                    },
+
+                    Answer = new AnswerDto
+                    {
+                         Content ="test answer 4"
+                    }
+                },
+
+                new QuestionAnswerPairDto
+                {
+                    Question = new QuestionDto
+                    {
+                        QuestionId = 5,
+                        Content ="Where did you first meet your spouse?",
+                        QuestionType =  QuestionType.KnowledgeBased,
+                       IsActive =true
+                    },
+
+                    Answer = new AnswerDto
+                    {
+                         Content ="test answer 5"
+                    }
+                },
+            };
+            
+            var sq = new List<QuestionAnswerPairDto>()
+            {
+                new QuestionAnswerPairDto
+                {
+                    Question = new QuestionDto
+                    {
+                        QuestionId = 21,
+                        Content ="What is the name of your favorite sports team?",
+                         QuestionType =  QuestionType.Security
+                    },
+
+                    Answer = new AnswerDto
+                    {
+                         Content ="test answer 6"
+                    }
+                },
+
+                new QuestionAnswerPairDto
+                {
+                    Question = new QuestionDto
+                    {
+                        QuestionId = 22,
+                        Content ="What street was your childhood home located on?",
+                        QuestionType =  QuestionType.Security,
+                       IsActive =true
+                    },
+
+                    Answer = new AnswerDto
+                    {
+                         Content ="test answer 7"
+                    }
+                }
+                };
+
+
+        //    var ret = _authenticationService.Register(userInfo, registrationToken, sq, kbq);
             return View();
         }
 
@@ -97,7 +217,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             try
             {
-                var result = await _authenticationService.SignInByUserName(model.UserName, model.Password, false);
+                var result = _authenticationService.SignInByUserName(model.UserName, model.Password, false).Result;
 
                 switch (result.AutehticationResult)
                 {

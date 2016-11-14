@@ -47,8 +47,9 @@
       <HintPath>..\..\XternalObjects\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="AutoMapper">
+    <Reference Include="AutoMapper, Version=5.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
       <HintPath>..\..\XternalObjects\AutoMapper.5.1.1\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\..\XternalObjects\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
@@ -394,6 +395,7 @@
     <None Include="Scripts\_references.js" />
     <Content Include="Scripts\kendo.modernizr.custom.js" />
     <Content Include="Scripts\linkoExchange.js" />
+    <Content Include="Scripts\Profile.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -405,6 +407,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
+    <Compile Include="AutoMapperProfile\UserProfileViewModelProfile.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AuthorityController.cs" />
     <Compile Include="Controllers\IndustryController.cs" />
@@ -431,6 +434,9 @@
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
     <Compile Include="ViewModels\Industry\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Shared\ConfirmationViewModel.cs" />
+    <Compile Include="ViewModels\Shared\JurisdictionViewModel.cs" />
+    <Compile Include="ViewModels\User\QuestionViewModel.cs" />
+    <Compile Include="ViewModels\User\UserProfileViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config">
@@ -457,6 +463,9 @@
     <Content Include="Views\Industry\Settings.cshtml" />
     <Content Include="Views\Authority\IndustryUsers.cshtml" />
     <Content Include="Views\Authority\IndustryUserDetails.cshtml" />
+    <Content Include="Views\User\Profile.cshtml" />
+    <Content Include="Views\User\questions.cshtml" />
+    <Content Include="Views\User\_QuestionAndAnswerView.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -468,7 +477,6 @@
     <Folder Include="App_Data\" />
     <Folder Include="ViewModels\Common\" />
     <Folder Include="Views\Home\" />
-    <Folder Include="Views\User\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Linko.LinkoExchange.Core\Linko.LinkoExchange.Core.csproj">

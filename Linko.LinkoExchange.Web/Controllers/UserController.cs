@@ -2,17 +2,47 @@
 using System.Linq;
 using System.Web.Mvc;
 using Linko.LinkoExchange.Services.Authentication;
+using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.User;
+using AutoMapper;
+using Linko.LinkoExchange.Web.ViewModels.User;
+using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.Dto;
+using System.Collections.Generic;
+using Linko.LinkoExchange.Web.ViewModels.Shared;
+using Linko.LinkoExchange.Services.Jurisdiction;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
     public class UserController : Controller
     {
         private readonly IAuthenticationService _authenticateService;
+        private readonly ISessionCache _sessionCache;
+        private readonly IUserService _userService;
+        private readonly IQuestionAnswerService _questionAnswerService;
+        private readonly IJurisdictionService _jurisdictionService;
 
-        public UserController(IAuthenticationService authenticateService)
+        private readonly IMapper _mapper;
+        private string FakeAnswer = "********";
+        public UserController(
+            IAuthenticationService authenticateService,
+            IQuestionAnswerService questAnswerService,
+            ISessionCache sessionCache,
+            IUserService userService,
+            IJurisdictionService jurisdictionService,
+            IMapper mapper)
         {
-            if(authenticateService == null) throw  new ArgumentNullException("authenticateService");
+            if (authenticateService == null) throw new ArgumentNullException("authenticateService");
+            if (sessionCache == null) throw new ArgumentNullException("sessionCache");
+            if (questAnswerService == null) throw new ArgumentNullException("questAnswerService");
+
             _authenticateService = authenticateService;
+            _sessionCache = sessionCache;
+            _userService = userService;
+            _jurisdictionService = jurisdictionService;
+            _mapper = mapper;
+            _questionAnswerService = questAnswerService;
         }
 
         // GET: UserDto
@@ -26,7 +56,209 @@ namespace Linko.LinkoExchange.Web.Controllers
             //    ViewBag.organizationName = organization.Value;
             //}
 
-            return View(); 
+            return View();
+        }
+
+        [AcceptVerbs(HttpVerbs.Get)]
+        public ActionResult Profile()
+        {
+            var userProfileViewModel = GetUserProfileViewModel();
+
+            return View(userProfileViewModel);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult Profile(UserProfileViewModel model, FormCollection form)
+        {
+            model.QuestionPool = GetQuestionPool();
+            model.StateList = GetStateList();
+
+            if (!ModelState.IsValid)
+            {
+                var errors = this.ModelState.Keys.SelectMany(key => this.ModelState[key].Errors);
+                return View(model);
+            }
+
+            #region Create Question Answer Dto
+
+            if (model.KBQAnswer1 == FakeAnswer)
+            {
+                model.KBQAnswer1 = "";
+            }
+            if (model.KBQAnswer2 == FakeAnswer)
+            {
+                model.KBQAnswer2 = "";
+            }
+            if (model.KBQAnswer3 == FakeAnswer)
+            {
+                model.KBQAnswer3 = "";
+            }
+            if (model.KBQAnswer4 == FakeAnswer)
+            {
+                model.KBQAnswer4 = "";
+            }
+            if (model.KBQAnswer5 == FakeAnswer)
+            {
+                model.KBQAnswer5 = "";
+            }
+
+            var kbqQuestionAnswers = new List<AnswerDto>();
+            kbqQuestionAnswers.AddRange(
+                new[] {
+                new AnswerDto
+                {
+                    QuestionId = model.KBQ1,
+                    Content = model.KBQAnswer1
+                },
+                new AnswerDto
+                {
+                    QuestionId = model.KBQ2,
+                    Content = model.KBQAnswer2
+                },
+                new AnswerDto
+                {
+                    QuestionId = model.KBQ3,
+                    Content = model.KBQAnswer3
+                },
+                new AnswerDto
+                {
+                    QuestionId = model.KBQ4,
+                    Content = model.KBQAnswer4
+                },
+                new AnswerDto
+                {
+                    QuestionId = model.KBQ5,
+                    Content = model.KBQAnswer5
+                 }
+
+              }
+            );
+
+            var sqQuestionAnswers = new List<AnswerDto>();
+            sqQuestionAnswers.Add(new AnswerDto
+            {
+                QuestionId = model.SecuritryQuestion1,
+                Content = model.SecurityQuestionAnswer1
+            });
+
+            sqQuestionAnswers.Add(new AnswerDto
+            {
+                QuestionId = model.SecurityQuestion2,
+                Content = model.SecurityQuestionAnswer2
+            });
+
+            #endregion create Question Answer Dto  
+
+            var profileIdStr = _sessionCache.GetClaimValue(CacheKey.UserProfileId) as string;
+            var userProfileId = int.Parse(profileIdStr);
+            var userProileDto = _userService.GetUserProfileById(userProfileId);
+
+            model.UserProfileId = userProfileId; 
+
+            var userDto = _mapper.Map<UserDto>(model);  
+             
+            var result = _userService.UpdateProfile(userDto, sqQuestionAnswers, kbqQuestionAnswers);
+            switch (result)
+            {
+                case RegistrationResult.BadSecurityQuestionAndAnswer:
+                    ModelState.AddModelError(string.Empty, ("Bad Security Question and Anwsers."));
+                    break;
+                case RegistrationResult.DuplicatedKBQ:
+                    ModelState.AddModelError(string.Empty, ("Duplicated Knowledage Based Questions"));
+                    break;
+                case RegistrationResult.DuplicatedKBQAnswer:
+                    ModelState.AddModelError(string.Empty, ("Duplicated Knowledage Based Question Answers"));
+                    break;
+                case RegistrationResult.MissingKBQ:
+                    ModelState.AddModelError(string.Empty, ("Missing Knowledage Based Questions"));
+                    break;
+                case RegistrationResult.MissingKBQAnswer:
+                    ModelState.AddModelError(string.Empty, ("Missing Knowledage Based Question Answers"));
+                    break;
+                case RegistrationResult.MissingSecurityQuestion:
+                    ModelState.AddModelError(string.Empty, ("Missing Security Question Answers"));
+                    break;
+                case RegistrationResult.BadUserProfileData:
+                    ModelState.AddModelError(string.Empty, ("Bad User Profile Data"));
+                    break;
+
+            }
+             
+            return View(model);
+        }
+
+        private UserProfileViewModel GetUserProfileViewModel()
+        {
+            var id = HttpContext.User.Identity;
+            var profileIdStr = _sessionCache.GetClaimValue(CacheKey.UserProfileId) as string;
+            var userProfileId = int.Parse(profileIdStr);
+            var userProileDto = _userService.GetUserProfileById(userProfileId);
+            var userProfileViewModel = _mapper.Map<UserProfileViewModel>(userProileDto);
+
+            // set password to be stars 
+            userProfileViewModel.Password = FakeAnswer;
+
+            // Get state list   
+            userProfileViewModel.StateList = GetStateList();
+
+            userProfileViewModel.Role = _sessionCache.GetClaimValue(CacheKey.UserRole);
+
+
+            var kbqQuestions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, Services.Dto.QuestionType.KnowledgeBased);
+            var securityQeustions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, Services.Dto.QuestionType.Security);
+
+            var kbqs = kbqQuestions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
+            var sqs = securityQeustions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
+
+            userProfileViewModel.QuestionPool = GetQuestionPool();
+
+            ////  security questions 
+            userProfileViewModel.SecuritryQuestion1 = sqs[0].Question.QuestionId.Value;
+            userProfileViewModel.SecurityQuestionAnswer1 = sqs[0].Answer.Content;
+
+            userProfileViewModel.SecurityQuestion2 = sqs[1].Question.QuestionId.Value;
+            userProfileViewModel.SecurityQuestionAnswer2 = sqs[1].Answer.Content;
+
+            ////  KBQ questions 
+            userProfileViewModel.KBQ1 = kbqs[0].Question.QuestionId.Value;
+            userProfileViewModel.KBQ2 = kbqs[1].Question.QuestionId.Value;
+            userProfileViewModel.KBQ3 = kbqs[2].Question.QuestionId.Value;
+            userProfileViewModel.KBQ4 = kbqs[3].Question.QuestionId.Value;
+            userProfileViewModel.KBQ5 = kbqs[4].Question.QuestionId.Value;
+
+            userProfileViewModel.KBQAnswer1 = FakeAnswer;
+            userProfileViewModel.KBQAnswer2 = FakeAnswer;
+            userProfileViewModel.KBQAnswer3 = FakeAnswer;
+            userProfileViewModel.KBQAnswer4 = FakeAnswer;
+            userProfileViewModel.KBQAnswer5 = FakeAnswer;
+
+            userProfileViewModel.SecurityQuestionAnswer1 = sqs[0].Answer.Content;
+
+            userProfileViewModel.SecurityQuestion2 = sqs[1].Question.QuestionId.Value;
+            userProfileViewModel.SecurityQuestionAnswer2 = sqs[1].Answer.Content;
+
+            return userProfileViewModel;
+        }
+
+        public List<QuestionViewModel> GetQuestionPool()
+        {
+           return _questionAnswerService.GetQuestions().Select(i => _mapper.Map<QuestionViewModel>(i)).ToList();
+        }
+
+        public List<JurisdictionViewModel> GetStateList()
+        {
+            var list = _jurisdictionService.GetStateProvs((int)(Country.USA));
+            var stateList = new List<JurisdictionViewModel>();
+            foreach (var jur in list)
+            {
+                stateList.Add(new JurisdictionViewModel
+                {
+                    JurisdictionId = jur.JurisdictionId,
+                    StateName = jur.Name
+                });
+            };
+
+            return stateList;
         }
     }
 }

@@ -26,7 +26,9 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using Microsoft.Practices.Unity;
 using NLog;
+using Linko.LinkoExchange.Web.AutoMapperProfile;
 using Linko.LinkoExchange.Services.Jurisdiction;
+using Linko.LinkoExchange.Web.ViewModels.User;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -123,7 +125,11 @@ namespace Linko.LinkoExchange.Web
                 cfg.AddProfile(new RegulatoryProgramMapperProfile());
                 cfg.AddProfile(new PermissionGroupMapProfile());
                 cfg.AddProfile(new SettingMapProfile());
+                cfg.AddProfile(new UserProfileViewModelProfile());
                 cfg.AddProfile(new JurisdictionMapProfile());
+                cfg.AddProfile(new QuestionAnswerPairViewModelProfile());
+                cfg.AddProfile(new AnswerViewModelProfile());
+                cfg.AddProfile(new QuestionViewModelProfile());
             });
 
             //Make sure there no methods were missing in the mappings loaded above via profiles
