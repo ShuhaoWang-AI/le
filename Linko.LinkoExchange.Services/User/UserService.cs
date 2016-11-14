@@ -545,7 +545,7 @@ namespace Linko.LinkoExchange.Services.User
         public void UpdateUser(UserDto dto)
         {
             UserProfile userProfile = _dbContext.Users.Single(up => up.UserProfileId == dto.UserProfileId);
-            userProfile = _mapper.Map<UserDto, UserProfile>(dto);
+            userProfile = _mapper.Map<UserDto, UserProfile>(dto, userProfile);
 
             //Additional manual mappings here
 
