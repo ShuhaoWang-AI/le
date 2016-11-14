@@ -12,6 +12,7 @@ using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.Jurisdiction;
 
 namespace Linko.LinkoExchange.Services.Organization
 {
@@ -22,14 +23,16 @@ namespace Linko.LinkoExchange.Services.Organization
         private readonly IMapper _mapper;
         private readonly ISettingService _settingService;
         private readonly IHttpContextService _httpContext;
+        private readonly IJurisdictionService _jurisdictionService;
 
         public OrganizationService(LinkoExchangeContext dbContext, IMapper mapper,
-            ISettingService settingService, IHttpContextService httpContext)
+            ISettingService settingService, IHttpContextService httpContext, IJurisdictionService jurisdictionService)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _settingService = settingService;
             _httpContext = httpContext;
+            _jurisdictionService = jurisdictionService;
         }
 
         public IEnumerable<OrganizationDto> GetUserOrganizationsByOrgRegProgUserId(int orgRegProgUserId)
@@ -176,7 +179,7 @@ namespace Linko.LinkoExchange.Services.Organization
             {
                 var foundOrg = _dbContext.Organizations.Single(o => o.OrganizationId == organizationId);
                 returnDto = _mapper.Map<Core.Domain.Organization, OrganizationDto>(foundOrg);
-                var jurisdiction = GetJurisdictionById(foundOrg.JurisdictionId);
+                var jurisdiction = _jurisdictionService.GetJurisdictionById(foundOrg.JurisdictionId);
                 returnDto.State = jurisdiction == null ? "" : jurisdiction.Name;
             }
             catch (DbEntityValidationException ex)
@@ -263,7 +266,7 @@ namespace Linko.LinkoExchange.Services.Organization
             dto.HasAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
                 .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
                 && o.PermissionGroup.Name == "Administrator") > 0;
-            dto.OrganizationDto.State = GetJurisdictionById(orgRegProgram.Organization.JurisdictionId).Name;
+            dto.OrganizationDto.State = _jurisdictionService.GetJurisdictionById(orgRegProgram.Organization.JurisdictionId).Name;
 
             return dto;
         }
@@ -293,7 +296,7 @@ namespace Linko.LinkoExchange.Services.Organization
                         dto.HasAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
                             .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
                             && o.PermissionGroup.Name == "Administrator") > 0;
-                        dto.OrganizationDto.State = GetJurisdictionById(orgRegProg.Organization.JurisdictionId).Name;
+                        dto.OrganizationDto.State = _jurisdictionService.GetJurisdictionById(orgRegProg.Organization.JurisdictionId).Name;
                         dtoList.Add(dto);
 
                     }
@@ -350,10 +353,7 @@ namespace Linko.LinkoExchange.Services.Organization
             } 
         }
 
-        public Jurisdiction GetJurisdictionById(int jurisdictionId)
-        {
-            return _dbContext.Jurisdictions.Single(j => j.JurisdictionId == jurisdictionId);
-        }
+       
         
         private void HandleEntityException(DbEntityValidationException ex)
         {

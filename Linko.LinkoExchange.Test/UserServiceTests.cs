@@ -17,6 +17,7 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.TimeZone;
+using Linko.LinkoExchange.Services.Jurisdiction;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -78,7 +79,7 @@ namespace Linko.LinkoExchange.Test
             _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString));
             _realSettingService = new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance);
             _realOrgService = new OrganizationService(new LinkoExchangeContext(connectionString),
-                Mapper.Instance, _realSettingService, new HttpContextService());
+                Mapper.Instance, _realSettingService, new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance));
             _realUserService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(),
                 new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _realSettingService,
                 _sessionCache.Object, _realOrgService, _requestCache, _timeZones);

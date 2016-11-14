@@ -6,6 +6,7 @@ using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Linko.LinkoExchange.Services.Jurisdiction;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -37,7 +38,8 @@ namespace Linko.LinkoExchange.Test
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             orgService = new OrganizationService(new LinkoExchangeContext(connectionString), 
-                Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance), new HttpContextService());
+                Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance), new HttpContextService(),
+                new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance));
         }
 
         [TestMethod]
