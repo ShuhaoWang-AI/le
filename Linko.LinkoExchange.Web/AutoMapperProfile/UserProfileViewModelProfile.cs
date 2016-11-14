@@ -29,33 +29,4 @@ namespace Linko.LinkoExchange.Web.AutoMapperProfile
                   .ForMember(i=>i.Password, i=>i.Ignore());
         } 
     }
-
-    public class QuestionAnswerPairViewModelProfile : Profile
-    {
-        public QuestionAnswerPairViewModelProfile()
-        {
-            CreateMap<QuestionAnswerPairViewModel, QuestionAnswerPairDto>() 
-                  .ReverseMap();
-        }
-    }
-
-    public class AnswerViewModelProfile : Profile
-    {
-        public AnswerViewModelProfile()
-        {
-            CreateMap<AnswerViewModel, AnswerDto>()
-                  .ReverseMap();
-        }
-    }
-
-    public class QuestionViewModelProfile : Profile
-    {
-        public QuestionViewModelProfile()
-        {
-            CreateMap<QuestionViewModel, QuestionDto>()
-                  .ReverseMap();
-        }
-    }
-
-
 }

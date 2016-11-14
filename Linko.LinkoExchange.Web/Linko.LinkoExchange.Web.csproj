@@ -407,6 +407,9 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
+    <Compile Include="AutoMapperProfile\AnswerViewModelProfile.cs" />
+    <Compile Include="AutoMapperProfile\QuestionAnswerPairViewModelProfile.cs" />
+    <Compile Include="AutoMapperProfile\QuestionViewModelProfile.cs" />
     <Compile Include="AutoMapperProfile\UserProfileViewModelProfile.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AuthorityController.cs" />
@@ -435,6 +438,8 @@
     <Compile Include="ViewModels\Industry\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Shared\ConfirmationViewModel.cs" />
     <Compile Include="ViewModels\Shared\JurisdictionViewModel.cs" />
+    <Compile Include="ViewModels\User\AnswerViewModel.cs" />
+    <Compile Include="ViewModels\User\QuestionAnswerPairViewModel.cs" />
     <Compile Include="ViewModels\User\QuestionViewModel.cs" />
     <Compile Include="ViewModels\User\UserProfileViewModel.cs" />
   </ItemGroup>

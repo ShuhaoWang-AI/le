@@ -10,18 +10,4 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         public string Content { get; set; }
         public bool IsActive { get; set; }
     }
-
-    public class AnswerViewModel
-    {
-        public int? UserQuestionAnswerId { get; set; }
-        public string Content { get; set; }
-        public int QuestionId { get; set; }
-
-    }
-
-    public class QuestionAnswerPairViewModel
-    {
-        public QuestionViewModel Question { get; set; }
-        public AnswerViewModel Answer { get; set; }
-    } 
 }
