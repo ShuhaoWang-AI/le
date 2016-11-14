@@ -536,7 +536,7 @@ namespace Linko.LinkoExchange.Services.User
             user.IsRemoved = true;
             //Persist modification date and modifier actor
             user.LastModificationDateTimeUtc = DateTime.UtcNow;
-            user.LastModifierUserId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
+            user.LastModifierUserId = Convert.ToInt32(_httpContext.CurrentUserProfileId());
             _dbContext.SaveChanges();
 
             return true;

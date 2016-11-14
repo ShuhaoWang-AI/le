@@ -228,7 +228,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 questionToUpdate.QuestionTypeId = (int)question.QuestionType;
                 questionToUpdate.IsActive = question.IsActive;
                 questionToUpdate.LastModificationDateTimeUtc = DateTime.UtcNow;
-                questionToUpdate.LastModifierUserId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
+                questionToUpdate.LastModifierUserId = Convert.ToInt32(_httpContext.CurrentUserProfileId());
 
                 try
                 {
