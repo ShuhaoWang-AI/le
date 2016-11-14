@@ -47,6 +47,10 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="dto">Profile DTO</param>
         void UpdateProfile(UserDto dto);
 
+        RegistrationResult UpdateProfile(UserDto dto, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions);
+
+        RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions);
+
         bool UpdateEmail(int userProfileId, string newEmailAddress);
 
         OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId);

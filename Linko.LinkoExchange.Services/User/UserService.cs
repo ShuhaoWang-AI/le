@@ -13,6 +13,8 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
 using Microsoft.AspNet.Identity;
+using Linko.LinkoExchange.Services.Authentication;
+using Linko.LinkoExchange.Services.QuestionAnswer;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -32,6 +34,8 @@ namespace Linko.LinkoExchange.Services.User
         private readonly IRequestCache _requestCache;
         private readonly IDictionary<SystemSettingType, string> _globalSettings;  
         private readonly ITimeZoneService _timeZones;
+        private readonly ApplicationUserManager _userManager;
+        private readonly IQuestionAnswerService _questionAnswerServices;
 
 
         #endregion
@@ -41,7 +45,8 @@ namespace Linko.LinkoExchange.Services.User
         public UserService(LinkoExchangeContext dbContext, IAuditLogEntry logger,
             IPasswordHasher passwordHasher, IMapper mapper, IHttpContextService httpContext,
             IEmailService emailService, ISettingService settingService, ISessionCache sessionCache,
-            IOrganizationService orgService, IRequestCache requestCache, ITimeZoneService timeZones)
+            IOrganizationService orgService, IRequestCache requestCache, ITimeZoneService timeZones,
+            ApplicationUserManager userManager, IQuestionAnswerService questionAnswerServices)
         {
             this._dbContext = dbContext;
             _logger = logger;
@@ -55,6 +60,8 @@ namespace Linko.LinkoExchange.Services.User
             _requestCache = requestCache;
             _globalSettings = _settingService.GetGlobalSettings();
             _timeZones = timeZones;
+            _userManager = userManager;
+            _questionAnswerServices = questionAnswerServices;
         }
 
         #endregion
@@ -567,6 +574,119 @@ namespace Linko.LinkoExchange.Services.User
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
             contentReplacements.Add("supportEmail", supportEmail);
             _emailService.SendEmail(new[] { dto.Email }, EmailType.Profile_ProfileChanged, contentReplacements);
+        }
+
+        public RegistrationResult UpdateProfile(UserDto dto, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions)
+        {
+            var validationResult = ValidateRegistrationUserData(dto, securityQuestions, kbqQuestions);
+
+            if (validationResult != RegistrationResult.Success)
+                return validationResult;
+
+            var transaction = _dbContext.BeginTransaction();
+            try
+            {
+                UpdateProfile(dto);
+                ICollection<AnswerDto> securityQuestionCollection = securityQuestions.ToList();
+                ICollection<AnswerDto> kbqQuestionCollection = kbqQuestions.ToList();
+                _questionAnswerServices.CreateOrUpdateUserQuestionAnswers(dto.UserProfileId, securityQuestionCollection);
+                _questionAnswerServices.CreateOrUpdateUserQuestionAnswers(dto.UserProfileId, kbqQuestionCollection);
+
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw ex;
+            }
+            finally
+            {
+                transaction.Dispose();
+            }
+
+            return RegistrationResult.Success;
+
+        }
+
+        public RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions)
+        {
+            if (userProfile.AgreeTermsAndConditions == false)
+            {
+                return RegistrationResult.NotAgreedTermsAndConditions;
+            }
+
+            // To verify user's password 
+            if (userProfile.Password.Length < 8 || userProfile.Password.Length > 15)
+            {
+                return RegistrationResult.BadPassword;
+            }
+
+            var validPassword = _userManager.PasswordValidator.ValidateAsync(userProfile.Password).Result;
+            if (validPassword.Succeeded == false)
+            {
+                return RegistrationResult.BadPassword;
+            }
+
+            if (userProfile == null ||
+                string.IsNullOrWhiteSpace(userProfile.FirstName) ||
+                string.IsNullOrWhiteSpace(userProfile.LastName) ||
+                string.IsNullOrWhiteSpace(userProfile.AddressLine1) ||
+                string.IsNullOrWhiteSpace(userProfile.CityName) ||
+                string.IsNullOrWhiteSpace(userProfile.ZipCode) ||
+                string.IsNullOrWhiteSpace(userProfile.Email) ||
+                string.IsNullOrWhiteSpace(userProfile.UserName) ||
+                securityQuestions == null || kbqQuestions == null)
+            {
+                return RegistrationResult.BadUserProfileData;
+            }
+
+            if (securityQuestions.Count() < 2)
+            {
+                return RegistrationResult.MissingSecurityQuestion;
+            }
+
+            if (kbqQuestions.Count() < 5)
+            {
+                return RegistrationResult.MissingKBQ;
+            }
+
+            // Test duplicated security questions
+            if (securityQuestions.GroupBy(i => i.QuestionId).Any(i => i.Count() > 1))
+            {
+                return RegistrationResult.DuplicatedSecurityQuestion;
+            }
+
+            // Test duplicated KBQ questions
+            if (kbqQuestions.GroupBy(i => i.QuestionId).Any(i => i.Count() > 1))
+            {
+                return RegistrationResult.DuplicatedKBQ;
+            }
+
+            // Test duplicated security question answers
+            if (securityQuestions.GroupBy(i => i.Content).Any(i => i.Count() > 1))
+            {
+                return RegistrationResult.DuplicatedSecurityQuestionAnswer;
+            }
+
+            // Test duplicated KBQ question answers
+            if (kbqQuestions.GroupBy(i => i.Content).Any(i => i.Count() > 1))
+            {
+                return RegistrationResult.DuplicatedKBQAnswer;
+            }
+
+            // Test security questions mush have answer
+            if (securityQuestions.Any(i => i.Content == null))
+            {
+                return RegistrationResult.MissingSecurityQuestionAnswer;
+            }
+
+            // Test KBQ questions mush have answer
+            if (kbqQuestions.Any(i => i.Content == null))
+            {
+                return RegistrationResult.MissingKBQAnswer;
+            }
+
+            return RegistrationResult.Success;
         }
 
         public bool UpdateEmail(int userProfileId, string newEmailAddress)

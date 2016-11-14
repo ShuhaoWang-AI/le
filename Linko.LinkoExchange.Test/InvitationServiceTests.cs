@@ -18,6 +18,7 @@ using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Jurisdiction;
+using Linko.LinkoExchange.Services.QuestionAnswer;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -31,6 +32,8 @@ namespace Linko.LinkoExchange.Test
         Mock<ISessionCache> _sessionCache;
         Mock<IOrganizationService> _orgService;
         Mock<ITimeZoneService> _timeZones;
+        Mock<ApplicationUserManager> _userManager;
+        Mock<IQuestionAnswerService> _qaService;
         public InvitationServiceTests()
         {
             Mapper.Initialize(cfg =>
@@ -63,7 +66,7 @@ namespace Linko.LinkoExchange.Test
                 new LinkoExchangeContext(connectionString),
                 Mapper.Instance,
                 new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance),
-                new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, new HttpContextService(), _emailService, _settingService, _sessionCache.Object, _orgService.Object, _requestCache, _timeZones.Object),
+                new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, new HttpContextService(), _emailService, _settingService, _sessionCache.Object, _orgService.Object, _requestCache, _timeZones.Object, _userManager.Object, _qaService.Object),
                 _requestCache,//new RequestCache(),
                 _emailService,
                 new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance), new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance)),

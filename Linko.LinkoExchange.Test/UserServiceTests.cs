@@ -18,6 +18,8 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Jurisdiction;
+using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -35,6 +37,9 @@ namespace Linko.LinkoExchange.Test
         ISettingService _realSettingService;
         IEmailService _emailService = Mock.Of<IEmailService>();
         ITimeZoneService _timeZones;
+        Mock<ApplicationUserManager> _userManager;
+        Mock<IQuestionAnswerService> _qaService;
+
         public UserServiceTests()
         {
             Mapper.Initialize(cfg =>
@@ -68,6 +73,10 @@ namespace Linko.LinkoExchange.Test
             _orgService = new Mock<IOrganizationService>();
             _orgService.Setup(x => x.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });
 
+            var userStore = new Mock<IUserStore<UserProfile>>();
+            _userManager = new Mock<ApplicationUserManager>(userStore.Object);
+            _qaService = new Mock<IQuestionAnswerService>();
+
             //_settingService.GetGlobalSettings()
             var globalSettingLookup = new Dictionary<SystemSettingType, string>();
             globalSettingLookup.Add(SystemSettingType.SupportPhoneNumber, "555-555-5555");
@@ -82,11 +91,11 @@ namespace Linko.LinkoExchange.Test
                 Mapper.Instance, _realSettingService, new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance));
             _realUserService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(),
                 new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _realSettingService,
-                _sessionCache.Object, _realOrgService, _requestCache, _timeZones);
+                _sessionCache.Object, _realOrgService, _requestCache, _timeZones, _userManager.Object, _qaService.Object);
 
             _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
                 new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService.Object, 
-                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones);
+                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones, _userManager.Object, _qaService.Object);
         }
 
         [TestMethod]
@@ -223,6 +232,27 @@ namespace Linko.LinkoExchange.Test
             };
 
             _userService.UpdateProfile(dto);
+        }
+
+        [TestMethod]
+        public void UpdateProfileComplete()
+        {
+            var dto = new UserDto()
+            {
+                FirstName = "Billy",
+                LastName = "Goat",
+                TitleRole = "President",
+                BusinessName = "Acme Corp.",
+                UserProfileId = 1,
+                AddressLine1 = "1234 Main St",
+                AddressLine2 = "Apt 102",
+                CityName = "Toronto",
+                ZipCode = "55555",
+            };
+
+            List<AnswerDto> kbqList = new List<AnswerDto>();
+            List<AnswerDto> sqList = new List<AnswerDto>();
+            _userService.UpdateProfile(dto, sqList, kbqList);
         }
 
         [TestMethod]
