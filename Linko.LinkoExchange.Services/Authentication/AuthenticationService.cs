@@ -806,6 +806,10 @@ namespace Linko.LinkoExchange.Services.Authentication
             {
                 signInResultDto.AutehticationResult = AuthenticationResult.InvalidUserNameOrPassword;
             }
+            else if (signInStatus == SignInStatus.LockedOut)
+            {
+                signInResultDto.AutehticationResult = AuthenticationResult.UserIsLocked;
+            }
 
             _logger.Info(message: "SignInByUserName. signInStatus={0}", argument: signInStatus.ToString());
             return Task.FromResult(signInResultDto);
