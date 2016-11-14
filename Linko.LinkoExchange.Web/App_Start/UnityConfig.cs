@@ -26,6 +26,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using Microsoft.Practices.Unity;
 using NLog;
+using Linko.LinkoExchange.Services.Jurisdiction;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -89,6 +90,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IQuestionAnswerService, QuestionAnswerService>();
             container.RegisterType<ITimeZoneService, TimeZoneService>();
             container.RegisterType<IEncryptionService, EncryptionService>();
+            container.RegisterType<IJurisdictionService, JurisdictionService>();
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
@@ -121,12 +123,14 @@ namespace Linko.LinkoExchange.Web
                 cfg.AddProfile(new RegulatoryProgramMapperProfile());
                 cfg.AddProfile(new PermissionGroupMapProfile());
                 cfg.AddProfile(new SettingMapProfile());
+                cfg.AddProfile(new JurisdictionMapProfile());
             });
 
             //Make sure there no methods were missing in the mappings loaded above via profiles
             Mapper.AssertConfigurationIsValid();
 
             container.RegisterInstance<IMapper>(Mapper.Instance);
+
 
         }
     }
