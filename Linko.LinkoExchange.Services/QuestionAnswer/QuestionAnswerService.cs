@@ -53,7 +53,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 if (question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
                 {
                     //Hash answer
-                    answer.Content = _passwordHasher.HashPassword(answer.Content.Trim().ToUpper());
+                    answer.Content = _passwordHasher.HashPassword(answer.Content.Trim().ToLower());
                 }
                 else if (question.QuestionTypeId == (int)Dto.QuestionType.Security)
                 {
@@ -104,7 +104,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             if (question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
             {
                 //Hash answer
-                answerDto.Content = _passwordHasher.HashPassword(answerDto.Content.Trim().ToUpper()); //CASE INSENSITIVE -- CAPITAL LETTERS ONLY
+                answerDto.Content = _passwordHasher.HashPassword(answerDto.Content.Trim().ToLower()); //CASE INSENSITIVE -- LOWER CASE ONLY
             }
             else if (question.QuestionTypeId == (int)Dto.QuestionType.Security)
             {
@@ -275,7 +275,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 if (answerToUpdate.Question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
                 {
                     //Hash answer
-                    answer.Content = _passwordHasher.HashPassword(answer.Content.Trim().ToUpper());
+                    answer.Content = _passwordHasher.HashPassword(answer.Content.Trim().ToLower());
                 }
                 else if (answerToUpdate.Question.QuestionTypeId == (int)Dto.QuestionType.Security)
                 {
