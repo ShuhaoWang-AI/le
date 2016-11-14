@@ -66,7 +66,7 @@ namespace Linko.LinkoExchange.Test
                 new LinkoExchangeContext(connectionString),
                 Mapper.Instance,
                 new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance),
-                new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, new HttpContextService(), _emailService, _settingService, _sessionCache.Object, _orgService.Object, _requestCache, _timeZones.Object, _userManager.Object, _qaService.Object),
+                new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, new HttpContextService(), _emailService, _settingService, _sessionCache.Object, _orgService.Object, _requestCache, _timeZones.Object, _qaService.Object),
                 _requestCache,//new RequestCache(),
                 _emailService,
                 new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance), new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance)),

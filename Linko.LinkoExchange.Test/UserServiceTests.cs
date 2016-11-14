@@ -91,11 +91,11 @@ namespace Linko.LinkoExchange.Test
                 Mapper.Instance, _realSettingService, new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance));
             _realUserService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(),
                 new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _realSettingService,
-                _sessionCache.Object, _realOrgService, _requestCache, _timeZones, _userManager.Object, _qaService.Object);
+                _sessionCache.Object, _realOrgService, _requestCache, _timeZones, _qaService.Object);
 
             _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
                 new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService.Object, 
-                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones, _userManager.Object, _qaService.Object);
+                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones, _qaService.Object);
         }
 
         [TestMethod]

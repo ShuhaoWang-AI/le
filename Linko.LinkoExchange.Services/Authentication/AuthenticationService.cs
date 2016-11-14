@@ -265,10 +265,9 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             _logger.Info("Register. userName={0}, email={1}", userInfo.UserName, registrationToken);
-
-
-            var validatResult = _userService.ValidateRegistrationUserData(userInfo, securityQuestions, kbqQuestions);
-            if (validatResult != RegistrationResult.Success)
+            
+            var validatResult = ValidateRegistrationData(userInfo, securityQuestions, kbqQuestions);
+           if (validatResult != RegistrationResult.Success)
             {
                 registrationResult.Result = validatResult;
                 return registrationResult;
@@ -1141,6 +1140,29 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             _emailService.SendEmail(new[] { userProfile.Email }, EmailType.ForgotUserName_ForgotUserName, contentReplacements);
         }
+
+        public RegistrationResult ValidateRegistrationData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions)
+        {
+            if (userProfile.AgreeTermsAndConditions == false)
+            {
+                return RegistrationResult.NotAgreedTermsAndConditions;
+            }
+
+            // To verify user's password 
+            if (userProfile.Password.Length < 8 || userProfile.Password.Length > 15)
+            {
+                return RegistrationResult.BadPassword;
+            }
+
+            var validPassword = _userManager.PasswordValidator.ValidateAsync(userProfile.Password).Result;
+            if (validPassword.Succeeded == false)
+            {
+                return RegistrationResult.BadPassword;
+            }
+
+            return _userService.ValidateRegistrationUserData(userProfile, securityQuestions, kbqQuestions);
+        }
+
         #endregion
     }
 }

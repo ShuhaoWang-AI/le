@@ -33,10 +33,8 @@ namespace Linko.LinkoExchange.Services.User
         private readonly IOrganizationService _orgService;
         private readonly IRequestCache _requestCache;
         private readonly IDictionary<SystemSettingType, string> _globalSettings;  
-        private readonly ITimeZoneService _timeZones;
-        private readonly ApplicationUserManager _userManager;
-        private readonly IQuestionAnswerService _questionAnswerServices;
-
+        private readonly ITimeZoneService _timeZones; 
+        private readonly IQuestionAnswerService _questionAnswerServices; 
 
         #endregion
 
@@ -46,7 +44,7 @@ namespace Linko.LinkoExchange.Services.User
             IPasswordHasher passwordHasher, IMapper mapper, IHttpContextService httpContext,
             IEmailService emailService, ISettingService settingService, ISessionCache sessionCache,
             IOrganizationService orgService, IRequestCache requestCache, ITimeZoneService timeZones,
-            ApplicationUserManager userManager, IQuestionAnswerService questionAnswerServices)
+             IQuestionAnswerService questionAnswerServices)
         {
             this._dbContext = dbContext;
             _logger = logger;
@@ -59,8 +57,7 @@ namespace Linko.LinkoExchange.Services.User
             _orgService = orgService;
             _requestCache = requestCache;
             _globalSettings = _settingService.GetGlobalSettings();
-            _timeZones = timeZones;
-            _userManager = userManager;
+            _timeZones = timeZones; 
             _questionAnswerServices = questionAnswerServices;
         }
 
@@ -609,23 +606,7 @@ namespace Linko.LinkoExchange.Services.User
         }
 
         public RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions)
-        {
-            if (userProfile.AgreeTermsAndConditions == false)
-            {
-                return RegistrationResult.NotAgreedTermsAndConditions;
-            }
-
-            // To verify user's password 
-            if (userProfile.Password.Length < 8 || userProfile.Password.Length > 15)
-            {
-                return RegistrationResult.BadPassword;
-            }
-
-            var validPassword = _userManager.PasswordValidator.ValidateAsync(userProfile.Password).Result;
-            if (validPassword.Succeeded == false)
-            {
-                return RegistrationResult.BadPassword;
-            }
+        { 
 
             if (userProfile == null ||
                 string.IsNullOrWhiteSpace(userProfile.FirstName) ||
@@ -841,7 +822,7 @@ namespace Linko.LinkoExchange.Services.User
                         return new RegistrationResultDto() { Result = RegistrationResult.UnauthorizedNotIUAdmin };
                     }
                 }
-                
+
 
             }
 
