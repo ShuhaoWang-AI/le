@@ -13,6 +13,7 @@ using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.Jurisdiction;
+using System.Data.Entity;
 
 namespace Linko.LinkoExchange.Services.Organization
 {
@@ -40,7 +41,7 @@ namespace Linko.LinkoExchange.Services.Organization
             var orgDtoList = new List<OrganizationDto>();
             var orgRegProgramId = _dbContext.OrganizationRegulatoryProgramUsers.Single(o => o.OrganizationRegulatoryProgramUserId == orgRegProgUserId).OrganizationRegulatoryProgramId;
             var regProgramId = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId).RegulatoryProgramId;
-            var orgList = _dbContext.OrganizationRegulatoryPrograms.Include("Organization").Where(o => o.RegulatoryProgramId == regProgramId);
+            var orgList = _dbContext.OrganizationRegulatoryPrograms.Include(o => o.Organization.OrganizationType).Where(o => o.RegulatoryProgramId == regProgramId);
             if (orgList != null)
             {
                 foreach (var org in orgList)
