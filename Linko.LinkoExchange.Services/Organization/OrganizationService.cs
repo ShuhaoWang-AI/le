@@ -139,13 +139,7 @@ namespace Linko.LinkoExchange.Services.Organization
             {
                 HandleEntityException(ex);
             }
-            catch (Exception e)
-            {
-                var linkoException = new LinkoExchangeException();
-                linkoException.ErrorType = LinkoExchangeError.DatabaseSetting;
-                linkoException.Errors = new List<string> { e.Message };
-                throw linkoException;
-            }
+
             return null;
         }
 
