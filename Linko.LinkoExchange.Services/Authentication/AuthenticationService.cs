@@ -576,7 +576,8 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             var authenticationResult = new AuthenticationResultDto();
 
-            if (_userManager.PasswordHasher.VerifyHashedPassword(correctSavedHashedAnswer, answer) != PasswordVerificationResult.Success)
+            //KBQ ANSWERS ARE CASE-INSENSITIVE; PERSISTED AS ALL CAPS
+            if (_userManager.PasswordHasher.VerifyHashedPassword(correctSavedHashedAnswer, answer.Trim().ToUpper()) != PasswordVerificationResult.Success)
             {
                 //Check hashed answer (5.3.a)
 

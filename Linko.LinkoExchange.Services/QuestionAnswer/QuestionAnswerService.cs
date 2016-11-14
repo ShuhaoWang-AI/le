@@ -53,12 +53,12 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 if (question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
                 {
                     //Hash answer
-                    answer.Content = _passwordHasher.HashPassword(answer.Content);
+                    answer.Content = _passwordHasher.HashPassword(answer.Content.Trim().ToUpper());
                 }
                 else if (question.QuestionTypeId == (int)Dto.QuestionType.Security)
                 {
                     //Encrypt answer
-                    answer.Content = _encryption.EncryptString(answer.Content);
+                    answer.Content = _encryption.EncryptString(answer.Content.Trim());
                 }
 
 
@@ -104,12 +104,12 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             if (question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
             {
                 //Hash answer
-                answerDto.Content = _passwordHasher.HashPassword(answerDto.Content);
+                answerDto.Content = _passwordHasher.HashPassword(answerDto.Content.Trim().ToUpper()); //CASE INSENSITIVE -- CAPITAL LETTERS ONLY
             }
             else if (question.QuestionTypeId == (int)Dto.QuestionType.Security)
             {
                 //Encrypt answer
-                answerDto.Content = _encryption.EncryptString(answerDto.Content);
+                answerDto.Content = _encryption.EncryptString(answerDto.Content.Trim());
             }
 
             UserQuestionAnswer answer;
@@ -275,12 +275,12 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 if (answerToUpdate.Question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
                 {
                     //Hash answer
-                    answer.Content = _passwordHasher.HashPassword(answer.Content);
+                    answer.Content = _passwordHasher.HashPassword(answer.Content.Trim().ToUpper());
                 }
                 else if (answerToUpdate.Question.QuestionTypeId == (int)Dto.QuestionType.Security)
                 {
                     //Encrypt answer
-                    answer.Content = _encryption.EncryptString(answer.Content);
+                    answer.Content = _encryption.EncryptString(answer.Content.Trim());
                 }
 
                 answerToUpdate.Content = answer.Content;
