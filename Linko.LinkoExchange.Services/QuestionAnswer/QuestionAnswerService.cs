@@ -515,5 +515,20 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             return list;
 
         }
+
+        public bool ConfirmCorrectAnswer(int userQuestionAnswerId, string answer)
+        {
+            var questionAnswer = _dbContext.UserQuestionAnswers.Include(q => q.Question.QuestionType)
+                .Single(u => u.UserQuestionAnswerId == userQuestionAnswerId);
+
+            if (questionAnswer.Question.QuestionType.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
+            {
+                return _passwordHasher.VerifyHashedPassword(questionAnswer.Content, answer.Trim().ToLower()) == PasswordVerificationResult.Success;
+            }
+            else
+            {
+                return _encryption.EncryptString(answer.Trim()) == questionAnswer.Content;
+            }
+        }
     }
 }

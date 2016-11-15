@@ -65,5 +65,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         ICollection<QuestionDto> GetQuestions();
 
+        bool ConfirmCorrectAnswer(int userQuestionAnswerId, string answer);
+
     }
 }

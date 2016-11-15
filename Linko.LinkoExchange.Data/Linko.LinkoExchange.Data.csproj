@@ -82,6 +82,7 @@
     <Compile Include="Mapping\EmailTemplateMap.cs" />
     <Compile Include="Mapping\AuditLogTemplateMap.cs" />
     <Compile Include="Mapping\InvitationMap.cs" />
+    <Compile Include="Mapping\QuestionTypeMap.cs" />
     <Compile Include="Mapping\TimeZoneMap.cs" />
     <Compile Include="Mapping\Jurisdiction.cs" />
     <Compile Include="Mapping\OrganizationMap.cs" />

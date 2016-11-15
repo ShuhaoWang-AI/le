@@ -15,6 +15,7 @@ namespace Linko.LinkoExchange.Data.Mapping
             ToTable("tQuestion");
             HasKey(i => i.QuestionId);
             Property(i => i.Content);
+            Property(i => i.QuestionTypeId);
             HasRequired(i => i.QuestionType)
                 .WithMany()
                 .HasForeignKey(i => i.QuestionTypeId);

@@ -195,7 +195,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetQuestions_Test()
         {
-            var result = _questionAnswerService.GetQuestions();
+            var result = _questionAnswerService.ConfirmCorrectAnswer(15, "NEW ANSWer 1");
         }
 
     }
