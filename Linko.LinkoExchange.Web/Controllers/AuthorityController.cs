@@ -183,7 +183,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         // POST: /Authority/IndustryDetails
         [AcceptVerbs(HttpVerbs.Post)]
         [Route("Industry/{id:int}/Details")]
-        public ActionResult IndustryDetails(IndustryViewModel model)
+        public ActionResult IndustryDetails(int id, IndustryViewModel model)
         {
             try
             {

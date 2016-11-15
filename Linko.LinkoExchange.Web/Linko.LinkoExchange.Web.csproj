@@ -433,6 +433,7 @@
     <Compile Include="ViewModels\Account\ResetPasswordViewModel.cs" />
     <Compile Include="ViewModels\Account\SignInViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserPendingInvitationViewModel.cs" />
+    <Compile Include="ViewModels\Authority\AuthoritySettingsViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
     <Compile Include="ViewModels\Industry\IndustryViewModel.cs" />
@@ -469,6 +470,8 @@
     <Content Include="Views\Authority\IndustryUsers.cshtml" />
     <Content Include="Views\Authority\IndustryUserDetails.cshtml" />
     <Content Include="Views\User\Profile.cshtml" />
+    <Content Include="Views\Authority\Settings.cshtml" />
+    <Content Include="Temp\GRESD Electronic Signature Agreement.pdf" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -509,7 +512,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>15250</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
