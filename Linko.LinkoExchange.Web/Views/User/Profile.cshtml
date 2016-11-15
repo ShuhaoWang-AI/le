@@ -20,337 +20,339 @@
 
 @using (Html.BeginForm())
 {
-    @*@Html.AntiForgeryToken()*@
+    @Html.AntiForgeryToken()
 
     <div>
-        @if (ViewData.ModelState.IsValid == false) {
+        @if (ViewData.ModelState.IsValid == false)
+        {
             @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new { @class = "alert alert-danger" })
         }
-    </div>
-    <div class="box box-primary">
-        <div class="box-header with-border">
-            <h3 class="box-title">User Information</h3>
-            <div class="box-tools pull-right">
-                <div class="pull-right"> 
-                     @if (Model.HasSigntory == false)
-                     {
-                      <a href="/request"><div name="Command" class="btn btn-sm btn-primary">Request Signaory </div></a>  
-                     }
+    </div> 
 
-                    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                </div>
-            </div><!-- /.box-tools -->
-        </div>  @*.box-header*@
+    <div id="user-info-panel" class="profileDiv">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">User Information</h3>
+                <div class="box-tools pull-right">
+                    <div class="pull-right">
+                        @if (Model.HasSigntory == false)
+                        {
+                    <a href="/request"><div name="Command" class="btn btn-sm btn-primary">Request Signaory </div></a>
+                        }
 
-        <section class="box-body form-horizontal">
-            <div id="user-info-panel">
-       
-                <!-- Line1   Role and  signatory   -->
-                <div class="form-group">
-                    @Html.LabelFor(model => model.Role, htmlAttributes: new
-               {
-                   @class = "control-label col-md-2"
-               })
-
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.Role, new
-                   {
-                       htmlAttributes = new
-                       {
-                           @class = "form-control",
-                           @readonly = "true"
-                       }
-                   })
+                        <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                     </div>
+                </div><!-- /.box-tools -->
+            </div>  @*.box-header*@
 
-                    @Html.LabelFor(model => model.HasSigntory, htmlAttributes: new
-               {
-                   @class = "control-label col-md-2"
-               })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.HasSigntoryText, new
-                   {
-                       htmlAttributes = new
-                       {
-                           @class = "form-control",
-                           @readonly = "true"
-                       }
-                   })
-                    </div>
-                </div>
-
-                <hr />
-                <div class="editabledDiv">
-                    <!-- Line2   FirstName and  LastName   -->
-                    <div class="form-group required" >  
-                        @Html.LabelFor(model => model.FirstName, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required "
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => model.FirstName, new
-                       {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control editable"
-                           }
-                       })
-                        </div>
-
-
-                        @Html.LabelFor(model => model.LastName, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required"
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => model.LastName, new
-                       {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control"
-                           }
-                       })
-                        </div>
-                    </div>
-
-                    <!-- Line3   Organization and  TitleROle   -->
-                    <div class="form-group ">
-                       @Html.LabelFor(model => model.BusinessName, htmlAttributes: new
-                   {
-                       @class = " control-label col-md-2 required "
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => model.BusinessName, new
-                       {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control "
-                           }
-                       })
-                        </div> 
-
-                            @Html.LabelFor(model => model.TitleRole, htmlAttributes: new
+            <section class="box-body form-horizontal"> 
+                    <!-- Line1   Role and  signatory-->
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Role, htmlAttributes: new
                    {
                        @class = "control-label col-md-2"
                    })
-                            <div class="col-md-4">
-                                @Html.EditorFor(model => model.TitleRole, new
+
+                        <div class="col-md-4">
+                            @Html.EditorFor(model => model.Role, new
                        {
                            htmlAttributes = new
                            {
-                               @class = "form-control"
+                               @class = "form-control",
+                               @readonly = "true"
                            }
                        })
+                        </div>
+
+                        @Html.LabelFor(model => model.HasSigntory, htmlAttributes: new
+                   {
+                       @class = "control-label col-md-2"
+                   })
+                        <div class="col-md-4">
+                            @Html.EditorFor(model => model.HasSigntoryText, new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control",
+                               @readonly = "true"
+                           }
+                       })
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="editabledDiv">
+                        <!-- Line2   FirstName and  LastName   -->
+                        <div class="form-group required">
+                            @Html.LabelFor(model => model.FirstName, htmlAttributes: new
+                       {
+                           @class = "control-label col-md-2 required "
+                       })
+                            <div class="col-md-4">
+                                @Html.EditorFor(model => model.FirstName, new
+                           {
+                               htmlAttributes = new
+                               {
+                                   @class = "form-control editable"
+                               }
+                           })
+                            </div>
+
+
+                            @Html.LabelFor(model => model.LastName, htmlAttributes: new
+                       {
+                           @class = "control-label col-md-2 required"
+                       })
+                            <div class="col-md-4">
+                                @Html.EditorFor(model => model.LastName, new
+                           {
+                               htmlAttributes = new
+                               {
+                                   @class = "form-control"
+                               }
+                           })
                             </div>
                         </div>
 
-                    <!-- Line4   Phone and  Ext   -->
+                        <!-- Line3   Organization and  TitleROle   -->
+                        <div class="form-group ">
+                            @Html.LabelFor(model => model.BusinessName, htmlAttributes: new
+                       {
+                           @class = " control-label col-md-2 required "
+                       })
+                            <div class="col-md-4">
+                                @Html.EditorFor(model => model.BusinessName, new
+                           {
+                               htmlAttributes = new
+                               {
+                                   @class = "form-control "
+                               }
+                           })
+                            </div>
+
+                            @Html.LabelFor(model => model.TitleRole, htmlAttributes: new
+                       {
+                           @class = "control-label col-md-2"
+                       })
+                            <div class="col-md-4">
+                                @Html.EditorFor(model => model.TitleRole, new
+                           {
+                               htmlAttributes = new
+                               {
+                                   @class = "form-control"
+                               }
+                           })
+                            </div>
+                        </div>
+
+                        <!-- Line4   Phone and  Ext   -->
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PhoneNumber, htmlAttributes: new
+                       {
+                           @class = "control-label col-md-2 required"
+                       })
+                            <div class="col-md-4">
+                                @Html.EditorFor(model => model.PhoneNumber, new
+                           {
+                               htmlAttributes = new
+                               {
+                                   @class = "form-control"
+                               }
+                           })
+                            </div>
+
+                            @Html.LabelFor(model => model.PhoneExt, htmlAttributes: new
+                       {
+                           @class = "control-label col-md-2"
+                       })
+                            <div class="col-md-4">
+                                @Html.EditorFor(model => model.PhoneExt, new
+                           {
+                               htmlAttributes = new
+                               {
+                                   @class = "form-control"
+                               }
+                           })
+                            </div>
+                        </div>
+
+                        <!-- Line5   Fax   -->
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Fax, htmlAttributes: new
+                       {
+                           @class = "control-label col-md-2"
+                       })
+                            <div class="col-md-4">
+                                @Html.EditorFor(model => model.Fax, new
+                           {
+                               htmlAttributes = new
+                               {
+                                   @class = "form-control"
+                               }
+                           })
+                            </div>
+                        </div>
+
+                        <!-- Line6  AddressLine1 and AddressLine2  -->
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.AddressLine1, htmlAttributes: new
+                       {
+                           @class = "control-label col-md-2 required"
+                       })
+                            <div class="col-md-4">
+                                @Html.EditorFor(model => model.AddressLine1, new
+                           {
+                               htmlAttributes = new
+                               {
+                                   @class = "form-control"
+                               }
+                           })
+                            </div>
+
+                            @Html.LabelFor(model => model.AddressLine2, htmlAttributes: new
+                       {
+                           @class = "control-label col-md-2"
+                       })
+                            <div class="col-md-4">
+                                @Html.EditorFor(model => model.AddressLine2, new
+                           {
+                               htmlAttributes = new
+                               {
+                                   @class = "form-control"
+                               }
+                           })
+                            </div>
+
+                        </div>
+
+                        <!-- Line7 City and State   -->
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CityName, htmlAttributes: new
+                       {
+                           @class = "control-label col-md-2 required"
+                       })
+                            <div class="col-md-4">
+                                @Html.EditorFor(model => model.CityName, new
+                           {
+                               htmlAttributes = new
+                               {
+                                   @class = "form-control"
+                               }
+                           })
+                            </div>
+
+                            @Html.LabelFor(model => model.JurisdictionId, htmlAttributes: new
+                       {
+                           @class = "control-label col-md-2 required"
+                       })
+                            <div class="col-md-4">
+                                @Html.DropDownListFor(model => model.JurisdictionId,
+         Model.StateList.Select(i => new SelectListItem
+         {
+             Text = i.StateName,
+             Value = i.JurisdictionId.ToString(),
+             Selected = Model.JurisdictionId == i.JurisdictionId
+         }).ToList(),
+
+          new
+          {
+              @class = "form-control"
+          })
+                            </div>
+                        </div>
+
+                        <!-- Line8 Zip Code   -->
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ZipCode, htmlAttributes: new
+                       {
+                           @class = "control-label col-md-2 required"
+                       })
+                            <div class="col-md-4">
+                                @Html.EditorFor(model => model.ZipCode, new
+                           {
+                               htmlAttributes = new
+                               {
+                                   @class = "form-control"
+                               }
+                           })
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <hr />
+
+                    <!-- Line 9 Email -->
                     <div class="form-group">
-                        @Html.LabelFor(model => model.PhoneNumber, htmlAttributes: new
+                        @Html.LabelFor(model => model.Email, htmlAttributes: new
                    {
                        @class = "control-label col-md-2 required"
                    })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => model.PhoneNumber, new
+                            @Html.EditorFor(model => model.Email, new
                        {
                            htmlAttributes = new
                            {
-                               @class = "form-control"
+                               @class = "form-control",
+                               @readonly = "true"
                            }
                        })
                         </div>
 
-                        @Html.LabelFor(model => model.PhoneExt, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2"
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => model.PhoneExt, new
-                       {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control"
-                           }
-                       })
-                        </div>
+                        @Html.ActionLink("Change", "Account", "ChangePassword")
                     </div>
 
-                    <!-- Line5   Fax   -->
+                    <!-- Line 10 UserName -->
                     <div class="form-group">
-                        @Html.LabelFor(model => model.Fax, htmlAttributes: new
+                        @Html.LabelFor(model => model.UserName, htmlAttributes: new
                    {
-                       @class = "control-label col-md-2"
+                       @class = "control-label col-md-2 required"
                    })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => model.Fax, new
+                            @Html.EditorFor(model => model.UserName, new
                        {
                            htmlAttributes = new
                            {
-                               @class = "form-control"
+                               @class = "form-control",
+                               @readonly = "true"
                            }
                        })
                         </div>
+
+                        @Html.ActionLink("Change", "Account", "ChangeUserName")
                     </div>
 
-                    <!-- Line6  AddressLine1 and AddressLine2  -->
+                    <!-- Line 11 UserName -->
                     <div class="form-group">
-                        @Html.LabelFor(model => model.AddressLine1, htmlAttributes: new
+                        @Html.LabelFor(model => model.Password, htmlAttributes: new
                    {
                        @class = "control-label col-md-2 required"
                    })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => model.AddressLine1, new
+                            @Html.EditorFor(model => model.Password, new
                        {
                            htmlAttributes = new
                            {
-                               @class = "form-control"
+                               @class = "form-control",
+                               @readonly = "true"
                            }
                        })
                         </div>
 
-                        @Html.LabelFor(model => model.AddressLine2, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2"
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => model.AddressLine2, new
-                       {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control"
-                           }
-                       })
-                        </div>
-
+                        @Html.ActionLink("Change", "Account", "ChangePassword")
                     </div>
-
-                    <!-- Line7 City and State   -->
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.CityName, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required"
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => model.CityName, new
-                       {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control"
-                           }
-                       })
-                        </div>
-
-                        @Html.LabelFor(model => model.JurisdictionId, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required"
-                   })
-                        <div class="col-md-4">
-                            @Html.DropDownListFor(model => model.JurisdictionId,
-                                Model.StateList.Select(i=> new SelectListItem
-                                { 
-                                    Text = i.StateName, 
-                                    Value = i.JurisdictionId.ToString(),
-                                    Selected = Model.JurisdictionId == i.JurisdictionId
-                                }).ToList(),
-
-                                 new
-                                 {
-                                     @class = "form-control"
-                                 })
-                        </div>
-                    </div>
-
-                    <!-- Line8 Zip Code   -->
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.ZipCode, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required"
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => model.ZipCode, new
-                       {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control"
-                           }
-                       })
-                        </div> 
-                         
-                    </div> 
-
-                </div>
-                <hr />
-
-                <!-- Line 9 Email -->
+             
+            </section>@*.box-body*@
+            <div class="box-footer">
                 <div class="form-group">
-                    @Html.LabelFor(model => model.Email, htmlAttributes: new
-               {
-                   @class = "control-label col-md-2 required"
-               })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.Email, new
-                   {
-                       htmlAttributes = new
-                       {
-                           @class = "form-control",
-                           @readonly = "true"
-                       }
-                   })
-                    </div>
-
-                    @Html.ActionLink("Change", "Account", "ChangePassword")
+                    <div class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
+                    <input id="save-user-info" type="submit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right" />
                 </div>
+            </div><!-- box-footer -->
+        </div><!-- /.box -->
+     </div> 
 
-                <!-- Line 10 UserName -->
-                <div class="form-group">
-                    @Html.LabelFor(model => model.UserName, htmlAttributes: new
-               {
-                   @class = "control-label col-md-2 required"
-               })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.UserName, new
-                   {
-                       htmlAttributes = new
-                       {
-                           @class = "form-control",
-                           @readonly = "true"
-                       }
-                   })
-                    </div>
-
-                    @Html.ActionLink("Change", "Account", "ChangeUserName")
-                </div>
-
-                <!-- Line 11 UserName -->
-                <div class="form-group">
-                    @Html.LabelFor(model => model.Password, htmlAttributes: new
-               {
-                   @class = "control-label col-md-2 required"
-               })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.Password, new
-                   {
-                       htmlAttributes = new
-                       {
-                           @class = "form-control",
-                           @readonly = "true"
-                       }
-                   })
-                    </div>
-
-                    @Html.ActionLink("Change", "Account", "ChangePassword")
-                </div>
-            </div>
-        </section>@*.box-body*@
-        <div class="box-footer">
-            <div class="form-group">
-                <div class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
-                <input id="save-user-info" type="submit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right" />
-            </div>
-        </div><!-- box-footer -->
-    </div><!-- /.box -->
-
-    <div id="kbq-panel">
+    <div id="kbq-panel" class="profileDiv">
         <div class="box box-primary">
             <div class="box-header with-border">
                 <h3 class="box-title"> Knowledge Based Questions </h3>
@@ -378,19 +380,19 @@
                         <div class="col-md-8">
 
                             @Html.DropDownListFor(
-                                         model => model.KBQ1,
-                                         questionPool.Select(i => new SelectListItem
-                                         {
-                                             Text = i.Content,
-                                             Value = i.QuestionId.Value.ToString(),
-                                             Selected = Model.KBQ1 == i.QuestionId.Value
-                                         }),
+                      model => model.KBQ1,
+                      questionPool.Select(i => new SelectListItem
+                      {
+                          Text = i.Content,
+                          Value = i.QuestionId.Value.ToString(),
+                          Selected = Model.KBQ1 == i.QuestionId.Value
+                      }),
 
-                                         new
-                                         {
-                                             @class = "form-control"
-                                         }
-                                   ) 
+                      new
+                      {
+                          @class = "form-control"
+                      }
+                ) 
                         </div>
                     </div>
 
@@ -404,6 +406,14 @@
                         </div>
 
                         <div class="col-md-8">
+                            <input type="password" value="*******" class="form-control disabled" style="margin-top:5px" />
+                            @Html.HiddenFor(model => Model.UserQuestionAnserId_KBQ1, new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control readonly" 
+                           }
+                       })
 
                             @Html.EditorFor(model => Model.KBQAnswer1, new
                        {
@@ -422,20 +432,19 @@
                             @Html.LabelFor(model => model.KBQ2)
                         </div>
                         <div class="col-md-8">
-
                             @Html.DropDownListFor(
-                                      model => model.KBQ2,
-                                      questionPool.Select(i => new SelectListItem
-                                      {
-                                          Text = i.Content,
-                                          Value = i.QuestionId.Value.ToString(),
-                                          Selected = Model.KBQ2 == i.QuestionId.Value
-                                      }),
+                   model => model.KBQ2,
+                   questionPool.Select(i => new SelectListItem
+                   {
+                       Text = i.Content,
+                       Value = i.QuestionId.Value.ToString(),
+                       Selected = Model.KBQ2 == i.QuestionId.Value
+                   }),
 
-                                      new
-                                      {
-                                          @class = "form-control"
-                                      })
+                   new
+                   {
+                       @class = "form-control"
+                   })
 
                         </div>
                     </div>
@@ -450,7 +459,14 @@
                         </div>
 
                         <div class="col-md-8">
-
+                            <input type="password" value="*******" class="form-control disabled" style="margin-top:5px" />
+                            @Html.HiddenFor(model => Model.UserQuestionAnserId_KBQ2, new
+                        {
+                            htmlAttributes = new
+                            {
+                                @class = "form-control readonly"
+                            }
+                        })
                             @Html.EditorFor(model => Model.KBQAnswer2, new
                        {
                            htmlAttributes = new
@@ -468,20 +484,19 @@
                             @Html.LabelFor(model => model.KBQ3)
                         </div>
                         <div class="col-md-8">
-
                             @Html.DropDownListFor(
-                                      model => model.KBQ3,
-                                      questionPool.Select(i => new SelectListItem
-                                      {
-                                          Text = i.Content,
-                                          Value = i.QuestionId.Value.ToString(),
-                                          Selected = Model.KBQ3 == i.QuestionId.Value
-                                      }),
+                   model => model.KBQ3,
+                   questionPool.Select(i => new SelectListItem
+                   {
+                       Text = i.Content,
+                       Value = i.QuestionId.Value.ToString(),
+                       Selected = Model.KBQ3 == i.QuestionId.Value
+                   }),
 
-                                      new
-                                      {
-                                          @class = "form-control"
-                                      }) 
+                   new
+                   {
+                       @class = "form-control"
+                   }) 
                         </div>
                     </div>
 
@@ -495,7 +510,14 @@
                         </div>
 
                         <div class="col-md-8">
-
+                            <input type="password" value="*******" class="form-control disabled" style="margin-top:5px" />
+                            @Html.HiddenFor(model => Model.UserQuestionAnserId_KBQ3, new
+                        {
+                            htmlAttributes = new
+                            {
+                                @class = "form-control readonly"
+                            }
+                        })
                             @Html.EditorFor(model => Model.KBQAnswer3, new
                        {
                            htmlAttributes = new
@@ -513,20 +535,20 @@
                             @Html.LabelFor(model => model.KBQ4)
                         </div>
                         <div class="col-md-8">
-
+                            
                             @Html.DropDownListFor(
-                                      model => model.KBQ4,
-                                      questionPool.Select(i => new SelectListItem
-                                      {
-                                          Text = i.Content,
-                                          Value = i.QuestionId.Value.ToString(),
-                                          Selected = Model.KBQ4 == i.QuestionId.Value
-                                      }),
+                   model => model.KBQ4,
+                   questionPool.Select(i => new SelectListItem
+                   {
+                       Text = i.Content,
+                       Value = i.QuestionId.Value.ToString(),
+                       Selected = Model.KBQ4 == i.QuestionId.Value
+                   }),
 
-                                      new
-                                      {
-                                          @class = "form-control"
-                                      })
+                   new
+                   {
+                       @class = "form-control"
+                   })
 
                         </div>
                     </div>
@@ -541,7 +563,14 @@
                         </div>
 
                         <div class="col-md-8">
-
+                            <input type="password" value="*******" class="form-control disabled" style="margin-top:5px" />
+                            @Html.HiddenFor(model => Model.UserQuestionAnserId_KBQ4, new
+                        {
+                            htmlAttributes = new
+                            {
+                                @class = "form-control readonly"
+                            }
+                        })
                             @Html.EditorFor(model => Model.KBQAnswer4, new
                        {
                            htmlAttributes = new
@@ -561,18 +590,18 @@
                         <div class="col-md-8">
 
                             @Html.DropDownListFor(
-                                      model => model.KBQ5,
-                                      questionPool.Select(i => new SelectListItem
-                                      {
-                                          Text = i.Content,
-                                          Value = i.QuestionId.Value.ToString(),
-                                          Selected = Model.KBQ5 == i.QuestionId.Value
-                                      }),
+                   model => model.KBQ5,
+                   questionPool.Select(i => new SelectListItem
+                   {
+                       Text = i.Content,
+                       Value = i.QuestionId.Value.ToString(),
+                       Selected = Model.KBQ5 == i.QuestionId.Value
+                   }),
 
-                                      new
-                                      {
-                                          @class = "form-control"
-                                      })
+                   new
+                   {
+                       @class = "form-control"
+                   })
 
                         </div>
                     </div>
@@ -587,7 +616,14 @@
                         </div>
 
                         <div class="col-md-8">
-
+                            <input type="password" value="*******" class="form-control disabled" style="margin-top:5px" />
+                            @Html.HiddenFor(model => Model.UserQuestionAnserId_KBQ5, new
+                        {
+                            htmlAttributes = new
+                            {
+                                @class = "form-control readonly"
+                            }
+                        })
                             @Html.EditorFor(model => Model.KBQAnswer5, new
                        {
                            htmlAttributes = new
@@ -611,7 +647,7 @@
         </div><!-- /.box -->
     </div>
 
-    <div id="sq-panel">
+    <div id="sq-panel" class="profileDiv">
         <div class="box box-primary">
             <div class="box-header with-border">
                 <h3 class="box-title"> Security Questions </h3>
@@ -639,18 +675,18 @@
                         <div class="col-md-8">
 
                             @Html.DropDownListFor(
-                                         model => model.KBQ1,
-                                         questionPool.Select(i => new SelectListItem
-                                         {
-                                             Text = i.Content,
-                                             Value = i.QuestionId.Value.ToString(),
-                                             Selected = Model.SecuritryQuestion1 == i.QuestionId.Value
-                                         }),
+                      model => model.SecuritryQuestion1,
+                      questionPool.Select(i => new SelectListItem
+                      {
+                          Text = i.Content,
+                          Value = i.QuestionId.Value.ToString(),
+                          Selected = Model.SecuritryQuestion1 == i.QuestionId.Value
+                      }),
 
-                                         new
-                                         {
-                                             @class = "form-control"
-                                         })
+                      new
+                      {
+                          @class = "form-control"
+                      })
 
                         </div>
                     </div>
@@ -665,7 +701,13 @@
                         </div>
 
                         <div class="col-md-8">
-
+                            @Html.HiddenFor(model => Model.UserQuestionAnserId_SQ1, new
+                        {
+                            htmlAttributes = new
+                            {
+                                @class = "form-control readonly"
+                            }
+                        })
                             @Html.EditorFor(model => Model.SecurityQuestionAnswer1, new
                        {
                            htmlAttributes = new
@@ -686,18 +728,18 @@
                         <div class="col-md-8">
 
                             @Html.DropDownListFor(
-                                         model => model.KBQ1,
-                                         questionPool.Select(i => new SelectListItem
-                                         {
-                                             Text = i.Content,
-                                             Value = i.QuestionId.Value.ToString(),
-                                             Selected = Model.SecuritryQuestion1 == i.QuestionId.Value
-                                         }),
+                      model => model.SecurityQuestion2,
+                      questionPool.Select(i => new SelectListItem
+                      {
+                          Text = i.Content,
+                          Value = i.QuestionId.Value.ToString(),
+                          Selected = Model.SecuritryQuestion1 == i.QuestionId.Value
+                      }),
 
-                                         new
-                                         {
-                                             @class = "form-control"
-                                         })
+                      new
+                      {
+                          @class = "form-control"
+                      })
 
                         </div>
                     </div>
@@ -712,7 +754,13 @@
                         </div>
 
                         <div class="col-md-8">
-
+                            @Html.HiddenFor(model => Model.UserQuestionAnserId_SQ2, new
+                        {
+                            htmlAttributes = new
+                            {
+                                @class = "form-control readonly"
+                            }
+                        })
                             @Html.EditorFor(model => Model.SecurityQuestionAnswer2, new
                        {
                            htmlAttributes = new
@@ -733,32 +781,5 @@
                 </div>
             </div><!-- box-footer -->
         </div><!-- /.box -->
-    </div>
-
-    @*<div id="kbq-panel">
-        @Html.Partial("_QuestionAndAnswerView",
-               new ViewDataDictionary {
-
-               { "Questions", Model.KBQPair },
-               { "QuestionPool", Model.QuestionPool},
-               { "Title",  "Knowledge Based Questions" },
-               { "editBtnId", "kbqEditBtnId"},
-               { "submitBtnId", "kbqSubmit"},
-               { "questionIds", Model.KBQQuestionIds}
-                 }
-               )
-        </div>*@
-
-    @*<div id="sq-panel">
-            @Html.Partial("_QuestionAndAnswerView", new ViewDataDictionary {
-           { "Questions", Model.SecurityQuestionPair },
-           { "QuestionPool", Model.QuestionPool},
-           { "Title",  "Security Questions" },
-           { "editBtnId", "sqEditBtnId"},
-           { "submitBtnId", "sqSubmit"},
-           { "questionIds", Model.SQQuestionIds}
-         }
-        )
-        </div>*@
-
-                        }
+    </div> 
+}

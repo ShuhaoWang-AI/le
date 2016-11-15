@@ -469,8 +469,6 @@
     <Content Include="Views\Authority\IndustryUsers.cshtml" />
     <Content Include="Views\Authority\IndustryUserDetails.cshtml" />
     <Content Include="Views\User\Profile.cshtml" />
-    <Content Include="Views\User\questions.cshtml" />
-    <Content Include="Views\User\_QuestionAndAnswerView.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

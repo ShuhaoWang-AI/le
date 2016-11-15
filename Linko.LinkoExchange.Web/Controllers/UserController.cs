@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Core.Enum;
+using System.Security.Claims;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -22,9 +23,9 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IUserService _userService;
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IJurisdictionService _jurisdictionService;
-
+        private string FakePassword = "********";
         private readonly IMapper _mapper;
-        private string FakeAnswer = "********";
+
         public UserController(
             IAuthenticationService authenticateService,
             IQuestionAnswerService questAnswerService,
@@ -59,7 +60,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
-        [AcceptVerbs(HttpVerbs.Get)]
+        [Authorize]
+        [AcceptVerbs(HttpVerbs.Get)] 
         public ActionResult Profile()
         {
             var userProfileViewModel = GetUserProfileViewModel();
@@ -67,7 +69,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(userProfileViewModel);
         }
 
-        [AcceptVerbs(HttpVerbs.Post)]
+        [Authorize]
+        [AcceptVerbs(HttpVerbs.Post)] 
+        [ValidateAntiForgeryToken]
         public ActionResult Profile(UserProfileViewModel model, FormCollection form)
         {
             model.QuestionPool = GetQuestionPool();
@@ -79,28 +83,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return View(model);
             }
 
-            #region Create Question Answer Dto
-
-            if (model.KBQAnswer1 == FakeAnswer)
-            {
-                model.KBQAnswer1 = "";
-            }
-            if (model.KBQAnswer2 == FakeAnswer)
-            {
-                model.KBQAnswer2 = "";
-            }
-            if (model.KBQAnswer3 == FakeAnswer)
-            {
-                model.KBQAnswer3 = "";
-            }
-            if (model.KBQAnswer4 == FakeAnswer)
-            {
-                model.KBQAnswer4 = "";
-            }
-            if (model.KBQAnswer5 == FakeAnswer)
-            {
-                model.KBQAnswer5 = "";
-            }
+            #region Create Question Answer Dto 
 
             var kbqQuestionAnswers = new List<AnswerDto>();
             kbqQuestionAnswers.AddRange(
@@ -108,43 +91,50 @@ namespace Linko.LinkoExchange.Web.Controllers
                 new AnswerDto
                 {
                     QuestionId = model.KBQ1,
-                    Content = model.KBQAnswer1
+                    Content = model.KBQAnswer1,
+                    UserQuestionAnswerId = model.UserQuestionAnserId_KBQ1
                 },
                 new AnswerDto
                 {
                     QuestionId = model.KBQ2,
-                    Content = model.KBQAnswer2
+                    Content = model.KBQAnswer2,
+                    UserQuestionAnswerId = model.UserQuestionAnserId_KBQ2
                 },
                 new AnswerDto
                 {
                     QuestionId = model.KBQ3,
-                    Content = model.KBQAnswer3
+                    Content = model.KBQAnswer3,
+                    UserQuestionAnswerId = model.UserQuestionAnserId_KBQ3
                 },
                 new AnswerDto
                 {
                     QuestionId = model.KBQ4,
-                    Content = model.KBQAnswer4
+                    Content = model.KBQAnswer4,
+                    UserQuestionAnswerId = model.UserQuestionAnserId_KBQ4
                 },
                 new AnswerDto
                 {
                     QuestionId = model.KBQ5,
-                    Content = model.KBQAnswer5
+                    Content = model.KBQAnswer5,
+                    UserQuestionAnswerId = model.UserQuestionAnserId_KBQ5
                  }
 
-              }
+                }
             );
 
             var sqQuestionAnswers = new List<AnswerDto>();
             sqQuestionAnswers.Add(new AnswerDto
             {
                 QuestionId = model.SecuritryQuestion1,
-                Content = model.SecurityQuestionAnswer1
+                Content = model.SecurityQuestionAnswer1,
+                UserQuestionAnswerId = model.UserQuestionAnserId_SQ1
             });
 
             sqQuestionAnswers.Add(new AnswerDto
             {
                 QuestionId = model.SecurityQuestion2,
-                Content = model.SecurityQuestionAnswer2
+                Content = model.SecurityQuestionAnswer2,
+                UserQuestionAnswerId = model.UserQuestionAnserId_SQ1
             });
 
             #endregion create Question Answer Dto  
@@ -161,25 +151,31 @@ namespace Linko.LinkoExchange.Web.Controllers
             switch (result)
             {
                 case RegistrationResult.BadSecurityQuestionAndAnswer:
-                    ModelState.AddModelError(string.Empty, ("Bad Security Question and Anwsers."));
+                    ModelState.AddModelError(string.Empty, "Bad Security Question and Anwsers.");
                     break;
                 case RegistrationResult.DuplicatedKBQ:
-                    ModelState.AddModelError(string.Empty, ("Duplicated Knowledage Based Questions"));
+                    ModelState.AddModelError(string.Empty, "Duplicated Knowledage Based Questions");
                     break;
                 case RegistrationResult.DuplicatedKBQAnswer:
-                    ModelState.AddModelError(string.Empty, ("Duplicated Knowledage Based Question Answers"));
+                    ModelState.AddModelError(string.Empty, "Duplicated Knowledage Based Question Answers");
+                    break;
+                case RegistrationResult.DuplicatedSecurityQuestion:
+                    ModelState.AddModelError(string.Empty, "Duplicated Security Questions");
+                    break;
+                case RegistrationResult.DuplicatedSecurityQuestionAnswer:
+                    ModelState.AddModelError(string.Empty, "Duplicated Security Question Answers");
                     break;
                 case RegistrationResult.MissingKBQ:
-                    ModelState.AddModelError(string.Empty, ("Missing Knowledage Based Questions"));
+                    ModelState.AddModelError(string.Empty, "Missing Knowledage Based Questions");
                     break;
                 case RegistrationResult.MissingKBQAnswer:
-                    ModelState.AddModelError(string.Empty, ("Missing Knowledage Based Question Answers"));
+                    ModelState.AddModelError(string.Empty, "Missing Knowledage Based Question Answers");
                     break;
                 case RegistrationResult.MissingSecurityQuestion:
-                    ModelState.AddModelError(string.Empty, ("Missing Security Question Answers"));
+                    ModelState.AddModelError(string.Empty, "Missing Security Question Answers");
                     break;
                 case RegistrationResult.BadUserProfileData:
-                    ModelState.AddModelError(string.Empty, ("Bad User Profile Data"));
+                    ModelState.AddModelError(string.Empty, "Bad User Profile Data");
                     break;
 
             }
@@ -189,20 +185,19 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private UserProfileViewModel GetUserProfileViewModel()
         {
-            var id = HttpContext.User.Identity;
-            var profileIdStr = _sessionCache.GetClaimValue(CacheKey.UserProfileId) as string;
+            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity; 
+            var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
             var userProfileId = int.Parse(profileIdStr);
             var userProileDto = _userService.GetUserProfileById(userProfileId);
             var userProfileViewModel = _mapper.Map<UserProfileViewModel>(userProileDto);
 
             // set password to be stars 
-            userProfileViewModel.Password = FakeAnswer;
+            userProfileViewModel.Password = FakePassword;
 
             // Get state list   
             userProfileViewModel.StateList = GetStateList();
 
-            userProfileViewModel.Role = _sessionCache.GetClaimValue(CacheKey.UserRole);
-
+            userProfileViewModel.Role = _sessionCache.GetClaimValue(CacheKey.UserRole); 
 
             var kbqQuestions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, Services.Dto.QuestionType.KnowledgeBased);
             var securityQeustions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, Services.Dto.QuestionType.Security);
@@ -212,12 +207,17 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             userProfileViewModel.QuestionPool = GetQuestionPool();
 
-            ////  security questions 
+            ////  Security questions 
             userProfileViewModel.SecuritryQuestion1 = sqs[0].Question.QuestionId.Value;
+            userProfileViewModel.SecurityQuestion2 = sqs[1].Question.QuestionId.Value;
+
+            userProfileViewModel.SecurityQuestionAnswer2 = sqs[1].Answer.Content;
             userProfileViewModel.SecurityQuestionAnswer1 = sqs[0].Answer.Content;
 
-            userProfileViewModel.SecurityQuestion2 = sqs[1].Question.QuestionId.Value;
-            userProfileViewModel.SecurityQuestionAnswer2 = sqs[1].Answer.Content;
+            //// Keep track UserQuestionAnswerId 
+            userProfileViewModel.UserQuestionAnserId_SQ1 = sqs[0].Answer.UserQuestionAnswerId.Value;
+            userProfileViewModel.UserQuestionAnserId_SQ2 = sqs[1].Answer.UserQuestionAnswerId.Value;
+
 
             ////  KBQ questions 
             userProfileViewModel.KBQ1 = kbqs[0].Question.QuestionId.Value;
@@ -226,16 +226,19 @@ namespace Linko.LinkoExchange.Web.Controllers
             userProfileViewModel.KBQ4 = kbqs[3].Question.QuestionId.Value;
             userProfileViewModel.KBQ5 = kbqs[4].Question.QuestionId.Value;
 
-            userProfileViewModel.KBQAnswer1 = FakeAnswer;
-            userProfileViewModel.KBQAnswer2 = FakeAnswer;
-            userProfileViewModel.KBQAnswer3 = FakeAnswer;
-            userProfileViewModel.KBQAnswer4 = FakeAnswer;
-            userProfileViewModel.KBQAnswer5 = FakeAnswer;
 
-            userProfileViewModel.SecurityQuestionAnswer1 = sqs[0].Answer.Content;
+            userProfileViewModel.KBQAnswer1 = kbqs[0].Answer.Content;
+            userProfileViewModel.KBQAnswer2 = kbqs[1].Answer.Content; 
+            userProfileViewModel.KBQAnswer3 = kbqs[2].Answer.Content; 
+            userProfileViewModel.KBQAnswer4 = kbqs[3].Answer.Content; 
+            userProfileViewModel.KBQAnswer5 = kbqs[4].Answer.Content;
 
-            userProfileViewModel.SecurityQuestion2 = sqs[1].Question.QuestionId.Value;
-            userProfileViewModel.SecurityQuestionAnswer2 = sqs[1].Answer.Content;
+            //// keep track UserQuestionAnswerId
+            userProfileViewModel.UserQuestionAnserId_KBQ1 = kbqs[0].Answer.UserQuestionAnswerId.Value;
+            userProfileViewModel.UserQuestionAnserId_KBQ2 = kbqs[1].Answer.UserQuestionAnswerId.Value;
+            userProfileViewModel.UserQuestionAnserId_KBQ3 = kbqs[2].Answer.UserQuestionAnswerId.Value;
+            userProfileViewModel.UserQuestionAnserId_KBQ4 = kbqs[3].Answer.UserQuestionAnswerId.Value;
+            userProfileViewModel.UserQuestionAnserId_KBQ5 = kbqs[4].Answer.UserQuestionAnswerId.Value; 
 
             return userProfileViewModel;
         }

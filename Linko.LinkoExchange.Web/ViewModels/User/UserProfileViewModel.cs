@@ -151,6 +151,41 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
             get; set;
         }
 
+        public int UserQuestionAnserId_SQ1
+        {
+            get;set;
+        }
+
+        public int UserQuestionAnserId_SQ2
+        {
+            get; set;
+        }
+
+        public int UserQuestionAnserId_KBQ1
+        {
+            get; set;
+        }
+
+        public int UserQuestionAnserId_KBQ2
+        {
+            get; set;
+        }
+
+        public int UserQuestionAnserId_KBQ3
+        {
+            get; set;
+        }
+
+        public int UserQuestionAnserId_KBQ4
+        {
+            get; set;
+        }
+
+        public int UserQuestionAnserId_KBQ5
+        {
+            get; set;
+        }
+
         [Required]
         [Display(Name = "Question 1")] 
         public int SecuritryQuestion1
