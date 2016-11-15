@@ -19,7 +19,6 @@
         public int? UserQuestionAnswerId { get; set; }
         public string Content { get; set; }
         public int QuestionId { get; set; }
-
     }
 
     public class QuestionAnswerPairDto

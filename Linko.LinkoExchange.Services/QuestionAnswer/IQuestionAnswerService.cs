@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.QuestionAnswer
 {
@@ -23,7 +24,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         /// <param name="questionAnswer"></param>
         void CreateOrUpdateUserQuestionAnswer(int userProfileId, AnswerDto questionAnswer);
 
-        bool CreateOrUpdateUserQuestionAnswers(int userProfileId, ICollection<AnswerDto> questionAnswers);
+        CreateOrUpdateAnswersResult CreateOrUpdateUserQuestionAnswers(int userProfileId, ICollection<AnswerDto> questionAnswers);
 
         /// <summary>
         /// Add a collection of question and answer pairs.

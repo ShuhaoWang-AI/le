@@ -15,6 +15,7 @@ using Microsoft.AspNet.Identity;
 using Moq;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Email;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -119,18 +120,77 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
-        public void CreateOrUpdateQuestionAnswerPairs_Duplicate_Questions_Test()
+        public void CreateOrUpdateQuestionAnswerPairs_KBQ_Only_SomeDirtySomeClean_NoDuplicates_Test()
         {
             var qAndAs = new List<AnswerDto>();
-            var a1 = new AnswerDto() { Content = "Black" };
-            var a2 = new AnswerDto() { Content = "Brown" };
+            var a1 = new AnswerDto() { UserQuestionAnswerId = 15, QuestionId = 4, Content = "New answer 1" };
+            var a2 = new AnswerDto() { UserQuestionAnswerId = 16, QuestionId = 5, Content = "New answer 2" };
+            var a3 = new AnswerDto() { UserQuestionAnswerId = 8, QuestionId = 6, Content = "AEFWE9YatSU7u5fxOhKxYmD5MPXU38Jzvx2fekf+4S0SM3rJg4hbYZa2/eE/hf2pyw==" };
+            var a4 = new AnswerDto() { UserQuestionAnswerId = 9, QuestionId = 7, Content = "AOXH+5TNf1zZIT8rJvbCqwVqDx3z2kbOssWb68035X/2eflFjxs3ceIR4ENGEoHCjw==" };
             qAndAs.Add(a1);
             qAndAs.Add(a2);
+            qAndAs.Add(a3);
+            qAndAs.Add(a4);
 
             var result = _questionAnswerService.CreateOrUpdateUserQuestionAnswers(1, qAndAs);
 
-            Assert.AreEqual(result, false);
+            Assert.AreEqual(result, CreateOrUpdateAnswersResult.Success);
         }
+
+        [TestMethod]
+        public void CreateOrUpdateQuestionAnswerPairs_KBQ_Only_SomeDirtySomeClean_WithDuplicates_Test()
+        {
+            var qAndAs = new List<AnswerDto>();
+            var a1 = new AnswerDto() { UserQuestionAnswerId = 15, QuestionId = 8, Content = "Same answer" };
+            var a2 = new AnswerDto() { UserQuestionAnswerId = 16, QuestionId = 20, Content = "Same answer" };
+            var a3 = new AnswerDto() { UserQuestionAnswerId = 8, QuestionId = 21, Content = "AEFWE9YatSU7u5fxOhKxYmD5MPXU38Jzvx2fekf+4S0SM3rJg4hbYZa2/eE/hf2pyw==" };
+            var a4 = new AnswerDto() { UserQuestionAnswerId = 9, QuestionId = 5, Content = "AOXH+5TNf1zZIT8rJvbCqwVqDx3z2kbOssWb68035X/2eflFjxs3ceIR4ENGEoHCjw==" };
+            qAndAs.Add(a1);
+            qAndAs.Add(a2);
+            qAndAs.Add(a3);
+            qAndAs.Add(a4);
+
+            var result = _questionAnswerService.CreateOrUpdateUserQuestionAnswers(1, qAndAs);
+
+            Assert.AreEqual(result, CreateOrUpdateAnswersResult.DuplicateAnswersInNew);
+        }
+
+        [TestMethod]
+        public void CreateOrUpdateQuestionAnswerPairs_AllNew_NoDuplicates_Test()
+        {
+            var qAndAs = new List<AnswerDto>();
+            var a1 = new AnswerDto() { QuestionId = 8, Content = "New answer 1" };
+            var a2 = new AnswerDto() { QuestionId = 20, Content = "New answer 2" };
+            var a3 = new AnswerDto() { QuestionId = 21, Content = "New answer 3" };
+            var a4 = new AnswerDto() { QuestionId = 5, Content = "New answer 4" };
+            qAndAs.Add(a1);
+            qAndAs.Add(a2);
+            qAndAs.Add(a3);
+            qAndAs.Add(a4);
+
+            var result = _questionAnswerService.CreateOrUpdateUserQuestionAnswers(1, qAndAs);
+
+            Assert.AreEqual(result, CreateOrUpdateAnswersResult.Success);
+        }
+
+        [TestMethod]
+        public void CreateOrUpdateQuestionAnswerPairs_AllNew_WithDuplicates_Test()
+        {
+            var qAndAs = new List<AnswerDto>();
+            var a1 = new AnswerDto() { UserQuestionAnswerId = 15, QuestionId = 8, Content = "New answer 1" };
+            var a2 = new AnswerDto() { UserQuestionAnswerId = 16, QuestionId = 20, Content = "New answer 1" };
+            var a3 = new AnswerDto() { UserQuestionAnswerId = 8, QuestionId = 21, Content = "New answer 3" };
+            var a4 = new AnswerDto() { UserQuestionAnswerId = 9, QuestionId = 5, Content = "New answer 4" };
+            qAndAs.Add(a1);
+            qAndAs.Add(a2);
+            qAndAs.Add(a3);
+            qAndAs.Add(a4);
+
+            var result = _questionAnswerService.CreateOrUpdateUserQuestionAnswers(1, qAndAs);
+
+            Assert.AreEqual(result, CreateOrUpdateAnswersResult.DuplicateAnswersInNew);
+        }
+
 
         [TestMethod]
         public void GetQuestions_Test()

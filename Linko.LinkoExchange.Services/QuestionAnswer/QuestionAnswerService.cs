@@ -165,16 +165,65 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         /// </summary>
         /// <param name="userProfileId">User</param>
         /// <param name="questionAnswers">Collection of Dtos</param>
-        public bool CreateOrUpdateUserQuestionAnswers(int userProfileId, ICollection<AnswerDto> questionAnswers)
+        public CreateOrUpdateAnswersResult CreateOrUpdateUserQuestionAnswers(int userProfileId, ICollection<AnswerDto> questionAnswers)
         {
-            //Check for duplicates answers
-            var duplicateAnswers = questionAnswers.GroupBy(x => new { x.Content })
-                                .Where(g => g.Count() > 1)
-                                .Select(y => y.Key)
-                                .ToList();
+            //First step: go through all answers and find dirty fields that are not hashed yet.
+            //Check THESE only against the clean ones
+            var updatedDirtyAnswerList = new List<string>();
+            var cleanHashedAnswerList = new List<string>();
+            var cleanEncryptedAnswerList = new List<string>();
+            var answerDtosToUpdate = new List<AnswerDto>();
+            foreach (var answerDto in questionAnswers)
+            {
+                if (!answerDto.UserQuestionAnswerId.HasValue 
+                    || _dbContext.UserQuestionAnswers
+                        .Single(q => q.UserQuestionAnswerId == answerDto.UserQuestionAnswerId).Content != answerDto.Content)
+                {
+                    //dirty
+                    if (updatedDirtyAnswerList.Contains(answerDto.Content))
+                        return CreateOrUpdateAnswersResult.DuplicateAnswersInNew; //duplicate new un-hashed answers
+                    else
+                    {
+                        updatedDirtyAnswerList.Add(answerDto.Content);
+                        answerDtosToUpdate.Add(answerDto);
+                    }
+                }
+                else
+                {
+                    //clean
 
-            if (duplicateAnswers.Count() > 0)
-                return false;
+                    //kbq or sq?
+                    var question = _dbContext.Questions.Single(q => q.QuestionId == answerDto.QuestionId);
+                    if (question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
+                    {
+                        //Hashed answer
+                        cleanHashedAnswerList.Add(answerDto.Content);
+                    }
+                    else if (question.QuestionTypeId == (int)Dto.QuestionType.Security)
+                    {
+                        //Encrypted answer
+                        cleanEncryptedAnswerList.Add(answerDto.Content);
+                    }
+
+                }
+            }
+
+            //Check new answers don't already exist within old answers
+            foreach (var newAnswer in updatedDirtyAnswerList)
+            {
+                foreach (var hashedAnswer in cleanHashedAnswerList)
+                {
+                    if (_passwordHasher.VerifyHashedPassword(hashedAnswer, newAnswer.Trim().ToLower()) == PasswordVerificationResult.Success)
+                        return CreateOrUpdateAnswersResult.DuplicateAnswersInNewAndExisting; //duplicate found
+                }
+
+                foreach (var encryptedAnswer in cleanEncryptedAnswerList)
+                {
+                    if (_encryption.EncryptString(newAnswer.Trim()) == encryptedAnswer)
+                        return CreateOrUpdateAnswersResult.DuplicateAnswersInNewAndExisting; //duplicate found
+                }
+            }
+
 
             //Check for duplicate questions
             var duplicateQuestions = questionAnswers.GroupBy(x => new { x.QuestionId })
@@ -183,12 +232,12 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                     .ToList();
 
             if (duplicateQuestions.Count() > 0)
-                return false;
+                return CreateOrUpdateAnswersResult.DuplicateQuestionsInNewAndExisting;
 
             //Persist to DB
             int questionCountKBQ = 0;
             int questionCountSQ = 0;
-            foreach (var questionAnswer in questionAnswers)
+            foreach (var questionAnswer in answerDtosToUpdate)
             {
                 var questionTypeId = _dbContext.Questions.Single(q => q.QuestionId == questionAnswer.QuestionId).QuestionTypeId;
                 questionCountKBQ += questionTypeId == (int)Dto.QuestionType.KnowledgeBased ? 1 : 0;
@@ -215,7 +264,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             if (questionCountSQ > 0)
                 _emailService.SendEmail(new[] { userProfile.Email }, EmailType.Profile_SecurityQuestionsChanged, contentReplacements);
 
-            return true;
+            return CreateOrUpdateAnswersResult.Success;
 
         }
 
