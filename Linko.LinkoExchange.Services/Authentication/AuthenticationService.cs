@@ -632,7 +632,13 @@ namespace Linko.LinkoExchange.Services.Authentication
                 _dbContext.UserPasswordHistories.Add(history);
                 _dbContext.SaveChanges();
 
+                //Set new password
                 _userService.SetHashedPassword(userProfileId, passwordHash);
+
+                //Unlock user
+                string userOwinId = _dbContext.Users.Single(u => u.UserProfileId == userProfileId).Id;
+                await _userManager.UnlockUserAccount(userOwinId);
+
                 authenticationResult.Success = true;
                 authenticationResult.Result = AuthenticationResult.Success;
             }

@@ -74,7 +74,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void UpdateAnswer()
         {
-            _questionAnswerService.UpdateAnswer(new AnswerDto() { UserQuestionAnswerId = 8, Content = "Purple" });
+            _questionAnswerService.UpdateAnswer(new AnswerDto() { UserQuestionAnswerId = 8, Content = "test answer" });
         }
 
         [TestMethod]

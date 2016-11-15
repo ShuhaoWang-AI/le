@@ -122,6 +122,17 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             return manager;
         }
+
+        public virtual async Task<IdentityResult> UnlockUserAccount(string userId)
+        {
+            var result = await this.SetLockoutEndDateAsync(userId, DateTimeOffset.MinValue);
+            if (result.Succeeded)
+            {
+                result = await this.ResetAccessFailedCountAsync(userId);
+
+            }
+            return result;
+        }
     }
 
     // Configure the application sign-in manager which is used in this application.

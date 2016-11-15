@@ -250,7 +250,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                 contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == thisOrgRegProgram.Organization.JurisdictionId).Name);
             }
 
-            string baseUrl = _httpContext.Current().Request.Url.Scheme + "://" + _httpContext.Current().Request.Url.Authority + _httpContext.Current().Request.ApplicationPath.TrimEnd('/') + "/";
+            string baseUrl = _httpContext.GetRequestBaseUrl();
             string url = baseUrl + "?token=" + invitationId;
             contentReplacements.Add("link", url);
 
