@@ -5,12 +5,7 @@
     var questionPool = Model.QuestionPool; 
     
 }
-
-@section head
-{
-    <script type="text/javascript" src="@Url.Content("/Scripts/profile.js")"></script>
-}
-
+ 
 <section>
     <ol class="breadcrumb">
         <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Home")'"><i class=""></i> Home </a></li>
@@ -782,4 +777,9 @@
             </div><!-- box-footer -->
         </div><!-- /.box -->
     </div> 
+}
+
+@section Scripts {
+    @Scripts.Render(paths: "~/bundles/profile")
+    @Scripts.Render(paths: "~/bundles/jqueryval")
 }

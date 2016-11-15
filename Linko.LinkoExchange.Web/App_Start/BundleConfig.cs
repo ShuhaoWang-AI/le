@@ -42,6 +42,9 @@ namespace Linko.LinkoExchange.Web
             bundles.Add(new ScriptBundle(virtualPath: "~/bundles/jqueryval")
                 .Include(virtualPath: "~/Scripts/jquery.validate*"));
 
+            bundles.Add(new ScriptBundle(virtualPath: "~/bundles/profile")
+                .Include(virtualPath: "~/Scripts/profile.js"));
+
 
 #if DEBUG
             BundleTable.EnableOptimizations = false;

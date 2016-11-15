@@ -194,7 +194,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         }
  
         [Required]
-        [Display(Name = "Answer 1")]
+        [Display(Name = "Answer 1")] 
         public string SecurityQuestionAnswer1
         {
             get;set;
@@ -208,7 +208,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         }
 
         [Required]
-        [Display(Name = "Answer 2")]
+        [Display(Name = "Answer 2")] 
         public string SecurityQuestionAnswer2
         {
             get; set;
@@ -223,6 +223,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
 
         [Required]
         [Display(Name = "Answer 1")]
+        [MaxLength(50)]
         public string KBQAnswer1
         {
             get; set;
@@ -237,6 +238,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
 
         [Required]
         [Display(Name = "Answer 2")]
+        [MaxLength(50)]
         public string KBQAnswer2
         {
             get; set;
@@ -251,6 +253,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
 
         [Required]
         [Display(Name = "Answer 3")]
+        [MaxLength(50)]
         public string KBQAnswer3
         {
             get; set;
@@ -265,6 +268,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
 
         [Required]
         [Display(Name = "Answer 4")]
+        [MaxLength(50)]
         public string KBQAnswer4
         {
             get; set;
@@ -279,6 +283,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
 
         [Required]
         [Display(Name = "Answer 5")]
+        [MaxLength(50)]
         public string KBQAnswer5
         {
             get; set;
