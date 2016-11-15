@@ -16,11 +16,13 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
         {
             CreateMap<OrganizationSetting, SettingDto>()
              .ForMember(d => d.TemplateName, op => op.ResolveUsing(o => MapSettingType(o.SettingTemplate.Name)))
-             .ForMember(d => d.OrgTypeName, o => o.MapFrom(s => MapOrganizationType(s.SettingTemplate.OrganizationType.Name)));
+             .ForMember(d => d.OrgTypeName, o => o.MapFrom(s => MapOrganizationType(s.SettingTemplate.OrganizationType.Name)))
+             .ForMember(d => d.DefaultValue, o => o.MapFrom(s => s.SettingTemplate.DefaultValue));
 
             CreateMap<OrganizationRegulatoryProgramSetting, SettingDto>()
                .ForMember(d => d.TemplateName, o => o.MapFrom(s => s.SettingTemplate.Name))
-               .ForMember(d => d.OrgTypeName, o => o.MapFrom(s => MapOrganizationType(s.OrganizationRegulatoryProgram.Organization.OrganizationType.Name)));
+               .ForMember(d => d.OrgTypeName, o => o.MapFrom(s => MapOrganizationType(s.OrganizationRegulatoryProgram.Organization.OrganizationType.Name)))
+               .ForMember(d => d.DefaultValue, o => o.MapFrom(s => s.SettingTemplate.DefaultValue));
         }
 
         public static SettingType MapSettingType(string settingType)

@@ -7,5 +7,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public SettingType TemplateName { get; set; }
         public OrganizationTypeName OrgTypeName { get; set; }
         public string Value { get; set; }
+        public string DefaultValue { get; set; }
     }
 }
