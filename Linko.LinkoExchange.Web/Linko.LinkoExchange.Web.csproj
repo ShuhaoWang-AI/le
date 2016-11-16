@@ -442,9 +442,9 @@
     <Compile Include="ViewModels\User\AnswerViewModel.cs" />
     <Compile Include="ViewModels\User\QuestionAnswerPairViewModel.cs" />
     <Compile Include="ViewModels\User\QuestionViewModel.cs" />
-    <Compile Include="ViewModels\User\UserSQViewModel.cs" />
     <Compile Include="ViewModels\User\UserKBQViewModel.cs" />
     <Compile Include="ViewModels\User\UserProfileViewModel.cs" />
+    <Compile Include="ViewModels\User\UserSQViewModel.cs" />
     <Compile Include="ViewModels\User\UserViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
