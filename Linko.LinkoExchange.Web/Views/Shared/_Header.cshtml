@@ -70,11 +70,14 @@
                                     </div>
                                 </li>
                                 <li class="user-footer">
-                                    <div class="pull-left">
-                                        <a href="/user/profile" class="btn btn-sm btn-primary">@Label.ButtonProfile (need to update link)  </a>
-                                    </div>
+                                    @if (ViewBag.PortalName != null && !string.IsNullOrWhiteSpace(ViewBag.PortalName))
+                                    {
+                                        <div class="pull-left">
+                                            <a href="#" onclick="location.href='@Url.Action(actionName: "Profile", controllerName: "User")'" class="btn btn-sm btn-primary">@Label.ButtonProfile </a>
+                                        </div>
+                                    }
                                     <div class="pull-right">
-                                        <a onclick="location.href='@Url.Action(actionName: "SignOut", controllerName: "Account")'" class="btn btn-sm btn-primary">@Label.ButtonSignOut</a>
+                                        <a href="#" onclick="location.href='@Url.Action(actionName: "SignOut", controllerName: "Account")'" class="btn btn-sm btn-primary">@Label.ButtonSignOut</a>
                                     </div>
                                 </li>
                             </ul>

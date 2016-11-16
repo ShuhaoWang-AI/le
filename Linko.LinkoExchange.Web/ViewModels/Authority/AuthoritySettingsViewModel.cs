@@ -29,7 +29,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 
         [Editable(false)]
         [Display(Name = "NPDES")]
-        public string NPDES
+        public string Npdes
         {
             get; set;
         }
@@ -130,8 +130,20 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get; set;
         }
 
+        [Editable(false)]
+        public string FailedPasswordAttemptMaxCountDefault
+        {
+            get; set;
+        }
+
         [Display(Name = "Number of Allowed Failed KBQ Attempts")]
-        public string FailedKBQAttemptMaxCount
+        public string FailedKbqAttemptMaxCount
+        {
+            get; set;
+        }
+
+        [Editable(false)]
+        public string FailedKbqAttemptMaxCountDefault
         {
             get; set;
         }
@@ -142,8 +154,20 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get; set;
         }
 
+        [Editable(false)]
+        public string InvitationExpiredHoursDefault
+        {
+            get; set;
+        }
+
         [Display(Name = "Number of Days Before Requiring a Password Change")]
         public string PasswordChangeRequiredDays
+        {
+            get; set;
+        }
+
+        [Editable(false)]
+        public string PasswordChangeRequiredDaysDefault
         {
             get; set;
         }
@@ -154,12 +178,17 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get; set;
         }
 
+        [Editable(false)]
+        public string PasswordHistoryMaxCountDefault
+        {
+            get; set;
+        }
+
         [Display(Name = "Time Zone")]
         public int TimeZone
         {
             get; set;
         }
-
 
         #endregion
 
@@ -167,6 +196,12 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         
         [Display(Name = "Max Days After Report Period End Date to Repudiate")]
         public int ReportRepudiatedDays
+        {
+            get; set;
+        }
+
+        [Editable(false)]
+        public string ReportRepudiatedDaysDefault
         {
             get; set;
         }
@@ -245,7 +280,6 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get; set;
         }
 
-        #endregion
-        
+        #endregion        
     }
 }

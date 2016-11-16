@@ -144,14 +144,54 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
         }
         #endregion
-
-
+        
         #region Show Industry Details
 
         // GET: /Authority/IndustryDetails
-
         [Route("Industry/{id:int}/Details")]
         public ActionResult IndustryDetails(int id)
+        {
+            IndustryViewModel viewModel = PrepareIndustryDetails(id);
+
+            return View(viewModel);
+        }
+
+        // POST: /Authority/IndustryDetails
+        [AcceptVerbs(HttpVerbs.Post)]
+        [Route("Industry/{id:int}/Details")]
+        public ActionResult IndustryDetails(int id, IndustryViewModel model)
+        {
+            try
+            {
+                var result = _organizationService.UpdateEnableDisableFlag(model.ID, !model.IsEnabled);
+                bool isUpdated = result.IsSuccess;
+
+                if (isUpdated)
+                {
+                    ViewBag.ShowSuccessMessage = true;
+                    ViewBag.SuccessMessage = model.IsEnabled ? "Industry Disabled!" : "Industry Enabled!";
+                    ModelState.Clear();
+                    model = PrepareIndustryDetails(id);
+                }
+                else
+                {
+                    model = PrepareIndustryDetails(id);
+
+                    List<RuleViolation> validationIssues = new List<RuleViolation>();
+                    string message = "Enable Industry not allowed. No more Industry Licenses are available.  Disable another Industry and try again.";
+                    validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                    throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
+            }
+
+            return View(model);
+        }
+
+        private IndustryViewModel PrepareIndustryDetails(int id)
         {
             var industry = _organizationService.GetOrganizationRegulatoryProgram(id);
             var userRole = _sessionCache.GetClaimValue(CacheKey.UserRole) ?? "";
@@ -176,71 +216,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                 LastSubmission = DateTime.Now, //TODO: get last submission date from service when implement //industry.LastSubmission 
                 HasPermissionForEnableDisable = userRole.ToLower().Equals(value: "administrator")
             };
-
-            return View(viewModel);
-        }
-
-        // POST: /Authority/IndustryDetails
-        [AcceptVerbs(HttpVerbs.Post)]
-        [Route("Industry/{id:int}/Details")]
-        public ActionResult IndustryDetails(int id, IndustryViewModel model)
-        {
-            try
-            {
-                var result = _organizationService.UpdateEnableDisableFlag(model.ID, !model.IsEnabled);
-                bool isUpdated = result.IsSuccess;
-
-                if (isUpdated)
-                {
-                    return RedirectToAction(actionName: "IndustryDetails", controllerName: "Authority", routeValues: new
-                    {
-                        id = model.ID
-                    });
-                }
-                else
-                {
-                    // model removes all information except id and IsEnabled as all fields are disabled and not in hidden fields. So need to repopulate again
-                    var industry = _organizationService.GetOrganizationRegulatoryProgram(model.ID);
-                    var userRole = _sessionCache.GetClaimValue(CacheKey.UserRole) ?? "";
-
-                    model = new IndustryViewModel
-                    {
-                        ID = industry.OrganizationRegulatoryProgramId,
-                        IndustryNo = industry.OrganizationDto.OrganizationId,
-                        IndustryName = industry.OrganizationDto.OrganizationName,
-                        AddressLine1 = industry.OrganizationDto.AddressLine1,
-                        AddressLine2 = industry.OrganizationDto.AddressLine2,
-                        CityName = industry.OrganizationDto.CityName,
-                        State = industry.OrganizationDto.State,
-                        ZipCode = industry.OrganizationDto.ZipCode,
-                        PhoneNumber = industry.OrganizationDto.PhoneNumber,
-                        PhoneExt = industry.OrganizationDto.PhoneExt,
-                        FaxNumber = industry.OrganizationDto.FaxNumber,
-                        WebsiteUrl = industry.OrganizationDto.WebsiteURL,
-                        IsEnabled = industry.IsEnabled,
-                        HasSignatory = industry.HasSignatory,
-                        AssignedTo = industry.AssignedTo,
-                        LastSubmission = DateTime.Now, //TODO: get last submission date from service when implement //industry.LastSubmission 
-                        HasPermissionForEnableDisable = userRole.ToLower().Equals(value: "administrator")
-                    };
-
-
-                    List<RuleViolation> validationIssues = new List<RuleViolation>();
-                    string message = "Enable Industry not allowed. No more Industry Licenses are available.  Disable another Industry and try again.";
-                    validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
-                    throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
-                }
-            }
-            catch (RuleViolationException rve)
-            {
-                MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
-            }
-
-            return View(model);
+            return viewModel;
         }
         #endregion
-
-
 
         #region Show Industry Users
 
@@ -268,6 +246,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 LastName = vm.UserProfileDto.LastName,
                 PhoneNumber = vm.UserProfileDto.PhoneNumber,
                 Email = vm.UserProfileDto.Email,
+                ResetEmail = vm.UserProfileDto.Email,
                 DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime,
                 Status = vm.IsEnabled,
                 AccountLocked = vm.UserProfileDto.IsAccountLocked
@@ -282,6 +261,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 LastName = vm.LastName,
                 PhoneNumber = vm.PhoneNumber,
                 Email = vm.Email,
+                ResetEmail = vm.ResetEmail,
                 DateRegistered = vm.DateRegistered,
                 StatusText = vm.StatusText,
                 AccountLockedText = vm.AccountLockedText
@@ -382,10 +362,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             return Json(items.ToDataSourceResult(request, ModelState));
         }
         #endregion
-
-
-
-        #region Show Industry Users
+        
+        #region Show Industry User Details
 
         // GET: /Authority/IndustryUserDetails
         [Route("Industry/{iid:int}/User/{id:int}/Details")]
@@ -401,21 +379,24 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route("Industry/{iid:int}/User/{id:int}/IndustryUserUpdateSignatoryStatus")]
         public ActionResult IndustryUserUpdateSignatoryStatus(int iid, int id, IndustryUserViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
             try
             {
                 _userService.UpdateUserSignatoryStatus(model.ID, model.IsSignatory);
-                return RedirectToAction(actionName: "IndustryUserDetails", controllerName: "Authority", routeValues: new
-                {
-                    iid = model.IID,
-                    id = model.ID
-                });
+                ViewBag.ShowSuccessMessage = true;
+                ViewBag.SuccessMessage = model.IsSignatory ? "User signatory permission granted!" : "User signatory permission removed!";
+                ModelState.Clear();
+                model = PrepareIndustryUserDetails(id);
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
+                model = PrepareIndustryUserDetails(id);
             }
 
-            model = PrepareIndustryUserDetails(id);
             return View(viewName: "IndustryUserDetails", model: model);
         }
 
@@ -424,21 +405,25 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route("Industry/{iid:int}/User/{id:int}/IndustryUserLockUnLock")]
         public ActionResult IndustryUserLockUnLock(int iid, int id, IndustryUserViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
             try
             {
                 _userService.LockUnlockUserAccount(model.PID, !model.AccountLocked, isForFailedKBQs: false);
-                return RedirectToAction(actionName: "IndustryUserDetails", controllerName: "Authority", routeValues: new
-                {
-                    iid = model.IID,
-                    id = model.ID
-                });
+
+                ViewBag.ShowSuccessMessage = true;
+                ViewBag.SuccessMessage = model.AccountLocked ? "User unlocked!" : "User locked!";
+                ModelState.Clear();
+                model = PrepareIndustryUserDetails(id);
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
+                model = PrepareIndustryUserDetails(id);
             }
 
-            model = PrepareIndustryUserDetails(id);
             return View(viewName: "IndustryUserDetails", model: model);
         }
 
@@ -448,17 +433,20 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult IndustryUserReset(int iid, int id, IndustryUserViewModel model)
         {
             string newEmail = model.ResetEmail;
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
             try
             {
                 var result = _userService.ResetUser(model.PID, newEmail);
 
                 if (result.IsSuccess)
                 {
-                    return RedirectToAction(actionName: "IndustryUserDetails", controllerName: "Authority", routeValues: new
-                    {
-                        iid = model.IID,
-                        id = model.ID
-                    });
+                    ViewBag.ShowSuccessMessage = true;
+                    ViewBag.SuccessMessage = "User account reset successfully!";
+                    ModelState.Clear();
+                    model = PrepareIndustryUserDetails(id);
                 }
                 else
                 {
@@ -471,7 +459,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                             message = "Email is already in use on another account.";
                             break;
                         default:
-                            message = "User Account Reset Failed";
+                            message = "User account reset failed";
                             break;
                     }
 
@@ -482,10 +470,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
-            }
 
-            model = PrepareIndustryUserDetails(id);
-            model.ResetEmail = newEmail;
+                model = PrepareIndustryUserDetails(id);
+                model.ResetEmail = newEmail;
+            }
 
             return View(viewName: "IndustryUserDetails", model: model);
         }

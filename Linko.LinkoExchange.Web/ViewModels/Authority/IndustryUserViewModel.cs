@@ -1,8 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using FluentValidation;
+using FluentValidation.Attributes;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Authority
 {
+    [Validator(typeof(IndustryUserValidator))]
     public class IndustryUserViewModel
     {
         [ScaffoldColumn(false)]
@@ -159,6 +162,17 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         public string Answer2
         {
             get; set;
+        }
+    }
+    
+    public partial class IndustryUserValidator : AbstractValidator<IndustryUserViewModel>
+    {
+        public IndustryUserValidator()
+        {
+            //ResetEmail
+            RuleFor(x => x.ResetEmail).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
+            RuleFor(x => x.ResetEmail.Length).LessThanOrEqualTo(valueToCompare: 256).WithMessage(errorMessage: "{PropertyName} must be less than or equal to 256 characters long.");
+            
         }
     }
 }
