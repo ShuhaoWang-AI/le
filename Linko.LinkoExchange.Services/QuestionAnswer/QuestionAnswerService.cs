@@ -530,5 +530,62 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 return _encryption.EncryptString(answer.Trim()) == questionAnswer.Content;
             }
         }
+
+
+        public RegistrationResult ValidateUserKbqData(IEnumerable<AnswerDto> kbqQuestions)
+        {
+            if (kbqQuestions == null || kbqQuestions.Count() < 5)
+            {
+                return RegistrationResult.MissingKBQ;
+            }
+
+            // Test duplicated KBQ questions
+            if (kbqQuestions.GroupBy(i => i.QuestionId).Any(i => i.Count() > 1))
+            {
+                return RegistrationResult.DuplicatedKBQ;
+            }
+
+            // Test duplicated KBQ question answers
+            if (kbqQuestions.GroupBy(i => i.Content).Any(i => i.Count() > 1))
+            {
+                return RegistrationResult.DuplicatedKBQAnswer;
+            }
+
+            // Test KBQ questions mush have answer
+            if (kbqQuestions.Any(i => i.Content == null))
+            {
+                return RegistrationResult.MissingKBQAnswer;
+            }
+
+            return RegistrationResult.Success;
+        }
+
+        public RegistrationResult ValidateUserSqData(IEnumerable<AnswerDto> securityQuestions)
+        {
+            if (securityQuestions == null || securityQuestions.Count() < 2)
+            {
+                return RegistrationResult.MissingSecurityQuestion;
+            }
+
+            // Test duplicated security questions
+            if (securityQuestions.GroupBy(i => i.QuestionId).Any(i => i.Count() > 1))
+            {
+                return RegistrationResult.DuplicatedSecurityQuestion;
+            }
+
+            // Test duplicated security question answers
+            if (securityQuestions.GroupBy(i => i.Content).Any(i => i.Count() > 1))
+            {
+                return RegistrationResult.DuplicatedSecurityQuestionAnswer;
+            }
+
+            // Test security questions mush have answer
+            if (securityQuestions.Any(i => i.Content == null))
+            {
+                return RegistrationResult.MissingSecurityQuestionAnswer;
+            }
+
+            return RegistrationResult.Success;
+        }
     }
 }

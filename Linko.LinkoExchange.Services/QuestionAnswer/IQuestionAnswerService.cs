@@ -67,5 +67,8 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         bool ConfirmCorrectAnswer(int userQuestionAnswerId, string answer);
 
+        RegistrationResult ValidateUserKbqData(IEnumerable<AnswerDto> kbqQuestions);
+
+        RegistrationResult ValidateUserSqData(IEnumerable<AnswerDto> securityQuestions); 
     }
 }

@@ -48,6 +48,8 @@ namespace Linko.LinkoExchange.Services.User
         void UpdateProfile(UserDto dto);
 
         RegistrationResult UpdateProfile(UserDto dto, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions);
+ 
+        RegistrationResult ValidateUserProfileData(UserDto userProfile);
 
         RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions);
 

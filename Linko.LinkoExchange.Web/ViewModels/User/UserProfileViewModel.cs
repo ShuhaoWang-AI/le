@@ -1,7 +1,6 @@
 ﻿using Linko.LinkoExchange.Web.ViewModels.Shared;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Web.Mvc;
 
 namespace Linko.LinkoExchange.Web.ViewModels.User
 {
@@ -17,8 +16,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         }
 
         // For permission role 
-        [Editable(false)]
-        [Required]
+        [Editable(false)] 
         [Display(Name ="Role")]
         public string Role
         {
@@ -26,8 +24,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         }
 
         [Editable(false)]
-        [Display(Name ="Signatory")]
-        [Required]
+        [Display(Name ="Signatory")] 
         public bool HasSigntory
         {
             get;set;
@@ -149,149 +146,6 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         public string Password
         {
             get; set;
-        }
-
-        public int UserQuestionAnserId_SQ1
-        {
-            get;set;
-        }
-
-        public int UserQuestionAnserId_SQ2
-        {
-            get; set;
-        }
-
-        public int UserQuestionAnserId_KBQ1
-        {
-            get; set;
-        }
-
-        public int UserQuestionAnserId_KBQ2
-        {
-            get; set;
-        }
-
-        public int UserQuestionAnserId_KBQ3
-        {
-            get; set;
-        }
-
-        public int UserQuestionAnserId_KBQ4
-        {
-            get; set;
-        }
-
-        public int UserQuestionAnserId_KBQ5
-        {
-            get; set;
-        }
-
-        [Required]
-        [Display(Name = "Question 1")] 
-        public int SecuritryQuestion1
-        {
-            get;set;
-        }
- 
-        [Required]
-        [Display(Name = "Answer 1")] 
-        public string SecurityQuestionAnswer1
-        {
-            get;set;
-        }
-
-        [Required]
-        [Display(Name = "Question 2")] 
-        public int SecurityQuestion2
-        {
-            get; set;
-        }
-
-        [Required]
-        [Display(Name = "Answer 2")] 
-        public string SecurityQuestionAnswer2
-        {
-            get; set;
-        }
-
-        [Required]
-        [Display(Name = "Question 1")] 
-        public int KBQ1
-        {
-            get; set;
-        }
-
-        [Required]
-        [Display(Name = "Answer 1")]
-        [MaxLength(50)]
-        public string KBQAnswer1
-        {
-            get; set;
-        }
-
-        [Required]
-        [Display(Name = "Question 2")] 
-        public int KBQ2
-        {
-            get; set;
-        }
-
-        [Required]
-        [Display(Name = "Answer 2")]
-        [MaxLength(50)]
-        public string KBQAnswer2
-        {
-            get; set;
-        }
-
-        [Required]
-        [Display(Name = "Question 3")]
-        public int KBQ3
-        {
-            get; set;
-        }
-
-        [Required]
-        [Display(Name = "Answer 3")]
-        [MaxLength(50)]
-        public string KBQAnswer3
-        {
-            get; set;
-        }
-
-        [Required]
-        [Display(Name = "Question 4")]
-        public int KBQ4
-        {
-            get; set;
-        }
-
-        [Required]
-        [Display(Name = "Answer 4")]
-        [MaxLength(50)]
-        public string KBQAnswer4
-        {
-            get; set;
-        }
-
-        [Required]
-        [Display(Name = "Question 5")]
-        public int KBQ5
-        {
-            get; set;
-        }
-
-        [Required]
-        [Display(Name = "Answer 5")]
-        [MaxLength(50)]
-        public string KBQAnswer5
-        {
-            get; set;
-        } 
-
-        public List<QuestionViewModel> QuestionPool
-        {
-            get;set;
         }
          
         public List<JurisdictionViewModel> StateList

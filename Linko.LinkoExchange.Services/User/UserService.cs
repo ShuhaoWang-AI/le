@@ -634,9 +634,27 @@ namespace Linko.LinkoExchange.Services.User
 
         }
 
+        public RegistrationResult ValidateUserProfileData(UserDto userProfile)
+        {
+
+            if (userProfile == null ||
+                string.IsNullOrWhiteSpace(userProfile.FirstName) ||
+                string.IsNullOrWhiteSpace(userProfile.LastName) ||
+                string.IsNullOrWhiteSpace(userProfile.AddressLine1) ||
+                string.IsNullOrWhiteSpace(userProfile.CityName) ||
+                string.IsNullOrWhiteSpace(userProfile.ZipCode) ||
+                string.IsNullOrWhiteSpace(userProfile.Email) ||
+                string.IsNullOrWhiteSpace(userProfile.UserName) 
+               )
+            {
+                return RegistrationResult.BadUserProfileData;
+            } 
+
+            return RegistrationResult.Success;
+        }
+
         public RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions)
         { 
-
             if (userProfile == null ||
                 string.IsNullOrWhiteSpace(userProfile.FirstName) ||
                 string.IsNullOrWhiteSpace(userProfile.LastName) ||
@@ -926,8 +944,7 @@ namespace Linko.LinkoExchange.Services.User
             return new RegistrationResultDto() { Result = RegistrationResult.Success };
 
         }
-        #endregion
-
-
+ 
+        #endregion 
     }
 }

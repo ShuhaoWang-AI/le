@@ -13,6 +13,7 @@ using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Core.Enum;
 using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -23,7 +24,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IUserService _userService;
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IJurisdictionService _jurisdictionService;
-        private string FakePassword = "********";
+        private readonly string fakePassword = "********";
         private readonly IMapper _mapper;
 
         public UserController(
@@ -61,30 +62,209 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [Authorize]
-        [AcceptVerbs(HttpVerbs.Get)] 
-        public ActionResult Profile()
+        [AcceptVerbs(HttpVerbs.Get)]
+        public new ActionResult Profile()
         {
-            var userProfileViewModel = GetUserProfileViewModel();
+            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
+            var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
+            var userProfileId = int.Parse(profileIdStr);
 
-            return View(userProfileViewModel);
+            var userProfileViewModel = GetUserProfileViewModel(userProfileId);
+            var userSQViewModel = GetUserSecurityQuestionViewModel(userProfileId);
+            var userKbqViewModel = GetUserKbqViewModel(userProfileId);
+
+            var user = new UserViewModel
+            {
+                UserKBQ = userKbqViewModel,
+                UserProfile = userProfileViewModel,
+                UserSQ = userSQViewModel
+            };
+
+            ViewBag.userKBQ = userKbqViewModel;
+            ViewBag.userProfile = userProfileViewModel;
+            ViewBag.userSQ = userSQViewModel;
+
+            return View(user);
         }
 
         [Authorize]
-        [AcceptVerbs(HttpVerbs.Post)] 
+        [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
-        public ActionResult Profile(UserProfileViewModel model, FormCollection form)
+        public new ActionResult Profile(UserViewModel model, string part)
         {
-            model.QuestionPool = GetQuestionPool();
-            model.StateList = GetStateList();
+            ViewBag.inValidProfile = false;
+            ViewBag.inValidKBQ = false;
+            ViewBag.inValidSQ = false;
 
-            if (!ModelState.IsValid)
+            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
+            var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
+            var userProfileId = int.Parse(profileIdStr);
+
+            var pristineUser = GetUserViewModel(userProfileId);
+            pristineUser.UserProfile = model.UserProfile;
+            pristineUser.UserProfile.StateList = GetStateList();
+
+            if (part == "Profile")
             {
-                var errors = this.ModelState.Keys.SelectMany(key => this.ModelState[key].Errors);
-                return View(model);
+                return SaveUserProfile(model, pristineUser, userProfileId);
+            }
+            else if (part == "KBQ")
+            {
+                return SaveUserKbq(model, pristineUser, userProfileId);
+            }
+            else if (part == "SQ")
+            {
+                return SaveUserSQ(model, pristineUser, userProfileId);
             }
 
-            #region Create Question Answer Dto 
+            return View(pristineUser);
+        }
 
+        private ActionResult SaveUserProfile(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)
+        {
+            ValidationContext context = null;
+            var validationResult = new List<ValidationResult>();
+            bool isValid = true; 
+            
+            context = new ValidationContext(model.UserProfile, serviceProvider: null, items: null);
+            isValid = Validator.TryValidateObject(model.UserProfile, context, validationResult, validateAllProperties: true); 
+
+            if (!isValid)
+            {
+                ViewBag.inValidProfile = true;
+                return View(pristineUserModel);
+            }
+
+            var userDto = _mapper.Map<UserDto>(model.UserProfile);
+            userDto.UserProfileId = userProfileId; 
+
+            var validateResult = _userService.ValidateUserProfileData(userDto);
+            if (validateResult == RegistrationResult.Success)
+            {
+                _userService.UpdateProfile(userDto);
+                ViewBag.SaveProfileSuccessfull = true;
+                ViewBag.SuccessMessage = String.Format(format: "Save Profile successfully.");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, errorMessage: "User profile data is not correct.");
+            }
+
+            return View(pristineUserModel);
+        }
+
+        private ActionResult SaveUserKbq(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)
+        {
+            pristineUserModel.UserKBQ.QuestionPool = GetQuestionPool(QuestionType.KnowledgeBased);
+
+            ValidationContext context = null;
+            var validationResult = new List<ValidationResult>();
+            bool isValid = true; 
+
+            context = new ValidationContext(model.UserKBQ, serviceProvider: null, items: null);
+            isValid = Validator.TryValidateObject(model.UserKBQ, context, validationResult, validateAllProperties: true);
+            
+            if (!isValid)
+            {
+                ViewBag.inValidKBQ = true;
+                return View(pristineUserModel);
+            }
+
+            pristineUserModel.UserKBQ.UserProfileId = userProfileId;
+            var kbqQuestionAnswers = GetPostedUserKbqQuestions(pristineUserModel.UserKBQ); 
+            var validateResult = _questionAnswerService.ValidateUserKbqData(kbqQuestionAnswers);
+            switch (validateResult)
+            {
+                case RegistrationResult.Success:
+                    _questionAnswerService.CreateOrUpdateUserQuestionAnswers(userProfileId, kbqQuestionAnswers); 
+                    ViewBag.SaveKBQSuccessfull = true;
+                    ViewBag.SuccessMessage = String.Format(format: "Save Knowledge Based Questions successfully.");
+                    break;
+                case RegistrationResult.DuplicatedKBQ:
+                    ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Knowledage Based Questions");
+                    break;
+                case RegistrationResult.DuplicatedKBQAnswer:
+                    ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Knowledage Based Question Answers");
+                    break;
+                case RegistrationResult.MissingKBQ:
+                    ModelState.AddModelError(string.Empty, errorMessage: "Missing Knowledage Based Questions");
+                    break;
+                case RegistrationResult.MissingKBQAnswer:
+                    ModelState.AddModelError(string.Empty, errorMessage: "Missing Knowledage Based Question Answers");
+                    break;
+            }  
+
+            return View(pristineUserModel);
+        }
+
+        private ActionResult SaveUserSQ(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)
+        {
+            pristineUserModel.UserSQ.QuestionPool = GetQuestionPool(QuestionType.Security);
+
+            ValidationContext context = null;
+            var validationResult = new List<ValidationResult>();
+            bool isValid = true;
+
+            context = new ValidationContext(model.UserSQ, serviceProvider: null, items: null);
+            isValid = Validator.TryValidateObject(model.UserSQ, context, validationResult, validateAllProperties: true);
+
+            if (!isValid)
+            {
+                ViewBag.inValidSQ = true;
+                return View(pristineUserModel);
+            } 
+
+            pristineUserModel.UserSQ.UserProfileId = userProfileId;
+
+            var sqQuestionAnswers = GetPostedUserSQQuestionAnswers(model.UserSQ);
+            var result = _questionAnswerService.ValidateUserSqData(sqQuestionAnswers);
+            switch (result)
+            {
+                case RegistrationResult.Success:
+                    _questionAnswerService.CreateOrUpdateUserQuestionAnswers(userProfileId, sqQuestionAnswers); 
+                    ViewBag.SaveSQSuccessfull = true;
+                    ViewBag.SuccessMessage = String.Format(format: "Save Security Questions successfully.");
+                    break;
+                case RegistrationResult.DuplicatedSecurityQuestion:
+                    ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Security Questions");
+                    break;
+                case RegistrationResult.DuplicatedSecurityQuestionAnswer:
+                    ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Security Question Answers");
+                    break;
+
+                case RegistrationResult.MissingSecurityQuestion:
+                    ModelState.AddModelError(string.Empty, errorMessage: "Missing Security Questions");
+                    break;
+                case RegistrationResult.MissingSecurityQuestionAnswer:
+                    ModelState.AddModelError(string.Empty, errorMessage: "Missing Security Question Answers");
+                    break;
+            }
+
+            return View(pristineUserModel);
+        }
+
+        private List<AnswerDto> GetPostedUserSQQuestionAnswers(UserSQViewModel model)
+        {
+            var sqQuestionAnswers = new List<AnswerDto>();
+            sqQuestionAnswers.Add(new AnswerDto
+            {
+                QuestionId = model.SecuritryQuestion1,
+                Content = model.SecurityQuestionAnswer1,
+                UserQuestionAnswerId = model.UserQuestionAnserId_SQ1
+            });
+
+            sqQuestionAnswers.Add(new AnswerDto
+            {
+                QuestionId = model.SecurityQuestion2,
+                Content = model.SecurityQuestionAnswer2,
+                UserQuestionAnswerId = model.UserQuestionAnserId_SQ1
+            });
+
+            return sqQuestionAnswers;
+        }
+
+        private List<AnswerDto> GetPostedUserKbqQuestions(UserKBQViewModel model)
+        {
             var kbqQuestionAnswers = new List<AnswerDto>();
             kbqQuestionAnswers.AddRange(
                 new[] {
@@ -122,133 +302,106 @@ namespace Linko.LinkoExchange.Web.Controllers
                 }
             );
 
-            var sqQuestionAnswers = new List<AnswerDto>();
-            sqQuestionAnswers.Add(new AnswerDto
-            {
-                QuestionId = model.SecuritryQuestion1,
-                Content = model.SecurityQuestionAnswer1,
-                UserQuestionAnswerId = model.UserQuestionAnserId_SQ1
-            });
-
-            sqQuestionAnswers.Add(new AnswerDto
-            {
-                QuestionId = model.SecurityQuestion2,
-                Content = model.SecurityQuestionAnswer2,
-                UserQuestionAnswerId = model.UserQuestionAnserId_SQ1
-            });
-
-            #endregion create Question Answer Dto  
-
-            var profileIdStr = _sessionCache.GetClaimValue(CacheKey.UserProfileId) as string;
-            var userProfileId = int.Parse(profileIdStr);
-            var userProileDto = _userService.GetUserProfileById(userProfileId);
-
-            model.UserProfileId = userProfileId; 
-
-            var userDto = _mapper.Map<UserDto>(model);  
-             
-            var result = _userService.UpdateProfile(userDto, sqQuestionAnswers, kbqQuestionAnswers);
-            switch (result)
-            {
-                case RegistrationResult.BadSecurityQuestionAndAnswer:
-                    ModelState.AddModelError(string.Empty, "Bad Security Question and Anwsers.");
-                    break;
-                case RegistrationResult.DuplicatedKBQ:
-                    ModelState.AddModelError(string.Empty, "Duplicated Knowledage Based Questions");
-                    break;
-                case RegistrationResult.DuplicatedKBQAnswer:
-                    ModelState.AddModelError(string.Empty, "Duplicated Knowledage Based Question Answers");
-                    break;
-                case RegistrationResult.DuplicatedSecurityQuestion:
-                    ModelState.AddModelError(string.Empty, "Duplicated Security Questions");
-                    break;
-                case RegistrationResult.DuplicatedSecurityQuestionAnswer:
-                    ModelState.AddModelError(string.Empty, "Duplicated Security Question Answers");
-                    break;
-                case RegistrationResult.MissingKBQ:
-                    ModelState.AddModelError(string.Empty, "Missing Knowledage Based Questions");
-                    break;
-                case RegistrationResult.MissingKBQAnswer:
-                    ModelState.AddModelError(string.Empty, "Missing Knowledage Based Question Answers");
-                    break;
-                case RegistrationResult.MissingSecurityQuestion:
-                    ModelState.AddModelError(string.Empty, "Missing Security Question Answers");
-                    break;
-                case RegistrationResult.BadUserProfileData:
-                    ModelState.AddModelError(string.Empty, "Bad User Profile Data");
-                    break;
-
-            }
-             
-            return View(model);
+            return kbqQuestionAnswers;
         }
 
-        private UserProfileViewModel GetUserProfileViewModel()
+        private UserViewModel GetUserViewModel(int userProfileId)
         {
-            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity; 
-            var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
-            var userProfileId = int.Parse(profileIdStr);
+            var userProfileViewModel = GetUserProfileViewModel(userProfileId);
+            var userSQViewModel = GetUserSecurityQuestionViewModel(userProfileId);
+            var userKbqViewModel = GetUserKbqViewModel(userProfileId);
+
+            return new UserViewModel
+            {
+                UserKBQ = userKbqViewModel,
+                UserProfile = userProfileViewModel,
+                UserSQ = userSQViewModel
+            };  
+        }
+
+        private UserProfileViewModel GetUserProfileViewModel(int userProfileId)
+        {
+
             var userProileDto = _userService.GetUserProfileById(userProfileId);
             var userProfileViewModel = _mapper.Map<UserProfileViewModel>(userProileDto);
 
             // set password to be stars 
-            userProfileViewModel.Password = FakePassword;
+            userProfileViewModel.Password = fakePassword;
 
             // Get state list   
             userProfileViewModel.StateList = GetStateList();
-
-            userProfileViewModel.Role = _sessionCache.GetClaimValue(CacheKey.UserRole); 
-
-            var kbqQuestions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, Services.Dto.QuestionType.KnowledgeBased);
-            var securityQeustions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, Services.Dto.QuestionType.Security);
-
-            var kbqs = kbqQuestions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
-            var sqs = securityQeustions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
-
-            userProfileViewModel.QuestionPool = GetQuestionPool();
-
-            ////  Security questions 
-            userProfileViewModel.SecuritryQuestion1 = sqs[0].Question.QuestionId.Value;
-            userProfileViewModel.SecurityQuestion2 = sqs[1].Question.QuestionId.Value;
-
-            userProfileViewModel.SecurityQuestionAnswer2 = sqs[1].Answer.Content;
-            userProfileViewModel.SecurityQuestionAnswer1 = sqs[0].Answer.Content;
-
-            //// Keep track UserQuestionAnswerId 
-            userProfileViewModel.UserQuestionAnserId_SQ1 = sqs[0].Answer.UserQuestionAnswerId.Value;
-            userProfileViewModel.UserQuestionAnserId_SQ2 = sqs[1].Answer.UserQuestionAnswerId.Value;
-
-
-            ////  KBQ questions 
-            userProfileViewModel.KBQ1 = kbqs[0].Question.QuestionId.Value;
-            userProfileViewModel.KBQ2 = kbqs[1].Question.QuestionId.Value;
-            userProfileViewModel.KBQ3 = kbqs[2].Question.QuestionId.Value;
-            userProfileViewModel.KBQ4 = kbqs[3].Question.QuestionId.Value;
-            userProfileViewModel.KBQ5 = kbqs[4].Question.QuestionId.Value;
-
-
-            userProfileViewModel.KBQAnswer1 = kbqs[0].Answer.Content;
-            userProfileViewModel.KBQAnswer2 = kbqs[1].Answer.Content; 
-            userProfileViewModel.KBQAnswer3 = kbqs[2].Answer.Content; 
-            userProfileViewModel.KBQAnswer4 = kbqs[3].Answer.Content; 
-            userProfileViewModel.KBQAnswer5 = kbqs[4].Answer.Content;
-
-            //// keep track UserQuestionAnswerId
-            userProfileViewModel.UserQuestionAnserId_KBQ1 = kbqs[0].Answer.UserQuestionAnswerId.Value;
-            userProfileViewModel.UserQuestionAnserId_KBQ2 = kbqs[1].Answer.UserQuestionAnswerId.Value;
-            userProfileViewModel.UserQuestionAnserId_KBQ3 = kbqs[2].Answer.UserQuestionAnswerId.Value;
-            userProfileViewModel.UserQuestionAnserId_KBQ4 = kbqs[3].Answer.UserQuestionAnswerId.Value;
-            userProfileViewModel.UserQuestionAnserId_KBQ5 = kbqs[4].Answer.UserQuestionAnswerId.Value; 
+            userProfileViewModel.Role = _sessionCache.GetClaimValue(CacheKey.UserRole);  
 
             return userProfileViewModel;
         }
 
-        public List<QuestionViewModel> GetQuestionPool()
+        private UserKBQViewModel GetUserKbqViewModel(int userProfileId)
         {
-           return _questionAnswerService.GetQuestions().Select(i => _mapper.Map<QuestionViewModel>(i)).ToList();
+
+            var userKbqViewModel = new UserKBQViewModel();
+            userKbqViewModel.UserProfileId = userProfileId;   
+
+            var kbqQuestions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, Services.Dto.QuestionType.KnowledgeBased);
+          
+            var kbqs = kbqQuestions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
+
+            userKbqViewModel.QuestionPool = GetQuestionPool(QuestionType.KnowledgeBased);
+
+            ////  KBQ questions 
+            userKbqViewModel.KBQ1 = kbqs[0].Question.QuestionId.Value;
+            userKbqViewModel.KBQ2 = kbqs[1].Question.QuestionId.Value;
+            userKbqViewModel.KBQ3 = kbqs[2].Question.QuestionId.Value;
+            userKbqViewModel.KBQ4 = kbqs[3].Question.QuestionId.Value;
+            userKbqViewModel.KBQ5 = kbqs[4].Question.QuestionId.Value;
+
+
+            userKbqViewModel.KBQAnswer1 = kbqs[0].Answer.Content;
+            userKbqViewModel.KBQAnswer2 = kbqs[1].Answer.Content;
+            userKbqViewModel.KBQAnswer3 = kbqs[2].Answer.Content;
+            userKbqViewModel.KBQAnswer4 = kbqs[3].Answer.Content;
+            userKbqViewModel.KBQAnswer5 = kbqs[4].Answer.Content;
+
+            //// keep track UserQuestionAnswerId
+            userKbqViewModel.UserQuestionAnserId_KBQ1 = kbqs[0].Answer.UserQuestionAnswerId.Value;
+            userKbqViewModel.UserQuestionAnserId_KBQ2 = kbqs[1].Answer.UserQuestionAnswerId.Value;
+            userKbqViewModel.UserQuestionAnserId_KBQ3 = kbqs[2].Answer.UserQuestionAnswerId.Value;
+            userKbqViewModel.UserQuestionAnserId_KBQ4 = kbqs[3].Answer.UserQuestionAnswerId.Value;
+            userKbqViewModel.UserQuestionAnserId_KBQ5 = kbqs[4].Answer.UserQuestionAnswerId.Value;
+
+            return userKbqViewModel;
         }
 
-        public List<JurisdictionViewModel> GetStateList()
+        private UserSQViewModel GetUserSecurityQuestionViewModel(int userProfileId)
+        {
+            var userSQViewModel = new UserSQViewModel();
+            userSQViewModel.UserProfileId = userProfileId;     
+            
+            var securityQeustions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, Services.Dto.QuestionType.Security);
+            var sqs = securityQeustions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
+
+            userSQViewModel.QuestionPool = GetQuestionPool(QuestionType.Security);
+
+            ////  Security questions 
+            userSQViewModel.SecuritryQuestion1 = sqs[0].Question.QuestionId.Value;
+            userSQViewModel.SecurityQuestion2 = sqs[1].Question.QuestionId.Value;
+
+            userSQViewModel.SecurityQuestionAnswer2 = sqs[1].Answer.Content;
+            userSQViewModel.SecurityQuestionAnswer1 = sqs[0].Answer.Content;
+
+            //// Keep track UserQuestionAnswerId 
+            userSQViewModel.UserQuestionAnserId_SQ1 = sqs[0].Answer.UserQuestionAnswerId.Value;
+            userSQViewModel.UserQuestionAnserId_SQ2 = sqs[1].Answer.UserQuestionAnswerId.Value; 
+          
+            return userSQViewModel;
+        }
+
+        private List<QuestionViewModel> GetQuestionPool(QuestionType type)
+        {
+            return _questionAnswerService.GetQuestions().Select(i => _mapper.Map<QuestionViewModel>(i)).ToList()
+                .Where(i => i.QuestionType == type).ToList();
+        }
+
+        private List<JurisdictionViewModel> GetStateList()
         {
             var list = _jurisdictionService.GetStateProvs((int)(Country.USA));
             var stateList = new List<JurisdictionViewModel>();
