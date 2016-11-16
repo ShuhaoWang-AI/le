@@ -1,16 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
-    public class QuestionType
+    /// <summary>
+    /// Represents a type of a question.
+    /// </summary>
+    public partial class QuestionType
     {
-        [Key]
+        /// <summary>
+        /// Primary key.
+        /// </summary>
         public int QuestionTypeId { get; set; }
+
         public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        public DateTimeOffset CreationDateTimeUtc { get; set; }
+
+        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
+
+        public int? LastModifierUserId { get; set; }
+
+
+        // Reverse navigation
+        public virtual ICollection<Question> Questions { get; set; }
     }
 }

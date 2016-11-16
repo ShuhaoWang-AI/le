@@ -1,22 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
-    public class UserQuestionAnswer
+    /// <summary>
+    /// 
+    /// </summary>
+    public partial class UserQuestionAnswer
     {
-        [Key]
+        /// <summary>
+        /// Primary key.
+        /// </summary>
         public int UserQuestionAnswerId { get; set; }
-        public string Content { get; set; }
-        public int UserProfileId { get; set; }
-        public DateTimeOffset CreationDateTimeUtc { get; set; }
-        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
-        public int QuestionId { get; set; }
-        public Question Question { get; set; }
 
+        public string Content { get; set; }
+
+        public int QuestionId { get; set; }
+        public virtual Question Question { get; set; }
+
+        public int UserProfileId { get; set; }
+        //public UserProfile UserProfile { get; set; }
+
+        public DateTimeOffset CreationDateTimeUtc { get; set; }
+
+        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
     }
 }

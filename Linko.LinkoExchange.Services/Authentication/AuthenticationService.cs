@@ -541,7 +541,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             int resetPasswordTokenValidateInterval = Convert.ToInt32(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"]);
 
-            var emailAuditLog = _dbContext.EmailAuditLog.FirstOrDefault(e => e.Token == resetPasswordToken);
+            var emailAuditLog = _dbContext.EmailAuditLogs.FirstOrDefault(e => e.Token == resetPasswordToken);
 
             if (emailAuditLog == null)
             {

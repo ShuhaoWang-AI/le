@@ -1,14 +1,22 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
-    public class UserPasswordHistory
+    /// <summary>
+    /// Represents a password change history for a particular user.
+    /// </summary>
+    public partial class UserPasswordHistory
     {
-        [Key]
+        /// <summary>
+        /// Primary key.
+        /// </summary>
         public int UserPasswordHistoryId { get; set; }
-        public string PasswordHash  { get; set; }
+
+        public string PasswordHash { get; set; }
+
         public int UserProfileId { get; set; }
+        //public UserProfile UserProfile { get; set; }
+
         public DateTimeOffset LastModificationDateTimeUtc { get; set; }
     }
 }

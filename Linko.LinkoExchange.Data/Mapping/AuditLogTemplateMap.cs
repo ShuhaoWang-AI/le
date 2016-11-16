@@ -3,32 +3,33 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
- 
-    class AuditLogTemplateMap : EntityTypeConfiguration<AuditLogTemplate>
+
+    public class AuditLogTemplateMap : EntityTypeConfiguration<AuditLogTemplate>
     {
         public AuditLogTemplateMap()
         {
             ToTable("tAuditLogTemplate");
 
-            HasKey(i => i.AuditLogTemplateId);
+            HasKey(x => x.AuditLogTemplateId);
 
-            Property(i => i.Name).HasMaxLength(100);
+            Property(x => x.Name).IsRequired().HasMaxLength(100);
 
-            Property(i => i.TemplateType).HasMaxLength(30); 
+            Property(x => x.TemplateType).IsRequired().HasMaxLength(15);
 
-            Property(i => i.EventCategory).HasMaxLength(20);
+            Property(x => x.EventCategory).IsRequired().HasMaxLength(30);
 
-            Property(i => i.EventType).HasMaxLength(50);
+            Property(x => x.EventType).IsRequired().HasMaxLength(50);
 
-            Property(i => i.SubjectTemplate).HasMaxLength(500); 
+            Property(x => x.SubjectTemplate).IsOptional().HasMaxLength(500);
 
-            Property(i => i.MessageTemplate).IsRequired();
+            Property(x => x.MessageTemplate).IsRequired();
 
-            Property(i => i.CreationDateTimeUtc).IsRequired();
+            Property(x => x.CreationDateTimeUtc).IsRequired();
 
-            Property(i => i.LastModificationDateTimeUtc).IsOptional();
+            Property(x => x.LastModificationDateTimeUtc).IsOptional();
 
-            Property(i => i.LastModifierUserId).IsOptional();
-         }
+            Property(x => x.LastModifierUserId).IsOptional();
+        }
     }
+
 }

@@ -26,7 +26,7 @@ namespace Linko.LinkoExchange.Web.AutoMapperProfile
                   .ForMember(d => d.EmailConfirmed, o => o.Ignore()) 
 
                   .ReverseMap() 
-                  .ForMember(i=>i.Password, i=>i.Ignore());
+                  .ForMember(d => d.Password, o => o.Ignore());
         } 
     }
 }

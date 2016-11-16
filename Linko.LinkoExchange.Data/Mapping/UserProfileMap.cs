@@ -1,10 +1,6 @@
 ﻿using Linko.LinkoExchange.Core.Domain;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
@@ -13,23 +9,49 @@ namespace Linko.LinkoExchange.Data.Mapping
         public UserProfileMap()
         {
             ToTable("tUserProfile");
-            HasKey(i => i.Id);
 
-            Property(i => i.UserProfileId);
-            Property(i => i.FirstName);
-            Property(i => i.LastName);
-            Property(i => i.Email); 
-            Property(i => i.IsAccountLocked); 
-            Property(i => i.OldEmailAddress);
-            Property(i => i.PasswordHash);
-            Property(i => i.AddressLine1);
-            Property(i => i.AddressLine2);
-            Property(i => i.CityName);
-            Property(i => i.ZipCode);
-            Property(i => i.IsInternalAccount);
-            Property(i => i.IsIdentityProofed);
-            Property(i => i.CreationDateTimeUtc);
+            Property(x => x.UserProfileId).IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 
+            Property(x => x.FirstName).IsRequired().HasMaxLength(50);
+
+            Property(x => x.LastName).IsRequired().HasMaxLength(50);
+
+            Property(x => x.TitleRole).IsOptional().HasMaxLength(250);
+
+            Property(x => x.BusinessName).IsRequired().HasMaxLength(100);
+
+            Property(x => x.AddressLine1).IsRequired().HasMaxLength(100);
+
+            Property(x => x.AddressLine2).IsOptional().HasMaxLength(100);
+
+            Property(x => x.CityName).IsRequired().HasMaxLength(100);
+
+            Property(x => x.ZipCode).IsRequired().HasMaxLength(50);
+
+            HasRequired(a => a.Jurisdiction)
+                .WithMany()
+                .HasForeignKey(c => c.JurisdictionId)
+                .WillCascadeOnDelete(false);
+
+            Property(x => x.PhoneExt).IsOptional();
+
+            Property(x => x.IsAccountLocked).IsRequired();
+
+            Property(x => x.IsAccountResetRequired).IsRequired();
+
+            Property(x => x.IsIdentityProofed).IsRequired();
+
+            Property(x => x.IsInternalAccount).IsRequired();
+
+            Property(x => x.OldEmailAddress).IsOptional().HasMaxLength(256);
+
+            Property(x => x.CreationDateTimeUtc).IsRequired();
+
+            Property(x => x.LastModificationDateTimeUtc).IsOptional();
+
+
+            // The default Identity entity is optional
+            Property(x => x.PhoneNumber).IsRequired();
         }
     }
 }

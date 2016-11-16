@@ -50,7 +50,7 @@ namespace Linko.LinkoExchange.Test
                 cfg.AddProfile(new PermissionGroupMapProfile());
                 cfg.AddProfile(new RegulatoryProgramMapperProfile());
                 cfg.AddProfile(new OrganizationRegulatoryProgramMapProfile());
-                cfg.AddProfile(new OrganizationRegulatoryProgramUserDtoMapProfile());
+                cfg.AddProfile(new OrganizationRegulatoryProgramUserMapProfile());
                 cfg.AddProfile(new OrganizationMapProfile());
                 cfg.AddProfile(new SettingMapProfile());
             });

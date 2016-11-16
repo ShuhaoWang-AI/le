@@ -1,20 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
-    public class OrganizationRegulatoryProgramSetting
+    /// <summary>
+    /// Represents a setting within a regulatory program for a particular organization.
+    /// </summary>
+    public partial class OrganizationRegulatoryProgramSetting
     {
-        [Key]
+        /// <summary>
+        /// Primary key.
+        /// </summary>
         public int OrganizationRegulatoryProgramSettingId { get; set; }
+
         public int OrganizationRegulatoryProgramId { get; set; }
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
+
         public int SettingTemplateId { get; set; }
-        public virtual SettingTemplate SettingTemplate { get; set;}
-        public string Value { get; set;}
+        public virtual SettingTemplate SettingTemplate { get; set; }
+
+        public string Value { get; set; }
+
+        public DateTimeOffset CreationDateTimeUtc { get; set; }
+
+        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
+
+        public int? LastModifierUserId { get; set; }
     }
 }

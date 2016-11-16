@@ -450,7 +450,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         public QuestionAnswerPairDto GetRandomQuestionAnswerFromToken(string token, Dto.QuestionType questionType)
         {
             //Find UserProfileId from EmailAuditLog.Recipient
-            var emailAuditLog = _dbContext.EmailAuditLog.FirstOrDefault(e => e.Token == token);
+            var emailAuditLog = _dbContext.EmailAuditLogs.FirstOrDefault(e => e.Token == token);
             if (emailAuditLog != null && emailAuditLog.RecipientUserProfileId.HasValue)
             {
                 var userProfileId = emailAuditLog.RecipientUserProfileId;

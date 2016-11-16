@@ -1,23 +1,33 @@
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Linko.LinkoExchange.Core.Domain;
 using System.Data.Entity.ModelConfiguration;
-using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    class InvitationMap : EntityTypeConfiguration<Invitation>
+    public class InvitationMap : EntityTypeConfiguration<Invitation>
     {
         public InvitationMap()
         {
             ToTable("tInvitation");
 
-            HasKey(i => i.InvitationId);
+            HasKey(x => x.InvitationId);
 
-            Property(i => i.FirstName);
-            Property(i => i.LastName);
-            Property(i => i.EmailAddress).IsRequired();
-            Property(i => i.InvitationDateTimeUtc).IsRequired();
-            Property(i => i.SenderOrganizationRegulatoryProgramId).IsRequired();
-            Property(i => i.RecipientOrganizationRegulatoryProgramId).IsRequired(); 
+            Property(x => x.FirstName).IsRequired().HasMaxLength(50);
+
+            Property(x => x.LastName).IsRequired().HasMaxLength(50);
+
+            Property(x => x.EmailAddress).IsRequired().HasMaxLength(256);
+
+            Property(x => x.InvitationDateTimeUtc).IsRequired();
+
+            HasRequired(a => a.RecipientOrganizationRegulatoryProgram)
+                .WithMany()
+                .HasForeignKey(c => c.RecipientOrganizationRegulatoryProgramId)
+                .WillCascadeOnDelete(false);
+
+            HasRequired(a => a.SenderOrganizationRegulatoryProgram)
+                .WithMany()
+                .HasForeignKey(c => c.SenderOrganizationRegulatoryProgramId)
+                .WillCascadeOnDelete(false);
         }
     }
 }

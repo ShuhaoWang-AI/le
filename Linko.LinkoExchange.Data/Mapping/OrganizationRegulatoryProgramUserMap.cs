@@ -1,37 +1,49 @@
 ﻿using Linko.LinkoExchange.Core.Domain;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    class OrganizationRegulatoryProgramUserMap: EntityTypeConfiguration<OrganizationRegulatoryProgramUser>
+    public partial class OrganizationRegulatoryProgramUserMap : EntityTypeConfiguration<OrganizationRegulatoryProgramUser>
     {
         public OrganizationRegulatoryProgramUserMap()
         {
             ToTable("tOrganizationRegulatoryProgramUser");
 
-            HasKey(i => i.OrganizationRegulatoryProgramUserId);
+            HasKey(x => x.OrganizationRegulatoryProgramUserId);
 
-           Property(i => i.UserProfileId);
-//             this.HasRequired(i => i.UserProfile)
-//                .WithMany()
-//                .HasForeignKey(i => i.UserProfileId);
+            Property(x => x.UserProfileId).IsRequired();
+            //HasRequired(a => a.UserProfile)
+            //    .WithMany()
+            //    .HasForeignKey(c => c.UserProfileId)
+            //    .WillCascadeOnDelete(false);
 
-            Property(i => i.OrganizationRegulatoryProgramId);
-            Property(i => i.PermissionGroupId); 
-            Property(i => i.RegistrationDateTimeUtc);
-            Property(i => i.IsRegistrationApproved);
-            Property(i => i.IsRegistrationDenied);
-            Property(i => i.IsRemoved);
-            Property(i => i.IsSignatory);
-            Property(i => i.IsEnabled);
-            Property(i => i.LastModificationDateTimeUtc);
-            Property(i => i.CreationDateTimeUtc);
-            Property(i => i.LastModifierUserId); 
+            HasRequired(a => a.OrganizationRegulatoryProgram)
+                .WithMany(b => b.OrganizationRegulatoryProgramUsers)
+                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
+                .WillCascadeOnDelete(false);
+
+            HasOptional(a => a.PermissionGroup)
+                .WithMany(b => b.OrganizationRegulatoryProgramUsers)
+                .HasForeignKey(c => c.PermissionGroupId)
+                .WillCascadeOnDelete(false);
+
+            Property(x => x.RegistrationDateTimeUtc).IsRequired();
+
+            Property(x => x.IsRegistrationApproved).IsRequired();
+
+            Property(x => x.IsRegistrationDenied).IsRequired();
+
+            Property(x => x.IsEnabled).IsRequired();
+
+            Property(x => x.IsRemoved).IsRequired();
+
+            Property(x => x.IsSignatory).IsRequired();
+
+            Property(x => x.CreationDateTimeUtc).IsRequired();
+
+            Property(x => x.LastModificationDateTimeUtc).IsOptional();
+
+            Property(x => x.LastModifierUserId).IsOptional();
         }
     }
 }

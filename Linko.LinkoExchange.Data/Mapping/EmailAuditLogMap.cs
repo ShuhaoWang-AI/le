@@ -1,42 +1,60 @@
-using Linko.LinkoExchange.Core.Domain;
+﻿using Linko.LinkoExchange.Core.Domain;
 using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    class EmailAuditLogMap : EntityTypeConfiguration<EmailAuditLog>
+    public class EmailAuditLogMap : EntityTypeConfiguration<EmailAuditLog>
     {
         public EmailAuditLogMap()
         {
             ToTable("tEmailAuditLog");
 
-            HasKey(i => i.EmailAuditLogId);
+            HasKey(x => x.EmailAuditLogId);
 
-            Property(i => i.AuditLogTemplateId); 
+            HasRequired(a => a.AuditLogTemplate)
+                .WithMany()
+                .HasForeignKey(c => c.AuditLogTemplateId)
+                .WillCascadeOnDelete(false);
 
-            Property(i => i.SenderRegulatoryProgramId);
-            Property(i => i.SenderOrganizationId);
-            Property(i => i.SenderRegulatorOrganizationId);
+            Property(x => x.SenderRegulatoryProgramId).IsOptional();
 
-            Property(i => i.SenderUserProfileId);
-            Property(i => i.SenderUserName);
-            Property(i => i.SenderFirstName);
-            Property(i => i.SenderLastName);
-            Property(i => i.SenderEmailAddress); 
+            Property(x => x.SenderOrganizationId).IsOptional();
 
-            Property(i => i.RecipientRegulatoryProgramId);
-            Property(i => i.RecipientOrganizationId);
-            Property(i => i.RecipientRegulatorOrganizationId);
+            Property(x => x.SenderRegulatorOrganizationId).IsOptional();
 
-            Property(i => i.RecipientUserProfileId);
-            Property(i => i.RecipientUserName); 
-            Property(i => i.RecipientFirstName);
-            Property(i => i.RecipientLastName);
-            Property(i => i.RecipientEmailAddress);
+            Property(x => x.SenderUserProfileId).IsOptional();
 
-            Property(i => i.Subject);
-            Property(i => i.Body);
-            Property(i => i.SentDateTimeUtc);
-            Property(i => i.Token);
+            Property(x => x.SenderUserName).IsOptional().HasMaxLength(256);
+
+            Property(x => x.SenderFirstName).IsOptional().HasMaxLength(50);
+
+            Property(x => x.SenderLastName).IsOptional().HasMaxLength(50);
+
+            Property(x => x.SenderEmailAddress).IsRequired().HasMaxLength(256);
+
+            Property(x => x.RecipientRegulatoryProgramId).IsOptional();
+
+            Property(x => x.RecipientOrganizationId).IsOptional();
+
+            Property(x => x.RecipientRegulatorOrganizationId).IsOptional();
+
+            Property(x => x.RecipientUserProfileId).IsOptional();
+
+            Property(x => x.RecipientUserName).IsOptional().HasMaxLength(256);
+
+            Property(x => x.RecipientFirstName).IsOptional().HasMaxLength(50);
+
+            Property(x => x.RecipientLastName).IsOptional().HasMaxLength(50);
+
+            Property(x => x.RecipientEmailAddress).IsRequired().HasMaxLength(256);
+
+            Property(x => x.Subject).IsRequired().HasMaxLength(500);
+
+            Property(x => x.Body).IsRequired();
+
+            Property(x => x.Token).IsOptional().HasMaxLength(128);
+
+            Property(x => x.SentDateTimeUtc).IsRequired();
         }
     }
 }

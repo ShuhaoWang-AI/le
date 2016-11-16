@@ -1,10 +1,5 @@
 ﻿using Linko.LinkoExchange.Core.Domain;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
@@ -13,16 +8,23 @@ namespace Linko.LinkoExchange.Data.Mapping
         public QuestionMap()
         {
             ToTable("tQuestion");
-            HasKey(i => i.QuestionId);
-            Property(i => i.Content);
-            Property(i => i.QuestionTypeId);
-            HasRequired(i => i.QuestionType)
-                .WithMany()
-                .HasForeignKey(i => i.QuestionTypeId);
-            Property(i => i.IsActive);
-            Property(i => i.CreationDateTimeUtc);
-            Property(i => i.LastModificationDateTimeUtc);
+
+            HasKey(x => x.QuestionId);
+
+            Property(x => x.Content).IsRequired().HasMaxLength(500);
+
+            HasRequired(a => a.QuestionType)
+                .WithMany(b => b.Questions)
+                .HasForeignKey(c => c.QuestionTypeId)
+                .WillCascadeOnDelete(false);
+
+            Property(x => x.IsActive).IsRequired();
+
+            Property(x => x.CreationDateTimeUtc).IsRequired();
+
+            Property(x => x.LastModificationDateTimeUtc).IsOptional();
+
+            Property(x => x.LastModifierUserId).IsOptional();
         }
     }
-
 }

@@ -1,17 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
-    public class RegulatoryProgram
+    /// <summary>
+    /// Represents a regulatory program.
+    /// </summary>
+    public partial class RegulatoryProgram
     {
-        [Key]
+        /// <summary>
+        /// Primary key.
+        /// </summary>
         public int RegulatoryProgramId { get; set; }
+
         public string Name { get; set; }
+
         public string Description { get; set; }
+
+        public DateTimeOffset CreationDateTimeUtc { get; set; }
+
+        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
+
+        public int? LastModifierUserId { get; set; }
+
+
+        // Reverse navigation
+        public virtual ICollection<OrganizationRegulatoryProgram> OrganizationRegulatoryPrograms { get; set; }
+
+        public virtual ICollection<OrganizationTypeRegulatoryProgram> OrganizationTypeRegulatoryPrograms { get; set; }
     }
 }

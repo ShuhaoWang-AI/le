@@ -1,10 +1,5 @@
 ﻿using Linko.LinkoExchange.Core.Domain;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
@@ -14,20 +9,34 @@ namespace Linko.LinkoExchange.Data.Mapping
         {
             ToTable("tOrganizationRegulatoryProgram");
 
-            HasKey(i => i.OrganizationRegulatoryProgramId);
-            Property(i => i.RegulatoryProgramId);
-            Property(i => i.OrganizationId);
-            this.HasRequired(i => i.Organization)
-                .WithMany()
-                .HasForeignKey(i => i.OrganizationId);
+            HasKey(x => x.OrganizationRegulatoryProgramId);
 
-            Property(i => i.RegulatorOrganizationId);
-            this.HasRequired(i => i.RegulatorOrganization)
-                .WithMany()
-                .HasForeignKey(i => i.RegulatorOrganizationId);
+            HasRequired(a => a.RegulatoryProgram)
+                .WithMany(b => b.OrganizationRegulatoryPrograms)
+                .HasForeignKey(c => c.RegulatoryProgramId)
+                .WillCascadeOnDelete(false);
 
-            Property(i => i.IsEnabled);
-            Property(i => i.AssignedTo);
+            HasRequired(a => a.Organization)
+                .WithMany(b => b.OrganizationRegulatoryPrograms)
+                .HasForeignKey(c => c.OrganizationId)
+                .WillCascadeOnDelete(false);
+
+            HasOptional(a => a.RegulatorOrganization)
+                .WithMany(b => b.RegulatorOrganizationRegulatoryPrograms)
+                .HasForeignKey(c => c.RegulatorOrganizationId)
+                .WillCascadeOnDelete(false);
+
+            Property(x => x.AssignedTo).IsOptional().HasMaxLength(50);
+
+            Property(x => x.IsEnabled).IsRequired();
+
+            Property(x => x.IsRemoved).IsRequired();
+
+            Property(x => x.CreationDateTimeUtc).IsRequired();
+
+            Property(x => x.LastModificationDateTimeUtc).IsOptional();
+
+            Property(x => x.LastModifierUserId).IsOptional();
         }
     }
 }

@@ -1,10 +1,5 @@
 ﻿using Linko.LinkoExchange.Core.Domain;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
@@ -14,9 +9,17 @@ namespace Linko.LinkoExchange.Data.Mapping
         {
             ToTable("tOrganizationType");
 
-            HasKey(i => i.OrganizationTypeId);
-            Property(i => i.Name);
-            Property(i => i.Description);
+            HasKey(x => x.OrganizationTypeId);
+
+            Property(x => x.Name).IsRequired().HasMaxLength(100);
+
+            Property(x => x.Description).IsOptional().HasMaxLength(500);
+
+            Property(x => x.CreationDateTimeUtc).IsRequired();
+
+            Property(x => x.LastModificationDateTimeUtc).IsOptional();
+
+            Property(x => x.LastModifierUserId).IsOptional();
         }
     }
 }

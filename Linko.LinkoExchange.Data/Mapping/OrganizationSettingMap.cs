@@ -1,10 +1,5 @@
 ﻿using Linko.LinkoExchange.Core.Domain;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
@@ -14,13 +9,25 @@ namespace Linko.LinkoExchange.Data.Mapping
         {
             ToTable("tOrganizationSetting");
 
-            this.HasKey(i => i.OrganizationSettingId);
-            Property(i => i.OrganizationId);
-            this.Property(i => i.Value);
-            this.Property(i => i.SettingTemplateId);
-            this.HasRequired(i => i.SettingTemplate)
-                .WithMany()
-                .HasForeignKey(i => i.SettingTemplateId);
+            HasKey(x => x.OrganizationSettingId);
+
+            HasRequired(a => a.Organization)
+                .WithMany(b => b.OrganizationSettings)
+                .HasForeignKey(c => c.OrganizationId)
+                .WillCascadeOnDelete(false);
+
+            HasRequired(a => a.SettingTemplate)
+                .WithMany(b => b.OrganizationSettings)
+                .HasForeignKey(c => c.SettingTemplateId)
+                .WillCascadeOnDelete(false);
+
+            Property(x => x.Value).IsRequired().HasMaxLength(500);
+
+            Property(x => x.CreationDateTimeUtc).IsRequired();
+
+            Property(x => x.LastModificationDateTimeUtc).IsOptional();
+
+            Property(x => x.LastModifierUserId).IsOptional();
         }
     }
 }

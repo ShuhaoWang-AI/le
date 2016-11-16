@@ -1,5 +1,5 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using Linko.LinkoExchange.Core.Domain;
+﻿using Linko.LinkoExchange.Core.Domain;
+using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
@@ -7,13 +7,19 @@ namespace Linko.LinkoExchange.Data.Mapping
     {
         public UserPasswordHistoryMap()
         {
-            ToTable("tUserPasswordHistory"); 
-             
-            HasKey(i => i.UserPasswordHistoryId); 
+            ToTable("tUserPasswordHistory");
 
-            Property(i => i.PasswordHash).HasMaxLength(value: 100);
-            Property(i => i.LastModificationDateTimeUtc);
-            Property(i => i.UserProfileId);
-        } 
-    } 
+            HasKey(x => x.UserPasswordHistoryId);
+
+            Property(x => x.PasswordHash).IsRequired();
+
+            Property(x => x.UserProfileId).IsRequired();
+            //HasRequired(a => a.UserProfile)
+            //    .WithMany()
+            //    .HasForeignKey(c => c.UserProfileId)
+            //    .WillCascadeOnDelete(false);
+
+            Property(x => x.LastModificationDateTimeUtc).IsRequired();
+        }
+    }
 }

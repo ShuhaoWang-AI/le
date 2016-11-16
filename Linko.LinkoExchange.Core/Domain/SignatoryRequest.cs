@@ -1,20 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
-    public class SignatoryRequest
+    /// <summary>
+    /// Represents the information related to a request for signatory. 
+    /// </summary>
+    public partial class SignatoryRequest
     {
-        [Key]
+        /// <summary>
+        /// Primary key.
+        /// </summary>
         public int SignatoryRequestId { get; set; }
-        public DateTime RequestDateTime { get; set; }
-        public DateTime GrantDenyDateTime { get; set; }
-        public DateTime RevokeDateTime { get; set; }
+
+        public DateTimeOffset RequestDateTimeUtc { get; set; }
+
+        /// <summary>
+        /// Signatory Status=Granted: it is the date and time the signatory right request is granted. 
+        /// Signatory Status=Denied: it is the date and time the signatory right request is denied.
+        /// </summary>
+        public DateTimeOffset GrantDenyDateTimeUtc { get; set; }
+
+        public DateTimeOffset RevokeDateTimeUtc { get; set; }
+
+        public int OrganizationRegulatoryProgramUserId { get; set; }
         public virtual OrganizationRegulatoryProgramUser OrganizationRegulatoryProgramUser { get; set; }
+
+        public int SignatoryRequestStatusId { get; set; }
         public virtual SignatoryRequestStatus SignatoryRequestStatus { get; set; }
     }
 }

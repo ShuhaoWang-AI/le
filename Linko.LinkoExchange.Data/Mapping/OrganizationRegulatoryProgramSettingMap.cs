@@ -1,10 +1,5 @@
 ﻿using Linko.LinkoExchange.Core.Domain;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
@@ -14,19 +9,25 @@ namespace Linko.LinkoExchange.Data.Mapping
         {
             ToTable("tOrganizationRegulatoryProgramSetting");
 
-            this.HasKey(i => i.OrganizationRegulatoryProgramSettingId);
-            this.Property(i => i.Value);
+            HasKey(x => x.OrganizationRegulatoryProgramSettingId);
 
-            this.Property(i => i.SettingTemplateId);
-            this.HasRequired(i => i.SettingTemplate)
-                .WithMany()
-                .HasForeignKey(i => i.SettingTemplateId);
+            HasRequired(a => a.OrganizationRegulatoryProgram)
+                .WithMany(b => b.OrganizationRegulatoryProgramSettings)
+                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
+                .WillCascadeOnDelete(false);
 
-            this.Property(i => i.OrganizationRegulatoryProgramId).HasColumnName("OrganizationRegulatoryProgramId");
-            this.HasRequired(i => i.OrganizationRegulatoryProgram)
-                .WithMany()
-                .HasForeignKey(i => i.OrganizationRegulatoryProgramId);
+            HasRequired(a => a.SettingTemplate)
+                .WithMany(b => b.OrganizationRegulatoryProgramSettings)
+                .HasForeignKey(c => c.SettingTemplateId)
+                .WillCascadeOnDelete(false);
 
+            Property(x => x.Value).IsRequired().HasMaxLength(500);
+
+            Property(x => x.CreationDateTimeUtc).IsRequired();
+
+            Property(x => x.LastModificationDateTimeUtc).IsOptional();
+
+            Property(x => x.LastModifierUserId).IsOptional();
         }
     }
 }

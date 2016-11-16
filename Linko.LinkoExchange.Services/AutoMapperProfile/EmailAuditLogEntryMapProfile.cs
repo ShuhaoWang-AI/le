@@ -11,7 +11,10 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
     {
         public EmailAuditLogEntryMapProfile()
         {
-            CreateMap<EmailAuditLogEntryDto, EmailAuditLog>(); 
+            CreateMap<EmailAuditLogEntryDto, EmailAuditLog>()
+                .ForMember(d => d.AuditLogTemplate, o => o.Ignore());
+
+
             CreateMap<EmailAuditLog, EmailAuditLogEntryDto>(); 
         }  
     } 

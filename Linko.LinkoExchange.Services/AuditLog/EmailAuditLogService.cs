@@ -31,7 +31,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
             var emailLogEntry = AutoMapper.Mapper.Map<EmailAuditLog>(emailLogEntryDto);
             emailLogEntry.Token = _requestCache.GetValue(CacheKey.Token) as string;
 
-            this._dbContext.EmailAuditLog.Add(emailLogEntry);
+            this._dbContext.EmailAuditLogs.Add(emailLogEntry);
             this._dbContext.SaveChanges();
         }
     }

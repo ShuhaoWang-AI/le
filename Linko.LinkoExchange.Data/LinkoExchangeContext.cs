@@ -1,9 +1,9 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 using Linko.LinkoExchange.Core.Domain;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Reflection;
 using System.Linq;
-using System;
 using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data
@@ -18,46 +18,46 @@ namespace Linko.LinkoExchange.Data
 
         }
 
-        //public static LinkoExchangeContext Create()
-        //{
-        //    return new LinkoExchangeContext ();
-        //}
-
-
         #endregion
 
-        public virtual DbContextTransaction BeginTransaction()
-        {
-            return Database.BeginTransaction();
-        }
 
-        #region DBSets
-        public DbSet<AuditLogTemplate> AuditLogTemplates { set; get; }
-        public DbSet<EmailAuditLog> EmailAuditLog { set; get; }
+        #region DbSets
+
+        public DbSet<AuditLogTemplate> AuditLogTemplates { get; set; }
+        public DbSet<CromerrAuditLog> CromerrAuditLogs { get; set; }
+        public DbSet<EmailAuditLog> EmailAuditLogs { get; set; }
         public DbSet<Invitation> Invitations { get; set; }
-        public DbSet<EmailTemplate> EmailTemplates { get; set; }
+        public DbSet<Jurisdiction> Jurisdictions { get; set; }
+        public DbSet<Core.Domain.Module> Modules { get; set; }
         public DbSet<Organization> Organizations { get; set; }
-         
-//        public DbSet<UserProfile> UserProfiles { get; set; } 
-
-        public virtual DbSet<UserPasswordHistory> UserPasswordHistories { get; set; }
+        public DbSet<OrganizationRegulatoryProgram> OrganizationRegulatoryPrograms { get; set; }
+        public DbSet<OrganizationRegulatoryProgramModule> OrganizationRegulatoryProgramModules { get; set; }
+        public DbSet<OrganizationRegulatoryProgramSetting> OrganizationRegulatoryProgramSettings { get; set; }
         public DbSet<OrganizationRegulatoryProgramUser> OrganizationRegulatoryProgramUsers { get; set; }
-        public DbSet<UserQuestionAnswer> UserQuestionAnswers { get; set; }
+        public DbSet<OrganizationSetting> OrganizationSettings { get; set; }
+        public DbSet<OrganizationType> OrganizationTypes { get; set; }
+        public DbSet<OrganizationTypeRegulatoryProgram> OrganizationTypeRegulatoryPrograms { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<PermissionGroup> PermissionGroups { get; set; }
+        public DbSet<PermissionGroupPermission> PermissionGroupPermissions { get; set; }
+        public DbSet<PermissionGroupTemplate> PermissionGroupTemplates { get; set; }
+        public DbSet<PermissionGroupTemplatePermission> PermissionGroupTemplatePermissions { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<QuestionType> QuestionTypes { get; set; }
-        public DbSet<PermissionGroup> PermissionGroups { get; set; }
-        public DbSet<OrganizationRegulatoryProgram> OrganizationRegulatoryPrograms { get; set; }
-        public DbSet<OrganizationRegulatoryProgramSetting> OrganizationRegulatoryProgramSettings { get; set; }
-        public DbSet<OrganizationSetting> OrganizationSettings { get; set; }
-        public DbSet<Jurisdiction> Jurisdictions { get; set; }
+        public DbSet<RegulatoryProgram> RegulatoryPrograms { get; set; }
         public DbSet<SettingTemplate> SettingTemplates { get; set; }
-
+        public DbSet<SignatoryRequest> SignatoryRequests { get; set; }
+        public DbSet<SignatoryRequestStatus> SignatoryRequestStatuses { get; set; }
+        public DbSet<SystemSetting> SystemSettings { get; set; }
         public DbSet<Core.Domain.TimeZone> TimeZones { get; set; }
+        public DbSet<UserPasswordHistory> UserPasswordHistories { get; set; }
+        public DbSet<UserQuestionAnswer> UserQuestionAnswers { get; set; }
 
         #endregion
 
 
         #region utilities
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             var typesToRegister = Assembly.GetExecutingAssembly().GetTypes()
@@ -72,7 +72,12 @@ namespace Linko.LinkoExchange.Data
 
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<UserProfile>().ToTable("tUserProfile"); 
+            modelBuilder.Entity<UserProfile>().ToTable("tUserProfile");
+        }
+
+        public virtual DbContextTransaction BeginTransaction()
+        {
+            return Database.BeginTransaction();
         }
 
         public void Commit(DbContextTransaction transaction)
@@ -86,6 +91,7 @@ namespace Linko.LinkoExchange.Data
             if (transaction != null)
                 transaction.Commit();
         }
+
         #endregion
     }
 }

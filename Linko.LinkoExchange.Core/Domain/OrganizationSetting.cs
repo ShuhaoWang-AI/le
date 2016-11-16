@@ -1,19 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
-    public class OrganizationSetting
+    /// <summary>
+    /// Represents a setting for a particular organization.
+    /// </summary>
+    public partial class OrganizationSetting
     {
-        [Key]
-        public int OrganizationSettingId { get; set;}
-        public int OrganizationId { get; set;}
+        /// <summary>
+        /// Primary key.
+        /// </summary>
+        public int OrganizationSettingId { get; set; }
+
+        public int OrganizationId { get; set; }
+        public virtual Organization Organization { get; set; }
+
         public int SettingTemplateId { get; set; }
-        public virtual SettingTemplate SettingTemplate { get; set;}
-        public string Value { get; set;}
+        public virtual SettingTemplate SettingTemplate { get; set; }
+
+        public string Value { get; set; }
+
+        public DateTimeOffset CreationDateTimeUtc { get; set; }
+
+        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
+
+        public int? LastModifierUserId { get; set; }
     }
 }

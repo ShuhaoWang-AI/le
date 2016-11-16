@@ -9,10 +9,10 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
         public OrganizationRegulatoryProgramMapProfile()
         {
             CreateMap<Core.Domain.OrganizationRegulatoryProgram, OrganizationRegulatoryProgramDto>()
-                .ForMember(i => i.RegulatoryProgramDto, o => o.MapFrom(s => s.RegulatoryProgram))
-                .ForMember(i => i.OrganizationDto, o => o.MapFrom(s => s.Organization))
-                .ForMember(i => i.HasSignatory, o => o.Ignore())
-                .ForMember(i => i.HasAdmin, o => o.Ignore())
+                .ForMember(d => d.RegulatoryProgramDto, o => o.MapFrom(s => s.RegulatoryProgram))
+                .ForMember(d => d.OrganizationDto, o => o.MapFrom(s => s.Organization))
+                .ForMember(d => d.HasSignatory, o => o.Ignore())
+                .ForMember(d => d.HasAdmin, o => o.Ignore())
             .ReverseMap();
 
         }

@@ -1,56 +1,42 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
-    public class AuditLogTemplate
+
+    /// <summary>
+    /// Represents a message template for an audit log.
+    /// </summary>
+    public partial class AuditLogTemplate
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int AuditLogTemplateId
-        {
-            get;set;
-        }
-        
-        public string Name
-        {
-            get;set;
-        }
-        public string TemplateType
-        {
-            get;set;
-        }
+        /// <summary>
+        /// Primary key.
+        /// </summary>
+        public int AuditLogTemplateId { get; set; }
 
-        public string EventCategory
-        {
-            get;set;
-        }
+        /// <summary>
+        /// Format: TemplateType_EventCategory_EventType. 
+        /// It exists to assist the business layer to refer a single row because there are many non-existent combination of the three values.
+        /// </summary>
+        public string Name { get; set; }
 
-        public string EventType
-        {
-            get;set;
-        }
+        public string TemplateType { get; set; }
 
-        public string SubjectTemplate
-        {
-            get;set;
-        }
+        public string EventCategory { get; set; }
 
-        public string MessageTemplate
-        {
-            set;get;
-        } 
+        public string EventType { get; set; }
 
-        public DateTimeOffset CreationDateTimeUtc
-        {
-            get; set; 
-            
-        }
+        /// <summary>
+        /// Used by Email TemplateType.
+        /// </summary>
+        public string SubjectTemplate { get; set; }
 
-        public DateTimeOffset? LastModificationDateTimeUtc
-        {
-            get; set;
-        }
+        public string MessageTemplate { get; set; }
+
+        public DateTimeOffset CreationDateTimeUtc { get; set; }
+
+        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
     }
+
 }

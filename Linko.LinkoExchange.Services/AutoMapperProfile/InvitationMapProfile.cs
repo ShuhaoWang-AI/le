@@ -8,9 +8,11 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
         public InvitationMapProfile()
         {
             CreateMap<Core.Domain.Invitation, InvitationDto>()
-                .ForMember(i => i.ExpiryDateTimeUtc, o => o.Ignore());
+                .ForMember(d => d.ExpiryDateTimeUtc, o => o.Ignore());
 
-            CreateMap<InvitationDto, Core.Domain.Invitation>();
+            CreateMap<InvitationDto, Core.Domain.Invitation>()
+                .ForMember(d => d.SenderOrganizationRegulatoryProgram, o => o.Ignore())
+                .ForMember(d => d.RecipientOrganizationRegulatoryProgram, o => o.Ignore());
         }
     }
 }

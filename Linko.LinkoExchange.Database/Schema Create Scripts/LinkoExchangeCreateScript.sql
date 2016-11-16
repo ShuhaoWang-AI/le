@@ -190,7 +190,7 @@ BEGIN
         , FirstName                     varchar(50) NOT NULL  
         , LastName                      varchar(50) NOT NULL  
         , TitleRole                     varchar(250) NULL  
-        , BusinessName                  varchar(100) NULL  
+        , BusinessName                  varchar(100) NOT NULL  
         , AddressLine1                  varchar(100) NOT NULL  
         , AddressLine2                  varchar(100) NULL  
         , CityName                      varchar(100) NOT NULL  
@@ -209,7 +209,7 @@ BEGIN
         , EmailConfirmed                bit NOT NULL  
         , PasswordHash                  nvarchar(max) NULL  
         , SecurityStamp                 nvarchar(max) NULL
-        , PhoneNumber                   nvarchar(max) NULL  
+        , PhoneNumber                   nvarchar(max) NOT NULL  
         , PhoneNumberConfirmed          bit NOT NULL  
         , TwoFactorEnabled              bit NOT NULL  
         , LockoutEndDateUtc             datetime NULL  
@@ -260,7 +260,7 @@ BEGIN
         , AddressLine2                  varchar(100) NULL  
         , CityName                      varchar(100) NOT NULL  
         , ZipCode                       varchar(50) NOT NULL  
-        , JurisdictionId                int NULL  
+        , JurisdictionId                int NOT NULL  
         , PhoneNumber                   varchar(25) NULL  
         , PhoneExt                      int NULL  
         , FaxNumber                     varchar(25) NULL  
@@ -1032,7 +1032,8 @@ BEGIN
         , AuditLogTemplateId        int NOT NULL  
         , RegulatoryProgramId       int NULL  
         , OrganizationId            int NULL  
-        , RegulatorOrganizationId   int NULL  
+        , RegulatorOrganizationId   int NULL
+		, UserProfileId				int NULL  
         , UserName                  nvarchar(256) NOT NULL  
         , UserFirstName             varchar(50) NULL  
         , UserLastName              varchar(50) NULL  

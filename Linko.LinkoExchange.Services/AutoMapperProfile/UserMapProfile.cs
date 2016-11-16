@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Dto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services.AutoMapperProfile
 {
@@ -16,7 +11,6 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
             CreateMap<UserProfile, UserDto>()
                .ForMember(d => d.Password, o => o.Ignore())
                .ForMember(d => d.AgreeTermsAndConditions, o => o.Ignore());
-            //.ReverseMap();
 
             CreateMap<UserDto, UserProfile>()
                 .ForMember(d => d.FirstName, o => o.MapFrom(s => s.FirstName))
@@ -27,7 +21,7 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
                 .ForMember(d => d.AddressLine2, o => o.MapFrom(s => s.AddressLine2))
                 .ForMember(d => d.CityName, o => o.MapFrom(s => s.CityName))
                 .ForMember(d => d.ZipCode, o => o.MapFrom(s => s.ZipCode))
-                .ForAllOtherMembers(opts => opts.Ignore());
+                .ForAllOtherMembers(o => o.Ignore());
 
         }
     }

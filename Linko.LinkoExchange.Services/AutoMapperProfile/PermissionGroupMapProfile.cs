@@ -9,7 +9,10 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
         public PermissionGroupMapProfile()
         {
             CreateMap<PermissionGroupDto, PermissionGroup>()
-                .ForMember(i => i.OrganizationRegulatoryProgram, o => o.Ignore())
+                .ForMember(d => d.OrganizationRegulatoryProgram, o => o.Ignore())
+                .ForMember(d => d.LastModifierUserId, o => o.Ignore())
+                .ForMember(d => d.OrganizationRegulatoryProgramUsers, o => o.Ignore())
+                .ForMember(d => d.PermissionGroupPermissions, o => o.Ignore())
                 .ReverseMap(); 
         }
     }

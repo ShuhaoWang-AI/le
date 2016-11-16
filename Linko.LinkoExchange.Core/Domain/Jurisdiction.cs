@@ -1,21 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
-    public class Jurisdiction
+    /// <summary>
+    /// Represents a jurisdiction, which can be a state, a province or a country.
+    /// </summary>
+    public partial class Jurisdiction
     {
-        [Key]
+        /// <summary>
+        /// Primary key.
+        /// </summary>
         public int JurisdictionId { get; set; }
-        public int CountryId { get; set; }
-        public int StateId { get; set; }
-        public string Code { get; set; }
-        public string Name { get; set; }
-        public int ParentId { get; set; }
 
+        /// <summary>
+        /// A JurisdictionId that represents the country.
+        /// </summary>
+        public int CountryId { get; set; }
+
+        /// <summary>
+        /// A JurisdictionId that represents the state.
+        /// </summary>
+        public int StateId { get; set; }
+
+        public string Code { get; set; }
+
+        public string Name { get; set; }
+
+        public int? ParentId { get; set; }
+
+        public DateTimeOffset CreationDateTimeUtc { get; set; }
+
+        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
+
+        public int? LastModifierUserId { get; set; }
     }
 }

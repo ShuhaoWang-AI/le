@@ -54,17 +54,17 @@ namespace Linko.LinkoExchange.Services.Dto
             get; set;
         }
 
+        public int? RecipientRegulatoryProgramId
+        {
+            get; set;
+        }
+
         public int? RecipientOrganizationId
         {
             get; set;
         }
 
         public int? RecipientRegulatorOrganizationId
-        {
-            get; set;
-        }
-
-        public int? RecipientRegulatoryProgramId
         {
             get; set;
         }
@@ -98,14 +98,15 @@ namespace Linko.LinkoExchange.Services.Dto
         {
             get; set;
         }
-        public DateTimeOffset SentDateTimeUtc
-        {
-            get; set;
-        }
 
         public string Token
         {
             get;set;
+        }
+
+        public DateTimeOffset SentDateTimeUtc
+        {
+            get; set;
         }
     }
 }

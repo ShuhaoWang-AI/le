@@ -126,7 +126,7 @@
     <Compile Include="AutoMapperProfile\InvitationMapProfile.cs" />
     <Compile Include="AutoMapperProfile\OrganizationMapProfile.cs" />
     <Compile Include="AutoMapperProfile\OrganizationRegulatoryProgramMapProfile.cs" />
-    <Compile Include="AutoMapperProfile\OrganziationRegulatoryProgramUserDtoMapProfile.cs" />
+    <Compile Include="AutoMapperProfile\OrganizationRegulatoryProgramUserMapProfile.cs" />
     <Compile Include="AutoMapperProfile\RegulatoryProgramMapperProfile.cs" />
     <Compile Include="AutoMapperProfile\SettingMapProfile.cs" />
     <Compile Include="AutoMapperProfile\UserMapProfile.cs" />
