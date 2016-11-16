@@ -100,8 +100,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
             var userProfileId = int.Parse(profileIdStr);
 
-            var pristineUser = GetUserViewModel(userProfileId);
-            pristineUser.UserProfile = model.UserProfile;
+            var pristineUser = GetUserViewModel(userProfileId); 
             pristineUser.UserProfile.StateList = GetStateList();
 
             if (part == "Profile")
