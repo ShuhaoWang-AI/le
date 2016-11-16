@@ -430,11 +430,14 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
                     if (questionType == Dto.QuestionType.Security)
                     {
-                        //Encrypt answer
-                        foundQA.Content = _encryption.DecryptString(foundQA.Content);
+                        //Decrypt answer
+                        newQADto.Answer.Content = _encryption.DecryptString(foundQA.Content);
+                    }
+                    else
+                    {
+                        newQADto.Answer.Content = foundQA.Content;
                     }
 
-                    newQADto.Answer.Content = foundQA.Content;
                     newQADto.Question.QuestionId = foundQA.Question.QuestionId;
                     newQADto.Question.IsActive = foundQA.Question.IsActive;
                     newQADto.Question.QuestionType = (Dto.QuestionType)foundQA.Question.QuestionTypeId;
