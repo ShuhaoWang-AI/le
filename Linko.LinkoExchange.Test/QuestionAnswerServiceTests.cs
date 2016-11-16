@@ -193,9 +193,11 @@ namespace Linko.LinkoExchange.Test
 
 
         [TestMethod]
-        public void GetQuestions_Test()
+        public void ConfirmCorrectKBQAnswer_Test()
         {
-            var result = _questionAnswerService.ConfirmCorrectAnswer(15, "NEW ANSWer 1");
+            var result = _questionAnswerService.ConfirmCorrectAnswer(15, "NeW aNSWer 1");
+
+            Assert.IsTrue(result);
         }
 
     }

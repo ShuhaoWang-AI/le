@@ -129,6 +129,7 @@
     <Compile Include="AutoMapperProfile\OrganizationRegulatoryProgramUserMapProfile.cs" />
     <Compile Include="AutoMapperProfile\RegulatoryProgramMapperProfile.cs" />
     <Compile Include="AutoMapperProfile\SettingMapProfile.cs" />
+    <Compile Include="AutoMapperProfile\TimeZoneMapProfile.cs" />
     <Compile Include="AutoMapperProfile\UserMapProfile.cs" />
     <Compile Include="Cache\CacheKey.cs" />
     <Compile Include="Cache\ISessionCache.cs" />
@@ -154,6 +155,7 @@
     <Compile Include="Dto\QuestionAnswerDtos.cs" />
     <Compile Include="Dto\RegistrationResultDto.cs" />
     <Compile Include="Dto\SettingDto.cs" />
+    <Compile Include="Dto\TimeZoneDto.cs" />
     <Compile Include="Email\IEmailService.cs" />
     <Compile Include="Email\EmailService.cs" />
     <Compile Include="Dto\UserDto.cs" />

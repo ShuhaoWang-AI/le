@@ -130,6 +130,7 @@ namespace Linko.LinkoExchange.Web
                 cfg.AddProfile(new QuestionAnswerPairViewModelProfile());
                 cfg.AddProfile(new AnswerViewModelProfile());
                 cfg.AddProfile(new QuestionViewModelProfile());
+                cfg.AddProfile(new TimeZoneMapProfile());
             });
 
             //Make sure there no methods were missing in the mappings loaded above via profiles
