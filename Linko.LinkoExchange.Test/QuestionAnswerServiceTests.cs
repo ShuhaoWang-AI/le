@@ -143,10 +143,10 @@ namespace Linko.LinkoExchange.Test
         public void CreateOrUpdateQuestionAnswerPairs_KBQ_Only_SomeDirtySomeClean_NoDuplicates_Test()
         {
             var qAndAs = new List<AnswerDto>();
-            var a1 = new AnswerDto() { UserQuestionAnswerId = 15, QuestionId = 4, Content = "New answer 1" };
-            var a2 = new AnswerDto() { UserQuestionAnswerId = 16, QuestionId = 5, Content = "New answer 2" };
-            var a3 = new AnswerDto() { UserQuestionAnswerId = 8, QuestionId = 6, Content = "AEFWE9YatSU7u5fxOhKxYmD5MPXU38Jzvx2fekf+4S0SM3rJg4hbYZa2/eE/hf2pyw==" };
-            var a4 = new AnswerDto() { UserQuestionAnswerId = 9, QuestionId = 7, Content = "AOXH+5TNf1zZIT8rJvbCqwVqDx3z2kbOssWb68035X/2eflFjxs3ceIR4ENGEoHCjw==" };
+            var a1 = new AnswerDto() { UserQuestionAnswerId = 49, QuestionId = 8, Content = "New answer 1" };
+            var a2 = new AnswerDto() { UserQuestionAnswerId = 50, QuestionId = 20, Content = "New answer 2" };
+            var a3 = new AnswerDto() { UserQuestionAnswerId = 51, QuestionId = 21, Content = "JcW2LFIrvNo7AIF13kWOG4Tbo3781pYr42DEsEX+8Hl9zx2zhGkE7goRceMe1+eNcmjZVuwznkiDgZLzyvGwgoF+4K0wTGbrvAVsV+6RB0EM+UkO0JnTY9TCh096SQ4h" };
+            var a4 = new AnswerDto() { UserQuestionAnswerId = 52, QuestionId = 5, Content = "ABT8jI4kSpK7I5mSPBl1jzkKD+FM/Sj44JKmUSRibf+cKA5kAcYVByyGGTFbCQ5sJA==" };
             qAndAs.Add(a1);
             qAndAs.Add(a2);
             qAndAs.Add(a3);
@@ -161,10 +161,10 @@ namespace Linko.LinkoExchange.Test
         public void CreateOrUpdateQuestionAnswerPairs_KBQ_Only_SomeDirtySomeClean_WithDuplicates_Test()
         {
             var qAndAs = new List<AnswerDto>();
-            var a1 = new AnswerDto() { UserQuestionAnswerId = 15, QuestionId = 8, Content = "Same answer" };
-            var a2 = new AnswerDto() { UserQuestionAnswerId = 16, QuestionId = 20, Content = "Same answer" };
-            var a3 = new AnswerDto() { UserQuestionAnswerId = 8, QuestionId = 21, Content = "AEFWE9YatSU7u5fxOhKxYmD5MPXU38Jzvx2fekf+4S0SM3rJg4hbYZa2/eE/hf2pyw==" };
-            var a4 = new AnswerDto() { UserQuestionAnswerId = 9, QuestionId = 5, Content = "AOXH+5TNf1zZIT8rJvbCqwVqDx3z2kbOssWb68035X/2eflFjxs3ceIR4ENGEoHCjw==" };
+            var a1 = new AnswerDto() { UserQuestionAnswerId = 44, QuestionId = 8, Content = "Same answer" };
+            var a2 = new AnswerDto() { UserQuestionAnswerId = 45, QuestionId = 20, Content = "Same answer" };
+            var a3 = new AnswerDto() { UserQuestionAnswerId = 46, QuestionId = 21, Content = "AEFWE9YatSU7u5fxOhKxYmD5MPXU38Jzvx2fekf+4S0SM3rJg4hbYZa2/eE/hf2pyw==" };
+            var a4 = new AnswerDto() { UserQuestionAnswerId = 47, QuestionId = 5, Content = "AOXH+5TNf1zZIT8rJvbCqwVqDx3z2kbOssWb68035X/2eflFjxs3ceIR4ENGEoHCjw==" };
             qAndAs.Add(a1);
             qAndAs.Add(a2);
             qAndAs.Add(a3);
@@ -197,10 +197,10 @@ namespace Linko.LinkoExchange.Test
         public void CreateOrUpdateQuestionAnswerPairs_AllNew_WithDuplicates_Test()
         {
             var qAndAs = new List<AnswerDto>();
-            var a1 = new AnswerDto() { UserQuestionAnswerId = 15, QuestionId = 8, Content = "New answer 1" };
-            var a2 = new AnswerDto() { UserQuestionAnswerId = 16, QuestionId = 20, Content = "New answer 1" };
-            var a3 = new AnswerDto() { UserQuestionAnswerId = 8, QuestionId = 21, Content = "New answer 3" };
-            var a4 = new AnswerDto() { UserQuestionAnswerId = 9, QuestionId = 5, Content = "New answer 4" };
+            var a1 = new AnswerDto() { UserQuestionAnswerId = 44, QuestionId = 8, Content = "New answer 1" };
+            var a2 = new AnswerDto() { UserQuestionAnswerId = 45, QuestionId = 20, Content = "New answer 1" };
+            var a3 = new AnswerDto() { UserQuestionAnswerId = 46, QuestionId = 21, Content = "New answer 3" };
+            var a4 = new AnswerDto() { UserQuestionAnswerId = 47, QuestionId = 5, Content = "New answer 4" };
             qAndAs.Add(a1);
             qAndAs.Add(a2);
             qAndAs.Add(a3);
@@ -215,7 +215,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void ConfirmCorrectKBQAnswer_Test()
         {
-            var result = _questionAnswerService.ConfirmCorrectAnswer(15, "NeW aNSWer 1");
+            var result = _questionAnswerService.ConfirmCorrectAnswer(44, "NeW aNSWer 1");
 
             Assert.IsTrue(result);
         }
