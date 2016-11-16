@@ -15,6 +15,9 @@ using Linko.LinkoExchange.Services.TimeZone;
 using Microsoft.AspNet.Identity;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.QuestionAnswer;
+using System.Data.Entity.Validation;
+using Linko.LinkoExchange.Core.Validation;
+using System.Data.Entity.Infrastructure;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -491,7 +494,33 @@ namespace Linko.LinkoExchange.Services.User
                 };
 
             user.IsAccountLocked = isAttemptingLock;
-            _dbContext.SaveChanges();
+
+            try {
+                _dbContext.SaveChanges();
+
+            }
+            catch (DbEntityValidationException ex)
+            {
+                List<RuleViolation> validationIssues = new List<RuleViolation>();
+                foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                {
+                    DbEntityEntry entry = item.Entry;
+                    string entityTypeName = entry.Entity.GetType().Name;
+
+                    foreach (DbValidationError subItem in item.ValidationErrors)
+                    {
+                        string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                        validationIssues.Add(new RuleViolation(string.Empty, null, message));
+
+                    }
+                }
+                throw new RuleViolationException("Validation errors", validationIssues);
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
 
             if (isAttemptingLock)
                 SendAccountLockoutEmails(user, isForFailedKBQs);

@@ -27,6 +27,7 @@ namespace Linko.LinkoExchange.Test
         Mock<ISettingService> _settings = new Mock<ISettingService>();
         Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
         Mock<IEmailService> _emailService = new Mock<IEmailService>();
+        private IPasswordHasher _passwordHasher;
 
         public QuestionAnswerServiceTests()
         {
@@ -42,6 +43,12 @@ namespace Linko.LinkoExchange.Test
         [TestInitialize]
         public void Initialize()
         {
+
+            Dictionary<SystemSettingType, string> globalSettings = new Dictionary<SystemSettingType, string>();
+            globalSettings.Add(SystemSettingType.SupportPhoneNumber, "555-555-5555");
+            globalSettings.Add(SystemSettingType.SupportEmailAddress, "test@test.com");
+            _settings.Setup(s => s.GetGlobalSettings()).Returns(globalSettings);
+
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             _questionAnswerService = new QuestionAnswerService(new LinkoExchangeContext(connectionString),
                                                                new EmailAuditLogEntryDto(),
@@ -53,6 +60,7 @@ namespace Linko.LinkoExchange.Test
                                                                _emailService.Object
                                                                );
             _encrypter = new EncryptionService();
+            _passwordHasher = new PasswordHasher();
         }
 
         [TestMethod]
@@ -98,11 +106,23 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void EncryptDecryptTest()
         {
-            var answer = "Test answer";
-            var encryptedString = _encrypter.EncryptString(answer);
+            var answer = "Second test answer";
+            answer = answer.Trim();
+            var encryptedString = _encrypter.EncryptString(answer.Trim());
             var deccryptedString = _encrypter.DecryptString(encryptedString);
 
             Assert.AreEqual(answer, deccryptedString);
+        }
+
+        [TestMethod]
+        public void StringHashTest()
+        {
+            var answer = "Hash tHiS answer";
+            answer = answer.Trim().ToLower();
+            var hashedString = _passwordHasher.HashPassword(answer);
+            var result = _passwordHasher.VerifyHashedPassword(hashedString, answer);
+
+            Assert.AreEqual(result, PasswordVerificationResult.Success);
         }
 
         [TestMethod]
@@ -116,7 +136,7 @@ namespace Linko.LinkoExchange.Test
 
             var result = _questionAnswerService.CreateOrUpdateUserQuestionAnswers(1, qAndAs);
 
-            Assert.AreEqual(result, false);
+            Assert.AreEqual(result, CreateOrUpdateAnswersResult.DuplicateAnswersInNew);
         }
 
         [TestMethod]
