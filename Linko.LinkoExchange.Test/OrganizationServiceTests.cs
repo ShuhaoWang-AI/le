@@ -119,6 +119,11 @@ namespace Linko.LinkoExchange.Test
             string authorityListString = orgService.GetUserAuthorityListForEmailContent(1);
         }
 
+        [TestMethod]
+        public void GetOrganizationRegulatoryProgram()
+        {
+            var result = orgService.GetOrganizationRegulatoryProgram(1);
+        }
 
     }
 }
