@@ -120,17 +120,57 @@ namespace Linko.LinkoExchange.Services.Settings
 
         public void CreateOrUpdateProgramSettings(ProgramSettingDto settingDtos)
         {
-            foreach (var settingDto in settingDtos.Settings)
+            var transaction = _dbContext.BeginTransaction();
+            try
             {
-                CreateOrUpdateProgramSetting(settingDtos.OrgRegProgId, settingDto);
+                foreach (var settingDto in settingDtos.Settings)
+                {
+                    CreateOrUpdateProgramSetting(settingDtos.OrgRegProgId, settingDto);
+                }
+
+                transaction.Commit();
+            }
+            catch (RuleViolationException rve)
+            {
+                transaction.Rollback();
+                throw rve;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw ex;
+            }
+            finally
+            {
+                transaction.Dispose();
             }
         }
 
         public void CreateOrUpdateProgramSettings(int orgRegProgId, IEnumerable<SettingDto> settingDtos)
         {
-            foreach (var settingDto in settingDtos)
+            var transaction = _dbContext.BeginTransaction();
+            try
             {
-                CreateOrUpdateProgramSetting(orgRegProgId, settingDto);
+                foreach (var settingDto in settingDtos)
+                {
+                    CreateOrUpdateProgramSetting(orgRegProgId, settingDto);
+                }
+
+                transaction.Commit();
+            }
+            catch (RuleViolationException rve)
+            {
+                transaction.Rollback();
+                throw rve;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw ex;
+            }
+            finally
+            {
+                transaction.Dispose();
             }
         }
         public void CreateOrUpdateProgramSetting(int orgRegProgId, SettingDto settingDto)
@@ -154,23 +194,73 @@ namespace Linko.LinkoExchange.Services.Settings
                 newSetting.Value = settingDto.Value;
                 _dbContext.OrganizationRegulatoryProgramSettings.Add(newSetting);
             }
-
-            _dbContext.SaveChanges();
+            try
+            {
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                string msg = string.Format("Cannot create/update program setting '{0}' to '{1}'", settingDto.TemplateName.ToString(), settingDto.Value);
+                var violations = new List<RuleViolation>() { new RuleViolation(settingDto.TemplateName.ToString(), settingDto.Value, msg) };
+                throw new RuleViolationException(msg, violations);
+            }
         }
         public void CreateOrUpdateOrganizationSettings(OrganizationSettingDto settingDtos)
         {
-            foreach (var settingDto in settingDtos.Settings)
+            var transaction = _dbContext.BeginTransaction();
+            try
             {
-                CreateOrUpdateOrganizationSetting(settingDtos.OrganizationId, settingDto);
+                foreach (var settingDto in settingDtos.Settings)
+                {
+                    CreateOrUpdateOrganizationSetting(settingDtos.OrganizationId, settingDto);
+                }
+
+                transaction.Commit();
+            }
+            catch (RuleViolationException rve)
+            {
+                transaction.Rollback();
+                throw rve;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw ex;
+            }
+            finally
+            {
+                transaction.Dispose();
             }
         }
+
         public void CreateOrUpdateOrganizationSettings(int organizationId, IEnumerable<SettingDto> settingDtos)
         {
-            foreach (var settingDto in settingDtos)
+            var transaction = _dbContext.BeginTransaction();
+            try
             {
-                CreateOrUpdateOrganizationSetting(organizationId, settingDto);
+                foreach (var settingDto in settingDtos)
+                {
+                    CreateOrUpdateOrganizationSetting(organizationId, settingDto);
+                }
+
+                transaction.Commit();
+            }
+            catch (RuleViolationException rve)
+            {
+                transaction.Rollback();
+                throw rve;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw ex;
+            }
+            finally
+            {
+                transaction.Dispose();
             }
         }
+
         public void CreateOrUpdateOrganizationSetting(int organizationId, SettingDto settingDto)
         {
             var existingSetting = _dbContext.OrganizationSettings
@@ -193,7 +283,16 @@ namespace Linko.LinkoExchange.Services.Settings
                 _dbContext.OrganizationSettings.Add(newSetting);
             }
 
-            _dbContext.SaveChanges();
+            try
+            {
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                string msg = string.Format("Cannot create/update program setting '{0}' to '{1}'", settingDto.TemplateName.ToString(), settingDto.Value);
+                var violations = new List<RuleViolation>() { new RuleViolation(settingDto.TemplateName.ToString(), settingDto.Value, msg) };
+                throw new RuleViolationException(msg, violations);
+            }
         }
   
 	    public int PasswordLockoutHours()

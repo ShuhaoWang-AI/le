@@ -8,6 +8,7 @@ using Linko.LinkoExchange.Services.Dto;
 using System.Collections.Generic;
 using System.Configuration;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Validation;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -59,6 +60,21 @@ namespace Linko.LinkoExchange.Test
             settings.Settings = new List<SettingDto>();
             settings.Settings.Add(new SettingDto() { TemplateName = SettingType.FailedKBQAttemptMaxCount, Value = "10" });
             settings.Settings.Add(new SettingDto() { TemplateName = SettingType.FailedPasswordAttemptMaxCount, Value = "31" });
+            settings.Settings.Add(new SettingDto() { TemplateName = SettingType.EmailContactInfoEmailAddress, Value = "test@test.com" });
+
+            _settingService.CreateOrUpdateProgramSettings(settings);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(RuleViolationException))]
+        public void CreateOrUpdateProgramSettings_Atomic_Rollback_Test()
+        {
+            var settings = new ProgramSettingDto() { OrgRegProgId = 1 };
+            settings.Settings = new List<SettingDto>();
+            settings.Settings.Add(new SettingDto() { TemplateName = SettingType.FailedKBQAttemptMaxCount, Value = "10" });
+            settings.Settings.Add(new SettingDto() { TemplateName = SettingType.FailedPasswordAttemptMaxCount, Value = "31" });
+            settings.Settings.Add(new SettingDto() { TemplateName = SettingType.EmailContactInfoEmailAddress, Value = null });
+
             _settingService.CreateOrUpdateProgramSettings(settings);
         }
 
@@ -69,6 +85,18 @@ namespace Linko.LinkoExchange.Test
             settings.Settings = new List<SettingDto>();
             settings.Settings.Add(new SettingDto() { TemplateName = SettingType.TimeZone, Value = "2" });
             settings.Settings.Add(new SettingDto() { TemplateName = SettingType.FailedPasswordAttemptMaxCount, Value = "5" });
+            _settingService.CreateOrUpdateOrganizationSettings(settings);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(RuleViolationException))]
+        public void CreateOrUpdateOrganizationSettings_Atomic_Rollback_Test()
+        {
+            var settings = new OrganizationSettingDto() { OrganizationId = 1001 };
+            settings.Settings = new List<SettingDto>();
+            settings.Settings.Add(new SettingDto() { TemplateName = SettingType.TimeZone, Value = "2" });
+            settings.Settings.Add(new SettingDto() { TemplateName = SettingType.FailedPasswordAttemptMaxCount, Value = "5" });
+            settings.Settings.Add(new SettingDto() { TemplateName = SettingType.EmailContactInfoEmailAddress, Value = null });
             _settingService.CreateOrUpdateOrganizationSettings(settings);
         }
 
