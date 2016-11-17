@@ -317,7 +317,7 @@
                        })
                         </div>
 
-                        @Html.ActionLink("Change", "ChangePassword", "Account")
+                        @Html.ActionLink("Change", "ChangeEmail", "Account")
                     </div>
 
                     <!-- Line 10 UserName -->
@@ -360,7 +360,7 @@
             </section>@*.box-body*@
             <div class="box-footer">
                 <div class="form-group">
-                    <div class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
+                    <div id="profileEditBtn" class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
                     <input id="profileSubmit" type="submit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right" />
                 </div>
             </div><!-- box-footer -->
@@ -454,7 +454,7 @@
                        {
                            htmlAttributes = new
                            {
-                               @class = "form-control readonly"
+                               @class = "form-control readonly kbq-answer"
                            }
                        })
 
@@ -691,7 +691,7 @@ new
             </section>@*.box-body*@
             <div class="box-footer">
                 <div class="form-group">
-                    <div id="kbqEditBtnId" class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
+                    <div id="kbqEditBtn" class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
                     <input type="submit" id="kbqSubmit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right" />
                 </div>
             </div><!-- box-footer -->
@@ -748,7 +748,7 @@ new
                     <!-- question 1 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
-                            @Html.LabelFor(model => Model.UserSQ.SecurityQuestionAnswer1)
+                            @Html.LabelFor(model => Model.UserSQ.SecuritryQuestion1)
                         </div>
                         <div class="col-md-8">
 
@@ -773,7 +773,7 @@ new
                     <!-- anwser 1 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserSQ.SecuritryQuestion1, htmlAttributes: new
+                            @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer1, htmlAttributes: new
                        {
                            @class = "control-label required"
                        })
@@ -828,7 +828,7 @@ new
                     <!-- anwser 2 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserSQ.SecurityQuestion2, htmlAttributes: new
+                            @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer2, htmlAttributes: new
                        {
                            @class = "control-label required"
                        })
@@ -857,7 +857,7 @@ new
             </section>@*.box-body*@
             <div class="box-footer">
                 <div class="form-group">
-                    <div id="kbqEditBtnId" class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
+                    <div id="sqEditBtn" class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
                     <input type="submit" id="sqSubmit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right" />
                 </div>
             </div><!-- box-footer -->

@@ -20,7 +20,6 @@ $(document).ready(function () {
         $("#kbq-panel .box-primary").removeClass("collapsed-box");
         $("#kbq-panel .box-primary").find("i.fa.fa-plus").removeClass('fa-plus');
         $("#kbq-panel .box-primary").find("i.fa").addClass('fa-minus');
-
     }
     if (sqCollapsed.toLowerCase() == "false") {
         $("#sq-panel .box-primary").removeClass("collapsed-box");
@@ -28,6 +27,14 @@ $(document).ready(function () {
         $("#sq-panel .box-primary").find("i.fa").addClass('fa-minus');
     }
   
+    $(document).find("#kbq-panel select").on("change", function () {
+        $(this).closest(".form-group").next().find("input[type=text]").val("");
+    })
+
+    $(document).find("#sq-panel select").on("change", function () {
+        $(this).closest(".form-group").next().find("input[type=text]").val("");
+    })
+
     $(document).on('click', ".edit-button", function () {
         $(this).hide();
         if ($(this).attr("id") == 'kbqEditBtn') {
