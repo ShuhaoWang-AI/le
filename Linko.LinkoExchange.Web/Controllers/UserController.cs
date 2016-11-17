@@ -273,7 +273,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 QuestionId = model.SecurityQuestion2,
                 Content = model.SecurityQuestionAnswer2,
-                UserQuestionAnswerId = model.UserQuestionAnserId_SQ1
+                UserQuestionAnswerId = model.UserQuestionAnserId_SQ2
             });
 
             return sqQuestionAnswers;

@@ -121,8 +121,9 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                     .Include(a => a.Question)
                     .Single(a => a.UserQuestionAnswerId == answerDto.UserQuestionAnswerId.Value);
 
+                answer.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                 answer.Content = answerDto.Content;
-                answer.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;  // DateTime.UtcNow;
+                answer.QuestionId = answerDto.QuestionId;
             }
             else
             {

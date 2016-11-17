@@ -766,7 +766,7 @@ new
                           @class = "form-control",
                           disabled = "disabled"
                       })
-                            @Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer1)
+                            @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer1)*@
                         </div>
                     </div>
 
@@ -780,18 +780,12 @@ new
                         </div>
 
                         <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ1, new
-                        {
-                            htmlAttributes = new
-                            {
-                                @class = "form-control readonly"
-                            }
-                        })
+                            @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ1)
                             @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer1, new
                        {
                            htmlAttributes = new
                            {
-                               @class = "form-control",
+                               @class = "form-control readonly",
                                @style = "margin-top:5px"
                            }
                        })
@@ -820,7 +814,7 @@ new
                           @class = "form-control",
                           disabled = "disabled"
                       })
-                            @Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer2)
+                            @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer2)*@
 
                         </div>
                     </div>
@@ -835,19 +829,13 @@ new
                         </div>
 
                         <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ2, new
-                        {
-                            htmlAttributes = new
-                            {
-                                @class = "form-control readonly"
-                            }
-                        })
+                            @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ2)
                             @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer2, new
                        {
                            htmlAttributes = new
                            {
-                               @class = "form-control",
-                               @style = "margin-top:5px"
+                               @class = "form-control readonly",
+                               @style = "margin-top:5px;"
                            }
                        })
                         </div>
