@@ -278,7 +278,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             {
                 var questionToUpdate = _dbContext.Questions.Single(q => q.QuestionId == question.QuestionId);
                 questionToUpdate.Content = question.Content;
-                questionToUpdate.QuestionTypeId = (int)question.QuestionType;
+                questionToUpdate.QuestionTypeId = _dbContext.QuestionTypes.Single(q => q.Name == question.QuestionType.ToString()).QuestionTypeId;
                 questionToUpdate.IsActive = question.IsActive;
                 questionToUpdate.LastModificationDateTimeUtc = DateTime.UtcNow;
                 questionToUpdate.LastModifierUserId = Convert.ToInt32(_httpContext.CurrentUserProfileId());
@@ -421,9 +421,9 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         public ICollection<QuestionAnswerPairDto> GetUsersQuestionAnswers(int userProfileId, QuestionTypeName questionType)
         {
             var usersQAList = new List<Dto.QuestionAnswerPairDto>();
-            var foundQAs = _dbContext.UserQuestionAnswers.Include(a => a.Question)
+            var foundQAs = _dbContext.UserQuestionAnswers.Include(a => a.Question.QuestionType)
                 .Where(a => a.UserProfileId == userProfileId
-                && a.Question.QuestionTypeId == (int)questionType);
+                && a.Question.QuestionType.Name == questionType.ToString());
 
             if (foundQAs != null)
             {

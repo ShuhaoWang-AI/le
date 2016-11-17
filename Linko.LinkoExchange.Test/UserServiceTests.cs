@@ -210,6 +210,8 @@ namespace Linko.LinkoExchange.Test
                 AddressLine2 = "Apt 102",
                 CityName = "Toronto",
                 ZipCode = "55555",
+                PhoneNumber = "555-555-5555",
+                JurisdictionId = 4
             };
 
             _userService.UpdateUser(dto);
@@ -229,6 +231,8 @@ namespace Linko.LinkoExchange.Test
                 AddressLine2 = "Apt 102",
                 CityName = "Toronto",
                 ZipCode = "55555",
+                PhoneNumber = "555-555-5555",
+                JurisdictionId = 4
             };
 
             _userService.UpdateProfile(dto);
@@ -248,6 +252,8 @@ namespace Linko.LinkoExchange.Test
                 AddressLine2 = "Apt 102",
                 CityName = "Toronto",
                 ZipCode = "55555",
+                PhoneNumber = "555-555-5555",
+                JurisdictionId = 4
             };
 
             List<AnswerDto> kbqList = new List<AnswerDto>();
