@@ -27,19 +27,25 @@ $(document).ready(function () {
         $("#sq-panel .box-primary").find("i.fa.fa-plus").removeClass('fa-plus');
         $("#sq-panel .box-primary").find("i.fa").addClass('fa-minus');
     }
-
+  
     $(document).on('click', ".edit-button", function () {
         $(this).hide();
-        $("#kbq-panel input[type='password'").hide();
-        $("#kbq-panel input[type='text'").show();
+        if ($(this).attr("id") == 'kbqEditBtn') {
+            $(this).closest(".box").find(".kbq-answer").val(""); 
+            $("#kbq-panel input[type='text'").show();
+            $("#kbq-panel input[type='password'").hide();
+            $("#kbq-panel input[type='text'").show();
+            $("#kbq-panel input[type='text'").val(""); 
+        }
+
         $(this).next(".profileDiv input[type='submit']").show();
         $(this).closest(".box").find(".editabledDiv input").prop('readonly', function (i, value) {
             return !value;
         })
         $(this).closest(".box").find(".editabledDiv select").attr('readonly', null);
         $(this).closest(".box").find(".editabledDiv select").attr('disabled', null);
-    })
-
+    }) 
+    
     $(document).on("click", "#profileSubmit", function () { 
         $("input[id=profileCollapsed").val("false"); 
         var collapsedSQ = $("#sq-panel .box-primary.collapsed-box");
