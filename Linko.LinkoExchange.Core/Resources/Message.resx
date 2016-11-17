@@ -147,4 +147,7 @@
   <data name="AccountIsNotAssociated" xml:space="preserve">
     <value>Your account is not associated with any active Organization.  Please contact your Authority for assistance.</value>
   </data>
+  <data name="PasswordChangeSucceed" xml:space="preserve">
+    <value>Password successfully changed.</value>
+  </data>
 </root>

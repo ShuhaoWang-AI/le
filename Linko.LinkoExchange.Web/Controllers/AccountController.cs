@@ -15,6 +15,8 @@ using Linko.LinkoExchange.Web.ViewModels.Account;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
 using Linko.LinkoExchange.Web.Mvc;
+using System.Security.Claims;
+using Linko.LinkoExchange.Core.Resources;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -611,6 +613,33 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 return View(model);
             }
+        }
+
+        [Authorize]
+        public ActionResult ChangePasswordSucceed()
+        {
+            ViewBag.SuccessMessage = Message.PasswordChangeSucceed;
+            return View();
+        }
+
+        [Authorize]
+        public ActionResult ChangePassword()
+        {
+            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
+            var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
+            var model = new ChangePasswordViewModel(); 
+            return View(model);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult ChangePassword(ChangePasswordViewModel model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            return RedirectToAction(actionName: "ChangePasswordSucceed");
         }
 
         //

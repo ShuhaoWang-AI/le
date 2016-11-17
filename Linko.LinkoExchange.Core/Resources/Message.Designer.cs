@@ -106,6 +106,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Password successfully changed..
+        /// </summary>
+        public static string PasswordChangeSucceed {
+            get {
+                return ResourceManager.GetString("PasswordChangeSucceed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your password has expired..
         /// </summary>
         public static string PasswordExpired {

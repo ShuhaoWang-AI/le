@@ -426,6 +426,7 @@
     <Compile Include="Mvc\CustomHandleErrorAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\Account\ChangePasswordViewModel.cs" />
     <Compile Include="ViewModels\Account\ForgotPasswordViewModel.cs" />
     <Compile Include="ViewModels\Account\ForgotUserNameViewModel.cs" />
     <Compile Include="ViewModels\Account\PortalDirectorViewModel.cs" />
@@ -479,6 +480,8 @@
     <Content Include="Temp\GRESD Electronic Signature Agreement.pdf" />
     <Content Include="Views\Authority\AuthorityUsers.cshtml" />
     <Content Include="Views\Authority\AuthorityUserDetails.cshtml" />
+    <Content Include="Views\Account\ChangePassword.cshtml" />
+    <Content Include="Views\Account\ChangePasswordSucceed.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
