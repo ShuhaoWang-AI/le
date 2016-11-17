@@ -64,7 +64,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Authorize]
         [AcceptVerbs(HttpVerbs.Get)]
         public new ActionResult Profile()
-        {
+        { 
+            ViewBag.profileCollapsed = false;
+            ViewBag.kbqCollapsed = true;
+            ViewBag.sqCollapsed = true;
+
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
             var userProfileId = int.Parse(profileIdStr);
@@ -90,17 +94,21 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Authorize]
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
-        public new ActionResult Profile(UserViewModel model, string part)
+        public new ActionResult Profile(UserViewModel model, string part, FormCollection form)
         {
             ViewBag.inValidProfile = false;
             ViewBag.inValidKBQ = false;
             ViewBag.inValidSQ = false;
 
+            ViewBag.profileCollapsed = Convert.ToString(form["profileCollapsed"]);
+            ViewBag.kbqCollapsed = Convert.ToString(form["kbqCollapsed"]);
+            ViewBag.sqCollapsed = Convert.ToString(form["sqCollapsed"]);
+
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
             var userProfileId = int.Parse(profileIdStr);
 
-            var pristineUser = GetUserViewModel(userProfileId); 
+            var pristineUser = GetUserViewModel(userProfileId);
             pristineUser.UserProfile.StateList = GetStateList();
 
             if (part == "Profile")
@@ -147,6 +155,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             else
             {
                 ModelState.AddModelError(string.Empty, errorMessage: "User profile data is not correct.");
+                ViewBag.inValidKBQ = true;
             }
 
             return View(pristineUserModel);
@@ -181,15 +190,19 @@ namespace Linko.LinkoExchange.Web.Controllers
                     break;
                 case RegistrationResult.DuplicatedKBQ:
                     ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Knowledage Based Questions");
+                    ViewBag.inValidKBQ = true;
                     break;
                 case RegistrationResult.DuplicatedKBQAnswer:
                     ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Knowledage Based Question Answers");
+                    ViewBag.inValidKBQ = true;
                     break;
                 case RegistrationResult.MissingKBQ:
                     ModelState.AddModelError(string.Empty, errorMessage: "Missing Knowledage Based Questions");
+                    ViewBag.inValidKBQ = true;
                     break;
                 case RegistrationResult.MissingKBQAnswer:
                     ModelState.AddModelError(string.Empty, errorMessage: "Missing Knowledage Based Question Answers");
+                    ViewBag.inValidKBQ = true;
                     break;
             }  
 
@@ -226,16 +239,20 @@ namespace Linko.LinkoExchange.Web.Controllers
                     break;
                 case RegistrationResult.DuplicatedSecurityQuestion:
                     ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Security Questions");
+                    ViewBag.inValidSQ = true;
                     break;
                 case RegistrationResult.DuplicatedSecurityQuestionAnswer:
                     ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Security Question Answers");
+                    ViewBag.inValidSQ = true;
                     break;
 
                 case RegistrationResult.MissingSecurityQuestion:
                     ModelState.AddModelError(string.Empty, errorMessage: "Missing Security Questions");
+                    ViewBag.inValidSQ = true;
                     break;
                 case RegistrationResult.MissingSecurityQuestionAnswer:
                     ModelState.AddModelError(string.Empty, errorMessage: "Missing Security Question Answers");
+                    ViewBag.inValidSQ = true;
                     break;
             }
 
