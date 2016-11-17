@@ -48,14 +48,15 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         {
             try
             {
-                var question = _dbContext.Questions.Single(q => q.QuestionId == answer.QuestionId);
+                var question = _dbContext.Questions.Include(q => q.QuestionType)
+                    .Single(q => q.QuestionId == answer.QuestionId);
 
-                if (question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
+                if (question.QuestionType.Name == QuestionTypeName.KBQ.ToString())
                 {
                     //Hash answer
                     answer.Content = _passwordHasher.HashPassword(answer.Content.Trim().ToLower());
                 }
-                else if (question.QuestionTypeId == (int)Dto.QuestionType.Security)
+                else if (question.QuestionType.Name == QuestionTypeName.SQ.ToString())
                 {
                     //Encrypt answer
                     answer.Content = _encryption.EncryptString(answer.Content.Trim());
@@ -100,13 +101,14 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         public void CreateOrUpdateUserQuestionAnswer(int userProfileId, AnswerDto answerDto)
         {
-            var question = _dbContext.Questions.Single(q => q.QuestionId == answerDto.QuestionId);
-            if (question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
+            var question = _dbContext.Questions.Include(q => q.QuestionType)
+                .Single(q => q.QuestionId == answerDto.QuestionId);
+            if (question.QuestionType.Name == QuestionTypeName.KBQ.ToString())
             {
                 //Hash answer
                 answerDto.Content = _passwordHasher.HashPassword(answerDto.Content.Trim().ToLower()); //CASE INSENSITIVE -- LOWER CASE ONLY
             }
-            else if (question.QuestionTypeId == (int)Dto.QuestionType.Security)
+            else if (question.QuestionType.Name == QuestionTypeName.SQ.ToString())
             {
                 //Encrypt answer
                 answerDto.Content = _encryption.EncryptString(answerDto.Content.Trim());
@@ -193,13 +195,14 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                     //clean
 
                     //kbq or sq?
-                    var question = _dbContext.Questions.Single(q => q.QuestionId == answerDto.QuestionId);
-                    if (question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
+                    var question = _dbContext.Questions.Include(q => q.QuestionType)
+                        .Single(q => q.QuestionId == answerDto.QuestionId);
+                    if (question.QuestionType.Name == QuestionTypeName.KBQ.ToString())
                     {
                         //Hashed answer
                         cleanHashedAnswerList.Add(answerDto.Content);
                     }
-                    else if (question.QuestionTypeId == (int)Dto.QuestionType.Security)
+                    else if (question.QuestionType.Name == QuestionTypeName.SQ.ToString())
                     {
                         //Encrypted answer
                         cleanEncryptedAnswerList.Add(answerDto.Content);
@@ -239,9 +242,10 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             int questionCountSQ = 0;
             foreach (var questionAnswer in answerDtosToUpdate)
             {
-                var questionTypeId = _dbContext.Questions.Single(q => q.QuestionId == questionAnswer.QuestionId).QuestionTypeId;
-                questionCountKBQ += questionTypeId == (int)Dto.QuestionType.KnowledgeBased ? 1 : 0;
-                questionCountSQ += questionTypeId == (int)Dto.QuestionType.Security ? 1 : 0;
+                var questionTypeName = _dbContext.Questions.Include(q => q.QuestionType)
+                    .Single(q => q.QuestionId == questionAnswer.QuestionId).QuestionType.Name;
+                questionCountKBQ += questionTypeName == QuestionTypeName.KBQ.ToString() ? 1 : 0;
+                questionCountSQ += questionTypeName == QuestionTypeName.SQ.ToString() ? 1 : 0;
 
                 CreateOrUpdateUserQuestionAnswer(userProfileId, questionAnswer);
             }
@@ -321,12 +325,12 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                     .Include("Question")
                     .Single(a => a.UserQuestionAnswerId == answer.UserQuestionAnswerId);
 
-                if (answerToUpdate.Question.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
+                if (answerToUpdate.Question.QuestionType.Name == QuestionTypeName.SQ.ToString())
                 {
                     //Hash answer
                     answer.Content = _passwordHasher.HashPassword(answer.Content.Trim().ToLower());
                 }
-                else if (answerToUpdate.Question.QuestionTypeId == (int)Dto.QuestionType.Security)
+                else if (answerToUpdate.Question.QuestionType.Name == QuestionTypeName.SQ.ToString())
                 {
                     //Encrypt answer
                     answer.Content = _encryption.EncryptString(answer.Content.Trim());
@@ -414,7 +418,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             }
         }
 
-        public ICollection<QuestionAnswerPairDto> GetUsersQuestionAnswers(int userProfileId, Dto.QuestionType questionType)
+        public ICollection<QuestionAnswerPairDto> GetUsersQuestionAnswers(int userProfileId, QuestionTypeName questionType)
         {
             var usersQAList = new List<Dto.QuestionAnswerPairDto>();
             var foundQAs = _dbContext.UserQuestionAnswers.Include(a => a.Question)
@@ -428,7 +432,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                     var newQADto = new QuestionAnswerPairDto() { Answer = new Dto.AnswerDto(), Question = new Dto.QuestionDto() };
                     newQADto.Answer.UserQuestionAnswerId = foundQA.UserQuestionAnswerId;
 
-                    if (questionType == Dto.QuestionType.Security)
+                    if (questionType == QuestionTypeName.SQ)
                     {
                         //Decrypt answer
                         newQADto.Answer.Content = _encryption.DecryptString(foundQA.Content);
@@ -440,7 +444,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
                     newQADto.Question.QuestionId = foundQA.Question.QuestionId;
                     newQADto.Question.IsActive = foundQA.Question.IsActive;
-                    newQADto.Question.QuestionType = (Dto.QuestionType)foundQA.Question.QuestionTypeId;
+                    newQADto.Question.QuestionType = (QuestionTypeName)Enum.Parse(typeof(QuestionTypeName), foundQA.Question.QuestionType.Name, true);
                     newQADto.Question.Content = foundQA.Question.Content;
 
                     usersQAList.Add(newQADto);
@@ -450,7 +454,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             return usersQAList;
         }
 
-        public QuestionAnswerPairDto GetRandomQuestionAnswerFromToken(string token, Dto.QuestionType questionType)
+        public QuestionAnswerPairDto GetRandomQuestionAnswerFromToken(string token, QuestionTypeName questionType)
         {
             //Find UserProfileId from EmailAuditLog.Recipient
             var emailAuditLog = _dbContext.EmailAuditLogs.FirstOrDefault(e => e.Token == token);
@@ -465,7 +469,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         }
 
-        public QuestionAnswerPairDto GetRandomQuestionAnswerFromUserProfileId(int userProfileId, Dto.QuestionType questionType)
+        public QuestionAnswerPairDto GetRandomQuestionAnswerFromUserProfileId(int userProfileId, QuestionTypeName questionType)
         {
             var qAndAs = GetUsersQuestionAnswers(userProfileId, questionType);
             return qAndAs.OrderBy(qu => Guid.NewGuid()).First();
@@ -510,8 +514,8 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                     QuestionId = question.QuestionId,
                     Content = question.Content
                 };
-                dto.QuestionType = (Dto.QuestionType)question.QuestionTypeId;
-                
+                dto.QuestionType = (QuestionTypeName)Enum.Parse(typeof(QuestionTypeName), question.QuestionType.Name, true);
+
                 list.Add(dto);
             }
 
@@ -524,7 +528,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             var questionAnswer = _dbContext.UserQuestionAnswers.Include(q => q.Question.QuestionType)
                 .Single(u => u.UserQuestionAnswerId == userQuestionAnswerId);
 
-            if (questionAnswer.Question.QuestionType.QuestionTypeId == (int)Dto.QuestionType.KnowledgeBased)
+            if (questionAnswer.Question.QuestionType.Name == QuestionTypeName.KBQ.ToString())
             {
                 return _passwordHasher.VerifyHashedPassword(questionAnswer.Content, answer.Trim().ToLower()) == PasswordVerificationResult.Success;
             }

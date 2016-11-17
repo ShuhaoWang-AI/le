@@ -57,11 +57,11 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         /// <param name="userProfileId"></param>
         void DeleteUserQuestionAndAnswers(int userProfileId);
 
-        ICollection<QuestionAnswerPairDto> GetUsersQuestionAnswers(int userProfileId, Dto.QuestionType questionType);
+        ICollection<QuestionAnswerPairDto> GetUsersQuestionAnswers(int userProfileId, QuestionTypeName questionType);
 
-        QuestionAnswerPairDto GetRandomQuestionAnswerFromToken(string token, Dto.QuestionType questionType);
+        QuestionAnswerPairDto GetRandomQuestionAnswerFromToken(string token, QuestionTypeName questionType);
 
-        QuestionAnswerPairDto GetRandomQuestionAnswerFromUserProfileId(int userProfileId, Dto.QuestionType questionType);
+        QuestionAnswerPairDto GetRandomQuestionAnswerFromUserProfileId(int userProfileId, QuestionTypeName questionType);
 
         ICollection<QuestionDto> GetQuestions();
 

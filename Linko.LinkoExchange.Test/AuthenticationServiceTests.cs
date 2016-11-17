@@ -581,8 +581,8 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_Failed_UserProfile_Return_MisingKBQ2()
         {
-            var kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 4);
-            var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 2);
+            var kbqQuestions = CreateQuestions(QuestionTypeName.KBQ, 4);
+            var sqQuestions = CreateQuestions(QuestionTypeName.SQ, 2);
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
 
@@ -592,8 +592,8 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_Failed_UserProfile_Return_MissingSecurityQuestion2()
         {
-            var kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 6);
-            var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 1);
+            var kbqQuestions = CreateQuestions(QuestionTypeName.KBQ, 6);
+            var sqQuestions = CreateQuestions(QuestionTypeName.SQ, 1);
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
 
@@ -604,9 +604,9 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_UserProfile_Return_DuplicatedKBQ()
         {
-            var kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 6);
-            kbqQuestions.AddRange(CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 1));
-            var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 2);
+            var kbqQuestions = CreateQuestions(QuestionTypeName.KBQ, 6);
+            kbqQuestions.AddRange(CreateQuestions(QuestionTypeName.KBQ, 1));
+            var sqQuestions = CreateQuestions(QuestionTypeName.SQ, 2);
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
 
@@ -617,9 +617,9 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_Failed_UserProfile_Return_DuplicatedSecurityQuestion()
         {
-            var kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 6);
-            var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 1);
-            sqQuestions.AddRange(CreateQuestions(Services.Dto.QuestionType.Security, 1));
+            var kbqQuestions = CreateQuestions(QuestionTypeName.KBQ, 6);
+            var sqQuestions = CreateQuestions(QuestionTypeName.SQ, 1);
+            sqQuestions.AddRange(CreateQuestions(QuestionTypeName.SQ, 1));
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
 
@@ -630,8 +630,8 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_Failed_Return_InvalidRegistrationToken()
         {
-            var kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 5);
-            var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 3);
+            var kbqQuestions = CreateQuestions(QuestionTypeName.KBQ, 5);
+            var sqQuestions = CreateQuestions(QuestionTypeName.SQ, 3);
   
             var invitServiceMock = Mock.Get(invitService);
             invitServiceMock.Setup(i => i.GetInvitation(It.IsAny<string>())).Returns((InvitationDto)null); 
@@ -645,8 +645,8 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_Failed_Return_Expired_Invitation()
         {
-            var kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 5);
-            var sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 3);
+            var kbqQuestions = CreateQuestions(QuestionTypeName.KBQ, 5);
+            var sqQuestions = CreateQuestions(QuestionTypeName.SQ, 3);
 
             // set invitation 5 days ago
             var invitationDto = Mock.Of<InvitationDto>(i => i.InvitationDateTimeUtc == DateTimeOffset.UtcNow.AddDays(-5)
@@ -861,8 +861,8 @@ namespace Linko.LinkoExchange.Test
 
         private void SetRegistrations(out IEnumerable<AnswerDto>  sqQuestions, out IEnumerable<AnswerDto> kbqQuestions)
         {
-            kbqQuestions = CreateQuestions(Services.Dto.QuestionType.KnowledgeBased, 5);
-            sqQuestions = CreateQuestions(Services.Dto.QuestionType.Security, 3);
+            kbqQuestions = CreateQuestions(QuestionTypeName.KBQ, 5);
+            sqQuestions = CreateQuestions(QuestionTypeName.SQ, 3);
 
             // set invitation 5 days ago
             var invitationDto = Mock.Of<InvitationDto>(i => i.InvitationDateTimeUtc == DateTimeOffset.UtcNow.AddDays(-5)
@@ -978,7 +978,7 @@ namespace Linko.LinkoExchange.Test
             };
         }
 
-        private QuestionDto CreateQuestion(int questionId, Services.Dto.QuestionType type, string content)
+        private QuestionDto CreateQuestion(int questionId, QuestionTypeName type, string content)
         {
             return new QuestionDto
             {
@@ -1019,7 +1019,7 @@ namespace Linko.LinkoExchange.Test
             return qap;
         }
 
-        public List<AnswerDto> CreateQuestions(Services.Dto.QuestionType type, int count)
+        public List<AnswerDto> CreateQuestions(QuestionTypeName type, int count)
         {
             var qformat = type.ToString() + " #{0}";
             var aformat = type.ToString() + " #{0} answer.";

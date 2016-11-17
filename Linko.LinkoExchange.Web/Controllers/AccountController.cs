@@ -58,7 +58,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         QuestionId = 1,
                         Content ="What is the first and middle name of your oldest sibling?",
-                         QuestionType =  QuestionType.KnowledgeBased,
+                         QuestionType =  QuestionTypeName.KBQ,
                           IsActive =true
                     },
 
@@ -74,7 +74,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         QuestionId = 2,
                         Content ="What is your favorite vacation destination??",
-                        QuestionType =  QuestionType.KnowledgeBased,
+                        QuestionType =  QuestionTypeName.KBQ,
                        IsActive =true
                     },
 
@@ -90,7 +90,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         QuestionId = 3,
                         Content ="What year and model (yyyy-name) was your first car?",
-                        QuestionType =  QuestionType.KnowledgeBased,
+                        QuestionType =  QuestionTypeName.KBQ,
                        IsActive =true
                     },
 
@@ -105,7 +105,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         QuestionId = 4,
                         Content ="What is your favorite TV show?",
-                        QuestionType =  QuestionType.KnowledgeBased,
+                        QuestionType =  QuestionTypeName.KBQ,
                        IsActive =true
                     },
 
@@ -121,7 +121,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         QuestionId = 5,
                         Content ="Where did you first meet your spouse?",
-                        QuestionType =  QuestionType.KnowledgeBased,
+                        QuestionType =  QuestionTypeName.KBQ,
                        IsActive =true
                     },
 
@@ -140,7 +140,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         QuestionId = 21,
                         Content ="What is the name of your favorite sports team?",
-                         QuestionType =  QuestionType.Security
+                         QuestionType =  QuestionTypeName.SQ
                     },
 
                     Answer = new AnswerDto
@@ -155,7 +155,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         QuestionId = 22,
                         Content ="What street was your childhood home located on?",
-                        QuestionType =  QuestionType.Security,
+                        QuestionType =  QuestionTypeName.SQ,
                        IsActive =true
                     },
 
@@ -598,7 +598,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             else
             {
-                var userQuestion = _questionAnswerService.GetRandomQuestionAnswerFromToken(token, QuestionType.KnowledgeBased);
+                var userQuestion = _questionAnswerService.GetRandomQuestionAnswerFromToken(token, QuestionTypeName.KBQ);
 
                 ResetPasswordViewModel model = new ResetPasswordViewModel();
                 model.Token = token;

@@ -163,7 +163,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult SaveUserKbq(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)
         {
-            pristineUserModel.UserKBQ.QuestionPool = GetQuestionPool(QuestionType.KnowledgeBased);
+            pristineUserModel.UserKBQ.QuestionPool = GetQuestionPool(QuestionTypeName.KBQ);
 
             ValidationContext context = null;
             var validationResult = new List<ValidationResult>();
@@ -211,7 +211,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult SaveUserSQ(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)
         {
-            pristineUserModel.UserSQ.QuestionPool = GetQuestionPool(QuestionType.Security);
+            pristineUserModel.UserSQ.QuestionPool = GetQuestionPool(QuestionTypeName.SQ);
 
             ValidationContext context = null;
             var validationResult = new List<ValidationResult>();
@@ -357,11 +357,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             var userKbqViewModel = new UserKBQViewModel();
             userKbqViewModel.UserProfileId = userProfileId;   
 
-            var kbqQuestions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, Services.Dto.QuestionType.KnowledgeBased);
+            var kbqQuestions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, QuestionTypeName.KBQ);
           
             var kbqs = kbqQuestions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
 
-            userKbqViewModel.QuestionPool = GetQuestionPool(QuestionType.KnowledgeBased);
+            userKbqViewModel.QuestionPool = GetQuestionPool(QuestionTypeName.KBQ);
 
             ////  KBQ questions 
             userKbqViewModel.KBQ1 = kbqs[0].Question.QuestionId.Value;
@@ -392,10 +392,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             var userSQViewModel = new UserSQViewModel();
             userSQViewModel.UserProfileId = userProfileId;     
             
-            var securityQeustions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, Services.Dto.QuestionType.Security);
+            var securityQeustions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, QuestionTypeName.SQ);
             var sqs = securityQeustions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
 
-            userSQViewModel.QuestionPool = GetQuestionPool(QuestionType.Security);
+            userSQViewModel.QuestionPool = GetQuestionPool(QuestionTypeName.SQ);
 
             ////  Security questions 
             userSQViewModel.SecuritryQuestion1 = sqs[0].Question.QuestionId.Value;
@@ -411,7 +411,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return userSQViewModel;
         }
 
-        private List<QuestionViewModel> GetQuestionPool(QuestionType type)
+        private List<QuestionViewModel> GetQuestionPool(QuestionTypeName type)
         {
             return _questionAnswerService.GetQuestions().Select(i => _mapper.Map<QuestionViewModel>(i)).ToList()
                 .Where(i => i.QuestionType == type).ToList();

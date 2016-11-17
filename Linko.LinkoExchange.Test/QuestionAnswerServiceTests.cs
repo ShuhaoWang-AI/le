@@ -91,7 +91,7 @@ namespace Linko.LinkoExchange.Test
         {
             _questionAnswerService.UpdateQuestion(
                 new QuestionDto() { QuestionId = 10,
-                    QuestionType = QuestionType.KnowledgeBased,
+                    QuestionType = QuestionTypeName.KBQ,
                     IsActive = true,                
                     Content = "Color of your first bike?" });
         }
@@ -99,7 +99,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetUsersQuestionAnswers()
         {
-            var results = _questionAnswerService.GetUsersQuestionAnswers(1, QuestionType.KnowledgeBased);
+            var results = _questionAnswerService.GetUsersQuestionAnswers(1, QuestionTypeName.KBQ);
         }
 
 

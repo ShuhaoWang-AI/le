@@ -589,7 +589,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private AuthorityUserViewModel PrepareAuthorityUserDetails(int id)
         {
             var user = _userService.GetOrganizationRegulatoryProgramUser(id);
-            var userQuesAns = _questionAnswerService.GetUsersQuestionAnswers(user.UserProfileId, QuestionType.Security);
+            var userQuesAns = _questionAnswerService.GetUsersQuestionAnswers(user.UserProfileId, QuestionTypeName.SQ);
 
             var viewModel = new AuthorityUserViewModel
             {
@@ -1053,7 +1053,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private IndustryUserViewModel PrepareIndustryUserDetails(int id)
         {
             var user = _userService.GetOrganizationRegulatoryProgramUser(id);
-            var userQuesAns = _questionAnswerService.GetUsersQuestionAnswers(user.UserProfileId, QuestionType.Security);
+            var userQuesAns = _questionAnswerService.GetUsersQuestionAnswers(user.UserProfileId, QuestionTypeName.SQ);
 
             var viewModel = new IndustryUserViewModel
             {
