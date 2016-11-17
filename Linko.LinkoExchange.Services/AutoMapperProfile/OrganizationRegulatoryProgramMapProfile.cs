@@ -13,7 +13,11 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
                 .ForMember(d => d.OrganizationDto, o => o.MapFrom(s => s.Organization))
                 .ForMember(d => d.HasSignatory, o => o.Ignore())
                 .ForMember(d => d.HasAdmin, o => o.Ignore())
-            .ReverseMap();
+            .ReverseMap()
+            .ForMember(d => d.PermissionGroups, o => o.Ignore())
+            .ForMember(d => d.OrganizationRegulatoryProgramUsers, o => o.Ignore())
+            .ForMember(d => d.OrganizationRegulatoryProgramSettings, o => o.Ignore())
+            .ForMember(d=>d.OrganizationRegulatoryProgramModules, o=>o.Ignore());
 
         }
     }

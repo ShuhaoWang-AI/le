@@ -34,7 +34,7 @@ namespace Linko.LinkoExchange.Services.Program
                                            i.UserProfileId == userId).ToList();
             return orp.Select(i=>
             {
-                return _mapper.Map<OrganizationRegulatoryProgramDto>(i);
+                return _mapper.Map<OrganizationRegulatoryProgramDto>(i.OrganizationRegulatoryProgram);
             });
         }
 

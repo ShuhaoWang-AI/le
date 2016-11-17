@@ -638,8 +638,18 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 return View(model);
             }
+            
+            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
+            var userId = claimsIdentity.Claims.First(i => i.Type == CacheKey.OwinUserId).Value;
 
-            return RedirectToAction(actionName: "ChangePasswordSucceed");
+            var result = _authenticationService.ChangePasswordAsync(userId, model.Password).Result;
+            if (result.Success)
+            {
+                return RedirectToAction(actionName: "ChangePasswordSucceed");
+            }
+            var errorMessage = result.Errors.Aggregate((i, j) => { return i + j; }); 
+            ModelState.AddModelError(string.Empty, errorMessage: errorMessage);
+            return View(model); 
         }
 
         //
