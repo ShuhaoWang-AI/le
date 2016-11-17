@@ -385,7 +385,9 @@ namespace Linko.LinkoExchange.Services.Organization
 
                 maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.UserPerIndustryMaxCount));
             }
-            var currentProgramUserCount = _dbContext.OrganizationRegulatoryProgramUsers.Count(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
+            var currentProgramUserCount = _dbContext.OrganizationRegulatoryProgramUsers
+                                                    .Count(u => u.OrganizationRegulatoryProgramId == orgRegProgramId
+                                                    && u.IsRemoved != true && u.IsRegistrationApproved == true);
             var remaining = maxCount - currentProgramUserCount;
 
             //Handle at caller
@@ -401,7 +403,8 @@ namespace Linko.LinkoExchange.Services.Organization
             var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
             var currentChildIndustryCount = _dbContext.OrganizationRegulatoryPrograms
                 .Count(u => u.RegulatorOrganizationId == orgRegProgram.OrganizationId
-                && u.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
+                && u.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId
+                && u.IsRemoved != true && u.IsEnabled == true);
 
             int maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.IndustryLicenseTotalCount));
             var remaining = maxCount - currentChildIndustryCount;
