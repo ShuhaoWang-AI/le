@@ -62,8 +62,9 @@ For more information on how to configure your ASP.NET application, please visit 
     <add key="EmailSenderFromEmail"
          value="noreply@linkoexchange.com" />
     <!--minutes -->
+    <!--change sessionState timeout value with same value-->
     <add key="CookieValidateInterval"
-         value="50" />
+         value="30" />
     <!-- hours  7 days 7 * 24 -->
     <add key="ResetPasswordTokenValidateInterval"
          value="168" />

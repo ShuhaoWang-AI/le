@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Authority
 {
@@ -185,7 +187,12 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         }
 
         [Display(Name = "Time Zone")]
-        public int TimeZone
+        public string TimeZone
+        {
+            get; set;
+        }
+
+        public IList<SelectListItem> AvailableTimeZones
         {
             get; set;
         }
@@ -193,9 +200,9 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         #endregion
 
         #region Authority program settings
-        
+
         [Display(Name = "Max Days After Report Period End Date to Repudiate")]
-        public int ReportRepudiatedDays
+        public string ReportRepudiatedDays
         {
             get; set;
         }
@@ -208,74 +215,86 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 
         [Editable(false)]
         [Display(Name = "Mass Loading pounds Conversion Factor")]
-        public int MassLoadingConversionFactorPounds
+        public string MassLoadingConversionFactorPounds
         {
             get; set;
         }
 
         [Editable(false)]
         [Display(Name = "Use < sign for Mass Loading Results")]
-        public int MassLoadingResultToUseLessThanSign
+        public string MassLoadingResultToUseLessThanSign
         {
             get; set;
         }
 
         [Editable(false)]
         [Display(Name = "Use these decimal places for Loading calculations")]
-        public int MassLoadingCalculationDecimalPlaces
-        {
-            get; set;
-        }
-        
-        [Display(Name = "Name")]
-        public int EmailContactInfoName
-        {
-            get; set;
-        }
-        
-        [Display(Name = "Phone")]
-        public int EmailContactInfoPhone
-        {
-            get; set;
-        }
-
-        [Display(Name = "Email")]
-        public int EmailContactInfoEmailAddress
+        public string MassLoadingCalculationDecimalPlaces
         {
             get; set;
         }
 
         [Editable(false)]
-        [Display(Name = "Number of Authority (Reg Program user) licenses Available")]
-        public int AuthorityUserLicenseTotalCount
+        [Display(Name = "Number of Authority (Reg Program User) Licenses Available")]
+        public string AuthorityUserLicenseTotalCount
         {
             get; set;
         }
 
         [Editable(false)]
-        [Display(Name = "Number of Authority (Reg Program user) licenses In Use")]
-        public int AuthorityUserLicenseUsedCount
+        [Display(Name = "Number of Authority (Reg Program User) Licenses In Use")]
+        public string AuthorityUserLicenseUsedCount
         {
             get; set;
         }
 
         [Editable(false)]
-        [Display(Name = "Number of Industry (Reg Program) licenses Available")]
-        public int IndustryLicenseTotalCount
+        [Display(Name = "Number of Industry (Reg Program) Licenses Available")]
+        public string IndustryLicenseTotalCount
         {
             get; set;
         }
 
         [Editable(false)]
-        [Display(Name = "Number of Industry (Reg Program) licenses In Use")]
-        public int IndustryLicenseUsedCount
+        [Display(Name = "Number of Industry (Reg Program) Licenses In Use")]
+        public string IndustryLicenseUsedCount
         {
             get; set;
         }
 
         [Editable(false)]
         [Display(Name = "Number of Industry Users (Reg Program) per Industry")]
-        public int UserPerIndustryMaxCount
+        public string UserPerIndustryMaxCount
+        {
+            get; set;
+        }
+
+        [Display(Name = "Name")]
+        public string EmailContactInfoName
+        {
+            get; set;
+        }
+
+        [Editable(false)]
+        public string EmailContactInfoNameDefault
+        {
+            get; set;
+        }
+
+        [Display(Name = "Phone")]
+        public string EmailContactInfoPhone
+        {
+            get; set;
+        }
+
+        [Editable(false)]
+        public string EmailContactInfoPhoneDefault
+        {
+            get; set;
+        }
+
+        [Display(Name = "Email")]
+        public string EmailContactInfoEmailAddress
         {
             get; set;
         }

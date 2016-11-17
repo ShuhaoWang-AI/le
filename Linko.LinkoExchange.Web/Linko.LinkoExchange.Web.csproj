@@ -432,8 +432,10 @@
     <Compile Include="ViewModels\Account\RegisterViewModel.cs" />
     <Compile Include="ViewModels\Account\ResetPasswordViewModel.cs" />
     <Compile Include="ViewModels\Account\SignInViewModel.cs" />
+    <Compile Include="ViewModels\Authority\AuthorityUserPendingInvitationViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserPendingInvitationViewModel.cs" />
     <Compile Include="ViewModels\Authority\AuthoritySettingsViewModel.cs" />
+    <Compile Include="ViewModels\Authority\AuthorityUserViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
     <Compile Include="ViewModels\Industry\IndustryViewModel.cs" />
@@ -475,6 +477,8 @@
     <Content Include="Views\User\Profile.cshtml" />
     <Content Include="Views\Authority\Settings.cshtml" />
     <Content Include="Temp\GRESD Electronic Signature Agreement.pdf" />
+    <Content Include="Views\Authority\AuthorityUsers.cshtml" />
+    <Content Include="Views\Authority\AuthorityUserDetails.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

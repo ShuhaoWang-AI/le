@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Authority
 {
-    public class IndustryUserPendingInvitationViewModel
+    public class AuthorityUserPendingInvitationViewModel
     {
         [ScaffoldColumn(false)]
         [Display(Name = "ID")]

@@ -1,4 +1,4 @@
-﻿@model Linko.LinkoExchange.Web.ViewModels.Industry.IndustryViewModel
+﻿@model Linko.LinkoExchange.Web.ViewModels.Authority.AuthoritySettingsViewModel
 @using Linko.LinkoExchange.Core.Resources
 
 @{
@@ -8,28 +8,29 @@
 
 <section class="">
     <ol class="breadcrumb">
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Industry")'"><i class=""></i> Home </a></li>
+        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
         <li class="active">Settings</li>
     </ol>
 </section>
 
 <div class="box box-primary">
     <div class="box-header with-border">
-        <h3 class="box-title">@Label.BoxTitleIndustryInformation</h3>
+        <h3 class="box-title">Authority Information</h3>
+        <div class="box-tools pull-right">
+            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+        </div><!-- /.box-tools -->
     </div>  @*.box-header*@
 
-    <section class="box-body form-horizontal">
-                
-        @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+    <section class="box-body form-horizontal">                
                     
         <div class="form-group">
-            @Html.LabelFor(model => model.IndustryNo, htmlAttributes: new
+            @Html.LabelFor(model => model.ExchangeAuthorityID, htmlAttributes: new
             {
                 @class = "control-label col-md-2"
             })
 
             <div class="col-md-4">
-                @Html.EditorFor(model => model.IndustryNo, new
+                @Html.EditorFor(model => model.ExchangeAuthorityID, new
                 {
                     htmlAttributes = new
                     {
@@ -39,12 +40,45 @@
                 })
             </div>
 
-            @Html.LabelFor(model => model.IndustryName, htmlAttributes: new
+            @Html.LabelFor(model => model.AuthorityName, htmlAttributes: new
             {
                 @class = "control-label col-md-2"
             })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.IndustryName, new
+                @Html.EditorFor(model => model.AuthorityName, new
+                {
+                    htmlAttributes = new
+                    {
+                        @class = "form-control",
+                        @disabled = "disabled"
+                    }
+                })
+            </div>
+        </div>
+        
+        <div class="form-group">
+            @Html.LabelFor(model => model.Npdes, htmlAttributes: new
+            {
+                @class = "control-label col-md-2"
+            })
+
+            <div class="col-md-4">
+                @Html.EditorFor(model => model.Npdes, new
+                {
+                    htmlAttributes = new
+                    {
+                        @class = "form-control",
+                        @disabled = "disabled"
+                    }
+                })
+            </div>
+
+            @Html.LabelFor(model => model.Signer, htmlAttributes: new
+            {
+                @class = "control-label col-md-2"
+            })
+            <div class="col-md-4">
+                @Html.EditorFor(model => model.Signer, new
                 {
                     htmlAttributes = new
                     {
@@ -189,3 +223,451 @@
         </div>
     </section>@*.box-body*@
 </div><!-- /.box -->
+
+<div id="AuthoritySettings" class="box box-primary"> @*collapsed-box*@
+    <div class="box-header with-border">
+        <h3 class="box-title">Authority Settings</h3>
+        <div class="box-tools pull-right">
+            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+        </div><!-- /.box-tools -->
+    </div>  @*.box-header*@
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <section class="box-body form-horizontal">
+            @if (ViewBag.ShowErrorMessageForAuthoritySettings != null && ViewBag.ShowErrorMessageForAuthoritySettings)
+            {
+                @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+            }
+            @if (ViewBag.ShowSuccessMessageForAuthoritySettings!= null && ViewBag.ShowSuccessMessageForAuthoritySettings)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <h5>
+                        <i class="icon fa fa-check"></i>
+                        @ViewBag.SuccessMessageForAuthoritySettings
+                    </h5>
+                </div>
+            }
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.FailedPasswordAttemptMaxCount, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.FailedPasswordAttemptMaxCount, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control"
+                        }
+                    })
+                    @Html.HiddenFor(model => model.FailedPasswordAttemptMaxCountDefault)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.FailedKbqAttemptMaxCount, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.FailedKbqAttemptMaxCount, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control"
+                        }
+                    })
+                    @Html.HiddenFor(model => model.FailedKbqAttemptMaxCountDefault)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.InvitationExpiredHours, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.InvitationExpiredHours, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control"
+                        }
+                    })
+                    @Html.HiddenFor(model => model.InvitationExpiredHoursDefault)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.PasswordChangeRequiredDays, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.PasswordChangeRequiredDays, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control"
+                        }
+                    })
+                    @Html.HiddenFor(model => model.PasswordChangeRequiredDaysDefault)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.PasswordHistoryMaxCount, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.PasswordHistoryMaxCount, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control"
+                        }
+                    })
+                    @Html.HiddenFor(model => model.PasswordHistoryMaxCountDefault)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.TimeZone, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.DropDownList("TimeZone", Model.AvailableTimeZones, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.TimeZone, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+        </section>@*.box-body*@
+        <div class="box-footer">
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-sm btn-primary pull-right" formaction="@Url.Action(actionName: "Settings", controllerName: "Authority")#AuthoritySettings" formmethod="post" />
+            </div>
+        </div><!-- box-footer -->
+    }
+</div><!-- /.box -->
+
+<div id="ProgramSettings" class="box box-primary"> 
+    <div class="box-header with-border">
+        <h3 class="box-title">Industry Pretreatment Program Settings</h3>
+        <div class="box-tools pull-right">
+            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+        </div><!-- /.box-tools -->
+    </div>  @*.box-header*@
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <section class="box-body form-horizontal">
+            
+            @if (ViewBag.ShowErrorMessageForProgramSettings != null && ViewBag.ShowErrorMessageForProgramSettings)
+            {
+                @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+            }
+            
+            @if (ViewBag.ShowSuccessMessageForProgramSettings != null && ViewBag.ShowSuccessMessageForProgramSettings)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <h5>
+                        <i class="icon fa fa-check"></i>
+                        @ViewBag.SuccessMessageForProgramSettings
+                    </h5>
+                </div>
+            }
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ReportRepudiatedDays, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.ReportRepudiatedDays, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control"
+                        }
+                    })
+                    @Html.HiddenFor(model => model.ReportRepudiatedDaysDefault)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.MassLoadingConversionFactorPounds, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.MassLoadingConversionFactorPounds, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.MassLoadingResultToUseLessThanSign, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.MassLoadingResultToUseLessThanSign, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.MassLoadingCalculationDecimalPlaces, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.MassLoadingCalculationDecimalPlaces, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.AuthorityUserLicenseTotalCount, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.AuthorityUserLicenseTotalCount, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.AuthorityUserLicenseUsedCount, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.AuthorityUserLicenseUsedCount, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.IndustryLicenseTotalCount, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.IndustryLicenseTotalCount, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.IndustryLicenseUsedCount, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.IndustryLicenseUsedCount, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.UserPerIndustryMaxCount, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.UserPerIndustryMaxCount, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+            </div>
+
+            <hr />
+            <div class="form-group">
+                <h4 class="control-label col-md-7 col-lg-6 hidden-xs hidden-sm">Contact Information on Emails</h4>
+                <h4 class="col-xs-12 hidden-md hidden-lg">Contact Information on Emails</h4>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.EmailContactInfoName, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.EmailContactInfoName, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control"
+                        }
+                    })
+                    @Html.HiddenFor(model => model.EmailContactInfoNameDefault)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.EmailContactInfoPhone, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.EmailContactInfoPhone, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control"
+                        }
+                    })
+                    @Html.HiddenFor(model => model.EmailContactInfoPhoneDefault)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.EmailContactInfoEmailAddress, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.EditorFor(model => model.EmailContactInfoEmailAddress, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control"
+                        }
+                    })
+                </div>
+            </div>
+
+        </section>@*.box-body*@
+        <div class="box-footer">
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-sm btn-primary pull-right" formaction="@Url.Action(actionName: "ProgramSettings", controllerName: "Authority")#ProgramSettings" formmethod="post" />
+            </div>
+        </div><!-- box-footer -->
+    }
+</div><!-- /.box -->
+
+@section Scripts {
+    @Scripts.Render(paths: "~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function ()
+        {
+            var tbWithIntValue = {
+                  '#FailedPasswordAttemptMaxCount': '#FailedPasswordAttemptMaxCountDefault'
+                , '#FailedKbqAttemptMaxCount': '#FailedKbqAttemptMaxCountDefault'
+                , '#InvitationExpiredHours': '#InvitationExpiredHoursDefault'
+                , '#PasswordChangeRequiredDays': '#PasswordChangeRequiredDaysDefault'
+                , '#PasswordHistoryMaxCount': '#PasswordHistoryMaxCountDefault'
+                , '#ReportRepudiatedDays': '#ReportRepudiatedDaysDefault'
+            };
+
+            $.each(tbWithIntValue, function (key, value)
+            {
+                $(key).blur(function ()
+                {
+                    var tb = $(key);
+                    var hf = $(value);
+                    tb.val((isNaN(parseInt(tb.val()))) ? ((isNaN(parseInt(hf.val()))) ? 0 : parseInt(hf.val())) : parseInt(tb.val()));
+                });
+            });
+            
+            var tbWithStringValue = {
+                  '#EmailContactInfoName': '#EmailContactInfoNameDefault'
+                , '#EmailContactInfoPhone': '#EmailContactInfoPhoneDefault'
+            };
+
+            $.each(tbWithStringValue, function (key, value)
+            {
+                $(key).blur(function ()
+                {
+                    var tb = $(key);
+                    var hf = $(value);
+                    tb.val($.isBlank(tb.val()) ? hf.val() : tb.val());
+                });
+            });
+        });
+
+        (function($){
+            $.isBlank = function(obj){
+                return(!obj || $.trim(obj) === "");
+            };
+        })(jQuery);
+    </script>
+}
