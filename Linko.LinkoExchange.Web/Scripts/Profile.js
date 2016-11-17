@@ -16,6 +16,7 @@ $(document).ready(function () {
             return !value;
         })
         $(this).closest(".box").find(".editabledDiv select").attr('readonly', null);
+        $(this).closest(".box").find(".editabledDiv select").attr('disabled', null);
     })
 
     $(document).on("click", "#kbqSubmit", function () {

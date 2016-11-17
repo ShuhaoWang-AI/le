@@ -266,8 +266,12 @@
 
                                   new
                                   {
-                                      @class = "form-control"
+                                      @class = "form-control",
+                                      disabled = "disabled"
                                   })
+                                @Html.HiddenFor(model => Model.UserProfile.JurisdictionId)
+
+
                             </div>
                         </div>
 
