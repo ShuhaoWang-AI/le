@@ -22,6 +22,8 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
                 .ForMember(d => d.CityName, o => o.MapFrom(s => s.CityName))
                 .ForMember(d => d.ZipCode, o => o.MapFrom(s => s.ZipCode))
                 .ForMember(d => d.JurisdictionId, o => o.MapFrom(s => s.JurisdictionId))
+                .ForMember(d => d.PhoneNumber, o => o.MapFrom(s => s.PhoneNumber))
+                .ForMember(d => d.PhoneExt, o => o.MapFrom(s => s.PhoneExt))
                 .ForAllOtherMembers(o => o.Ignore());
 
         }
