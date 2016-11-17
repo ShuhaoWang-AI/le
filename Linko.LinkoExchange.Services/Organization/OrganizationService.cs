@@ -388,8 +388,9 @@ namespace Linko.LinkoExchange.Services.Organization
             var currentProgramUserCount = _dbContext.OrganizationRegulatoryProgramUsers.Count(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
             var remaining = maxCount - currentProgramUserCount;
 
-            if (remaining < 0)
-                throw new Exception(string.Format("ERROR: Remaining user license count is a negative number (={0}) for Org Reg Program={1}, IsForAuthority={2}", remaining, orgRegProgramId, isForAuthority));
+            //Handle at caller
+            //if (remaining < 0)
+            //    throw new Exception(string.Format("ERROR: Remaining user license count is a negative number (={0}) for Org Reg Program={1}, IsForAuthority={2}", remaining, orgRegProgramId, isForAuthority));
 
             return remaining;
 
@@ -405,12 +406,34 @@ namespace Linko.LinkoExchange.Services.Organization
             int maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.IndustryLicenseTotalCount));
             var remaining = maxCount - currentChildIndustryCount;
 
-            if (remaining < 0)
-                throw new Exception(string.Format("ERROR: Remaining industry license count is a negative number (={0}) for Org Reg Program={1}", remaining, orgRegProgramId));
+            //Handle at caller
+            //if (remaining < 0)
+            //    throw new Exception(string.Format("ERROR: Remaining industry license count is a negative number (={0}) for Org Reg Program={1}", remaining, orgRegProgramId));
 
             return remaining;
 
         }
+
+        public int GetCurrentUserLicenseCount(int orgRegProgramId)
+        {
+            var currentProgramUserCount = _dbContext.OrganizationRegulatoryProgramUsers
+                                                    .Count(u => u.OrganizationRegulatoryProgramId == orgRegProgramId
+                                                    && u.IsRemoved != true && u.IsRegistrationApproved == true);
+            return currentProgramUserCount;
+
+        }
+
+        public int GetCurrentIndustryLicenseCount(int orgRegProgramId)
+        {
+            var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
+            var currentChildIndustryCount = _dbContext.OrganizationRegulatoryPrograms
+                .Count(u => u.RegulatorOrganizationId == orgRegProgram.OrganizationId
+                && u.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId
+                && u.IsRemoved != true && u.IsEnabled == true);
+
+            return currentChildIndustryCount;
+        }
+
 
         public OrganizationRegulatoryProgramDto GetAuthority(int orgRegProgramId)
         {
