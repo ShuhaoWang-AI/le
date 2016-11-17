@@ -39,7 +39,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         }
 
         [Display(Name = "TitleRole")]
-        public int TitleRole
+        public string TitleRole
         {
             get; set;
         }
