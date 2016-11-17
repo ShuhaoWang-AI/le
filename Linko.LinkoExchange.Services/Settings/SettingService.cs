@@ -201,7 +201,7 @@ namespace Linko.LinkoExchange.Services.Settings
             catch (Exception ex)
             {
                 string msg = string.Format("Cannot create/update program setting '{0}' to '{1}'", settingDto.TemplateName.ToString(), settingDto.Value);
-                var violations = new List<RuleViolation>() { new RuleViolation(settingDto.TemplateName.ToString(), settingDto.Value, msg) };
+                var violations = new List<RuleViolation>() { new RuleViolation("", settingDto.Value, msg) };
                 throw new RuleViolationException(msg, violations);
             }
         }
@@ -290,7 +290,7 @@ namespace Linko.LinkoExchange.Services.Settings
             catch (Exception ex)
             {
                 string msg = string.Format("Cannot create/update program setting '{0}' to '{1}'", settingDto.TemplateName.ToString(), settingDto.Value);
-                var violations = new List<RuleViolation>() { new RuleViolation(settingDto.TemplateName.ToString(), settingDto.Value, msg) };
+                var violations = new List<RuleViolation>() { new RuleViolation("", settingDto.Value, msg) };
                 throw new RuleViolationException(msg, violations);
             }
         }

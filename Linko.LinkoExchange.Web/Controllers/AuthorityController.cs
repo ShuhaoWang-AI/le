@@ -145,7 +145,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 //EmailContactInfoPhone
                 programSettings.Where(s => s.TemplateName.Equals(SettingType.EmailContactInfoPhone)).ToList().ForEach(s => s.Value = model.EmailContactInfoPhone);
                 //EmailContactInfoEmailAddress
-                programSettings.Where(s => s.TemplateName.Equals(SettingType.EmailContactInfoEmailAddress)).ToList().ForEach(s => s.Value = model.EmailContactInfoEmailAddress);
+                programSettings.Where(s => s.TemplateName.Equals(SettingType.EmailContactInfoEmailAddress)).ToList()
+                    .ForEach(s => s.Value = ("" + model.EmailContactInfoEmailAddress));
 
                 _settingService.CreateOrUpdateProgramSettings(id, programSettings);
 
@@ -254,11 +255,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                 AuthorityUserLicenseTotalCount          = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.AuthorityUserLicenseTotalCount))
                                                                  .Select(s => s.Value).First(),
-                AuthorityUserLicenseUsedCount           = _organizationService.GetRemainingUserLicenseCount(id, isForAuthority: true).ToString(),
+                AuthorityUserLicenseUsedCount           = _organizationService.GetCurrentUserLicenseCount(id).ToString(),
                 IndustryLicenseTotalCount               = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.IndustryLicenseTotalCount))
                                                                  .Select(s => s.Value).First(),
-                IndustryLicenseUsedCount                = _organizationService.GetRemainingIndustryLicenseCount(id).ToString(),
+                IndustryLicenseUsedCount                = _organizationService.GetCurrentIndustryLicenseCount(id).ToString(),
                 UserPerIndustryMaxCount                 = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.UserPerIndustryMaxCount))
                                                                  .Select(s => s.Value).First(),
