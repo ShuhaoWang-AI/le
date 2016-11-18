@@ -1,0 +1,59 @@
+﻿@model Linko.LinkoExchange.Web.ViewModels.Account.ChangeEmailViewModel 
+
+
+@using Linko.LinkoExchange.Web.ViewModels.Account
+@using Linko.LinkoExchange.Core.Resources
+
+
+@{
+    ViewBag.Title = "";
+    ViewBag.Description = "";
+    ViewBag.SubTitle = Label.ChangEmailAddress;
+}
+
+<div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-5">
+    <div>
+        <h1 class="h3">@ViewBag.SubTitle</h1>
+    </div>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h4 class="box-title">@Label.ChangEmailAddress</h4>
+        </div> @*.box-header*@
+        <section id="Form1" class="box-body">
+            @using (Html.BeginForm(actionName: "ChangeEmail", controllerName: "Account", method: FormMethod.Post, htmlAttributes: new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.OldEmail, new { @class = "col-md-2 required control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.OldEmail, htmlAttributes: new
+                   {
+                       @class = "form-control readonly",
+                   })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.NewEmail, new { @class = "col-md-2 required control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.NewEmail, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.NewEmail, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group pull-right">
+                        <input type="submit" class="btn btn-primary" value="@Label.ChangEmailAddress" />
+                    </div>
+                </div>
+            }
+        </section>@*.box-body*@
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render(paths: "~/bundles/jqueryval")
+}

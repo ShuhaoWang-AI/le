@@ -153,6 +153,9 @@
   <data name="ButtonSignOut" xml:space="preserve">
     <value>Sign out</value>
   </data>
+  <data name="ChangEmailAddress" xml:space="preserve">
+    <value>Change Email Address</value>
+  </data>
   <data name="ChangePassword" xml:space="preserve">
     <value>Change Password</value>
   </data>

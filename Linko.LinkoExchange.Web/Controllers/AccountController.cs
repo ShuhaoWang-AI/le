@@ -652,6 +652,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(model); 
         }
 
+        [Authorize]
+        public ActionResult ChangeEmail()
+        {
+            return View();
+        }
+
         //
         // POST: /Account/ResetPassword
         [AcceptVerbs(HttpVerbs.Post)]
