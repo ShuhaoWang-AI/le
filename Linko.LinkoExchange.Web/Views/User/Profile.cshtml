@@ -16,13 +16,24 @@
     </ol>
 </section>
 
-@using (Html.BeginForm("Profile", "User", new { part ="Profile"}))
+<style>
+    .left-flow-link {
+        margin-left: 0px;
+        margin-top:10px;
+        text-align: left;
+        vertical-align: bottom;
+        float: left;
+    }
+
+</style>
+
+@using (Html.BeginForm("Profile", "User", new { part = "Profile" }))
 {
     @Html.AntiForgeryToken()
     <input type="hidden" id="profileCollapsed" name="profileCollapsed" value="true" />
     <input type="hidden" id="kbqCollapsed" name="kbqCollapsed" value="false" />
     <input type="hidden" id="sqCollapsed" name="sqCollapsed" value="false" />
-    
+
     <div id="user-info-panel" class="profileDiv">  
       
         <div class="box box-primary">
@@ -261,18 +272,18 @@
                        })
                             <div class="col-md-4">
                                 @Html.DropDownListFor(model => Model.UserProfile.JurisdictionId,
-                                 Model.UserProfile.StateList.Select(i => new SelectListItem
-                                 {
-                                     Text = i.StateName,
-                                     Value = i.JurisdictionId.ToString(),
-                                     Selected = Model.UserProfile.JurisdictionId == i.JurisdictionId
-                                 }).ToList(),
+      Model.UserProfile.StateList.Select(i => new SelectListItem
+      {
+          Text = i.StateName,
+          Value = i.JurisdictionId.ToString(),
+          Selected = Model.UserProfile.JurisdictionId == i.JurisdictionId
+      }).ToList(),
 
-                                  new
-                                  {
-                                      @class = "form-control",
-                                      disabled = "disabled"
-                                  })
+       new
+       {
+           @class = "form-control",
+           disabled = "disabled"
+       })
                                 @Html.HiddenFor(model => Model.UserProfile.JurisdictionId)
 
 
@@ -316,8 +327,13 @@
                            }
                        })
                         </div>
+                        <div>
+                            @Html.ActionLink("Change", "ChangeEmail", "Account", htmlAttributes: new
+                       {
+                           @class = "left-flow-link", 
+                       })
+                        </div>
 
-                        @Html.ActionLink("Change", "ChangeEmail", "Account")
                     </div>
 
                     <!-- Line 10 UserName -->
@@ -354,7 +370,10 @@
                            }
                        })
                         </div> 
-                        @Html.ActionLink("Change", "ChangePassword", "Account")
+                        @Html.ActionLink("Change", "ChangePassword", "Account", htmlAttributes: new
+                   {
+                       @class = "left-flow-link",
+                   })
                     </div>
              
             </section>@*.box-body*@
