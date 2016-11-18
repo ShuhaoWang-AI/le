@@ -294,6 +294,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         }
 
         [Display(Name = "Email")]
+        [EmailAddress]
         public string EmailContactInfoEmailAddress
         {
             get; set;

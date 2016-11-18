@@ -81,5 +81,5 @@
 
 .control-label.required:before   {
     content:"*";
-    color:red; 
+    color:#dd4b39; 
 }
