@@ -27,7 +27,7 @@
 
 </style>
 
-@using (Html.BeginForm("Profile", "User", new { part = "Profile" }))
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
     <input type="hidden" id="profileCollapsed" name="profileCollapsed" value="true" />
@@ -380,15 +380,17 @@
             <div class="box-footer">
                 <div class="form-group">
                     <div id="profileEditBtn" class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
-                    <input id="profileSubmit" type="submit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right" />
+                    <input id="profileSubmit" type="submit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right" 
+                           formaction="@Url.Action(actionName: "Profile", controllerName: "User",routeValues: new { part = "Profile" })#user-info-panel" formmethod="post"
+                           />
                 </div>
             </div><!-- box-footer -->
         </div><!-- /.box -->
      </div>
 
 }
-
-@using (Html.BeginForm("Profile", "User", new { part = "KBQ" }))
+ 
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
     <input type="hidden" id="profileCollapsed" name="profileCollapsed" value="true" />
@@ -711,67 +713,68 @@ new
             <div class="box-footer">
                 <div class="form-group">
                     <div id="kbqEditBtn" class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
-                    <input type="submit" id="kbqSubmit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right" />
+                    <input type="submit" id="kbqSubmit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right" 
+                            formaction="@Url.Action(actionName: "Profile", controllerName: "User",routeValues: new { part = "KBQ" })#kbq-panel" formmethod="post" />
                 </div>
             </div><!-- box-footer -->
         </div><!-- /.box -->
     </div>
-}
+} 
+ 
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" id="profileCollapsed" name="profileCollapsed" />
+        <input type="hidden" id="kbqCollapsed" name="kbqCollapsed" />
+        <input type="hidden" id="sqCollapsed" name="sqCollapsed" />
 
-@using (Html.BeginForm("Profile", "User", new { part = "SQ" }))
-{
-    @Html.AntiForgeryToken()
-    <input type="hidden" id="profileCollapsed" name="profileCollapsed" />
-    <input type="hidden" id="kbqCollapsed" name="kbqCollapsed" />
-    <input type="hidden" id="sqCollapsed" name="sqCollapsed" />
-
-    <div id="sq-panel" class="profileDiv">
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title"> Security Questions </h3>
-                <div class="box-tools pull-right">
-                    <div class="pull-right">
-                        <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                    </div>
-                </div><!-- /.box-tools -->
-            </div>  @*.box-header*@
-
-            <div>
-                @if (ViewData.ModelState.IsValid == false && inValidSQ)
-                {
-                    @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new { @class = "alert alert-danger" })
-                }
-
-                @if (ViewBag.SaveSQSuccessfull != null && !string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
-                {
-                    <div class="alert alert-success alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <h5>
-                            <i class="icon fa fa-check"></i>
-                            @ViewBag.SuccessMessage
-                        </h5>
-                    </div>
-                }
-
-            </div> 
-
-            <section class="box-body form-horizontal">
-                <h3>Select Answers to 2 Security Questions</h3>
-                Security Questions are used to unlock your account if it is locked because of suspicion of compromise.
-                You may be asked the answer to these questions by your authority.
-                <br/>
-                <br/>
-                <br /> 
-                <div class="editabledDiv">
-
-                    <!-- question 1 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(model => Model.UserSQ.SecuritryQuestion1)
+        <div id="sq-panel" class="profileDiv">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title"> Security Questions </h3>
+                    <div class="box-tools pull-right">
+                        <div class="pull-right">
+                            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                         </div>
-                        <div class="col-md-8">
+                    </div><!-- /.box-tools -->
+                </div>  @*.box-header*@
 
-                            @Html.DropDownListFor(
+                <div>
+                    @if (ViewData.ModelState.IsValid == false && inValidSQ)
+                {
+                @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+                }
+
+                    @if (ViewBag.SaveSQSuccessfull != null && !string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
+                {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <h5>
+                        <i class="icon fa fa-check"></i>
+                        @ViewBag.SuccessMessage
+                    </h5>
+                </div>
+                }
+
+                </div>
+
+                <section class="box-body form-horizontal">
+                    <h3>Select Answers to 2 Security Questions</h3>
+                    Security Questions are used to unlock your account if it is locked because of suspicion of compromise.
+                    You may be asked the answer to these questions by your authority.
+                    <br />
+                    <br />
+                    <br />
+                    <div class="editabledDiv">
+
+                        <!-- question 1 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(model => Model.UserSQ.SecuritryQuestion1)
+                            </div>
+                            <div class="col-md-8">
+
+                                @Html.DropDownListFor(
                       model => Model.UserSQ.SecuritryQuestion1,
                       sqQuestionPool.Select(i => new SelectListItem
                       {
@@ -785,22 +788,22 @@ new
                           @class = "form-control",
                           disabled = "disabled"
                       })
-                            @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer1)*@
+                                @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer1)*@
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- anwser 1 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer1, htmlAttributes: new
+                        <!-- anwser 1 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer1, htmlAttributes: new
                        {
                            @class = "control-label required"
                        })
-                        </div>
+                            </div>
 
-                        <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ1)
-                            @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer1, new
+                            <div class="col-md-8">
+                                @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ1)
+                                @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer1, new
                        {
                            htmlAttributes = new
                            {
@@ -808,18 +811,18 @@ new
                                @style = "margin-top:5px"
                            }
                        })
+                            </div>
                         </div>
-                    </div>
 
 
-                    <!-- question 2 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(model => Model.UserSQ.SecurityQuestion2)
-                        </div>
-                        <div class="col-md-8">
+                        <!-- question 2 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(model => Model.UserSQ.SecurityQuestion2)
+                            </div>
+                            <div class="col-md-8">
 
-                            @Html.DropDownListFor(
+                                @Html.DropDownListFor(
                       model => Model.UserSQ.SecurityQuestion2,
                       sqQuestionPool.Select(i => new SelectListItem
                       {
@@ -833,23 +836,23 @@ new
                           @class = "form-control",
                           disabled = "disabled"
                       })
-                            @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer2)*@
+                                @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer2)*@
 
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- anwser 2 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer2, htmlAttributes: new
+                        <!-- anwser 2 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer2, htmlAttributes: new
                        {
                            @class = "control-label required"
                        })
-                        </div>
+                            </div>
 
-                        <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ2)
-                            @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer2, new
+                            <div class="col-md-8">
+                                @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ2)
+                                @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer2, new
                        {
                            htmlAttributes = new
                            {
@@ -857,28 +860,28 @@ new
                                @style = "margin-top:5px;"
                            }
                        })
+                            </div>
                         </div>
                     </div>
-                </div>
 
-            </section>@*.box-body*@
-            <div class="box-footer">
-                <div class="form-group">
-                    <div id="sqEditBtn" class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
-                    <input type="submit" id="sqSubmit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right" />
-                </div>
-            </div><!-- box-footer -->
-        </div><!-- /.box -->
-    </div> 
-}
+                </section>@*.box-body*@
+                <div class="box-footer">
+                    <div class="form-group">
+                        <div id="sqEditBtn" class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
+                        <input type="submit" id="sqSubmit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right" 
+                                         formaction="@Url.Action(actionName: "Profile", controllerName: "User",routeValues: new { part = "SQ" })#sq-panel" formmethod="post" />
+                    </div>
+                </div><!-- box-footer -->
+            </div><!-- /.box -->
+        </div>
+    } 
+    @section Scripts {
+        @Scripts.Render(paths: "~/bundles/profile")
+        @Scripts.Render(paths: "~/bundles/jqueryval")
+    }
 
-@section Scripts {
-    @Scripts.Render(paths: "~/bundles/profile")
-    @Scripts.Render(paths: "~/bundles/jqueryval")
-}
-
-<script type="text/javascript">
-    var profileCollapsed = '@Html.Raw(ViewBag.profileCollapsed)';
-    var kbqCollapsed = '@Html.Raw(ViewBag.kbqCollapsed)';
-    var sqCollapsed = '@Html.Raw(ViewBag.sqCollapsed)';  
- </script>
+    <script type="text/javascript">
+        var profileCollapsed = '@Html.Raw(ViewBag.profileCollapsed)';
+        var kbqCollapsed = '@Html.Raw(ViewBag.kbqCollapsed)';
+        var sqCollapsed = '@Html.Raw(ViewBag.sqCollapsed)';
+    </script>
