@@ -179,7 +179,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             pristineUserModel.UserKBQ.UserProfileId = userProfileId;
-            var kbqQuestionAnswers = GetPostedUserKbqQuestions(pristineUserModel.UserKBQ); 
+            var kbqQuestionAnswers = GetPostedUserKbqQuestions(model.UserKBQ); 
             var validateResult = _questionAnswerService.ValidateUserKbqData(kbqQuestionAnswers);
             switch (validateResult)
             {
