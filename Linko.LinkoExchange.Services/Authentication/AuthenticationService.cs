@@ -197,7 +197,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
 
                 // Check if the new password is one of the password used last # numbers
-                if (IsValidPasswordCheckInHistory(newPassword, applicationUser.UserProfileId, organizationSettings))
+                if (!IsValidPasswordCheckInHistory(newPassword, applicationUser.UserProfileId, organizationSettings))
                 {
                     authenticationResult.Success = false;
                     authenticationResult.Result = AuthenticationResult.CanNotUseOldPassword;
