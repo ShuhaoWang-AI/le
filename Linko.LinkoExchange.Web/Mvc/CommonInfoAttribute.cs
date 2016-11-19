@@ -22,7 +22,7 @@ namespace Linko.LinkoExchange.Web.Mvc
             if (filterContext.HttpContext.User.Identity.IsAuthenticated)
             {
                 var portalName = _sessionCache.GetClaimValue(CacheKey.PortalName);
-                filterContext.Controller.ViewBag.PortalName = portalName;
+                filterContext.Controller.ViewBag.PortalName = string.IsNullOrWhiteSpace(portalName) ? "" : portalName;
                 filterContext.Controller.ViewBag.OrganizationName = string.IsNullOrWhiteSpace(portalName) ? "" : _sessionCache.GetClaimValue(CacheKey.OrganizationName);
                 filterContext.Controller.ViewBag.UserName = _sessionCache.GetClaimValue(CacheKey.UserName);
                 filterContext.Controller.ViewBag.UserRole = _sessionCache.GetClaimValue(CacheKey.UserRole); 

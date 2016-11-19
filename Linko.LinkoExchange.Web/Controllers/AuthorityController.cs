@@ -190,7 +190,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 PhoneExt = authority.OrganizationDto.PhoneExt,
                 FaxNumber = authority.OrganizationDto.FaxNumber,
                 WebsiteUrl = authority.OrganizationDto.WebsiteURL,
-                HasPermissionForUpdate = userRole.ToLower().Equals(value: "administrator"),
+                HasPermissionForUpdate = userRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString()),
 
                 FailedPasswordAttemptMaxCount           = authoritySettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.FailedPasswordAttemptMaxCount))
@@ -286,13 +286,14 @@ namespace Linko.LinkoExchange.Web.Controllers
         
         #region Show Authority Users
 
-        // GET: /Authority/AuthorityUsers
+        // GET: /Authority/Users
         [Route("Users")]
         public ActionResult AuthorityUsers()
         {
             int id = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authority = _organizationService.GetOrganizationRegulatoryProgram(id);
             ViewBag.Title = string.Format(format: "{0} Users", arg0: authority.OrganizationDto.OrganizationName);
+            ViewBag.CanInvite = _sessionCache.GetClaimValue(CacheKey.UserRole).IsCaseInsensitiveEqual(UserRole.Administrator.ToString());
             return View();
         }
 
@@ -377,7 +378,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var organizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var invitations = _invitationService.GetInvitationsForOrgRegProgram(organizationRegulatoryProgramId);
 
-            var viewModels = invitations.Select(vm => new AuthorityUserPendingInvitationViewModel
+            var viewModels = invitations.Select(vm => new PendingInvitationViewModel
             {
                 ID = vm.InvitationId,
                 FirstName = vm.FirstName,
@@ -401,7 +402,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(HttpVerbs.Post)]
-        public ActionResult AuthorityUsers_PendingInvitations_Delete([DataSourceRequest] DataSourceRequest request, [Bind(Prefix = "models")]IEnumerable<AuthorityUserPendingInvitationViewModel> items)
+        public ActionResult AuthorityUsers_PendingInvitations_Delete([DataSourceRequest] DataSourceRequest request, [Bind(Prefix = "models")]IEnumerable<PendingInvitationViewModel> items)
         {
             if (!ModelState.IsValid)
             {
@@ -526,7 +527,6 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         // user remove successfully
         // GET: /Authority/AuthorityUserRemoved
-        [AllowAnonymous]
         public ActionResult AuthorityUserRemoved()
         {
             ConfirmationViewModel model = new ConfirmationViewModel();
@@ -591,6 +591,12 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var user = _userService.GetOrganizationRegulatoryProgramUser(id);
             var userQuesAns = _questionAnswerService.GetUsersQuestionAnswers(user.UserProfileId, QuestionTypeName.SQ);
+            var currentUserRole = _sessionCache.GetClaimValue(CacheKey.UserRole) ?? "";
+            var currentUserProfileId = _sessionCache.GetClaimValue(CacheKey.UserProfileId);
+
+            ViewBag.HasPermissionForUpdate = currentUserRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString()) &&
+                !currentUserProfileId.IsCaseInsensitiveEqual(user.UserProfileId.ToString());
+            ViewBag.HasPermissionForChangeRole= currentUserRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString());
 
             var viewModel = new AuthorityUserViewModel
             {
@@ -789,7 +795,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 HasSignatory = industry.HasSignatory,
                 AssignedTo = industry.AssignedTo,
                 LastSubmission = DateTime.Now, //TODO: get last submission date from service when implement //industry.LastSubmission 
-                HasPermissionForEnableDisable = userRole.ToLower().Equals(value: "administrator")
+                HasPermissionForEnableDisable = userRole.ToLower().IsCaseInsensitiveEqual(UserRole.Administrator.ToString())
             };
             return viewModel;
         }
@@ -824,7 +830,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                 ResetEmail = vm.UserProfileDto.Email,
                 DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime,
                 Status = vm.IsEnabled,
-                AccountLocked = vm.UserProfileDto.IsAccountLocked
+                AccountLocked = vm.UserProfileDto.IsAccountLocked,
+                Role = vm.PermissionGroup.PermissionGroupId,
+                RoleText = vm.PermissionGroup.Name
             });
 
             DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
@@ -839,7 +847,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                 ResetEmail = vm.ResetEmail,
                 DateRegistered = vm.DateRegistered,
                 StatusText = vm.StatusText,
-                AccountLockedText = vm.AccountLockedText
+                AccountLockedText = vm.AccountLockedText,
+                Role = vm.Role,
+                RoleText = vm.RoleText
             });
 
             return Json(result);
@@ -887,7 +897,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var organizationRegulatoryProgramId = int.Parse(industryId);
             var invitations = _invitationService.GetInvitationsForOrgRegProgram(organizationRegulatoryProgramId);
 
-            var viewModels = invitations.Select(vm => new IndustryUserPendingInvitationViewModel
+            var viewModels = invitations.Select(vm => new PendingInvitationViewModel
             {
                 ID = vm.InvitationId,
                 FirstName = vm.FirstName,
@@ -911,7 +921,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(HttpVerbs.Post)]
-        public ActionResult IndustryUsers_PendingInvitations_Delete([DataSourceRequest] DataSourceRequest request, [Bind(Prefix = "models")]IEnumerable<IndustryUserPendingInvitationViewModel> items)
+        public ActionResult IndustryUsers_PendingInvitations_Delete([DataSourceRequest] DataSourceRequest request, [Bind(Prefix = "models")]IEnumerable<PendingInvitationViewModel> items)
         {
             if (!ModelState.IsValid)
             {
@@ -1070,7 +1080,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 DateRegistered = user.RegistrationDateTimeUtc.Value.DateTime,
                 Status = user.IsEnabled,
                 AccountLocked = user.UserProfileDto.IsAccountLocked,
-                Role = user.PermissionGroup.Name,
+                Role = user.PermissionGroup.PermissionGroupId,
+                RoleText = user.PermissionGroup.Name,
                 IsSignatory = user.IsSignatory,
                 SecurityQuestion1 = (userQuesAns.Count > 0 && userQuesAns.ElementAt(index: 0) != null) ? userQuesAns.ElementAt(index: 0).Question.Content : "",
                 Answer1 = (userQuesAns.Count > 0 && userQuesAns.ElementAt(index: 0) != null) ? userQuesAns.ElementAt(index: 0).Answer.Content : "",

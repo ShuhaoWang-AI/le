@@ -370,11 +370,15 @@
             </div>
 
         </section>@*.box-body*@
-        <div class="box-footer">
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-sm btn-primary pull-right" formaction="@Url.Action(actionName: "Settings", controllerName: "Authority")#AuthoritySettings" formmethod="post" />
-            </div>
-        </div><!-- box-footer -->
+
+        if (Model.HasPermissionForUpdate)
+        {
+            <div class="box-footer">
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-sm btn-primary pull-right" formaction="@Url.Action(actionName: "Settings", controllerName: "Authority")#AuthoritySettings" formmethod="post" />
+                </div>
+            </div><!-- box-footer -->
+        }
     }
 </div><!-- /.box -->
 
@@ -631,11 +635,14 @@
             </div>
 
         </section>@*.box-body*@
-        <div class="box-footer">
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-sm btn-primary pull-right" formaction="@Url.Action(actionName: "ProgramSettings", controllerName: "Authority")#ProgramSettings" formmethod="post" />
-            </div>
-        </div><!-- box-footer -->
+        if (Model.HasPermissionForUpdate)
+        {
+            <div class="box-footer">
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-sm btn-primary pull-right" formaction="@Url.Action(actionName: "ProgramSettings", controllerName: "Authority")#ProgramSettings" formmethod="post" />
+                </div>
+            </div><!-- box-footer -->
+        }
     }
 </div><!-- /.box -->
 

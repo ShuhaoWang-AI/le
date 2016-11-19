@@ -29,8 +29,8 @@ namespace Linko.LinkoExchange.Services.Cache
 
         public string GetClaimValue(string claimType)
         {
-            var owinUserId = GetValue(CacheKey.OwinUserId) as string;
-            if (string.IsNullOrWhiteSpace(owinUserId)) return null;
+           // var owinUserId = GetValue(CacheKey.OwinUserId) as string;
+           // if (string.IsNullOrWhiteSpace(owinUserId)) return null;
 
             var owinClaims = GetValue(CacheKey.OwinClaims) as IList<Claim>;
             
@@ -38,6 +38,7 @@ namespace Linko.LinkoExchange.Services.Cache
             if(owinClaims == null)
             {
                 RestoreClaims();
+                owinClaims = GetValue(CacheKey.OwinClaims) as IList<Claim>;
             } 
 
             if (owinClaims != null)

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 using FluentValidation;
 using FluentValidation.Attributes;
 
-namespace Linko.LinkoExchange.Web.ViewModels.Authority
+namespace Linko.LinkoExchange.Web.ViewModels.Industry
 {
     [Validator(typeof(IndustryUserValidator))]
     public class IndustryUserViewModel
@@ -14,14 +16,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         {
             get; set;
         }
-
-        [ScaffoldColumn(false)]
-        [Display(Name = "iID")]
-        public int IID
-        {
-            get; set;
-        }
-
+        
         [ScaffoldColumn(false)]
         [Display(Name = "pID")]
         public int PID
@@ -122,8 +117,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
                 return AccountLocked ? "Unlock" : "Lock";
             }
         }
-        
-        [Editable(false)]
+
         [Display(Name = "Role")]
         public int Role
         {
@@ -137,6 +131,12 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get; set;
         }
 
+        public IList<SelectListItem> AvailableRoles
+        {
+            get; set;
+        }
+
+        [Editable(false)]
         [Display(Name = "Is Signatory")]
         public bool IsSignatory
         {

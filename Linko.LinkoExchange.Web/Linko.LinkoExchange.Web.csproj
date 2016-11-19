@@ -436,12 +436,12 @@
     <Compile Include="ViewModels\Account\RegisterViewModel.cs" />
     <Compile Include="ViewModels\Account\ResetPasswordViewModel.cs" />
     <Compile Include="ViewModels\Account\SignInViewModel.cs" />
-    <Compile Include="ViewModels\Authority\AuthorityUserPendingInvitationViewModel.cs" />
-    <Compile Include="ViewModels\Authority\IndustryUserPendingInvitationViewModel.cs" />
     <Compile Include="ViewModels\Authority\AuthoritySettingsViewModel.cs" />
     <Compile Include="ViewModels\Authority\AuthorityUserViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
+    <Compile Include="ViewModels\Shared\PendingInvitationViewModel.cs" />
+    <Compile Include="ViewModels\Industry\IndustryUserViewModel.cs" />
     <Compile Include="ViewModels\Industry\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Shared\ConfirmationViewModel.cs" />
     <Compile Include="ViewModels\Shared\JurisdictionViewModel.cs" />
@@ -484,6 +484,8 @@
     <Content Include="Views\Authority\AuthorityUsers.cshtml" />
     <Content Include="Views\Authority\AuthorityUserDetails.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />
+    <Content Include="Views\Industry\IndustryUserDetails.cshtml" />
+    <Content Include="Views\Industry\IndustryUsers.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

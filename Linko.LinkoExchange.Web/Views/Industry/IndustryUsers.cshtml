@@ -2,9 +2,7 @@
 
 <section>
     <ol class="breadcrumb">
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Industries", controllerName: "Authority")'"><i class=""></i> Industries </a></li>
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryDetails", controllerName: "Authority", routeValues: new { id = ViewBag.IndustryID })'"><i class=""></i> Details </a></li>
+        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Industry")'"><i class=""></i> Home </a></li>
         <li class="active">Users</li>
     </ol>
 </section>
@@ -20,7 +18,7 @@
         <div class="form-group">
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@
-                @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Authority.IndustryUserViewModel>()
+                @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Industry.IndustryUserViewModel>()
                     .Name(componentName: "gridUser")
                     .Columns(columns =>
                     {
@@ -70,10 +68,7 @@
                         .Ajax()
                         .ServerOperation(enabled: false)
                         .Batch(enabled: true)
-                        .Read(read => read.Action(actionName: "IndustryUsers_Read", controllerName: "Authority", routeValues: new
-                        {
-                            industryId = @ViewBag.IndustryId
-                        }))
+                        .Read(read => read.Action(actionName: "IndustryUsers_Read", controllerName: "Industry"))
                         .PageSize(pageSize: 10)
                         .Events(events => events.Error(handler: "error_handler"))
                     )
@@ -87,7 +82,7 @@
     <div class="box-header with-border">
         <h3 class="box-title">Pending Invitations</h3>
         <div class="box-tools pull-right">
-            <input type="button" value="Invite Administrator" class="btn btn-sm btn-primary" />
+            <input type="button" value="Invite" class="btn btn-sm btn-primary" />
             <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
         </div><!-- /.box-tools -->
@@ -139,11 +134,8 @@
                             model.Field(m => m.DateInvited);
                             model.Field(m => m.InviteExpires);
                         })
-                        .Read(read => read.Action(actionName: "IndustryUsers_PendingInvitations_Read", controllerName: "Authority", routeValues: new
-                        {
-                            industryId = @ViewBag.IndustryId
-                        }))
-                        .Destroy(d => d.Action(actionName: "IndustryUsers_PendingInvitations_Delete", controllerName: "Authority"))
+                        .Read(read => read.Action(actionName: "IndustryUsers_PendingInvitations_Read", controllerName: "Industry"))
+                        .Destroy(d => d.Action(actionName: "IndustryUsers_PendingInvitations_Delete", controllerName: "Industry"))
                         .PageSize(pageSize: 10)
                         .Events(events => events.Error(handler: "error_handler").RequestEnd(handler: "onRequestEnd"))
                     )
@@ -160,7 +152,7 @@
         gotoNextPage = function ()
         {
             var grid = $("#gridUser").data("kendoGrid");
-            var postUrl = "/Authority/IndustryUsers_Select";
+            var postUrl = "/Industry/IndustryUsers_Select";
 
             doAjaxAction(grid, postUrl, "", "Select an user");
         }

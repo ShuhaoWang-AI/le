@@ -117,15 +117,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
                 return AccountLocked ? "Unlock" : "Lock";
             }
         }
-
-        [Editable(false)]
+                
         [Display(Name = "Role")]
         public int Role
         {
             get; set;
         }
-
-        [Editable(false)]
+        
         [Display(Name = "Role")]
         public string RoleText
         {

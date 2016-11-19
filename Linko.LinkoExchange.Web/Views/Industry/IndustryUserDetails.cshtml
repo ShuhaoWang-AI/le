@@ -1,4 +1,4 @@
-﻿@model Linko.LinkoExchange.Web.ViewModels.Authority.AuthorityUserViewModel
+﻿@model Linko.LinkoExchange.Web.ViewModels.Industry.IndustryUserViewModel
 
 @{
     ViewBag.Title = "User Details";
@@ -6,8 +6,8 @@
 
 <section>
     <ol class="breadcrumb">
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "AuthorityUsers", controllerName: "Authority")'"><i class=""></i> Users </a></li>
+        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Industry")'"><i class=""></i> Home </a></li>
+        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryUsers", controllerName: "Industry")'"><i class=""></i> Users </a></li>
         <li class="active">User Details</li>
     </ol>
 </section>
@@ -24,10 +24,10 @@
                     @if (ViewBag.HasPermissionForUpdate)
                     {
                         <input type="submit" value="@Model.AccountLockedButtonText" class="btn btn-sm btn-primary" 
-                               formaction="@Url.Action(actionName: "AuthorityUserLockUnLock", controllerName: "Authority")" formmethod="post" />
-                        <input type="button" value="Remove" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#removeModal"/>
-                        <input type="button" value="Reset" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#resetModal"/>   
-                    }                
+                               formaction="@Url.Action(actionName: "IndustryUserLockUnLock", controllerName: "Industry")" formmethod="post" />
+                        <input type="button" value="Remove" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#removeModal" />
+                        <input type="button" value="Reset" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#resetModal"/>     
+                    }              
                 </div>
             </div><!-- /.box-tools -->
         </div>  @*.box-header*@
@@ -76,7 +76,7 @@
                             <div class="form-group">
                                 <div class="pull-right">
                                     <button type="submit" class="btn btn-sm btn-primary"
-                                            formaction="@Url.Action(actionName: "AuthorityUserReset", controllerName: "Authority")" formmethod="post">
+                                            formaction="@Url.Action(actionName: "IndustryUserReset", controllerName: "Industry")" formmethod="post">
                                         Reset
                                     </button>
                                     <button type="button" class="btn btn-sm btn-primary" data-dismiss="modal" aria-label="Close">Cancel</button>
@@ -102,7 +102,7 @@
                             <div class="form-group">
                                 <div class="pull-right">
                                     <button type="submit" class="btn btn-sm btn-primary"
-                                            formaction="@Url.Action(actionName: "AuthorityUserRemove", controllerName: "Authority")" formmethod="post">
+                                            formaction="@Url.Action(actionName: "IndustryUserRemove", controllerName: "Industry")" formmethod="post">
                                         Yes
                                     </button>
                                     <button type="button" class="btn btn-sm btn-primary" data-dismiss="modal" aria-label="Close">No</button>
@@ -156,6 +156,23 @@
                 })
                 <div class="col-md-4">
                     @Html.DropDownList("Role", Model.AvailableRoles, new { @class = "form-control" })
+                </div>
+
+                @Html.LabelFor(model => model.IsSignatory, htmlAttributes: new
+                {
+                    @class = "control-label col-md-2"
+                })
+                <div class="col-md-4">
+                    <div class="checkbox">
+                        @Html.EditorFor(model => model.IsSignatory, new
+                        {
+                            htmlAttributes = new
+                            {
+                                @class = "form-control",
+                                @disabled = "disabled"
+                            }
+                        })
+                    </div>
                 </div>
             </div>
 
@@ -262,7 +279,7 @@
             <div class="box-footer">
                 <div class="form-group">
                     <input type="submit" value="Save" class="btn btn-sm btn-primary pull-right" 
-                           formaction="@Url.Action(actionName: "AuthorityUserDetails", controllerName: "Authority")" formmethod="post" />
+                           formaction="@Url.Action(actionName: "IndustryUserDetails", controllerName: "Industry")" formmethod="post" />
                 </div>
             </div><!-- box-footer -->
         }
@@ -348,5 +365,5 @@
 }
 
 @section Scripts {
-    @Scripts.Render(paths:"~/bundles/jqueryval")
+    @Scripts.Render(paths: "~/bundles/jqueryval")
 }

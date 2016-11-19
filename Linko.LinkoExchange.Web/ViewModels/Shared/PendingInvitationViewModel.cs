@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Linko.LinkoExchange.Web.ViewModels.Authority
+namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
-    public class IndustryUserPendingInvitationViewModel
+    public class PendingInvitationViewModel
     {
         [ScaffoldColumn(false)]
         [Display(Name = "ID")]
