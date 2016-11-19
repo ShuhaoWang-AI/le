@@ -11,8 +11,6 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasKey(x => x.TimeZoneId);
 
-            Property(x => x.Abbreviation).IsRequired().HasMaxLength(10);
-
             Property(x => x.Name).IsRequired().HasMaxLength(100);
 
             Property(x => x.CreationDateTimeUtc).IsRequired();

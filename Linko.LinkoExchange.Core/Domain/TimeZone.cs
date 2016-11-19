@@ -12,8 +12,6 @@ namespace Linko.LinkoExchange.Core.Domain
         /// </summary>
         public int TimeZoneId { get; set; }
 
-        public string Abbreviation { get; set; }
-
         public string Name { get; set; }
 
         public DateTimeOffset CreationDateTimeUtc { get; set; }
