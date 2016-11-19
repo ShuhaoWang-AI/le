@@ -3181,51 +3181,58 @@ BEGIN
     PRINT '----------------------------------'
     
     -- Linko Support KBQs
+    -- string: Hash tHiS answer
     INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'Game of Thrones'
+	SELECT 'AKuOPfPEFZoHj9FLjgGatC34IIgOfou3ImkGJSew5HNRmJpgHWpG20VkoY/mU0kpVw=='
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite TV show?')
 		, UserProfileId
 	FROM dbo.tUserProfile
     WHERE UserName <> 'Linko'
 
+    -- string: Hash tHiS answer 2
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'Shantaram'
+	SELECT 'AE+w46NmQpmYTdIShLn6Kt5m97tLl/iaAAMXO5KBm9QaqPRurxHOWxlYHrDcyJO+Tg=='
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite book?')
 		, UserProfileId
 	FROM dbo.tUserProfile
     WHERE UserName <> 'Linko'
 
+    -- string: Hash tHiS answer 3
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'Skiing'
+	SELECT 'APkqDsEGZEKJAUkZ/0jxHAPFeYszYflXH8QYTgkRAAQt4BHmugJXGMV+PQXfDwQ47A=='
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite hobby?')
 		, UserProfileId
 	FROM dbo.tUserProfile
     WHERE UserName <> 'Linko'
 
+    -- string: Hash tHiS answer 4
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'Smith'
+	SELECT 'AEAsu7xLtE5tAiJLa6ljvx+INXQMjV2n4Nv2xpTdw7LCUGTZMOjC/SA8UlDVcJCcgw=='
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is the last name of your favorite teacher?')
 		, UserProfileId
 	FROM dbo.tUserProfile
     WHERE UserName <> 'Linko'
 
+    -- string: Hash tHiS answer 5
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'Spot'
+	SELECT 'ANiN5YMCvnaN26T9L1ABz0eBl3jqB2SCvljwFFouLIIW5b2dbFHKHqMF7BJccLmdhA=='
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite pet''s name?')
 		, UserProfileId
 	FROM dbo.tUserProfile
     WHERE UserName <> 'Linko'
 	
 	-- SQs
+    -- string: Test answer
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'Green'
+	SELECT 'bTnDtaQz5oHY/cbKJbvAOLjvCEegDzjjRGIpIoJlOZ63oRl/Qa5qf4iMTZnoFm3GhKC20ZQn0HP6uO22EaIYPaW55QmdDG3U/VxbJLZQF3jRiwEtHPuNk8+OiKZeLFGZ'
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite color?')
 		, UserProfileId
 	FROM dbo.tUserProfile
     WHERE UserName <> 'Linko'
 
+    -- string: Test answer
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'Italian'
+	SELECT 'bTnDtaQz5oHY/cbKJbvAOLjvCEegDzjjRGIpIoJlOZ63oRl/Qa5qf4iMTZnoFm3GhKC20ZQn0HP6uO22EaIYPaW55QmdDG3U/VxbJLZQF3jRiwEtHPuNk8+OiKZeLFGZ'
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite food?')
 		, UserProfileId
 	FROM dbo.tUserProfile
