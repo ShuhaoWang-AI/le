@@ -17,6 +17,7 @@ using NLog;
 using Linko.LinkoExchange.Web.Mvc;
 using System.Security.Claims;
 using Linko.LinkoExchange.Core.Resources;
+using Linko.LinkoExchange.Services.User;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -31,15 +32,17 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IRequestCache _requestCache;
         private readonly ILogger _logger;
+        private readonly IUserService _userService;
 
         public AccountController(IAuthenticationService authenticationService, IOrganizationService organizationService,
-            IQuestionAnswerService questionAnswerService, IRequestCache requestCache, ILogger logger)
+            IQuestionAnswerService questionAnswerService, IRequestCache requestCache, ILogger logger, IUserService userService)
         {
             _authenticationService = authenticationService;
             _organizationService = organizationService;
             _questionAnswerService = questionAnswerService;
             _requestCache = requestCache;
             _logger = logger;
+            _userService = userService;
         }
 
         #endregion
@@ -616,9 +619,13 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [Authorize]
-        public ActionResult ChangePasswordSucceed()
+        public ActionResult ChangeAccountSucceed()
         {
-            ViewBag.SuccessMessage = Message.PasswordChangeSucceed;
+            ViewBag.SuccessMessage = TempData["Message"];
+            ViewBag.SubTitle = TempData["SubTitle"];
+            TempData["SubTitle"] = "Change Email";
+            TempData["Message"] = "Change emal address succeeded.";
+
             return View();
         }
 
@@ -627,7 +634,12 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
-            var model = new ChangePasswordViewModel(); 
+            var model = new ChangePasswordViewModel();
+
+
+            var refer = HttpContext.Request.UrlReferrer;
+            ViewBag.refer = refer.ToString();
+
             return View(model);
         }
 
@@ -645,7 +657,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             var result = _authenticationService.ChangePasswordAsync(userId, model.Password).Result;
             if (result.Success)
             {
-                return RedirectToAction(actionName: "ChangePasswordSucceed");
+                TempData["SubTitle"] = "Change Password";
+                TempData["Message"] = "Change password succeeded";
+                return RedirectToAction(actionName: "ChangeAccountSucceed");
             }
             var errorMessage = result.Errors.Aggregate((i, j) => { return i + j; }); 
             ModelState.AddModelError(string.Empty, errorMessage: errorMessage);
@@ -655,7 +669,57 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Authorize]
         public ActionResult ChangeEmail()
         {
-            return View();
+            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
+            var userId = claimsIdentity.Claims.First(i => i.Type == CacheKey.OwinUserId).Value;
+            var email = claimsIdentity.Claims.First(i => i.Type == CacheKey.Email).Value;
+            var changeEmailViewModel = new ChangeEmailViewModel();
+            changeEmailViewModel.OldEmail = email;
+
+            return View(changeEmailViewModel);
+        }
+
+
+        [Authorize]
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult ChangeEmail(ChangeEmailViewModel model)
+        {
+            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
+            var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
+            var userProfileId = int.Parse(profileIdStr);
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var userDto = _userService.GetUserProfileById(userProfileId);
+            if (userDto == null ||
+                userDto != null && userDto.UserProfileId != userProfileId)
+            {
+                ModelState.AddModelError(string.Empty, errorMessage: "The email to change is not your email.");
+                ViewBag.inValidData = true;
+                return View(model);
+            }
+
+            var result = _userService.UpdateEmail(userProfileId, model.NewEmail);
+            if (!result)
+            {
+                ViewBag.inValidData = true;
+                ModelState.AddModelError(string.Empty, errorMessage: "Change email address failed."); 
+
+                return View(model);
+            } else
+            {
+                // TODO:need to update the claims now.
+
+                TempData["SubTitle"] = "Change Email";
+                TempData["Message"] = "Change emal address succeeded.";
+                return RedirectToAction(actionName: "ChangeAccountSucceed");
+            }
+
+
+            var changeEmailViewModel = new ChangeEmailViewModel();  
+            return View(changeEmailViewModel);
         }
 
         //

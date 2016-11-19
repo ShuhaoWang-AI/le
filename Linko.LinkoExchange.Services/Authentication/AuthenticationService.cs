@@ -1169,6 +1169,12 @@ namespace Linko.LinkoExchange.Services.Authentication
             return _userService.ValidateRegistrationUserData(userProfile, securityQuestions, kbqQuestions);
         }
 
+        // TODO: to implement 
+        public void UpdateClaim(string key, string value)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }

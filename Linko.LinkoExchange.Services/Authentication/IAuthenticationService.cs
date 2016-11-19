@@ -58,6 +58,9 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// </summary>
         /// <param name="claims">The claims to set</param>
         void SetCurrentUserClaims(IDictionary<string,string> claims);
+
+        void UpdateClaim(string key, string value); 
+
         IList<Claim> GetClaims();
         //sign off
         void SignOff();

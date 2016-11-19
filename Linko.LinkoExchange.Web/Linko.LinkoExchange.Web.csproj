@@ -396,6 +396,7 @@
     <Content Include="Scripts\kendo.modernizr.custom.js" />
     <Content Include="Scripts\linkoExchange.js" />
     <Content Include="Scripts\Profile.js" />
+    <Content Include="Views\Account\ChangeAccountSucceed.cshtml" />
     <Content Include="Views\Account\ChangeEmail.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -483,7 +484,6 @@
     <Content Include="Views\Authority\AuthorityUsers.cshtml" />
     <Content Include="Views\Authority\AuthorityUserDetails.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />
-    <Content Include="Views\Account\ChangePasswordSucceed.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
