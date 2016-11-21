@@ -149,7 +149,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 var itor = claims.GetEnumerator();
 
                 while (itor.MoveNext())
-                {
+                {    
                     currentClaims.Add(new Claim(itor.Current.Key, itor.Current.Value));
                 }
 
@@ -1033,7 +1033,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             _sessionCache.SetValue(CacheKey.OwinClaims, claims);
-
+            _authenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
             _authenticationManager.SignIn(authProperties, identity);
         }
         private void SetPasswordPolicy(IEnumerable<SettingDto> organizationSettings)
@@ -1169,10 +1169,25 @@ namespace Linko.LinkoExchange.Services.Authentication
             return _userService.ValidateRegistrationUserData(userProfile, securityQuestions, kbqQuestions);
         }
 
-        // TODO: to implement 
         public void UpdateClaim(string key, string value)
         {
-            throw new NotImplementedException();
+            _sessionCache.SetValue(key, value);
+            var currentClaims = GetClaims();
+            if (currentClaims !=null)
+            {                 
+                var claim = currentClaims.FirstOrDefault(i => i.Type == key);
+                if(claim != null)
+                {
+                    currentClaims.Remove(claim);
+                }
+
+                currentClaims.Add(new Claim(key, value)); 
+            }
+
+            var owinUserId = _sessionCache.GetValue(CacheKey.OwinUserId) as string; 
+
+            ClearClaims(owinUserId);
+            SaveClaims(owinUserId, currentClaims); 
         }
 
         #endregion

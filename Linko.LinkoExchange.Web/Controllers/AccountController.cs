@@ -634,8 +634,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
-            var model = new ChangePasswordViewModel();
-
+            var model = new ChangePasswordViewModel(); 
 
             var refer = HttpContext.Request.UrlReferrer;
             ViewBag.refer = refer.ToString();
@@ -678,7 +677,6 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(changeEmailViewModel);
         }
 
-
         [Authorize]
         [AcceptVerbs(HttpVerbs.Post)]
         public ActionResult ChangeEmail(ChangeEmailViewModel model)
@@ -708,15 +706,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                 ModelState.AddModelError(string.Empty, errorMessage: "Change email address failed."); 
 
                 return View(model);
-            } else
+            }
+            else
             {
-                // TODO:need to update the claims now.
+                _authenticationService.UpdateClaim(CacheKey.Email, model.NewEmail);
 
                 TempData["SubTitle"] = "Change Email";
                 TempData["Message"] = "Change emal address succeeded.";
                 return RedirectToAction(actionName: "ChangeAccountSucceed");
             }
-
 
             var changeEmailViewModel = new ChangeEmailViewModel();  
             return View(changeEmailViewModel);
