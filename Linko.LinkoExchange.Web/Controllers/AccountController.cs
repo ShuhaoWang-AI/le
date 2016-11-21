@@ -14,9 +14,7 @@ using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.ViewModels.Account;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
-using Linko.LinkoExchange.Web.Mvc;
 using System.Security.Claims;
-using Linko.LinkoExchange.Core.Resources;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.ViewModels.User;
 using Linko.LinkoExchange.Services.Invitation;
@@ -572,12 +570,16 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
-            var model = new ChangePasswordViewModel(); 
 
-            var refer = HttpContext.Request.UrlReferrer;
-            ViewBag.refer = refer.ToString();
-
-            return View(model);
+            if (NeedToValidKbq())
+            {
+                return RedirectToAction("KbqChallenge", new { returnUrl = Request.Url.ToString() });
+            }
+            else
+            {
+                var model = new ChangePasswordViewModel(); 
+                return View(model);
+            }
         }
 
         [AcceptVerbs(HttpVerbs.Post)]
@@ -608,14 +610,9 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var userId = claimsIdentity.Claims.First(i => i.Type == CacheKey.OwinUserId).Value;
-            var email = claimsIdentity.Claims.First(i => i.Type == CacheKey.Email).Value;
-
-            var previousUri = HttpContext.Request.UrlReferrer;
-            var kbqPass = TempData["KbqPass"] as string; 
-
-            if ( (previousUri == null ||  previousUri.AbsolutePath.ToLower().IndexOf("user/profile") < 0 ) &&
-                (string.IsNullOrWhiteSpace(kbqPass) || kbqPass != "true")
-                ) 
+            var email = claimsIdentity.Claims.First(i => i.Type == CacheKey.Email).Value; 
+          
+            if (NeedToValidKbq())
             {
                 return RedirectToAction("KbqChallenge", new { returnUrl = Request.Url.ToString() });
             }
@@ -685,6 +682,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return View(kbqChallange);
         }
+
         [AcceptVerbs(HttpVerbs.Post)]
         public ActionResult KbqChallenge(KbqChallengeViewModel model, string returnUrl)
         {
@@ -695,13 +693,13 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (!_questionAnswerService.ConfirmCorrectAnswer(model.QuestionAnswerId, model.Answer.ToLower()))
             {
                 ModelState.AddModelError(key: "", errorMessage: "Wrong Answer.");
-                
+
                 return View(model);
-            } 
+            }
             else
             {
                 TempData["KbqPass"] = "true";
-                return Redirect(returnUrl);     /// RedirectToLocal(returnUrl);
+                return Redirect(returnUrl);
             }
         }
 
@@ -799,6 +797,14 @@ namespace Linko.LinkoExchange.Web.Controllers
         #endregion
 
         #region Helpers
+
+        private bool NeedToValidKbq()
+        {
+            var kbqPass = TempData["KbqPass"] as string;
+            var previousUri = HttpContext.Request.UrlReferrer;
+            return ( previousUri == null ||  previousUri.AbsolutePath.ToLower().IndexOf("user/profile") < 0 ) &&
+                   (string.IsNullOrWhiteSpace(kbqPass) || kbqPass != "true");
+        }
 
         private void AddErrors(IEnumerable<string> errors)
         {
