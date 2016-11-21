@@ -15,6 +15,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Account
         } 
      
         [Display(Name = "New Email")] 
+        [EmailAddress]
         public string NewEmail
         {
             get; set;
