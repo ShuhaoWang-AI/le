@@ -1945,7 +1945,7 @@ BEGIN
 		(
 		    'TimeZone'
 		    , 'Time zone'
-            , ''
+            , (SELECT TimeZoneId FROM dbo.tTimeZone WHERE Name = 'Eastern Standard Time')
 		    , @OrganizationTypeId_Authority
 		    , NULL
 		)
@@ -2250,54 +2250,66 @@ BEGIN
     PRINT '----------------------------------'
     
     -- Linko Support KBQs
+    -- string: Hash tHiS answer
     INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
 		VALUES 
 		(
-		    ''
+		    'AKuOPfPEFZoHj9FLjgGatC34IIgOfou3ImkGJSew5HNRmJpgHWpG20VkoY/mU0kpVw=='
 		    , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite vacation destination?')
 		    , @UserProfileId_Linko
 		)
+
+    -- string: Hash tHiS answer 2
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
 		VALUES 
 		(
-		    ''
+		    'AE+w46NmQpmYTdIShLn6Kt5m97tLl/iaAAMXO5KBm9QaqPRurxHOWxlYHrDcyJO+Tg=='
 		    , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What was your first pet''s name?')
 		    , @UserProfileId_Linko
 		)
+
+    -- string: Hash tHiS answer 3
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
 		VALUES 
 		(
-		    ''
+		    'APkqDsEGZEKJAUkZ/0jxHAPFeYszYflXH8QYTgkRAAQt4BHmugJXGMV+PQXfDwQ47A=='
 		    , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is the name of your home town newspaper?')
 		    , @UserProfileId_Linko
 		)
+
+    -- string: Hash tHiS answer 4
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
 		VALUES 
 		(
-		    ''
+		    'AEAsu7xLtE5tAiJLa6ljvx+INXQMjV2n4Nv2xpTdw7LCUGTZMOjC/SA8UlDVcJCcgw=='
 		    , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite hobby?')
 		    , @UserProfileId_Linko
 		)
+
+    -- string: Hash tHiS answer 5
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
 		VALUES 
 		(
-		    ''
+		    'ANiN5YMCvnaN26T9L1ABz0eBl3jqB2SCvljwFFouLIIW5b2dbFHKHqMF7BJccLmdhA=='
 		    , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite song?')
 		    , @UserProfileId_Linko
 		)
 	
 	-- Linko Support SQs
+    -- string: Test answer
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
 		VALUES 
 		(
-		    ''
+		    'bTnDtaQz5oHY/cbKJbvAOLjvCEegDzjjRGIpIoJlOZ63oRl/Qa5qf4iMTZnoFm3GhKC20ZQn0HP6uO22EaIYPaW55QmdDG3U/VxbJLZQF3jRiwEtHPuNk8+OiKZeLFGZ'
 		    , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is the name of your favorite sports team?')
 		    , @UserProfileId_Linko
 		)
+
+    -- string: Test answer
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
 		VALUES 
 		(
-		    ''
+		    'bTnDtaQz5oHY/cbKJbvAOLjvCEegDzjjRGIpIoJlOZ63oRl/Qa5qf4iMTZnoFm3GhKC20ZQn0HP6uO22EaIYPaW55QmdDG3U/VxbJLZQF3jRiwEtHPuNk8+OiKZeLFGZ'
 		    , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite food?')
 		    , @UserProfileId_Linko
 		)

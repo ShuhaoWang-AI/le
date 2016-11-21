@@ -3180,7 +3180,7 @@ BEGIN
     PRINT 'Add records to tUserQuestionAnswer'
     PRINT '----------------------------------'
     
-    -- Linko Support KBQs
+    -- KBQs
     -- string: Hash tHiS answer
     INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
 	SELECT 'AKuOPfPEFZoHj9FLjgGatC34IIgOfou3ImkGJSew5HNRmJpgHWpG20VkoY/mU0kpVw=='
