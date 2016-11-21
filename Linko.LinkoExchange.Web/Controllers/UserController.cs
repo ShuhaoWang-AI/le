@@ -145,7 +145,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                         new RouteValueDictionary {
                             { "action", "KbqChallenge" },
                             { "controller", "Account" },
-                            { "returnUrl", "Profile" }
+                            { "returnUrl", filterContext.HttpContext.Request.Url }
                         }
                     );
                 }

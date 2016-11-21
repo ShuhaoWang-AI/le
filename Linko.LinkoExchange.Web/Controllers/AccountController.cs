@@ -609,10 +609,22 @@ namespace Linko.LinkoExchange.Web.Controllers
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var userId = claimsIdentity.Claims.First(i => i.Type == CacheKey.OwinUserId).Value;
             var email = claimsIdentity.Claims.First(i => i.Type == CacheKey.Email).Value;
-            var changeEmailViewModel = new ChangeEmailViewModel();
-            changeEmailViewModel.OldEmail = email;
 
-            return View(changeEmailViewModel);
+            var previousUri = HttpContext.Request.UrlReferrer;
+            var kbqPass = TempData["KbqPass"] as string; 
+
+            if ( (previousUri == null ||  previousUri.AbsolutePath.ToLower().IndexOf("user/profile") < 0 ) &&
+                (string.IsNullOrWhiteSpace(kbqPass) || kbqPass != "true")
+                ) 
+            {
+                return RedirectToAction("KbqChallenge", new { returnUrl = Request.Url.ToString() });
+            }
+            else
+            {
+                var changeEmailViewModel = new ChangeEmailViewModel();
+                changeEmailViewModel.OldEmail = email;
+                return View(changeEmailViewModel);
+            }
         }
 
         [Authorize]
@@ -689,7 +701,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             else
             {
                 TempData["KbqPass"] = "true";
-                return RedirectToAction(returnUrl, "User");
+                return Redirect(returnUrl);     /// RedirectToLocal(returnUrl);
             }
         }
 
