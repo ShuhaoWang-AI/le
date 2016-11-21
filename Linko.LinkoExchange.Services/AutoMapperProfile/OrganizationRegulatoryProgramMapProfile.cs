@@ -13,6 +13,7 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
                 .ForMember(d => d.OrganizationDto, o => o.MapFrom(s => s.Organization))
                 .ForMember(d => d.HasSignatory, o => o.Ignore())
                 .ForMember(d => d.HasAdmin, o => o.Ignore())
+                .ForMember(d => d.RegulatorOrganizationId, o => o.MapFrom(s => s.RegulatorOrganizationId.HasValue ? s.RegulatorOrganizationId.Value : s.OrganizationId )) //They ARE the regulator
             .ReverseMap()
             .ForMember(d => d.PermissionGroups, o => o.Ignore())
             .ForMember(d => d.OrganizationRegulatoryProgramUsers, o => o.Ignore())

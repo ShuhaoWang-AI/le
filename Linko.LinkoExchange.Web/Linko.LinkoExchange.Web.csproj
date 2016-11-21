@@ -451,6 +451,7 @@
     <Compile Include="ViewModels\User\AnswerViewModel.cs" />
     <Compile Include="ViewModels\User\QuestionAnswerPairViewModel.cs" />
     <Compile Include="ViewModels\User\QuestionViewModel.cs" />
+    <Compile Include="ViewModels\User\RegistrationViewModel.cs" />
     <Compile Include="ViewModels\User\UserKBQViewModel.cs" />
     <Compile Include="ViewModels\User\UserProfileViewModel.cs" />
     <Compile Include="ViewModels\User\UserSQViewModel.cs" />
@@ -492,6 +493,7 @@
     <Content Include="Views\Industry\IndustryUserDetails.cshtml" />
     <Content Include="Views\Industry\IndustryUsers.cshtml" />
     <Content Include="Views\Account\KbqChallenge.cshtml" />
+    <Content Include="Views\Account\Register.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

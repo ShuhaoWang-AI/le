@@ -18,6 +18,10 @@ using Linko.LinkoExchange.Web.Mvc;
 using System.Security.Claims;
 using Linko.LinkoExchange.Core.Resources;
 using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Web.ViewModels.User;
+using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.Jurisdiction;
+using AutoMapper;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -33,9 +37,14 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IRequestCache _requestCache;
         private readonly ILogger _logger;
         private readonly IUserService _userService;
+        private readonly IInvitationService _invitationService;
+        private readonly IJurisdictionService _jurisdictionService;
+        private readonly IMapper _mapper;
+
 
         public AccountController(IAuthenticationService authenticationService, IOrganizationService organizationService,
-            IQuestionAnswerService questionAnswerService, IRequestCache requestCache, ILogger logger, IUserService userService)
+            IQuestionAnswerService questionAnswerService, IRequestCache requestCache, ILogger logger, IUserService userService,
+            IInvitationService invitationService, IJurisdictionService jurisdictionService, IMapper mapper)
         {
             _authenticationService = authenticationService;
             _organizationService = organizationService;
@@ -43,6 +52,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             _requestCache = requestCache;
             _logger = logger;
             _userService = userService;
+            _invitationService = invitationService;
+            _jurisdictionService = jurisdictionService;
+            _mapper = mapper;
         }
 
         #endregion
@@ -53,128 +65,54 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AllowAnonymous]
-        public ActionResult Register(UserDto userInfo, string registrationToken)
+        public ActionResult Register(string token)
         {
-            var kbq = new List<QuestionAnswerPairDto>()
+            var invitation = _invitationService.GetInvitation(token);
+            if (invitation == null)
             {
-                new QuestionAnswerPairDto
-                {
-                    Question = new QuestionDto
-                    {
-                        QuestionId = 1,
-                        Content ="What is the first and middle name of your oldest sibling?",
-                         QuestionType =  QuestionTypeName.KBQ,
-                          IsActive =true
-                    },
+                ModelState.AddModelError("Invitation", "Invalid invitation link.");
+                return View();
+            }
 
-                    Answer = new AnswerDto
-                    {
-                         Content ="test answer 1"
-                    }
-                },
+            var model = new RegistrationViewModel();
+            model.UserProfile = new UserProfileViewModel();
+            model.UserKBQ = new UserKBQViewModel();
+            model.UserSQ = new UserSQViewModel();
+            model.UserKBQ.QuestionPool = GetQuestionPool(QuestionTypeName.KBQ);
+            model.UserSQ.QuestionPool = GetQuestionPool(QuestionTypeName.SQ);
 
-                new QuestionAnswerPairDto
-                {
-                    Question = new QuestionDto
-                    {
-                        QuestionId = 2,
-                        Content ="What is your favorite vacation destination??",
-                        QuestionType =  QuestionTypeName.KBQ,
-                       IsActive =true
-                    },
+            model.UserProfile.FirstName = invitation.FirstName;
+            model.UserProfile.LastName = invitation.LastName;
+            model.UserProfile.Email = invitation.EmailAddress;
 
-                    Answer = new AnswerDto
-                    {
-                         Content ="test answer 2"
-                    }
-                },
+            model.UserProfile.StateList = GetStateList();
+            model.Token = token;
 
-                new QuestionAnswerPairDto
-                {
-                    Question = new QuestionDto
-                    {
-                        QuestionId = 3,
-                        Content ="What year and model (yyyy-name) was your first car?",
-                        QuestionType =  QuestionTypeName.KBQ,
-                       IsActive =true
-                    },
+            return View(model);
+        }
 
-                    Answer = new AnswerDto
-                    {
-                         Content ="test answer 3"
-                    }
-                },
-                new QuestionAnswerPairDto
-                {
-                    Question = new QuestionDto
-                    {
-                        QuestionId = 4,
-                        Content ="What is your favorite TV show?",
-                        QuestionType =  QuestionTypeName.KBQ,
-                       IsActive =true
-                    },
+        [AllowAnonymous]
+        [AcceptVerbs(HttpVerbs.Post)]
+        async public Task<ActionResult> Register(RegistrationViewModel model, string registrationToken)
+        {
+            UserDto userDto = _mapper.Map<UserProfileViewModel, UserDto>(model.UserProfile);
+            userDto.Password = model.UserProfile.Password;
+            userDto.AgreeTermsAndConditions = true;
 
-                    Answer = new AnswerDto
-                    {
-                         Content ="test answer 4"
-                    }
-                },
+            var kbqs = new List<AnswerDto>();
+            var sqs = new List<AnswerDto>();
+            kbqs.Add(new AnswerDto() { QuestionId = model.UserKBQ.KBQ1, Content = model.UserKBQ.KBQAnswer1 });
+            kbqs.Add(new AnswerDto() { QuestionId = model.UserKBQ.KBQ2, Content = model.UserKBQ.KBQAnswer2 });
+            kbqs.Add(new AnswerDto() { QuestionId = model.UserKBQ.KBQ3, Content = model.UserKBQ.KBQAnswer3 });
+            kbqs.Add(new AnswerDto() { QuestionId = model.UserKBQ.KBQ4, Content = model.UserKBQ.KBQAnswer4 });
+            kbqs.Add(new AnswerDto() { QuestionId = model.UserKBQ.KBQ5, Content = model.UserKBQ.KBQAnswer5 });
+            sqs.Add(new AnswerDto() { QuestionId = model.UserSQ.SecurityQuestion1, Content = model.UserSQ.SecurityQuestionAnswer1 });
+            sqs.Add(new AnswerDto() { QuestionId = model.UserSQ.SecurityQuestion2, Content = model.UserSQ.SecurityQuestionAnswer2 });
 
-                new QuestionAnswerPairDto
-                {
-                    Question = new QuestionDto
-                    {
-                        QuestionId = 5,
-                        Content ="Where did you first meet your spouse?",
-                        QuestionType =  QuestionTypeName.KBQ,
-                       IsActive =true
-                    },
-
-                    Answer = new AnswerDto
-                    {
-                         Content ="test answer 5"
-                    }
-                },
-            };
-            
-            var sq = new List<QuestionAnswerPairDto>()
-            {
-                new QuestionAnswerPairDto
-                {
-                    Question = new QuestionDto
-                    {
-                        QuestionId = 21,
-                        Content ="What is the name of your favorite sports team?",
-                         QuestionType =  QuestionTypeName.SQ
-                    },
-
-                    Answer = new AnswerDto
-                    {
-                         Content ="test answer 6"
-                    }
-                },
-
-                new QuestionAnswerPairDto
-                {
-                    Question = new QuestionDto
-                    {
-                        QuestionId = 22,
-                        Content ="What street was your childhood home located on?",
-                        QuestionType =  QuestionTypeName.SQ,
-                       IsActive =true
-                    },
-
-                    Answer = new AnswerDto
-                    {
-                         Content ="test answer 7"
-                    }
-                }
-                };
-
-
-        //    var ret = _authenticationService.Register(userInfo, registrationToken, sq, kbq);
+            var result = await _authenticationService.Register(userDto, model.Token, sqs, kbqs);
             return View();
         }
+
 
 
         #region default action
@@ -868,6 +806,26 @@ namespace Linko.LinkoExchange.Web.Controllers
             return RedirectToAction(actionName: "Index", controllerName: "Home");
         }
 
+        private List<JurisdictionViewModel> GetStateList()
+        {
+            var list = _jurisdictionService.GetStateProvs((int)(Country.USA));
+            var stateList = new List<JurisdictionViewModel>();
+            foreach (var jur in list)
+            {
+                stateList.Add(new JurisdictionViewModel
+                {
+                    JurisdictionId = jur.JurisdictionId,
+                    StateName = jur.Name
+                });
+            };
+
+            return stateList;
+        }
+        private List<QuestionViewModel> GetQuestionPool(QuestionTypeName type)
+        {
+            return _questionAnswerService.GetQuestions().Select(i => _mapper.Map<QuestionViewModel>(i)).ToList()
+                .Where(i => i.QuestionType == type).ToList();
+        }
         #endregion
     }
 }

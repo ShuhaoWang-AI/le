@@ -328,6 +328,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                         #region Update the new user profile  
 
                         applicationUser.TitleRole = userInfo.TitleRole;
+                        applicationUser.BusinessName = userInfo.BusinessName;
                         applicationUser.FirstName = userInfo.UserName;
                         applicationUser.LastName = userInfo.LastName;
                         applicationUser.UserName = userInfo.UserName;

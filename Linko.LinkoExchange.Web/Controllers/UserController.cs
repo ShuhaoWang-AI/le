@@ -293,7 +293,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var sqQuestionAnswers = new List<AnswerDto>();
             sqQuestionAnswers.Add(new AnswerDto
             {
-                QuestionId = model.SecuritryQuestion1,
+                QuestionId = model.SecurityQuestion1,
                 Content = model.SecurityQuestionAnswer1,
                 UserQuestionAnswerId = model.UserQuestionAnserId_SQ1
             });
@@ -427,7 +427,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             userSQViewModel.QuestionPool = GetQuestionPool(QuestionTypeName.SQ);
 
             ////  Security questions 
-            userSQViewModel.SecuritryQuestion1 = sqs[0].Question.QuestionId.Value;
+            userSQViewModel.SecurityQuestion1 = sqs[0].Question.QuestionId.Value;
             userSQViewModel.SecurityQuestion2 = sqs[1].Question.QuestionId.Value;
 
             userSQViewModel.SecurityQuestionAnswer2 = sqs[1].Answer.Content;

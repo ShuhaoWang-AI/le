@@ -26,7 +26,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
           
         [Required]
         [Display(Name = "Question 1")] 
-        public int SecuritryQuestion1
+        public int SecurityQuestion1
         {
             get;set;
         }
