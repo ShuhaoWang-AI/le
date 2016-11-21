@@ -14,6 +14,7 @@ using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Core.Enum;
 using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Routing;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -61,7 +62,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
-        [Authorize]
+        [Authorize] 
         [AcceptVerbs(HttpVerbs.Get)]
         public new ActionResult Profile()
         { 
@@ -126,6 +127,33 @@ namespace Linko.LinkoExchange.Web.Controllers
 
 
             return View(pristineUser);
+        }
+
+        protected override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            if (filterContext.RouteData.Values["action"].ToString().ToLower() == "profile")
+            {
+                var kbqPass = TempData["KbqPass"] as string;
+                if (!string.IsNullOrWhiteSpace(kbqPass) &&
+                     kbqPass.ToLower() == "true")
+                {
+                    base.OnActionExecuting(filterContext);
+                }
+                else
+                {
+                    filterContext.Result = new RedirectToRouteResult(
+                        new RouteValueDictionary {
+                            { "action", "KbqChallenge" },
+                            { "controller", "Account" },
+                            { "returnUrl", "Profile" }
+                        }
+                    );
+                }
+            }
+            else
+            {
+                base.OnActionExecuting(filterContext);
+            }
         }
 
         private ActionResult SaveUserProfile(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)

@@ -720,6 +720,41 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(changeEmailViewModel);
         }
 
+        public ActionResult KbqChallenge(string returnUrl)
+        {
+            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
+            var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
+            var userProfileId = int.Parse(profileIdStr);
+
+            KbqChallengeViewModel kbqChallange = new KbqChallengeViewModel();
+            var questionAndAnswer = _questionAnswerService.GetRandomQuestionAnswerFromUserProfileId(userProfileId, QuestionTypeName.KBQ); 
+
+            kbqChallange.Question = questionAndAnswer.Question.Content;
+            kbqChallange.QuestionAnswerId = questionAndAnswer.Answer.UserQuestionAnswerId.Value;
+            ViewBag.returnUrl = returnUrl; 
+
+            return View(kbqChallange);
+        }
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult KbqChallenge(KbqChallengeViewModel model, string returnUrl)
+        {
+            var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
+            var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
+            var userProfileId = int.Parse(profileIdStr);
+
+            if (!_questionAnswerService.ConfirmCorrectAnswer(model.QuestionAnswerId, model.Answer.ToLower()))
+            {
+                ModelState.AddModelError(key: "", errorMessage: "Wrong Answer.");
+                
+                return View(model);
+            } 
+            else
+            {
+                TempData["KbqPass"] = "true";
+                return RedirectToAction(returnUrl, "User");
+            }
+        }
+
         //
         // POST: /Account/ResetPassword
         [AcceptVerbs(HttpVerbs.Post)]

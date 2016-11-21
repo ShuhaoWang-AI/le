@@ -433,6 +433,7 @@
     <Compile Include="ViewModels\Account\ChangePasswordViewModel.cs" />
     <Compile Include="ViewModels\Account\ForgotPasswordViewModel.cs" />
     <Compile Include="ViewModels\Account\ForgotUserNameViewModel.cs" />
+    <Compile Include="ViewModels\Account\KbqChallengeViewModel.cs" />
     <Compile Include="ViewModels\Account\PortalDirectorViewModel.cs" />
     <Compile Include="ViewModels\Account\RegisterViewModel.cs" />
     <Compile Include="ViewModels\Account\ResetPasswordViewModel.cs" />
@@ -490,6 +491,7 @@
     <Content Include="Views\Authority\Invite.cshtml" />
     <Content Include="Views\Industry\IndustryUserDetails.cshtml" />
     <Content Include="Views\Industry\IndustryUsers.cshtml" />
+    <Content Include="Views\Account\KbqChallenge.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

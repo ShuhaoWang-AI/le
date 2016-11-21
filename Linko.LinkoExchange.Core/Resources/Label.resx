@@ -186,6 +186,9 @@
   <data name="TitleIndustryDetails" xml:space="preserve">
     <value>Industry Details</value>
   </data>
+  <data name="TitleKBQChanllenge" xml:space="preserve">
+    <value>KBQ Question Challenge</value>
+  </data>
   <data name="TitleLinkoExchangeSignIn" xml:space="preserve">
     <value>LinkoExchange Sign In</value>
   </data>

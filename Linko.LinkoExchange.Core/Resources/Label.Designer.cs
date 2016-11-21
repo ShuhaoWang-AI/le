@@ -268,6 +268,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to KBQ Question Challenge.
+        /// </summary>
+        public static string TitleKBQChanllenge {
+            get {
+                return ResourceManager.GetString("TitleKBQChanllenge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to LinkoExchange Sign In.
         /// </summary>
         public static string TitleLinkoExchangeSignIn {

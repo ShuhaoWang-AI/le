@@ -1,0 +1,81 @@
+﻿
+@{
+    ViewBag.Title = "KbqChallenge";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+} 
+
+@model Linko.LinkoExchange.Web.ViewModels.Account.KbqChallengeViewModel
+
+
+@using Linko.LinkoExchange.Web.ViewModels.Account
+@using Linko.LinkoExchange.Core.Resources
+
+
+@{
+    ViewBag.Title = Label.TitleKBQChanllenge;  
+    ViewBag.Description = "";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section>
+    <ol class="breadcrumb">
+        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Home")'"><i class=""></i> Home </a></li>
+        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Profile", controllerName: "User")'"><i class=""></i> Profile </a></li>
+
+        <li class="active">KBQ Question</li>
+    </ol>
+</section>
+
+
+<div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-5">
+    <div>
+        <h1 class="h3">@ViewBag.SubTitle</h1>
+    </div>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h4 class="box-title">@Label.TitleKBQChanllenge</h4>
+        </div> @*.box-header*@
+        <section id="Form1" class="box-body">
+            @using (Html.BeginForm(actionName: "KbqChallenge",
+                controllerName: "Account",
+                method: FormMethod.Post, routeValues:new { returnUrl = ViewBag.returnUrl }, 
+                htmlAttributes: new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Question, new { @class = "col-md-3 control-label" })
+                    <div class="col-md-9">
+                        @Html.TextBoxFor(m => m.Question, htmlAttributes: new
+                   {
+                       @class = "form-control",
+                       @readonly = "readonly"
+                   })
+
+                        @Html.HiddenFor(m => m.QuestionAnswerId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Answer, new { @class = "col-md-3 required control-label" })
+                    <div class="col-md-9">
+                        @Html.TextBoxFor(m => m.Answer, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Answer, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group pull-right">
+                        <input type="submit" class="btn btn-primary" value="Submit" />
+                    </div>
+                </div>
+            }
+        </section>@*.box-body*@
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render(paths: "~/bundles/jqueryval")
+}
