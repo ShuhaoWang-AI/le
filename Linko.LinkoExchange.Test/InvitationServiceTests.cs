@@ -19,6 +19,7 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.QuestionAnswer;
+using NLog;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -35,6 +36,7 @@ namespace Linko.LinkoExchange.Test
         Mock<ApplicationUserManager> _userManager;
         Mock<IQuestionAnswerService> _qaService;
         Mock<IHttpContextService> _httpContext;
+        Mock<ILogger> _logger;
 
         public InvitationServiceTests()
         {
@@ -66,6 +68,7 @@ namespace Linko.LinkoExchange.Test
             _userManager = new Mock<ApplicationUserManager>();
             _qaService = new Mock<IQuestionAnswerService>();
             _httpContext = new Mock<IHttpContextService>();
+            _logger = new Mock<ILogger>();
 
             _httpContext.Setup(x => x.GetRequestBaseUrl()).Returns("http://test.linkoexchange.com/");
 
@@ -77,7 +80,7 @@ namespace Linko.LinkoExchange.Test
                 _requestCache,//new RequestCache(),
                 _emailService,
                 new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance), new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance)),
-                _httpContext.Object, _timeZones.Object);
+                _httpContext.Object, _timeZones.Object, _logger.Object);
         }
 
         [TestMethod]

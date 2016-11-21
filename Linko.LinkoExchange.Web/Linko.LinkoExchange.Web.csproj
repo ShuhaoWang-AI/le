@@ -395,6 +395,7 @@
     <None Include="Scripts\_references.js" />
     <Content Include="Scripts\kendo.modernizr.custom.js" />
     <Content Include="Scripts\linkoExchange.js" />
+    <Content Include="Scripts\invite.js" />
     <Content Include="Scripts\Profile.js" />
     <Content Include="Views\Account\ChangeAccountSucceed.cshtml" />
     <Content Include="Views\Account\ChangeEmail.cshtml" />
@@ -442,6 +443,7 @@
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
     <Compile Include="ViewModels\Shared\PendingInvitationViewModel.cs" />
     <Compile Include="ViewModels\Industry\IndustryUserViewModel.cs" />
+    <Compile Include="ViewModels\Authority\InviteViewModel.cs" />
     <Compile Include="ViewModels\Industry\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Shared\ConfirmationViewModel.cs" />
     <Compile Include="ViewModels\Shared\JurisdictionViewModel.cs" />
@@ -484,8 +486,8 @@
     <Content Include="Views\Authority\AuthorityUsers.cshtml" />
     <Content Include="Views\Authority\AuthorityUserDetails.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />
-    <Content Include="Views\Industry\IndustryUserDetails.cshtml" />
-    <Content Include="Views\Industry\IndustryUsers.cshtml" />
+    <Content Include="Views\Account\ChangePasswordSucceed.cshtml" />
+    <Content Include="Views\Authority\Invite.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

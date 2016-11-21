@@ -1091,5 +1091,82 @@ namespace Linko.LinkoExchange.Web.Controllers
             return viewModel;
         }
         #endregion
+
+        // GET: /Authority/Invite
+        public ActionResult Invite()
+        {
+            return View(new InviteViewModel());
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult InviteCheckEmail(string emailAddress)
+        {
+            var orgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+            InviteViewModel viewModel = new InviteViewModel();
+            var foundUsers = _invitationService.CheckEmailAddress(orgRegProgramId, emailAddress);
+            if (foundUsers.ExistingUserSameProgram != null)
+            {
+                viewModel = new InviteViewModel()
+                {
+                    DisplayMessage = "This user is already associated with this account.",
+                    IsExistingProgramUser = true,
+                    //OrgRegProgramUserId = foundUsers.ExistingUserSameProgram.OrganizationRegulatoryProgramUserId,
+                    FirstName = foundUsers.ExistingUserSameProgram.UserProfileDto.FirstName,
+                    LastName = foundUsers.ExistingUserSameProgram.UserProfileDto.LastName,
+                    EmailAddress = foundUsers.ExistingUserSameProgram.UserProfileDto.Email,
+                    FacilityName = foundUsers.ExistingUserSameProgram.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName,
+                    PhoneNumber = foundUsers.ExistingUserSameProgram.OrganizationRegulatoryProgramDto.OrganizationDto.PhoneNumber
+
+                };
+            }
+            else if (foundUsers.ExistingUserDifferentProgram != null)
+            {
+                viewModel = new InviteViewModel()
+                {
+                    DisplayMessage = "Found user not yet associated with this Authority Regulatory Program.",
+                    IsExistingProgramUser = false,
+                    //OrgRegProgramUserId = foundUsers.ExistingUserDifferentProgram.OrganizationRegulatoryProgramUserId,
+                    FirstName = foundUsers.ExistingUserDifferentProgram.UserProfileDto.FirstName,
+                    LastName = foundUsers.ExistingUserDifferentProgram.UserProfileDto.LastName,
+                    EmailAddress = foundUsers.ExistingUserDifferentProgram.UserProfileDto.Email,
+                    FacilityName = foundUsers.ExistingUserDifferentProgram.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName,
+                    PhoneNumber = foundUsers.ExistingUserDifferentProgram.OrganizationRegulatoryProgramDto.OrganizationDto.PhoneNumber
+                };
+
+            }
+
+            return Json(viewModel);
+
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult Invite(InviteViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+
+            var orgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var result = _invitationService.SendUserInvite(orgRegProgramId, viewModel.EmailAddress, viewModel.FirstName, viewModel.LastName, InvitationType.AuthorityToAuthority);
+            if (result.Success)
+            {
+                _logger.Info(string.Format("Invite successfully sent. Email={0}, FirstName={1}, LastName={2}.",
+                    viewModel.EmailAddress, viewModel.FirstName, viewModel.LastName));
+                return new RedirectResult("~/Authority/Users");
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(error, error);
+                }
+            }
+
+            return View(viewModel);
+
+        }
+
     }
 }

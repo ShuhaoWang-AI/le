@@ -45,6 +45,8 @@ namespace Linko.LinkoExchange.Web
             bundles.Add(new ScriptBundle(virtualPath: "~/bundles/profile")
                 .Include(virtualPath: "~/Scripts/profile.js"));
 
+            bundles.Add(new ScriptBundle(virtualPath: "~/bundles/invite")
+                .Include(virtualPath: "~/Scripts/invite.js"));
 
 #if DEBUG
             BundleTable.EnableOptimizations = false;

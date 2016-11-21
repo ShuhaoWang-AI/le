@@ -135,6 +135,7 @@
     <Compile Include="Cache\ISessionCache.cs" />
     <Compile Include="Cache\SessionCache.cs" />
     <Compile Include="Dto\EnableOrganizationResultDto.cs" />
+    <Compile Include="Dto\InvitationCheckEmailResultDto.cs" />
     <Compile Include="Dto\JurisdictionDto.cs" />
     <Compile Include="Dto\ResetUserResultDto.cs" />
     <Compile Include="Dto\AccountLockoutResultDto.cs" />

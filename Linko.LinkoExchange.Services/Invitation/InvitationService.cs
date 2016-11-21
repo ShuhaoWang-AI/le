@@ -15,6 +15,7 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.User;
+using NLog;
 
 namespace Linko.LinkoExchange.Services.Invitation
 {
@@ -29,11 +30,12 @@ namespace Linko.LinkoExchange.Services.Invitation
         private readonly IOrganizationService _organizationService;
         private readonly IHttpContextService _httpContext;
         private readonly ITimeZoneService _timeZones;
+        private readonly ILogger _logger;
 
         public InvitationService(LinkoExchangeContext dbContext, IMapper mapper, 
             ISettingService settingService, IUserService userService, IRequestCache requestCache,
             IEmailService emailService, IOrganizationService organizationService, IHttpContextService httpContext,
-            ITimeZoneService timeZones) 
+            ITimeZoneService timeZones, ILogger logger) 
         {
             _dbContext = dbContext; 
             _mapper = mapper;
@@ -44,6 +46,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             _organizationService = organizationService;
             _httpContext = httpContext;
             _timeZones = timeZones;
+            _logger = logger;
         }
  
         public InvitationDto GetInvitation(string invitationId)
@@ -123,7 +126,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             else
                 authority = org.Organization;
 
-            var invites = _dbContext.Invitations.Where(i => i.RecipientOrganizationRegulatoryProgramId == orgRegProgramId);
+            var invites = _dbContext.Invitations.Where(i => i.SenderOrganizationRegulatoryProgramId == orgRegProgramId);
             if (invites != null)
             {
                 foreach (var invite in invites)
@@ -150,6 +153,8 @@ namespace Linko.LinkoExchange.Services.Invitation
 
         public InvitationServiceResultDto SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType)
         {
+            int recipientOrgRegProgramId = orgRegProgramId; // default
+
             //See if any existing users belong to this program
             var existingProgramUsers = _userService.GetProgramUsersByEmail(email);
             if (existingProgramUsers != null && existingProgramUsers.Count() > 0)
@@ -164,24 +169,27 @@ namespace Linko.LinkoExchange.Services.Invitation
                         Errors = new string[] { existingUserForThisProgram.UserProfileDto.FirstName, existingUserForThisProgram.UserProfileDto.LastName }
                     };
                 }
-
-                //Found match(es) for user not yet part of this program (4.a)
-                List<string> userList = new List<string>();
-                foreach (var user in existingProgramUsers)
+                else
                 {
-                    userList.Add(string.Format("{0}|{1}|{2}|{3}|{4}|{5}", user.OrganizationRegulatoryProgramId,
-                        user.UserProfileDto.FirstName,
-                        user.UserProfileDto.LastName,
-                        user.UserProfileDto.PhoneNumber,
-                        user.OrganizationRegulatoryProgramDto.RegulatoryProgramDto.Name,
-                        user.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName)); //Add additional as needed
+                    //Found match(es) for user not yet part of this program (4.a)
+                    List<string> userList = new List<string>();
+                    foreach (var user in existingProgramUsers)
+                    {
+                        userList.Add(string.Format("{0}|{1}|{2}|{3}|{4}|{5}", user.OrganizationRegulatoryProgramId,
+                            user.UserProfileDto.FirstName,
+                            user.UserProfileDto.LastName,
+                            user.UserProfileDto.PhoneNumber,
+                            user.OrganizationRegulatoryProgramDto.RegulatoryProgramDto.Name,
+                            user.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName)); //Add additional as needed
+                    }
+                    //return new InvitationServiceResultDto()
+                    //{
+                    //    Success = false,
+                    //    ErrorType = Core.Enum.InvitationError.MatchingUsersInOtherPrograms,
+                    //    Errors = userList
+                    //};
+                    recipientOrgRegProgramId = existingProgramUsers.First().OrganizationRegulatoryProgramId;
                 }
-                return new InvitationServiceResultDto()
-                {
-                    Success = false,
-                    ErrorType = Core.Enum.InvitationError.MatchingUsersInOtherPrograms,
-                    Errors = userList
-                };
 
             }
 
@@ -199,7 +207,6 @@ namespace Linko.LinkoExchange.Services.Invitation
                     Success = false,
                     ErrorType = Core.Enum.InvitationError.NoMoreRemainingUserLicenses
                 };
-
             }
 
             var invitationId = Guid.NewGuid().ToString();
@@ -213,7 +220,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                 EmailAddress = email,
                 FirstName = firstName,
                 LastName = lastName,
-                RecipientOrganizationRegulatoryProgramId = orgRegProgramId,
+                RecipientOrganizationRegulatoryProgramId = recipientOrgRegProgramId,
                 SenderOrganizationRegulatoryProgramId = orgRegProgramId,
             });
 
@@ -240,6 +247,8 @@ namespace Linko.LinkoExchange.Services.Invitation
             contentReplacements.Add("authorityName", authorityName);
             contentReplacements.Add("emailAddress", authorityEmail);
             contentReplacements.Add("phoneNumber", authorityPhone);
+            contentReplacements.Add("supportEmail", authorityEmail);
+            contentReplacements.Add("supportPhoneNumber", authorityPhone);
 
             if (invitationType == InvitationType.AuthorityToIndustry
                 || invitationType == InvitationType.IndustryToIndustry)
@@ -254,7 +263,24 @@ namespace Linko.LinkoExchange.Services.Invitation
             string url = baseUrl + "?token=" + invitationId;
             contentReplacements.Add("link", url);
 
-            _emailService.SendEmail(new[] { email }, EmailType.Registration_AuthorityInviteIndustryUser, contentReplacements);
+            EmailType emailType;
+            switch (invitationType)
+            {
+                case InvitationType.AuthorityToAuthority:
+                    emailType = EmailType.Registration_InviteAuthorityUser;
+                    break;
+                case InvitationType.AuthorityToIndustry:
+                    emailType = EmailType.Registration_AuthorityInviteIndustryUser;
+                    break;
+                case InvitationType.IndustryToIndustry:
+                    emailType = EmailType.Registration_IndustryInviteIndustryUser;
+                    break;
+                default:
+
+                    throw new Exception("ERROR: unknown EmailType");
+            }
+
+            _emailService.SendEmail(new[] { email }, emailType, contentReplacements);
 
             return new InvitationServiceResultDto()
             {
@@ -265,16 +291,43 @@ namespace Linko.LinkoExchange.Services.Invitation
 
         public void CreateInvitation(InvitationDto dto)
         {
-            var newInvitation = _dbContext.Invitations.Create();
-            newInvitation.InvitationId = dto.InvitationId;
-            newInvitation.InvitationDateTimeUtc = DateTimeOffset.Now;
-            newInvitation.EmailAddress = dto.EmailAddress;
-            newInvitation.FirstName = dto.FirstName;
-            newInvitation.LastName = dto.LastName;
-            newInvitation.RecipientOrganizationRegulatoryProgramId = dto.RecipientOrganizationRegulatoryProgramId;
-            newInvitation.SenderOrganizationRegulatoryProgramId = dto.SenderOrganizationRegulatoryProgramId;
-            _dbContext.Invitations.Add(newInvitation);
-            _dbContext.SaveChanges();
+            try
+            {
+                var newInvitation = _dbContext.Invitations.Create();
+                newInvitation.InvitationId = dto.InvitationId;
+                newInvitation.InvitationDateTimeUtc = DateTimeOffset.Now;
+                newInvitation.EmailAddress = dto.EmailAddress;
+                newInvitation.FirstName = dto.FirstName;
+                newInvitation.LastName = dto.LastName;
+                newInvitation.RecipientOrganizationRegulatoryProgramId = dto.RecipientOrganizationRegulatoryProgramId;
+                newInvitation.SenderOrganizationRegulatoryProgramId = dto.SenderOrganizationRegulatoryProgramId;
+                _dbContext.Invitations.Add(newInvitation);
+                _dbContext.SaveChanges();
+            }
+            catch (DbEntityValidationException ex)
+            {
+                List<RuleViolation> validationIssues = new List<RuleViolation>();
+                foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                {
+                    DbEntityEntry entry = item.Entry;
+                    string entityTypeName = entry.Entity.GetType().Name;
+
+                    foreach (DbValidationError subItem in item.ValidationErrors)
+                    {
+                        string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                        validationIssues.Add(new RuleViolation(string.Empty, null, message));
+
+                    }
+                }
+                _logger.Info(string.Format("CreateInvitation. DbEntityValidationException. Email={0}", dto.EmailAddress));
+                throw new RuleViolationException("Validation errors", validationIssues);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Info(string.Format("CreateInvitation. Error creating invitation. Email={0}", dto.EmailAddress));
+                throw (ex);
+            }
 
         }
 
@@ -283,6 +336,39 @@ namespace Linko.LinkoExchange.Services.Invitation
             var obj = _dbContext.Invitations.Find(invitationId);  
             _dbContext.Invitations.Remove(obj);
             _dbContext.SaveChanges();
+        }
+
+        public InvitationCheckEmailResultDto CheckEmailAddress(int orgRegProgramId, string emailAddress)
+        {
+            var existingProgramUsers = _userService.GetProgramUsersByEmail(emailAddress);
+            var existingProgramUser = existingProgramUsers.FirstOrDefault();
+
+            if (existingProgramUser != null)
+            {
+                if (existingProgramUser.OrganizationRegulatoryProgramId == orgRegProgramId)
+                {
+                    return new InvitationCheckEmailResultDto()
+                    {
+                        ExistingUserDifferentProgram = null,
+                        ExistingUserSameProgram = existingProgramUser
+                    };
+                }
+
+                //Found match(es) for user not yet part of this program (4.a)
+                return new InvitationCheckEmailResultDto()
+                {
+                    ExistingUserSameProgram = null,
+                    ExistingUserDifferentProgram = existingProgramUser
+                };
+
+            }
+
+            return new InvitationCheckEmailResultDto()
+            {
+                ExistingUserDifferentProgram = null,
+                ExistingUserSameProgram = null
+            };
+
         }
     }
 }

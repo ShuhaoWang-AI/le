@@ -38,5 +38,7 @@ namespace Linko.LinkoExchange.Services.Invitation
 
         InvitationServiceResultDto SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType);
 
+        InvitationCheckEmailResultDto CheckEmailAddress(int orgRegProgramId, string email);
+
     }
 }

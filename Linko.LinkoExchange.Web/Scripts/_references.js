@@ -6,6 +6,7 @@
 /// <reference path="bootstrap.js" />
 /// <reference path="bootstrap-switch.min.js" />
 /// <reference path="fastclick.js" />
+/// <reference path="invite.js" />
 /// <reference path="jquery.icheck.js" />
 /// <reference path="jquery.inputmask/inputmask.date.extensions.js" />
 /// <reference path="jquery.inputmask/inputmask.extensions.js" />

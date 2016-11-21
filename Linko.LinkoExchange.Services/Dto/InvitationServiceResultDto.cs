@@ -12,7 +12,7 @@ namespace Linko.LinkoExchange.Services.Dto
         }
 
         public InvitationDto InvitationDto { get; set; }
-        public bool Success { get; set; }  
+        public bool Success { get; set; }
         public InvitationError? ErrorType { get; set; }
         public IEnumerable<string> Errors { get; set; }
     } 

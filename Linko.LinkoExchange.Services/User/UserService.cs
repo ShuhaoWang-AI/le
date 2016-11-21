@@ -94,7 +94,7 @@ namespace Linko.LinkoExchange.Services.User
         public ICollection<OrganizationRegulatoryProgramUserDto> GetProgramUsersByEmail(string emailAddress)
         {
             var dtos = new List<OrganizationRegulatoryProgramUserDto>();
-            UserProfile userProfile = _dbContext.Users.SingleOrDefault(u => u.Email == emailAddress);
+            UserProfile userProfile = _dbContext.Users.SingleOrDefault(u => u.Email == emailAddress && u.EmailConfirmed == true);
             if (userProfile != null)
             {
                 var programUsers = _dbContext.OrganizationRegulatoryProgramUsers.Where(o => o.UserProfileId == userProfile.UserProfileId).ToList();
