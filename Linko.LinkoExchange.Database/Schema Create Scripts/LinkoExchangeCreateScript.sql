@@ -2085,7 +2085,7 @@ BEGIN
 		VALUES 
 		(
 		    'PasswordRequiredLength'
-		    , '6'
+		    , '8'
 		    , ''
 		)
 	INSERT INTO dbo.tSystemSetting (Name, Value, Description)
