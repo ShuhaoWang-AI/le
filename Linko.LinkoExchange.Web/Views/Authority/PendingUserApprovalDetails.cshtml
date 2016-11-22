@@ -136,6 +136,11 @@
                                 @disabled = "disabled"
                             }
                         })
+                        @Html.ValidationMessageFor(m => m.Role, "", new
+                        {
+                            @class = "text-danger"
+                        })
+                        @Html.HiddenFor(model => model.Role)
                     </div>
                 }
             </div>        

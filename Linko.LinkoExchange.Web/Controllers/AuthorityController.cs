@@ -1178,6 +1178,27 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewModel);
 
         }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult InviteExistingUser(int orgRegProgramUserId)
+        {
+            var orgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var result = _invitationService.SendUserInvite(orgRegProgramId, "", "", "", InvitationType.AuthorityToAuthority, orgRegProgramUserId);
+            if (result.Success)
+            {
+                _logger.Info(string.Format("Invite successfully sent to existing user in different program. OrgRegProgUserId={0} from ProgramId={1}", orgRegProgramUserId, orgRegProgramId));
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    _logger.Info(string.Format("Invite failed to send to existing user {0} in different program. Error={1} from ProgramId={2}", orgRegProgramUserId, error, orgRegProgramId));
+                }
+            }
+
+            return new RedirectResult("~/Authority/Users");
+        }
+
         #endregion
 
         #region Show Pending User Approvals
@@ -1192,8 +1213,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult PendingUserApprovals_Read([DataSourceRequest] DataSourceRequest request)
         {
             var organizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            var users = _userService.GetUserProfilesForOrgRegProgram(organizationRegulatoryProgramId, isRegApproved: false, isRegDenied: false, isEnabled: null, isRemoved: false);
-            // TODO: Change service as not including industry users
+            var users = _userService.GetPendingRegistrationProgramUsers(organizationRegulatoryProgramId);
+            
             var viewModels = users.Select(vm => new PendingUserApprovalViewModel
             {
                 Id = vm.OrganizationRegulatoryProgramUserId,
@@ -1206,9 +1227,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 BusinessName = vm.UserProfileDto.BusinessName,
                 PhoneNumber = vm.UserProfileDto.PhoneNumber,
                 Email = vm.UserProfileDto.Email,
-                DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime,
-                Role = vm.PermissionGroup.PermissionGroupId,
-                RoleText = vm.PermissionGroup.Name
+                DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime
             });
 
             DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
@@ -1224,8 +1243,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 PhoneNumber = vm.PhoneNumber,
                 Email = vm.Email,
                 DateRegistered = vm.DateRegistered,
-                Role = vm.Role,
-                RoleText = vm.RoleText
+                Role = 1 // role need to be more than 0 otherwise ModelState.IsValid = false 
             });
 
             return Json(result);
@@ -1312,27 +1330,6 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(HttpVerbs.Post)]
-        public ActionResult InviteExistingUser(int orgRegProgramUserId)
-        {
-            var orgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            var result = _invitationService.SendUserInvite(orgRegProgramId, "", "", "", InvitationType.AuthorityToAuthority, orgRegProgramUserId);
-            if (result.Success)
-            {
-                _logger.Info(string.Format("Invite successfully sent to existing user in different program. OrgRegProgUserId={0} from ProgramId={1}", orgRegProgramUserId, orgRegProgramId));
-            }
-            else
-            {
-                foreach (var error in result.Errors)
-                {
-                    _logger.Info(string.Format("Invite failed to send to existing user {0} in different program. Error={1} from ProgramId={2}", orgRegProgramUserId, error, orgRegProgramId));
-                }
-            }
-
-            return new RedirectResult("~/Authority/Users");
-        }
-
-
-        [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("PendingUserApprovals/{id:int}/Details/PendingUserDeny")]
         public ActionResult PendingUserDeny(int id, PendingUserApprovalViewModel model)
@@ -1390,8 +1387,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 PhoneNumber = result.UserProfileDto.PhoneNumber,
                 PhoneExt = result.UserProfileDto.PhoneExt,
                 DateRegistered = result.RegistrationDateTimeUtc.Value.DateTime,
-                Role = result.PermissionGroup.PermissionGroupId, // ?? 0,
-                RoleText = result.PermissionGroup.Name
+                Role = (result.PermissionGroup == null) ? 0 : result.PermissionGroup.PermissionGroupId,
+                RoleText = (result.PermissionGroup == null) ? "" : result.PermissionGroup.Name
             };
             // Roles
             viewModel.AvailableRoles = new List<SelectListItem>();
@@ -1411,7 +1408,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.HasPermissionForApproveDeny = true; // TODO: call service when implement
             ViewBag.CanChangeRole = viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Authority.ToString());
 
-            if (viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Industry.ToString()) && !viewModel.Role.HasValue)
+            if (viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Industry.ToString()) 
+                && !viewModel.Role.HasValue && viewModel.Role.Value!=0)
             {
                 viewModel.Role = roles.Where(r => r.Name.IsCaseInsensitiveEqual(UserRole.Administrator.ToString())).First().PermissionGroupId;
                 viewModel.RoleText = UserRole.Administrator.ToString();

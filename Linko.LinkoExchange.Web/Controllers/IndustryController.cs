@@ -457,7 +457,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult PendingUserApprovals_Read([DataSourceRequest] DataSourceRequest request)
         {
             var organizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            var users = _userService.GetUserProfilesForOrgRegProgram(organizationRegulatoryProgramId, isRegApproved: false, isRegDenied: false, isEnabled: null, isRemoved: false);
+            var users = _userService.GetPendingRegistrationProgramUsers(organizationRegulatoryProgramId);
+
             // TODO: Change service as not including industry users
             var viewModels = users.Select(vm => new PendingUserApprovalViewModel
             {
@@ -471,9 +472,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 BusinessName = vm.UserProfileDto.BusinessName,
                 PhoneNumber = vm.UserProfileDto.PhoneNumber,
                 Email = vm.UserProfileDto.Email,
-                DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime,
-                Role = vm.PermissionGroup.PermissionGroupId,
-                RoleText = vm.PermissionGroup.Name
+                DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime
             });
 
             DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
@@ -489,8 +488,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 PhoneNumber = vm.PhoneNumber,
                 Email = vm.Email,
                 DateRegistered = vm.DateRegistered,
-                Role = vm.Role,
-                RoleText = vm.RoleText
+                Role = 1 // role need to be more than 0 otherwise ModelState.IsValid = false 
             });
 
             return Json(result);
@@ -635,8 +633,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 PhoneNumber = result.UserProfileDto.PhoneNumber,
                 PhoneExt = result.UserProfileDto.PhoneExt,
                 DateRegistered = result.RegistrationDateTimeUtc.Value.DateTime,
-                Role = result.PermissionGroup.PermissionGroupId, // ?? 0,
-                RoleText = result.PermissionGroup.Name
+                Role = (result.PermissionGroup == null) ? 0 : result.PermissionGroup.PermissionGroupId,
+                RoleText = (result.PermissionGroup == null) ? "" : result.PermissionGroup.Name
             };
             // Roles
             viewModel.AvailableRoles = new List<SelectListItem>();
@@ -655,13 +653,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             var currentUserRole = _sessionCache.GetClaimValue(CacheKey.UserRole) ?? "";
             ViewBag.HasPermissionForApproveDeny = currentUserRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString()); // TODO: call service when implement
-
-            if (viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Industry.ToString()) && !viewModel.Role.HasValue)
-            {
-                viewModel.Role = roles.Where(r => r.Name.IsCaseInsensitiveEqual(UserRole.Administrator.ToString())).First().PermissionGroupId;
-                viewModel.RoleText = UserRole.Administrator.ToString();
-            }
-
+            
             return viewModel;
         }
         #endregion
