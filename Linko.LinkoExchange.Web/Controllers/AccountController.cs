@@ -789,6 +789,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
             var userProfileId = int.Parse(profileIdStr);
+            ViewBag.returnUrl = returnUrl; 
 
             if (!_questionAnswerService.ConfirmCorrectAnswer(model.QuestionAnswerId, model.Answer.ToLower()))
             {
