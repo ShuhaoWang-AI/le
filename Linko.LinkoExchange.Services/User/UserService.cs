@@ -477,7 +477,7 @@ namespace Linko.LinkoExchange.Services.User
         {
             var user = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
             //Check user is not support role
-            if (user.IsInternalAccount && isAttemptingLock)
+            if (user.IsInternalAccount && isAttemptingLock && !isForFailedKBQs)
                 return new Dto.AccountLockoutResultDto()
                 {
                     IsSuccess = false,
@@ -486,7 +486,7 @@ namespace Linko.LinkoExchange.Services.User
 
             //Check user is not THIS user's own account
             int thisUserProfileId = _httpContext.CurrentUserProfileId();
-            if (thisUserProfileId > 0 && userProfileId == thisUserProfileId)
+            if (thisUserProfileId > 0 && userProfileId == thisUserProfileId   && !isForFailedKBQs)
                 return new Dto.AccountLockoutResultDto()
                 {
                     IsSuccess = false,
