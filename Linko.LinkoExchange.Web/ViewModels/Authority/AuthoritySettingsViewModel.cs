@@ -9,15 +9,15 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         #region Authority information
 
         [ScaffoldColumn(false)]
-        [Display(Name = "ID")]
-        public int ID
+        [Display(Name = "Id")]
+        public int Id
         {
             get; set;
         }
 
         [Editable(false)]
-        [Display(Name = "Exchange Authority ID")]
-        public int ExchangeAuthorityID
+        [Display(Name = "Exchange Authority Id")]
+        public int ExchangeAuthorityId
         {
             get; set;
         }

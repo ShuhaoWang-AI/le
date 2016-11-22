@@ -51,7 +51,7 @@
                 </li>
 
                 <li class="treeview">
-                    <a href="#">
+                    <a href="#" onclick="location.href = '@Url.Action(actionName: "PendingUserApprovals", controllerName: "Authority")'">
                         <i class="fa fa-user-plus fa-fw"></i>
                         <span>Pending Registrations</span>
                     </a>
@@ -180,7 +180,7 @@ else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.Porta
                             </a>
                         </li>
                         <li class="treeview">
-                            <a href="#">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName: "PendingUserApprovals", controllerName: "Industry")'">
                                 <i class="fa fa-user-plus fa-fw"></i>
                                 <span>Pending Registrations</span>
                                 @*<span class="pull-right-container">

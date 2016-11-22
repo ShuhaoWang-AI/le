@@ -5,21 +5,50 @@
 <!DOCTYPE html>
 
 <html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Page not found</title>
-</head>
-<body>
-    <div>
-        <h1 class="h3">
-            We're sorry, we can't find that page.
-            It's possible you typed the address incorrectly or that the page you were looking for has been moved or no longer exists.
-        </h1>
-        <p>
-            Please go to our home page and try again.
-            Thank you for your patience.
-        </p>
-    </div>
-</body>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+        <title> Page not found </title>
+
+        @Styles.Render(paths: "~/Bundles/css")
+
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+    </head>
+    <body class="hold-transition skin-blue-light fixed sidebar-collapse">
+        <header class="main-header">
+            <div class="logo hidden-xs">&nbsp;</div>
+            <nav class="navbar navbar-static-top" role="navigation">
+                @* BEGIN Logo *@
+                <span>
+                    <a href="@Url.Action(actionName: "Index", controllerName: "Home")">
+                        <img title=" " alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo.png")" class="img-responsive" width="200" height="40" />
+                    </a>
+                </span>
+                @* END Logo *@
+            </nav>
+        </header>
+        <div class="wrapper">
+            <div class="content-wrapper">
+                <section class="content">
+                    <div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6">
+                        <h1 class="h3">
+                            We're sorry, we can't find that page.
+                            It's possible you typed the address incorrectly or that the page you were looking for has been moved or no longer exists.
+                        </h1>
+                        <p>
+                            Please go to our home page and try again.
+                            Thank you for your patience.
+                        </p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </body>
 </html>
 

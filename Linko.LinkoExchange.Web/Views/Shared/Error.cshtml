@@ -4,26 +4,56 @@
 
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Error</title>
-</head>
-<body>
-    <div>
-        <p>
-            <b>
-                We're sorry, an internal error occurred that prevents the request from completing.
-            </b>
-        </p>
-        <p>
-            Our support staff has been notified about this error and will address this issue
-            shortly. We apologize for the inconvenience. You might want to try the same action at a later time.
-        </p>
-        <p>
-            If the problem persists, please contact us at 1-877-546-5699.
-        </p>
-        <p>
-            Linko Technology Inc.
-        </p>
-    </div>
-</body>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+        <title> Error </title>
+
+        @Styles.Render(paths: "~/Bundles/css")
+
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+    </head>
+    <body class="hold-transition skin-blue-light fixed sidebar-collapse">
+        <header class="main-header">
+            <div class="logo hidden-xs">&nbsp;</div>
+            <nav class="navbar navbar-static-top" role="navigation">
+                @* BEGIN Logo *@
+                <span>
+                    <a href="@Url.Action(actionName: "Index", controllerName: "Home")">
+                        <img title=" " alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo.png")" class="img-responsive" width="200" height="40" />
+                    </a>
+                </span>
+                @* END Logo *@
+            </nav>
+        </header>
+        <div class="wrapper">
+            <div class="content-wrapper">
+                <section class="content">
+                    <div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-5">
+                        <p>
+                            <b>
+                                We're sorry, an internal error occurred that prevents the request from completing.
+                            </b>
+                        </p>
+                        <p>
+                            Our support staff has been notified about this error and will address this issue
+                            shortly. We apologize for the inconvenience. You might want to try the same action at a later time.
+                        </p>
+                        <p>
+                            If the problem persists, please contact us at 1-877-546-5699.
+                        </p>
+                        <p>
+                            Linko Technology Inc.
+                        </p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </body>
 </html>

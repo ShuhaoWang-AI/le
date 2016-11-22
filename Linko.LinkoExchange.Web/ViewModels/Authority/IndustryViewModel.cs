@@ -6,8 +6,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
     public class IndustryViewModel
     {
         [ScaffoldColumn(false)]
-        [Display(Name = "ID")]
-        public int ID
+        [Display(Name = "Id")]
+        public int Id
         {
             get; set;
         }

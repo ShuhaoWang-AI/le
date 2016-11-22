@@ -448,6 +448,7 @@
     <Compile Include="ViewModels\Industry\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Shared\ConfirmationViewModel.cs" />
     <Compile Include="ViewModels\Shared\JurisdictionViewModel.cs" />
+    <Compile Include="ViewModels\Shared\PendingUserApprovalViewModel.cs" />
     <Compile Include="ViewModels\User\AnswerViewModel.cs" />
     <Compile Include="ViewModels\User\QuestionAnswerPairViewModel.cs" />
     <Compile Include="ViewModels\User\QuestionViewModel.cs" />
@@ -494,6 +495,10 @@
     <Content Include="Views\Industry\IndustryUsers.cshtml" />
     <Content Include="Views\Account\KbqChallenge.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
+    <Content Include="Views\Authority\PendingUserApprovals.cshtml" />
+    <Content Include="Views\Authority\PendingUserApprovalDetails.cshtml" />
+    <Content Include="Views\Industry\PendingUserApprovalDetails.cshtml" />
+    <Content Include="Views\Industry\PendingUserApprovals.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

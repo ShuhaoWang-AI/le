@@ -1,16 +1,15 @@
-﻿@model Linko.LinkoExchange.Web.ViewModels.Authority.IndustryUserViewModel
+﻿@model Linko.LinkoExchange.Web.ViewModels.Shared.PendingUserApprovalViewModel
 
 @{
-    ViewBag.Title = "User Details";
+    ViewBag.Title = "Profile Details";
 }
+
 
 <section>
     <ol class="breadcrumb">
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Industries", controllerName: "Authority")'"><i class=""></i> Industries </a></li>
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryDetails", controllerName: "Authority", routeValues: new { id = Model.IId })'"><i class=""></i> Details </a></li>
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryUsers", controllerName: "Authority", routeValues: new { id = Model.IId })'"><i class=""></i> Users </a></li>
-        <li class="active">User Details</li>
+        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Industry")'"><i class=""></i> Home </a></li>
+        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "PendingUserApprovals", controllerName: "Industry")'"><i class=""></i> Pending Registrations </a></li>
+        <li class="active">Profile Details</li>
     </ol>
 </section>
 
@@ -23,9 +22,12 @@
             <h3 class="box-title">User Information</h3>
             <div class="box-tools pull-right">
                 <div class="pull-right">
-                    <input type="submit" value="@Model.AccountLockedButtonText" class="btn btn-sm btn-primary" 
-                           formaction="@Url.Action(actionName: "IndustryUserLockUnLock", controllerName: "Authority")" formmethod="post" />
-                    <input type="button" value="Reset" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#resetModal"/>                   
+                    @if ((ViewBag.HasPermissionForApproveDeny!=null && ViewBag.HasPermissionForApproveDeny)
+                        && (ViewBag.ShowSuccessMessage == null))
+                    {
+                        <input type="button" value="Approve" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#ApproveModal" />
+                        <input type="button" value="Deny" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#DenyModal" />
+                    }                
                 </div>
             </div><!-- /.box-tools -->
         </div>  @*.box-header*@
@@ -45,39 +47,20 @@
                 </div>
             }
 
-            <div class="col-md-12 modal modal-info fade" id="resetModal" tabindex="-1" role="dialog" aria-labelledby="resetModalLabel">
+            <div class="col-md-12 modal modal-info fade" id="ApproveModal" tabindex="-1" role="dialog" aria-labelledby="resetModalLabel">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content alert alert-info alert-dismissible">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
-                        <h4 class="box-title">Reset User Account</h4>
+                        <h4 class="box-title">Approve Registration</h4>
 
-                        <section>
-                            <p>
-                                User will be required to re-register before they can log into LinkoExchange.
-                                What email should be used in the Registration Profile?
-                            </p>
-                            <div class="form-group">
-                                <div class="col-md-12">
-                                    @Html.EditorFor(model => model.ResetEmail, new
-                                    {
-                                        htmlAttributes = new
-                                        {
-                                            @class = "form-control"
-                                        }
-                                    })
-
-                                    @Html.ValidationMessageFor(model => model.ResetEmail, "", new { @class = "text-danger" })
-                                </div>
-                            </div>
-                        </section>
                         <div>
                             <div class="form-group">
                                 <div class="pull-right">
                                     <button type="submit" class="btn btn-sm btn-primary"
-                                            formaction="@Url.Action(actionName: "IndustryUserReset", controllerName: "Authority")" formmethod="post">
-                                        Reset
+                                            formaction="@Url.Action(actionName: "PendingUserApprove", controllerName: "Industry")" formmethod="post">
+                                        Yes
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-primary" data-dismiss="modal" aria-label="Close">Cancel</button>
+                                    <button type="button" class="btn btn-sm btn-primary" data-dismiss="modal" aria-label="Close">No</button>
                                 </div>
                             </div>
                         </div>
@@ -85,50 +68,36 @@
                 </div>
             </div>
 
-            @Html.HiddenFor(model => model.IId)
-            @Html.HiddenFor(model => model.PId)
-            @Html.HiddenFor(model => model.ResetEmail)
+            <div class="col-md-12 modal modal-info fade" id="DenyModal" tabindex="-1" role="dialog" aria-labelledby="removeModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content alert alert-info alert-dismissible">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                        <h4 class="box-title">Deny Registration</h4>
 
-            <div class="form-group">
-                @Html.LabelFor(model => model.Status, htmlAttributes: new
-                {
-                    @class = "control-label col-md-2"
-                })
-                <div class="col-md-4">
-                    @Html.EditorFor(model => model.StatusText, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @disabled = "disabled"
-                        }
-                    })
-                </div>
-
-                @Html.LabelFor(model => model.AccountLocked, htmlAttributes: new
-                {
-                    @class = "control-label col-md-2"
-                })
-                <div class="col-md-4">
-                    @Html.EditorFor(model => model.AccountLockedText, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @disabled = "disabled"
-                        }
-                    })
-                    @Html.HiddenFor(model => model.AccountLocked)
+                        <div>
+                            <div class="form-group">
+                                <div class="pull-right">
+                                    <button type="submit" class="btn btn-sm btn-primary"
+                                            formaction="@Url.Action(actionName: "PendingUserDeny", controllerName: "Industry")" formmethod="post">
+                                        Yes
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-primary" data-dismiss="modal" aria-label="Close">No</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            @Html.HiddenFor(model => model.PId)
+                    
             <div class="form-group">
-                @Html.LabelFor(model => model.RoleText, htmlAttributes: new
+                @Html.LabelFor(model => model.RegisteredOrgName, htmlAttributes: new
                 {
                     @class = "control-label col-md-2"
                 })
                 <div class="col-md-4">
-                    @Html.EditorFor(model => model.RoleText, new
+                    @Html.EditorFor(model => model.RegisteredOrgName, new
                     {
                         htmlAttributes = new
                         {
@@ -136,16 +105,35 @@
                             @disabled = "disabled"
                         }
                     })
-                </div>
+                </div>                
 
-                @Html.LabelFor(model => model.IsSignatory, htmlAttributes: new
+                @Html.LabelFor(model => model.Role, htmlAttributes: new
+                {
+                    @class = "control-label col-md-2 required"
+                })
+                <div class="col-md-4">
+                    @Html.DropDownList(name: "Role", selectList: Model.AvailableRoles, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Role, "", new
+                    {
+                        @class = "text-danger"
+                    })
+                </div>
+            </div>        
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DateRegistered, htmlAttributes: new
                 {
                     @class = "control-label col-md-2"
                 })
                 <div class="col-md-4">
-                    <div class="checkbox">
-                        @Html.EditorFor(model => model.IsSignatory)
-                    </div>
+                    @Html.EditorFor(model => model.DateRegistered, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
                 </div>
             </div>
 
@@ -173,6 +161,69 @@
                 })
                 <div class="col-md-4">
                     @Html.EditorFor(model => model.LastName, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.UserName, htmlAttributes: new
+                {
+                    @class = "control-label col-md-2"
+                })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.UserName, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+                @Html.LabelFor(model => model.Email, htmlAttributes: new
+                {
+                    @class = "control-label col-md-2"
+                })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.Email, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BusinessName, htmlAttributes: new
+                {
+                    @class = "control-label col-md-2"
+                })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.BusinessName, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+
+                @Html.LabelFor(model => model.TitleRole, htmlAttributes: new
+                {
+                    @class = "control-label col-md-2"
+                })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.TitleRole, new
                     {
                         htmlAttributes = new
                         {
@@ -216,12 +267,46 @@
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.Email, htmlAttributes: new
+                @Html.LabelFor(model => model.AddressLine1, htmlAttributes: new
                 {
                     @class = "control-label col-md-2"
                 })
                 <div class="col-md-4">
-                    @Html.EditorFor(model => model.Email, new
+                    @Html.EditorFor(model => model.AddressLine1, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.AddressLine2, htmlAttributes: new
+                {
+                    @class = "control-label col-md-2"
+                })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.AddressLine2, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.CityName, htmlAttributes: new
+                {
+                    @class = "control-label col-md-2"
+                })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.CityName, new
                     {
                         htmlAttributes = new
                         {
@@ -231,12 +316,29 @@
                     })
                 </div>
 
-                @Html.LabelFor(model => model.DateRegistered, htmlAttributes: new
+                @Html.LabelFor(model => model.State, htmlAttributes: new
                 {
                     @class = "control-label col-md-2"
                 })
                 <div class="col-md-4">
-                    @Html.EditorFor(model => model.DateRegistered, new
+                    @Html.EditorFor(model => model.State, new
+                    {
+                        htmlAttributes = new
+                        {
+                            @class = "form-control",
+                            @disabled = "disabled"
+                        }
+                    })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ZipCode, htmlAttributes: new
+                {
+                    @class = "control-label col-md-2"
+                })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.ZipCode, new
                     {
                         htmlAttributes = new
                         {
@@ -247,93 +349,6 @@
                 </div>
             </div>
         </section>@*.box-body*@
-        <div class="box-footer">
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-sm btn-primary pull-right" 
-                       formaction="@Url.Action(actionName: "IndustryUserUpdateSignatoryStatus", controllerName: "Authority")" formmethod="post" />
-            </div>
-        </div><!-- box-footer -->
     </div><!-- /.box -->
 	
-    <div class="box box-primary">
-        <div class="box-header with-border">
-            <h3 class="box-title">User Security Questions</h3>
-            <div class="box-tools pull-right">
-                <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            </div><!-- /.box-tools -->
-        </div>  @*.box-header*@
-		 <section class="box-body form-horizontal">
-            <div class="form-group">
-                @Html.LabelFor(model => model.SecurityQuestion1, htmlAttributes: new
-                {
-                    @class = "control-label col-md-2"
-                })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.SecurityQuestion1, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @disabled = "disabled"
-                        }
-                    })
-                </div>
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor(model => model.Answer1, htmlAttributes: new
-                {
-                    @class = "control-label col-md-2"
-                })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.Answer1, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @disabled = "disabled"
-                        }
-                    })
-                </div>
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor(model => model.SecurityQuestion2, htmlAttributes: new
-                {
-                    @class = "control-label col-md-2"
-                })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.SecurityQuestion2, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @disabled = "disabled"
-                        }
-                    })
-                </div>
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor(model => model.Answer2, htmlAttributes: new
-                {
-                    @class = "control-label col-md-2"
-                })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.Answer2, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @disabled = "disabled"
-                        }
-                    })
-                </div>
-            </div>
-        </section>@*.box-body*@
-    </div><!-- /.box -->
-}
-
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
 }

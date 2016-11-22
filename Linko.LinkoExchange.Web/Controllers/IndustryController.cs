@@ -52,7 +52,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         // GET: Industry
         public ActionResult Index()
         {
-            return RedirectToAction(actionName: "IndustryUsers", controllerName: "Industry");
+            return RedirectToAction(actionName: "PendingUserApprovals", controllerName: "Industry");
         }
         #endregion
 
@@ -67,7 +67,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             var viewModel = new IndustryViewModel
             {
-                ID = industry.OrganizationRegulatoryProgramId,
+                Id = industry.OrganizationRegulatoryProgramId,
                 IndustryNo = industry.OrganizationDto.OrganizationId,
                 IndustryName = industry.OrganizationDto.OrganizationName,
                 AddressLine1 = industry.OrganizationDto.AddressLine1,
@@ -113,8 +113,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             var viewModels = users.Select(vm => new IndustryUserViewModel
             {
-                ID = vm.OrganizationRegulatoryProgramUserId,
-                PID = vm.UserProfileId,
+                Id = vm.OrganizationRegulatoryProgramUserId,
+                PId = vm.UserProfileId,
                 FirstName = vm.UserProfileDto.FirstName,
                 LastName = vm.UserProfileDto.LastName,
                 PhoneNumber = vm.UserProfileDto.PhoneNumber,
@@ -129,8 +129,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
             {
-                ID = vm.ID,
-                PID = vm.PID,
+                Id = vm.Id,
+                PId = vm.PId,
                 FirstName = vm.FirstName,
                 LastName = vm.LastName,
                 PhoneNumber = vm.PhoneNumber,
@@ -159,7 +159,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                         redirect = true,
                         newurl = Url.Action(actionName: "IndustryUserDetails", controllerName: "Industry", routeValues: new
                         {
-                            id = item.ID
+                            id = item.Id
                         })
                     });
                 }
@@ -189,7 +189,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             var viewModels = invitations.Select(vm => new PendingInvitationViewModel
             {
-                ID = vm.InvitationId,
+                Id = vm.InvitationId,
                 FirstName = vm.FirstName,
                 LastName = vm.LastName,
                 Email = vm.EmailAddress,
@@ -199,7 +199,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
             {
-                ID = vm.ID,
+                Id = vm.Id,
                 FirstName = vm.FirstName,
                 LastName = vm.LastName,
                 Email = vm.Email,
@@ -224,7 +224,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     var item = items.First();
 
-                    _invitationService.DeleteInvitation(item.ID);
+                    _invitationService.DeleteInvitation(item.Id);
                 }
             }
             catch (RuleViolationException rve)
@@ -258,7 +258,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                _userService.UpdateUserPermissionGroupId(model.ID, model.Role);
+                _userService.UpdateUserPermissionGroupId(model.Id, model.Role);
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = "User role updated successfully!";
                 ModelState.Clear();
@@ -284,7 +284,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                var result = _userService.RemoveUser(model.ID);
+                var result = _userService.RemoveUser(model.Id);
 
                 if (result)
                 {
@@ -329,7 +329,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                _userService.LockUnlockUserAccount(model.PID, !model.AccountLocked, isForFailedKBQs: false);
+                _userService.LockUnlockUserAccount(model.PId, !model.AccountLocked, isForFailedKBQs: false);
 
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = model.AccountLocked ? "User unlocked!" : "User locked!";
@@ -357,7 +357,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                var result = _userService.ResetUser(model.PID, newEmail);
+                var result = _userService.ResetUser(model.PId, newEmail);
 
                 if (result.IsSuccess)
                 {
@@ -410,8 +410,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             var viewModel = new IndustryUserViewModel
             {
-                ID = user.OrganizationRegulatoryProgramUserId,
-                PID = user.UserProfileId,
+                Id = user.OrganizationRegulatoryProgramUserId,
+                PId = user.UserProfileId,
                 FirstName = user.UserProfileDto.FirstName,
                 LastName = user.UserProfileDto.LastName,
                 PhoneNumber = user.UserProfileDto.PhoneNumber,
@@ -445,5 +445,225 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
         #endregion
 
+        #region Show Pending User Approvals
+
+        // GET: /Industry/PendingUserApprovals
+        [Route("PendingUserApprovals")]
+        public ActionResult PendingUserApprovals()
+        {
+            return View();
+        }
+
+        public ActionResult PendingUserApprovals_Read([DataSourceRequest] DataSourceRequest request)
+        {
+            var organizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var users = _userService.GetUserProfilesForOrgRegProgram(organizationRegulatoryProgramId, isRegApproved: false, isRegDenied: false, isEnabled: null, isRemoved: false);
+            // TODO: Change service as not including industry users
+            var viewModels = users.Select(vm => new PendingUserApprovalViewModel
+            {
+                Id = vm.OrganizationRegulatoryProgramUserId,
+                PId = vm.UserProfileId,
+                RegisteredOrgName = vm.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName,
+                Type = vm.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationType.Name,
+                UserName = vm.UserProfileDto.UserName,
+                FirstName = vm.UserProfileDto.FirstName,
+                LastName = vm.UserProfileDto.LastName,
+                BusinessName = vm.UserProfileDto.BusinessName,
+                PhoneNumber = vm.UserProfileDto.PhoneNumber,
+                Email = vm.UserProfileDto.Email,
+                DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime,
+                Role = vm.PermissionGroup.PermissionGroupId,
+                RoleText = vm.PermissionGroup.Name
+            });
+
+            DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
+            {
+                Id = vm.Id,
+                PId = vm.PId,
+                RegisteredOrgName = vm.RegisteredOrgName,
+                Type = vm.Type,
+                UserName = vm.UserName,
+                FirstName = vm.FirstName,
+                LastName = vm.LastName,
+                BusinessName = vm.BusinessName,
+                PhoneNumber = vm.PhoneNumber,
+                Email = vm.Email,
+                DateRegistered = vm.DateRegistered,
+                Role = vm.Role,
+                RoleText = vm.RoleText
+            });
+
+            return Json(result);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult PendingUserApprovals_Select(IEnumerable<PendingUserApprovalViewModel> items)
+        {
+            try
+            {
+                if (items != null && ModelState.IsValid)
+                {
+                    var item = items.First();
+                    return Json(new
+                    {
+                        redirect = true,
+                        newurl = Url.Action(actionName: "PendingUserApprovalDetails", controllerName: "Industry", routeValues: new
+                        {
+                            id = item.Id
+                        })
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        redirect = false,
+                        message = "Please select an user."
+                    });
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                return Json(new
+                {
+                    redirect = false,
+                    message = MvcValidationExtensions.GetViolationMessages(rve)
+                });
+            }
+        }
+        #endregion
+
+        #region Show Pending User Approval Details
+
+        // GET: /Industry/PendingUserApprovals
+        [Route("PendingUserApprovals/{id:int}/Details")]
+        public ActionResult PendingUserApprovalDetails(int id)
+        {
+            var viewModel = PreparePendingUserApprovalDetails(id);
+            return View(viewModel);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route("PendingUserApprovals/{id:int}/Details/PendingUserApprove")]
+        public ActionResult PendingUserApprove(int id, PendingUserApprovalViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var result = _userService.ApprovePendingRegistration(model.Id, model.Role.Value, isApproved: true);
+                    switch (result.Result)
+                    {
+                        case RegistrationResult.Success:
+                            ViewBag.ShowSuccessMessage = true;
+                            ViewBag.SuccessMessage = "Registration Approved!";
+                            ModelState.Clear();
+                            _logger.Info(string.Format(format: "PendingUserApprove. User={0} - id={1} Registration Approved!", arg0: model.UserName, arg1: model.Id));
+                            break;
+                        default:
+                            _logger.Info(string.Format(format: "PendingUserApprove. User={0} - id={1} Registration Approval Failed!", arg0: model.UserName, arg1: model.Id));
+                            ModelState.AddModelError(key: "", errorMessage: "Registration Approval Failed");
+                            break;
+                    }
+                }
+                catch (RuleViolationException rve)
+                {
+                    MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
+                }
+            }
+            model = PreparePendingUserApprovalDetails(id);
+            return View(viewName: "PendingUserApprovalDetails", model: model);
+        }
+
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route("PendingUserApprovals/{id:int}/Details/PendingUserDeny")]
+        public ActionResult PendingUserDeny(int id, PendingUserApprovalViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var result = _userService.ApprovePendingRegistration(model.Id, model.Role.Value, isApproved: false);
+                    switch (result.Result)
+                    {
+                        case RegistrationResult.Success:
+                            ViewBag.ShowSuccessMessage = true;
+                            ViewBag.SuccessMessage = "Registration Denied!";
+                            ModelState.Clear();
+                            _logger.Info(string.Format(format: "PendingUserDeny. User={0} - id={1} Registration Denied!", arg0: model.UserName, arg1: model.Id));
+                            break;
+                        default:
+                            _logger.Info(string.Format(format: "PendingUserDeny. User={0} - id={1} Registration Denial Failed!", arg0: model.UserName, arg1: model.Id));
+                            ModelState.AddModelError(key: "", errorMessage: "Registration Denial Failed");
+                            break;
+                    }
+                }
+                catch (RuleViolationException rve)
+                {
+                    MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
+                }
+            }
+
+            model = PreparePendingUserApprovalDetails(id);
+            return View(viewName: "PendingUserApprovalDetails", model: model);
+        }
+
+        private PendingUserApprovalViewModel PreparePendingUserApprovalDetails(int id)
+        {
+            var result = _userService.GetOrganizationRegulatoryProgramUser(id);
+
+            var viewModel = new PendingUserApprovalViewModel
+            {
+                Id = result.OrganizationRegulatoryProgramUserId,
+                PId = result.UserProfileId,
+                RegisteredOrgName = result.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName,
+                Type = result.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationType.Name,
+                UserName = result.UserProfileDto.UserName,
+                FirstName = result.UserProfileDto.FirstName,
+                LastName = result.UserProfileDto.LastName,
+                BusinessName = result.UserProfileDto.BusinessName,
+                TitleRole = result.UserProfileDto.TitleRole,
+                AddressLine1 = result.UserProfileDto.AddressLine1,
+                AddressLine2 = result.UserProfileDto.AddressLine2,
+                CityName = result.UserProfileDto.CityName,
+                State = result.UserProfileDto.ZipCode,
+                ZipCode = result.UserProfileDto.AddressLine1,
+                Email = result.UserProfileDto.Email,
+                PhoneNumber = result.UserProfileDto.PhoneNumber,
+                PhoneExt = result.UserProfileDto.PhoneExt,
+                DateRegistered = result.RegistrationDateTimeUtc.Value.DateTime,
+                Role = result.PermissionGroup.PermissionGroupId, // ?? 0,
+                RoleText = result.PermissionGroup.Name
+            };
+            // Roles
+            viewModel.AvailableRoles = new List<SelectListItem>();
+            var roles = _permissionService.GetRoles(result.OrganizationRegulatoryProgramId);
+
+            if (roles.Count() > 0)
+            {
+                viewModel.AvailableRoles = roles.Select(r => new SelectListItem
+                {
+                    Text = r.Name,
+                    Value = r.PermissionGroupId.ToString(),
+                    Selected = (Convert.ToInt32(r.PermissionGroupId) == viewModel.Role)
+                }).ToList();
+            }
+            viewModel.AvailableRoles.Insert(index: 0, item: new SelectListItem { Text = "Select User Role", Value = "0" });
+
+            var currentUserRole = _sessionCache.GetClaimValue(CacheKey.UserRole) ?? "";
+            ViewBag.HasPermissionForApproveDeny = currentUserRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString()); // TODO: call service when implement
+
+            if (viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Industry.ToString()) && !viewModel.Role.HasValue)
+            {
+                viewModel.Role = roles.Where(r => r.Name.IsCaseInsensitiveEqual(UserRole.Administrator.ToString())).First().PermissionGroupId;
+                viewModel.RoleText = UserRole.Administrator.ToString();
+            }
+
+            return viewModel;
+        }
+        #endregion
     }
 }

@@ -31,14 +31,14 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         }
 
         [Editable(false)]
-        [Display(Name = "HasSigntoryText")]
+        [Display(Name = "Signatory")]
         [Required]
         public string HasSigntoryText
         {
             get { return HasSigntory ? "Yes" : "No"; }
         }
 
-        [Display(Name = "TitleRole")]
+        [Display(Name = "Title Role")]
         public string TitleRole
         {
             get; set;
@@ -99,7 +99,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         } 
 
         [Required]
-        [Display(Name = "ZipCode")]
+        [Display(Name = "Zip Code")]
         public string ZipCode
         {
             get; set;

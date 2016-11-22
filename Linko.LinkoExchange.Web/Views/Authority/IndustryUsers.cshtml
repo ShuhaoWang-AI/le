@@ -4,7 +4,7 @@
     <ol class="breadcrumb">
         <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
         <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Industries", controllerName: "Authority")'"><i class=""></i> Industries </a></li>
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryDetails", controllerName: "Authority", routeValues: new { id = ViewBag.IndustryID })'"><i class=""></i> Details </a></li>
+        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryDetails", controllerName: "Authority", routeValues: new { id = ViewBag.IndustryId })'"><i class=""></i> Details </a></li>
         <li class="active">Users</li>
     </ol>
 </section>
@@ -132,7 +132,7 @@
                         .Batch(enabled: true)
                         .Model(model =>
                         {
-                            model.Id(m => m.ID);
+                            model.Id(m => m.Id);
                             model.Field(m => m.FirstName);
                             model.Field(m => m.LastName);
                             model.Field(m => m.Email);

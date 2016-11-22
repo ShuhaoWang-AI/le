@@ -11,15 +11,15 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
     public class IndustryUserViewModel
     {
         [ScaffoldColumn(false)]
-        [Display(Name = "ID")]
-        public int ID
+        [Display(Name = "Id")]
+        public int Id
         {
             get; set;
         }
         
         [ScaffoldColumn(false)]
-        [Display(Name = "pID")]
-        public int PID
+        [Display(Name = "PId")]
+        public int PId
         {
             get; set;
         }

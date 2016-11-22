@@ -912,9 +912,9 @@ namespace Linko.LinkoExchange.Services.User
             }
 
             var contentReplacements = new Dictionary<string, string>();
-            string authorityName = _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoName);
-            string authorityPhoneNumber = _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoPhone);
-            string authorityEmail = _settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.EmailContactInfoEmailAddress);
+            string authorityName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+            string authorityPhoneNumber = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+            string authorityEmail = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
 
             contentReplacements.Add("userName", programUser.UserProfileDto.UserName);
             contentReplacements.Add("authorityName", authorityName);

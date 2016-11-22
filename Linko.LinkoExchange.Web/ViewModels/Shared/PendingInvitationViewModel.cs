@@ -6,8 +6,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
     public class PendingInvitationViewModel
     {
         [ScaffoldColumn(false)]
-        [Display(Name = "ID")]
-        public string ID
+        [Display(Name = "Id")]
+        public string Id
         {
             get; set;
         }

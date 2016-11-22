@@ -1,25 +1,25 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using AutoMapper;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.ViewModels.Account;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
-using NLog;
-using System.Security.Claims;
-using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.ViewModels.User;
-using Linko.LinkoExchange.Services.Invitation;
-using Linko.LinkoExchange.Services.Jurisdiction;
-using AutoMapper;
+using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -57,11 +57,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        public ActionResult Test()
-        {
-            return View();
-        }
-
+        #region Register
         [AllowAnonymous]
         public ActionResult Register(string token)
         {
@@ -113,6 +109,9 @@ namespace Linko.LinkoExchange.Web.Controllers
 
 
 
+
+        #endregion
+        
         #region default action
 
         [AllowAnonymous]
@@ -414,6 +413,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
         #endregion
 
+
         #region forgot password action
 
         // GET: /Account/ForgotPassword
@@ -659,7 +659,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 _authenticationService.UpdateClaim(CacheKey.Email, model.NewEmail);
 
                 TempData["SubTitle"] = "Change Email";
-                TempData["Message"] = "Change emal address succeeded.";
+                TempData["Message"] = "Change email address succeeded.";
                 return RedirectToAction(actionName: "ChangeAccountSucceed");
             }
 
