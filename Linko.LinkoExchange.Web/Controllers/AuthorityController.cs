@@ -634,7 +634,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
         #endregion
 
-        #region Show Industry list for current user authority
+        #region Show Industry list
 
         // GET: /Authority/Industries
         public ActionResult Industries()
@@ -660,6 +660,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 Id = vm.OrganizationRegulatoryProgramId,
                 IndustryNo = vm.OrganizationDto.OrganizationId,
+                IndustryNoText = vm.OrganizationDto.OrganizationId.ToString(),
                 IndustryName = vm.OrganizationDto.OrganizationName,
                 AddressLine1 = vm.OrganizationDto.AddressLine1,
                 AddressLine2 = vm.OrganizationDto.AddressLine2,
@@ -679,6 +680,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 Id = vm.Id,
                 IndustryNo = vm.IndustryNo,
+                IndustryNoText = vm.IndustryNoText,
                 IndustryName = vm.IndustryName,
                 Address = vm.Address,
                 IsEnabledText = vm.IsEnabledText,
