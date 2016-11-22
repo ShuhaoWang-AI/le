@@ -20,6 +20,6 @@ namespace Linko.LinkoExchange.Services.Program
         /// <returns></returns>
         OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int organizationRegulatoryProgramId);
 
-        OrganizationRegulatoryProgramUserDto CreateOrganizationRegulatoryProgramForUser(int userProfileId, int regulatoryProgramId);
+        OrganizationRegulatoryProgramUserDto CreateOrganizationRegulatoryProgramForUser(int userProfileId, int organizationRegulatoryProgramId, int inviterOrganizationRegulatoryProgramId);
     }
 }

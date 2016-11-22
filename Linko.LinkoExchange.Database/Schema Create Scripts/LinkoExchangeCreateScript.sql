@@ -1386,19 +1386,20 @@ BEGIN
     
     CREATE TABLE dbo.tOrganizationRegulatoryProgramUser 
     (
-        OrganizationRegulatoryProgramUserId int IDENTITY(1,1) NOT NULL
-        , UserProfileId                     int NOT NULL    
-        , OrganizationRegulatoryProgramId   int NOT NULL  
-        , PermissionGroupId                 int NULL  
-        , RegistrationDateTimeUtc           datetimeoffset(0) NOT NULL  
-        , IsRegistrationApproved            bit NOT NULL  
-        , IsRegistrationDenied              bit NOT NULL  
-        , IsEnabled                         bit NOT NULL  
-        , IsRemoved                         bit NOT NULL  
-        , IsSignatory                       bit NOT NULL  
-        , CreationDateTimeUtc               datetimeoffset(0) NOT NULL  
-        , LastModificationDateTimeUtc       datetimeoffset(0) NULL  
-        , LastModifierUserId                int NULL  
+        OrganizationRegulatoryProgramUserId         int IDENTITY(1,1) NOT NULL
+        , UserProfileId                             int NOT NULL    
+        , OrganizationRegulatoryProgramId           int NOT NULL  
+        , InviterOrganizationRegulatoryProgramId    int NOT NULL  
+        , PermissionGroupId                         int NULL  
+        , RegistrationDateTimeUtc                   datetimeoffset(0) NOT NULL
+        , IsRegistrationApproved                    bit NOT NULL  
+        , IsRegistrationDenied                      bit NOT NULL  
+        , IsEnabled                                 bit NOT NULL  
+        , IsRemoved                                 bit NOT NULL  
+        , IsSignatory                               bit NOT NULL  
+        , CreationDateTimeUtc                       datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc               datetimeoffset(0) NULL  
+        , LastModifierUserId                        int NULL  
     
         CONSTRAINT PK_tOrganizationRegulatoryProgramUser PRIMARY KEY CLUSTERED 
         (
@@ -1413,9 +1414,13 @@ BEGIN
 		(
 			UserProfileId
 		) REFERENCES dbo.tUserProfile(UserProfileId)
-		, CONSTRAINT FK_tOrganizationRegulatoryProgramUser_tOrganizationRegulatoryProgram FOREIGN KEY 
+		, CONSTRAINT FK_tOrganizationRegulatoryProgramUser_tOrganizationRegulatoryProgram_OrganizationRegulatoryProgramId FOREIGN KEY 
 		(
 			OrganizationRegulatoryProgramId
+		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
+        , CONSTRAINT FK_tOrganizationRegulatoryProgramUser_tOrganizationRegulatoryProgram_InviterOrganizationRegulatoryProgramId FOREIGN KEY 
+		(
+			InviterOrganizationRegulatoryProgramId
 		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
 		, CONSTRAINT FK_tOrganizationRegulatoryProgramUser_tPermissionGroup FOREIGN KEY 
 		(
@@ -1439,6 +1444,11 @@ BEGIN
 	CREATE NONCLUSTERED INDEX IX_tOrganizationRegulatoryProgramUser_OrganizationRegulatoryProgramId ON dbo.tOrganizationRegulatoryProgramUser
 	(
 		OrganizationRegulatoryProgramId ASC
+	) WITH FILLFACTOR = 100 ON [PRIMARY]
+
+    CREATE NONCLUSTERED INDEX IX_tOrganizationRegulatoryProgramUser_InviterOrganizationRegulatoryProgramId ON dbo.tOrganizationRegulatoryProgramUser
+	(
+		InviterOrganizationRegulatoryProgramId ASC
 	) WITH FILLFACTOR = 100 ON [PRIMARY]
 	
 	CREATE NONCLUSTERED INDEX IX_tOrganizationRegulatoryProgramUser_PermissionGroupId ON dbo.tOrganizationRegulatoryProgramUser
@@ -3167,12 +3177,13 @@ BEGIN
     PRINT 'Add records to tOrganizationRegulatoryProgramUser'
     PRINT '-------------------------------------------------'
     
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    @UserProfileId_Linko
 		    , (SELECT OrganizationRegulatoryProgramId FROM dbo.tOrganizationRegulatoryProgram WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP AND OrganizationId = @OrganizationId_GRESD)
-		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Administrator' AND OrganizationRegulatoryProgramId = (SELECT OrganizationRegulatoryProgramId FROM dbo.tOrganizationRegulatoryProgram WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP AND OrganizationId = @OrganizationId_GRESD))
+		    , (SELECT OrganizationRegulatoryProgramId FROM dbo.tOrganizationRegulatoryProgram WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP AND OrganizationId = @OrganizationId_GRESD)
+            , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Administrator' AND OrganizationRegulatoryProgramId = (SELECT OrganizationRegulatoryProgramId FROM dbo.tOrganizationRegulatoryProgram WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP AND OrganizationId = @OrganizationId_GRESD))
 		    , SYSDATETIMEOFFSET()
 		    , 1
 		    , 1

@@ -719,7 +719,7 @@ namespace Linko.LinkoExchange.Test
             
             var qaServiceMock = Mock.Get(questionAnswerService);
             qaServiceMock.Verify(i => i.CreateUserQuestionAnswers(It.IsAny<int>(), It.IsAny<IEnumerable<AnswerDto>>()), Times.Once); 
-            progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>())); 
+            progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())); 
             permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>(), It.IsAny<int>()));  
         }
 
@@ -741,7 +741,7 @@ namespace Linko.LinkoExchange.Test
             qaServiceMock.Verify(i => i.CreateUserQuestionAnswers(It.IsAny<int>(), It.IsAny<IEnumerable<AnswerDto>>()), Times.Once);
             qaServiceMock.Verify(i => i.DeleteUserQuestionAndAnswers(It.IsAny<int>())); 
 
-            progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>()));
+            progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()));
             permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>(), It.IsAny<int>()));
         }
 
@@ -904,7 +904,7 @@ namespace Linko.LinkoExchange.Test
                       Mock.Of<OrganizationRegulatoryProgramDto>(i=>i.OrganizationId == 1001)
                   }); 
 
-            progServiceMock.Setup(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>())).Returns(
+            progServiceMock.Setup(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(
                    Mock.Of<OrganizationRegulatoryProgramUserDto>(i=>i.IsEnabled == true && i.OrganizationRegulatoryProgramId == 100  
                    )
                 );

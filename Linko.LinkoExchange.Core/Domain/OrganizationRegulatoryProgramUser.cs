@@ -19,6 +19,9 @@ namespace Linko.LinkoExchange.Core.Domain
         public int OrganizationRegulatoryProgramId { get; set; }
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 
+        public int InviterOrganizationRegulatoryProgramId { get; set; }
+        public virtual OrganizationRegulatoryProgram InviterOrganizationRegulatoryProgram { get; set; }
+
         public int? PermissionGroupId { get; set; }
         public virtual PermissionGroup PermissionGroup { get; set; }
 

@@ -22,6 +22,11 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(false);
 
+            HasRequired(a => a.InviterOrganizationRegulatoryProgram)
+                .WithMany(b => b.InviterOrganizationRegulatoryProgramUsers)
+                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
+                .WillCascadeOnDelete(false);
+
             HasOptional(a => a.PermissionGroup)
                 .WithMany(b => b.OrganizationRegulatoryProgramUsers)
                 .HasForeignKey(c => c.PermissionGroupId)

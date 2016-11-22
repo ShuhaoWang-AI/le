@@ -12,6 +12,7 @@ namespace Linko.LinkoExchange.Services.Program
     {
         private readonly LinkoExchangeContext _linkoExchangeDbContext;
         private readonly IMapper _mapper; 
+
         public ProgramService(
             LinkoExchangeContext applicationDbContext, 
             IMapper mapper
@@ -75,7 +76,7 @@ namespace Linko.LinkoExchange.Services.Program
             return organziationRegulatoryProgramUserDtos;
         }
 
-        public OrganizationRegulatoryProgramUserDto CreateOrganizationRegulatoryProgramForUser(int userProfileId, int organizationRegulatoryProgramId)
+        public OrganizationRegulatoryProgramUserDto CreateOrganizationRegulatoryProgramForUser(int userProfileId, int organizationRegulatoryProgramId, int inviterOrganizationRegulatoryProgramId)
         {
             var orpu = new OrganizationRegulatoryProgramUser();
             orpu.IsEnabled = true;
@@ -87,6 +88,7 @@ namespace Linko.LinkoExchange.Services.Program
             orpu.CreationDateTimeUtc = DateTimeOffset.UtcNow;
             orpu.RegistrationDateTimeUtc = DateTimeOffset.UtcNow;
             orpu.OrganizationRegulatoryProgramId = organizationRegulatoryProgramId;
+            orpu.InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgramId;
 
             _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Add(orpu);
             _linkoExchangeDbContext.SaveChanges();

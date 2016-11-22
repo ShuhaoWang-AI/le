@@ -52,7 +52,13 @@ namespace Linko.LinkoExchange.Test
                          OrganizationRegulatoryProgramId = 90001,
                          OrganizationId = 90000,
                          RegulatorOrganizationId = 90000
-                     }  &&  
+                     }  &&
+                     p.InviterOrganizationRegulatoryProgramDto == new OrganizationRegulatoryProgramDto
+                     {
+                         OrganizationRegulatoryProgramId = 90001,
+                         OrganizationId = 90000,
+                         RegulatorOrganizationId = 90000
+                     } &&
 
                      p.UserProfileDto == new UserDto
                      {

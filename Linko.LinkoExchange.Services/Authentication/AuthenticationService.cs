@@ -414,7 +414,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     // UC-42 6
                     // 2 Create organization regulatory program userProfile, and set the approved statue to false  
-                    var orpu = _programService.CreateOrganizationRegulatoryProgramForUser(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId);
+                    var orpu = _programService.CreateOrganizationRegulatoryProgramForUser(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId, invitationDto.SenderOrganizationRegulatoryProgramId);
 
                     // UC-42 7, 8
                     // Find out who have approval permission   

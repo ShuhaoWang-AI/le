@@ -7,6 +7,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public int OrganizationRegulatoryProgramUserId { get; set; }
         public int UserProfileId { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
+        public int InviterOrganizationRegulatoryProgramId { get; set; }
         public bool IsEnabled { get; set; }
         public bool IsRegistrationApproved { get; set; }
         public bool IsRegistrationDenied { get; set; }
@@ -16,5 +17,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTimeOffset? RegistrationDateTimeUtc { get; set; }
         public UserDto UserProfileDto { get; set; }
         public virtual OrganizationRegulatoryProgramDto OrganizationRegulatoryProgramDto { get; set; }
+        public virtual OrganizationRegulatoryProgramDto InviterOrganizationRegulatoryProgramDto { get; set; }
     }
 }

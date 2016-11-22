@@ -17,6 +17,7 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
             .ReverseMap()
             .ForMember(d => d.PermissionGroups, o => o.Ignore())
             .ForMember(d => d.OrganizationRegulatoryProgramUsers, o => o.Ignore())
+            .ForMember(d => d.InviterOrganizationRegulatoryProgramUsers, o => o.Ignore())
             .ForMember(d => d.OrganizationRegulatoryProgramSettings, o => o.Ignore())
             .ForMember(d=>d.OrganizationRegulatoryProgramModules, o=>o.Ignore());
 

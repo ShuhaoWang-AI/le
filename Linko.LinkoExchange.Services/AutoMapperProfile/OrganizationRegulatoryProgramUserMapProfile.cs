@@ -13,7 +13,8 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
 
             CreateMap<OrganizationRegulatoryProgramUser, OrganizationRegulatoryProgramUserDto>()
                 .ForMember(d => d.UserProfileDto, o => o.Ignore())
-                .ForMember(d => d.OrganizationRegulatoryProgramDto, o => o.MapFrom(s => s.OrganizationRegulatoryProgram)); 
+                .ForMember(d => d.OrganizationRegulatoryProgramDto, o => o.MapFrom(s => s.OrganizationRegulatoryProgram))
+                .ForMember(d => d.InviterOrganizationRegulatoryProgramDto, o => o.MapFrom(s => s.InviterOrganizationRegulatoryProgram));
 
             CreateMap<OrganizationRegulatoryProgramUser, UserDto>()
 

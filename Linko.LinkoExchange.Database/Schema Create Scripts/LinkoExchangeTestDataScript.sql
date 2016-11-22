@@ -3260,6 +3260,12 @@ FROM dbo.tOrganizationRegulatoryProgram
 WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP
     AND OrganizationId = @OrganizationId_GRESD
 
+DECLARE @OrganizationRegulatoryProgramId_Spectrum int
+SELECT @OrganizationRegulatoryProgramId_Spectrum = orp.OrganizationRegulatoryProgramId
+FROM dbo.tOrganizationRegulatoryProgram orp
+    INNER JOIN dbo.tOrganization o ON o.OrganizationId = orp.OrganizationId
+WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP
+    AND o.Name = 'Spectrum Industries Wealthy'
 
 DECLARE @OrganizationRegulatoryProgramId_Valley int
 SELECT @OrganizationRegulatoryProgramId_Valley = orp.OrganizationRegulatoryProgramId
@@ -3268,14 +3274,12 @@ FROM dbo.tOrganizationRegulatoryProgram orp
 WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP
     AND o.Name = 'Valley City Plating'
 
-
 DECLARE @OrganizationRegulatoryProgramId_Kerry int
 SELECT @OrganizationRegulatoryProgramId_Kerry = orp.OrganizationRegulatoryProgramId
 FROM dbo.tOrganizationRegulatoryProgram orp
     INNER JOIN dbo.tOrganization o ON o.OrganizationId = orp.OrganizationId
 WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP
     AND o.Name = 'Kerry, Inc.'
-
 
 DECLARE @OrganizationRegulatoryProgramId_Allied int
 SELECT @OrganizationRegulatoryProgramId_Allied = orp.OrganizationRegulatoryProgramId
@@ -3310,144 +3314,157 @@ BEGIN
     PRINT 'Add records to tOrganizationRegulatoryProgramUser'
     PRINT '-------------------------------------------------'
     
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    (SELECT UserProfileId FROM dbo.tUserProfile WHERE UserName = 'Linko')
-		    , @OrganizationRegulatoryProgramId_Valley
-		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Administrator' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_Valley)
+		    , @OrganizationRegulatoryProgramId_Spectrum
+            , @OrganizationRegulatoryProgramId_GRESD
+		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Administrator' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_Spectrum)
 		    , SYSDATETIMEOFFSET()
-		    , 1
+		    , 0
 		    , 1
         )
 
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    (SELECT UserProfileId FROM dbo.tUserProfile WHERE UserName = 'kanderson')
 		    , @OrganizationRegulatoryProgramId_GRESD
+            , @OrganizationRegulatoryProgramId_GRESD
 		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Administrator' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_GRESD)
 		    , SYSDATETIMEOFFSET()
 		    , 1
 		    , 1
         )
 
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    (SELECT UserProfileId FROM dbo.tUserProfile WHERE UserName = 'pkuklewski')
 		    , @OrganizationRegulatoryProgramId_GRESD
+            , @OrganizationRegulatoryProgramId_GRESD
 		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Standard' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_GRESD)
 		    , SYSDATETIMEOFFSET()
 		    , 1
 		    , 1
         )
 
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    (SELECT UserProfileId FROM dbo.tUserProfile WHERE UserName = 'dpelletier')
 		    , @OrganizationRegulatoryProgramId_Valley
+            , @OrganizationRegulatoryProgramId_GRESD
 		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Administrator' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_Valley)
 		    , SYSDATETIMEOFFSET()
 		    , 1
 		    , 1
         )
 
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    (SELECT UserProfileId FROM dbo.tUserProfile WHERE UserName = 'rdavis')
 		    , @OrganizationRegulatoryProgramId_Kerry
+            , @OrganizationRegulatoryProgramId_GRESD
 		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Administrator' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_Kerry)
 		    , SYSDATETIMEOFFSET()
 		    , 1
 		    , 1
         )
 
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    (SELECT UserProfileId FROM dbo.tUserProfile WHERE UserName = 'nbora')
 		    , @OrganizationRegulatoryProgramId_Allied
+            , @OrganizationRegulatoryProgramId_GRESD
 		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Administrator' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_Allied)
 		    , SYSDATETIMEOFFSET()
 		    , 1
 		    , 1
         )
 
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    (SELECT UserProfileId FROM dbo.tUserProfile WHERE UserName = 'jrasche')
 		    , @OrganizationRegulatoryProgramId_Valley
+            , @OrganizationRegulatoryProgramId_Valley
 		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Standard' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_Valley)
 		    , SYSDATETIMEOFFSET()
 		    , 1
 		    , 1
         )
 
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    (SELECT UserProfileId FROM dbo.tUserProfile WHERE UserName = 'bskip')
 		    , @OrganizationRegulatoryProgramId_Kerry
+            , @OrganizationRegulatoryProgramId_Kerry
 		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Standard' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_Kerry)
 		    , SYSDATETIMEOFFSET()
 		    , 1
 		    , 1
         )
 
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    (SELECT UserProfileId FROM dbo.tUserProfile WHERE UserName = 'bhirdes')
 		    , @OrganizationRegulatoryProgramId_Allied
+            , @OrganizationRegulatoryProgramId_Allied
 		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Standard' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_Allied)
 		    , SYSDATETIMEOFFSET()
 		    , 1
 		    , 1
         )
 
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    (SELECT UserProfileId FROM dbo.tUserProfile WHERE UserName = 'bfrazier')
 		    , @OrganizationRegulatoryProgramId_GRESD
-		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Administrator' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_GRESD)
+            , @OrganizationRegulatoryProgramId_GRESD
+		    , NULL
 		    , SYSDATETIMEOFFSET()
 		    , 0
 		    , 1
         )
 
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    (SELECT UserProfileId FROM dbo.tUserProfile WHERE UserName = 'jsoper')
 		    , @OrganizationRegulatoryProgramId_GRESD
-		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Standard' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_GRESD)
+            , @OrganizationRegulatoryProgramId_GRESD
+		    , NULL
 		    , SYSDATETIMEOFFSET()
 		    , 0
 		    , 1
         )
 
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    (SELECT UserProfileId FROM dbo.tUserProfile WHERE UserName = 'cnorberg')
 		    , @OrganizationRegulatoryProgramId_Kerry
-		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Administrator' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_Kerry)
+            , @OrganizationRegulatoryProgramId_Kerry
+		    , NULL
 		    , SYSDATETIMEOFFSET()
 		    , 0
 		    , 1
         )
 
-    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
 		(
 		    (SELECT UserProfileId FROM dbo.tUserProfile WHERE UserName = 'sschnau')
 		    , @OrganizationRegulatoryProgramId_Allied
-		    , (SELECT PermissionGroupId FROM dbo.tPermissionGroup WHERE Name = 'Standard' AND OrganizationRegulatoryProgramId = @OrganizationRegulatoryProgramId_Allied)
+            , @OrganizationRegulatoryProgramId_Allied
+		    , NULL
 		    , SYSDATETIMEOFFSET()
 		    , 0
 		    , 1
