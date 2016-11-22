@@ -733,6 +733,7 @@ namespace Linko.LinkoExchange.Services.User
                 userProfile = _dbContext.Users.Single(up => up.UserProfileId == userProfileId);
                 oldEmailAddress = userProfile.Email;
                 userProfile.Email = newEmailAddress;
+                userProfile.OldEmailAddress = oldEmailAddress;
                 _dbContext.SaveChanges();
                 dbContextTransaction.Commit();
             }
