@@ -35,7 +35,7 @@
                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
                         columns.Bound(c => c.Email)
                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                        columns.Bound(c => c.OrgName)
+                        columns.Bound(c => c.RegisteredOrgName)
                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
                         columns.Bound(c => c.DateRegistered).Format(value: "{0:MM-dd-yyyy}")
                                .Filterable(filterable => filterable.Enabled(value: true).Extra(value: true));
