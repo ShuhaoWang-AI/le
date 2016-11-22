@@ -24,9 +24,9 @@ namespace Linko.LinkoExchange.Services.Email
         private readonly IAuditLogService _emailAuditLogService;
         private readonly IProgramService _programService;
         private readonly ISettingService _settingService;
-        private readonly IRequestCache _requestCache; 
+        private readonly IRequestCache _requestCache;
 
-        private string _emailServer = ConfigurationManager.AppSettings["EmailServer"]; 
+        private string _emailServer = "";
 
         private readonly string _senderEmailAddres;
         private readonly string _senderFistName;
@@ -48,7 +48,9 @@ namespace Linko.LinkoExchange.Services.Email
 
             _senderEmailAddres = _settingService.GetGlobalSettings()[SystemSettingType.SystemEmailEmailAddress];
             _senderFistName = _settingService.GetGlobalSettings()[SystemSettingType.SystemEmailFirstName];
-            _senderLastName = _settingService.GetGlobalSettings()[SystemSettingType.SystemEmailLastName]; 
+            _senderLastName = _settingService.GetGlobalSettings()[SystemSettingType.SystemEmailLastName];
+
+            _emailServer = settingService.GetGlobalSettings()[SystemSettingType.EmailServer];
         }
 
         public async Task SendEmail(IEnumerable<string> recipients, EmailType emailType,

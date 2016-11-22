@@ -14,6 +14,8 @@ namespace Linko.LinkoExchange.Core.Enum
         PasswordExpiredDays = 6,
         SupportPhoneNumber = 7,
         SupportEmailAddress = 8,
-        EmailServer = 9
+        EmailServer = 9,
+        PasswordRequiredLength,
+        PasswordRequireDigit
     }
 }

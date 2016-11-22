@@ -57,10 +57,7 @@ For more information on how to configure your ASP.NET application, please visit 
     </rules>
   </nlog>
   <appSettings>
-    <add key="EmailServer"
-         value="wtraxadc2.watertrax.local" />
-    <add key="EmailSenderFromEmail"
-         value="noreply@linkoexchange.com" />
+    
     <!--minutes -->
     <!--change sessionState timeout value with same value-->
     <add key="CookieValidateInterval"

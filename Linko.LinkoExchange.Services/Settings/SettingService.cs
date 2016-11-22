@@ -31,16 +31,19 @@ namespace Linko.LinkoExchange.Services.Settings
         {
             _dbContext = dbContext; 
             _mapper = mapper;
-            
 
-            //TODO get from DB
-            _globalSettings.Add(SystemSettingType.PasswordExpiredDays, "90"); 
-            _globalSettings.Add(SystemSettingType.EmailServer, "6");
-            _globalSettings.Add(SystemSettingType.SupportPhoneNumber, "+1-604-418-3201");
-            _globalSettings.Add(SystemSettingType.SupportEmailAddress, "support@linkoExchange.com");
-            _globalSettings.Add(SystemSettingType.SystemEmailEmailAddress, "shuhao.wang@watertrax.com");
-            _globalSettings.Add(SystemSettingType.SystemEmailFirstName, "LinkoExchange");
-            _globalSettings.Add(SystemSettingType.SystemEmailLastName, "System");  
+            var systemSettings = _dbContext.SystemSettings.ToList(); 
+
+            _globalSettings.Add(SystemSettingType.EmailServer, systemSettings.First(i => i.Name == SystemSettingType.EmailServer.ToString()).Value);
+            _globalSettings.Add(SystemSettingType.PasswordExpiredDays, systemSettings.First(i => i.Name == SystemSettingType.PasswordExpiredDays.ToString()).Value);
+            _globalSettings.Add(SystemSettingType.SupportPhoneNumber, systemSettings.First(i => i.Name == SystemSettingType.SupportPhoneNumber.ToString()).Value);
+            _globalSettings.Add(SystemSettingType.SupportEmailAddress, systemSettings.First(i => i.Name == SystemSettingType.SupportEmailAddress.ToString()).Value);
+            _globalSettings.Add(SystemSettingType.SystemEmailEmailAddress, systemSettings.First(i => i.Name == SystemSettingType.SystemEmailEmailAddress.ToString()).Value);
+            _globalSettings.Add(SystemSettingType.SystemEmailFirstName, systemSettings.First(i => i.Name == SystemSettingType.SystemEmailFirstName.ToString()).Value);
+            _globalSettings.Add(SystemSettingType.SystemEmailLastName, systemSettings.First(i => i.Name == SystemSettingType.SystemEmailLastName.ToString()).Value);
+
+            _globalSettings.Add(SystemSettingType.PasswordRequireDigit, systemSettings.First(i => i.Name == SystemSettingType.PasswordRequireDigit.ToString()).Value);
+            _globalSettings.Add(SystemSettingType.PasswordRequiredLength, systemSettings.First(i => i.Name == SystemSettingType.PasswordRequiredLength.ToString()).Value); 
         }
 
         /// <summary>
