@@ -981,6 +981,11 @@ namespace Linko.LinkoExchange.Services.Authentication
         private void ClearClaims(string userId)
         {
             if (string.IsNullOrWhiteSpace(userId)) return;
+            var user = _userManager.FindById(userId);
+            if(user == null)
+            {
+                return;
+            }
 
             var claims = _userManager.GetClaims(userId).ToList();
             foreach (var claim in claims)
