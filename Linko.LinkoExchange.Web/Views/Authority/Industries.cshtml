@@ -69,7 +69,7 @@
                                      .Width(pixelWidth: 60);
                           })
                           .Pageable(pageable => pageable
-                                    .PageSizes(enabled: true)
+                                    .PageSizes(new List<object> { "all", 10, 20, 30, 40, 50 })
                                     .Refresh(enabled: true)
                                     .Input(enabled: true)
                                     .Numeric(enabled: false)
