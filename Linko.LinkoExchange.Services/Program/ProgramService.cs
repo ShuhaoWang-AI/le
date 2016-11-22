@@ -85,6 +85,7 @@ namespace Linko.LinkoExchange.Services.Program
             orpu.IsSignatory = false;
             orpu.UserProfileId = userProfileId;
             //orpu.LastModificationDateTimeUtc = DateTime.UtcNow;
+            orpu.IsRemoved = false;
             orpu.CreationDateTimeUtc = DateTimeOffset.UtcNow;
             orpu.RegistrationDateTimeUtc = DateTimeOffset.UtcNow;
             orpu.OrganizationRegulatoryProgramId = organizationRegulatoryProgramId;
