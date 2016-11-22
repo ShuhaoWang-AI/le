@@ -15,7 +15,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         [Display(Name = "Email Address")]
         public string EmailAddress { get; set; }
 
-        //public int OrgRegProgramUserId { get; set; }
+        public int OrgRegProgramUserId { get; set; }
 
         [Required]
         [Display(Name = "First Name")]

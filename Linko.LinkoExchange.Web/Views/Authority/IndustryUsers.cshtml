@@ -87,7 +87,7 @@
     <div class="box-header with-border">
         <h3 class="box-title">Pending Invitations</h3>
         <div class="box-tools pull-right">
-            <input type="button" value="Invite Administrator" class="btn btn-sm btn-primary" />
+            @Html.ActionLink("Invite Adminstrator", "Invite", "Authority", new { orgRegProgramId = ViewBag.IndustryId }, new { @class = "btn btn-sm btn-primary" } )
             <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
         </div><!-- /.box-tools -->

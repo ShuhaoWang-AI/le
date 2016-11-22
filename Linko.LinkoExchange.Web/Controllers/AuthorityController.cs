@@ -1150,15 +1150,28 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #region Invite User
         // GET: /Authority/Invite
-        public ActionResult Invite()
+        public ActionResult Invite(string orgRegProgramId)
         {
-            return View(new InviteViewModel());
+            var model = new InviteViewModel();
+            if (!String.IsNullOrEmpty(orgRegProgramId))
+            {
+                model.OrgRegProgramUserId = Convert.ToInt32(orgRegProgramId);
+            }
+            return View(model);
         }
 
         [AcceptVerbs(HttpVerbs.Post)]
-        public ActionResult InviteCheckEmail(string emailAddress)
+        public ActionResult InviteCheckEmail(string emailAddress, string orgRegProgramIdString)
         {
-            var orgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            int orgRegProgramId;
+            if (String.IsNullOrEmpty(orgRegProgramIdString) || int.Parse(orgRegProgramIdString) < 1)
+            {
+                orgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            }
+            else
+            {
+                orgRegProgramId = int.Parse(orgRegProgramIdString);
+            }
 
             InviteViewModel viewModel = new InviteViewModel();
             var foundUsers = _invitationService.CheckEmailAddress(orgRegProgramId, emailAddress);
@@ -1213,13 +1226,28 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return View(viewModel);
             }
 
+            string redirectUrl;
+            InvitationType inviteType;
             var orgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            var result = _invitationService.SendUserInvite(orgRegProgramId, viewModel.EmailAddress, viewModel.FirstName, viewModel.LastName, InvitationType.AuthorityToAuthority);
+            if (viewModel.OrgRegProgramUserId > 0)
+            {
+                //Inviting Admin user for UI
+                orgRegProgramId = viewModel.OrgRegProgramUserId;
+                redirectUrl = string.Format("~/Authority/Industry/{0}/Users", orgRegProgramId);
+                inviteType = InvitationType.AuthorityToIndustry;
+            }
+            else
+            {
+                redirectUrl = "~/Authority/Users";
+                inviteType = InvitationType.AuthorityToAuthority;
+            }
+
+            var result = _invitationService.SendUserInvite(orgRegProgramId, viewModel.EmailAddress, viewModel.FirstName, viewModel.LastName, inviteType);
             if (result.Success)
             {
                 _logger.Info(string.Format("Invite successfully sent. Email={0}, FirstName={1}, LastName={2}.",
                     viewModel.EmailAddress, viewModel.FirstName, viewModel.LastName));
-                return new RedirectResult("~/Authority/Users");
+                return new RedirectResult(redirectUrl);
             }
             else
             {
@@ -1381,6 +1409,41 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             model = PreparePendingUserApprovalDetails(id);
             return View(viewName: "PendingUserApprovalDetails", model: model);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult InviteExistingUser(int orgRegProgramUserId, string industryOrgRegProgramId)
+        {
+            var orgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            InvitationType inviteType;
+            string redirectUrl;
+            if (!String.IsNullOrEmpty(industryOrgRegProgramId) && int.Parse(industryOrgRegProgramId) > 0)
+            {
+                //inviting to industry organization
+                orgRegProgramId = int.Parse(industryOrgRegProgramId);
+                inviteType = InvitationType.AuthorityToIndustry;
+                redirectUrl = string.Format("~/Authority/Industry/{0}/Users", industryOrgRegProgramId);
+            }
+            else
+            {
+                inviteType = InvitationType.AuthorityToAuthority;
+                redirectUrl = "~/Authority/Users";
+            } 
+
+            var result = _invitationService.SendUserInvite(orgRegProgramId, "", "", "", inviteType, orgRegProgramUserId);
+            if (result.Success)
+            {
+                _logger.Info(string.Format("Invite successfully sent to existing user in different program. OrgRegProgUserId={0} from ProgramId={1}", orgRegProgramUserId, orgRegProgramId));
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    _logger.Info(string.Format("Invite failed to send to existing user {0} in different program. Error={1} from ProgramId={2}", orgRegProgramUserId, error, orgRegProgramId));
+                }
+            }
+
+            return new RedirectResult(redirectUrl);
         }
 
         [AcceptVerbs(HttpVerbs.Post)]

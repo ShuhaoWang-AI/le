@@ -4,7 +4,8 @@ $(document).ready(function () {
     $("#searchEmailBtn").click(function () {
         $.post("./InviteCheckEmail",
         {
-            emailAddress: $("#EmailAddress").val()
+            emailAddress: $("#EmailAddress").val(),
+            orgRegProgramIdString: $("#OrgRegProgramUserId").val()
         },
         function (data, status) {
             //alert("Data: " + data + "\nStatus: " + status);
@@ -39,6 +40,10 @@ $(document).ready(function () {
                 }
             }
             else {
+                var grid = $('#gridExistingUsers').getKendoGrid();
+                grid.dataSource.data(data.ExistingUsers);
+                grid.refresh();
+
                 $("#searchEmailBtn").hide();
                 $("#boxFoundUser").hide();
                 $("#boxFoundUsers").show();
