@@ -671,7 +671,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.SuccessMessage = TempData["Message"];
             ViewBag.SubTitle = TempData["SubTitle"];
             TempData["SubTitle"] = "Change Email";
-            TempData["Message"] = "Change emal address succeeded.";
+            TempData["Message"] = "Change email address succeeded.";
 
             return View();
         }
