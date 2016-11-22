@@ -329,7 +329,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                         applicationUser.TitleRole = userInfo.TitleRole;
                         applicationUser.BusinessName = userInfo.BusinessName;
-                        applicationUser.FirstName = userInfo.UserName;
+                        applicationUser.FirstName = userInfo.FirstName;
                         applicationUser.LastName = userInfo.LastName;
                         applicationUser.UserName = userInfo.UserName;
                         applicationUser.AddressLine1 = userInfo.AddressLine1;

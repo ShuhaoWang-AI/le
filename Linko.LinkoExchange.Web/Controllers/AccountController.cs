@@ -122,7 +122,18 @@ namespace Linko.LinkoExchange.Web.Controllers
             sqs.Add(new AnswerDto() { QuestionId = model.UserSQ.SecurityQuestion2, Content = model.UserSQ.SecurityQuestionAnswer2 });
 
             var result = await _authenticationService.Register(userDto, model.Token, sqs, kbqs);
-            return View(model);
+
+
+            if (result.Result == RegistrationResult.Success)
+            {
+                _logger.Info(string.Format("Registration successfully completed. Email={0}, FirstName={1}, LastName={2}.", userDto.Email, userDto.FirstName, userDto.LastName));
+                return View("Confirmation", new ConfirmationViewModel() { Title = "Registration Completed", Message = "Thank you for completing registration." });
+            }
+            else
+            {
+                _logger.Info(string.Format("Registration failed. Email={0}, FirstName={1}, LastName={2}, Result={3}", userDto.Email, userDto.FirstName, userDto.LastName, result.Result.ToString()));
+                return View("Error");
+            }
         }
 
 
