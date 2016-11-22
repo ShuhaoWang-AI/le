@@ -320,8 +320,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
-        [Route("User/{id:int}/Details/UserLockUnLock")]
-        public ActionResult IndustryUserLockUnLock(int id, IndustryUserViewModel model)
+        [Route("User/{id:int}/Details/ChangeStatus")]
+        public ActionResult IndustryUserChangeStatus(int id, IndustryUserViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -329,10 +329,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                _userService.LockUnlockUserAccount(model.PId, !model.AccountLocked, isForFailedKBQs: false);
+                _userService.EnableDisableUserAccount(model.Id, !model.Status);
 
                 ViewBag.ShowSuccessMessage = true;
-                ViewBag.SuccessMessage = model.AccountLocked ? "User unlocked!" : "User locked!";
+                ViewBag.SuccessMessage = model.Status ? "User Disabled!" : "User Enabled!";
                 ModelState.Clear();
                 model = PrepareIndustryUserDetails(id);
             }
@@ -340,57 +340,6 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
                 model = PrepareIndustryUserDetails(id);
-            }
-
-            return View(viewName: "IndustryUserDetails", model: model);
-        }
-
-        [AcceptVerbs(HttpVerbs.Post)]
-        [ValidateAntiForgeryToken]
-        [Route("User/{id:int}/Details/UserReset")]
-        public ActionResult IndustryUserReset(int id, IndustryUserViewModel model)
-        {
-            string newEmail = model.ResetEmail;
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            try
-            {
-                var result = _userService.ResetUser(model.PId, newEmail);
-
-                if (result.IsSuccess)
-                {
-                    ViewBag.ShowSuccessMessage = true;
-                    ViewBag.SuccessMessage = "User account reset successfully!";
-                    ModelState.Clear();
-                    model = PrepareIndustryUserDetails(id);
-                }
-                else
-                {
-                    List<RuleViolation> validationIssues = new List<RuleViolation>();
-                    string message = "";
-
-                    switch (result.FailureReason)
-                    {
-                        case ResetUserFailureReason.NewEmailAddressAlreadyInUse:
-                            message = "Email is already in use on another account.";
-                            break;
-                        default:
-                            message = "User account reset failed";
-                            break;
-                    }
-
-                    validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
-                    throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
-                }
-            }
-            catch (RuleViolationException rve)
-            {
-                MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
-
-                model = PrepareIndustryUserDetails(id);
-                model.ResetEmail = newEmail;
             }
 
             return View(viewName: "IndustryUserDetails", model: model);

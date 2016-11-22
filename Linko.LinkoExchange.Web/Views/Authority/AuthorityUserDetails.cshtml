@@ -25,6 +25,7 @@
                     {
                         <input type="submit" value="@Model.AccountLockedButtonText" class="btn btn-sm btn-primary" 
                                formaction="@Url.Action(actionName: "AuthorityUserLockUnLock", controllerName: "Authority")" formmethod="post" />
+                        <input type="button" value="@Model.StatusButtonText" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#ChangeStatusModal" />
                         <input type="button" value="Remove" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#removeModal"/>
                         <input type="button" value="Reset" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#resetModal"/>   
                     }                
@@ -87,6 +88,48 @@
                 </div>
             </div>
 
+            <div class="col-md-12 modal modal-info fade" id="ChangeStatusModal" tabindex="-1" role="dialog" aria-labelledby="ChangeStatusModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content alert alert-info alert-dismissible">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+
+                        @if (@Model.Status)
+                        {
+                            <h4 class="box-title">"Disable User?"</h4>
+
+                        }
+                        else
+                        {
+                            <h4 class="box-title">"Enable User?"</h4>
+                        }
+
+                        <section>
+                            <p>
+                                @if (@Model.Status)
+                                {
+                                    <span>"User will no longer be able to log into this portal."</span>
+                                }
+                                else
+                                {
+                                    <span>"User will be able to log into this portal."</span>
+                                }
+                            </p>
+                        </section>
+                        <div>
+                            <div class="form-group">
+                                <div class="pull-right">
+                                    <button type="submit" class="btn btn-sm btn-primary"
+                                            formaction="@Url.Action(actionName: "AuthorityUserChangeStatus", controllerName: "Authority")" formmethod="post">
+                                        Yes
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-primary" data-dismiss="modal" aria-label="Close">No</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-md-12 modal modal-info fade" id="removeModal" tabindex="-1" role="dialog" aria-labelledby="removeModalLabel">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content alert alert-info alert-dismissible">
@@ -130,6 +173,7 @@
                             @disabled = "disabled"
                         }
                     })
+                    @Html.HiddenFor(model => model.Status)
                 </div>
 
                 @Html.LabelFor(model => model.AccountLocked, htmlAttributes: new

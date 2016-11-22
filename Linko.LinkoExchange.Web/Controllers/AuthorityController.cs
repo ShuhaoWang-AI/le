@@ -493,6 +493,33 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
+        [Route("User/{id:int}/Details/ChangeStatus")]
+        public ActionResult AuthorityUserChangeStatus(int id, AuthorityUserViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            try
+            {
+                _userService.EnableDisableUserAccount(model.Id, !model.Status);
+
+                ViewBag.ShowSuccessMessage = true;
+                ViewBag.SuccessMessage = model.Status ? "User disabled!" : "User enabled!";
+                ModelState.Clear();
+                model = PrepareAuthorityUserDetails(id);
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
+                model = PrepareAuthorityUserDetails(id);
+            }
+
+            return View(viewName: "AuthorityUserDetails", model: model);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
         [Route("User/{id:int}/Details/UserRemove")]
         public ActionResult AuthorityUserRemove(int id, AuthorityUserViewModel model)
         {
@@ -1000,6 +1027,33 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = model.AccountLocked ? "User unlocked!" : "User locked!";
+                ModelState.Clear();
+                model = PrepareIndustryUserDetails(id);
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
+                model = PrepareIndustryUserDetails(id);
+            }
+
+            return View(viewName: "IndustryUserDetails", model: model);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route("Industry/{iid:int}/User/{id:int}/Details/ChangeStatus")]
+        public ActionResult IndustryUserChangeStatus(int iid, int id, IndustryUserViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            try
+            {
+                _userService.EnableDisableUserAccount(model.Id, !model.Status);
+
+                ViewBag.ShowSuccessMessage = true;
+                ViewBag.SuccessMessage = model.Status ? "User disabled!" : "User enabled!";
                 ModelState.Clear();
                 model = PrepareIndustryUserDetails(id);
             }

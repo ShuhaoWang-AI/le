@@ -98,6 +98,15 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         }
 
         [Editable(false)]
+        public string StatusButtonText
+        {
+            get
+            {
+                return Status ? "Disable" : "Enable";
+            }
+        }
+
+        [Editable(false)]
         [Display(Name = "Account Locked")]
         public bool AccountLocked
         {
