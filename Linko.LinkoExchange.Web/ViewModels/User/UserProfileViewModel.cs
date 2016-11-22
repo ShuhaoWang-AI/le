@@ -118,12 +118,6 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         {
             get; set;
         } 
-
-        [Display(Name = "Fax")]
-        public string Fax
-        {
-            get; set;
-        }
  
         [Required]
         [Display(Name = "Email")]
