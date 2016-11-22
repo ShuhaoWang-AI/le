@@ -17,6 +17,8 @@ namespace Linko.LinkoExchange.Services.User
 
         ICollection<OrganizationRegulatoryProgramUserDto> GetProgramUsersByEmail(string emailAddress);
 
+        List<OrganizationRegulatoryProgramUserDto> GetPendingRegistrationProgramUsers(int orgRegProgramId);
+
         List<OrganizationRegulatoryProgramUserDto> GetUserProfilesForOrgRegProgram(int orgRegProgramId,
                              bool? isRegApproved,
                              bool? isRegDenied,

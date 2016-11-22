@@ -115,6 +115,36 @@ namespace Linko.LinkoExchange.Services.User
             return dtos;
         }
 
+        public List<OrganizationRegulatoryProgramUserDto> GetPendingRegistrationProgramUsers(int orgRegProgramId)
+        {
+            var dtos = new List<OrganizationRegulatoryProgramUserDto>();
+
+            var users = _dbContext.OrganizationRegulatoryProgramUsers
+                .Where(u => u.InviterOrganizationRegulatoryProgramId == orgRegProgramId
+                && u.IsRegistrationApproved == false && u.IsRegistrationDenied == false
+                && u.IsRemoved == false);
+
+            var authority = _orgService.GetAuthority(orgRegProgramId);
+            int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.TimeZone));
+            TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(_timeZones.GetTimeZoneName(timeZoneId));
+
+            foreach (var user in users.ToList())
+            {
+                var dto = _mapper.Map<OrganizationRegulatoryProgramUser, OrganizationRegulatoryProgramUserDto>(user);
+                //manually map user profile child
+                var userProfileDto = GetUserProfileById(user.UserProfileId);
+
+                //Need to modify datetime to local
+                dto.RegistrationDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(dto.RegistrationDateTimeUtc.Value.UtcDateTime, authorityLocalZone);
+                userProfileDto.CreationDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(userProfileDto.CreationDateTimeUtc.Value.UtcDateTime, authorityLocalZone);
+
+                dto.UserProfileDto = userProfileDto;
+                dtos.Add(dto);
+            }
+
+            return dtos;
+        }
+
         public List<OrganizationRegulatoryProgramUserDto> GetUserProfilesForOrgRegProgram(int orgRegProgramId,
                              bool? isRegApproved,
                              bool? isRegDenied,

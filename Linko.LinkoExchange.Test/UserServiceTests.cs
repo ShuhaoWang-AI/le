@@ -123,8 +123,16 @@ namespace Linko.LinkoExchange.Test
         public void ApprovePendingRegistrationTransactionWithEmails()
         {
             var orgRegProgUserId = 7;
-            var permissionGroupId = 1;
+            var permissionGroupId = 65;
             _realUserService.ApprovePendingRegistration(orgRegProgUserId, permissionGroupId, false);
+        }
+
+        
+        [TestMethod]
+        public void GetPendingRegistrationsProgramUsers()
+        {
+            var orgRegProgUserId = 1;
+            _realUserService.GetPendingRegistrationProgramUsers(orgRegProgUserId);
         }
 
         [TestMethod]
