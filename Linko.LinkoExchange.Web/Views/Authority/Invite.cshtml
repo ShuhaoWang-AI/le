@@ -270,7 +270,86 @@
                 <input type="button" id="cancelInviteBtn" value="Cancel" class="btn btn-sm btn-primary" />
             </div>
         </div><!-- box-footer -->
-    </div><!-- /.box -->
+    </div>
+
+}
+@using (Html.BeginForm())
+{
+    <div id="boxFoundUsers" class="box box-primary" style="display:none;">
+        <div class="box-header with-border">
+            <h3 class="box-title">Found Users</h3>
+        </div>
+
+        <section class="box-body form-horizontal">
+
+            @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+
+            @if (ViewBag.ShowSuccessMessage != null && ViewBag.ShowSuccessMessage)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <h5>
+                        <i class="icon fa fa-check"></i>
+                        @ViewBag.SuccessMessage
+                    </h5>
+                </div>
+            }
+
+
+            <div>
+                <div class="alert alert-warning">
+                    <h5>
+                        <i class="icon fa fa-check"></i>
+                        Found users in other organization regulatory programs.
+                    </h5>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Authority.InviteExistingUserViewModel>()
+                    .Name(componentName: "gridExistingUsers")
+                    .AutoBind(false)
+                    .Columns(columns =>
+                    {
+                        columns.Bound(p => p.OrgRegProgramUserId).Hidden();
+                        columns.Bound(c => c.FirstName);
+                        columns.Bound(c => c.LastName);
+                        columns.Bound(c => c.PhoneNumber);
+                        columns.Bound(c => c.FacilityName);
+                        columns.Template(m =>
+                        {
+                        })
+                                .ClientTemplate(value: "<input type='submit' value='Send Invite' class='btn btn-sm btn-primary' formaction='/Authority/InviteExistingUser?orgRegProgramUserId=#: OrgRegProgramUserId #' formmethod='post' />")
+                                .Width(pixelWidth: 90);
+                    })
+                    .Pageable(pageable => pageable.Enabled(false))
+                    .Selectable(selectable => selectable.Enabled(false))
+                    .Sortable(sortable => sortable.Enabled(false))
+                    .Filterable(filterable => filterable.Enabled(false))
+                    .Resizable(resizable => resizable.Columns(false))
+                    .Scrollable(s => s.Height(value: "auto"))
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Model(model => model.Id(p => p.OrgRegProgramUserId))
+                        .ServerOperation(enabled: false)
+                        .Batch(enabled: true)
+                    )
+                    )
+                </div>
+            </div>
+
+
+        </section>@*.box-body*@
+        <div class="box-footer">
+            <div class="form-group pull-right">
+                @*<input id="foundUserInviteButton" type="submit" value="Send Invite" class="btn btn-sm btn-primary"
+                       formaction='@Url.Action("Invite","Authority")' formmethod="post" />*@
+                <input type="button" id="cancelInviteBtn" value="Cancel" class="btn btn-sm btn-primary" />
+            </div>
+        </div><!-- box-footer -->
+    </div>
 
 }
 
@@ -278,5 +357,22 @@
     @Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/invite")
 
-    
+   <script>
+       $('#searchEmailBtn').click(function () {
+           $.ajax({
+               type: 'POST',
+               url: '@Url.Action("InviteCheckEmail", "Authority")',
+               dataType: "json",
+               data: {
+                   emailAddress: $('#EmailAddress').val()
+               },
+               success: function (result) {
+                   var grid = $('#gridExistingUsers').getKendoGrid();
+                   grid.dataSource.data(result.ExistingUsers);
+                   grid.refresh();
+               }
+           });
+           return false;
+       });
+</script>
 }

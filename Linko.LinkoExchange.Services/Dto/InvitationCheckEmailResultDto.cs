@@ -9,6 +9,6 @@ namespace Linko.LinkoExchange.Services.Dto
     public class InvitationCheckEmailResultDto
     {
         public OrganizationRegulatoryProgramUserDto ExistingUserSameProgram { get; set; }
-        public OrganizationRegulatoryProgramUserDto ExistingUserDifferentProgram { get; set; }
+        public ICollection<OrganizationRegulatoryProgramUserDto> ExistingUsersDifferentPrograms { get; set; }
     }
 }

@@ -151,47 +151,38 @@ namespace Linko.LinkoExchange.Services.Invitation
             return dtos;
         }
 
-        public InvitationServiceResultDto SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType)
+        public InvitationServiceResultDto SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType, int? existingOrgRegProgramUserId = null)
         {
-            int recipientOrgRegProgramId = orgRegProgramId; // default
-
-            //See if any existing users belong to this program
-            var existingProgramUsers = _userService.GetProgramUsersByEmail(email);
-            if (existingProgramUsers != null && existingProgramUsers.Count() > 0)
+            int recipientOrgRegProgramId;
+            if (existingOrgRegProgramUserId.HasValue) //Existing user in a different program -- lookup required invitation fields
             {
-                var existingUserForThisProgram = existingProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
-                if (existingUserForThisProgram != null)
-                {
-                    return new InvitationServiceResultDto()
-                    {
-                        Success = false,
-                        ErrorType = Core.Enum.InvitationError.Duplicated,
-                        Errors = new string[] { existingUserForThisProgram.UserProfileDto.FirstName, existingUserForThisProgram.UserProfileDto.LastName }
-                    };
-                }
-                else
-                {
-                    //Found match(es) for user not yet part of this program (4.a)
-                    List<string> userList = new List<string>();
-                    foreach (var user in existingProgramUsers)
-                    {
-                        userList.Add(string.Format("{0}|{1}|{2}|{3}|{4}|{5}", user.OrganizationRegulatoryProgramId,
-                            user.UserProfileDto.FirstName,
-                            user.UserProfileDto.LastName,
-                            user.UserProfileDto.PhoneNumber,
-                            user.OrganizationRegulatoryProgramDto.RegulatoryProgramDto.Name,
-                            user.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName)); //Add additional as needed
-                    }
-                    //return new InvitationServiceResultDto()
-                    //{
-                    //    Success = false,
-                    //    ErrorType = Core.Enum.InvitationError.MatchingUsersInOtherPrograms,
-                    //    Errors = userList
-                    //};
-                    recipientOrgRegProgramId = existingProgramUsers.First().OrganizationRegulatoryProgramId;
-                }
-
+                var existingUser = _userService.GetOrganizationRegulatoryProgramUser(existingOrgRegProgramUserId.Value);
+                recipientOrgRegProgramId = existingUser.OrganizationRegulatoryProgramId;
+                email = existingUser.UserProfileDto.Email;
+                firstName = existingUser.UserProfileDto.FirstName;
+                lastName = existingUser.UserProfileDto.LastName;
             }
+            else
+            {
+                recipientOrgRegProgramId = orgRegProgramId; // default
+                
+                //See if any existing users belong to this program
+                var existingProgramUsers = _userService.GetProgramUsersByEmail(email);
+                if (existingProgramUsers != null && existingProgramUsers.Count() > 0)
+                {
+                    var existingUserForThisProgram = existingProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
+                    if (existingUserForThisProgram != null)
+                    {
+                        return new InvitationServiceResultDto()
+                        {
+                            Success = false,
+                            ErrorType = Core.Enum.InvitationError.Duplicated,
+                            Errors = new string[] { existingUserForThisProgram.UserProfileDto.FirstName, existingUserForThisProgram.UserProfileDto.LastName }
+                        };
+                    }
+                }
+            }
+
 
             //Check available license count
             int remaining;
@@ -260,7 +251,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             }
 
             string baseUrl = _httpContext.GetRequestBaseUrl();
-            string url = baseUrl + "?token=" + invitationId;
+            string url = baseUrl + "Account/Register?token=" + invitationId;
             contentReplacements.Add("link", url);
 
             EmailType emailType;
@@ -340,32 +331,40 @@ namespace Linko.LinkoExchange.Services.Invitation
 
         public InvitationCheckEmailResultDto CheckEmailAddress(int orgRegProgramId, string emailAddress)
         {
-            var existingProgramUsers = _userService.GetProgramUsersByEmail(emailAddress);
-            var existingProgramUser = existingProgramUsers.FirstOrDefault();
+            var existingUsers = _userService.GetProgramUsersByEmail(emailAddress);
+            var existingUsersDifferentPrograms = new List<OrganizationRegulatoryProgramUserDto>();
 
-            if (existingProgramUser != null)
+            if (existingUsers != null && existingUsers.Count() > 0)
             {
-                if (existingProgramUser.OrganizationRegulatoryProgramId == orgRegProgramId)
+                foreach (var existingUser in existingUsers)
                 {
-                    return new InvitationCheckEmailResultDto()
+                    if (existingUser.OrganizationRegulatoryProgramId == orgRegProgramId)
                     {
-                        ExistingUserDifferentProgram = null,
-                        ExistingUserSameProgram = existingProgramUser
-                    };
+                        return new InvitationCheckEmailResultDto()
+                        {
+                            ExistingUsersDifferentPrograms = null,
+                            ExistingUserSameProgram = existingUser
+                        };
+                    }
+                    else
+                    {
+                        existingUsersDifferentPrograms.Add(existingUser);
+                    }
+
                 }
 
                 //Found match(es) for user not yet part of this program (4.a)
                 return new InvitationCheckEmailResultDto()
                 {
                     ExistingUserSameProgram = null,
-                    ExistingUserDifferentProgram = existingProgramUser
+                    ExistingUsersDifferentPrograms = existingUsersDifferentPrograms
                 };
 
             }
 
             return new InvitationCheckEmailResultDto()
             {
-                ExistingUserDifferentProgram = null,
+                ExistingUsersDifferentPrograms = null,
                 ExistingUserSameProgram = null
             };
 

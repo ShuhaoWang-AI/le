@@ -33,13 +33,17 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 
         public bool IsExistingProgramUser { get; set; }
 
-        //[Required]
-        //[Display(Name = "First Name")]
-        //public string NewFirstName { get; set; }
+        public ICollection<InviteExistingUserViewModel> ExistingUsers { get; set; }
 
-        //[Required]
-        //[Display(Name = "Last Name")]
-        //public string NewLastName { get; set; }
+    }
 
+    public class InviteExistingUserViewModel
+    {
+        public int? OrgRegProgramUserId { get; set; }
+        public string EmailAddress { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string FacilityName { get; set; }
+        public string PhoneNumber { get; set; }
     }
 }

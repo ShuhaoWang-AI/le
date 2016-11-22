@@ -1121,21 +1121,29 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 };
             }
-            else if (foundUsers.ExistingUserDifferentProgram != null)
+            else if (foundUsers.ExistingUsersDifferentPrograms != null)
             {
                 viewModel = new InviteViewModel()
                 {
-                    DisplayMessage = "Found user not yet associated with this Authority Regulatory Program.",
+                    DisplayMessage = "Found users not yet associated with this Authority Regulatory Program.",
                     IsExistingProgramUser = false,
-                    //OrgRegProgramUserId = foundUsers.ExistingUserDifferentProgram.OrganizationRegulatoryProgramUserId,
-                    FirstName = foundUsers.ExistingUserDifferentProgram.UserProfileDto.FirstName,
-                    LastName = foundUsers.ExistingUserDifferentProgram.UserProfileDto.LastName,
-                    EmailAddress = foundUsers.ExistingUserDifferentProgram.UserProfileDto.Email,
-                    FacilityName = foundUsers.ExistingUserDifferentProgram.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName,
-                    PhoneNumber = foundUsers.ExistingUserDifferentProgram.OrganizationRegulatoryProgramDto.OrganizationDto.PhoneNumber
                 };
 
+                viewModel.ExistingUsers = new List<InviteExistingUserViewModel>();
+                foreach (var existingUser in foundUsers.ExistingUsersDifferentPrograms)
+                {
+                    viewModel.ExistingUsers.Add(new ViewModels.Authority.InviteExistingUserViewModel() {
+                        OrgRegProgramUserId = existingUser.OrganizationRegulatoryProgramUserId,
+                        FirstName = existingUser.UserProfileDto.FirstName,
+                        LastName = existingUser.UserProfileDto.LastName,
+                        EmailAddress = existingUser.UserProfileDto.Email,
+                        FacilityName = existingUser.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName,
+                        PhoneNumber = existingUser.OrganizationRegulatoryProgramDto.OrganizationDto.PhoneNumber
+                    });
+                }
+
             }
+
 
             return Json(viewModel);
 
@@ -1299,6 +1307,26 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             model = PreparePendingUserApprovalDetails(id);
             return View(viewName: "PendingUserApprovalDetails", model: model);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult InviteExistingUser(int orgRegProgramUserId)
+        {
+            var orgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var result = _invitationService.SendUserInvite(orgRegProgramId, "", "", "", InvitationType.AuthorityToAuthority, orgRegProgramUserId);
+            if (result.Success)
+            {
+                _logger.Info(string.Format("Invite successfully sent to existing user in different program. OrgRegProgUserId={0} from ProgramId={1}", orgRegProgramUserId, orgRegProgramId));
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    _logger.Info(string.Format("Invite failed to send to existing user {0} in different program. Error={1} from ProgramId={2}", orgRegProgramUserId, error, orgRegProgramId));
+                }
+            }
+
+            return new RedirectResult("~/Authority/Users");
         }
 
 

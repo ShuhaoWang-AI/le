@@ -73,25 +73,26 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AllowAnonymous]
         public ActionResult Register(string token)
         {
-            var invitation = _invitationService.GetInvitation(token);
-            if (invitation == null)
-            {
-                ModelState.AddModelError("Invitation", "Invalid invitation link.");
-                return View();
-            }
-
             var model = new RegistrationViewModel();
             model.UserProfile = new UserProfileViewModel();
+            model.UserProfile.StateList = GetStateList();
             model.UserKBQ = new UserKBQViewModel();
             model.UserSQ = new UserSQViewModel();
             model.UserKBQ.QuestionPool = GetQuestionPool(QuestionTypeName.KBQ);
             model.UserSQ.QuestionPool = GetQuestionPool(QuestionTypeName.SQ);
 
+            var invitation = _invitationService.GetInvitation(token);
+            if (invitation == null)
+            {
+                ModelState.AddModelError("Invitation", "Invalid invitation link.");
+                return View("Error");
+            }
+
+
             model.UserProfile.FirstName = invitation.FirstName;
             model.UserProfile.LastName = invitation.LastName;
             model.UserProfile.Email = invitation.EmailAddress;
 
-            model.UserProfile.StateList = GetStateList();
             model.Token = token;
 
             return View(model);
@@ -99,8 +100,13 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         [AllowAnonymous]
         [AcceptVerbs(HttpVerbs.Post)]
-        async public Task<ActionResult> Register(RegistrationViewModel model, string registrationToken)
+        async public Task<ActionResult> Register(RegistrationViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
             UserDto userDto = _mapper.Map<UserProfileViewModel, UserDto>(model.UserProfile);
             userDto.Password = model.UserProfile.Password;
             userDto.AgreeTermsAndConditions = true;
@@ -116,7 +122,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             sqs.Add(new AnswerDto() { QuestionId = model.UserSQ.SecurityQuestion2, Content = model.UserSQ.SecurityQuestionAnswer2 });
 
             var result = await _authenticationService.Register(userDto, model.Token, sqs, kbqs);
-            return View();
+            return View(model);
         }
 
 
