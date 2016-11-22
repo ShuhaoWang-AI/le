@@ -125,13 +125,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return SaveUserSQ(model, pristineUser, userProfileId);
             }
 
-
             return View(pristineUser);
         }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (filterContext.RouteData.Values["action"].ToString().ToLower() == "profile")
+            if (filterContext.RouteData.Values["action"].ToString().ToLower() == "profile" 
+                && Request.HttpMethod != "POST")
             {
                 var kbqPass = TempData["KbqPass"] as string;
                 if (!string.IsNullOrWhiteSpace(kbqPass) &&
