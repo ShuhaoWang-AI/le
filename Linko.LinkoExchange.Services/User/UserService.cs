@@ -797,7 +797,16 @@ namespace Linko.LinkoExchange.Services.User
             var user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
             if (user == null) return;
 
-            user.IsRegistrationApproved = isApproved;
+            if (isApproved)
+            {
+                user.IsRegistrationApproved = isApproved;
+                user.IsRegistrationDenied = false;
+            }
+            else
+            {
+                user.IsRegistrationApproved = isApproved;
+                user.IsRegistrationDenied = true;
+            }
             _dbContext.SaveChanges(); 
         }
 
