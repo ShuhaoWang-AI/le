@@ -314,7 +314,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime,
                 Status = vm.IsEnabled,
                 AccountLocked = vm.UserProfileDto.IsAccountLocked,
-                Role = vm.PermissionGroup.PermissionGroupId,
+                Role = vm.PermissionGroup.PermissionGroupId.Value,
                 RoleText = vm.PermissionGroup.Name
             });
 
@@ -611,7 +611,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 DateRegistered = user.RegistrationDateTimeUtc.Value.DateTime,
                 Status = user.IsEnabled,
                 AccountLocked = user.UserProfileDto.IsAccountLocked,
-                Role = user.PermissionGroup.PermissionGroupId,
+                Role = user.PermissionGroup.PermissionGroupId.Value,
                 RoleText = user.PermissionGroup.Name,
                 SecurityQuestion1 = (userQuesAns.Count > 0 && userQuesAns.ElementAt(index: 0) != null) ? userQuesAns.ElementAt(index: 0).Question.Content : "",
                 Answer1 = (userQuesAns.Count > 0 && userQuesAns.ElementAt(index: 0) != null) ? userQuesAns.ElementAt(index: 0).Answer.Content : "",
@@ -831,7 +831,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime,
                 Status = vm.IsEnabled,
                 AccountLocked = vm.UserProfileDto.IsAccountLocked,
-                Role = vm.PermissionGroup.PermissionGroupId,
+                Role = vm.PermissionGroup.PermissionGroupId.Value,
                 RoleText = vm.PermissionGroup.Name
             });
 
@@ -1080,7 +1080,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 DateRegistered = user.RegistrationDateTimeUtc.Value.DateTime,
                 Status = user.IsEnabled,
                 AccountLocked = user.UserProfileDto.IsAccountLocked,
-                Role = user.PermissionGroup.PermissionGroupId,
+                Role = user.PermissionGroup.PermissionGroupId.Value,
                 RoleText = user.PermissionGroup.Name,
                 IsSignatory = user.IsSignatory,
                 SecurityQuestion1 = (userQuesAns.Count > 0 && userQuesAns.ElementAt(index: 0) != null) ? userQuesAns.ElementAt(index: 0).Question.Content : "",

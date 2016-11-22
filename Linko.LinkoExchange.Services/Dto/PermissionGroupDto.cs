@@ -4,7 +4,7 @@ namespace Linko.LinkoExchange.Services.Dto
 {
     public class PermissionGroupDto
     {
-        public int PermissionGroupId
+        public int? PermissionGroupId
         {
             get;set;
         }
