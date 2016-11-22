@@ -499,6 +499,7 @@
     <Content Include="Views\Authority\PendingUserApprovalDetails.cshtml" />
     <Content Include="Views\Industry\PendingUserApprovalDetails.cshtml" />
     <Content Include="Views\Industry\PendingUserApprovals.cshtml" />
+    <Content Include="Views\User\RequestSignatory.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

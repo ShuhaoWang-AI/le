@@ -187,6 +187,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Download Signatory Agreement.
+        /// </summary>
+        public static string DownloadSignatoryAgreement {
+            get {
+                return ResourceManager.GetString("DownloadSignatoryAgreement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Email Address.
         /// </summary>
         public static string Email {
@@ -282,6 +291,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         public static string TitleLinkoExchangeSignIn {
             get {
                 return ResourceManager.GetString("TitleLinkoExchangeSignIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request Signatory Rights.
+        /// </summary>
+        public static string TitleRequestSignatoryRight {
+            get {
+                return ResourceManager.GetString("TitleRequestSignatoryRight", resourceCulture);
             }
         }
         

@@ -15,6 +15,8 @@ using Linko.LinkoExchange.Core.Enum;
 using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Routing;
+using System.Web.Hosting;
+using System.IO;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -61,6 +63,22 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return View();
         }
+        
+        public ActionResult DownloadSignatory()
+        {
+            var file = HostingEnvironment.MapPath("~/Temp/GRESD Electronic Signature Agreement.pdf");
+            var fileDownloadName = "GRESD Electronic Signature Agreement.pdf";
+            var contentType = "application/pdf"; 
+            var fileStream = new MemoryStream(); 
+            fileStream.Position = 0; 
+            return File(fileStream, contentType, fileDownloadName);
+        }
+
+        [Authorize]
+        public ActionResult RequestSignatory()
+        {
+            return View();
+        } 
 
         [Authorize] 
         [AcceptVerbs(HttpVerbs.Get)]

@@ -159,6 +159,9 @@
   <data name="ChangePassword" xml:space="preserve">
     <value>Change Password</value>
   </data>
+  <data name="DownloadSignatoryAgreement" xml:space="preserve">
+    <value>Download Signatory Agreement</value>
+  </data>
   <data name="Email" xml:space="preserve">
     <value>Email Address</value>
   </data>
@@ -191,6 +194,9 @@
   </data>
   <data name="TitleLinkoExchangeSignIn" xml:space="preserve">
     <value>LinkoExchange Sign In</value>
+  </data>
+  <data name="TitleRequestSignatoryRight" xml:space="preserve">
+    <value>Request Signatory Rights</value>
   </data>
   <data name="TitleResetPassword" xml:space="preserve">
     <value>Reset Password</value>
