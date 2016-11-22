@@ -1,20 +1,12 @@
-﻿
-@{
-    ViewBag.Title = "KbqChallenge";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-} 
-
-@model Linko.LinkoExchange.Web.ViewModels.Account.KbqChallengeViewModel
-
+﻿@model Linko.LinkoExchange.Web.ViewModels.Account.KbqChallengeViewModel 
 
 @using Linko.LinkoExchange.Web.ViewModels.Account
 @using Linko.LinkoExchange.Core.Resources
 
-
 @{
-    ViewBag.Title = Label.TitleKBQChanllenge;  
-    ViewBag.Description = "";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = Label.TitleKBQChanllenge;  
+    ViewBag.Description = ""; 
 }
 
 <section>
@@ -44,6 +36,7 @@
             {
                 @Html.AntiForgeryToken()
                 @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+                @Html.HiddenFor(model => model.FailedCount)               
 
                 <div class="form-group">
                     @Html.LabelFor(m => m.Question, new { @class = "col-md-3 control-label" })
@@ -54,9 +47,9 @@
                        @readonly = "readonly"
                    })
 
-                        @Html.HiddenFor(m => m.QuestionAnswerId)
+                        @Html.HiddenFor(m => m.QuestionAnswerId)  
                     </div>
-                </div>
+                </div> 
 
                 <div class="form-group">
                     @Html.LabelFor(m => m.Answer, new { @class = "col-md-3 required control-label" })

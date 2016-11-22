@@ -24,6 +24,12 @@ namespace Linko.LinkoExchange.Web.ViewModels.Account
             get; set;
 
         }
+
+        [ScaffoldColumn(false)]
+        public int FailedCount
+        {
+            get; set;
+        }
     }
      
     public partial class KbqChanlengeViewModelValidator : AbstractValidator<KbqChallengeViewModel>

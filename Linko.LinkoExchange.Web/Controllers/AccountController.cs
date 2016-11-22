@@ -20,6 +20,14 @@ using Linko.LinkoExchange.Web.ViewModels.Account;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 using NLog;
+using System.Security.Claims;
+using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Web.ViewModels.User;
+using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.Jurisdiction;
+using AutoMapper;
+using Linko.LinkoExchange.Services.Settings;
+using System;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -37,12 +45,21 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IUserService _userService;
         private readonly IInvitationService _invitationService;
         private readonly IJurisdictionService _jurisdictionService;
+        private readonly ISettingService _settingService;
         private readonly IMapper _mapper;
 
 
-        public AccountController(IAuthenticationService authenticationService, IOrganizationService organizationService,
-            IQuestionAnswerService questionAnswerService, IRequestCache requestCache, ILogger logger, IUserService userService,
-            IInvitationService invitationService, IJurisdictionService jurisdictionService, IMapper mapper)
+        public AccountController(
+            IAuthenticationService authenticationService, 
+            IOrganizationService organizationService,
+            IQuestionAnswerService questionAnswerService, 
+            IRequestCache requestCache, 
+            ILogger logger, 
+            IUserService userService,
+            IInvitationService invitationService,
+            IJurisdictionService jurisdictionService, 
+            ISettingService settingService,
+            IMapper mapper)
         {
             _authenticationService = authenticationService;
             _organizationService = organizationService;
@@ -52,6 +69,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _userService = userService;
             _invitationService = invitationService;
             _jurisdictionService = jurisdictionService;
+            _settingService = settingService;
             _mapper = mapper;
         }
 
@@ -673,7 +691,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
             var userProfileId = int.Parse(profileIdStr);
 
-            KbqChallengeViewModel kbqChallange = new KbqChallengeViewModel();
+            KbqChallengeViewModel kbqChallange = new KbqChallengeViewModel(); 
             var questionAndAnswer = _questionAnswerService.GetRandomQuestionAnswerFromUserProfileId(userProfileId, QuestionTypeName.KBQ); 
 
             kbqChallange.Question = questionAndAnswer.Question.Content;
@@ -692,8 +710,33 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             if (!_questionAnswerService.ConfirmCorrectAnswer(model.QuestionAnswerId, model.Answer.ToLower()))
             {
-                ModelState.AddModelError(key: "", errorMessage: "Wrong Answer.");
+                model.FailedCount++; 
+                int maxAnswerAttempts = Convert.ToInt32(_settingService.GetOrganizationSettingValueByUserId(userProfileId, SettingType.FailedKBQAttemptMaxCount, true, null));
+                if (maxAnswerAttempts <= model.FailedCount)
+                {
+                    // Logout user
+                    _authenticationService.SignOff(); 
 
+                    // Lock the account; 
+                    var result = _userService.LockUnlockUserAccount(userProfileId, true, true);
+                    if (result.IsSuccess)
+                    {
+                        _logger.Info(string.Format(format: "KBQ question. Failed to Answer KBQ Question {0} times. Account is locked. UserProfileId:{1}",
+                                     arg0: maxAnswerAttempts, arg1:userProfileId)); 
+
+                        return RedirectToAction(actionName: "AccountLocked", controllerName: "Account");
+                    }
+                    else
+                    {
+                        _logger.Info(string.Format(format: "KBQ question. Failed to Answer KBQ Question {0} times. Failed to locked the Account. UserProfileId:{1}",
+                                    arg0: maxAnswerAttempts, arg1: userProfileId));
+                    } 
+                }
+                else
+                {
+                    ModelState.Remove(key: "FailedCount");
+                    ModelState.AddModelError(key: "", errorMessage: "Wrong Answer."); 
+                }
                 return View(model);
             }
             else
