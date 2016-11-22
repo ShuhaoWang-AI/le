@@ -20,12 +20,6 @@ using Linko.LinkoExchange.Web.ViewModels.Account;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 using NLog;
-using System.Security.Claims;
-using Linko.LinkoExchange.Services.User;
-using Linko.LinkoExchange.Web.ViewModels.User;
-using Linko.LinkoExchange.Services.Invitation;
-using Linko.LinkoExchange.Services.Jurisdiction;
-using AutoMapper;
 using Linko.LinkoExchange.Services.Settings;
 using System;
 
@@ -430,8 +424,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
         }
         #endregion
-
-
+        
         #region forgot password action
 
         // GET: /Account/ForgotPassword
@@ -570,7 +563,90 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 return View(model);
             }
+        } 
+
+        //
+        // POST: /Account/ResetPassword
+        [AcceptVerbs(HttpVerbs.Post)]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var result = await _authenticationService.ResetPasswordAsync(model.Token, model.Id, model.Answer, model.FailedCount, model.Password);
+
+            switch (result.Result)
+            {
+                case AuthenticationResult.Success:
+                    _logger.Info(string.Format(format: "ResetPassword. Password for {0} has been successfully reset.", arg0: model.Token));
+                    return RedirectToAction(actionName: "ResetPasswordConfirmation", controllerName: "Account");
+
+                case AuthenticationResult.PasswordRequirementsNotMet:
+                    _logger.Info(string.Format(format: "ResetPassword. Password Requirements Not Met for Token = {0}.", arg0: model.Token));
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(key: "", errorMessage: error);
+                    }
+                    return View(model);
+
+                // Can Not Use Old Password
+                case AuthenticationResult.CanNotUseOldPassword:
+                    _logger.Info(string.Format(format: "ResetPassword. Can not use old password for Token = {0}.", arg0: model.Token));
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(key: "", errorMessage: error);
+                    }
+                    return View(model);
+
+                // incorrect answer
+                case AuthenticationResult.IncorrectAnswerToQuestion:
+                    ModelState.Remove(key: "FailedCount"); // if you don't remove then hidden field does not update on post-back 
+                    model.FailedCount++;
+                    _logger.Info(string.Format(format: "ResetPassword. Failed for Token = {0}.", arg0: model.Token));
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(key: "", errorMessage: error);
+                    }
+                    return View(model);
+
+                // User is got locked
+                case AuthenticationResult.UserIsLocked:                 // 3.a
+                    _logger.Info(string.Format(format: "ResetPassword. User has been locked out for Token = {0}.", arg0: model.Token));
+                    TempData["Message"] = result.Errors;
+                    return RedirectToAction(actionName: "AccountLocked", controllerName: "Account");
+
+                // Token expired
+                case AuthenticationResult.ExpiredRegistrationToken:
+                default:
+                    _logger.Info(string.Format(format: "ResetPassword. Failed for Token = {0}.", arg0: model.Token));
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(key: "", errorMessage: error);
+                    }
+                    return View(model);
+            }
         }
+
+        //
+        // GET: /User/ResetPasswordConfirmation
+        [AllowAnonymous]
+        public ActionResult ResetPasswordConfirmation()
+        {
+            ConfirmationViewModel model = new ConfirmationViewModel();
+            model.Title = "Reset password confirmation";
+            model.HtmlStr = "Your password has been successfully reset. Please click <a href= ";
+            model.HtmlStr += Url.Action(actionName: "SignIn", controllerName: "Account") + ">here </a> to Sign in.";
+
+            return View(viewName: "Confirmation", model: model);
+        }
+
+        #endregion
+
+        #region  Change password and change email address   
 
         [Authorize]
         public ActionResult ChangeAccountSucceed()
@@ -745,86 +821,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return Redirect(returnUrl);
             }
         }
-
-        //
-        // POST: /Account/ResetPassword
-        [AcceptVerbs(HttpVerbs.Post)]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var result = await _authenticationService.ResetPasswordAsync(model.Token, model.Id, model.Answer, model.FailedCount, model.Password);
-
-            switch (result.Result)
-            {
-                case AuthenticationResult.Success:
-                    _logger.Info(string.Format(format: "ResetPassword. Password for {0} has been successfully reset.", arg0: model.Token));
-                    return RedirectToAction(actionName: "ResetPasswordConfirmation", controllerName: "Account");
-
-                case AuthenticationResult.PasswordRequirementsNotMet:
-                    _logger.Info(string.Format(format: "ResetPassword. Password Requirements Not Met for Token = {0}.", arg0: model.Token));
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(key: "", errorMessage: error);
-                    }
-                    return View(model);
-
-                // Can Not Use Old Password
-                case AuthenticationResult.CanNotUseOldPassword:
-                    _logger.Info(string.Format(format: "ResetPassword. Can not use old password for Token = {0}.", arg0: model.Token));
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(key: "", errorMessage: error);
-                    }
-                    return View(model);
-
-                // incorrect answer
-                case AuthenticationResult.IncorrectAnswerToQuestion:
-                    ModelState.Remove(key: "FailedCount"); // if you don't remove then hidden field does not update on post-back 
-                    model.FailedCount++;
-                    _logger.Info(string.Format(format: "ResetPassword. Failed for Token = {0}.", arg0: model.Token));
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(key: "", errorMessage: error);
-                    }
-                    return View(model);
-
-                // User is got locked
-                case AuthenticationResult.UserIsLocked:                 // 3.a
-                    _logger.Info(string.Format(format: "ResetPassword. User has been locked out for Token = {0}.", arg0: model.Token));
-                    TempData["Message"] = result.Errors;
-                    return RedirectToAction(actionName: "AccountLocked", controllerName: "Account");
-
-                // Token expired
-                case AuthenticationResult.ExpiredRegistrationToken:
-                default:
-                    _logger.Info(string.Format(format: "ResetPassword. Failed for Token = {0}.", arg0: model.Token));
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(key: "", errorMessage: error);
-                    }
-                    return View(model);
-            }
-        }
-
-        //
-        // GET: /User/ResetPasswordConfirmation
-        [AllowAnonymous]
-        public ActionResult ResetPasswordConfirmation()
-        {
-            ConfirmationViewModel model = new ConfirmationViewModel();
-            model.Title = "Reset password confirmation";
-            model.HtmlStr = "Your password has been successfully reset. Please click <a href= ";
-            model.HtmlStr += Url.Action(actionName: "SignIn", controllerName: "Account") + ">here </a> to Sign in.";
-
-            return View(viewName: "Confirmation", model: model);
-        }
-
 
         #endregion
 
