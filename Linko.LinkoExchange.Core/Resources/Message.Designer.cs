@@ -88,7 +88,7 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your account has been locked because you exceeded the maximum login attempts..
+        ///   Looks up a localized string similar to Maximum number of login attempts exceeded. Use Forgot Password to reset your password..
         /// </summary>
         public static string ExceedMaximumLoginAttempt {
             get {

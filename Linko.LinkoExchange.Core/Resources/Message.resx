@@ -136,7 +136,7 @@
     <value>Your password has expired.</value>
   </data>
   <data name="ExceedMaximumLoginAttempt" xml:space="preserve">
-    <value>Your account has been locked because you exceeded the maximum login attempts.</value>
+    <value>Maximum number of login attempts exceeded. Use Forgot Password to reset your password.</value>
   </data>
   <data name="EmailNotFound" xml:space="preserve">
     <value>Email not found.</value>
