@@ -1,13 +1,28 @@
 ﻿@model Linko.LinkoExchange.Web.ViewModels.Shared.InviteViewModel
-
+@using Linko.LinkoExchange.Core.Enum
 @{
     ViewBag.Title = "Invite";
 }
 
 <section>
     <ol class="breadcrumb">
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "AuthorityUsers", controllerName: "Authority")'"><i class=""></i> Users </a></li>
+        @if (Model.InvitationType == InvitationType.AuthorityToAuthority)
+        {
+            <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
+            <li><a href="#" onclick="location.href = '@Url.Action(actionName: "AuthorityUsers", controllerName: "Authority")'"><i class=""></i> Users </a></li>
+        }
+        else if (Model.InvitationType == InvitationType.AuthorityToIndustry)
+        {
+            <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
+            <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Industries", controllerName: "Authority")'"><i class=""></i> Industries </a></li>
+            <li><a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryDetails", controllerName: "Authority", routeValues: new { id = Model.OrgRegProgramUserId })'"><i class=""></i> Details </a></li>
+            <li><a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryUsers", controllerName: "Authority", routeValues: new { id = Model.OrgRegProgramUserId })'"><i class=""></i> Users </a></li>
+        }
+        else if (Model.InvitationType == InvitationType.IndustryToIndustry)
+        {
+            <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Industry")'"><i class=""></i> Home </a></li>
+            <li><a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryUsers", controllerName: "Industry")'"><i class=""></i> Users </a></li>
+        }
         <li class="active">Invite</li>
     </ol>
 </section>
