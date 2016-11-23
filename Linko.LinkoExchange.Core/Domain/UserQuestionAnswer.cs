@@ -3,7 +3,7 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// 
+    /// Represents an answer entered by a user for a particular question.
     /// </summary>
     public partial class UserQuestionAnswer
     {

@@ -8,8 +8,6 @@ using Linko.LinkoExchange.Services.Program;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services.Permission
 {
@@ -18,7 +16,6 @@ namespace Linko.LinkoExchange.Services.Permission
         private readonly IProgramService _programService;
         private readonly LinkoExchangeContext _dbContext;
         private readonly IMapper _mapper;
-        private object registrationResult;
 
         public PermissionService(IProgramService programService, LinkoExchangeContext dbContext, IMapper mapper)
         {

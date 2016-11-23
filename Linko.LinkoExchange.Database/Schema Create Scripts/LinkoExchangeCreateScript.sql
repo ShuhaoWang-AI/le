@@ -2078,7 +2078,7 @@ BEGIN
 		VALUES 
 		(
 		    'SystemEmailEmailAddress'
-		    , 'noreply@linkoexchange.com'
+		    , 'noreply@linkotechnology.com'
 		    , ''
 		)
 	INSERT INTO dbo.tSystemSetting (Name, Value, Description)
@@ -2113,7 +2113,7 @@ BEGIN
 		VALUES 
 		(
 		    'SupportEmailAddress'
-		    , 'support@linkoexchange.com'
+		    , 'support@linkotechnology.com'
 		    , ''
 		)
 	INSERT INTO dbo.tSystemSetting (Name, Value, Description)

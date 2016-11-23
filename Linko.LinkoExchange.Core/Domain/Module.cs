@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
@@ -27,8 +28,8 @@ namespace Linko.LinkoExchange.Core.Domain
 
 
         // Reverse navigation
-        public virtual System.Collections.Generic.ICollection<OrganizationRegulatoryProgramModule> OrganizationRegulatoryProgramModules { get; set; }
+        public virtual ICollection<OrganizationRegulatoryProgramModule> OrganizationRegulatoryProgramModules { get; set; }
 
-        public virtual System.Collections.Generic.ICollection<Permission> Permissions { get; set; }
+        public virtual ICollection<Permission> Permissions { get; set; }
     }
 }

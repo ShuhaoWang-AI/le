@@ -18,6 +18,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
             _dbContext = linkoExchangeContext;
             _requestCache = requestCache; 
         }
+
         /// <summary>
         /// Write email audit log
         /// </summary>
