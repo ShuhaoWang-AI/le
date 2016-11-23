@@ -326,7 +326,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                     .Include("Question")
                     .Single(a => a.UserQuestionAnswerId == answer.UserQuestionAnswerId);
 
-                if (answerToUpdate.Question.QuestionType.Name == QuestionTypeName.SQ.ToString())
+                if (answerToUpdate.Question.QuestionType.Name == QuestionTypeName.KBQ.ToString())
                 {
                     //Hash answer
                     answer.Content = _passwordHasher.HashPassword(answer.Content.Trim().ToLower());
