@@ -254,13 +254,18 @@ namespace Linko.LinkoExchange.Services.Organization
         {
             var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId);
             OrganizationRegulatoryProgramDto dto = _mapper.Map<OrganizationRegulatoryProgram, OrganizationRegulatoryProgramDto>(orgRegProgram);
-            dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
+            var signatoryUserCount = _dbContext.OrganizationRegulatoryProgramUsers
                 .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
-                && o.IsSignatory == true) > 0;
-
-            dto.HasAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
+                && o.IsSignatory == true);
+            dto.HasSignatory = signatoryUserCount > 0;
+            var adminUserCount = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
                 .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
-                && o.PermissionGroup.Name == "Administrator") > 0;
+                && o.PermissionGroup.Name == UserRole.Administrator.ToString()
+                && o.IsRegistrationApproved == true
+                && o.IsRegistrationDenied == false
+                && o.IsEnabled == true
+                && o.IsRemoved == false);
+            dto.HasAdmin = adminUserCount > 0;
             dto.OrganizationDto.State = _jurisdictionService.GetJurisdictionById(orgRegProgram.Organization.JurisdictionId).Name;
 
             return dto;

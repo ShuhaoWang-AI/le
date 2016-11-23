@@ -173,13 +173,32 @@ namespace Linko.LinkoExchange.Services.Invitation
                     var existingUserForThisProgram = existingProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
                     if (existingUserForThisProgram != null)
                     {
+                        _logger.Info(string.Format("SendInvitation Failed. User with email={0} already exists within OrgRegProgramId={0}", email, orgRegProgramId));
                         return new InvitationServiceResultDto()
                         {
                             Success = false,
-                            ErrorType = Core.Enum.InvitationError.Duplicated,
+                            ErrorType = InvitationError.Duplicated,
                             Errors = new string[] { existingUserForThisProgram.UserProfileDto.FirstName, existingUserForThisProgram.UserProfileDto.LastName }
                         };
                     }
+                }
+            }
+
+            //For Authority inviting Industry, check if an active 
+            //Admin user does not already exist within that IU
+            if (invitationType == InvitationType.AuthorityToIndustry)
+            {
+                var orgRegProgram = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgramId);
+                if (orgRegProgram.HasAdmin) //already
+                {
+                    _logger.Info(string.Format("SendInvitation Failed. Industry already has Admin User. OrgRegProgramId={0}", orgRegProgramId));
+                    string errorMsg = "This organization already has an Administrator.";
+                    return new InvitationServiceResultDto()
+                    {
+                        Success = false,
+                        ErrorType = InvitationError.IndustryAlreadyHasAdminUser,
+                        Errors = new string[] { errorMsg }
+                    };
                 }
             }
 
@@ -193,6 +212,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             
             if (remaining < 1)
             {
+                _logger.Info(string.Format("SendInvitation Failed. No more remaining user licenses. OrgRegProgramId={0}, InviteType={0}", orgRegProgramId, invitationType.ToString()));
                 return new InvitationServiceResultDto()
                 {
                     Success = false,

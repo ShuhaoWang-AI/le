@@ -123,10 +123,13 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(error, error);
+                    ModelState.AddModelError(string.Empty, error);
                 }
             }
 
+            viewModel.EmailAddress = "";
+            viewModel.FirstName = "";
+            viewModel.LastName = "";
             return View(viewModel);
 
         }

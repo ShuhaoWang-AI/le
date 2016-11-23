@@ -3,6 +3,7 @@
     public enum InvitationError
     {
         Duplicated,
+        IndustryAlreadyHasAdminUser,
         MatchingUsersInOtherPrograms,
         NotFound,
         InvalidData,

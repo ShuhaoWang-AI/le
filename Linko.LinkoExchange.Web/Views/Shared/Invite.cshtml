@@ -38,10 +38,6 @@
             <h3 class="box-title">Search Email Address</h3>
             <div class="box-tools pull-right">
                 <div class="pull-right">
-                    @*<input type="submit" value="Search Email" class="btn btn-sm btn-primary" 
-                           formaction="@Url.Action(actionName: "AuthorityUserLockUnLock", controllerName: "Authority")" formmethod="post" />*@
-                    @*<input type="button" value="Cancel" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#resetModal"/>*@                   
-                      @*<input type="button" id="searchEmailBtn" value="Search Email" class="btn btn-sm btn-primary" />*@
                 </div>
             </div><!-- /.box-tools -->
         </div>  @*.box-header*@
@@ -60,46 +56,6 @@
                     </h5>
                 </div>
             }
-
-            @*<div class="col-md-12 modal modal-info fade" id="resetModal" tabindex="-1" role="dialog" aria-labelledby="resetModalLabel">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content alert alert-info alert-dismissible">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
-                        <h4 class="box-title">Reset User Account</h4>
-
-                        <section>
-                            <p>
-                                User will be required to re-register before they can log into LinkoExchange.
-                                What email should be used in the Registration Profile?
-                            </p>
-                            <div class="form-group">
-                                <div class="col-md-12">
-                                    @Html.EditorFor(model => model.ResetEmail, new
-                                    {
-                                        htmlAttributes = new
-                                        {
-                                            @class = "form-control"
-                                        }
-                                    })
-
-                                    @Html.ValidationMessageFor(model => model.ResetEmail, "", new { @class = "text-danger" })
-                                </div>
-                            </div>
-                        </section>
-                        <div>
-                            <div class="form-group">
-                                <div class="pull-right">
-                                    <button type="submit" class="btn btn-sm btn-primary"
-                                            formaction="@Url.Action(actionName: "AuthorityUserReset", controllerName: "Authority")" formmethod="post">
-                                        Reset
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-primary" data-dismiss="modal" aria-label="Close">Cancel</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>*@
 
             <div id="noUserFoundMessage" style="display:none;">
                 <div class="alert alert-success">
@@ -171,8 +127,7 @@
         <div class="box-footer">
             <div class="form-group pull-right" >
                 <input type="button" id="searchEmailBtn" value="Search Email" class="btn btn-sm btn-primary" />
-                <input type="submit" id="sendInviteBtn" value="Send Invite" class="btn btn-sm btn-primary" style="display:none;"
-                       formaction="@Url.Action(actionName: "Invite", controllerName: "Invite")" formmethod="post" />
+                <input type="submit" id="sendInviteBtn" value="Send Invite" class="btn btn-sm btn-primary" style="display:none;" formmethod="post" />
                 <input type="button" id="cancelInviteBtn" value="Cancel" class="btn btn-sm btn-primary" style="display:none;" />
             </div>
         </div><!-- box-footer -->
@@ -363,8 +318,6 @@
         </section>@*.box-body*@
         <div class="box-footer">
             <div class="form-group pull-right">
-                @*<input id="foundUserInviteButton" type="submit" value="Send Invite" class="btn btn-sm btn-primary"
-                       formaction='@Url.Action("Invite","Authority")' formmethod="post" />*@
                 <input type="button" id="cancelInviteBtn" value="Cancel" class="btn btn-sm btn-primary" />
             </div>
         </div><!-- box-footer -->
