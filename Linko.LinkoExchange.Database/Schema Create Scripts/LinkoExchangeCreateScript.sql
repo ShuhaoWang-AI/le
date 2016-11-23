@@ -228,6 +228,14 @@ BEGIN
 		(
 			JurisdictionId
 		) REFERENCES dbo.tJurisdiction(JurisdictionId)
+        , CONSTRAINT AK_tUserProfile_Email UNIQUE 
+        (
+            Email ASC
+        ) WITH FILLFACTOR = 100 ON [PRIMARY]
+        , CONSTRAINT AK_tUserProfile_UserName UNIQUE 
+        (
+            UserName ASC
+        ) WITH FILLFACTOR = 100 ON [PRIMARY]
     ) ON [PRIMARY]
     
     ALTER TABLE dbo.tUserProfile ADD CONSTRAINT DF_tUserProfile_IsAccountLocked DEFAULT 0 FOR IsAccountLocked

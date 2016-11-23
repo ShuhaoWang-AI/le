@@ -10,6 +10,16 @@ PRINT CHAR(13)
 USE [LinkoExchange]
 GO
 
+
+UPDATE dbo.tSystemSetting
+SET Value = 'linkoqa@linkotechnology.com'
+WHERE Name = 'SupportEmailAddress'
+
+UPDATE dbo.tUserProfile
+SET Email = 'linkoqa@linkotechnology.com'
+WHERE UserName = 'Linko'
+
+
 DECLARE @JurisdictionId_MI int
 SELECT @JurisdictionId_MI = JurisdictionId 
 FROM dbo.tJurisdiction 
@@ -22,10 +32,6 @@ BEGIN
     PRINT CHAR(13)
     PRINT 'Add records to tUserProfile'
     PRINT '---------------------------'
-    
-    UPDATE dbo.tUserProfile
-    SET Email = 'linkoqa@linkotechnology.com'
-    WHERE UserName = 'Linko'
 
     INSERT INTO dbo.tUserProfile
     (
@@ -66,7 +72,7 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
-        , 'linkoqa1@linkotechnology.com'
+        , 'linkoqa01@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
         , '8599e4f3-53e5-4ee8-bcc5-907d4f08ee95'
@@ -117,7 +123,7 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
-        , 'linkoqa2@linkotechnology.com'
+        , 'linkoqa02@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
         , '8599e4f3-53e5-4ee8-bcc5-907d4f08ee95'
@@ -168,7 +174,7 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
-        , 'linkoqa3@linkotechnology.com'
+        , 'linkoqa03@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
         , '8599e4f3-53e5-4ee8-bcc5-907d4f08ee95'
@@ -219,7 +225,7 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
-        , 'linkoqa4@linkotechnology.com'
+        , 'linkoqa04@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
         , '8599e4f3-53e5-4ee8-bcc5-907d4f08ee95'
@@ -270,7 +276,7 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
-        , 'linkoqa5@linkotechnology.com'
+        , 'linkoqa05@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
         , '8599e4f3-53e5-4ee8-bcc5-907d4f08ee95'
@@ -321,7 +327,7 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
-        , 'linkoqa6@linkotechnology.com'
+        , 'linkoqa06@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
         , '8599e4f3-53e5-4ee8-bcc5-907d4f08ee95'
@@ -372,7 +378,7 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
-        , 'linkoqa7@linkotechnology.com'
+        , 'linkoqa07@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
         , '8599e4f3-53e5-4ee8-bcc5-907d4f08ee95'
@@ -423,7 +429,7 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
-        , 'linkoqa8@linkotechnology.com'
+        , 'linkoqa08@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
         , '8599e4f3-53e5-4ee8-bcc5-907d4f08ee95'
@@ -474,7 +480,7 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
-        , 'linkoqa9@linkotechnology.com'
+        , 'linkoqa09@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
         , '8599e4f3-53e5-4ee8-bcc5-907d4f08ee95'
