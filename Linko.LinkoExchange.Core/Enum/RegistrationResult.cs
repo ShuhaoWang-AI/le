@@ -4,6 +4,9 @@ namespace Linko.LinkoExchange.Core.Enum
     {
         Success,
         Failed,
+        EmailIsUsed,
+        EmailOrUserNameExists,
+        UserNameIsUsed,
         InvitationExpired,
         NotAgreedTermsAndConditions,
         InvalidRegistrationToken,

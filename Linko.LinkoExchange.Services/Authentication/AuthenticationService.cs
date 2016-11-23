@@ -306,13 +306,39 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             #endregion  End of Checking invitation expiration 
 
-            UserProfile applicationUser = _userManager.FindByName(userInfo.UserName);
+            // Email should be unique.
+            UserProfile applicationUser = _userManager.FindByEmail(userInfo.Email);
 
             // 2.a  Actor is already registration with LinkoExchange  
-            bool newUserRegistration = true;
+            bool newUserRegistration = true;     // totally new user
+            bool isFromResetUser = false;        // user is in db, but from reset account request
+
             if (applicationUser != null)
             {
                 newUserRegistration = false;
+                if (applicationUser.IsAccountResetRequired)
+                {
+                    isFromResetUser = true;
+                } 
+
+                var testUser = _userManager.FindByName(userInfo.UserName); 
+                if(testUser!= null && 
+                    testUser.UserName == userInfo.UserName  && 
+                    testUser.Email != userInfo.Email && 
+                    !isFromResetUser)
+                {
+                    registrationResult.Result = RegistrationResult.UserNameIsUsed;
+                    return registrationResult;
+                } 
+            }
+            else 
+            {
+                var testUser = _userManager.FindByName(userInfo.UserName);
+                if (testUser != null)
+                {
+                    registrationResult.Result = RegistrationResult.UserNameIsUsed;
+                    return registrationResult;
+                } 
             }
 
             using (var transaction = _dbContext.BeginTransaction())
@@ -385,30 +411,38 @@ namespace Linko.LinkoExchange.Services.Authentication
                             return registrationResult; 
                         }
 
-                        applicationUser.PasswordHash = passwordHash; 
-
-                        // Set IsRestRequired to be false  
-                        applicationUser.IsAccountResetRequired = false;
+                        applicationUser.PasswordHash = passwordHash;  
 
                         // Clear KBQ questions and Security Questions for existing user re-registration 
                         _questionAnswerService.DeleteUserQuestionAndAnswers(applicationUser.UserProfileId);  
                     }
 
+                    if (isFromResetUser)
+                    {
+                        // Set IsRestRequired to be false  
+                        applicationUser.IsAccountResetRequired = false;
+                    }
+
+
+
                     #endregion
 
                     #region Save into passwordHistory and KBQ question, and Security Question 
 
-                    // Create a new row in userProfile password history table 
-                    _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
+                    if (newUserRegistration || isFromResetUser)
                     {
-                        LastModificationDateTimeUtc = DateTimeOffset.UtcNow,
-                        PasswordHash = applicationUser.PasswordHash,
-                        UserProfileId = applicationUser.UserProfileId
-                    });
+                        // Create a new row in userProfile password history table 
+                        _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
+                        {
+                            LastModificationDateTimeUtc = DateTimeOffset.UtcNow,
+                            PasswordHash = applicationUser.PasswordHash,
+                            UserProfileId = applicationUser.UserProfileId
+                        });
 
-                    // Save Security questions and kbq questions
-                    var combined = securityQuestions.Concat(kbqQuestions);
-                    _questionAnswerService.CreateUserQuestionAnswers(applicationUser.UserProfileId, combined);
+                        // Save Security questions and kbq questions
+                        var combined = securityQuestions.Concat(kbqQuestions);
+                        _questionAnswerService.CreateUserQuestionAnswers(applicationUser.UserProfileId, combined); 
+                    }
 
                     #endregion 
 
