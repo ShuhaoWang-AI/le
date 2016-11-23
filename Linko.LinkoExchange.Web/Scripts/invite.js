@@ -36,6 +36,7 @@ $(document).ready(function () {
                     else {
                         $("#foundUserInviteButton").show();
                     }
+                    $("#searchEmailBtn").hide();
 
                 }
             }
