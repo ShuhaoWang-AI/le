@@ -2,6 +2,11 @@
 $(document).ready(function () {
 
     $("#searchEmailBtn").click(function () {
+        if (!$('#EmailAddress').valid())
+        {
+            return false;
+        }
+
         $.post("/Invite/InviteCheckEmail",
         {
             emailAddress: $("#EmailAddress").val(),
