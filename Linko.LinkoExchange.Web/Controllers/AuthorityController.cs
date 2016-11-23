@@ -839,6 +839,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.IndustryId = id;
             var industry = _organizationService.GetOrganizationRegulatoryProgram(id);
             ViewBag.Title = industry.OrganizationDto.OrganizationName;
+
+            //Invite button only visible if there isn't currently an active Admin for this IU
+            ViewBag.CanInvite = !industry.HasAdmin;
+
             return View();
         }
         
