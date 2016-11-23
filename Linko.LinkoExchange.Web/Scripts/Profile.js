@@ -1,11 +1,13 @@
 ﻿
 $(document).ready(function () {
 
-    $(".editabledDiv input").attr("readonly", true);
-    $(".editabledDiv select").attr("readonly", "disabled");
+    if (newRegistration == 'false') { 
+        $(".editabledDiv input").attr("readonly", true);
+        $(".editabledDiv select").attr("readonly", "disabled"); 
+        $("#kbq-panel input[type='text'").hide();
+    }
 
     $(".profileDiv input[type='submit'").hide();
-    $("#kbq-panel input[type='text'").hide();
 
     $(".box-primary").addClass("collapsed-box");
     $(".box-primary >.box-header").find("i.fa.fa-minus").removeClass('fa-minus');

@@ -1,15 +1,24 @@
 ﻿@model Linko.LinkoExchange.Web.ViewModels.User.RegistrationViewModel
 
 @{
+    var newRegistration = false;
+}
+
+@{
     ViewBag.Title = "User Details";
     var sqQuestionPool = Model.UserSQ.QuestionPool;
     var kbqQuestionPool = Model.UserKBQ.QuestionPool;
+    var inValidProfile = ViewBag.InValidProfile == null ? false : ViewBag.InValidProfile;
+    var inValidKBQ = ViewBag.InValidKBQ == null ? false : ViewBag.InValidKBQ;
+    var inValidSQ = ViewBag.InValidSQ == null ? false : ViewBag.InValidSQ;
 
+    var activeLink = "Register";
 }
 
 <section>
     <ol class="breadcrumb">
-        <li class="active">Register</li>
+        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Home")'"><i class=""></i> Home </a></li>
+        <li class="active">@activeLink</li>
     </ol>
 </section>
 
@@ -21,11 +30,11 @@
         vertical-align: bottom;
         float: left;
     }
-</style>
+</style> 
 
 @using (Html.BeginForm())
 {
-    @Html.HiddenFor(model => model.Token);
+    @Html.HiddenFor(model => model.Token)
 
     @Html.AntiForgeryToken()
     <input type="hidden" id="profileCollapsed" name="profileCollapsed" value="true" />
@@ -45,22 +54,10 @@
             </div>  @*.box-header*@
 
             <div>
-                @if (ViewData.ModelState.IsValid == false)
+                @if (ViewData.ModelState.IsValid == false && inValidProfile)
                 {
                     @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new { @class = "alert alert-danger" })
-                }
-
-                @if (ViewBag.SaveProfileSuccessfull != null && !string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
-                {
-                    <div class="alert alert-success alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <h5>
-                            <i class="icon fa fa-check"></i>
-                            @ViewBag.SuccessMessage
-                        </h5>
-                    </div>
-                }
-
+                } 
             </div>
 
             <section class="box-body form-horizontal">
@@ -68,126 +65,126 @@
                     <!-- Line2   FirstName and  LastName   -->
                     <div class="form-group required">
                         @Html.LabelFor(model => Model.UserProfile.FirstName, htmlAttributes: new
-                       {
-                           @class = "control-label col-md-2 required "
-                       })
+                   {
+                       @class = "control-label col-md-2 required "
+                   })
                         <div class="col-md-4">
                             @Html.EditorFor(model => Model.UserProfile.FirstName, new
+                       {
+                           htmlAttributes = new
                            {
-                               htmlAttributes = new
-                               {
-                                   @class = "form-control editable"
-                               }
-                           })
+                               @class = "form-control editable"
+                           }
+                       })
                         </div>
 
 
                         @Html.LabelFor(model => Model.UserProfile.LastName, htmlAttributes: new
-                       {
-                           @class = "control-label col-md-2 required"
-                       })
+                   {
+                       @class = "control-label col-md-2 required"
+                   })
                         <div class="col-md-4">
                             @Html.EditorFor(model => Model.UserProfile.LastName, new
+                       {
+                           htmlAttributes = new
                            {
-                               htmlAttributes = new
-                               {
-                                   @class = "form-control"
-                               }
-                           })
+                               @class = "form-control"
+                           }
+                       })
                         </div>
                     </div>
 
                     <!-- Line3   Organization and  TitleROle   -->
                     <div class="form-group ">
                         @Html.LabelFor(model => Model.UserProfile.BusinessName, htmlAttributes: new
-                       {
-                           @class = " control-label col-md-2 required "
-                       })
+                   {
+                       @class = " control-label col-md-2 required "
+                   })
                         <div class="col-md-4">
                             @Html.EditorFor(model => Model.UserProfile.BusinessName, new
+                       {
+                           htmlAttributes = new
                            {
-                               htmlAttributes = new
-                               {
-                                   @class = "form-control "
-                               }
-                           })
+                               @class = "form-control "
+                           }
+                       })
                         </div>
 
                         @Html.LabelFor(model => Model.UserProfile.TitleRole, htmlAttributes: new
-                       {
-                           @class = "control-label col-md-2"
-                       })
+                   {
+                       @class = "control-label col-md-2"
+                   })
                         <div class="col-md-4">
                             @Html.EditorFor(model => Model.UserProfile.TitleRole, new
+                       {
+                           htmlAttributes = new
                            {
-                               htmlAttributes = new
-                               {
-                                   @class = "form-control"
-                               }
-                           })
+                               @class = "form-control"
+                           }
+                       })
                         </div>
                     </div>
 
                     <!-- Line4   Phone and  Ext   -->
                     <div class="form-group">
                         @Html.LabelFor(model => Model.UserProfile.PhoneNumber, htmlAttributes: new
-                       {
-                           @class = "control-label col-md-2 required"
-                       })
+                   {
+                       @class = "control-label col-md-2 required"
+                   })
                         <div class="col-md-4">
                             @Html.EditorFor(model => Model.UserProfile.PhoneNumber, new
+                       {
+                           htmlAttributes = new
                            {
-                               htmlAttributes = new
-                               {
-                                   @class = "form-control"
-                               }
-                           })
+                               @class = "form-control"
+                           }
+                       })
                         </div>
 
                         @Html.LabelFor(model => Model.UserProfile.PhoneExt, htmlAttributes: new
-                       {
-                           @class = "control-label col-md-2"
-                       })
+                   {
+                       @class = "control-label col-md-2"
+                   })
                         <div class="col-md-4">
                             @Html.EditorFor(model => Model.UserProfile.PhoneExt, new
+                       {
+                           htmlAttributes = new
                            {
-                               htmlAttributes = new
-                               {
-                                   @class = "form-control",
-                                   @type = "text"
-                               }
-                           })
+                               @class = "form-control",
+                               @type = "text"
+                           }
+                       })
                         </div>
                     </div>
 
                     <!-- Line6  AddressLine1 and AddressLine2  -->
                     <div class="form-group">
                         @Html.LabelFor(model => Model.UserProfile.AddressLine1, htmlAttributes: new
-                       {
-                           @class = "control-label col-md-2 required"
-                       })
+                   {
+                       @class = "control-label col-md-2 required"
+                   })
                         <div class="col-md-4">
                             @Html.EditorFor(model => Model.UserProfile.AddressLine1, new
+                       {
+                           htmlAttributes = new
                            {
-                               htmlAttributes = new
-                               {
-                                   @class = "form-control"
-                               }
-                           })
+                               @class = "form-control"
+                           }
+                       })
                         </div>
 
                         @Html.LabelFor(model => Model.UserProfile.AddressLine2, htmlAttributes: new
-                       {
-                           @class = "control-label col-md-2"
-                       })
+                   {
+                       @class = "control-label col-md-2"
+                   })
                         <div class="col-md-4">
                             @Html.EditorFor(model => Model.UserProfile.AddressLine2, new
+                       {
+                           htmlAttributes = new
                            {
-                               htmlAttributes = new
-                               {
-                                   @class = "form-control"
-                               }
-                           })
+                               @class = "form-control"
+                           }
+                       })
                         </div>
 
                     </div>
@@ -195,36 +192,36 @@
                     <!-- Line7 City and State   -->
                     <div class="form-group">
                         @Html.LabelFor(model => Model.UserProfile.CityName, htmlAttributes: new
-                       {
-                           @class = "control-label col-md-2 required"
-                       })
+                   {
+                       @class = "control-label col-md-2 required"
+                   })
                         <div class="col-md-4">
                             @Html.EditorFor(model => Model.UserProfile.CityName, new
+                       {
+                           htmlAttributes = new
                            {
-                               htmlAttributes = new
-                               {
-                                   @class = "form-control"
-                               }
-                           })
+                               @class = "form-control"
+                           }
+                       })
                         </div>
 
                         @Html.LabelFor(model => Model.UserProfile.JurisdictionId, htmlAttributes: new
-                       {
-                           @class = "control-label col-md-2 required"
-                       })
+                   {
+                       @class = "control-label col-md-2 required"
+                   })
                         <div class="col-md-4">
                             @Html.DropDownListFor(model => Model.UserProfile.JurisdictionId,
-      Model.UserProfile.StateList.Select(i => new SelectListItem
-      {
-          Text = i.StateName,
-          Value = i.JurisdictionId.ToString(),
-          Selected = Model.UserProfile.JurisdictionId == i.JurisdictionId
-      }).ToList(),
+Model.UserProfile.StateList.Select(i => new SelectListItem
+{
+    Text = i.StateName,
+    Value = i.JurisdictionId.ToString(),
+    Selected = Model.UserProfile.JurisdictionId == i.JurisdictionId
+}).ToList(),
 
-       new
-       {
-           @class = "form-control"
-       })
+new
+{
+    @class = "form-control"
+})
                             @Html.HiddenFor(model => Model.UserProfile.JurisdictionId)
 
 
@@ -234,17 +231,17 @@
                     <!-- Line8 Zip Code   -->
                     <div class="form-group">
                         @Html.LabelFor(model => Model.UserProfile.ZipCode, htmlAttributes: new
-                       {
-                           @class = "control-label col-md-2 required"
-                       })
+                   {
+                       @class = "control-label col-md-2 required"
+                   })
                         <div class="col-md-4">
                             @Html.EditorFor(model => Model.UserProfile.ZipCode, new
+                       {
+                           htmlAttributes = new
                            {
-                               htmlAttributes = new
-                               {
-                                   @class = "form-control"
-                               }
-                           })
+                               @class = "form-control"
+                           }
+                       })
                         </div>
 
                     </div>
@@ -255,17 +252,17 @@
                 <!-- Line 9 Email -->
                 <div class="form-group">
                     @Html.LabelFor(model => Model.UserProfile.Email, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required"
-                   })
+               {
+                   @class = "control-label col-md-2 required"
+               })
                     <div class="col-md-4">
                         @Html.EditorFor(model => Model.UserProfile.Email, new
+                   {
+                       htmlAttributes = new
                        {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control"
-                           }
-                       })
+                           @class = "form-control"
+                       }
+                   })
                     </div>
                     
                 </div>
@@ -273,31 +270,31 @@
                 <!-- Line 10 UserName -->
                 <div class="form-group">
                     @Html.LabelFor(model => Model.UserProfile.UserName, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required"
-                   })
+               {
+                   @class = "control-label col-md-2 required"
+               })
                     <div class="col-md-4">
                         @Html.EditorFor(model => Model.UserProfile.UserName, new
+                   {
+                       htmlAttributes = new
                        {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control"
-                           }
-                       })
+                           @class = "form-control"
+                       }
+                   })
                     </div>
                 </div>
 
                 <!-- Line 11 UserName -->
                 <div class="form-group">
                     @Html.LabelFor(model => Model.UserProfile.Password, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required"
-                   })
+               {
+                   @class = "control-label col-md-2 required"
+               })
                     <div class="col-md-4">
                         @Html.PasswordFor(model => Model.UserProfile.Password, new
-                       {
-                            @class = "form-control"
-                       })
+                   {
+                       @class = "form-control"
+                   })
                     </div>
                 </div>
 
@@ -324,21 +321,11 @@
             </div>  @*.box-header*@
 
             <div>
-                @if (ViewData.ModelState.IsValid == false)
+                @if (ViewData.ModelState.IsValid == false && inValidKBQ)
                 {
                     @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new { @class = "alert alert-danger" })
                 }
 
-                @if (ViewBag.SaveKBQSuccessfull != null && !string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
-                {
-                    <div class="alert alert-success alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <h5>
-                            <i class="icon fa fa-check"></i>
-                            @ViewBag.SuccessMessage
-                        </h5>
-                    </div>
-                }
             </div>
 
             <section class="box-body form-horizontal">
@@ -358,18 +345,18 @@
                         <div class="col-md-8">
 
                             @Html.DropDownListFor(
-   model => Model.UserKBQ.KBQ1,
-   kbqQuestionPool.Select(i => new SelectListItem
-   {
-       Text = i.Content,
-       Value = i.QuestionId.Value.ToString(),
-       Selected = Model.UserKBQ.KBQ1 == i.QuestionId.Value
-   }),
+model => Model.UserKBQ.KBQ1,
+kbqQuestionPool.Select(i => new SelectListItem
+{
+    Text = i.Content,
+    Value = i.QuestionId.Value.ToString(),
+    Selected = Model.UserKBQ.KBQ1 == i.QuestionId.Value
+}),
 
-   new
-   {
-       @class = "form-control"
-   }
+new
+{
+    @class = "form-control"
+}
 )
                         </div>
                     </div>
@@ -622,7 +609,6 @@ new
             </div>*@
         </div><!-- /.box -->
     </div>
-
     
 <div id="sq-panel" class="profileDiv">
     <div class="box box-primary">
@@ -636,20 +622,9 @@ new
         </div>  @*.box-header*@
 
         <div>
-            @if (ViewData.ModelState.IsValid == false)
-        {
+            @if (ViewData.ModelState.IsValid == false && inValidSQ)
+            {
                 @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new { @class = "alert alert-danger" })
-            }
-
-            @if (ViewBag.SaveSQSuccessfull != null && !string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
-        {
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                    <h5>
-                        <i class="icon fa fa-check"></i>
-                        @ViewBag.SuccessMessage
-                    </h5>
-                </div>
             }
 
         </div>
@@ -671,18 +646,18 @@ new
                     <div class="col-md-8">
 
                         @Html.DropDownListFor(
-                model => Model.UserSQ.SecurityQuestion1,
-                sqQuestionPool.Select(i => new SelectListItem
-                {
-                    Text = i.Content,
-                    Value = i.QuestionId.Value.ToString(),
-                    Selected = Model.UserSQ.SecurityQuestion1 == i.QuestionId.Value
-                }),
+ model => Model.UserSQ.SecurityQuestion1,
+ sqQuestionPool.Select(i => new SelectListItem
+ {
+     Text = i.Content,
+     Value = i.QuestionId.Value.ToString(),
+     Selected = Model.UserSQ.SecurityQuestion1 == i.QuestionId.Value
+ }),
 
-                new
-                {
-                    @class = "form-control"
-                })
+ new
+ {
+     @class = "form-control"
+ })
                         @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer1)*@
                     </div>
                 </div>
@@ -691,21 +666,21 @@ new
                 <div class="form-group">
                     <div class="col-lg-2 control-label">
                         @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer1, htmlAttributes: new
-                    {
-                        @class = "control-label required"
-                    })
+                   {
+                       @class = "control-label required"
+                   })
                     </div>
 
                     <div class="col-md-8">
                         @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ1)
                         @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer1, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control readonly",
-                            @style = "margin-top:5px"
-                        }
-                    })
+                   {
+                       htmlAttributes = new
+                       {
+                           @class = "form-control readonly",
+                           @style = "margin-top:5px"
+                       }
+                   })
                     </div>
                 </div>
 
@@ -718,18 +693,18 @@ new
                     <div class="col-md-8">
 
                         @Html.DropDownListFor(
-                model => Model.UserSQ.SecurityQuestion2,
-                sqQuestionPool.Select(i => new SelectListItem
-                {
-                    Text = i.Content,
-                    Value = i.QuestionId.Value.ToString(),
-                    Selected = Model.UserSQ.SecurityQuestion1 == i.QuestionId.Value
-                }),
+ model => Model.UserSQ.SecurityQuestion2,
+ sqQuestionPool.Select(i => new SelectListItem
+ {
+     Text = i.Content,
+     Value = i.QuestionId.Value.ToString(),
+     Selected = Model.UserSQ.SecurityQuestion1 == i.QuestionId.Value
+ }),
 
-                new
-                {
-                    @class = "form-control"
-                })
+ new
+ {
+     @class = "form-control"
+ })
                         @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer2)*@
 
                     </div>
@@ -739,21 +714,21 @@ new
                 <div class="form-group">
                     <div class="col-lg-2 control-label">
                         @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer2, htmlAttributes: new
-                    {
-                        @class = "control-label required"
-                    })
+                   {
+                       @class = "control-label required"
+                   })
                     </div>
 
                     <div class="col-md-8">
                         @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ2)
                         @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer2, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control readonly",
-                            @style = "margin-top:5px;"
-                        }
-                    })
+                   {
+                       htmlAttributes = new
+                       {
+                           @class = "form-control readonly",
+                           @style = "margin-top:5px;"
+                       }
+                   })
                     </div>
                 </div>
             </div>
@@ -768,14 +743,24 @@ new
     </div><!-- /.box -->
 </div>
 
-<div>
+<div class="profileDiv"> 
+     <div class="form-group">  
+         <div class="col-lg-offset-2  col-md-8"> 
+             @Html.EditorFor(model => model.AgreeTermsAndConditions) 
+          <span> @Html.LabelFor(m => m.AgreeTermsAndConditions)</span>
+        </div>
+     </div>   
+</div>
+ 
+<div class="box-footer">
     <input type="submit" id="sqSubmit" value="Register" name="Command" class="btn btn-sm btn-primary pull-right"
             formaction='@Url.Action(actionName: "Register", controllerName: "Account")' formmethod="post" />
 </div>
-
+<br />
+<br />
 }
 @section Scripts {
-    @*@Scripts.Render(paths: "~/bundles/profile")*@
+    @Scripts.Render(paths: "~/bundles/profile")
     @Scripts.Render(paths: "~/bundles/jqueryval")
 }
 
@@ -783,4 +768,5 @@ new
     var profileCollapsed = '@Html.Raw(ViewBag.profileCollapsed)';
     var kbqCollapsed = '@Html.Raw(ViewBag.kbqCollapsed)';
     var sqCollapsed = '@Html.Raw(ViewBag.sqCollapsed)';
+    var newRegistration = '@Html.Raw(ViewBag.newRegistration)';
 </script>

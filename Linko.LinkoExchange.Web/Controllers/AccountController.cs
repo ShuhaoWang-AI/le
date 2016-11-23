@@ -21,7 +21,8 @@ using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 using NLog;
 using Linko.LinkoExchange.Services.Settings;
-using System;
+using System; 
+using System.ComponentModel.DataAnnotations;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -73,6 +74,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AllowAnonymous]
         public ActionResult Register(string token)
         {
+            ViewBag.newRegistration = true;
+            ViewBag.profileCollapsed = false;
+            ViewBag.kbqCollapsed = false;
+            ViewBag.sqCollapsed = false;
+
             var model = new RegistrationViewModel();
             model.UserProfile = new UserProfileViewModel();
             model.UserProfile.StateList = GetStateList();
@@ -88,7 +94,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return View("Error");
             }
 
-
+            // TODO to display the program name
+             
             model.UserProfile.FirstName = invitation.FirstName;
             model.UserProfile.LastName = invitation.LastName;
             model.UserProfile.Email = invitation.EmailAddress;
@@ -100,16 +107,62 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         [AllowAnonymous]
         [AcceptVerbs(HttpVerbs.Post)]
-        async public Task<ActionResult> Register(RegistrationViewModel model)
+        async public Task<ActionResult> Register(RegistrationViewModel model, FormCollection form)
         {
+            ViewBag.newRegistration = true;
+            ViewBag.profileCollapsed = Convert.ToString(form["profileCollapsed"]);
+            ViewBag.kbqCollapsed = Convert.ToString(form["kbqCollapsed"]);
+            ViewBag.sqCollapsed = Convert.ToString(form["sqCollapsed"]);
+
+            model.UserProfile.StateList = GetStateList();
+            model.UserKBQ.QuestionPool = GetQuestionPool(QuestionTypeName.KBQ);
+            model.UserSQ.QuestionPool = GetQuestionPool(QuestionTypeName.SQ);
             if (!ModelState.IsValid)
             {
+                ViewBag.inValidProfile = false;
+                ViewBag.inValidKBQ = false;
+                ViewBag.inValidSQ = false;
+
+                // Validate Profile
+                ValidationContext context = null;
+                var validationResult = new List<ValidationResult>();
+                bool isValid = true;
+
+                context = new ValidationContext(model.UserProfile, serviceProvider: null, items: null);
+                isValid = Validator.TryValidateObject(model.UserProfile, context, validationResult, validateAllProperties: true);
+
+                if (!isValid)
+                {
+                    ViewBag.inValidProfile = true;
+                    return View(model);
+                }
+
+                // Validate KBQ  
+                context = new ValidationContext(model.UserKBQ, serviceProvider: null, items: null);
+                isValid = Validator.TryValidateObject(model.UserKBQ, context, validationResult, validateAllProperties: true);
+
+                if (!isValid)
+                {
+                    ViewBag.inValidKBQ = true;
+                    return View(model);
+                }
+
+                // Validate SQ 
+                context = new ValidationContext(model.UserSQ, serviceProvider: null, items: null);
+                isValid = Validator.TryValidateObject(model.UserSQ, context, validationResult, validateAllProperties: true);
+
+                if (!isValid)
+                {
+                    ViewBag.inValidSQ = true;
+                    return View(model);
+                }
+
                 return View(model);
             }
 
             UserDto userDto = _mapper.Map<UserProfileViewModel, UserDto>(model.UserProfile);
             userDto.Password = model.UserProfile.Password;
-            userDto.AgreeTermsAndConditions = true;
+            userDto.AgreeTermsAndConditions = model.AgreeTermsAndConditions;
 
             var kbqs = new List<AnswerDto>();
             var sqs = new List<AnswerDto>();
@@ -122,22 +175,60 @@ namespace Linko.LinkoExchange.Web.Controllers
             sqs.Add(new AnswerDto() { QuestionId = model.UserSQ.SecurityQuestion2, Content = model.UserSQ.SecurityQuestionAnswer2 });
 
             var result = await _authenticationService.Register(userDto, model.Token, sqs, kbqs);
-
-
-            if (result.Result == RegistrationResult.Success)
+            switch (result.Result)
             {
-                _logger.Info(string.Format("Registration successfully completed. Email={0}, FirstName={1}, LastName={2}.", userDto.Email, userDto.FirstName, userDto.LastName));
-                return View("Confirmation", new ConfirmationViewModel() { Title = "Registration Completed", Message = "Thank you for completing registration." });
+                case RegistrationResult.Success:
+                    _logger.Info(string.Format("Registration successfully completed. Email={0}, FirstName={1}, LastName={2}.", userDto.Email, userDto.FirstName, userDto.LastName));
+                    return View("Confirmation", new ConfirmationViewModel() { Title = "Registration Completed", Message = "Thank you for completing registration." }); 
+
+                case RegistrationResult.BadUserProfileData:
+                   
+                    ViewBag.inValidProfile = true;
+                    ModelState.AddModelError(key: "", errorMessage: "Invalid user profile data.");
+                    break;
+                case RegistrationResult.BadPassword:
+                    ViewBag.inValidProfile = true;
+                    ModelState.AddModelError(key: "", errorMessage: "Password does not meet criteria.");
+                    break;
+                case RegistrationResult.CanNotUseLastNumberOfPasswords:
+                    ViewBag.inValidProfile = true;
+                    ModelState.AddModelError(key: "", errorMessage: String.Join(separator: " ", values: result.Errors));
+                    break;
+                case RegistrationResult.DuplicatedKBQ:
+                    ViewBag.inValidKBQ = true;
+                    ModelState.AddModelError(key: "", errorMessage: "Knowledge based questions can not be dulicated.");
+                    break;
+                case RegistrationResult.DuplicatedKBQAnswer:
+                    ViewBag.inValidKBQ = true;
+                    ModelState.AddModelError(key: "", errorMessage: "Knowledge based question answers can not be dulicated.");
+                    break;
+                case RegistrationResult.MissingKBQ:
+                    ViewBag.inValidKBQ = true;
+                    ModelState.AddModelError(key: "", errorMessage: "Not enough knowledge based questions.");
+                    break;
+                case RegistrationResult.DuplicatedSecurityQuestion:
+                    ViewBag.inValidSQ = true;
+                    ModelState.AddModelError(key: "", errorMessage: "Security questions can not be dulicated.");
+                    break;
+                case RegistrationResult.MissingSecurityQuestion:
+                    ViewBag.inValidSQ = true;
+                    ModelState.AddModelError(key: "", errorMessage: "Not enough security questions.");
+                    break; 
+                case RegistrationResult.DuplicatedSecurityQuestionAnswer:
+                    ViewBag.inValidSQ = true;
+                    ModelState.AddModelError(key: "", errorMessage: "Security question answers can not be dulicated.");
+                    break; 
+                case RegistrationResult.BadKBQAndAnswer:
+                    ViewBag.inValidKBQ = true;
+                    ModelState.AddModelError(key: "", errorMessage: "Invalid knowledge based quetion and answers.");
+                    break;
+                default:
+                    break; 
             }
-            else
-            {
-                _logger.Info(string.Format("Registration failed. Email={0}, FirstName={1}, LastName={2}, Result={3}", userDto.Email, userDto.FirstName, userDto.LastName, result.Result.ToString()));
-                return View("Error");
-            }
-        }
 
-
-
+             _logger.Info(string.Format("Registration failed. Email={0}, FirstName={1}, LastName={2}, Result={3}", userDto.Email, userDto.FirstName, userDto.LastName, result.Result.ToString()));
+            return View(model);
+         } 
 
         #endregion
         
@@ -900,7 +991,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             return _questionAnswerService.GetQuestions().Select(i => _mapper.Map<QuestionViewModel>(i)).ToList()
                 .Where(i => i.QuestionType == type).ToList();
-        }
+        }         
         #endregion
     }
 }

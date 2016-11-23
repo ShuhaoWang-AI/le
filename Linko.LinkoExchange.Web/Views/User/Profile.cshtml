@@ -859,12 +859,13 @@ new
         </div>
     } 
     @section Scripts {
-        @Scripts.Render(paths: "~/bundles/profile")
+        @*@Scripts.Render(paths: "~/bundles/profile")*@
         @Scripts.Render(paths: "~/bundles/jqueryval")
     }
 
     <script type="text/javascript">
         var profileCollapsed = '@Html.Raw(ViewBag.profileCollapsed)';
         var kbqCollapsed = '@Html.Raw(ViewBag.kbqCollapsed)';
-        var sqCollapsed = '@Html.Raw(ViewBag.sqCollapsed)';
+        var sqCollapsed = '@Html.Raw(ViewBag.sqCollapsed)'; 
+        var newRegistration = '@Html.Raw(ViewBag.newRegistration)';
     </script>

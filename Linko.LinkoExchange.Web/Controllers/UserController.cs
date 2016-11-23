@@ -87,6 +87,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.profileCollapsed = false;
             ViewBag.kbqCollapsed = true;
             ViewBag.sqCollapsed = true;
+            ViewBag.newRegistration = false; 
 
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
