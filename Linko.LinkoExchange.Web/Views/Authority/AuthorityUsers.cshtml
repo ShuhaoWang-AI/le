@@ -33,7 +33,7 @@
                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
                         columns.Bound(c => c.Email)
                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                        columns.Bound(c => c.DateRegistered).Format(value: "{0:MM-dd-yyyy}")
+                        columns.Bound(c => c.DateRegistered).Format(value: "{0:MM/dd/yyyy}")
                                 .Filterable(filterable => filterable.Enabled(value: true).Extra(value: true));
                         columns.Bound(c => c.StatusText)
                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
@@ -111,7 +111,7 @@
                         columns.Bound(c => c.LastName);
                         columns.Bound(c => c.Email);
                         columns.Bound(c => c.DateInvited).Format(value: "{0:MM/dd/yyyy hh:mm:ss}");
-                        columns.Bound(c => c.InviteExpires).Format(value: "{0:MM-dd-yyyy}");
+                        columns.Bound(c => c.InviteExpires).Format(value: "{0:MM/dd/yyyy hh:mm:ss}");
                         columns.Command(c =>
                         {
                             c.Destroy().Text(text: " ");
