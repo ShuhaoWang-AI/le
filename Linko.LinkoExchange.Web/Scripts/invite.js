@@ -2,7 +2,7 @@
 $(document).ready(function () {
 
     $("#searchEmailBtn").click(function () {
-        $.post("./InviteCheckEmail",
+        $.post("/Invite/InviteCheckEmail",
         {
             emailAddress: $("#EmailAddress").val(),
             orgRegProgramIdString: $("#OrgRegProgramUserId").val()

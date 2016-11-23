@@ -1,4 +1,4 @@
-﻿@model Linko.LinkoExchange.Web.ViewModels.Authority.InviteViewModel
+﻿@model Linko.LinkoExchange.Web.ViewModels.Shared.InviteViewModel
 
 @{
     ViewBag.Title = "Invite";
@@ -16,6 +16,7 @@
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(model => model.OrgRegProgramUserId)
+    @Html.HiddenFor(model => model.InvitationType)
 
     <div class="box box-primary">
         <div class="box-header with-border">
@@ -156,7 +157,7 @@
             <div class="form-group pull-right" >
                 <input type="button" id="searchEmailBtn" value="Search Email" class="btn btn-sm btn-primary" />
                 <input type="submit" id="sendInviteBtn" value="Send Invite" class="btn btn-sm btn-primary" style="display:none;"
-                       formaction="@Url.Action(actionName: "Invite", controllerName: "Authority")" formmethod="post" />
+                       formaction="@Url.Action(actionName: "Invite", controllerName: "Invite")" formmethod="post" />
                 <input type="button" id="cancelInviteBtn" value="Cancel" class="btn btn-sm btn-primary" style="display:none;" />
             </div>
         </div><!-- box-footer -->
@@ -277,6 +278,7 @@
 @using (Html.BeginForm())
 {
     @Html.HiddenFor(model => model.OrgRegProgramUserId)
+    @Html.HiddenFor(model => model.InvitationType)
     <div id="boxFoundUsers" class="box box-primary" style="display:none;">
         <div class="box-header with-border">
             <h3 class="box-title">Found Users</h3>
@@ -310,7 +312,7 @@
 
             <div class="form-group">
                 <div class="col-md-12">
-                    @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Authority.InviteExistingUserViewModel>()
+                    @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Shared.InviteExistingUserViewModel>()
                     .Name(componentName: "gridExistingUsers")
                     .AutoBind(false)
                     .Columns(columns =>
@@ -323,7 +325,7 @@
                         columns.Template(m =>
                         {
                         })
-                                .ClientTemplate(value: "<input type='submit' value='Send Invite' class='btn btn-sm btn-primary' formaction='/Authority/InviteExistingUser?orgRegProgramUserId=#: OrgRegProgramUserId #&industryOrgRegProgramId=" + Model.OrgRegProgramUserId + "' formmethod='post' />")
+                                .ClientTemplate(value: "<input type='submit' value='Send Invite' class='btn btn-sm btn-primary' formaction='/Invite/InviteExistingUser?orgRegProgUserIdString=#: OrgRegProgramUserId #&industryOrgRegProgramId=" + Model.OrgRegProgramUserId + "&invitationType=" + Model.InvitationType + "' formmethod='post' />")
                                 .Width(pixelWidth: 90);
                     })
                     .Pageable(pageable => pageable.Enabled(false))

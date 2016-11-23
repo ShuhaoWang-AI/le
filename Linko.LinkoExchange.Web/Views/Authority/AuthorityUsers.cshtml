@@ -88,7 +88,7 @@
 
             @if (ViewBag.CanInvite)
             {
-                @Html.ActionLink("Invite", "Invite", "Authority", new { @class = "btn btn-sm btn-primary" })
+                @Html.RouteLink("Invite", "AuthorityInvitesAuthorityUser", null, new { @class = "btn btn-sm btn-primary" })
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             }
             <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>

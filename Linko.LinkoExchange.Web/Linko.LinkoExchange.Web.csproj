@@ -417,6 +417,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AuthorityController.cs" />
     <Compile Include="Controllers\IndustryController.cs" />
+    <Compile Include="Controllers\InviteController.cs" />
     <Compile Include="GlimpseSecurityPolicy.cs" />
     <Compile Include="Mvc\CommonInfoAttribute.cs" />
     <Compile Include="Controllers\CommonController.cs" />
@@ -444,7 +445,7 @@
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
     <Compile Include="ViewModels\Shared\PendingInvitationViewModel.cs" />
     <Compile Include="ViewModels\Industry\IndustryUserViewModel.cs" />
-    <Compile Include="ViewModels\Authority\InviteViewModel.cs" />
+    <Compile Include="ViewModels\Shared\InviteViewModel.cs" />
     <Compile Include="ViewModels\Industry\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Shared\ConfirmationViewModel.cs" />
     <Compile Include="ViewModels\Shared\JurisdictionViewModel.cs" />
@@ -490,7 +491,6 @@
     <Content Include="Views\Authority\AuthorityUserDetails.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />
     <Content Include="Views\Account\ChangePasswordSucceed.cshtml" />
-    <Content Include="Views\Authority\Invite.cshtml" />
     <Content Include="Views\Industry\IndustryUserDetails.cshtml" />
     <Content Include="Views\Industry\IndustryUsers.cshtml" />
     <Content Include="Views\Account\KbqChallenge.cshtml" />
@@ -500,6 +500,7 @@
     <Content Include="Views\Industry\PendingUserApprovalDetails.cshtml" />
     <Content Include="Views\Industry\PendingUserApprovals.cshtml" />
     <Content Include="Views\User\RequestSignatory.cshtml" />
+    <Content Include="Views\Shared\Invite.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -511,6 +512,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="ViewModels\Common\" />
     <Folder Include="Views\Home\" />
+    <Folder Include="Views\Invite\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Linko.LinkoExchange.Core\Linko.LinkoExchange.Core.csproj">

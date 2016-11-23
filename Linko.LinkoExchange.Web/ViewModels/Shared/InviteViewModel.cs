@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Linko.LinkoExchange.Core.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
-namespace Linko.LinkoExchange.Web.ViewModels.Authority
+namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
     public class InviteViewModel
     {
@@ -34,6 +35,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         public bool IsExistingProgramUser { get; set; }
 
         public ICollection<InviteExistingUserViewModel> ExistingUsers { get; set; }
+
+        public InvitationType InvitationType { get; set; }
 
     }
 
