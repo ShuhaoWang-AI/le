@@ -20,7 +20,8 @@ namespace Linko.LinkoExchange.Web
                 .Include(virtualPath: "~/Content/font-awesome.css"));
 
             bundles.Add(new StyleBundle(virtualPath: "~/Bundles/icheck")
-                .Include(virtualPath: "~/Content/icheck/minimal/blue.css"));
+                .Include(virtualPath: "~/Content/icheck/minimal/blue.css", 
+                transforms: new System.Web.Optimization.IItemTransform[] { new CssRewriteUrlTransform() }));
 
             bundles.Add(new ScriptBundle(virtualPath: "~/Bundles/js")
                 .Include(virtualPath: "~/Scripts/bootstrap.js")

@@ -28,6 +28,7 @@ namespace Linko.LinkoExchange.Services.TimeZone
         public ICollection<TimeZoneDto> GetTimeZones()
         {
             var dtos = _mapper.Map<IEnumerable<Core.Domain.TimeZone>, ICollection<TimeZoneDto>>(_dbContext.TimeZones);
+            dtos = dtos.OrderBy(t => TimeZoneInfo.FindSystemTimeZoneById(t.Name).BaseUtcOffset).ToList();
             return dtos;
         }
     }
