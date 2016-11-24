@@ -291,6 +291,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             var authorityPhone = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
 
             contentReplacements.Add("authorityName", authorityName);
+            contentReplacements.Add("authorityOrganizationName", authority.Organization.Name);
             contentReplacements.Add("emailAddress", authorityEmail);
             contentReplacements.Add("phoneNumber", authorityPhone);
             contentReplacements.Add("supportEmail", authorityEmail);

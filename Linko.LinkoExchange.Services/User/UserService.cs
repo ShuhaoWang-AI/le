@@ -255,6 +255,7 @@ namespace Linko.LinkoExchange.Services.User
             var contentReplacements = new Dictionary<string, string>();
             contentReplacements.Add("userName", user.UserName);
             contentReplacements.Add("authorityName", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName));
+            contentReplacements.Add("authorityOrganizationName", authority.Organization.Name);
             contentReplacements.Add("organizationName", orgRegProgram.Organization.Name);
             contentReplacements.Add("addressLine1", orgRegProgram.Organization.AddressLine1);
             contentReplacements.Add("cityName", orgRegProgram.Organization.CityName);
@@ -282,6 +283,7 @@ namespace Linko.LinkoExchange.Services.User
                 contentReplacements.Add("lastName", user.LastName);
                 contentReplacements.Add("userName", user.UserName);
                 contentReplacements.Add("authorityName", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName));
+                contentReplacements.Add("authorityOrganizationName", authority.Organization.Name);
                 contentReplacements.Add("email", user.Email);
                 contentReplacements.Add("organizationName", orgRegProgram.Organization.Name);
                 contentReplacements.Add("addressLine1", orgRegProgram.Organization.AddressLine1);
@@ -474,6 +476,7 @@ namespace Linko.LinkoExchange.Services.User
 
                     contentReplacements = new Dictionary<string, string>();
                     contentReplacements.Add("authorityName", authorityName);
+                    contentReplacements.Add("authorityOrganizationName", authority.Organization.Name);
                     contentReplacements.Add("authoritySupportEmail", authorityEmail);
                     contentReplacements.Add("authoritySupportPhoneNumber", authorityPhone);
                     _emailService.SendEmail(new[] { user.Email }, EmailType.UserAccess_AccountLockOut, contentReplacements);
@@ -951,6 +954,7 @@ namespace Linko.LinkoExchange.Services.User
 
             contentReplacements.Add("userName", programUser.UserProfileDto.UserName);
             contentReplacements.Add("authorityName", authorityName);
+            contentReplacements.Add("authorityOrganizationName", authority.OrganizationDto.OrganizationName);
             contentReplacements.Add("phoneNumber", authorityPhoneNumber);
             contentReplacements.Add("emailAddress", authorityEmail);
 

@@ -78,5 +78,6 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="Schema Create Scripts\LinkoExchangeCreateScript.sql" />
+    <Build Include="Schema Create Scripts\LinkoExchangeTestDataScript.sql" />
   </ItemGroup>
 </Project>

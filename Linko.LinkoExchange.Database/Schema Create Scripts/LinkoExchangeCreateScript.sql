@@ -2372,7 +2372,7 @@ Hello {userName},
 
 Your LinkoExchange Registration has been denied for the following:
                  
-    Authority:  {authorityName} 
+    Authority:  {authorityOrganizationName} 
 
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
 If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}. 
@@ -2390,7 +2390,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Registration',   
         'IndustryRegistrationDenied', 
         
-        'Registration Denied for {organizationName}({authorityName})',
+        'Registration Denied for {organizationName}({authorityOrganizationName})',
         '<html>
             <body> 
                 <pre>
@@ -2398,7 +2398,7 @@ Hello {userName},
 
 Your LinkoExchange Registration has been denied for the following:
                  
-    Authority:  {authorityName}
+    Authority:  {authorityOrganizationName}
      Facility:  {organizationName}
                 {addressLine1}
                 {cityName}, {stateName} 
@@ -2419,7 +2419,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Registration',
         'IndustryRegistrationApproved',
           
-        'Registration Approved for {organizationName}({authorityName})',
+        'Registration Approved for {organizationName}({authorityOrganizationName})',
         '<html>
             <body> 
                 <pre>
@@ -2427,7 +2427,7 @@ Hello {userName},
 
 Your LinkoExchange Registration has been approved for the following: 
 
-    Authority:  {authorityName}
+    Authority:  {authorityOrganizationName}
      Facility:  {organizationName}
                 {addressLine1}
                 {cityName}, {stateName} 
@@ -2458,7 +2458,7 @@ Hello {userName},
 
 Your LinkoExchange Registration has been approved for the following: 
 
-    Authority:  {authorityName} 
+    Authority:  {authorityOrganizationName} 
                      
 You can log in here: {link} 
                      
@@ -2566,7 +2566,7 @@ Hello {userName},
 
 You''ve been invited to be a user of LinkoExchange:
                         
-    Authority:  {authorityName} 
+    Authority:  {authorityOrganizationName} 
                      
 To accept the invitation, please click here or copy and paste the link below into your web browser.
                       
@@ -2607,7 +2607,7 @@ Hello {userName},
 
 You''ve been invited to be a user of LinkoExchange:
                         
-    Authority:  {authorityName}
+    Authority:  {authorityOrganizationName}
      Facility:  {organizationName}
                 {addressLine1}
                 {cityName}, {stateName} 
@@ -2632,7 +2632,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Signature',
         'SignatoryGranted',
          
-        'Signatory Rights Granted for {organizationName}({authorityName})',
+        'Signatory Rights Granted for {organizationName}({authorityOrganizationName})',
         '<html>
             <body> 
                 <pre>
@@ -2640,7 +2640,7 @@ Hello {userName},
 
 Your signatory rights have been granted for 
 
-    Authority:  {authorityName}
+    Authority:  {authorityOrganizationName}
      Facility:  {organizationName}
                 {addressLine1}
                 {cityName}, {stateName} 
@@ -2663,7 +2663,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Signature',
         'SignatoryGrantedToAdmin',
          
-        'Signatory Rights Granted for {organizationName}({authorityName})',
+        'Signatory Rights Granted for {organizationName}({authorityOrganizationName})',
         '<html>
 			<body> 
 				<pre>
@@ -2672,7 +2672,7 @@ Hello {adminFirstName} {adminLastName},
 Signatory rights have been granted for:
 
 	     User:	{firstName} {lastName}
-	Authority:	{authorityName}
+	Authority:	{authorityOrganizationName}
 	 Facility:	{organizationName}
 				{addressLine1}
 				{cityName}, {stateName} 
@@ -2693,7 +2693,7 @@ If you have questions or concerns, please contact {authorityName} at {emailAddre
         'Signature',
         'SignatoryRevoked', 
         
-        'Signatory Rights Revoked for {organizationName}({authorityName})',
+        'Signatory Rights Revoked for {organizationName}({authorityOrganizationName})',
         '<html>
             <body> 
                 <pre>
@@ -2701,7 +2701,7 @@ Hello {userName},
 
 Your signatory rights have been removed for 
 
-    Authority:  {authorityName}
+    Authority:  {authorityOrganizationName}
      Facility:  {organizationName}
                 {addressLine1}
                 {cityName}, {stateName} 
@@ -2724,7 +2724,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Signature',
         'SignatoryRevokedToAdmin', 
         
-        'Signatory Rights Revoked for {organizationName}({authorityName})',
+        'Signatory Rights Revoked for {organizationName}({authorityOrganizationName})',
         '<html>
 			<body> 
 				<pre>
@@ -2733,7 +2733,7 @@ Hello {adminFirstName} {adminLastName},
 Signatory rights have been revoked for:
 
 	     User:	{firstName} {lastName}
-	Authority:	{authorityName}
+	Authority:	{authorityOrganizationName}
 	 Facility:	{organizationName}
 				{addressLine1}
 				{cityName}, {stateName} 
@@ -2987,14 +2987,14 @@ If you have questions or concerns, please contact your Authority or Linko Techno
         'Registration',
         'IndustryUserRegistrationPendingToApprovers', 
 
-        'Registration Pending for {organizationName} ({authorityName})' ,
+        'Registration Pending for {organizationName} ({authorityOrganizationName})' ,
         '<html>
             <body> 
                 <pre>
 The following user has registered at LinkoExchange and requires action:
 
        Registrant:  {firstName} {lastName}
-        Authority:  {authorityName}
+        Authority:  {authorityOrganizationName}
          Facility:  {organizationName}
                     {addressLine1}
                     {cityName}, {stateName}
@@ -3016,14 +3016,14 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Registration',
         'AuthorityUserRegistrationPendingToApprovers', 
 
-        'Registration Pending for {organizationName} ({authorityName})' ,
+        'Registration Pending for {organizationName} ({authorityOrganizationName})' ,
         '<html>
             <body> 
                 <pre>
 The following user has registered at LinkoExchange and requires action:
 
     Registrant:  {firstName} {lastName}
-     Authority:  {authorityName} 
+     Authority:  {authorityOrganizationName} 
                       
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
 If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
@@ -3092,7 +3092,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Registration',   
         'IndustryInviteIndustryUser', 
         
-        'Invitation to {organizationName}({authorityName})',
+        'Invitation to {organizationName}({authorityOrganizationName})',
         '<html>
             <body> 
                 <pre>
@@ -3100,7 +3100,7 @@ Hello {userName},
 
 You''ve been invited to be a user of LinkoExchange:
                         
-    Authority:  {authorityName}
+    Authority:  {authorityOrganizationName}
      Facility:  {organizationName}
                 {addressLine1}
                 {cityName}, {stateName} 

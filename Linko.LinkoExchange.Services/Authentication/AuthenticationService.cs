@@ -492,16 +492,14 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     var emailContentReplacements = new Dictionary<string, string>();
                     emailContentReplacements.Add("firstName", applicationUser.FirstName);
-                    emailContentReplacements.Add("lastName", applicationUser.LastName); 
-
-                    //Here setting should be the authority program setting 
-                    var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(senderProgram.RegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
-                    var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(senderProgram.RegulatoryProgramId, SettingType.EmailContactInfoPhone);
-
+                    emailContentReplacements.Add("lastName", applicationUser.LastName);
+                    var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+                    var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+                    var authorityName = _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
                     emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
                     emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
-
-                    emailContentReplacements.Add("authorityName", authorityOrg.OrganizationName);
+                    emailContentReplacements.Add("authorityName", authorityName);
+                    emailContentReplacements.Add("authorityOrganizationName", authorityOrg.OrganizationName);
                     emailContentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
 
                     if (inviteIndustryUser)
