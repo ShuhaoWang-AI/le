@@ -436,16 +436,16 @@ namespace Linko.LinkoExchange.Services.User
 
                 }
 
-                if (program.RegulatorOrganizationId != null)
-                {
-                    //Find distinct authorities
-                    var authority = _dbContext.OrganizationRegulatoryPrograms
-                        .Single(o => o.OrganizationId == program.RegulatorOrganizationId
-                            && o.RegulatoryProgramId == program.RegulatoryProgramId);
-                    if (!(authorityList.Exists(a => a.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId)))
-                        authorityList.Add(authority);
+                //Get authority's org id, if it exists. If not, they ARE the authority
+                int authorityOrganizationId = program.RegulatorOrganizationId.HasValue ? 
+                    program.RegulatorOrganizationId.Value : program.OrganizationId;
 
-                }
+                //Find distinct authorities
+                var authority = _dbContext.OrganizationRegulatoryPrograms
+                    .Single(o => o.OrganizationId == authorityOrganizationId
+                        && o.RegulatoryProgramId == program.RegulatoryProgramId);
+                if (!(authorityList.Exists(a => a.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId)))
+                    authorityList.Add(authority);
             }
 
          
