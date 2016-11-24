@@ -11,18 +11,18 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
     {
         public string DisplayMessage {  get; set; }
 
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [EmailAddress]
         [Display(Name = "Email Address")]
         public string EmailAddress { get; set; }
 
         public int OrgRegProgramUserId { get; set; }
 
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 

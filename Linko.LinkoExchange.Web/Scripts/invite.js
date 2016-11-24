@@ -5,7 +5,8 @@ $(document).ready(function () {
         //Prevent empty (just white space) strings
         $("#FirstName").val($("#FirstName").val().trim());
         $("#LastName").val($("#LastName").val().trim());
-        $("#form-email-field").submit();
+        var form = $(this).parents('form:first');
+        form.submit();
     });
 
     $("#searchEmailBtn").click(function () {

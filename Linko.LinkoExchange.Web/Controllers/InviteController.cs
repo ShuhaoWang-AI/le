@@ -117,7 +117,14 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 _logger.Info(string.Format("Invite successfully sent. Email={0}, FirstName={1}, LastName={2}.",
                     viewModel.EmailAddress, viewModel.FirstName, viewModel.LastName));
-                return new RedirectResult(redirectUrl);
+
+                //return new RedirectResult(redirectUrl);
+                return View("Confirmation", new ConfirmationViewModel()
+                {
+                    Title = "Invitation Confirmation",
+                    Message = "An invitation has been sent",
+                    HtmlStr = "<p><a href=\"#\" onclick=\"location.href='" + redirectUrl + "'\" class=\"btn btn-sm btn-primary\">OK</a></p>"
+                });
             }
             else
             {
@@ -161,7 +168,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                 }
             }
 
-            return new RedirectResult(redirectUrl);
+            //return new RedirectResult(redirectUrl);
+            return View("Confirmation", new ConfirmationViewModel()
+            {
+                Title = "Invitation Confirmation",
+                Message = "An invitation has been sent",
+                HtmlStr = "<p><a href=\"#\" onclick=\"location.href='" + redirectUrl + "'\" class=\"btn btn-sm btn-primary\">OK</a></p>"
+            });
+
         }
 
         private string GetRedirectUrl(InvitationType invitationType, int? industryOrgRegProgramId = null)
@@ -169,13 +183,13 @@ namespace Linko.LinkoExchange.Web.Controllers
             switch (invitationType)
             {
                 case InvitationType.AuthorityToAuthority:
-                    return "~/Authority/Users";
+                    return "/Authority/Users";
                 case InvitationType.IndustryToIndustry:
-                    return "~/Industry/Users";
+                    return "/Industry/Users";
                 case InvitationType.AuthorityToIndustry:
                     if (industryOrgRegProgramId.HasValue && industryOrgRegProgramId.Value > 0)
                     {
-                        return string.Format("~/Authority/Industry/{0}/Users", industryOrgRegProgramId.Value);
+                        return string.Format("/Authority/Industry/{0}/Users", industryOrgRegProgramId.Value);
                     }
                     break;
             }

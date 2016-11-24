@@ -27,7 +27,7 @@
     </ol>
 </section>
 
-@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "form-email-field" }))
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(model => model.OrgRegProgramUserId)
