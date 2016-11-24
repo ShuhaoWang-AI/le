@@ -499,7 +499,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     emailContentReplacements.Add("authorityName", authorityName);
                     emailContentReplacements.Add("authorityOrganizationName", authorityOrg.OrganizationName);
                     emailContentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
-
+ 
                     if (inviteIndustryUser)
                     {
                         var receipientOrg = _organizationService.GetOrganization(recipientProgram.OrganizationId);
@@ -527,9 +527,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                     // 4 Remove the invitation from table 
                     _invitationService.DeleteInvitation(invitationDto.InvitationId);
 
-                    _dbContext.SaveChanges();
-                    registrationResult.Result = RegistrationResult.Success;
-                    _dbContext.Commit(transaction);
+                    transaction.Commit(); 
+                    registrationResult.Result = RegistrationResult.Success; 
                 }
                 catch (Exception ex)
                 {
@@ -544,8 +543,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                     _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
 
                     registrationResult.Result = RegistrationResult.Failed;
-                    registrationResult.Errors = errors;
-                    _dbContext.Rollback(transaction);
+                    registrationResult.Errors = errors; 
+                    transaction.Rollback();
                     throw;
                 }
             }

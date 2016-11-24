@@ -106,7 +106,7 @@ namespace Linko.LinkoExchange.Test
             //settingDict.Add(SystemSettingType.FailedPasswordAttemptMaxCount, "1"); //Does not exist in system settings
 
             //settingDict.Add(SystemSettingType.PasswordHistoryMaxCount, "10"); //Does not exist in system settings
-            systemSettingDict.Add(SystemSettingType.EmailServer, "6");
+            systemSettingDict.Add(SystemSettingType.EmailServer, "wtraxadc2.watertrax.local");
             systemSettingDict.Add(SystemSettingType.SupportPhoneNumber, "+1-604-418-3201");
             systemSettingDict.Add(SystemSettingType.SupportEmailAddress, "support@linkoExchange.com");
             systemSettingDict.Add(SystemSettingType.SystemEmailEmailAddress, "shuhao.wang@watertrax.com");
@@ -114,9 +114,13 @@ namespace Linko.LinkoExchange.Test
             systemSettingDict.Add(SystemSettingType.SystemEmailLastName, "System");
 
             settingServiceMock.Setup(i => i.GetGlobalSettings()).Returns(systemSettingDict);
-            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordHistoryMaxCount, OrganizationTypeName.Authority)).Returns("10");
-            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordChangeRequiredDays, OrganizationTypeName.Authority)).Returns("90");
-            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.FailedPasswordAttemptMaxCount, OrganizationTypeName.Authority)).Returns("3");
+            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordHistoryMaxCount, It.IsAny<OrganizationTypeName>())).Returns("10");
+            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordChangeRequiredDays, It.IsAny<OrganizationTypeName>())).Returns("90");
+            settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.FailedPasswordAttemptMaxCount, It.IsAny<OrganizationTypeName>())).Returns("3");
+
+            //settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordHistoryMaxCount, OrganizationTypeName.Authority)).Returns("10");
+            //settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordChangeRequiredDays, OrganizationTypeName.Authority)).Returns("90");
+            //settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.FailedPasswordAttemptMaxCount, OrganizationTypeName.Authority)).Returns("3");
 
             _authenticationService = new AuthenticationService(
                 userManagerObj.Object,
@@ -468,7 +472,7 @@ namespace Linko.LinkoExchange.Test
         public void Test_Registrer_Failed_Return_NotAgreedTermsAndConditions()
         {
             userInfo.AgreeTermsAndConditions = false;
-            var result = _authenticationService.Register(userInfo, registrationToken, null, null);
+            var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.NotAgreedTermsAndConditions, result.Result.Result);
         }
@@ -477,7 +481,7 @@ namespace Linko.LinkoExchange.Test
         public void Test_Register_Failed_Password_Policy_Return_BadPassword1()
         {
             userInfo.Password = "1";
-            var result = _authenticationService.Register(userInfo, registrationToken, null, null);
+            var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.BadPassword, result.Result.Result);
         }
@@ -486,7 +490,7 @@ namespace Linko.LinkoExchange.Test
         public void Test_Register_Failed_Password_Policy_Return_BadPassword2()
         {
             userInfo.Password = "VERY long password that is not supported";
-            var result = _authenticationService.Register(userInfo, registrationToken, null, null);
+            var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.BadPassword, result.Result.Result);
         }
@@ -494,7 +498,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_Failed_UserProfile_Null_Return_BadUserProfileData()
         {
-            var result = _authenticationService.Register(null, registrationToken, null, null);
+            var result = _authenticationService.Register(null, registrationToken, null, null, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
         }
@@ -503,7 +507,7 @@ namespace Linko.LinkoExchange.Test
         public void Test_Register_Failed_UserProfile_NoFirstName_Return_BadUserProfileData()
         {
             userInfo.FirstName = null;
-            var result = _authenticationService.Register(userInfo, registrationToken, null, null);
+            var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
         }
@@ -512,7 +516,7 @@ namespace Linko.LinkoExchange.Test
         public void Test_Register_Failed_UserProfile_NoLastName_Return_BadUserProfileData()
         {
             userInfo.LastName = null;
-            var result = _authenticationService.Register(userInfo, registrationToken, null, null);
+            var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
         }
@@ -521,7 +525,7 @@ namespace Linko.LinkoExchange.Test
         public void Test_Register_Failed_UserProfile_NoUserName_Return_BadUserProfileData()
         {
             userInfo.UserName = null;
-            var result = _authenticationService.Register(userInfo, registrationToken, null, null);
+            var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
         }
@@ -530,7 +534,7 @@ namespace Linko.LinkoExchange.Test
         public void Test_Register_Failed_UserProfile_NoAddressLine1_Return_BadUserProfileData()
         {
             userInfo.AddressLine1 = "";
-            var result = _authenticationService.Register(userInfo, registrationToken, null, null);
+            var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
             Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
         }
 
@@ -538,7 +542,7 @@ namespace Linko.LinkoExchange.Test
         public void Test_Register_Failed_UserProfile_NoCityName_Return_BadUserProfileData()
         {
             userInfo.CityName = ""; ;
-            var result = _authenticationService.Register(userInfo, registrationToken, null, null);
+            var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
         }
@@ -547,7 +551,7 @@ namespace Linko.LinkoExchange.Test
         public void Test_Register_Failed_UserProfile_NoZipCode_Return_BadUserProfileData()
         {
             userInfo.ZipCode = ""; ;
-            var result = _authenticationService.Register(userInfo, registrationToken, null, null);
+            var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
         }
@@ -556,7 +560,7 @@ namespace Linko.LinkoExchange.Test
         public void Test_Register_Failed_UserProfile_NoEmail_Return_BadUserProfileData()
         {
             userInfo.Email = "";
-            var result = _authenticationService.Register(userInfo, registrationToken, null, null);
+            var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
         }
@@ -564,7 +568,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_Failed_UserProfile_Return_MisingKBQ()
         {
-            var result = _authenticationService.Register(userInfo, registrationToken, null, null);
+            var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
         }
@@ -573,7 +577,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Register_Failed_UserProfile_Return_MissingSecurityQuestion()
         {
-            var result = _authenticationService.Register(userInfo, registrationToken, null, null);
+            var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
             Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
         }
 
@@ -583,7 +587,7 @@ namespace Linko.LinkoExchange.Test
             var kbqQuestions = CreateQuestions(QuestionTypeName.KBQ, 4);
             var sqQuestions = CreateQuestions(QuestionTypeName.SQ, 2);
 
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.MissingKBQ, result.Result.Result);
         }
@@ -594,7 +598,7 @@ namespace Linko.LinkoExchange.Test
             var kbqQuestions = CreateQuestions(QuestionTypeName.KBQ, 6);
             var sqQuestions = CreateQuestions(QuestionTypeName.SQ, 1);
 
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.MissingSecurityQuestion, result.Result.Result);
         }
@@ -607,7 +611,7 @@ namespace Linko.LinkoExchange.Test
             kbqQuestions.AddRange(CreateQuestions(QuestionTypeName.KBQ, 1));
             var sqQuestions = CreateQuestions(QuestionTypeName.SQ, 2);
 
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.DuplicatedKBQ, result.Result.Result);
         }
@@ -620,7 +624,7 @@ namespace Linko.LinkoExchange.Test
             var sqQuestions = CreateQuestions(QuestionTypeName.SQ, 1);
             sqQuestions.AddRange(CreateQuestions(QuestionTypeName.SQ, 1));
 
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.DuplicatedSecurityQuestion, result.Result.Result);
         }
@@ -635,7 +639,7 @@ namespace Linko.LinkoExchange.Test
             var invitServiceMock = Mock.Get(invitService);
             invitServiceMock.Setup(i => i.GetInvitation(It.IsAny<string>())).Returns((InvitationDto)null); 
 
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.InvalidRegistrationToken, result.Result.Result);
         }
@@ -688,7 +692,7 @@ namespace Linko.LinkoExchange.Test
             settingServiceMock.Setup(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>()))
                .Returns(new[] { orgSettingDto } );
             
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result.Result);
         }
@@ -712,7 +716,7 @@ namespace Linko.LinkoExchange.Test
             userManagerObj.Setup(i => i.FindByIdAsync(It.IsAny<string>())).
                 Returns(Task.FromResult(userProfile));
 
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
             userManagerObj.Verify(i => i.CreateAsync(It.IsAny<UserProfile>(), It.IsAny<string>()));
             
@@ -731,7 +735,7 @@ namespace Linko.LinkoExchange.Test
 
             SetRegistrations(out sqQuestions, out kbqQuestions);
   
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions); 
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration); 
 
             var settingServiceMock = Mock.Get(settService);
             settingServiceMock.Verify(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>())); 
@@ -761,7 +765,7 @@ namespace Linko.LinkoExchange.Test
             userManagerObj.Setup(i => i.CreateAsync(It.IsAny<UserProfile>(), It.IsAny<string>())).
                 Returns(Task.FromResult((IdentityResult)createUserResult));
 
-            var ret = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions).Result;
+            var ret = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration).Result;
         }
 
         [TestMethod]
@@ -779,7 +783,7 @@ namespace Linko.LinkoExchange.Test
                     ); 
 
             // To test new user register    
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);   
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);   
             Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result.Result);
         }
 
@@ -798,7 +802,7 @@ namespace Linko.LinkoExchange.Test
                     );
 
             // To test new user register    
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
             Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result.Result);
         }
 
@@ -811,7 +815,7 @@ namespace Linko.LinkoExchange.Test
             SetRegistrations(out sqQuestions, out kbqQuestions); 
          
             // To test new user register    
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions);
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
             var emailServiceMock = Mock.Get(emailService);
 
             emailServiceMock.Verify(i => i.SendEmail(It.IsAny<IEnumerable<string>>(),
