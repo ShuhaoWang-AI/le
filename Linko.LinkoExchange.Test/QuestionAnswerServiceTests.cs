@@ -215,7 +215,9 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void ConfirmCorrectKBQAnswer_Test()
         {
-            var result = _questionAnswerService.ConfirmCorrectAnswer(44, "NeW aNSWer 1");
+            string phrase = "NeW aNSWer 1";
+            _questionAnswerService.UpdateAnswer(new AnswerDto() { UserQuestionAnswerId = 44, Content = phrase });
+            var result = _questionAnswerService.ConfirmCorrectAnswer(44, phrase);
 
             Assert.IsTrue(result);
         }
