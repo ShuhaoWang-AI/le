@@ -130,7 +130,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                 model.UserProfile = profileHelper.GetUserProfileViewModel(user.UserProfileId);
                 model.UserKBQ = profileHelper.GetUserKbqViewModel(user.UserProfileId);
                 model.UserSQ  = profileHelper.GetUserSecurityQuestionViewModel(user.UserProfileId);
-                
+                // For re-registration, set the kbq questions to be **** so that we do not display guly hashed string.
+                model.UserKBQ.KBQAnswer1 = "**********";
+                model.UserKBQ.KBQAnswer2 = "**********";
+                model.UserKBQ.KBQAnswer3 = "**********";
+                model.UserKBQ.KBQAnswer4 = "**********";
+                model.UserKBQ.KBQAnswer5 = "**********"; 
+
                 // For Registration, we don't update anything to the user's profile, put a fake password here only to by pass the data validation. 
                 model.UserProfile.Password = "FakePassowrd!001";
                 model.AgreeTermsAndConditions = true; 
@@ -210,7 +216,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             sqs.Add(new AnswerDto() { QuestionId = model.UserSQ.SecurityQuestion1, Content = model.UserSQ.SecurityQuestionAnswer1 });
             sqs.Add(new AnswerDto() { QuestionId = model.UserSQ.SecurityQuestion2, Content = model.UserSQ.SecurityQuestionAnswer2 });
 
-            var result = await _authenticationService.Register(userDto, model.Token, sqs, kbqs);
+            var result = await _authenticationService.Register(userDto, model.Token, sqs, kbqs, model.RegistrationType);
             switch (result.Result)
             {
                 case RegistrationResult.Success:

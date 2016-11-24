@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
 using Linko.LinkoExchange.Services.Dto;
-using System.Threading.Tasks; 
+using System.Threading.Tasks;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
@@ -14,8 +15,9 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="registrationToken">The registration token string</param>
         /// <param name="securityQuestions">Security questions and answers</param>
         /// <param name="kbqQuestions">KBQ question and answers</param>
+        /// <param name="registrationType">Registration type</param>
         /// <returns></returns>
-        Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions); 
+        Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions, RegistrationType registrationType); 
 
         // Change or reset password
         /// <summary>

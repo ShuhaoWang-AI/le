@@ -81,25 +81,25 @@ namespace Linko.LinkoExchange.Web.shared
             userKbqViewModel.QuestionPool = GetQuestionPool(QuestionTypeName.KBQ);
 
             ////  KBQ questions 
-            userKbqViewModel.KBQ1 = kbqs[0].Question.QuestionId.Value;
-            userKbqViewModel.KBQ2 = kbqs[1].Question.QuestionId.Value;
-            userKbqViewModel.KBQ3 = kbqs[2].Question.QuestionId.Value;
-            userKbqViewModel.KBQ4 = kbqs[3].Question.QuestionId.Value;
-            userKbqViewModel.KBQ5 = kbqs[4].Question.QuestionId.Value;
+            userKbqViewModel.KBQ1 = kbqs.Count > 4 ? kbqs[0].Question.QuestionId.Value : -1;
+            userKbqViewModel.KBQ2 = kbqs.Count > 4 ? kbqs[1].Question.QuestionId.Value : -1;
+            userKbqViewModel.KBQ3 = kbqs.Count > 4 ? kbqs[2].Question.QuestionId.Value : -1;
+            userKbqViewModel.KBQ4 = kbqs.Count > 4 ? kbqs[3].Question.QuestionId.Value : -1;
+            userKbqViewModel.KBQ5 = kbqs.Count > 4 ? kbqs[4].Question.QuestionId.Value : -1;
 
 
-            userKbqViewModel.KBQAnswer1 = kbqs[0].Answer.Content;
-            userKbqViewModel.KBQAnswer2 = kbqs[1].Answer.Content;
-            userKbqViewModel.KBQAnswer3 = kbqs[2].Answer.Content;
-            userKbqViewModel.KBQAnswer4 = kbqs[3].Answer.Content;
-            userKbqViewModel.KBQAnswer5 = kbqs[4].Answer.Content;
+            userKbqViewModel.KBQAnswer1 = kbqs.Count > 4 ? kbqs[0].Answer.Content : "";
+            userKbqViewModel.KBQAnswer2 = kbqs.Count > 4 ? kbqs[1].Answer.Content : "";
+            userKbqViewModel.KBQAnswer3 = kbqs.Count > 4 ? kbqs[2].Answer.Content : "";
+            userKbqViewModel.KBQAnswer4 = kbqs.Count > 4 ? kbqs[3].Answer.Content : "";
+            userKbqViewModel.KBQAnswer5 = kbqs.Count > 4 ? kbqs[4].Answer.Content : "";
 
             //// keep track UserQuestionAnswerId
-            userKbqViewModel.UserQuestionAnserId_KBQ1 = kbqs[0].Answer.UserQuestionAnswerId.Value;
-            userKbqViewModel.UserQuestionAnserId_KBQ2 = kbqs[1].Answer.UserQuestionAnswerId.Value;
-            userKbqViewModel.UserQuestionAnserId_KBQ3 = kbqs[2].Answer.UserQuestionAnswerId.Value;
-            userKbqViewModel.UserQuestionAnserId_KBQ4 = kbqs[3].Answer.UserQuestionAnswerId.Value;
-            userKbqViewModel.UserQuestionAnserId_KBQ5 = kbqs[4].Answer.UserQuestionAnswerId.Value;
+            userKbqViewModel.UserQuestionAnserId_KBQ1 = kbqs.Count > 4 ? kbqs[0].Answer.UserQuestionAnswerId.Value : -1;
+            userKbqViewModel.UserQuestionAnserId_KBQ2 = kbqs.Count > 4 ? kbqs[1].Answer.UserQuestionAnswerId.Value : -1;
+            userKbqViewModel.UserQuestionAnserId_KBQ3 = kbqs.Count > 4 ? kbqs[2].Answer.UserQuestionAnswerId.Value : -1;
+            userKbqViewModel.UserQuestionAnserId_KBQ4 = kbqs.Count > 4 ? kbqs[3].Answer.UserQuestionAnswerId.Value : -1;
+            userKbqViewModel.UserQuestionAnserId_KBQ5 = kbqs.Count > 4 ? kbqs[4].Answer.UserQuestionAnswerId.Value : -1;
 
             return userKbqViewModel;
         }
@@ -115,15 +115,15 @@ namespace Linko.LinkoExchange.Web.shared
             userSQViewModel.QuestionPool = GetQuestionPool(QuestionTypeName.SQ);
 
             ////  Security questions 
-            userSQViewModel.SecurityQuestion1 = sqs[0].Question.QuestionId.Value;
-            userSQViewModel.SecurityQuestion2 = sqs[1].Question.QuestionId.Value;
+            userSQViewModel.SecurityQuestion1 = sqs.Count > 1 ? sqs[0].Question.QuestionId.Value : -1;
+            userSQViewModel.SecurityQuestion2 = sqs.Count > 1 ? sqs[1].Question.QuestionId.Value : -1;
 
-            userSQViewModel.SecurityQuestionAnswer2 = sqs[1].Answer.Content;
-            userSQViewModel.SecurityQuestionAnswer1 = sqs[0].Answer.Content;
+            userSQViewModel.SecurityQuestionAnswer2 = sqs.Count > 1 ? sqs[1].Answer.Content : "";
+            userSQViewModel.SecurityQuestionAnswer1 = sqs.Count > 1 ? sqs[0].Answer.Content : "";
 
             //// Keep track UserQuestionAnswerId 
-            userSQViewModel.UserQuestionAnserId_SQ1 = sqs[0].Answer.UserQuestionAnswerId.Value;
-            userSQViewModel.UserQuestionAnserId_SQ2 = sqs[1].Answer.UserQuestionAnswerId.Value;
+            userSQViewModel.UserQuestionAnserId_SQ1 = sqs.Count > 1 ? sqs[0].Answer.UserQuestionAnswerId.Value : -1;
+            userSQViewModel.UserQuestionAnserId_SQ2 = sqs.Count > 1 ? sqs[1].Answer.UserQuestionAnswerId.Value : -1;
 
             return userSQViewModel;
         }

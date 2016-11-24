@@ -248,29 +248,38 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="registrationToken">Registration token</param>
         /// <param name="securityQuestions">Security questions</param>
         /// <param name="kbqQuestions">KBQ questions</param>
+        /// <param name="registrationType">Registration type</param>
         /// <returns>Registration results.</returns>
-        public async Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions)
+        public async Task<RegistrationResultDto> Register(
+            UserDto userInfo, 
+            string registrationToken, 
+            IEnumerable<AnswerDto> securityQuestions, 
+            IEnumerable<AnswerDto> kbqQuestions, 
+            RegistrationType registrationType)
         {
             var registrationResult = new RegistrationResultDto();
-            if (userInfo == null)
+            if (registrationType != RegistrationType.ReRegistration)
             {
-                registrationResult.Result = RegistrationResult.BadUserProfileData;
-                return registrationResult;
-            }
+                if (userInfo == null)
+                {
+                    registrationResult.Result = RegistrationResult.BadUserProfileData;
+                    return registrationResult;
+                }
 
-            if (string.IsNullOrWhiteSpace(registrationToken))
-            {
-                registrationResult.Result = RegistrationResult.InvalidRegistrationToken;
-                return registrationResult;
-            }
+                if (string.IsNullOrWhiteSpace(registrationToken))
+                {
+                    registrationResult.Result = RegistrationResult.InvalidRegistrationToken;
+                    return registrationResult;
+                }
 
-            _logger.Info("Register. userName={0}, email={1}", userInfo.UserName, registrationToken);
-            
-            var validatResult = ValidateRegistrationData(userInfo, securityQuestions, kbqQuestions);
-           if (validatResult != RegistrationResult.Success)
-            {
-                registrationResult.Result = validatResult;
-                return registrationResult;
+                _logger.Info("Register. userName={0}, email={1}", userInfo.UserName, registrationToken);
+
+                var validatResult = ValidateRegistrationData(userInfo, securityQuestions, kbqQuestions);
+                if (validatResult != RegistrationResult.Success)
+                {
+                    registrationResult.Result = validatResult;
+                    return registrationResult;
+                }
             }
 
             var invitationDto = _invitationService.GetInvitation(registrationToken);
@@ -310,35 +319,27 @@ namespace Linko.LinkoExchange.Services.Authentication
             UserProfile applicationUser = _userManager.FindByEmail(userInfo.Email);
 
             // 2.a  Actor is already registration with LinkoExchange  
-            bool newUserRegistration = true;     // totally new user
-            bool isFromResetUser = false;        // user is in db, but from reset account request
 
-            if (applicationUser != null)
+            if(applicationUser != null)
             {
-                newUserRegistration = false;
-                if (applicationUser.IsAccountResetRequired)
+                if(registrationType == RegistrationType.NewRegistration)
                 {
-                    isFromResetUser = true;
-                } 
-
-                var testUser = _userManager.FindByName(userInfo.UserName); 
-                if(testUser!= null && 
-                    testUser.UserName == userInfo.UserName  && 
-                    testUser.Email != userInfo.Email && 
-                    !isFromResetUser)
-                {
-                    registrationResult.Result = RegistrationResult.UserNameIsUsed;
+                    registrationResult.Result = RegistrationResult.EmailIsUsed;
                     return registrationResult;
                 } 
             }
-            else 
+            else
             {
-                var testUser = _userManager.FindByName(userInfo.UserName);
-                if (testUser != null)
+                if(registrationType == RegistrationType.NewRegistration)
                 {
-                    registrationResult.Result = RegistrationResult.UserNameIsUsed;
-                    return registrationResult;
-                } 
+                    var testUser = _userManager.FindByName(userInfo.UserName);
+                    if (testUser != null)
+                    {
+                        registrationResult.Result = RegistrationResult.UserNameIsUsed;
+                        return registrationResult;
+                    }
+
+                }
             }
 
             using (var transaction = _dbContext.BeginTransaction())
@@ -347,7 +348,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 {
                     #region Create a new user registration 
 
-                    if (newUserRegistration)
+                    if (registrationType == RegistrationType.NewRegistration)
                     {
                         applicationUser = AssignUser(userInfo.UserName, userInfo.Email);
 
@@ -396,7 +397,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     // Exsiting user re-register
                     // Check if the password has been in # password in history
-                    if (!newUserRegistration)
+                    if (registrationType == RegistrationType.ResetRegistration)
                     {
                         string passwordHash = _passwordHasher.HashPassword(userInfo.Password); 
 
@@ -414,11 +415,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                         applicationUser.PasswordHash = passwordHash;  
 
                         // Clear KBQ questions and Security Questions for existing user re-registration 
-                        _questionAnswerService.DeleteUserQuestionAndAnswers(applicationUser.UserProfileId);  
-                    }
+                        _questionAnswerService.DeleteUserQuestionAndAnswers(applicationUser.UserProfileId);
 
-                    if (isFromResetUser)
-                    {
                         // Set IsRestRequired to be false  
                         applicationUser.IsAccountResetRequired = false;
                     } 
@@ -427,7 +425,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     #region Save into passwordHistory and KBQ question, and Security Question 
 
-                    if (newUserRegistration || isFromResetUser)
+                    if (registrationType == RegistrationType.NewRegistration || registrationType == RegistrationType.ResetRegistration)
                     {
                         // Create a new row in userProfile password history table 
                         _dbContext.UserPasswordHistories.Add(new UserPasswordHistory
