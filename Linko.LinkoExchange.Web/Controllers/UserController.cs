@@ -389,6 +389,15 @@ namespace Linko.LinkoExchange.Web.Controllers
             var userProileDto = _userService.GetUserProfileById(userProfileId);
             var userProfileViewModel = _mapper.Map<UserProfileViewModel>(userProileDto);
 
+            //Need to set the HasSignatory for Org Reg Program User
+            string orgRegProgramUserIdString = _sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId);
+            if (!String.IsNullOrEmpty(orgRegProgramUserIdString))
+            {
+                int orgRegProgramUserId = int.Parse(orgRegProgramUserIdString);
+                var orgRegProgamUser = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgramUserId);
+                userProfileViewModel.HasSigntory = orgRegProgamUser.IsSignatory;
+            }
+
             // set password to be stars 
             userProfileViewModel.Password = fakePassword;
 
