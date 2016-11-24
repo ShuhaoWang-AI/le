@@ -491,15 +491,17 @@ namespace Linko.LinkoExchange.Services.Authentication
                     var emailContentReplacements = new Dictionary<string, string>();
                     emailContentReplacements.Add("firstName", applicationUser.FirstName);
                     emailContentReplacements.Add("lastName", applicationUser.LastName);
-                    var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
-                    var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
-                    var authorityName = _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+
+                    var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(senderProgram.RegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+                    var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(senderProgram.RegulatoryProgramId, SettingType.EmailContactInfoPhone);
+                    var authorityName = _settingService.GetOrgRegProgramSettingValue(senderProgram.RegulatoryProgramId, SettingType.EmailContactInfoName); 
+
                     emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
                     emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
                     emailContentReplacements.Add("authorityName", authorityName);
                     emailContentReplacements.Add("authorityOrganizationName", authorityOrg.OrganizationName);
                     emailContentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
- 
+
                     if (inviteIndustryUser)
                     {
                         var receipientOrg = _organizationService.GetOrganization(recipientProgram.OrganizationId);
