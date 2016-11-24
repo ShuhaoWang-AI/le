@@ -88,12 +88,12 @@ namespace Linko.LinkoExchange.Test
             );
 
             var requestCache = Mock.Of<IRequestCache>(i =>
-                    i.GetValue("EmailRecipientRegulatoryProgramId") == "1" &&
-                    i.GetValue("EmailRecipientOrganizationId") == "2" &&
-                    i.GetValue("EmailRecipientOrganizationId") == "3" && 
-                    i.GetValue("Token") == Guid.NewGuid().ToString() && 
-                    i.GetValue(CacheKey.EmailRecipientUserProfileId) == "1000" && 
-                    i.GetValue(CacheKey.EmailSenderUserProfileId) == "2000"
+                    i.GetValue("EmailRecipientRegulatoryProgramId").ToString() == "1" &&
+                    i.GetValue("EmailRecipientOrganizationId").ToString() == "2" &&
+                    i.GetValue("EmailRecipientOrganizationId").ToString() == "3" && 
+                    i.GetValue("Token").ToString() == Guid.NewGuid().ToString() && 
+                    i.GetValue(CacheKey.EmailRecipientUserProfileId).ToString() == "1000" && 
+                    i.GetValue(CacheKey.EmailSenderUserProfileId).ToString() == "2000"
             );
              
             var emailAuditLogService = new EmailAuditLogService(dbContext, requestCache);

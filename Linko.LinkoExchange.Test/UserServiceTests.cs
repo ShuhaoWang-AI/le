@@ -1,25 +1,25 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Linko.LinkoExchange.Services.User;
-using AutoMapper;
-using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.AutoMapperProfile;
-using System.Collections.Generic;
-using Linko.LinkoExchange.Services.Dto;
-using Microsoft.AspNet.Identity;
+﻿using System.Collections.Generic;
 using System.Configuration;
-using Linko.LinkoExchange.Services;
-using Moq;
-using Linko.LinkoExchange.Services.Settings;
-using Linko.LinkoExchange.Services.Email;
-using Linko.LinkoExchange.Services.Authentication;
-using Linko.LinkoExchange.Services.Cache;
-using Linko.LinkoExchange.Services.Organization;
-using Linko.LinkoExchange.Core.Enum;
-using Linko.LinkoExchange.Services.TimeZone;
-using Linko.LinkoExchange.Services.Jurisdiction;
-using Linko.LinkoExchange.Services.QuestionAnswer;
+using AutoMapper;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.Authentication;
+using Linko.LinkoExchange.Services.AutoMapperProfile;
+using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Email;
+using Linko.LinkoExchange.Services.Jurisdiction;
+using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.TimeZone;
+using Linko.LinkoExchange.Services.User;
+using Microsoft.AspNet.Identity;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using NLog;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -39,6 +39,7 @@ namespace Linko.LinkoExchange.Test
         ITimeZoneService _timeZones;
         Mock<ApplicationUserManager> _userManager;
         Mock<IQuestionAnswerService> _qaService;
+        Mock<ILogger> _logger;
 
         public UserServiceTests()
         {
@@ -76,6 +77,7 @@ namespace Linko.LinkoExchange.Test
             var userStore = new Mock<IUserStore<UserProfile>>();
             _userManager = new Mock<ApplicationUserManager>(userStore.Object);
             _qaService = new Mock<IQuestionAnswerService>();
+            _logger = new Mock<ILogger>();
 
             //_settingService.GetGlobalSettings()
             var globalSettingLookup = new Dictionary<SystemSettingType, string>();
@@ -86,7 +88,7 @@ namespace Linko.LinkoExchange.Test
             _settingService.Setup(x => x.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.TimeZone)).Returns("1");
 
             _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString), Mapper.Instance);
-            _realSettingService = new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance);
+            _realSettingService = new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance, _logger.Object);
             _realOrgService = new OrganizationService(new LinkoExchangeContext(connectionString),
                 Mapper.Instance, _realSettingService, new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance));
             _realUserService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(),

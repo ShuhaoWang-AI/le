@@ -1,14 +1,15 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Linko.LinkoExchange.Services.Settings;
-using AutoMapper;
-using Linko.LinkoExchange.Services.AutoMapperProfile;
-using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.Dto;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
+using AutoMapper;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
+using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.AutoMapperProfile;
+using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Settings;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using NLog;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -16,6 +17,7 @@ namespace Linko.LinkoExchange.Test
     public class SettingServiceTests
     {
         private SettingService _settingService;
+        Mock<ILogger> _logger;
 
         public SettingServiceTests()
         {
@@ -38,7 +40,8 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            _settingService = new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance);
+            _logger = new Mock<ILogger>();
+            _settingService = new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance, _logger.Object);
         }
 
         [TestMethod]

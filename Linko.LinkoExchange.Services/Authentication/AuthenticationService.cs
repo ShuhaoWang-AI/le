@@ -532,8 +532,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     _dbContext.SaveChanges();
                     registrationResult.Result = RegistrationResult.Success;
-                    _dbContext.Commit(transaction); 
-                    return registrationResult;
+                    _dbContext.Commit(transaction);
                 }
                 catch (Exception ex)
                 {

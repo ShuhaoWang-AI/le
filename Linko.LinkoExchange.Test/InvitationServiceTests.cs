@@ -75,11 +75,11 @@ namespace Linko.LinkoExchange.Test
             invitationService = new InvitationService(
                 new LinkoExchangeContext(connectionString),
                 Mapper.Instance,
-                new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance),
+                new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance, _logger.Object),
                 new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, new HttpContextService(), _emailService, _settingService, _sessionCache.Object, _orgService.Object, _requestCache, _timeZones.Object, _qaService.Object),
                 _requestCache,//new RequestCache(),
                 _emailService,
-                new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance), new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance)),
+                new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance, _logger.Object), new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance)),
                 _httpContext.Object, _timeZones.Object, _logger.Object);
         }
 

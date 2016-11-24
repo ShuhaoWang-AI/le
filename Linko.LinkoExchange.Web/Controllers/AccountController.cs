@@ -268,7 +268,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> SignIn(SignInViewModel model, string returnUrl = null)
+        public ActionResult SignIn(SignInViewModel model, string returnUrl = null)
         {
             if (!ModelState.IsValid)
             {
@@ -277,7 +277,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             try
             {
-                var result = _authenticationService.SignInByUserName(model.UserName, model.Password, false).Result;
+                var result = _authenticationService.SignInByUserName(model.UserName, model.Password, isPersistent: false).Result;
 
                 switch (result.AutehticationResult)
                 {
@@ -864,9 +864,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 TempData["Message"] = "Change email address succeeded.";
                 return RedirectToAction(actionName: "ChangeAccountSucceed");
             }
-
-            var changeEmailViewModel = new ChangeEmailViewModel();  
-            return View(changeEmailViewModel);
+            
         }
 
         public ActionResult KbqChallenge(string returnUrl)

@@ -197,14 +197,7 @@ namespace Linko.LinkoExchange.Services.User
             _dbContext.Users.Add(newUserProfile);
             newOrgRegProgUser.UserProfileId = newUserProfile.UserProfileId;
 
-            try
-            {
-                return _dbContext.SaveChanges();
-            }
-            catch (Exception ex) {
-                //_logger.Log("ERROR")
-                throw new Exception();
-            }
+            return _dbContext.SaveChanges();
         }
         
         public void UpdateUserState(int orgRegProgUserId, bool? isRegApproved, bool? isRegDenied, bool? isEnabled, bool? isRemoved)

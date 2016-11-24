@@ -9,8 +9,6 @@ namespace Linko.LinkoExchange.Web.Controllers
     {
         private readonly ILogger _logger;
 
-        private IEnumerable<Claim> claims;
-
         #region constructor
 
         public CommonController(ILogger logger)

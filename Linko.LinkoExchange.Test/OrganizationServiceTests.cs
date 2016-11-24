@@ -3,10 +3,12 @@ using AutoMapper;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.AutoMapperProfile;
+using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Linko.LinkoExchange.Services.Jurisdiction;
+using Moq;
+using NLog;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -14,6 +16,7 @@ namespace Linko.LinkoExchange.Test
     public class OrganizationServiceTests
     {
         private OrganizationService orgService;
+        Mock<ILogger> _logger;
 
         public OrganizationServiceTests()
         {
@@ -37,9 +40,10 @@ namespace Linko.LinkoExchange.Test
         [TestInitialize]
         public void Initialize()
         {
+            _logger = new Mock<ILogger>();
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             orgService = new OrganizationService(new LinkoExchangeContext(connectionString), 
-                Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance), new HttpContextService(),
+                Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance, _logger.Object), new HttpContextService(),
                 new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance));
         }
 

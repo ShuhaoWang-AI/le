@@ -57,7 +57,6 @@ namespace Linko.LinkoExchange.Test
         AuthenticationService _authenticationService;
         Dictionary<SystemSettingType, string> systemSettingDict = new Dictionary<SystemSettingType, string>();
         Dictionary<SettingType, string> settingDict = new Dictionary<SettingType, string>();
-        Mock<IHttpContextService> _httpContext;
         ILogger logger = Mock.Of<ILogger>();
         UserDto userInfo;
         string registrationToken = "TEST-REGISTRATION-TOKEN";

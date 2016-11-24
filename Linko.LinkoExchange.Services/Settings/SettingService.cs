@@ -1,16 +1,17 @@
-﻿using System.Collections.Generic;
-using Linko.LinkoExchange.Services.Dto;
-using Linko.LinkoExchange.Data;
-using AutoMapper;
-using System.Linq;
-using Linko.LinkoExchange.Core.Domain;
-using System;
-using Linko.LinkoExchange.Core.Common;
-using Linko.LinkoExchange.Core.Validation;
-using System.Data.Entity.Validation;
-using System.Data.Entity.Infrastructure;
-using Linko.LinkoExchange.Core.Enum;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
+using System.Linq;
+using AutoMapper;
+using Linko.LinkoExchange.Core.Common;
+using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Validation;
+using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.Dto;
+using NLog;
 
 namespace Linko.LinkoExchange.Services.Settings
 {
@@ -19,7 +20,7 @@ namespace Linko.LinkoExchange.Services.Settings
         #region private members
 
         private readonly LinkoExchangeContext _dbContext;
-        //private readonly IAuditLogEntry _logger;
+        private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
 	    private  Dictionary<SystemSettingType, string> _globalSettings = new Dictionary<SystemSettingType, string>();
@@ -27,10 +28,11 @@ namespace Linko.LinkoExchange.Services.Settings
 
         #endregion
 
-        public SettingService(LinkoExchangeContext dbContext, IMapper mapper)
+        public SettingService(LinkoExchangeContext dbContext, IMapper mapper, ILogger logger)
         {
             _dbContext = dbContext; 
             _mapper = mapper;
+            _logger = logger;
 
             var systemSettings = _dbContext.SystemSettings.ToList(); 
 
@@ -138,10 +140,10 @@ namespace Linko.LinkoExchange.Services.Settings
                 transaction.Rollback();
                 throw rve;
             }
-            catch (Exception ex)
+            catch
             {
                 transaction.Rollback();
-                throw ex;
+                throw;
             }
             finally
             {
@@ -166,10 +168,10 @@ namespace Linko.LinkoExchange.Services.Settings
                 transaction.Rollback();
                 throw rve;
             }
-            catch (Exception ex)
+            catch
             {
                 transaction.Rollback();
-                throw ex;
+                throw;
             }
             finally
             {
@@ -203,6 +205,7 @@ namespace Linko.LinkoExchange.Services.Settings
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, ex.Message);
                 string msg = string.Format("Cannot create/update program setting '{0}' to '{1}'", settingDto.TemplateName.ToString(), settingDto.Value);
                 var violations = new List<RuleViolation>() { new RuleViolation("", settingDto.Value, msg) };
                 throw new RuleViolationException(msg, violations);
@@ -225,10 +228,10 @@ namespace Linko.LinkoExchange.Services.Settings
                 transaction.Rollback();
                 throw rve;
             }
-            catch (Exception ex)
+            catch
             {
                 transaction.Rollback();
-                throw ex;
+                throw ;
             }
             finally
             {
@@ -253,10 +256,10 @@ namespace Linko.LinkoExchange.Services.Settings
                 transaction.Rollback();
                 throw rve;
             }
-            catch (Exception ex)
+            catch
             {
                 transaction.Rollback();
-                throw ex;
+                throw;
             }
             finally
             {
@@ -292,6 +295,7 @@ namespace Linko.LinkoExchange.Services.Settings
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, ex.Message);
                 string msg = string.Format("Cannot create/update program setting '{0}' to '{1}'", settingDto.TemplateName.ToString(), settingDto.Value);
                 var violations = new List<RuleViolation>() { new RuleViolation("", settingDto.Value, msg) };
                 throw new RuleViolationException(msg, violations);
@@ -360,8 +364,11 @@ namespace Linko.LinkoExchange.Services.Settings
 
                 }
             }
+            else
+            {
+                throw new Exception(string.Format("ERROR: Could not find any associated organizations for user profile id={0}", userProfileId));
+            }
 
-            throw new Exception(string.Format("ERROR: Could not find any associated organizations for user profile id={0}", userProfileId));
 
         }
 
@@ -390,12 +397,9 @@ namespace Linko.LinkoExchange.Services.Settings
             {
                 HandleEntityException(ex);
             }
-            catch (Exception e)
+            catch
             {
-                var linkoException = new LinkoExchangeException();
-                linkoException.ErrorType = LinkoExchangeError.OrganizationSetting;
-                linkoException.Errors = new List<string> { e.Message };
-                throw linkoException;
+                throw;
             }
             return null;
         } 
@@ -423,6 +427,8 @@ namespace Linko.LinkoExchange.Services.Settings
 
         private void HandleEntityException(DbEntityValidationException ex)
         {
+            _logger.Error(ex, ex.Message);
+
             List<RuleViolation> validationIssues = new List<RuleViolation>();
             foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
             {
@@ -431,13 +437,13 @@ namespace Linko.LinkoExchange.Services.Settings
 
                 foreach (DbValidationError subItem in item.ValidationErrors)
                 {
-                    string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                    string message = string.Format(format: "Error '{0}' occurred in {1} at {2}", arg0: subItem.ErrorMessage, arg1: entityTypeName, arg2: subItem.PropertyName);
                     validationIssues.Add(new RuleViolation(string.Empty, null, message));
 
                 }
             }
-            //_logger.Info("???");
-            throw new RuleViolationException("Validation errors", validationIssues);
+            
+            throw new RuleViolationException(message: "", validationIssues: validationIssues);
         }
     }
 }

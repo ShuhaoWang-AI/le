@@ -3,7 +3,7 @@
     // TODO to implement
     public class TokenGenerator
     {
-        private string SALT = "R9HEU9I-olSvM+dK!QBX0&R6&(WAML$C*OO%SEO&Lt"; 
+        //private string SALT = "R9HEU9I-olSvM+dK!QBX0&R6&(WAML$C*OO%SEO&Lt"; 
 
         public string GenToken(string userId)
         {
