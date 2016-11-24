@@ -9,6 +9,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public int OrganizationId { get; set; }
         public int? RegulatorOrganizationId { get; set; }
         public OrganizationDto OrganizationDto { get; set; }
+        public virtual OrganizationDto RegulatorOrganization { get; set; }
         public bool IsEnabled { get; set; }
         public bool IsRemoved { get; set; }
         public string AssignedTo { get; set; }

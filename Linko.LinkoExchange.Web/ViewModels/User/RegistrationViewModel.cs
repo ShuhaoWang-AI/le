@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Attributes;
+using Linko.LinkoExchange.Core.Enum;
 using System.ComponentModel.DataAnnotations;
 
 namespace Linko.LinkoExchange.Web.ViewModels.User
@@ -11,6 +12,14 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
 
         [Display(Name = "Agree To Terms And Conditions")]
         public bool AgreeTermsAndConditions { get; set; }
+
+        [Display(Name ="Email")]
+        [DataType(DataType.EmailAddress, ErrorMessage = "Email is not valid")]
+        public string Email { get; set; }
+        public string ProgramName { get; set; }
+        public string AuthorityName { get; set; }
+        public string IndustryName { get; set; }
+        public RegistrationType RegistrationType { get; set; }
     }
 
     public partial class RegistrationValidator : AbstractValidator<RegistrationViewModel>

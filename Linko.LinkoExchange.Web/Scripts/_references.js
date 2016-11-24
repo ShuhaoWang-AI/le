@@ -24,3 +24,4 @@
 /// <reference path="kendo.modernizr.custom.js" />
 /// <reference path="linkoexchange.js" />
 /// <reference path="profile.js" />
+/// <reference path="registration.js" />

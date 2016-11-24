@@ -746,21 +746,21 @@ new
 <div class="profileDiv"> 
      <div class="form-group">  
          <div class="col-lg-offset-2  col-md-8"> 
-             @Html.EditorFor(model => model.AgreeTermsAndConditions) 
+             @Html.CheckBoxFor(model => model.AgreeTermsAndConditions) 
           <span> @Html.LabelFor(m => m.AgreeTermsAndConditions)</span>
         </div>
      </div>   
 </div>
  
 <div class="box-footer">
-    <input type="submit" id="sqSubmit" value="Register" name="Command" class="btn btn-sm btn-primary pull-right"
+    <input type="submit" id="register" value="Register" name="Command" class="btn btn-sm btn-primary pull-right"
             formaction='@Url.Action(actionName: "Register", controllerName: "Account")' formmethod="post" />
 </div>
 <br />
 <br />
 }
 @section Scripts {
-    @Scripts.Render(paths: "~/bundles/profile")
+    @Scripts.Render(paths: "~/bundles/registration")
     @Scripts.Render(paths: "~/bundles/jqueryval")
 }
 
@@ -769,4 +769,6 @@ new
     var kbqCollapsed = '@Html.Raw(ViewBag.kbqCollapsed)';
     var sqCollapsed = '@Html.Raw(ViewBag.sqCollapsed)';
     var newRegistration = '@Html.Raw(ViewBag.newRegistration)';
+
+    var registrationType = '@Html.Raw(Model.RegistrationType.ToString())';
 </script>

@@ -16,6 +16,7 @@ using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.User;
 using NLog;
+using Linko.LinkoExchange.Services.Program;
 
 namespace Linko.LinkoExchange.Services.Invitation
 {
@@ -30,12 +31,14 @@ namespace Linko.LinkoExchange.Services.Invitation
         private readonly IOrganizationService _organizationService;
         private readonly IHttpContextService _httpContext;
         private readonly ITimeZoneService _timeZones;
+        private readonly IProgramService _programService;
         private readonly ILogger _logger;
 
         public InvitationService(LinkoExchangeContext dbContext, IMapper mapper, 
             ISettingService settingService, IUserService userService, IRequestCache requestCache,
             IEmailService emailService, IOrganizationService organizationService, IHttpContextService httpContext,
-            ITimeZoneService timeZones, ILogger logger) 
+            ITimeZoneService timeZones, ILogger logger,
+            IProgramService programService) 
         {
             _dbContext = dbContext; 
             _mapper = mapper;
@@ -46,15 +49,47 @@ namespace Linko.LinkoExchange.Services.Invitation
             _organizationService = organizationService;
             _httpContext = httpContext;
             _timeZones = timeZones;
+            _programService = programService;
             _logger = logger;
         }
- 
+
         public InvitationDto GetInvitation(string invitationId)
         {
-            var invitation = _dbContext.Invitations.SingleOrDefault(i => i.InvitationId == invitationId);   
-            if(invitation == null) return null;
+            var invitation = _dbContext.Invitations.SingleOrDefault(i => i.InvitationId == invitationId);
+            if (invitation == null) return null;
 
-            return _mapper.Map<InvitationDto>(invitation); 
+            var invitationDto = _mapper.Map<InvitationDto>(invitation);
+            var senderProgram = _programService.GetOrganizationRegulatoryProgram(invitation.SenderOrganizationRegulatoryProgramId);
+            var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitation.RecipientOrganizationRegulatoryProgramId);
+
+            if (senderProgram == null || recipientProgram == null)
+            {
+                throw new Exception("Invalid invitation data");
+            }
+
+            // Industry Invite Industry
+            if (senderProgram.RegulatorOrganization != null)
+            {
+                invitationDto.AuthorityName = senderProgram.RegulatorOrganization.OrganizationName;
+                if (senderProgram.OrganizationDto != null)
+                {
+                    invitationDto.IndustryName = senderProgram.OrganizationDto.OrganizationName;
+                }
+            } 
+
+            if (recipientProgram != null && !recipientProgram.RegulatorOrganizationId.HasValue
+                && recipientProgram.OrganizationDto != null)
+            {
+                // recipient is authority user 
+                invitationDto.AuthorityName = recipientProgram.OrganizationDto.CityName;
+            }
+
+            if (recipientProgram != null && recipientProgram.RegulatoryProgramDto != null)
+            {
+                invitationDto.ProgramName = recipientProgram.RegulatoryProgramDto.Name;
+            }
+
+            return invitationDto;
         }
 
         public IEnumerable<OrganizationDto> GetInvitationrRecipientOrganization(string invitationId)

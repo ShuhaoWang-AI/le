@@ -17,6 +17,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Web.Routing;
 using System.Web.Hosting;
 using System.IO;
+using Linko.LinkoExchange.Web.shared;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -29,7 +30,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IJurisdictionService _jurisdictionService;
         private readonly string fakePassword = "********";
         private readonly IMapper _mapper;
-
+        private readonly ProfileHelper profileHelper;
         public UserController(
             IAuthenticationService authenticateService,
             IQuestionAnswerService questAnswerService,
@@ -48,6 +49,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             _jurisdictionService = jurisdictionService;
             _mapper = mapper;
             _questionAnswerService = questAnswerService;
+
+            profileHelper = new ProfileHelper(questAnswerService, sessionCache, userService, jurisdictionService, mapper);
         }
 
         // GET: UserDto
@@ -93,9 +96,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
             var userProfileId = int.Parse(profileIdStr);
 
-            var userProfileViewModel = GetUserProfileViewModel(userProfileId);
-            var userSQViewModel = GetUserSecurityQuestionViewModel(userProfileId);
-            var userKbqViewModel = GetUserKbqViewModel(userProfileId);
+            var userProfileViewModel = profileHelper.GetUserProfileViewModel(userProfileId);
+            var userSQViewModel = profileHelper.GetUserSecurityQuestionViewModel(userProfileId);
+            var userKbqViewModel = profileHelper.GetUserKbqViewModel(userProfileId);
 
             var user = new UserViewModel
             {
@@ -128,8 +131,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
             var userProfileId = int.Parse(profileIdStr);
 
-            var pristineUser = GetUserViewModel(userProfileId);
-            pristineUser.UserProfile.StateList = GetStateList();
+            var pristineUser = profileHelper.GetUserViewModel(userProfileId);
+            pristineUser.UserProfile.StateList = profileHelper.GetStateList();
 
             if (part == "Profile")
             {
@@ -211,7 +214,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult SaveUserKbq(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)
         {
-            pristineUserModel.UserKBQ.QuestionPool = GetQuestionPool(QuestionTypeName.KBQ);
+            pristineUserModel.UserKBQ.QuestionPool = profileHelper.GetQuestionPool(QuestionTypeName.KBQ);
 
             ValidationContext context = null;
             var validationResult = new List<ValidationResult>();
@@ -259,7 +262,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult SaveUserSQ(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)
         {
-            pristineUserModel.UserSQ.QuestionPool = GetQuestionPool(QuestionTypeName.SQ);
+            pristineUserModel.UserSQ.QuestionPool = profileHelper.GetQuestionPool(QuestionTypeName.SQ);
 
             ValidationContext context = null;
             var validationResult = new List<ValidationResult>();
@@ -369,125 +372,6 @@ namespace Linko.LinkoExchange.Web.Controllers
             return kbqQuestionAnswers;
         }
 
-        private UserViewModel GetUserViewModel(int userProfileId)
-        {
-            var userProfileViewModel = GetUserProfileViewModel(userProfileId);
-            var userSQViewModel = GetUserSecurityQuestionViewModel(userProfileId);
-            var userKbqViewModel = GetUserKbqViewModel(userProfileId);
-
-            return new UserViewModel
-            {
-                UserKBQ = userKbqViewModel,
-                UserProfile = userProfileViewModel,
-                UserSQ = userSQViewModel
-            };  
-        }
-
-        private UserProfileViewModel GetUserProfileViewModel(int userProfileId)
-        {
-
-            var userProileDto = _userService.GetUserProfileById(userProfileId);
-            var userProfileViewModel = _mapper.Map<UserProfileViewModel>(userProileDto);
-
-            //Need to set the HasSignatory for Org Reg Program User
-            string orgRegProgramUserIdString = _sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId);
-            if (!String.IsNullOrEmpty(orgRegProgramUserIdString))
-            {
-                int orgRegProgramUserId = int.Parse(orgRegProgramUserIdString);
-                var orgRegProgamUser = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgramUserId);
-                userProfileViewModel.HasSigntory = orgRegProgamUser.IsSignatory;
-            }
-
-            // set password to be stars 
-            userProfileViewModel.Password = fakePassword;
-
-            // Get state list   
-            userProfileViewModel.StateList = GetStateList();
-            userProfileViewModel.Role = _sessionCache.GetClaimValue(CacheKey.UserRole);  
-
-            return userProfileViewModel;
-        }
-
-        private UserKBQViewModel GetUserKbqViewModel(int userProfileId)
-        {
-
-            var userKbqViewModel = new UserKBQViewModel();
-            userKbqViewModel.UserProfileId = userProfileId;   
-
-            var kbqQuestions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, QuestionTypeName.KBQ);
-          
-            var kbqs = kbqQuestions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
-
-            userKbqViewModel.QuestionPool = GetQuestionPool(QuestionTypeName.KBQ);
-
-            ////  KBQ questions 
-            userKbqViewModel.KBQ1 = kbqs[0].Question.QuestionId.Value;
-            userKbqViewModel.KBQ2 = kbqs[1].Question.QuestionId.Value;
-            userKbqViewModel.KBQ3 = kbqs[2].Question.QuestionId.Value;
-            userKbqViewModel.KBQ4 = kbqs[3].Question.QuestionId.Value;
-            userKbqViewModel.KBQ5 = kbqs[4].Question.QuestionId.Value;
-
-
-            userKbqViewModel.KBQAnswer1 = kbqs[0].Answer.Content;
-            userKbqViewModel.KBQAnswer2 = kbqs[1].Answer.Content;
-            userKbqViewModel.KBQAnswer3 = kbqs[2].Answer.Content;
-            userKbqViewModel.KBQAnswer4 = kbqs[3].Answer.Content;
-            userKbqViewModel.KBQAnswer5 = kbqs[4].Answer.Content;
-
-            //// keep track UserQuestionAnswerId
-            userKbqViewModel.UserQuestionAnserId_KBQ1 = kbqs[0].Answer.UserQuestionAnswerId.Value;
-            userKbqViewModel.UserQuestionAnserId_KBQ2 = kbqs[1].Answer.UserQuestionAnswerId.Value;
-            userKbqViewModel.UserQuestionAnserId_KBQ3 = kbqs[2].Answer.UserQuestionAnswerId.Value;
-            userKbqViewModel.UserQuestionAnserId_KBQ4 = kbqs[3].Answer.UserQuestionAnswerId.Value;
-            userKbqViewModel.UserQuestionAnserId_KBQ5 = kbqs[4].Answer.UserQuestionAnswerId.Value;
-
-            return userKbqViewModel;
-        }
-
-        private UserSQViewModel GetUserSecurityQuestionViewModel(int userProfileId)
-        {
-            var userSQViewModel = new UserSQViewModel();
-            userSQViewModel.UserProfileId = userProfileId;     
-            
-            var securityQeustions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, QuestionTypeName.SQ);
-            var sqs = securityQeustions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
-
-            userSQViewModel.QuestionPool = GetQuestionPool(QuestionTypeName.SQ);
-
-            ////  Security questions 
-            userSQViewModel.SecurityQuestion1 = sqs[0].Question.QuestionId.Value;
-            userSQViewModel.SecurityQuestion2 = sqs[1].Question.QuestionId.Value;
-
-            userSQViewModel.SecurityQuestionAnswer2 = sqs[1].Answer.Content;
-            userSQViewModel.SecurityQuestionAnswer1 = sqs[0].Answer.Content;
-
-            //// Keep track UserQuestionAnswerId 
-            userSQViewModel.UserQuestionAnserId_SQ1 = sqs[0].Answer.UserQuestionAnswerId.Value;
-            userSQViewModel.UserQuestionAnserId_SQ2 = sqs[1].Answer.UserQuestionAnswerId.Value; 
-          
-            return userSQViewModel;
-        }
-
-        private List<QuestionViewModel> GetQuestionPool(QuestionTypeName type)
-        {
-            return _questionAnswerService.GetQuestions().Select(i => _mapper.Map<QuestionViewModel>(i)).ToList()
-                .Where(i => i.QuestionType == type).ToList();
-        }
-
-        private List<JurisdictionViewModel> GetStateList()
-        {
-            var list = _jurisdictionService.GetStateProvs((int)(Country.USA));
-            var stateList = new List<JurisdictionViewModel>();
-            foreach (var jur in list)
-            {
-                stateList.Add(new JurisdictionViewModel
-                {
-                    JurisdictionId = jur.JurisdictionId,
-                    StateName = jur.Name
-                });
-            };
-
-            return stateList;
-        }
+       
     }
 }

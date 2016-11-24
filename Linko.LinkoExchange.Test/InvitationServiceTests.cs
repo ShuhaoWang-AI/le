@@ -20,6 +20,7 @@ using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using NLog;
+using Linko.LinkoExchange.Services.Program;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -30,12 +31,14 @@ namespace Linko.LinkoExchange.Test
         IEmailService _emailService = Mock.Of<IEmailService>();
         IRequestCache _requestCache = Mock.Of<IRequestCache>();
         ISettingService _settingService = Mock.Of<ISettingService>();
+        IProgramService _programService = Mock.Of<IProgramService>();
         Mock<ISessionCache> _sessionCache;
         Mock<IOrganizationService> _orgService;
         Mock<ITimeZoneService> _timeZones;
         Mock<ApplicationUserManager> _userManager;
         Mock<IQuestionAnswerService> _qaService;
         Mock<IHttpContextService> _httpContext;
+        
         Mock<ILogger> _logger;
 
         public InvitationServiceTests()
@@ -68,6 +71,7 @@ namespace Linko.LinkoExchange.Test
             _userManager = new Mock<ApplicationUserManager>();
             _qaService = new Mock<IQuestionAnswerService>();
             _httpContext = new Mock<IHttpContextService>();
+             
             _logger = new Mock<ILogger>();
 
             _httpContext.Setup(x => x.GetRequestBaseUrl()).Returns("http://test.linkoexchange.com/");
@@ -79,8 +83,15 @@ namespace Linko.LinkoExchange.Test
                 new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), Mapper.Instance, new HttpContextService(), _emailService, _settingService, _sessionCache.Object, _orgService.Object, _requestCache, _timeZones.Object, _qaService.Object),
                 _requestCache,//new RequestCache(),
                 _emailService,
-                new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance, _logger.Object), new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance)),
-                _httpContext.Object, _timeZones.Object, _logger.Object);
+                new OrganizationService(new LinkoExchangeContext(connectionString), Mapper.Instance, 
+                new SettingService(
+                    new LinkoExchangeContext(connectionString), 
+                    Mapper.Instance,
+                    _logger.Object), 
+                new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance)),
+                _httpContext.Object, _timeZones.Object, _logger.Object,
+                _programService
+                );
         }
 
         [TestMethod]

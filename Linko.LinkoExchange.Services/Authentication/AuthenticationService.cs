@@ -421,9 +421,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     {
                         // Set IsRestRequired to be false  
                         applicationUser.IsAccountResetRequired = false;
-                    }
-
-
+                    } 
 
                     #endregion
 
@@ -494,9 +492,12 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     var emailContentReplacements = new Dictionary<string, string>();
                     emailContentReplacements.Add("firstName", applicationUser.FirstName);
-                    emailContentReplacements.Add("lastName", applicationUser.LastName);
-                    var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
-                    var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(recipientProgram.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+                    emailContentReplacements.Add("lastName", applicationUser.LastName); 
+
+                    //Here setting should be the authority program setting 
+                    var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(senderProgram.RegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+                    var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(senderProgram.RegulatoryProgramId, SettingType.EmailContactInfoPhone);
+
                     emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
                     emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
 

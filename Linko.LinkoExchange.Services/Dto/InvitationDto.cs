@@ -12,5 +12,10 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTimeOffset ExpiryDateTimeUtc { get; set; }
         public int SenderOrganizationRegulatoryProgramId { get; set; }
         public int RecipientOrganizationRegulatoryProgramId { get; set; }
+
+        public string ProgramName { get; set; }
+        public string AuthorityName { get; set; }
+        public string IndustryName { get; set; }
+        
     }
 }

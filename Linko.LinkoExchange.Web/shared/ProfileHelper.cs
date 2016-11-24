@@ -1,0 +1,153 @@
+﻿using AutoMapper;
+using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Jurisdiction;
+using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Web.ViewModels.Shared;
+using Linko.LinkoExchange.Web.ViewModels.User;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Linko.LinkoExchange.Web.shared
+{
+    public class ProfileHelper
+    {
+        private readonly ISessionCache _sessionCache;
+        private readonly IUserService _userService;
+        private readonly IQuestionAnswerService _questionAnswerService;
+        private readonly IJurisdictionService _jurisdictionService;
+        private readonly IMapper _mapper;
+        private readonly string fakePassword = "********";
+
+        public ProfileHelper(
+            IQuestionAnswerService questAnswerService,
+            ISessionCache sessionCache,
+            IUserService userService,
+            IJurisdictionService jurisdictionService,
+            IMapper mapper
+
+            ) { 
+            _sessionCache = sessionCache;
+            _userService = userService;
+            _jurisdictionService = jurisdictionService;
+            _mapper = mapper;
+            _questionAnswerService = questAnswerService; 
+        }
+
+
+        public UserViewModel GetUserViewModel(int userProfileId)
+        {
+            var userProfileViewModel = GetUserProfileViewModel(userProfileId);
+            var userSQViewModel = GetUserSecurityQuestionViewModel(userProfileId);
+            var userKbqViewModel = GetUserKbqViewModel(userProfileId);
+
+            return new UserViewModel
+            {
+                UserKBQ = userKbqViewModel,
+                UserProfile = userProfileViewModel,
+                UserSQ = userSQViewModel
+            };
+        }
+
+        public UserProfileViewModel GetUserProfileViewModel(int userProfileId)
+        {
+            var userProileDto = _userService.GetUserProfileById(userProfileId);
+            var userProfileViewModel = _mapper.Map<UserProfileViewModel>(userProileDto);
+
+            // set password to be stars 
+            userProfileViewModel.Password = fakePassword;
+
+            // Get state list   
+            userProfileViewModel.StateList = GetStateList();
+            userProfileViewModel.Role = _sessionCache.GetClaimValue(CacheKey.UserRole);
+
+            return userProfileViewModel;
+        }
+
+        public UserKBQViewModel GetUserKbqViewModel(int userProfileId)
+        {
+
+            var userKbqViewModel = new UserKBQViewModel();
+            userKbqViewModel.UserProfileId = userProfileId;
+
+            var kbqQuestions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, QuestionTypeName.KBQ);
+
+            var kbqs = kbqQuestions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
+
+            userKbqViewModel.QuestionPool = GetQuestionPool(QuestionTypeName.KBQ);
+
+            ////  KBQ questions 
+            userKbqViewModel.KBQ1 = kbqs[0].Question.QuestionId.Value;
+            userKbqViewModel.KBQ2 = kbqs[1].Question.QuestionId.Value;
+            userKbqViewModel.KBQ3 = kbqs[2].Question.QuestionId.Value;
+            userKbqViewModel.KBQ4 = kbqs[3].Question.QuestionId.Value;
+            userKbqViewModel.KBQ5 = kbqs[4].Question.QuestionId.Value;
+
+
+            userKbqViewModel.KBQAnswer1 = kbqs[0].Answer.Content;
+            userKbqViewModel.KBQAnswer2 = kbqs[1].Answer.Content;
+            userKbqViewModel.KBQAnswer3 = kbqs[2].Answer.Content;
+            userKbqViewModel.KBQAnswer4 = kbqs[3].Answer.Content;
+            userKbqViewModel.KBQAnswer5 = kbqs[4].Answer.Content;
+
+            //// keep track UserQuestionAnswerId
+            userKbqViewModel.UserQuestionAnserId_KBQ1 = kbqs[0].Answer.UserQuestionAnswerId.Value;
+            userKbqViewModel.UserQuestionAnserId_KBQ2 = kbqs[1].Answer.UserQuestionAnswerId.Value;
+            userKbqViewModel.UserQuestionAnserId_KBQ3 = kbqs[2].Answer.UserQuestionAnswerId.Value;
+            userKbqViewModel.UserQuestionAnserId_KBQ4 = kbqs[3].Answer.UserQuestionAnswerId.Value;
+            userKbqViewModel.UserQuestionAnserId_KBQ5 = kbqs[4].Answer.UserQuestionAnswerId.Value;
+
+            return userKbqViewModel;
+        }
+
+        public UserSQViewModel GetUserSecurityQuestionViewModel(int userProfileId)
+        {
+            var userSQViewModel = new UserSQViewModel();
+            userSQViewModel.UserProfileId = userProfileId;
+
+            var securityQeustions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, QuestionTypeName.SQ);
+            var sqs = securityQeustions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
+
+            userSQViewModel.QuestionPool = GetQuestionPool(QuestionTypeName.SQ);
+
+            ////  Security questions 
+            userSQViewModel.SecurityQuestion1 = sqs[0].Question.QuestionId.Value;
+            userSQViewModel.SecurityQuestion2 = sqs[1].Question.QuestionId.Value;
+
+            userSQViewModel.SecurityQuestionAnswer2 = sqs[1].Answer.Content;
+            userSQViewModel.SecurityQuestionAnswer1 = sqs[0].Answer.Content;
+
+            //// Keep track UserQuestionAnswerId 
+            userSQViewModel.UserQuestionAnserId_SQ1 = sqs[0].Answer.UserQuestionAnswerId.Value;
+            userSQViewModel.UserQuestionAnserId_SQ2 = sqs[1].Answer.UserQuestionAnswerId.Value;
+
+            return userSQViewModel;
+        }
+
+        public List<QuestionViewModel> GetQuestionPool(QuestionTypeName type)
+        {
+            return _questionAnswerService.GetQuestions().Select(i => _mapper.Map<QuestionViewModel>(i)).ToList()
+                .Where(i => i.QuestionType == type).ToList();
+        }
+
+        public List<JurisdictionViewModel> GetStateList()
+        {
+            var list = _jurisdictionService.GetStateProvs((int) (Country.USA));
+            var stateList = new List<JurisdictionViewModel>();
+            foreach (var jur in list)
+            {
+                stateList.Add(new JurisdictionViewModel
+                {
+                    JurisdictionId = jur.JurisdictionId,
+                    StateName = jur.Name
+                });
+            };
+
+            return stateList;
+        }
+    }
+}

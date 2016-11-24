@@ -21,8 +21,10 @@ using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 using NLog;
 using Linko.LinkoExchange.Services.Settings;
-using System; 
+using System;
 using System.ComponentModel.DataAnnotations;
+using Linko.LinkoExchange.Services.Program;
+using Linko.LinkoExchange.Web.shared;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -41,10 +43,13 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IInvitationService _invitationService;
         private readonly IJurisdictionService _jurisdictionService;
         private readonly ISettingService _settingService;
+        private readonly IProgramService _programService;
         private readonly IMapper _mapper;
-
+        private readonly ISessionCache _sessionCache;
+        private readonly ProfileHelper profileHelper; 
 
         public AccountController(
+
             IAuthenticationService authenticationService, 
             IOrganizationService organizationService,
             IQuestionAnswerService questionAnswerService, 
@@ -54,6 +59,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             IInvitationService invitationService,
             IJurisdictionService jurisdictionService, 
             ISettingService settingService,
+            IProgramService programService,
+            ISessionCache sessionCache,
             IMapper mapper)
         {
             _authenticationService = authenticationService;
@@ -65,7 +72,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             _invitationService = invitationService;
             _jurisdictionService = jurisdictionService;
             _settingService = settingService;
+            _programService = programService;
+            _sessionCache = sessionCache;
             _mapper = mapper;
+            profileHelper = new ProfileHelper(questionAnswerService, sessionCache, userService, jurisdictionService, mapper);
         }
 
         #endregion
@@ -79,14 +89,6 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.kbqCollapsed = false;
             ViewBag.sqCollapsed = false;
 
-            var model = new RegistrationViewModel();
-            model.UserProfile = new UserProfileViewModel();
-            model.UserProfile.StateList = GetStateList();
-            model.UserKBQ = new UserKBQViewModel();
-            model.UserSQ = new UserSQViewModel();
-            model.UserKBQ.QuestionPool = GetQuestionPool(QuestionTypeName.KBQ);
-            model.UserSQ.QuestionPool = GetQuestionPool(QuestionTypeName.SQ);
-
             var invitation = _invitationService.GetInvitation(token);
             if (invitation == null)
             {
@@ -94,11 +96,45 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return View("Error");
             }
 
-            // TODO to display the program name
+            var model = new RegistrationViewModel();
+            model.Email = invitation.EmailAddress; 
+            model.UserProfile = new UserProfileViewModel();
+            model.UserProfile.StateList = GetStateList();
+            model.UserKBQ = new UserKBQViewModel();
+            model.UserSQ = new UserSQViewModel();
+            model.UserKBQ.QuestionPool = profileHelper.GetQuestionPool(QuestionTypeName.KBQ);
+            model.UserSQ.QuestionPool = profileHelper.GetQuestionPool(QuestionTypeName.SQ);
+
+            model.ProgramName = invitation.ProgramName;
+            model.IndustryName = invitation.IndustryName;
+            model.AuthorityName = invitation.AuthorityName; 
              
             model.UserProfile.FirstName = invitation.FirstName;
             model.UserProfile.LastName = invitation.LastName;
             model.UserProfile.Email = invitation.EmailAddress;
+ 
+            var user = _userService.GetUserProfileByEmail(invitation.EmailAddress);
+            if (user == null)
+            {
+                model.RegistrationType = RegistrationType.NewRegistration;
+            }
+            else if (user.IsAccountResetRequired)
+            {
+                model.RegistrationType = RegistrationType.ResetRegistration;
+            }
+            else
+            {
+                model.RegistrationType = RegistrationType.ReRegistration; 
+                
+                //TODO fill out the kbq questions and security questions 
+                model.UserProfile = profileHelper.GetUserProfileViewModel(user.UserProfileId);
+                model.UserKBQ = profileHelper.GetUserKbqViewModel(user.UserProfileId);
+                model.UserSQ  = profileHelper.GetUserSecurityQuestionViewModel(user.UserProfileId);
+                
+                // For Registration, we don't update anything to the user's profile, put a fake password here only to by pass the data validation. 
+                model.UserProfile.Password = "FakePassowrd!001";
+                model.AgreeTermsAndConditions = true; 
+            }
 
             model.Token = token;
 
@@ -115,8 +151,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.sqCollapsed = Convert.ToString(form["sqCollapsed"]);
 
             model.UserProfile.StateList = GetStateList();
-            model.UserKBQ.QuestionPool = GetQuestionPool(QuestionTypeName.KBQ);
-            model.UserSQ.QuestionPool = GetQuestionPool(QuestionTypeName.SQ);
+            model.UserKBQ.QuestionPool = profileHelper.GetQuestionPool(QuestionTypeName.KBQ);
+            model.UserSQ.QuestionPool = profileHelper.GetQuestionPool(QuestionTypeName.SQ);
             if (!ModelState.IsValid)
             {
                 ViewBag.inValidProfile = false;
@@ -985,11 +1021,11 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return stateList;
         }
-        private List<QuestionViewModel> GetQuestionPool(QuestionTypeName type)
-        {
-            return _questionAnswerService.GetQuestions().Select(i => _mapper.Map<QuestionViewModel>(i)).ToList()
-                .Where(i => i.QuestionType == type).ToList();
-        }         
+        //private List<QuestionViewModel> GetQuestionPool(QuestionTypeName type)
+        //{
+        //    return _questionAnswerService.GetQuestions().Select(i => _mapper.Map<QuestionViewModel>(i)).ToList()
+        //        .Where(i => i.QuestionType == type).ToList();
+        //}         
         #endregion
     }
 }

@@ -122,6 +122,7 @@
     <Compile Include="AutoMapperConfig.cs" />
     <Compile Include="EmailServiceTests.cs" />
     <Compile Include="InvitationServiceTests.cs" />
+    <Compile Include="IProgromService.cs" />
     <Compile Include="ProgramServiceTests.cs" />
     <Compile Include="TimeZoneServiceTests.cs" />
     <Compile Include="JurisdictionTests.cs" />
