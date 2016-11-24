@@ -824,7 +824,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 HasSignatory = industry.HasSignatory,
                 AssignedTo = industry.AssignedTo,
                 LastSubmission = DateTime.Now, //TODO: get last submission date from service when implement //industry.LastSubmission 
-                HasPermissionForEnableDisable = userRole.ToLower().IsCaseInsensitiveEqual(UserRole.Administrator.ToString())
+                HasPermissionForEnableDisable = true //All Authority user types have permission! //userRole.ToLower().IsCaseInsensitiveEqual(UserRole.Administrator.ToString())
             };
             return viewModel;
         }
