@@ -277,7 +277,7 @@ namespace Linko.LinkoExchange.Services.User
 
                 contentReplacements = new Dictionary<string, string>();
                 contentReplacements.Add("adminFirstName", adminProfile.FirstName);
-                contentReplacements.Add("adminLastName", adminProfile.FirstName);
+                contentReplacements.Add("adminLastName", adminProfile.LastName);
                 contentReplacements.Add("firstName", user.FirstName);
                 contentReplacements.Add("lastName", user.LastName);
                 contentReplacements.Add("userName", user.UserName);
