@@ -1,6 +1,13 @@
 ﻿
 $(document).ready(function () {
 
+    $("#sendInviteBtn").click(function () {
+        //Prevent empty (just white space) strings
+        $("#FirstName").val($("#FirstName").val().trim());
+        $("#LastName").val($("#LastName").val().trim());
+        $("#form-email-field").submit();
+    });
+
     $("#searchEmailBtn").click(function () {
         if (!$('#EmailAddress').valid())
         {
