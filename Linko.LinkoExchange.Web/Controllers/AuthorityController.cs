@@ -272,7 +272,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 viewModel.AvailableTimeZones = timeZones.Select(tz => new SelectListItem
                 {
-                    Text = tz.Name,
+                    Text = TimeZoneInfo.FindSystemTimeZoneById(tz.Name).DisplayName,
                     Value = tz.TimeZoneId.ToString(),
                     Selected = (tz.TimeZoneId.ToString().Equals(viewModel.TimeZone))
                 }).ToList();
@@ -838,7 +838,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             ViewBag.IndustryId = id;
             var industry = _organizationService.GetOrganizationRegulatoryProgram(id);
-            ViewBag.Title = industry.OrganizationDto.OrganizationName;
+            ViewBag.Title = string.Format(format: "{0} Users", arg0: industry.OrganizationDto.OrganizationName);
 
             //Invite button only visible if there isn't currently an active Admin for this IU
             ViewBag.CanInvite = !industry.HasAdmin;

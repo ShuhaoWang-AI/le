@@ -56,7 +56,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 viewModel = new InviteViewModel()
                 {
-                    DisplayMessage = "This user is already associated with this account.",
+                    DisplayMessage = "This user is already associated with this account. No invite can be sent.",
                     IsExistingProgramUser = true,
                     FirstName = foundUsers.ExistingUserSameProgram.UserProfileDto.FirstName,
                     LastName = foundUsers.ExistingUserSameProgram.UserProfileDto.LastName,
@@ -70,7 +70,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 viewModel = new InviteViewModel()
                 {
-                    DisplayMessage = "Found users not yet associated with this Authority Regulatory Program.",
+                    DisplayMessage = "This user is not yet associated with this account. Click the 'Send Invite' button to invite them.",
                     IsExistingProgramUser = false,
                 };
 

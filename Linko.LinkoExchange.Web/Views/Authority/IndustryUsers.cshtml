@@ -10,7 +10,7 @@
 </section>
 <div class="box box-primary">
     <div class="box-header with-border">
-        <h3 class="box-title">Current Users</h3>
+        <h3 class="box-title">Users</h3>
         <div class="box-tools pull-right">
             <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
         </div><!-- /.box-tools -->
@@ -62,6 +62,7 @@
                     .Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                     .Resizable(resizable => resizable.Columns(value: true))
                     .Scrollable(s => s.Height(value: "auto"))
+                    .NoRecords(text: "No users exist.")
                     .Events(events =>
                     {
                         events.Change(handler: "gotoNextPage");
@@ -128,7 +129,7 @@
                     .Filterable(filterable => filterable.Enabled(value: false))
                     .Resizable(resizable => resizable.Columns(value: true))
                     .Scrollable(s => s.Height(value: "auto"))
-                    .NoRecords(text: "No pending invitation left.")
+                    .NoRecords(text: "No pending invitations exist.")
                     .DataSource(dataSource => dataSource
                         .Ajax()
                         .ServerOperation(enabled: false)

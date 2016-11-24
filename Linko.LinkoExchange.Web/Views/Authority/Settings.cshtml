@@ -24,6 +24,21 @@
     <section class="box-body form-horizontal">                
                     
         <div class="form-group">
+            @Html.LabelFor(model => model.AuthorityName, htmlAttributes: new
+            {
+                @class = "control-label col-md-2"
+            })
+            <div class="col-md-4">
+                @Html.EditorFor(model => model.AuthorityName, new
+                {
+                    htmlAttributes = new
+                    {
+                        @class = "form-control",
+                        @disabled = "disabled"
+                    }
+                })
+            </div>
+
             @Html.LabelFor(model => model.ExchangeAuthorityId, htmlAttributes: new
             {
                 @class = "control-label col-md-2"
@@ -39,13 +54,32 @@
                     }
                 })
             </div>
+        </div>
 
-            @Html.LabelFor(model => model.AuthorityName, htmlAttributes: new
+        <div class="form-group">
+            @Html.LabelFor(model => model.AddressLine1, htmlAttributes: new
             {
                 @class = "control-label col-md-2"
             })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.AuthorityName, new
+                @Html.EditorFor(model => model.AddressLine1, new
+                {
+                    htmlAttributes = new
+                    {
+                        @class = "form-control",
+                        @disabled = "disabled"
+                    }
+                })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AddressLine2, htmlAttributes: new
+            {
+                @class = "control-label col-md-2"
+            })
+            <div class="col-md-4">
+                @Html.EditorFor(model => model.AddressLine2, new
                 {
                     htmlAttributes = new
                     {
@@ -57,13 +91,12 @@
         </div>
         
         <div class="form-group">
-            @Html.LabelFor(model => model.Npdes, htmlAttributes: new
+            @Html.LabelFor(model => model.CityName, htmlAttributes: new
             {
                 @class = "control-label col-md-2"
             })
-
             <div class="col-md-4">
-                @Html.EditorFor(model => model.Npdes, new
+                @Html.EditorFor(model => model.CityName, new
                 {
                     htmlAttributes = new
                     {
@@ -72,13 +105,32 @@
                     }
                 })
             </div>
+        </div>
 
-            @Html.LabelFor(model => model.Signer, htmlAttributes: new
+        <div class="form-group">
+            @Html.LabelFor(model => model.State, htmlAttributes: new
             {
                 @class = "control-label col-md-2"
             })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.Signer, new
+                @Html.EditorFor(model => model.State, new
+                {
+                    htmlAttributes = new
+                    {
+                        @class = "form-control",
+                        @disabled = "disabled"
+                    }
+                })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ZipCode, htmlAttributes: new
+            {
+                @class = "control-label col-md-2"
+            })
+            <div class="col-md-4">
+                @Html.EditorFor(model => model.ZipCode, new
                 {
                     htmlAttributes = new
                     {
@@ -153,48 +205,17 @@
                 })
             </div>
         </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.AddressLine1, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
-            <div class="col-md-4">
-                @Html.EditorFor(model => model.AddressLine1, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @disabled = "disabled"
-                    }
-                })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.AddressLine2, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
-            <div class="col-md-4">
-                @Html.EditorFor(model => model.AddressLine2, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @disabled = "disabled"
-                    }
-                })
-            </div>
-        </div>
         
+        <hr />    
+
         <div class="form-group">
-            @Html.LabelFor(model => model.CityName, htmlAttributes: new
+            @Html.LabelFor(model => model.Npdes, htmlAttributes: new
             {
                 @class = "control-label col-md-2"
             })
+
             <div class="col-md-4">
-                @Html.EditorFor(model => model.CityName, new
+                @Html.EditorFor(model => model.Npdes, new
                 {
                     htmlAttributes = new
                     {
@@ -204,29 +225,12 @@
                 })
             </div>
 
-            @Html.LabelFor(model => model.State, htmlAttributes: new
+            @Html.LabelFor(model => model.Signer, htmlAttributes: new
             {
                 @class = "control-label col-md-2"
             })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.State, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @disabled = "disabled"
-                    }
-                })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.ZipCode, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
-            <div class="col-md-4">
-                @Html.EditorFor(model => model.ZipCode, new
+                @Html.EditorFor(model => model.Signer, new
                 {
                     htmlAttributes = new
                     {
@@ -384,7 +388,7 @@
 
 <div id="ProgramSettings" class="box box-primary"> 
     <div class="box-header with-border">
-        <h3 class="box-title">Industry Pretreatment Program Settings</h3>
+        <h3 class="box-title">Industrial Pretreatment Settings</h3>
         <div class="box-tools pull-right">
             <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
         </div><!-- /.box-tools -->
@@ -572,12 +576,6 @@
                         }
                     })
                 </div>
-            </div>
-
-            <hr />
-            <div class="form-group">
-                <h4 class="control-label col-md-7 col-lg-6 hidden-xs hidden-sm">Contact Information on Emails</h4>
-                <h4 class="col-xs-12 hidden-md hidden-lg">Contact Information on Emails</h4>
             </div>
 
             <div class="form-group">

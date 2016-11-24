@@ -266,12 +266,12 @@ namespace Linko.LinkoExchange.Services.Organization
                 && o.IsEnabled == true
                 && o.IsRemoved == false);
             dto.HasAdmin = adminUserCount > 0;
-            dto.OrganizationDto.State = _jurisdictionService.GetJurisdictionById(orgRegProgram.Organization.JurisdictionId).Name;
+            dto.OrganizationDto.State = _jurisdictionService.GetJurisdictionById(orgRegProgram.Organization.JurisdictionId).Code;
 
             return dto;
         }
 
-        public List<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int orgRegProgId, string startsWith = null)
+        public List<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int orgRegProgId, string searchString = null)
         {
             try
             {
@@ -279,9 +279,16 @@ namespace Linko.LinkoExchange.Services.Organization
                 var childOrgRegProgs = _dbContext.OrganizationRegulatoryPrograms.Where(o => o.RegulatorOrganizationId == orgRegProgram.OrganizationId
                     && o.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
 
-                if (childOrgRegProgs != null && !String.IsNullOrEmpty(startsWith))
+                if (childOrgRegProgs != null && !String.IsNullOrEmpty(searchString))
                 {
-                    childOrgRegProgs = childOrgRegProgs.Where(x => x.Organization.Name.StartsWith(startsWith));
+                    childOrgRegProgs = childOrgRegProgs.Where(x =>
+                                                               x.Organization.OrganizationId.ToString().Contains(searchString)
+                                                            || x.Organization.Name.Contains(searchString) 
+                                                            || x.Organization.AddressLine1.Contains(searchString)
+                                                            || x.Organization.AddressLine2.Contains(searchString)
+                                                            || x.Organization.CityName.Contains(searchString)
+                                                            || x.Organization.Jurisdiction.Code.Contains(searchString)
+                                                            || x.Organization.ZipCode.Contains(searchString));
                 }
 
                 if (childOrgRegProgs != null)
@@ -296,7 +303,7 @@ namespace Linko.LinkoExchange.Services.Organization
                         dto.HasAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
                             .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
                             && o.PermissionGroup.Name == "Administrator") > 0;
-                        dto.OrganizationDto.State = _jurisdictionService.GetJurisdictionById(orgRegProg.Organization.JurisdictionId).Name;
+                        dto.OrganizationDto.State = _jurisdictionService.GetJurisdictionById(orgRegProg.Organization.JurisdictionId).Code;
                         dtoList.Add(dto);
 
                     }

@@ -799,7 +799,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (result.Success)
             {
                 TempData["SubTitle"] = "Change Password";
-                TempData["Message"] = "Change password succeeded";
+                TempData["Message"] = "Change password succeeded.";
                 return RedirectToAction(actionName: "ChangeAccountSucceed");
             }
             var errorMessage = result.Errors.Aggregate((i, j) => { return i + j; }); 

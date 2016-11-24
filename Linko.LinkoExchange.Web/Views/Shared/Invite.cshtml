@@ -61,8 +61,7 @@
                 <div class="alert alert-success">
                     <h5>
                         <i class="icon fa fa-check"></i>
-                        The user does not exist.  Enter a first and last name and click the 'Send Invite' button.
-
+                        The user does not exist. Enter a first and last name and click the 'Send Invite' button.
                     </h5>
                 </div>
             </div>
@@ -120,9 +119,7 @@
                         </div>
                 </div>
              </div>
-
-
-
+        
         </section>@*.box-body*@
         <div class="box-footer">
             <div class="form-group pull-right" >
@@ -152,17 +149,15 @@
                     </h5>
                 </div>
             }
-
             
             <div>
-                <div class="alert alert-warning">
-                    <h5 id="foundUserMessage">
-                        <i class="icon fa fa-check"></i>
+                <div class="alert alert-danger">
+                    <h5>
+                        <i class="icon fa fa-close"></i>
+                        <span id="foundUserMessage"></span>
                     </h5>
                 </div>
-            </div>
-
-        
+            </div>        
 
             <div class="form-group">
                 @Html.LabelFor(model => model.FirstName, htmlAttributes: new
@@ -228,12 +223,7 @@
                })
                 </div>
             </div>
-
-
-
-
-
-
+        
         </section>@*.box-body*@
         <div class="box-footer">
             <div class="form-group pull-right">
@@ -268,13 +258,12 @@
                     </h5>
                 </div>
             }
-
-
+        
             <div>
-                <div class="alert alert-warning">
+                <div class="alert alert-info">
                     <h5>
                         <i class="icon fa fa-check"></i>
-                        Found users in other organization regulatory programs.
+                        <span id="foundUserInDifferentProgramsMessage"></span>
                     </h5>
                 </div>
             </div>
@@ -305,11 +294,11 @@
                     .Resizable(resizable => resizable.Columns(false))
                     .Scrollable(s => s.Height(value: "auto"))
                     .DataSource(dataSource => dataSource
-                        .Ajax()
-                        .Model(model => model.Id(p => p.OrgRegProgramUserId))
-                        .ServerOperation(enabled: false)
-                        .Batch(enabled: true)
-                    )
+                            .Ajax()
+                            .Model(model => model.Id(p => p.OrgRegProgramUserId))
+                            .ServerOperation(enabled: false)
+                            .Batch(enabled: true)
+                        )
                     )
                 </div>
             </div>

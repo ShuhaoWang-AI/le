@@ -23,6 +23,21 @@
         @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
                     
         <div class="form-group">
+            @Html.LabelFor(model => model.IndustryName, htmlAttributes: new
+            {
+                @class = "control-label col-md-2"
+            })
+            <div class="col-md-4">
+                @Html.EditorFor(model => model.IndustryName, new
+                {
+                    htmlAttributes = new
+                    {
+                        @class = "form-control",
+                        @disabled = "disabled"
+                    }
+                })
+            </div>
+
             @Html.LabelFor(model => model.IndustryNo, htmlAttributes: new
             {
                 @class = "control-label col-md-2"
@@ -38,24 +53,9 @@
                     }
                 })
             </div>
-
-            @Html.LabelFor(model => model.IndustryName, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
-            <div class="col-md-4">
-                @Html.EditorFor(model => model.IndustryName, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @disabled = "disabled"
-                    }
-                })
-            </div>
         </div>
 
-        <div class="form-group">
+        @*<div class="form-group">
             @Html.LabelFor(model => model.PhoneNumber, htmlAttributes: new
             {
                 @class = "control-label col-md-2"
@@ -103,7 +103,7 @@
                     }
                 })
             </div>
-        </div>
+        </div>*@
 
         <div class="form-group">
             @Html.LabelFor(model => model.AddressLine1, htmlAttributes: new
@@ -154,6 +154,9 @@
                     }
                 })
             </div>
+        </div>
+        
+        <div class="form-group">
 
             @Html.LabelFor(model => model.State, htmlAttributes: new
             {

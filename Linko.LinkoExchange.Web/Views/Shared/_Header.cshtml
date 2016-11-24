@@ -22,9 +22,9 @@
                 <span class="sr-only">Toggle navigation</span>
             </a>
             <span class="navbar-brand program-font">
-                @if(!string.IsNullOrWhiteSpace(ViewBag.PortalName))
+                @if (!string.IsNullOrWhiteSpace(ViewBag.PortalName))
                 {
-                    @ViewBag.PortalName
+                    <span>@string.Format(format: "{0} Portal", arg0: ViewBag.PortalName)</span>
                 }
             </span>
             @if(!string.IsNullOrWhiteSpace(ViewBag.OrganizationName))

@@ -38,7 +38,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
             get { return HasSigntory ? "Yes" : "No"; }
         }
 
-        [Display(Name = "Title Role")]
+        [Display(Name = "Title/Role")]
         public string TitleRole
         {
             get; set;
@@ -72,13 +72,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
             get; set;
         }
 
-        [Display(Name = "Address Line1")]
+        [Display(Name = "Address Line 1")]
         public string AddressLine1
         {
             get; set;
         }
 
-        [Display(Name = "Address Line2")]
+        [Display(Name = "Address Line 2")]
         public string AddressLine2
         {
             get; set;

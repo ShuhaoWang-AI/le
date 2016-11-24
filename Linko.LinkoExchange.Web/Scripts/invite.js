@@ -53,7 +53,7 @@ $(document).ready(function () {
                 $("#searchEmailBtn").hide();
                 $("#boxFoundUser").hide();
                 $("#boxFoundUsers").show();
-
+                $("#foundUserInDifferentProgramsMessage").html(data.DisplayMessage);
             }
 
         });

@@ -235,41 +235,41 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         }
 
         [Editable(false)]
-        [Display(Name = "Number of Authority (Reg Program User) Licenses Available")]
+        [Display(Name = "Number of Authority Licenses Available")]
         public string AuthorityUserLicenseTotalCount
         {
             get; set;
         }
 
         [Editable(false)]
-        [Display(Name = "Number of Authority (Reg Program User) Licenses In Use")]
+        [Display(Name = "Number of Authority Licenses In Use")]
         public string AuthorityUserLicenseUsedCount
         {
             get; set;
         }
 
         [Editable(false)]
-        [Display(Name = "Number of Industry (Reg Program) Licenses Available")]
+        [Display(Name = "Number of Industry Licenses Available")]
         public string IndustryLicenseTotalCount
         {
             get; set;
         }
 
         [Editable(false)]
-        [Display(Name = "Number of Industry (Reg Program) Licenses In Use")]
+        [Display(Name = "Number of Industry Licenses In Use")]
         public string IndustryLicenseUsedCount
         {
             get; set;
         }
 
         [Editable(false)]
-        [Display(Name = "Number of Industry Users (Reg Program) per Industry")]
+        [Display(Name = "Number of Industry Users per Industry")]
         public string UserPerIndustryMaxCount
         {
             get; set;
         }
 
-        [Display(Name = "Name")]
+        [Display(Name = "Contact Information - Name")]
         public string EmailContactInfoName
         {
             get; set;
@@ -281,7 +281,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get; set;
         }
 
-        [Display(Name = "Phone")]
+        [Display(Name = "Contact Information - Phone")]
         public string EmailContactInfoPhone
         {
             get; set;
@@ -293,7 +293,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get; set;
         }
 
-        [Display(Name = "Email")]
+        [Display(Name = "Contact Information - Email")]
         [EmailAddress]
         public string EmailContactInfoEmailAddress
         {

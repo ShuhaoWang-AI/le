@@ -107,19 +107,19 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         }
 
         [Editable(false)]
-        [Display(Name = "Is Enabled")]
+        [Display(Name = "Enabled")]
         public bool IsEnabled
         {
             get; set;
         }
 
         [Editable(false)]
-        [Display(Name = "Is Enabled")]
+        [Display(Name = "Enabled")]
         public string IsEnabledText
         {
             get
             {
-                return IsEnabled ? "Enabled" : "Disabled";
+                return IsEnabled ? "Yes" : "No";
             }
         }
 

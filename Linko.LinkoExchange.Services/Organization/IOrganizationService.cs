@@ -47,7 +47,7 @@ namespace Linko.LinkoExchange.Services.Organization
 
         OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int orgRegProgId);
 
-        List<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int orgRegProgId, string startsWith = null);
+        List<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int orgRegProgId, string searchString = null);
 
         void AddChildOrganization(int parentRegOrdId, OrganizationDto childOrganization);
 
