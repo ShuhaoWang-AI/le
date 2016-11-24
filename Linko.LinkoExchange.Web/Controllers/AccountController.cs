@@ -941,7 +941,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                     if (result.IsSuccess)
                     {
                         _logger.Info(string.Format(format: "KBQ question. Failed to Answer KBQ Question {0} times. Account is locked. UserProfileId:{1}",
-                                     arg0: maxAnswerAttempts, arg1:userProfileId)); 
+                                     arg0: maxAnswerAttempts, arg1:userProfileId));
+
+                        var regulatoryList = _organizationService.GetUserRegulators(userProfileId);
+                        if (regulatoryList == null)
+                        {
+                            regulatoryList = new List<AuthorityDto>();
+                        }
+
+                        TempData["RegulatoryList"] = regulatoryList;
 
                         return RedirectToAction(actionName: "AccountLocked", controllerName: "Account");
                     }
