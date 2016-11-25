@@ -30,9 +30,10 @@ namespace Linko.LinkoExchange.Services.Invitation
         /// Returns all records in the Invitation table 
         /// where recipient program id matches
         /// </summary>
-        /// <param name="orgRegProgramId"></param>
+        /// <param name="senderOrgRegProgramId">The Org Reg Program that sent the invitation</param>
+        /// <param name="targetOrgRegProgramId">The Org Reg Program that the user was invited into (aka "recipient")</param>
         /// <returns></returns>
-        ICollection<InvitationDto> GetInvitationsForOrgRegProgram(int orgRegProgramId);
+        ICollection<InvitationDto> GetInvitationsForOrgRegProgram(int senderOrgRegProgramId, int targetOrgRegProgramId);
 
         void CreateInvitation(InvitationDto dto);
 

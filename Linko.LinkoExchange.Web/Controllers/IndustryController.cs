@@ -185,7 +185,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult IndustryUsers_PendingInvitations_Read([DataSourceRequest] DataSourceRequest request)
         {
             var organizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            var invitations = _invitationService.GetInvitationsForOrgRegProgram(organizationRegulatoryProgramId);
+            var invitations = _invitationService.GetInvitationsForOrgRegProgram(organizationRegulatoryProgramId, organizationRegulatoryProgramId);
 
             var viewModels = invitations.Select(vm => new PendingInvitationViewModel
             {

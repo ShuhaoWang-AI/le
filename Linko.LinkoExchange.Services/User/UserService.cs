@@ -589,7 +589,7 @@ namespace Linko.LinkoExchange.Services.User
         public bool RemoveUser(int orgRegProgUserId)
         {
             //Ensure this is not the calling User's account
-            var thisUsersOrgRegProgUserId = Convert.ToInt32(_httpContext.GetSessionValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            int thisUsersOrgRegProgUserId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             if (thisUsersOrgRegProgUserId == orgRegProgUserId)
                 return false;
 
@@ -870,7 +870,7 @@ namespace Linko.LinkoExchange.Services.User
 
                 //Is the logged in actor user in the set of IU admins?
                 var isCurrentUserIUAdmin = false;
-                int loggedInUsersOrgRegProgUserId = Convert.ToInt32(_httpContext.GetSessionValue(CacheKey.OrganizationRegulatoryProgramUserId));
+                int loggedInUsersOrgRegProgUserId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
                 if (IUAdmins != null && IUAdmins.Any(x => x.OrganizationRegulatoryProgramUserId == loggedInUsersOrgRegProgUserId))
                 {
                     //Logged in user is one of the IU Admins
