@@ -453,7 +453,7 @@ namespace Linko.LinkoExchange.Services.Organization
         public OrganizationRegulatoryProgramDto GetAuthority(int orgRegProgramId)
         {
             OrganizationRegulatoryProgramDto authorityDto;
-            var org = _dbContext.OrganizationRegulatoryPrograms.Include("Organization")
+            var org = _dbContext.OrganizationRegulatoryPrograms.Include("Organization.Jurisdiction")
                 .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
             OrganizationRegulatoryProgram authority;
             if (org.RegulatorOrganization != null)

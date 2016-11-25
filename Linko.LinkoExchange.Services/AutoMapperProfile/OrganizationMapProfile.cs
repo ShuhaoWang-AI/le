@@ -10,7 +10,7 @@ namespace Linko.LinkoExchange.Services.AutoMapperProfile
         {
             CreateMap<Core.Domain.Organization, OrganizationDto>() //Map all properties in the destination where names are the same 
             .ForMember(d => d.OrganizationName, o => o.MapFrom(s => s.Name)) //Need to explicitly map b/c mismatched naming 
-            .ForMember(d => d.State, o => o.Ignore())
+            .ForMember(d => d.State, o => o.MapFrom(s => s.Jurisdiction.Code))
             .ReverseMap();
 
             CreateMap<OrganizationType, OrganizationTypeDto>()

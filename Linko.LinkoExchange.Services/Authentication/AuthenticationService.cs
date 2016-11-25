@@ -363,6 +363,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                         applicationUser.AddressLine2 = userInfo.AddressLine2;
                         applicationUser.CityName = userInfo.CityName;
                         applicationUser.ZipCode = userInfo.ZipCode;
+                        applicationUser.JurisdictionId = userInfo.JurisdictionId;
                         applicationUser.PhoneNumber = userInfo.PhoneNumber;
                         applicationUser.PhoneExt = userInfo.PhoneExt;
                         applicationUser.PhoneNumberConfirmed = true;
