@@ -78,20 +78,32 @@ namespace Linko.LinkoExchange.Services.Program
 
         public OrganizationRegulatoryProgramUserDto CreateOrganizationRegulatoryProgramForUser(int userProfileId, int organizationRegulatoryProgramId, int inviterOrganizationRegulatoryProgramId)
         {
-            var orpu = new OrganizationRegulatoryProgramUser();
-            orpu.IsEnabled = true;
-            orpu.IsRegistrationApproved = false;
-            orpu.IsRegistrationDenied = false;
-            orpu.IsSignatory = false;
-            orpu.UserProfileId = userProfileId;
-            //orpu.LastModificationDateTimeUtc = DateTime.UtcNow;
-            orpu.IsRemoved = false;
-            orpu.CreationDateTimeUtc = DateTimeOffset.UtcNow;
-            orpu.RegistrationDateTimeUtc = DateTimeOffset.UtcNow;
-            orpu.OrganizationRegulatoryProgramId = organizationRegulatoryProgramId;
-            orpu.InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgramId;
+            //var orpu = new OrganizationRegulatoryProgramUser();
+            var orpu = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault
+                (i => i.UserProfileId == userProfileId &&
+                 i.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId);
+            if (orpu == null)
+            {
+                orpu = new OrganizationRegulatoryProgramUser();
+                orpu.IsEnabled = true;
+                orpu.IsRegistrationApproved = false;
+                orpu.IsRegistrationDenied = false;
+                orpu.IsSignatory = false;
+                orpu.UserProfileId = userProfileId;
+                //orpu.LastModificationDateTimeUtc = DateTime.UtcNow;
+                orpu.IsRemoved = false;
+                orpu.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+                orpu.RegistrationDateTimeUtc = DateTimeOffset.UtcNow;
+                orpu.OrganizationRegulatoryProgramId = organizationRegulatoryProgramId;
+                orpu.InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgramId;
 
-            _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Add(orpu);
+                _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Add(orpu);
+            }
+            else
+            {
+                orpu.IsRemoved = false;
+            }
+
             _linkoExchangeDbContext.SaveChanges();
 
             return _mapper.Map<OrganizationRegulatoryProgramUserDto>(orpu);
