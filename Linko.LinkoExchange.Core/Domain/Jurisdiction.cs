@@ -26,6 +26,10 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public string Name { get; set; }
 
+        /// <summary>
+        /// A JurisdictionId that the current Jurisdiction belongs to.
+        /// If the current Jurisdiction has no parent (0) then it is a country.
+        /// </summary>
         public int? ParentId { get; set; }
 
         public DateTimeOffset CreationDateTimeUtc { get; set; }

@@ -4,6 +4,7 @@ namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
     /// Represents a setting within a regulatory program for a particular organization.
+    /// A regulatee will inherit these settings from its regulator.
     /// </summary>
     public partial class OrganizationRegulatoryProgramSetting
     {

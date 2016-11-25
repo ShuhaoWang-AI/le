@@ -21,9 +21,16 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public DateTimeOffset InvitationDateTimeUtc { get; set; }
 
+        /// <summary>
+        /// OrganizationRegulatoryProgram of the sender.
+        /// Typical usage: to determine which portal the invitation should be shown.
+        /// </summary>
         public int SenderOrganizationRegulatoryProgramId { get; set; }
         public virtual OrganizationRegulatoryProgram SenderOrganizationRegulatoryProgram { get; set; }
 
+        /// <summary>
+        /// OrganizationRegulatoryProgram where the recipient is invited into.
+        /// </summary>
         public int RecipientOrganizationRegulatoryProgramId { get; set; }
         public virtual OrganizationRegulatoryProgram RecipientOrganizationRegulatoryProgram { get; set; }
     }

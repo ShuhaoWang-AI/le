@@ -17,6 +17,9 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public string Description { get; set; }
 
+        /// <summary>
+        /// Default value to be copied over during the initial specific Organization or OrganizationRegulatoryProgram setup.
+        /// </summary>
         public string DefaultValue { get; set; }
 
         public int OrganizationTypeId { get; set; }
