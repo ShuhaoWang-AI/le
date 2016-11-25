@@ -1544,7 +1544,11 @@ BEGIN
     PRINT CHAR(13)
     PRINT 'Add records to tTimeZone'
     PRINT '------------------------'
-    
+
+	INSERT INTO dbo.tTimeZone (Name)
+		VALUES ('Hawaiian Standard Time')
+    INSERT INTO dbo.tTimeZone (Name)
+		VALUES ('Alaskan Standard Time')    
 	INSERT INTO dbo.tTimeZone (Name)
 		VALUES ('Pacific Standard Time')
 	INSERT INTO dbo.tTimeZone (Name)
@@ -1553,10 +1557,6 @@ BEGIN
 		VALUES ('Central Standard Time')
 	INSERT INTO dbo.tTimeZone (Name)
 		VALUES ('Eastern Standard Time')
-	INSERT INTO dbo.tTimeZone (Name)
-		VALUES ('Alaskan Standard Time')
-	INSERT INTO dbo.tTimeZone (Name)
-		VALUES ('Hawaiian Standard Time')
 	INSERT INTO dbo.tTimeZone (Name)
 		VALUES ('Atlantic Standard Time')
 	INSERT INTO dbo.tTimeZone (Name)
