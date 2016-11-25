@@ -12,8 +12,8 @@ namespace Linko.LinkoExchange.Web
                 //.Include(virtualPath: "~/Content/select2.css")
                 .Include(virtualPath: "~/Content/bootstrap-switch/bootstrap3/bootstrap-switch.css")
                 .Include(virtualPath: "~/Content/AdminLTE/css/datepicker3.css")
-                .Include(virtualPath: "~/Content/AdminLTE/css/AdminLTE.css")
-                .Include(virtualPath: "~/Content/AdminLTE/css/skins/skin-blue-light.css")
+               // .Include(virtualPath: "~/Content/AdminLTE/css/AdminLTE.css") // Don't include this file in bundling as it fails to load fonts
+                //.Include(virtualPath: "~/Content/AdminLTE/css/skins/skin-blue-light.css")
                 .Include(virtualPath: "~/Content/site.css"));
 
             bundles.Add(new StyleBundle(virtualPath: "~/Bundles/font-awesome")
