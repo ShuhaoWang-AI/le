@@ -771,78 +771,82 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             signInResultDto.RegulatoryList = regulatoryList;
 
-            if (applicationUser.IsAccountResetRequired)
-            {
-                signInResultDto.AutehticationResult = AuthenticationResult.AccountResetRequired;
-                return Task.FromResult(signInResultDto);
-            }
-
-            // UC-29, 2.c
-            // Check if the user is in 'password lock' status
-            if (_userManager.IsLockedOut(applicationUser.Id))
-            {
-                //TODO: log failed login because of Locked to Audit (UC-2) 
-                signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
-                return Task.FromResult(signInResultDto);
-            }
-
-            // UC-29, 3.a
-            // Check if the user has been locked "Account Lockout"  by an authority
-            if (applicationUser.IsAccountLocked)
-            {
-                //TODO: log failed login because of Locked to Audit (UC-2) 
-                signInResultDto.AutehticationResult = AuthenticationResult.UserIsLocked;
-                return Task.FromResult(signInResultDto);
-            }
-
-            // UC-29, 4.a, 5.a, 6.a
-            if (!ValidateUserAccess(applicationUser, signInResultDto))
-            {
-                return Task.FromResult(signInResultDto);
-            }
-
             // clear claims from db if there are   
             ClearClaims(applicationUser.Id);
             applicationUser.Claims.Clear();
+
             var userId = applicationUser.UserProfileId;
             var organizationIds = GetUserOrganizationIds(userId);
 
             var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
 
-            // UC-29 7.a
-            // Check if user's password is expired or not   
-            if (IsUserPasswordExpired(userId, organizationSettings))
-            {
-                // Put user profile Id into session, to request user change their password. 
-                _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId);
-
-                signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
-                return Task.FromResult(signInResultDto);
-            }
-
             SetPasswordPolicy(organizationSettings);
 
             _signInManager.UserManager = _userManager;
-            var signInStatus = _signInManager.PasswordSignIn(userName, password, isPersistent, true);
+            var signInStatus = _signInManager.PasswordSignIn(userName, password, isPersistent, shouldLockout: true);
 
             if (signInStatus == SignInStatus.Success)
             {
-                signInResultDto.AutehticationResult = AuthenticationResult.Success;
-
-                _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId);
-                _sessionCache.SetValue(CacheKey.OwinUserId, applicationUser.Id);
-
                 var claims = GetUserIdentity(applicationUser);
 
-                var identity = new ClaimsIdentity(_httpContext.Current().User.Identity);    
-                identity.AddClaims(claims); 
+                var identity = new ClaimsIdentity(_httpContext.Current().User.Identity);
+                identity.AddClaims(claims);
                 _authenticationManager.AuthenticationResponseGrant = new AuthenticationResponseGrant
                     (identity, new AuthenticationProperties { IsPersistent = true });
 
                 _authenticationManager.SignOut();
-                _authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
-                _signInManager.PasswordSignIn(userName, password, isPersistent, true);
-                
+
+                if (applicationUser.IsAccountResetRequired)
+                {
+                    signInResultDto.AutehticationResult = AuthenticationResult.AccountResetRequired;
+                    return Task.FromResult(signInResultDto);
+                }
+
+                // UC-29, 2.c
+                // Check if the user is in 'password lock' status
+                else if (_userManager.IsLockedOut(applicationUser.Id))
+                {
+                    //TODO: log failed login because of Locked to Audit (UC-2) 
+                    signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
+                    return Task.FromResult(signInResultDto);
+                }
+
+                // UC-29, 3.a
+                // Check if the user has been locked "Account Lockout"  by an authority
+                else if (applicationUser.IsAccountLocked)
+                {
+                    //TODO: log failed login because of Locked to Audit (UC-2) 
+                    signInResultDto.AutehticationResult = AuthenticationResult.UserIsLocked;
+                    return Task.FromResult(signInResultDto);
+                }
+
+                // UC-29, 4.a, 5.a, 6.a
+                else if (!ValidateUserAccess(applicationUser, signInResultDto))
+                {
+                    return Task.FromResult(signInResultDto);
+                }
+
+                // UC-29 7.a
+                // Check if user's password is expired or not   
+                else if (IsUserPasswordExpired(userId, organizationSettings))
+                {
+                    // Put user profile Id into session, to request user change their password. 
+                    _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId);
+
+                    signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
+                    return Task.FromResult(signInResultDto);
+                }
+                else
+                {
+                    signInResultDto.AutehticationResult = AuthenticationResult.Success;
+
+                    _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId);
+                    _sessionCache.SetValue(CacheKey.OwinUserId, applicationUser.Id);
+
+                    _authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
+                    _signInManager.PasswordSignIn(userName, password, isPersistent, shouldLockout: true);
+
+                }
             }
             else if (signInStatus == SignInStatus.Failure)
             {
@@ -850,7 +854,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
             else if (signInStatus == SignInStatus.LockedOut)
             {
-                signInResultDto.AutehticationResult = AuthenticationResult.UserIsLocked;
+                signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
             }
 
             _logger.Info(message: "SignInByUserName. signInStatus={0}", argument: signInStatus.ToString());
@@ -865,8 +869,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             {
                 // UC-29 4.a
                 // System confirms user has status “Registration Pending” (and no access to any other portal where registration is not pending or portal is not disabled)
-                if (orpus.All(i => i.IsRegistrationApproved == false) ||
-                    !orpus.Any(i => i.IsRegistrationApproved && i.OrganizationRegulatoryProgramDto.IsEnabled))
+                if (orpus.All(i => i.IsRegistrationApproved == false && i.OrganizationRegulatoryProgramDto.IsEnabled))
                 {
                     // TODO: Log failed login because of registration pending to Audit (UC-2)
                     signInResultDto.AutehticationResult = AuthenticationResult.RegistrationApprovalPending;
@@ -1086,7 +1089,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             _userManager.UserLockoutEnabledByDefault = true;
             _userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromHours(_settingService.PasswordLockoutHours());
 
-            _userManager.MaxFailedAccessAttemptsBeforeLockout = MaxFailedPasswordAttempts(organizationSettings, null);
+            _userManager.MaxFailedAccessAttemptsBeforeLockout = MaxFailedPasswordAttempts(organizationSettings, orgTypeName: null);
         }
 
 
