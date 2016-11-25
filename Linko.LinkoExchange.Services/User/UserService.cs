@@ -329,19 +329,23 @@ namespace Linko.LinkoExchange.Services.User
             else
             {
                 //Check if new address is in use
-                if (GetUserProfileByEmail(newEmailAddress) == null)
+                if (GetUserProfileByEmail(newEmailAddress) != null)
+                {
                     return new ResetUserResultDto()
                     {
                         IsSuccess = false,
                         FailureReason = ResetUserFailureReason.NewEmailAddressAlreadyInUse
                     };
+                }
+                else
+                {
+                    user.OldEmailAddress = user.Email;
+                    user.Email = newEmailAddress;
+                    sendEmailChangedNotifications.Add(user.OldEmailAddress);
+                    sendEmailChangedNotifications.Add(user.Email);
 
-                user.OldEmailAddress = user.Email;
-                user.Email = newEmailAddress;
-                sendEmailChangedNotifications.Add(user.OldEmailAddress);
-                sendEmailChangedNotifications.Add(user.Email);
-
-                user.EmailConfirmed = false;
+                    user.EmailConfirmed = false;
+                }
             }
 
             //reset flags

@@ -269,7 +269,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get; set;
         }
 
-        [Display(Name = "Contact Information - Name")]
+        [Display(Name = "Name on Emails")]
         public string EmailContactInfoName
         {
             get; set;
@@ -281,7 +281,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get; set;
         }
 
-        [Display(Name = "Contact Information - Phone")]
+        [Display(Name = "Phone on Emails")]
         public string EmailContactInfoPhone
         {
             get; set;
@@ -293,7 +293,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get; set;
         }
 
-        [Display(Name = "Contact Information - Email")]
+        [Display(Name = "Email on Emails")]
         [EmailAddress]
         public string EmailContactInfoEmailAddress
         {
