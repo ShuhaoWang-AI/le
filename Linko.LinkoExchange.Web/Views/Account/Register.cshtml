@@ -64,34 +64,36 @@
                 </div>
 
                 <section class="box-body form-horizontal"> 
-                    <div class="form-group"> 
-                        <label class="control-label col-md-2">Authority Name:</label>
-                        <div class="col-md-4">
-                            <label class="control-label ">@Model.AuthorityName</label>
-                        </div> 
-                    </div> 
+                                        @*<div class="form-group">
+            <label class="control-label col-md-2">Authority Name:</label>
+            <div class="col-md-4">
+                <label class="control-label ">@Model.AuthorityName</label>
+            </div>
+        </div>
 
-                    @{
-                        if (Model.IndustryName != null)
-                        {
-                            <div class="form-group"> 
-                                <label class="control-label col-md-2">Industry Name:</label>
+        @{
+            if (Model.IndustryName != null)
+            {
+                <div class="form-group">
+                    <label class="control-label col-md-2">Industry Name:</label>
 
-                                <div class="col-md-4">
-                                    <label class="control-label ">@Model.IndustryName</label>
-                                </div>
-                          </div> 
-                        }
-                    }
-                    <div class="form-group">
-                        <label class="control-label col-md-2">Program Name:</label>
-
-                        <div class="col-md-4">
-                            <label class="control-label ">@Model.ProgramName</label>
-                        </div>
+                    <div class="col-md-4">
+                        <label class="control-label ">@Model.IndustryName</label>
                     </div>
+              </div>
+            }
+        }
+        <div class="form-group">
+            <label class="control-label col-md-2">Program Name:</label>
 
-                        <hr />
+            <div class="col-md-4">
+                <label class="control-label ">@Model.ProgramName</label>
+            </div>
+        </div>
+
+            <hr />
+                                        *@
+
 
                         <div class="editabledDiv">
 
