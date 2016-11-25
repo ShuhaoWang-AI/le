@@ -81,16 +81,16 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult RequestSignatory()
         {
             return View();
-        } 
+        }
 
-        [Authorize] 
+        [Authorize]
         [AcceptVerbs(HttpVerbs.Get)]
         public new ActionResult Profile()
-        { 
+        {
             ViewBag.profileCollapsed = false;
             ViewBag.kbqCollapsed = true;
             ViewBag.sqCollapsed = true;
-            ViewBag.newRegistration = false; 
+            ViewBag.newRegistration = false;
 
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
@@ -99,6 +99,17 @@ namespace Linko.LinkoExchange.Web.Controllers
             var userProfileViewModel = profileHelper.GetUserProfileViewModel(userProfileId);
             var userSQViewModel = profileHelper.GetUserSecurityQuestionViewModel(userProfileId);
             var userKbqViewModel = profileHelper.GetUserKbqViewModel(userProfileId);
+
+            string portalName = _authenticateService.GetClaimsValue(CacheKey.PortalName);
+            portalName = string.IsNullOrWhiteSpace(portalName) ? "" : portalName.Trim().ToLower();
+            if (portalName.Equals(value: "authority"))
+            {
+                ViewBag.industryPortal = false;
+            }
+            else
+            {
+                ViewBag.industryPortal = true;
+            }   
 
             var user = new UserViewModel
             {
@@ -126,6 +137,17 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.profileCollapsed = Convert.ToString(form["profileCollapsed"]);
             ViewBag.kbqCollapsed = Convert.ToString(form["kbqCollapsed"]);
             ViewBag.sqCollapsed = Convert.ToString(form["sqCollapsed"]);
+
+            string portalName = _authenticateService.GetClaimsValue(CacheKey.PortalName);
+            portalName = string.IsNullOrWhiteSpace(portalName) ? "" : portalName.Trim().ToLower();
+            if (portalName.Equals(value: "authority"))
+            {
+                ViewBag.industryPortal = false;
+            }
+            else
+            {
+                ViewBag.industryPortal = true;
+            }
 
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
