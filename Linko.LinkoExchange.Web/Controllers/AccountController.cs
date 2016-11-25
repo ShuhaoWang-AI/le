@@ -121,6 +121,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             else if (user.IsAccountResetRequired)
             {
                 model.RegistrationType = RegistrationType.ResetRegistration;
+                model.UserProfile = profileHelper.GetUserProfileViewModel(user.UserProfileId);
             }
             else
             {
