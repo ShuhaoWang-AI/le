@@ -81,13 +81,13 @@
                 <div class="editabledDiv">
                     <!-- Line 1   FirstName and  LastName   -->
                     <div class="form-group required">
-                        @Html.LabelFor(model => Model.UserProfile.FirstName, htmlAttributes: new
+                        @Html.LabelFor(model => model.UserProfile.FirstName, htmlAttributes: new
                             {
                                 @class = "control-label col-md-2 required "
                             }
                         )
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.FirstName, new
+                            @Html.EditorFor(model => model.UserProfile.FirstName, new
                                 {
                                     htmlAttributes = new
                                     {
@@ -95,16 +95,17 @@
                                     }
                                 }
                             )
+                            @Html.ValidationMessageFor(model => model.UserProfile.FirstName, "", new { @class = "text-danger" })
                         </div>
+                       
 
-
-                        @Html.LabelFor(model => Model.UserProfile.LastName, htmlAttributes: new
+                        @Html.LabelFor(model => model.UserProfile.LastName, htmlAttributes: new
                            {
                                @class = "control-label col-md-2 required"
                            }
                         )
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.LastName, new
+                            @Html.EditorFor(model => model.UserProfile.LastName, new
                                 {
                                     htmlAttributes = new
                                     {
@@ -112,18 +113,19 @@
                                     }
                                 }
                             )
+                            @Html.ValidationMessageFor(model => model.UserProfile.LastName, "", new { @class = "text-danger" })
                         </div>
                     </div>
 
                     <!-- Line 2   Organization and  TitleROle   -->
                     <div class="form-group ">
-                        @Html.LabelFor(model => Model.UserProfile.BusinessName, htmlAttributes: new
+                        @Html.LabelFor(model => model.UserProfile.BusinessName, htmlAttributes: new
                             {
                                 @class = " control-label col-md-2 required "
                             }
                         )
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.BusinessName, new
+                            @Html.EditorFor(model => model.UserProfile.BusinessName, new
                                 {
                                     htmlAttributes = new
                                     {
@@ -133,13 +135,13 @@
                             )
                         </div>
 
-                        @Html.LabelFor(model => Model.UserProfile.TitleRole, htmlAttributes: new
+                        @Html.LabelFor(model => model.UserProfile.TitleRole, htmlAttributes: new
                             {
                                 @class = "control-label col-md-2"
                             }
                         )
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.TitleRole, new
+                            @Html.EditorFor(model => model.UserProfile.TitleRole, new
                                 {
                                     htmlAttributes = new
                                     {
@@ -152,7 +154,7 @@
 
                     <!-- Line 3   Phone and  Ext   -->
                     <div class="form-group">
-                        @Html.LabelFor(model => Model.UserProfile.PhoneNumber, htmlAttributes: new
+                        @Html.LabelFor(model => model.UserProfile.PhoneNumber, htmlAttributes: new
                                 {
                                     @class = "control-label col-md-2 required"
                                 }
