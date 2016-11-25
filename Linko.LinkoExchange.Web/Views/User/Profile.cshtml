@@ -40,7 +40,7 @@
                 <h3 class="box-title">Profile Details</h3>
                 <div class="box-tools pull-right">
                     <div class="pull-right">
-                        @if (ViewBag.industryPort == true &&  Model.UserProfile.HasSigntory == false)
+                        @if ((ViewBag.PortalName != null) && ViewBag.PortalName.ToLower().Equals(value: "industry") &&  Model.UserProfile.HasSigntory == false)
                         {
                             @Html.ActionLink("Request Signatory", "RequestSignatory", "User", null, new
                                {
