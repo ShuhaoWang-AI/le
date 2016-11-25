@@ -300,7 +300,7 @@ namespace Linko.LinkoExchange.Services.User
 
         }
 
-        public ResetUserResultDto ResetUser(int userProfileId, string newEmailAddress)
+        public ResetUserResultDto ResetUser(int userProfileId, string newEmailAddress, int? targetOrgRegProgramId = null)
         {
             var user = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
             //Check user is not support role
@@ -391,8 +391,25 @@ namespace Linko.LinkoExchange.Services.User
 
             //2) Send "Reg Reset" Email
             var token = Guid.NewGuid().ToString();
+
+            //Create Invitation entry
+            //
+            //Case "Authority Reset Authority" : sender org reg program is same as target/recipient org reg program
+            //Case "Authority Reset Industry" : sender org reg program is different than target/recipient org reg program
+            int senderOrgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var newInvitation = _dbContext.Invitations.Create();
+            newInvitation.InvitationId = token;
+            newInvitation.InvitationDateTimeUtc = DateTimeOffset.Now;
+            newInvitation.EmailAddress = user.Email;
+            newInvitation.FirstName = user.FirstName;
+            newInvitation.LastName = user.LastName;
+            newInvitation.RecipientOrganizationRegulatoryProgramId = targetOrgRegProgramId.HasValue ? targetOrgRegProgramId.Value : senderOrgRegProgramId;
+            newInvitation.SenderOrganizationRegulatoryProgramId = senderOrgRegProgramId;
+            _dbContext.Invitations.Add(newInvitation);
+            _dbContext.SaveChanges();
+
             string baseUrl = _httpContext.GetRequestBaseUrl();
-            string link = baseUrl + "Account/ResetRegistration/?token=" + token;
+            string link = baseUrl + "Account/Register?token=" + token;
             contentReplacements = new Dictionary<string, string>();
             contentReplacements.Add("link", link);
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);

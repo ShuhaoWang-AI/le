@@ -1083,7 +1083,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                var result = _userService.ResetUser(model.PId, newEmail);
+                var result = _userService.ResetUser(model.PId, newEmail, model.IId);
 
                 if (result.IsSuccess)
                 {
