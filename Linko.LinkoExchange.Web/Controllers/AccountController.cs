@@ -220,8 +220,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             switch (result.Result)
             {
                 case RegistrationResult.Success:
-                    _logger.Info(string.Format("Registration successfully completed. Email={0}, FirstName={1}, LastName={2}.", userDto.Email, userDto.FirstName, userDto.LastName));
-                    return View("Confirmation", new ConfirmationViewModel() { Title = "Registration Completed", Message = "Thank you for completing registration." }); 
+                    _logger.Info($"Registration successfully completed. Email={userDto.Email}, FirstName={userDto.FirstName}, LastName={userDto.LastName}.");
+                    return View(viewName: "Confirmation",
+                        model: new ConfirmationViewModel() { Title = "Registration Completed", Message = "Thank you for completing registration." }); 
 
                 case RegistrationResult.BadUserProfileData:
                    
@@ -238,11 +239,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                     break;
                 case RegistrationResult.DuplicatedKBQ:
                     ViewBag.inValidKBQ = true;
-                    ModelState.AddModelError(key: "", errorMessage: "Knowledge based questions can not be dulicated.");
+                    ModelState.AddModelError(key: "", errorMessage: "Knowledge based questions can not be duplicated.");
                     break;
                 case RegistrationResult.DuplicatedKBQAnswer:
                     ViewBag.inValidKBQ = true;
-                    ModelState.AddModelError(key: "", errorMessage: "Knowledge based question answers can not be dulicated.");
+                    ModelState.AddModelError(key: "", errorMessage: "Knowledge based question answers can not be duplicated.");
                     break;
                 case RegistrationResult.MissingKBQ:
                     ViewBag.inValidKBQ = true;
@@ -250,7 +251,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     break;
                 case RegistrationResult.DuplicatedSecurityQuestion:
                     ViewBag.inValidSQ = true;
-                    ModelState.AddModelError(key: "", errorMessage: "Security questions can not be dulicated.");
+                    ModelState.AddModelError(key: "", errorMessage: "Security questions can not be duplicated.");
                     break;
                 case RegistrationResult.MissingSecurityQuestion:
                     ViewBag.inValidSQ = true;
@@ -258,17 +259,17 @@ namespace Linko.LinkoExchange.Web.Controllers
                     break; 
                 case RegistrationResult.DuplicatedSecurityQuestionAnswer:
                     ViewBag.inValidSQ = true;
-                    ModelState.AddModelError(key: "", errorMessage: "Security question answers can not be dulicated.");
+                    ModelState.AddModelError(key: "", errorMessage: "Security question answers can not be duplicated.");
                     break; 
                 case RegistrationResult.BadKBQAndAnswer:
                     ViewBag.inValidKBQ = true;
-                    ModelState.AddModelError(key: "", errorMessage: "Invalid knowledge based quetion and answers.");
+                    ModelState.AddModelError(key: "", errorMessage: "Invalid knowledge based question and answers.");
                     break;
                 default:
                     break; 
             }
 
-             _logger.Info(string.Format("Registration failed. Email={0}, FirstName={1}, LastName={2}, Result={3}", userDto.Email, userDto.FirstName, userDto.LastName, result.Result.ToString()));
+             _logger.Info($"Registration failed. Email={userDto.Email}, FirstName={userDto.FirstName}, LastName={userDto.LastName}, Result={result.Result.ToString()}");
             return View(model);
          } 
 
@@ -292,8 +293,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         #endregion
 
         #region sign in action
-
-
+        
         // GET: Account/SignIn
         [AllowAnonymous]
         public ActionResult SignIn(string returnUrl)

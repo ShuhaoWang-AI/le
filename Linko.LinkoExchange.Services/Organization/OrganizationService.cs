@@ -95,7 +95,7 @@ namespace Linko.LinkoExchange.Services.Organization
                 var orpUsers = _dbContext.OrganizationRegulatoryProgramUsers.ToList()
                     .FindAll(u => u.UserProfileId == userId &&
                                 u.IsRemoved == false &&
-                                u.IsEnabled == true &&
+                               // u.IsEnabled == true &&
                                 u.IsRegistrationApproved &&
                                 u.OrganizationRegulatoryProgram.IsEnabled &&
                                 u.OrganizationRegulatoryProgram.IsRemoved == false);
