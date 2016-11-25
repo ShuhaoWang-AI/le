@@ -225,8 +225,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     return View(viewName: "Confirmation",
                         model: new ConfirmationViewModel() { Title = "Registration Completed", Message = "Thank you for completing registration." }); 
 
-                case RegistrationResult.BadUserProfileData:
-                   
+                case RegistrationResult.BadUserProfileData: 
                     ViewBag.inValidProfile = true;
                     ModelState.AddModelError(key: "", errorMessage: "Invalid user profile data.");
                     break;
@@ -265,6 +264,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                 case RegistrationResult.BadKBQAndAnswer:
                     ViewBag.inValidKBQ = true;
                     ModelState.AddModelError(key: "", errorMessage: "Invalid knowledge based question and answers.");
+                    break;
+                case RegistrationResult.UserNameIsUsed:
+                    ViewBag.inValidProfile = true;
+                    ModelState.AddModelError(key: "", errorMessage: "UserName is being used by another person, please change a different one.");
+                    break;
+                case RegistrationResult.EmailIsUsed:
+                    ViewBag.inValidProfile = true;
+                    ModelState.AddModelError(key: "", errorMessage: "Email is being used by another person, please change a different one.");
                     break;
                 default:
                     break; 
