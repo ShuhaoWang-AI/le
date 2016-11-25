@@ -502,7 +502,11 @@ namespace Linko.LinkoExchange.Services.Authentication
                     emailContentReplacements.Add("authorityOrganizationName", authorityOrg.OrganizationName);
                     emailContentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
 
-                    if (inviteIndustryUser)
+                    if (sendTo == null || sendTo.Count() == 0)
+                    {
+                        sendTo = new[] { emailAddressOnEmail };
+                    }
+                    if (inviteIndustryUser) 
                     {
                         var receipientOrg = _organizationService.GetOrganization(recipientProgram.OrganizationId);
 
