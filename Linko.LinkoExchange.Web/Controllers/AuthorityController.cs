@@ -1362,7 +1362,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.CanChangeRole = viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Authority.ToString());
 
             if (viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Industry.ToString()) 
-                && !viewModel.Role.HasValue && viewModel.Role.Value!=0)
+                && (!viewModel.Role.HasValue || viewModel.Role.Value == 0))
             {
                 viewModel.Role = roles.Where(r => r.Name.IsCaseInsensitiveEqual(UserRole.Administrator.ToString())).First().PermissionGroupId;
                 viewModel.RoleText = UserRole.Administrator.ToString();
