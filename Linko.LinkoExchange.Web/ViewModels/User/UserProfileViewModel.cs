@@ -164,6 +164,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
             RuleFor(x => x.ZipCode).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
             RuleFor(x => x.ZipCode.Length).LessThanOrEqualTo(valueToCompare: 50).WithMessage(errorMessage: "{PropertyName} is not more than 50 characters.");
 
+            RuleFor(x => x.PhoneNumber).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
+
             RuleFor(x => x.Email).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
 
             RuleFor(x => x.UserName).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
