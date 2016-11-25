@@ -31,7 +31,7 @@
                         columns.Bound(c => c.Email)
                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
                         columns.Bound(c => c.DateRegistered).Format(value: "{0:MM/dd/yyyy}")
-                                .Filterable(filterable => filterable.Enabled(value: true).Extra(value: true));
+                                .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
                         columns.Bound(c => c.StatusText)
                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
                         columns.Bound(c => c.AccountLockedText)
@@ -57,7 +57,7 @@
                     {
                         sortable.SortMode(GridSortMode.MultipleColumn);
                     })
-                    .Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                    //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                     .Resizable(resizable => resizable.Columns(value: true))
                     .Scrollable(s => s.Height(value: "auto"))
                     .NoRecords(text: "No users exist.")
@@ -121,7 +121,7 @@
                     {
                         sortable.SortMode(GridSortMode.MultipleColumn);
                     })
-                    .Filterable(filterable => filterable.Enabled(value: false))
+                    //.Filterable(filterable => filterable.Enabled(value: false))
                     .Resizable(resizable => resizable.Columns(value: true))
                     .Scrollable(s => s.Height(value: "auto"))
                     .NoRecords(text: "No pending invitations exist.")

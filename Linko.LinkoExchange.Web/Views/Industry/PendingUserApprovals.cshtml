@@ -61,7 +61,7 @@
                         sortable.SortMode(GridSortMode.MultipleColumn);
                     })
                     .Groupable()
-                    .Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                    //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                     .Resizable(resizable => resizable.Columns(value: true))
                     .Scrollable(s => s.Height(value: "auto"))
                     .Events(events =>

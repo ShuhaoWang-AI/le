@@ -21,7 +21,7 @@ namespace Linko.LinkoExchange.Web
 
             bundles.Add(new StyleBundle(virtualPath: "~/Bundles/icheck")
                 .Include(virtualPath: "~/Content/icheck/minimal/blue.css", 
-                transforms: new System.Web.Optimization.IItemTransform[] { new CssRewriteUrlTransform() }));
+                transforms: new IItemTransform[] { new CssRewriteUrlTransform() }));
 
             bundles.Add(new ScriptBundle(virtualPath: "~/Bundles/js")
                 .Include(virtualPath: "~/Scripts/bootstrap.js")
