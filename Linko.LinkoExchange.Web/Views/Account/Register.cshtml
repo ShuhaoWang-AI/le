@@ -32,187 +32,219 @@
     }
 </style> 
 
-@using (Html.BeginForm())
-{
-    @Html.HiddenFor(model => model.Token)
 
-    @Html.AntiForgeryToken()
-    <input type="hidden" id="profileCollapsed" name="profileCollapsed" value="true" />
-    <input type="hidden" id="kbqCollapsed" name="kbqCollapsed" value="false" />
-    <input type="hidden" id="sqCollapsed" name="sqCollapsed" value="false" />
+    @using (Html.BeginForm())
+    {
+        @Html.HiddenFor(model => model.Token)
 
-    @Html.HiddenFor(m => m.RegistrationType)
+        @Html.AntiForgeryToken()
+        <input type="hidden" id="profileCollapsed" name="profileCollapsed" value="true" />
+        <input type="hidden" id="kbqCollapsed" name="kbqCollapsed" value="false" />
+        <input type="hidden" id="sqCollapsed" name="sqCollapsed" value="false" />
 
-    <div id="user-info-panel" class="profileDiv">
+        @Html.HiddenFor(m => m.RegistrationType)
 
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">User Information</h3>
-                <div class="box-tools pull-right">
-                    <div class="pull-right">
-                        <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                    </div>
-                </div><!-- /.box-tools -->
-            </div>  @*.box-header*@
+        <div id="user-info-panel" class="profileDiv">
 
-            <div>
-                @if (ViewData.ModelState.IsValid == false && inValidProfile)
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">User Information</h3>
+                    <div class="box-tools pull-right">
+                        <div class="pull-right">
+                            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div><!-- /.box-tools -->
+                </div>  @*.box-header*@
+
+                <div>
+                    @if (ViewData.ModelState.IsValid == false && inValidProfile)
                 {
-                    @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new { @class = "alert alert-danger" })
-                } 
-            </div>
+                        @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+                    }
+                </div>
 
-            <section class="box-body form-horizontal">
-                <div class="editabledDiv">
-                    <!-- Line2   FirstName and  LastName   -->
-                    <div class="form-group required">
-                        @Html.LabelFor(model => Model.UserProfile.FirstName, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required "
-                   })
+                <section class="box-body form-horizontal"> 
+                    <div class="form-group"> 
+                        <label class="control-label col-md-2">Authority Name:</label>
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.FirstName, new
-                       {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control editable"
-                           }
-                       })
-                        </div>
+                            <label class="control-label ">@Model.AuthorityName</label>
+                        </div> 
+                    </div> 
 
+                    @{
+                        if (Model.IndustryName != null)
+                        {
+                            <div class="form-group"> 
+                                <label class="control-label col-md-2">Industry Name:</label>
 
-                        @Html.LabelFor(model => Model.UserProfile.LastName, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required"
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.LastName, new
-                       {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control"
-                           }
-                       })
-                        </div>
-                    </div>
-
-                    <!-- Line3   Organization and  TitleROle   -->
-                    <div class="form-group ">
-                        @Html.LabelFor(model => Model.UserProfile.BusinessName, htmlAttributes: new
-                   {
-                       @class = " control-label col-md-2 required "
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.BusinessName, new
-                       {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control "
-                           }
-                       })
-                        </div>
-
-                        @Html.LabelFor(model => Model.UserProfile.TitleRole, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2"
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.TitleRole, new
-                       {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control"
-                           }
-                       })
-                        </div>
-                    </div>
-
-                    <!-- Line4   Phone and  Ext   -->
+                                <div class="col-md-4">
+                                    <label class="control-label ">@Model.IndustryName</label>
+                                </div>
+                          </div> 
+                        }
+                    }
                     <div class="form-group">
-                        @Html.LabelFor(model => Model.UserProfile.PhoneNumber, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required"
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.PhoneNumber, new
-                       {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control"
-                           }
-                       })
-                        </div>
+                        <label class="control-label col-md-2">Program Name:</label>
 
-                        @Html.LabelFor(model => Model.UserProfile.PhoneExt, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2"
-                   })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.PhoneExt, new
-                       {
-                           htmlAttributes = new
-                           {
-                               @class = "form-control",
-                               @type = "text"
-                           }
-                       })
+                            <label class="control-label ">@Model.ProgramName</label>
                         </div>
                     </div>
 
-                    <!-- Line6  AddressLine1 and AddressLine2  -->
-                    <div class="form-group">
-                        @Html.LabelFor(model => Model.UserProfile.AddressLine1, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required"
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.AddressLine1, new
-                       {
-                           htmlAttributes = new
+                        <hr />
+
+                        <div class="editabledDiv">
+
+
+                            <!-- Line2   FirstName and  LastName   -->
+                            <div class="form-group required">
+                                @Html.LabelFor(model => Model.UserProfile.FirstName, htmlAttributes: new
                            {
-                               @class = "form-control"
-                           }
-                       })
-                        </div>
+                               @class = "control-label col-md-2 required "
+                           })
+                                <div class="col-md-4">
+                                    @Html.EditorFor(model => Model.UserProfile.FirstName, new
+                               {
+                                   htmlAttributes = new
+                                   {
+                                       @class = "form-control editable"
+                                   }
+                               })
+                                </div>
 
-                        @Html.LabelFor(model => Model.UserProfile.AddressLine2, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2"
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.AddressLine2, new
-                       {
-                           htmlAttributes = new
+
+                                @Html.LabelFor(model => Model.UserProfile.LastName, htmlAttributes: new
                            {
-                               @class = "form-control"
-                           }
-                       })
-                        </div>
+                               @class = "control-label col-md-2 required"
+                           })
+                                <div class="col-md-4">
+                                    @Html.EditorFor(model => Model.UserProfile.LastName, new
+                               {
+                                   htmlAttributes = new
+                                   {
+                                       @class = "form-control"
+                                   }
+                               })
+                                </div>
+                            </div>
 
-                    </div>
-
-                    <!-- Line7 City and State   -->
-                    <div class="form-group">
-                        @Html.LabelFor(model => Model.UserProfile.CityName, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required"
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.CityName, new
-                       {
-                           htmlAttributes = new
+                            <!-- Line3   Organization and  TitleROle   -->
+                            <div class="form-group ">
+                                @Html.LabelFor(model => Model.UserProfile.BusinessName, htmlAttributes: new
                            {
-                               @class = "form-control"
-                           }
-                       })
-                        </div>
+                               @class = " control-label col-md-2 required "
+                           })
+                                <div class="col-md-4">
+                                    @Html.EditorFor(model => Model.UserProfile.BusinessName, new
+                               {
+                                   htmlAttributes = new
+                                   {
+                                       @class = "form-control "
+                                   }
+                               })
+                                </div>
 
-                        @Html.LabelFor(model => Model.UserProfile.JurisdictionId, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required"
-                   })
-                        <div class="col-md-4">
-                            @Html.DropDownListFor(model => Model.UserProfile.JurisdictionId,
+                                @Html.LabelFor(model => Model.UserProfile.TitleRole, htmlAttributes: new
+                           {
+                               @class = "control-label col-md-2"
+                           })
+                                <div class="col-md-4">
+                                    @Html.EditorFor(model => Model.UserProfile.TitleRole, new
+                               {
+                                   htmlAttributes = new
+                                   {
+                                       @class = "form-control"
+                                   }
+                               })
+                                </div>
+                            </div>
+
+                            <!-- Line4   Phone and  Ext   -->
+                            <div class="form-group">
+                                @Html.LabelFor(model => Model.UserProfile.PhoneNumber, htmlAttributes: new
+                           {
+                               @class = "control-label col-md-2 required"
+                           })
+                                <div class="col-md-4">
+                                    @Html.EditorFor(model => Model.UserProfile.PhoneNumber, new
+                               {
+                                   htmlAttributes = new
+                                   {
+                                       @class = "form-control"
+                                   }
+                               })
+                                </div>
+
+                                @Html.LabelFor(model => Model.UserProfile.PhoneExt, htmlAttributes: new
+                           {
+                               @class = "control-label col-md-2"
+                           })
+                                <div class="col-md-4">
+                                    @Html.EditorFor(model => Model.UserProfile.PhoneExt, new
+                               {
+                                   htmlAttributes = new
+                                   {
+                                       @class = "form-control",
+                                       @type = "text"
+                                   }
+                               })
+                                </div>
+                            </div>
+
+                            <!-- Line6  AddressLine1 and AddressLine2  -->
+                            <div class="form-group">
+                                @Html.LabelFor(model => Model.UserProfile.AddressLine1, htmlAttributes: new
+                           {
+                               @class = "control-label col-md-2 required"
+                           })
+                                <div class="col-md-4">
+                                    @Html.EditorFor(model => Model.UserProfile.AddressLine1, new
+                               {
+                                   htmlAttributes = new
+                                   {
+                                       @class = "form-control"
+                                   }
+                               })
+                                </div>
+
+                                @Html.LabelFor(model => Model.UserProfile.AddressLine2, htmlAttributes: new
+                           {
+                               @class = "control-label col-md-2"
+                           })
+                                <div class="col-md-4">
+                                    @Html.EditorFor(model => Model.UserProfile.AddressLine2, new
+                               {
+                                   htmlAttributes = new
+                                   {
+                                       @class = "form-control"
+                                   }
+                               })
+                                </div>
+
+                            </div>
+
+                            <!-- Line7 City and State   -->
+                            <div class="form-group">
+                                @Html.LabelFor(model => Model.UserProfile.CityName, htmlAttributes: new
+                           {
+                               @class = "control-label col-md-2 required"
+                           })
+                                <div class="col-md-4">
+                                    @Html.EditorFor(model => Model.UserProfile.CityName, new
+                               {
+                                   htmlAttributes = new
+                                   {
+                                       @class = "form-control"
+                                   }
+                               })
+                                </div>
+
+                                @Html.LabelFor(model => Model.UserProfile.JurisdictionId, htmlAttributes: new
+                           {
+                               @class = "control-label col-md-2 required"
+                           })
+                                <div class="col-md-4">
+                                    @Html.DropDownListFor(model => Model.UserProfile.JurisdictionId,
 Model.UserProfile.StateList.Select(i => new SelectListItem
 {
     Text = i.StateName,
@@ -224,130 +256,130 @@ new
 {
     @class = "form-control"
 })
-                            @Html.HiddenFor(model => Model.UserProfile.JurisdictionId)
+                                    @Html.HiddenFor(model => Model.UserProfile.JurisdictionId)
 
+
+                                </div>
+                            </div>
+
+                            <!-- Line8 Zip Code   -->
+                            <div class="form-group">
+                                @Html.LabelFor(model => Model.UserProfile.ZipCode, htmlAttributes: new
+                           {
+                               @class = "control-label col-md-2 required"
+                           })
+                                <div class="col-md-4">
+                                    @Html.EditorFor(model => Model.UserProfile.ZipCode, new
+                               {
+                                   htmlAttributes = new
+                                   {
+                                       @class = "form-control"
+                                   }
+                               })
+                                </div>
+
+                            </div>
 
                         </div>
-                    </div>
+                        <hr />
 
-                    <!-- Line8 Zip Code   -->
-                    <div class="form-group">
-                        @Html.LabelFor(model => Model.UserProfile.ZipCode, htmlAttributes: new
-                   {
-                       @class = "control-label col-md-2 required"
-                   })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.ZipCode, new
+                        <!-- Line 9 Email -->
+                        <div class="form-group">
+                            @Html.LabelFor(model => Model.UserProfile.Email, htmlAttributes: new
                        {
-                           htmlAttributes = new
+                           @class = "control-label col-md-2 required"
+                       })
+                            <div class="col-md-4">
+                                @Html.EditorFor(model => Model.UserProfile.Email, new
+                           {
+                               htmlAttributes = new
+                               {
+                                   @class = "form-control",
+                                   @readonly = "readonly"
+                               }
+                           })
+                            </div>
+
+                        </div>
+
+                        <!-- Line 10 UserName -->
+                        <div class="form-group">
+                            @Html.LabelFor(model => Model.UserProfile.UserName, htmlAttributes: new
+                       {
+                           @class = "control-label col-md-2 required"
+                       })
+                            <div class="col-md-4">
+                                @Html.EditorFor(model => Model.UserProfile.UserName, new
+                           {
+                               htmlAttributes = new
+                               {
+                                   @class = "form-control"
+                               }
+                           })
+                            </div>
+                        </div>
+
+                        <!-- Line 11 UserName -->
+                        <div class="form-group">
+                            @Html.LabelFor(model => Model.UserProfile.Password, htmlAttributes: new
+                       {
+                           @class = "control-label col-md-2 required"
+                       })
+                            <div class="col-md-4">
+                                @Html.PasswordFor(model => Model.UserProfile.Password, new
                            {
                                @class = "form-control"
-                           }
-                       })
+                           })
+                            </div>
                         </div>
 
-                    </div>
-
-                </div>
-                <hr />
-
-                <!-- Line 9 Email -->
-                <div class="form-group">
-                    @Html.LabelFor(model => Model.UserProfile.Email, htmlAttributes: new
-               {
-                   @class = "control-label col-md-2 required"
-               })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => Model.UserProfile.Email, new
-                   {
-                       htmlAttributes = new
-                       {
-                           @class = "form-control",
-                           @readonly="readonly"
-                       }
-                   })
-                    </div>
-                    
-                </div>
-
-                <!-- Line 10 UserName -->
-                <div class="form-group">
-                    @Html.LabelFor(model => Model.UserProfile.UserName, htmlAttributes: new
-               {
-                   @class = "control-label col-md-2 required"
-               })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => Model.UserProfile.UserName, new
-                   {
-                       htmlAttributes = new
-                       {
-                           @class = "form-control"
-                       }
-                   })
-                    </div>
-                </div>
-
-                <!-- Line 11 UserName -->
-                <div class="form-group">
-                    @Html.LabelFor(model => Model.UserProfile.Password, htmlAttributes: new
-               {
-                   @class = "control-label col-md-2 required"
-               })
-                    <div class="col-md-4">
-                        @Html.PasswordFor(model => Model.UserProfile.Password, new
-                   {
-                       @class = "form-control"
-                   })
-                    </div>
-                </div>
-
-            </section>@*.box-body*@
-            @*<div class="box-footer">
-                <div class="form-group">
-                    <div id="profileNextBtn" class="btn btn-sm btn-primary pull-right edit-button">Next</div>
-                </div>
-            </div>*@
-            <!-- box-footer -->
-        </div><!-- /.box -->
-    </div>
+</section>@*.box-body*@
+                @*<div class="box-footer">
+                        <div class="form-group">
+                            <div id="profileNextBtn" class="btn btn-sm btn-primary pull-right edit-button">Next</div>
+                        </div>
+                    </div>*@
+                <!-- box-footer -->
+            </div><!-- /.box -->
+        </div>
 
 
-    <div id="kbq-panel" class="profileDiv">
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title"> Knowledge Based Questions </h3>
-                <div class="box-tools pull-right">
-                    <div class="pull-right">
-                        <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                    </div>
-                </div><!-- /.box-tools -->
-            </div>  @*.box-header*@
+        <div id="kbq-panel" class="profileDiv">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title"> Knowledge Based Questions </h3>
+                    <div class="box-tools pull-right">
+                        <div class="pull-right">
+                            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div><!-- /.box-tools -->
+                </div>  @*.box-header*@
 
-            <div>
-                @if (ViewData.ModelState.IsValid == false && inValidKBQ)
+                <div>
+                    @if (ViewData.ModelState.IsValid == false && inValidKBQ)
                 {
-                    @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+                @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new { @class = "alert alert-danger" })
                 }
 
-            </div>
+                </div>
 
-            <section class="box-body form-horizontal">
-                <h3>Select Answers to 5 Knowledge Based Questions</h3>
-                Knowledge Based Questions are used along with your password to further prove your identity during report submission.
-                During report submission you will be required to enter an answer that matches what you enter below.
-                <br />
-                <br />
-                <br />
-                <div class="editabledDiv">
+                <section class="box-body form-horizontal">
+                    <h3>Select Answers to 5 Knowledge Based Questions</h3>
+                    Knowledge Based Questions are used along with your password to further prove your identity during report submission.
+                    During report submission you will be required to enter an answer that matches what you enter below.
+                    <br />
+                    <br />
+                    <br />
+                    <div class="editabledDiv">
 
-                    <!-- question 1 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(model => Model.UserKBQ.KBQ1)
-                        </div>
-                        <div class="col-md-8">
+                        <!-- question 1 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(model => Model.UserKBQ.KBQ1)
+                            </div>
+                            <div class="col-md-8">
 
-                            @Html.DropDownListFor(
+                                @Html.DropDownListFor(
 model => Model.UserKBQ.KBQ1,
 kbqQuestionPool.Select(i => new SelectListItem
 {
@@ -361,20 +393,20 @@ new
     @class = "form-control"
 }
 )
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- anwser 1 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer1, htmlAttributes: new
+                        <!-- anwser 1 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(i => Model.UserKBQ.KBQAnswer1, htmlAttributes: new
                        {
                            @class = "control-label required"
                        })
-                        </div>
+                            </div>
 
-                        <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ1, new
+                            <div class="col-md-8">
+                                @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ1, new
                        {
                            htmlAttributes = new
                            {
@@ -382,7 +414,7 @@ new
                            }
                        })
 
-                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer1, new
+                                @Html.EditorFor(model => Model.UserKBQ.KBQAnswer1, new
                        {
                            htmlAttributes = new
                            {
@@ -390,16 +422,16 @@ new
                                @style = "margin-top:5px"
                            }
                        })
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- question 2 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(model => Model.UserKBQ.KBQ2)
-                        </div>
-                        <div class="col-md-8">
-                            @Html.DropDownListFor(
+                        <!-- question 2 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(model => Model.UserKBQ.KBQ2)
+                            </div>
+                            <div class="col-md-8">
+                                @Html.DropDownListFor(
 model => Model.UserKBQ.KBQ2,
 kbqQuestionPool.Select(i => new SelectListItem
 {
@@ -412,29 +444,29 @@ new
 {
     @class = "form-control"
 })
-                            @Html.HiddenFor(model => Model.UserKBQ.KBQ2)
+                                @Html.HiddenFor(model => Model.UserKBQ.KBQ2)
 
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- anwser 2 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer2, htmlAttributes: new
+                        <!-- anwser 2 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(i => Model.UserKBQ.KBQAnswer2, htmlAttributes: new
                        {
                            @class = "control-label required"
                        })
-                        </div>
+                            </div>
 
-                        <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ2, new
+                            <div class="col-md-8">
+                                @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ2, new
                        {
                            htmlAttributes = new
                            {
                                @class = "form-control readonly"
                            }
                        })
-                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer2, new
+                                @Html.EditorFor(model => Model.UserKBQ.KBQAnswer2, new
                        {
                            htmlAttributes = new
                            {
@@ -442,16 +474,16 @@ new
                                @style = "margin-top:5px"
                            }
                        })
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- question 3 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(model => Model.UserKBQ.KBQ3)
-                        </div>
-                        <div class="col-md-8">
-                            @Html.DropDownListFor(
+                        <!-- question 3 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(model => Model.UserKBQ.KBQ3)
+                            </div>
+                            <div class="col-md-8">
+                                @Html.DropDownListFor(
 model => Model.UserKBQ.KBQ3,
 kbqQuestionPool.Select(i => new SelectListItem
 {
@@ -464,28 +496,28 @@ new
 {
     @class = "form-control"
 })
-                            @Html.HiddenFor(model => Model.UserKBQ.KBQ3)
+                                @Html.HiddenFor(model => Model.UserKBQ.KBQ3)
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- anwser 3 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer3, htmlAttributes: new
+                        <!-- anwser 3 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(i => Model.UserKBQ.KBQAnswer3, htmlAttributes: new
                        {
                            @class = "control-label required"
                        })
-                        </div>
+                            </div>
 
-                        <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ3, new
+                            <div class="col-md-8">
+                                @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ3, new
                        {
                            htmlAttributes = new
                            {
                                @class = "form-control readonly"
                            }
                        })
-                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer3, new
+                                @Html.EditorFor(model => Model.UserKBQ.KBQAnswer3, new
                        {
                            htmlAttributes = new
                            {
@@ -493,17 +525,17 @@ new
                                @style = "margin-top:5px"
                            }
                        })
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- question 4 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(model => Model.UserKBQ.KBQ4)
-                        </div>
-                        <div class="col-md-8">
+                        <!-- question 4 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(model => Model.UserKBQ.KBQ4)
+                            </div>
+                            <div class="col-md-8">
 
-                            @Html.DropDownListFor(
+                                @Html.DropDownListFor(
 model => Model.UserKBQ.KBQ4,
 kbqQuestionPool.Select(i => new SelectListItem
 {
@@ -516,29 +548,29 @@ new
 {
     @class = "form-control"
 })
-                            @Html.HiddenFor(model => Model.UserKBQ.KBQ4)
+                                @Html.HiddenFor(model => Model.UserKBQ.KBQ4)
 
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- anwser 4 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer4, htmlAttributes: new
+                        <!-- anwser 4 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(i => Model.UserKBQ.KBQAnswer4, htmlAttributes: new
                        {
                            @class = "control-label required"
                        })
-                        </div>
+                            </div>
 
-                        <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ4, new
+                            <div class="col-md-8">
+                                @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ4, new
                        {
                            htmlAttributes = new
                            {
                                @class = "form-control readonly"
                            }
                        })
-                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer4, new
+                                @Html.EditorFor(model => Model.UserKBQ.KBQAnswer4, new
                        {
                            htmlAttributes = new
                            {
@@ -546,17 +578,17 @@ new
                                @style = "margin-top:5px"
                            }
                        })
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- question 5 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(model => Model.UserKBQ.KBQ5)
-                        </div>
-                        <div class="col-md-8">
+                        <!-- question 5 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(model => Model.UserKBQ.KBQ5)
+                            </div>
+                            <div class="col-md-8">
 
-                            @Html.DropDownListFor(
+                                @Html.DropDownListFor(
 model => Model.UserKBQ.KBQ5,
 kbqQuestionPool.Select(i => new SelectListItem
 {
@@ -569,29 +601,29 @@ new
 {
     @class = "form-control"
 })
-                            @Html.HiddenFor(model => Model.UserKBQ.KBQ5)
+                                @Html.HiddenFor(model => Model.UserKBQ.KBQ5)
 
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- anwser 5 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer5, htmlAttributes: new
+                        <!-- anwser 5 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(i => Model.UserKBQ.KBQAnswer5, htmlAttributes: new
                        {
                            @class = "control-label required"
                        })
-                        </div>
+                            </div>
 
-                        <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ5, new
+                            <div class="col-md-8">
+                                @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ5, new
                        {
                            htmlAttributes = new
                            {
                                @class = "form-control readonly"
                            }
                        })
-                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer5, new
+                                @Html.EditorFor(model => Model.UserKBQ.KBQAnswer5, new
                        {
                            htmlAttributes = new
                            {
@@ -599,56 +631,56 @@ new
                                @style = "margin-top:5px"
                            }
                        })
+                            </div>
                         </div>
+
                     </div>
 
-                </div>
-
-            </section>@*.box-body*@
-            @*<div class="box-footer">
-                <div class="form-group">
-                    <div id="kbqNextBtn" class="btn btn-sm btn-primary pull-right edit-button">Next</div>
-                </div>
-            </div>*@
-        </div><!-- /.box -->
-    </div>
-    
-<div id="sq-panel" class="profileDiv">
-    <div class="box box-primary">
-        <div class="box-header with-border">
-            <h3 class="box-title"> Security Questions </h3>
-            <div class="box-tools pull-right">
-                <div class="pull-right">
-                    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                </div>
-            </div><!-- /.box-tools -->
-        </div>  @*.box-header*@
-
-        <div>
-            @if (ViewData.ModelState.IsValid == false && inValidSQ)
-            {
-                @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new { @class = "alert alert-danger" })
-            }
-
+                </section>@*.box-body*@
+                @*<div class="box-footer">
+                        <div class="form-group">
+                            <div id="kbqNextBtn" class="btn btn-sm btn-primary pull-right edit-button">Next</div>
+                        </div>
+                    </div>*@
+            </div><!-- /.box -->
         </div>
 
-        <section class="box-body form-horizontal">
-            <h3>Select Answers to 2 Security Questions</h3>
-            Security Questions are used to unlock your account if it is locked because of suspicion of compromise.
-            You may be asked the answer to these questions by your authority.
-            <br />
-            <br />
-            <br />
-            <div class="editabledDiv">
+        <div id="sq-panel" class="profileDiv">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title"> Security Questions </h3>
+                    <div class="box-tools pull-right">
+                        <div class="pull-right">
+                            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div><!-- /.box-tools -->
+                </div>  @*.box-header*@
 
-                <!-- question 1 -->
-                <div class="form-group">
-                    <div class="col-lg-2 control-label">
-                        @Html.LabelFor(model => Model.UserSQ.SecurityQuestion1)
-                    </div>
-                    <div class="col-md-8">
+                <div>
+                    @if (ViewData.ModelState.IsValid == false && inValidSQ)
+                    {
+                        @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+                    }
 
-                        @Html.DropDownListFor(
+                </div>
+
+                <section class="box-body form-horizontal">
+                    <h3>Select Answers to 2 Security Questions</h3>
+                    Security Questions are used to unlock your account if it is locked because of suspicion of compromise.
+                    You may be asked the answer to these questions by your authority.
+                    <br />
+                    <br />
+                    <br />
+                    <div class="editabledDiv">
+
+                        <!-- question 1 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(model => Model.UserSQ.SecurityQuestion1)
+                            </div>
+                            <div class="col-md-8">
+
+                                @Html.DropDownListFor(
  model => Model.UserSQ.SecurityQuestion1,
  sqQuestionPool.Select(i => new SelectListItem
  {
@@ -661,22 +693,22 @@ new
  {
      @class = "form-control"
  })
-                        @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer1)*@
-                    </div>
-                </div>
+                                @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer1)*@
+                            </div>
+                        </div>
 
-                <!-- anwser 1 -->
-                <div class="form-group">
-                    <div class="col-lg-2 control-label">
-                        @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer1, htmlAttributes: new
+                        <!-- anwser 1 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer1, htmlAttributes: new
                    {
                        @class = "control-label required"
                    })
-                    </div>
+                            </div>
 
-                    <div class="col-md-8">
-                        @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ1)
-                        @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer1, new
+                            <div class="col-md-8">
+                                @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ1)
+                                @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer1, new
                    {
                        htmlAttributes = new
                        {
@@ -684,18 +716,18 @@ new
                            @style = "margin-top:5px"
                        }
                    })
-                    </div>
-                </div>
+                            </div>
+                        </div>
 
 
-                <!-- question 2 -->
-                <div class="form-group">
-                    <div class="col-lg-2 control-label">
-                        @Html.LabelFor(model => Model.UserSQ.SecurityQuestion2)
-                    </div>
-                    <div class="col-md-8">
+                        <!-- question 2 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(model => Model.UserSQ.SecurityQuestion2)
+                            </div>
+                            <div class="col-md-8">
 
-                        @Html.DropDownListFor(
+                                @Html.DropDownListFor(
  model => Model.UserSQ.SecurityQuestion2,
  sqQuestionPool.Select(i => new SelectListItem
  {
@@ -708,23 +740,23 @@ new
  {
      @class = "form-control"
  })
-                        @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer2)*@
+                                @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer2)*@
 
-                    </div>
-                </div>
+                            </div>
+                        </div>
 
-                <!-- anwser 2 -->
-                <div class="form-group">
-                    <div class="col-lg-2 control-label">
-                        @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer2, htmlAttributes: new
+                        <!-- anwser 2 -->
+                        <div class="form-group">
+                            <div class="col-lg-2 control-label">
+                                @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer2, htmlAttributes: new
                    {
                        @class = "control-label required"
                    })
-                    </div>
+                            </div>
 
-                    <div class="col-md-8">
-                        @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ2)
-                        @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer2, new
+                            <div class="col-md-8">
+                                @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ2)
+                                @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer2, new
                    {
                        htmlAttributes = new
                        {
@@ -732,46 +764,46 @@ new
                            @style = "margin-top:5px;"
                        }
                    })
+                            </div>
+                        </div>
                     </div>
+
+                </section>@*.box-body*@
+                @*<div class="box-footer">
+                        <div class="form-group">
+                            <div id="sqNextBtn" class="btn btn-sm btn-primary pull-right edit-button">Next</div>
+                        </div>
+                    </div>*@
+                <!-- box-footer -->
+            </div><!-- /.box -->
+        </div>
+
+        <div class="profileDiv">
+            <div class="form-group">
+                <div class="col-lg-offset-2  col-md-8">
+                    @Html.CheckBoxFor(model => model.AgreeTermsAndConditions)
+                    <span> @Html.LabelFor(m => m.AgreeTermsAndConditions)</span>
                 </div>
             </div>
-
-        </section>@*.box-body*@
-        @*<div class="box-footer">
-            <div class="form-group">
-                <div id="sqNextBtn" class="btn btn-sm btn-primary pull-right edit-button">Next</div>
-            </div>
-        </div>*@
-        <!-- box-footer -->
-    </div><!-- /.box -->
-</div>
-
-<div class="profileDiv"> 
-     <div class="form-group">  
-         <div class="col-lg-offset-2  col-md-8"> 
-             @Html.CheckBoxFor(model => model.AgreeTermsAndConditions) 
-          <span> @Html.LabelFor(m => m.AgreeTermsAndConditions)</span>
         </div>
-     </div>   
-</div>
- 
-<div class="box-footer">
-    <input type="submit" id="register" value="Register" name="Command" class="btn btn-sm btn-primary pull-right"
-            formaction='@Url.Action(actionName: "Register", controllerName: "Account")' formmethod="post" />
-</div>
-<br />
-<br />
-}
-@section Scripts {
-    @Scripts.Render(paths: "~/bundles/registration")
-    @Scripts.Render(paths: "~/bundles/jqueryval")
-}
 
-<script type="text/javascript">
-    var profileCollapsed = '@Html.Raw(ViewBag.profileCollapsed)';
-    var kbqCollapsed = '@Html.Raw(ViewBag.kbqCollapsed)';
-    var sqCollapsed = '@Html.Raw(ViewBag.sqCollapsed)';
-    var newRegistration = '@Html.Raw(ViewBag.newRegistration)';
+        <div class="box-footer">
+            <input type="submit" id="register" value="Register" name="Command" class="btn btn-sm btn-primary pull-right"
+                   formaction='@Url.Action(actionName: "Register", controllerName: "Account")' formmethod="post" />
+        </div>
+        <br />
+        <br />
+    }
+    @section Scripts {
+        @Scripts.Render(paths: "~/bundles/registration")
+        @Scripts.Render(paths: "~/bundles/jqueryval")
+    }
 
-    var registrationType = '@Html.Raw(Model.RegistrationType.ToString())';
-</script>
+    <script type="text/javascript">
+        var profileCollapsed = '@Html.Raw(ViewBag.profileCollapsed)';
+        var kbqCollapsed = '@Html.Raw(ViewBag.kbqCollapsed)';
+        var sqCollapsed = '@Html.Raw(ViewBag.sqCollapsed)';
+        var newRegistration = '@Html.Raw(ViewBag.newRegistration)';
+
+        var registrationType = '@Html.Raw(Model.RegistrationType.ToString())';
+    </script>
