@@ -759,12 +759,6 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return Task.FromResult(signInResultDto);
             }
 
-            if (applicationUser.IsAccountResetRequired)
-            {
-                signInResultDto.AutehticationResult = AuthenticationResult.AccountResetRequired;
-                return Task.FromResult(signInResultDto);
-            }
-
             var regulatoryList = _organizationService.GetUserRegulators(applicationUser.UserProfileId);
             if (regulatoryList == null)
             {
@@ -772,6 +766,12 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             signInResultDto.RegulatoryList = regulatoryList;
+
+            if (applicationUser.IsAccountResetRequired)
+            {
+                signInResultDto.AutehticationResult = AuthenticationResult.AccountResetRequired;
+                return Task.FromResult(signInResultDto);
+            }
 
             // UC-29, 2.c
             // Check if the user is in 'password lock' status

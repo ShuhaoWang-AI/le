@@ -331,6 +331,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     case AuthenticationResult.PasswordLockedOut:            // 2.c
                         _logger.Info(string.Format(format: "SignIn. User={0} has been locked out for exceeding the maximum login attempts.", arg0: model.UserName));
                         return RedirectToAction(actionName: "LockedOut", controllerName: "Account");
+                    case AuthenticationResult.AccountResetRequired:
                     case AuthenticationResult.UserIsLocked:                 // 3.a
                         _logger.Info(string.Format(format: "SignIn. User={0} has been locked out.", arg0: model.UserName));
                         TempData["RegulatoryList"] = result.RegulatoryList;
