@@ -247,44 +247,45 @@
                             @Html.ValidationMessageFor(m => m.UserProfile.ZipCode, "", new { @class = "text-danger" })
                         </div>
                     </div>
+
+                    <!-- Line 6   Phone and  Ext   -->
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.UserProfile.PhoneNumber, htmlAttributes: new
+               {
+                   @class = "control-label col-md-2 required"
+               }
+                    )
+                        <div class="col-md-4">
+                            @Html.EditorFor(m => m.UserProfile.PhoneNumber, new
+                   {
+                       htmlAttributes = new
+                       {
+                           @class = "form-control"
+                       }
+                   }
+                        )
+                            @Html.ValidationMessageFor(m => m.UserProfile.PhoneNumber, "", new { @class = "text-danger" })
+                        </div>
+
+                        @Html.LabelFor(m => m.UserProfile.PhoneExt, htmlAttributes: new
+               {
+                   @class = "control-label col-md-2"
+               }
+                    )
+                        <div class="col-md-4">
+                            @Html.EditorFor(m => m.UserProfile.PhoneExt, new
+                   {
+                       htmlAttributes = new
+                       {
+                           @class = "form-control",
+                           @type = "text"
+                       }
+                   }
+                        )
+                        </div>
+                    </div>
+
                 </div>            
-
-                <!-- Line 6   Phone and  Ext   -->
-                <div class="form-group">
-                    @Html.LabelFor(m => m.UserProfile.PhoneNumber, htmlAttributes: new
-                            {
-                                @class = "control-label col-md-2 required"
-                            }
-                    )
-                    <div class="col-md-4">
-                        @Html.EditorFor(m => m.UserProfile.PhoneNumber, new
-                            {
-                                htmlAttributes = new
-                                {
-                                    @class = "form-control"
-                                }
-                            }
-                        )
-                        @Html.ValidationMessageFor(m => m.UserProfile.PhoneNumber, "", new { @class = "text-danger" })
-                    </div>
-
-                    @Html.LabelFor(m => m.UserProfile.PhoneExt, htmlAttributes: new
-                        {
-                            @class = "control-label col-md-2"
-                        }
-                    )
-                    <div class="col-md-4">
-                        @Html.EditorFor(m => m.UserProfile.PhoneExt, new
-                            {
-                                htmlAttributes = new
-                                {
-                                    @class = "form-control",
-                                    @type = "text"
-                                }
-                            }
-                        )
-                    </div>
-                </div>
 
                 <hr />
 
@@ -340,14 +341,10 @@
                         @class = "control-label col-md-2 required"
                     })
                     <div class="col-md-4">
-                        @Html.EditorFor(m => m.UserProfile.Password, new
-                        {
-                            htmlAttributes = new
-                            {
-                                @class = "form-control",
-                                @readonly = "true"
-                            }
-                        })
+                        @Html.PasswordFor(m => m.UserProfile.Password, new {
+                       @class = "form-control",
+                       @readonly = "true" 
+                   })
                         @*@Html.ValidationMessageFor(m => m.UserProfile.Password, "", new { @class = "text-danger" })*@
                     </div>
                     @Html.ActionLink("Change", "ChangePassword", "Account", null, htmlAttributes: new

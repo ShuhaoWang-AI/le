@@ -4,6 +4,7 @@ $(document).ready(function () {
     $(".editabledDiv input").attr("readonly", true);
     $(".editabledDiv select").attr("readonly", "disabled");
 
+    $("#user-info-panel input[type='password'").val("Tiger12345");
     $(".profileDiv input[type='submit'").hide();
     $("#kbq-panel input[type='text'").hide();
 

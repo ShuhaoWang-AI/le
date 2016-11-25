@@ -100,6 +100,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             var userSQViewModel = profileHelper.GetUserSecurityQuestionViewModel(userProfileId);
             var userKbqViewModel = profileHelper.GetUserKbqViewModel(userProfileId);
 
+            //set the fake passsword, just make sure data validataion pass
+            userProfileViewModel.Password = "Tiger12345";
             string portalName = _authenticateService.GetClaimsValue(CacheKey.PortalName);
             portalName = string.IsNullOrWhiteSpace(portalName) ? "" : portalName.Trim().ToLower();
             if (portalName.Equals(value: "authority"))
