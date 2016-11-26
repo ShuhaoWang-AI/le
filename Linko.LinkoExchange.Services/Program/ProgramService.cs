@@ -101,6 +101,8 @@ namespace Linko.LinkoExchange.Services.Program
             }
             else
             {
+                orpu.IsRegistrationApproved = false;
+                orpu.IsRegistrationDenied = false;
                 orpu.IsRemoved = false;
             }
 
