@@ -2905,7 +2905,7 @@ If you have questions or concerns, please contact your Authority or Linko Techno
                 <pre>
 Hello {userName},
 
-For security reasons, we wanted to let you know the password on your LinkoExchange Profile were changed. 
+For security reasons, we wanted to let you know the password on your LinkoExchange Profile was changed. 
 
 If you did not make this change, please contact your Authority immediately to report a possible security breach.
 
