@@ -164,10 +164,18 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(pristineUser);
         }
 
+        private bool NeedToValidKbq()
+        {   
+            var previousUri = HttpContext.Request.UrlReferrer;
+            return (previousUri == null || 
+                   (previousUri.AbsolutePath.ToLower().IndexOf("account/changeaccountsucceed") < 0)  &&
+                   (previousUri.AbsolutePath.ToLower().IndexOf("account/changeaccountsucceed") < 0) );
+        }
+
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             if (filterContext.RouteData.Values["action"].ToString().ToLower() == "profile" 
-                && Request.HttpMethod != "POST")
+                && Request.HttpMethod != "POST" && NeedToValidKbq())
             {
                 var kbqPass = TempData["KbqPass"] as string;
                 if (!string.IsNullOrWhiteSpace(kbqPass) &&
