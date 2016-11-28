@@ -69,7 +69,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         
         public ActionResult DownloadSignatory()
         {
-            var file = HostingEnvironment.MapPath("~/Temp/GRESD Electronic Signature Agreement.pdf");
+            var file = HostingEnvironment.MapPath(virtualPath: "~/Temp/GRESD Electronic Signature Agreement.pdf");
             var fileDownloadName = "GRESD Electronic Signature Agreement.pdf";
             var contentType = "application/pdf";
             
@@ -101,7 +101,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var userSQViewModel = profileHelper.GetUserSecurityQuestionViewModel(userProfileId);
             var userKbqViewModel = profileHelper.GetUserKbqViewModel(userProfileId);
 
-            //set the fake passsword, just make sure data validataion pass
+            //set the fake password, just make sure data validation pass
             userProfileViewModel.Password = "Tiger12345";
 
             var user = new UserViewModel
@@ -169,8 +169,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         {   
             var previousUri = HttpContext.Request.UrlReferrer;
             return (previousUri == null || 
-                   (previousUri.AbsolutePath.ToLower().IndexOf("account/changeaccountsucceed") < 0)  &&
-                   (previousUri.AbsolutePath.ToLower().IndexOf("account/changeaccountsucceed") < 0) );
+                   (previousUri.AbsolutePath.ToLower().IndexOf(value: "account/changeaccountsucceed")< 0)  &&
+                   (previousUri.AbsolutePath.ToLower().IndexOf(value: "account/changeaccountsucceed")< 0) );
         }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
@@ -263,19 +263,19 @@ namespace Linko.LinkoExchange.Web.Controllers
                     ViewBag.SuccessMessage = String.Format(format: "Save Knowledge Based Questions successfully.");
                     break;
                 case RegistrationResult.DuplicatedKBQ:
-                    ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Knowledage Based Questions");
+                    ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Knowledge Based Questions");
                     ViewBag.inValidKBQ = true;
                     break;
                 case RegistrationResult.DuplicatedKBQAnswer:
-                    ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Knowledage Based Question Answers");
+                    ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Knowledge Based Question Answers");
                     ViewBag.inValidKBQ = true;
                     break;
                 case RegistrationResult.MissingKBQ:
-                    ModelState.AddModelError(string.Empty, errorMessage: "Missing Knowledage Based Questions");
+                    ModelState.AddModelError(string.Empty, errorMessage: "Missing Knowledge Based Questions");
                     ViewBag.inValidKBQ = true;
                     break;
                 case RegistrationResult.MissingKBQAnswer:
-                    ModelState.AddModelError(string.Empty, errorMessage: "Missing Knowledage Based Question Answers");
+                    ModelState.AddModelError(string.Empty, errorMessage: "Missing Knowledge Based Question Answers");
                     ViewBag.inValidKBQ = true;
                     break;
             }  
