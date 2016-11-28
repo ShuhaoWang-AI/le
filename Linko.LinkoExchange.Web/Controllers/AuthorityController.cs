@@ -1358,7 +1358,20 @@ namespace Linko.LinkoExchange.Web.Controllers
             viewModel.AvailableRoles.Insert(index: 0, item: new SelectListItem { Text = "Select User Role", Value = "0" });
 
             var currentUserRole = _sessionCache.GetClaimValue(CacheKey.UserRole) ?? "";
-            ViewBag.HasPermissionForApproveDeny = currentUserRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString()); // TODO: call service when implement
+            ViewBag.HasPermissionForApproveDeny = false;
+            if (viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Industry.ToString()))
+            {
+                ViewBag.HasPermissionForApproveDeny = true;
+            }
+            else
+            { 
+                // For authority user registration request, only authority admin can approve 
+                if (currentUserRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString()))
+                {
+                    ViewBag.HasPermissionForApproveDeny = true;
+                }  
+            }
+             
             ViewBag.CanChangeRole = viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Authority.ToString());
 
             if (viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Industry.ToString()) 
