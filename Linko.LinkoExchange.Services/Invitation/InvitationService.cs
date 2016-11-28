@@ -124,11 +124,11 @@ namespace Linko.LinkoExchange.Services.Invitation
                     var dto = _mapper.Map<Core.Domain.Invitation, InvitationDto>(invite);
 
                     //Get expiry
-                    int addExpiryHours = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.InvitationExpiredHours));
+                    int addExpiryHours = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, org.RegulatoryProgramId, SettingType.InvitationExpiredHours));
                     dto.ExpiryDateTimeUtc = dto.InvitationDateTimeUtc.AddHours(addExpiryHours);
 
                     //Need to modify datetime to local
-                    int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.TimeZone));
+                    int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, org.RegulatoryProgramId, SettingType.TimeZone));
 
                     TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(_timeZones.GetTimeZoneName(timeZoneId));
                     dto.InvitationDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(dto.InvitationDateTimeUtc.UtcDateTime, authorityLocalZone);
@@ -157,7 +157,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                 if (existingProgramUsers != null && existingProgramUsers.Count() > 0)
                 {
                     var existingUserForThisProgram = existingProgramUsers
-                        .SingleOrDefault(u => u.OrganizationRegulatoryProgramId == targetOrgRegProgramId);
+                        .SingleOrDefault(u => u.OrganizationRegulatoryProgramId == targetOrgRegProgramId && u.UserProfileDto.IsAccountResetRequired == false);
                     if (existingUserForThisProgram != null)
                     {
                         _logger.Info(string.Format("SendInvitation Failed. User with email={0} already exists within OrgRegProgramId={0}", email, targetOrgRegProgramId));
@@ -349,7 +349,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             {
                 foreach (var existingUser in existingUsers)
                 {
-                    if (existingUser.OrganizationRegulatoryProgramId == orgRegProgramId)
+                    if (existingUser.OrganizationRegulatoryProgramId == orgRegProgramId && existingUser.UserProfileDto.IsAccountResetRequired == false)
                     {
                         return new InvitationCheckEmailResultDto()
                         {

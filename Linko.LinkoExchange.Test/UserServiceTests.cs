@@ -85,7 +85,7 @@ namespace Linko.LinkoExchange.Test
             globalSettingLookup.Add(SystemSettingType.SupportEmailAddress, "test@test.com");
             _settingService = new Mock<ISettingService>();
             _settingService.Setup(x => x.GetGlobalSettings()).Returns(globalSettingLookup);
-            _settingService.Setup(x => x.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.TimeZone)).Returns("1");
+            _settingService.Setup(x => x.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<int>(), SettingType.TimeZone)).Returns("1");
 
             _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString), Mapper.Instance);
             _realSettingService = new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance, _logger.Object);

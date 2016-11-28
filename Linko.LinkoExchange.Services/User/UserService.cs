@@ -125,7 +125,7 @@ namespace Linko.LinkoExchange.Services.User
                 && u.IsRemoved == false);
 
             var authority = _orgService.GetAuthority(orgRegProgramId);
-            int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.TimeZone));
+            int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, authority.RegulatoryProgramId, SettingType.TimeZone));
             TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(_timeZones.GetTimeZoneName(timeZoneId));
 
             foreach (var user in users.ToList())
@@ -154,7 +154,7 @@ namespace Linko.LinkoExchange.Services.User
             var dtos = new List<OrganizationRegulatoryProgramUserDto>();
             var users = _dbContext.OrganizationRegulatoryProgramUsers.Where(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
             var authority = _orgService.GetAuthority(orgRegProgramId);
-            int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.TimeZone));
+            int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, authority.RegulatoryProgramId, SettingType.TimeZone));
             TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(_timeZones.GetTimeZoneName(timeZoneId));
 
             if (isRegApproved.HasValue)
@@ -820,7 +820,7 @@ namespace Linko.LinkoExchange.Services.User
 
             //Need to modify datetime to local
             var authority = _orgService.GetAuthority(dto.OrganizationRegulatoryProgramId);
-            int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, SettingType.TimeZone));
+            int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, authority.RegulatoryProgramId, SettingType.TimeZone));
             TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(_timeZones.GetTimeZoneName(timeZoneId));
             dto.UserProfileDto.CreationDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(dto.UserProfileDto.CreationDateTimeUtc.Value.UtcDateTime, authorityLocalZone);
 

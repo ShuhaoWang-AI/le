@@ -372,10 +372,39 @@ namespace Linko.LinkoExchange.Services.Settings
 
         }
 
-        public string GetOrganizationSettingValue(int organizationId, SettingType settingType)
+        private OrganizationRegulatoryProgram GetAuthority(int? organizationId = null, int? regProgramId = null, int? orgRegProgramId = null)
         {
+            OrganizationRegulatoryProgram thisOrgRegProgram;
+            if (orgRegProgramId.HasValue)
+            {
+                thisOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms
+                       .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId.Value);
+            }
+            else
+            {
+                thisOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms
+                       .Single(o => o.OrganizationId == organizationId.Value && o.RegulatoryProgramId == regProgramId.Value);
+            }
+
+            OrganizationRegulatoryProgram authority;
+            if (thisOrgRegProgram.RegulatorOrganization != null)
+            {
+                authority = _dbContext.OrganizationRegulatoryPrograms.Include("Organization.OrganizationType")
+                    .Single(o => o.OrganizationId == thisOrgRegProgram.RegulatorOrganizationId
+                    && o.RegulatoryProgramId == thisOrgRegProgram.RegulatoryProgramId);
+
+            }
+            else
+                authority = thisOrgRegProgram;
+
+            return authority;
+        }
+
+        public string GetOrganizationSettingValue(int organizationId, int regProgramId, SettingType settingType)
+        {
+            OrganizationRegulatoryProgram authority = GetAuthority(organizationId, regProgramId);
             return _dbContext.OrganizationSettings
-               .Single(s => s.OrganizationId == organizationId
+               .Single(s => s.OrganizationId == authority.OrganizationId
                && s.SettingTemplate.Name == settingType.ToString()).Value;
         }
 
@@ -383,14 +412,13 @@ namespace Linko.LinkoExchange.Services.Settings
         {
             try
             {
-                //get org type
-                int orgTypeId = _dbContext.OrganizationRegulatoryPrograms.Include("Organization.OrganizationType")
-                    .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId).Organization.OrganizationType.OrganizationTypeId;
+                OrganizationRegulatoryProgram authority = GetAuthority(orgRegProgramId: orgRegProgramId);
+                var orgTypeId = authority.Organization.OrganizationType.OrganizationTypeId;
 
-           return _dbContext.OrganizationRegulatoryProgramSettings
-                .Single(s => s.OrganizationRegulatoryProgramId == orgRegProgramId
-                && s.SettingTemplate.Name == settingType.ToString() 
-                && s.SettingTemplate.OrganizationTypeId == orgTypeId).Value;
+                return _dbContext.OrganizationRegulatoryProgramSettings
+                    .Single(s => s.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId
+                    && s.SettingTemplate.Name == settingType.ToString() 
+                    && s.SettingTemplate.OrganizationTypeId == orgTypeId).Value;
 
             }
             catch (DbEntityValidationException ex)

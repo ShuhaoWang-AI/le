@@ -51,9 +51,15 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
+        public void GetOrganizationSettingValue_Test()
+        {
+            var result = _settingService.GetOrganizationSettingValue(1003, 1, SettingType.PasswordHistoryMaxCount);
+        }
+
+        [TestMethod]
         public void GetOrgRegProgramSettingValue_Test()
         {
-            var result = _settingService.GetOrgRegProgramSettingValue(1, SettingType.EmailContactInfoName);
+            var result = _settingService.GetOrgRegProgramSettingValue(1, SettingType.IndustryLicenseTotalCount);
         }
 
         [TestMethod]
