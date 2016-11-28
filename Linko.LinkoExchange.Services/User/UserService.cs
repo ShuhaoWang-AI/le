@@ -978,6 +978,8 @@ namespace Linko.LinkoExchange.Services.User
             contentReplacements.Add("authorityOrganizationName", authority.OrganizationDto.OrganizationName);
             contentReplacements.Add("phoneNumber", authorityPhoneNumber);
             contentReplacements.Add("emailAddress", authorityEmail);
+            contentReplacements.Add("supportPhoneNumber", authorityPhoneNumber);
+            contentReplacements.Add("supportEmail", authorityEmail);
 
             if (!isAuthorityUser)
             {
