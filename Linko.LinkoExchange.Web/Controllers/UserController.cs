@@ -71,8 +71,9 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var file = HostingEnvironment.MapPath("~/Temp/GRESD Electronic Signature Agreement.pdf");
             var fileDownloadName = "GRESD Electronic Signature Agreement.pdf";
-            var contentType = "application/pdf"; 
-            var fileStream = new MemoryStream(); 
+            var contentType = "application/pdf";
+            
+            var fileStream = System.IO.File.OpenRead(file);
             fileStream.Position = 0; 
             return File(fileStream, contentType, fileDownloadName);
         }
