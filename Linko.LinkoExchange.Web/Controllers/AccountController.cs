@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using AutoMapper;
+using Kendo.Mvc.Extensions;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Authentication;
@@ -13,18 +16,16 @@ using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.ViewModels.Account;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
-using NLog;
-using Linko.LinkoExchange.Services.Settings;
-using System;
-using System.ComponentModel.DataAnnotations;
-using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Web.shared;
+using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -152,6 +153,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         async public Task<ActionResult> Register(RegistrationViewModel model, FormCollection form)
         {
+            var invitation = _invitationService.GetInvitation(model.Token);
             ViewBag.newRegistration = true;
             ViewBag.profileCollapsed = Convert.ToString(form["profileCollapsed"]);
             ViewBag.kbqCollapsed = Convert.ToString(form["kbqCollapsed"]);
@@ -222,8 +224,32 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 case RegistrationResult.Success:
                     _logger.Info($"Registration successfully completed. Email={userDto.Email}, FirstName={userDto.FirstName}, LastName={userDto.LastName}.");
+                    
+                    var authorityProgramSettings = _settingService.GetAuthorityProgramSettingsById(invitation.RecipientOrganizationRegulatoryProgramId);
+                    string authorityName = authorityProgramSettings.Settings.Where(s => s.TemplateName.Equals(SettingType.EmailContactInfoName)).First().Value;
+                    string authorityEmail = authorityProgramSettings.Settings.Where(s => s.TemplateName.Equals(SettingType.EmailContactInfoEmailAddress)).First().Value;
+                    string authorityPhone = authorityProgramSettings.Settings.Where(s => s.TemplateName.Equals(SettingType.EmailContactInfoPhone)).First().Value;
+                    var org = _organizationService.GetOrganizationRegulatoryProgram(invitation.RecipientOrganizationRegulatoryProgramId);
+
+                    string messageBody = "";
+                    messageBody += "<p>Your LinkoExchange registration has been received and is now under review for the following:</p>";
+                    messageBody += $"<p>Authority: {_organizationService.GetAuthority(invitation.RecipientOrganizationRegulatoryProgramId).OrganizationDto.OrganizationName}</pr>";
+                    if (org.OrganizationDto.OrganizationType.Name.ToLower().IsCaseInsensitiveEqual(OrganizationTypeName.Industry.ToString()))
+                    {
+                        messageBody += $"<p>Facility: {org.OrganizationDto.OrganizationName} </p>";
+                    }
+                    else
+                    {
+                        messageBody += "";
+                    }
+                    messageBody += "<p>You will be notified by email when a decision has been made about your account request.</p>";
+                    messageBody += $"<p>If you have questions or concerns, please contact {authorityName} at {authorityEmail} or {authorityPhone}.</p>";
+
                     return View(viewName: "Confirmation",
-                        model: new ConfirmationViewModel() { Title = "Registration Completed", Message = "Thank you for completing registration." }); 
+                        model: new ConfirmationViewModel() {
+                            Title = $"Thanks for Registering {model.UserProfile.FirstName} {model.UserProfile.LastName}!",
+                            HtmlStr = messageBody
+                        }); 
 
                 case RegistrationResult.BadUserProfileData: 
                     ViewBag.inValidProfile = true;

@@ -123,6 +123,39 @@ namespace Linko.LinkoExchange.Services.Settings
             return progSettingDto;
 		}
 
+
+        /// <summary>
+        /// Get settings for one program. If industry it will find the authority first and return the settings for the authority 
+        /// </summary>
+        /// <param name="programId">The program Id to get for</param>
+        /// <returns>The PrrogramSetting object</returns>
+        public ProgramSettingDto GetAuthorityProgramSettingsById(int orgRegProgramId)
+        {
+            var progSettingDto = new ProgramSettingDto() { OrgRegProgId = orgRegProgramId };
+            progSettingDto.Settings = new List<SettingDto>();
+            
+            var org = _dbContext.OrganizationRegulatoryPrograms.Include("Organization.Jurisdiction")
+                .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
+            OrganizationRegulatoryProgram authority;
+            if (org.RegulatorOrganization != null)
+            {
+                authority = _dbContext.OrganizationRegulatoryPrograms.Include("Organization")
+                    .Single(o => o.OrganizationId == org.RegulatorOrganization.OrganizationId
+                    && o.RegulatoryProgramId == org.RegulatoryProgramId);
+            }
+            else
+            {
+                authority = org;
+            }
+
+            var settings = _dbContext.OrganizationRegulatoryProgramSettings.Where(o => o.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId);
+            foreach (var setting in settings)
+            {
+                progSettingDto.Settings.Add(_mapper.Map<OrganizationRegulatoryProgramSetting, SettingDto>(setting));
+            }
+            return progSettingDto;
+        }
+
         public void CreateOrUpdateProgramSettings(ProgramSettingDto settingDtos)
         {
             var transaction = _dbContext.BeginTransaction();
