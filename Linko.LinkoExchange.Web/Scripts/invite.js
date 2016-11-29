@@ -9,7 +9,8 @@ $(document).ready(function () {
         form.submit();
     });
 
-    $("#searchEmailBtn").click(function () {
+    $("#searchEmailBtn").click(function (event) {
+        event.preventDefault();
         if (!$('#EmailAddress').valid())
         {
             return false;
@@ -64,6 +65,7 @@ $(document).ready(function () {
                 $("#foundUserInDifferentProgramsMessage").html(data.DisplayMessage);
             }
 
+            return false;
         });
     });
 
