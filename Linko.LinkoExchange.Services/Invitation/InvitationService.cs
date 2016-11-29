@@ -200,7 +200,8 @@ namespace Linko.LinkoExchange.Services.Invitation
                 return new InvitationServiceResultDto()
                 {
                     Success = false,
-                    ErrorType = Core.Enum.InvitationError.NoMoreRemainingUserLicenses
+                    ErrorType = Core.Enum.InvitationError.NoMoreRemainingUserLicenses,
+                    Errors = new string[] { "No more User Licenses are available for this organization.  Disable another User and try again." }
                 };
             }
 
