@@ -125,14 +125,11 @@ namespace Linko.LinkoExchange.Services.Invitation
 
                     //Get expiry
                     int addExpiryHours = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, org.RegulatoryProgramId, SettingType.InvitationExpiredHours));
-                    dto.ExpiryDateTimeUtc = dto.InvitationDateTimeUtc.AddHours(addExpiryHours);
 
                     //Need to modify datetime to local
-                    int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, org.RegulatoryProgramId, SettingType.TimeZone));
-
-                    TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(_timeZones.GetTimeZoneName(timeZoneId));
-                    dto.InvitationDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(dto.InvitationDateTimeUtc.UtcDateTime, authorityLocalZone);
-                    dto.ExpiryDateTimeUtc = TimeZoneInfo.ConvertTimeFromUtc(dto.ExpiryDateTimeUtc.UtcDateTime, authorityLocalZone);
+                    dto.InvitationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(
+                        dto.InvitationDateTimeUtc.DateTime, authority.OrganizationId, org.RegulatoryProgramId);
+                    dto.ExpiryDateTimeUtc = dto.InvitationDateTimeUtc.AddHours(addExpiryHours);
 
                     dtos.Add(dto);
 
