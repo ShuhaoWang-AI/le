@@ -259,7 +259,9 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
 
             var authorityList = _orgService.GetUserAuthorityListForEmailContent(userProfileId);
-            contentReplacements.Add("userName", userProfile.UserName);
+            contentReplacements.Add("firstName", userProfile.FirstName);
+            contentReplacements.Add("lastName", userProfile.LastName);
+
             contentReplacements.Add("authorityList", authorityList);
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
             contentReplacements.Add("supportEmail", supportEmail);

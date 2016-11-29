@@ -2368,7 +2368,7 @@ BEGIN
         '<html>
             <body> 
                 <pre>
-Hello {userName},
+Hello {firstName} {lastName},
 
 Your LinkoExchange Registration has been denied for the following:
                  
@@ -2394,7 +2394,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         '<html>
             <body> 
                 <pre>
-Hello {userName},
+Hello {firstName} {lastName},
 
 Your LinkoExchange Registration has been denied for the following:
                  
@@ -2423,7 +2423,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         '<html>
             <body> 
                 <pre>
-Hello {userName}, 
+Hello {firstName} {lastName}, 
 
 Your LinkoExchange Registration has been approved for the following: 
 
@@ -2454,7 +2454,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         '<html>
             <body> 
                 <pre>
-Hello {userName}, 
+Hello {firstName} {lastName}, 
 
 Your LinkoExchange Registration has been approved for the following: 
 
@@ -2562,7 +2562,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         '<html>
             <body> 
                 <pre>
-Hello {userName},
+Hello {firstName} {lastName},
 
 You''ve been invited to be a user of LinkoExchange:
                         
@@ -2603,7 +2603,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         '<html>
             <body> 
                 <pre>
-Hello {userName},
+Hello {firstName} {lastName},
 
 You''ve been invited to be a user of LinkoExchange:
                         
@@ -2636,7 +2636,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         '<html>
             <body> 
                 <pre>
-Hello {userName},
+Hello {firstName} {lastName},
 
 Your signatory rights have been granted for 
 
@@ -2697,7 +2697,7 @@ If you have questions or concerns, please contact {authorityName} at {emailAddre
         '<html>
             <body> 
                 <pre>
-Hello {userName},
+Hello {firstName} {lastName},
 
 Your signatory rights have been removed for 
 
@@ -2788,7 +2788,7 @@ If you have questions or concerns, please contact your authority or LinkoExchang
         '<html>
             <body> 
                 <pre>
-Hello {userName},
+Hello {firstName} {lastName},
 
 For security reasons, we wanted to let you know your LinkoExchange Profile was changed.
 
@@ -2816,7 +2816,7 @@ If you have questions or concerns, please contact your Authority or Linko Techno
         '<html>
             <body> 
                 <pre>
-Hello {userName},
+Hello {firstName} {lastName},
 
 For security reasons, we wanted to let you know the Email Address on your LinkoExchange Profile was changed.
 
@@ -2847,7 +2847,7 @@ If you have questions or concerns, please contact your Authority or Linko Techno
         '<html>
             <body> 
                 <pre>
-Hello {userName},
+Hello {firstName} {lastName},
 
 For security reasons, we wanted to let you know Knowledge Based Questions on your LinkoExchange Profile were changed. 
 
@@ -2875,7 +2875,7 @@ If you have questions or concerns, please contact your Authority or Linko Techno
         '<html>
             <body> 
                 <pre>
-Hello {userName},
+Hello {firstName} {lastName},
 
 For security reasons, we wanted to let you know Security Questions on your LinkoExchange Profile were changed. 
 
@@ -2903,7 +2903,7 @@ If you have questions or concerns, please contact your Authority or Linko Techno
         '<html>
             <body> 
                 <pre>
-Hello {userName},
+Hello {firstName} {lastName},
 
 For security reasons, we wanted to let you know the password on your LinkoExchange Profile was changed. 
 
@@ -3096,7 +3096,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         '<html>
             <body> 
                 <pre>
-Hello {userName},
+Hello {firstName} {lastName},
 
 You''ve been invited to be a user of LinkoExchange:
                         

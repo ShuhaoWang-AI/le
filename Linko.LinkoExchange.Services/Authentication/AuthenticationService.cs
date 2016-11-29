@@ -222,7 +222,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                 string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
 
                 var authorityList = _organizationService.GetUserAuthorityListForEmailContent(applicationUser.UserProfileId);
-                contentReplacements.Add("userName", applicationUser.UserName);
+                contentReplacements.Add("firstName", applicationUser.FirstName);
+                contentReplacements.Add("lastName", applicationUser.LastName);
                 contentReplacements.Add("authorityList", authorityList);
                 contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
                 contentReplacements.Add("supportEmail", supportEmail);

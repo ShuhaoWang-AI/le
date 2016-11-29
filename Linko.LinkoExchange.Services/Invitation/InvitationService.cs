@@ -227,7 +227,8 @@ namespace Linko.LinkoExchange.Services.Invitation
             OrganizationRegulatoryProgram authority;
             var targetOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == targetOrgRegProgramId);
             var senderOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == senderOrgRegProgramId);
-            contentReplacements.Add("userName", firstName + " " + lastName);
+            contentReplacements.Add("firstName", firstName);
+            contentReplacements.Add("lastName", lastName);
 
             if (invitationType != InvitationType.IndustryToIndustry)    //Sender is the authority
                 authority = senderOrgRegProgram;
