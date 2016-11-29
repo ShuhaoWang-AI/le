@@ -216,7 +216,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             CreateInvitation(new Dto.InvitationDto()
             {
                 InvitationId = invitationId,
-                InvitationDateTimeUtc = DateTimeOffset.Now,
+                InvitationDateTimeUtc = DateTime.UtcNow,
                 EmailAddress = email,
                 FirstName = firstName,
                 LastName = lastName,
@@ -297,7 +297,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             {
                 var newInvitation = _dbContext.Invitations.Create();
                 newInvitation.InvitationId = dto.InvitationId;
-                newInvitation.InvitationDateTimeUtc = DateTimeOffset.Now;
+                newInvitation.InvitationDateTimeUtc = DateTimeOffset.UtcNow;
                 newInvitation.EmailAddress = dto.EmailAddress;
                 newInvitation.FirstName = dto.FirstName;
                 newInvitation.LastName = dto.LastName;
