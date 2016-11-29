@@ -813,6 +813,7 @@ namespace Linko.LinkoExchange.Services.User
 
             //Need to modify datetime to local
             dto.UserProfileDto.CreationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(dto.UserProfileDto.CreationDateTimeUtc.Value.DateTime, orgRegProgUserId);
+            dto.RegistrationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(dto.RegistrationDateTimeUtc.Value.DateTime, orgRegProgUserId);
 
             return dto;
         }
