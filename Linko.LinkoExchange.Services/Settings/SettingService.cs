@@ -433,6 +433,14 @@ namespace Linko.LinkoExchange.Services.Settings
             return authority;
         }
 
+        public string GetOrganizationSettingValue(int orgRegProgramId, SettingType settingType)
+        {
+            OrganizationRegulatoryProgram authority = GetAuthority(orgRegProgramId: orgRegProgramId);
+            return _dbContext.OrganizationSettings
+               .Single(s => s.OrganizationId == authority.OrganizationId
+               && s.SettingTemplate.Name == settingType.ToString()).Value;
+        }
+
         public string GetOrganizationSettingValue(int organizationId, int regProgramId, SettingType settingType)
         {
             OrganizationRegulatoryProgram authority = GetAuthority(organizationId, regProgramId);

@@ -87,7 +87,7 @@ namespace Linko.LinkoExchange.Test
             _settingService.Setup(x => x.GetGlobalSettings()).Returns(globalSettingLookup);
             _settingService.Setup(x => x.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<int>(), SettingType.TimeZone)).Returns("1");
 
-            _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString), Mapper.Instance);
+            _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString), Mapper.Instance, _settingService.Object);
             _realSettingService = new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance, _logger.Object);
             _realOrgService = new OrganizationService(new LinkoExchangeContext(connectionString),
                 Mapper.Instance, _realSettingService, new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance));

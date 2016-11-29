@@ -11,5 +11,8 @@ namespace Linko.LinkoExchange.Services.TimeZone
     {
         string GetTimeZoneName(int timeZoneId);
         ICollection<TimeZoneDto> GetTimeZones();
+        DateTime GetLocalizedDateTimeUsingSettingForThisOrg(DateTime utcDateTime, int orgId, int regProgramId);
+
+        DateTime GetLocalizedDateTimeUsingSettingForThisOrg(DateTime utcDateTime, int orgRegProgramId);
     }
 }
