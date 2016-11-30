@@ -154,7 +154,10 @@ namespace Linko.LinkoExchange.Services.Invitation
                 if (existingProgramUsers != null && existingProgramUsers.Count() > 0)
                 {
                     var existingUserForThisProgram = existingProgramUsers
-                        .SingleOrDefault(u => u.OrganizationRegulatoryProgramId == targetOrgRegProgramId && u.UserProfileDto.IsAccountResetRequired == false);
+                        .SingleOrDefault(u => u.OrganizationRegulatoryProgramId == targetOrgRegProgramId 
+                        && u.UserProfileDto.IsAccountResetRequired == false
+                        && u.IsRegistrationDenied != true);
+
                     if (existingUserForThisProgram != null)
                     {
                         _logger.Info(string.Format("SendInvitation Failed. User with email={0} already exists within OrgRegProgramId={0}", email, targetOrgRegProgramId));
@@ -348,7 +351,9 @@ namespace Linko.LinkoExchange.Services.Invitation
             {
                 foreach (var existingUser in existingUsers)
                 {
-                    if (existingUser.OrganizationRegulatoryProgramId == orgRegProgramId && existingUser.UserProfileDto.IsAccountResetRequired == false)
+                    if (existingUser.OrganizationRegulatoryProgramId == orgRegProgramId 
+                        && existingUser.UserProfileDto.IsAccountResetRequired == false
+                        && existingUser.IsRegistrationDenied != true)
                     {
                         return new InvitationCheckEmailResultDto()
                         {
