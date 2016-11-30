@@ -175,7 +175,7 @@ namespace Linko.LinkoExchange.Services.Organization
                 var foundOrg = _dbContext.Organizations.Single(o => o.OrganizationId == organizationId);
                 returnDto = _mapper.Map<Core.Domain.Organization, OrganizationDto>(foundOrg);
                 var jurisdiction = _jurisdictionService.GetJurisdictionById(foundOrg.JurisdictionId);
-                returnDto.State = jurisdiction == null ? "" : jurisdiction.Name;
+                returnDto.State = jurisdiction == null ? "" : jurisdiction.Code;
             }
             catch (DbEntityValidationException ex)
             {

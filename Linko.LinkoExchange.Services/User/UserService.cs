@@ -254,7 +254,7 @@ namespace Linko.LinkoExchange.Services.User
             contentReplacements.Add("organizationName", orgRegProgram.Organization.Name);
             contentReplacements.Add("addressLine1", orgRegProgram.Organization.AddressLine1);
             contentReplacements.Add("cityName", orgRegProgram.Organization.CityName);
-            contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == orgRegProgram.Organization.JurisdictionId).Name);
+            contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == orgRegProgram.Organization.JurisdictionId).Code);
             contentReplacements.Add("emailAddress", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress));
             contentReplacements.Add("phoneNumber", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone));
 
@@ -282,7 +282,7 @@ namespace Linko.LinkoExchange.Services.User
                 contentReplacements.Add("organizationName", orgRegProgram.Organization.Name);
                 contentReplacements.Add("addressLine1", orgRegProgram.Organization.AddressLine1);
                 contentReplacements.Add("cityName", orgRegProgram.Organization.CityName);
-                contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == orgRegProgram.Organization.JurisdictionId).Name);
+                contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == orgRegProgram.Organization.JurisdictionId).Code);
                 contentReplacements.Add("emailAddress", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress));
                 contentReplacements.Add("phoneNumber", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone));
 
@@ -985,7 +985,7 @@ namespace Linko.LinkoExchange.Services.User
                 contentReplacements.Add("organizationName", org.Name);
                 contentReplacements.Add("addressLine1", org.AddressLine1);
                 contentReplacements.Add("cityName", org.CityName);
-                contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == org.JurisdictionId).Name);
+                contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == org.JurisdictionId).Code);
             }
 
             if (isApproved)
