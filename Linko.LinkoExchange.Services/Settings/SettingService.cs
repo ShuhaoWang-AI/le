@@ -351,10 +351,23 @@ namespace Linko.LinkoExchange.Services.Settings
 
         public string GetOrganizationSettingValueByUserId(int userProfileId, SettingType settingType, bool? isChooseMin, bool? isChooseMax)
         {
-            var orgIds = _dbContext.OrganizationRegulatoryProgramUsers.Where(o => o.UserProfileId == userProfileId).Select(o => o.OrganizationRegulatoryProgram.OrganizationId).Distinct();
-            if (orgIds != null)
+            var orgRegProgramIds = _dbContext.OrganizationRegulatoryProgramUsers
+                .Where(o => o.UserProfileId == userProfileId)
+                .Select(o => o.OrganizationRegulatoryProgramId).Distinct();
+
+            var authorityOrgIds = new List<int>();
+            foreach (var orgRegProgId in orgRegProgramIds)
             {
-                var orgSettingDtos = this.GetOrganizationSettingsByIds(orgIds);
+                var authority = this.GetAuthority(orgRegProgramId: orgRegProgId);
+                if (!authorityOrgIds.Contains(authority.OrganizationId))
+                {
+                    authorityOrgIds.Add(authority.OrganizationId);
+                }
+            }
+
+            if (authorityOrgIds != null)
+            {
+                var orgSettingDtos = this.GetOrganizationSettingsByIds(authorityOrgIds);
                 var settings = orgSettingDtos.SelectMany(o => o.Settings).Where(s => s.TemplateName == settingType);
                 if (settings == null || settings.Count() < 1)
                     throw new Exception(string.Format("ERROR: Could not find organization settings for user profile id={0} and setting type={1}", userProfileId, settingType.ToString()));

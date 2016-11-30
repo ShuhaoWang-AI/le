@@ -1003,7 +1003,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                 else
                 {
                     ModelState.Remove(key: "FailedCount");
-                    ModelState.AddModelError(key: "", errorMessage: "Wrong Answer."); 
+                    ModelState.AddModelError(key: "", errorMessage: "Wrong Answer.");
+                    ModelState.Remove(key: "Answer");
+                    model.Answer = "";
                 }
                 return View(model);
             }
