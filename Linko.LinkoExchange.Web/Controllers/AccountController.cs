@@ -715,7 +715,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult ForgotUserNameConfirmation()
         {
             ConfirmationViewModel model = new ConfirmationViewModel();
-            model.Title = "Forgot user name confirmation";
+            model.Title = "Forgot User Name Confirmation";
             model.Message = "Please check your email for your User Name.";
 
             return View(viewName: "Confirmation", model: model);
