@@ -156,7 +156,8 @@ namespace Linko.LinkoExchange.Services.Invitation
                     var existingUserForThisProgram = existingProgramUsers
                         .SingleOrDefault(u => u.OrganizationRegulatoryProgramId == targetOrgRegProgramId 
                         && u.UserProfileDto.IsAccountResetRequired == false
-                        && u.IsRegistrationDenied != true);
+                        && u.IsRegistrationDenied != true
+                        && u.IsRemoved != true);
 
                     if (existingUserForThisProgram != null)
                     {
@@ -353,7 +354,8 @@ namespace Linko.LinkoExchange.Services.Invitation
                 {
                     if (existingUser.OrganizationRegulatoryProgramId == orgRegProgramId 
                         && existingUser.UserProfileDto.IsAccountResetRequired == false
-                        && existingUser.IsRegistrationDenied != true)
+                        && existingUser.IsRegistrationDenied != true
+                        && existingUser.IsRemoved != true)
                     {
                         return new InvitationCheckEmailResultDto()
                         {
