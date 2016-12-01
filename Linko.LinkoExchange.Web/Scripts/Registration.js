@@ -12,21 +12,9 @@ $(document).ready(function () {
         $("#user-info-panel input[type='password'").val("********"); 
     }
     else if (registrationType == 'ResetRegistration') {
-        // User can only change password, kbq, sq
-        $("input").attr("readonly", true);
-
-        $("input[type='checkbox'").prop('checked', true);
-        $(".editabledDiv select").attr("readonly", "disabled");
-
-        /// TODO 
-        /// open password, kbq, sq 
-        $("#kbq-panel input").attr("readonly", false);
-        $("#kbq-panel select").attr("readonly", false);
-
-        $("#sq-panel input").attr("readonly", false);
-        $("#sq-panel select").attr("readonly", false); 
-
-        $("#user-info-panel input[type='password'").attr("readonly", false);
+        // Everything should be editable except email and username
+        $("#UserProfile_Email").attr("readonly", true);
+        $("#UserProfile_UserName").attr("readonly", true);
 
     } else if (registrationType == 'NewRegistration') {
         // All inputs are open to user
