@@ -399,7 +399,7 @@ namespace Linko.LinkoExchange.Services.Organization
             }
             var currentProgramUserCount = _dbContext.OrganizationRegulatoryProgramUsers
                                                     .Count(u => u.OrganizationRegulatoryProgramId == orgRegProgramId
-                                                    && u.IsRemoved != true && u.IsRegistrationApproved == true);
+                                                    && !u.IsRemoved && u.IsRegistrationApproved && u.IsEnabled);
             var remaining = maxCount - currentProgramUserCount;
 
             //Handle at caller
@@ -433,7 +433,7 @@ namespace Linko.LinkoExchange.Services.Organization
         {
             var currentProgramUserCount = _dbContext.OrganizationRegulatoryProgramUsers
                                                     .Count(u => u.OrganizationRegulatoryProgramId == orgRegProgramId
-                                                    && u.IsRemoved != true && u.IsRegistrationApproved == true);
+                                                    && !u.IsRemoved && u.IsRegistrationApproved && u.IsEnabled);
             return currentProgramUserCount;
 
         }
