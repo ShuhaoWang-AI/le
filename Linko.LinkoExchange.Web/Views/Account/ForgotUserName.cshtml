@@ -1,5 +1,5 @@
 ﻿@using Linko.LinkoExchange.Web.ViewModels.Account
-@using Linko.LinkoExchange.Core.Resources
+
 @model ForgotUserNameViewModel
 
 @{
@@ -21,13 +21,13 @@
             @using (Html.BeginForm(actionName: "ForgotUserName", controllerName: "Account", method: FormMethod.Post, htmlAttributes: new { @class = "form-horizontal", role = "form" }))
             {
                 @Html.AntiForgeryToken()
-                @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+                @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new { @class = "alert alert-danger" })
 
                 <div class="form-group">
                     @Html.LabelFor(m => m.EmailAddress, new { @class = "col-md-2 required control-label" })
                     <div class="col-md-10">
                         @Html.TextBoxFor(m => m.EmailAddress, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.EmailAddress, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(m => m.EmailAddress, "", new { @class = "text-red" })
                     </div>
                 </div>
 

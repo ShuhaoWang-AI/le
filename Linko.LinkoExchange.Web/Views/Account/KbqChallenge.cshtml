@@ -1,7 +1,6 @@
-﻿@model Linko.LinkoExchange.Web.ViewModels.Account.KbqChallengeViewModel 
+﻿@using Linko.LinkoExchange.Web.ViewModels.Account
 
-@using Linko.LinkoExchange.Web.ViewModels.Account
-@using Linko.LinkoExchange.Core.Resources
+@model KbqChallengeViewModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -35,7 +34,7 @@
                 htmlAttributes: new { @class = "form-horizontal", role = "form" }))
             {
                 @Html.AntiForgeryToken()
-                @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+                @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new { @class = "alert alert-danger" })
                 @Html.HiddenFor(model => model.FailedCount)               
 
                 <div class="form-group">
@@ -55,7 +54,7 @@
                     @Html.LabelFor(m => m.Answer, new { @class = "col-md-3 required control-label" })
                     <div class="col-md-9">
                         @Html.TextBoxFor(m => m.Answer, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.Answer, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(m => m.Answer, "", new { @class = "text-red" })
                     </div>
                 </div>
 

@@ -150,4 +150,7 @@
   <data name="PasswordChangeSucceed" xml:space="preserve">
     <value>Password successfully changed.</value>
   </data>
+  <data name="ValidationSummaryHeaderText" xml:space="preserve">
+    <value>Unable to perform the action. See error messages below.</value>
+  </data>
 </root>

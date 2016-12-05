@@ -1,9 +1,9 @@
-﻿using FluentValidation;
-using FluentValidation.Attributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
+using FluentValidation;
+using FluentValidation.Attributes;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
@@ -67,7 +67,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         }
 
         [Editable(false)]
-        [Display(Name = "Title Role")]
+        [Display(Name = "Title/Role")]
         public string TitleRole
         {
             get; set;

@@ -1,5 +1,4 @@
 ﻿@model Linko.LinkoExchange.Web.ViewModels.Authority.AuthoritySettingsViewModel
-@using Linko.LinkoExchange.Core.Resources
 
 @{
     ViewBag.Title = "Settings";
@@ -258,7 +257,7 @@
         <section class="box-body form-horizontal">
             @if (ViewBag.ShowErrorMessageForAuthoritySettings != null && ViewBag.ShowErrorMessageForAuthoritySettings)
             {
-                @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+                @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new { @class = "alert alert-danger" })
             }
             @if (ViewBag.ShowSuccessMessageForAuthoritySettings!= null && ViewBag.ShowSuccessMessageForAuthoritySettings)
             {
@@ -369,7 +368,7 @@
 
                 <div class="col-md-5 col-lg-4">
                     @Html.DropDownList("TimeZone", Model.AvailableTimeZones, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(model => model.TimeZone, "", new { @class = "text-danger" })
+                    @Html.ValidationMessageFor(model => model.TimeZone, "", new { @class = "text-red" })
                 </div>
             </div>
 
@@ -402,7 +401,7 @@
             
             @if (ViewBag.ShowErrorMessageForProgramSettings != null && ViewBag.ShowErrorMessageForProgramSettings)
             {
-                @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+                @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new { @class = "alert alert-danger" })
             }
             
             @if (ViewBag.ShowSuccessMessageForProgramSettings != null && ViewBag.ShowSuccessMessageForProgramSettings)
@@ -628,7 +627,7 @@
                             @class = "form-control"
                         }
                     })
-                    @Html.ValidationMessageFor(m => m.EmailContactInfoEmailAddress, "", new { @class = "text-danger" })
+                    @Html.ValidationMessageFor(m => m.EmailContactInfoEmailAddress, "", new { @class = "text-red" })
                 </div>
             </div>
 

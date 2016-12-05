@@ -1,5 +1,4 @@
 ﻿@model Linko.LinkoExchange.Web.ViewModels.Industry.IndustryViewModel
-@using Linko.LinkoExchange.Core.Resources
 
 @{
     ViewBag.Title = "Settings";
@@ -20,7 +19,7 @@
 
     <section class="box-body form-horizontal">
                 
-        @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+        @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new { @class = "alert alert-danger" })
                     
         <div class="form-group">
             @Html.LabelFor(model => model.IndustryName, htmlAttributes: new

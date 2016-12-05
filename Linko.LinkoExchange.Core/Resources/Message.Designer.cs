@@ -158,5 +158,14 @@ namespace Linko.LinkoExchange.Core.Resources {
                 return ResourceManager.GetString("UserNameNotFound", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to perform the action. See error messages below..
+        /// </summary>
+        public static string ValidationSummaryHeaderText {
+            get {
+                return ResourceManager.GetString("ValidationSummaryHeaderText", resourceCulture);
+            }
+        }
     }
 }

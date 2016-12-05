@@ -1,6 +1,4 @@
-﻿@using Linko.LinkoExchange.Core.Resources
-
-<section>
+﻿<section>
     <ol class="breadcrumb">
         <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
         <li class="active">Users</li>
@@ -14,7 +12,7 @@
         </div><!-- /.box-tools -->
     </div>  @*.box-header*@
     <section class="box-body form-horizontal">
-        @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new
+        @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new
         {
             @class = "alert alert-info"
         })
@@ -96,7 +94,7 @@
         </div><!-- /.box-tools -->
     </div>  @*.box-header*@
     <section class="box-body form-horizontal">
-        @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new
+        @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new
         {
             @class = "alert alert-info"
         })

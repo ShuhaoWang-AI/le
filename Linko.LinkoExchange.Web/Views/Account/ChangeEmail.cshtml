@@ -1,14 +1,8 @@
 ﻿@model Linko.LinkoExchange.Web.ViewModels.Account.ChangeEmailViewModel 
 
-
-@using Linko.LinkoExchange.Web.ViewModels.Account
-@using Linko.LinkoExchange.Core.Resources
-
-
 @{
     ViewBag.Title = Label.ChangEmailAddress;
     ViewBag.Description = "";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
  
 <section>
@@ -34,7 +28,7 @@
             @using (Html.BeginForm(actionName: "ChangeEmail", controllerName: "Account", method: FormMethod.Post, htmlAttributes: new { @class = "form-horizontal", role = "form" }))
             {
                 @Html.AntiForgeryToken()
-                @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })
+                @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new { @class = "alert alert-danger" })
 
                 <div class="form-group">
                     @Html.LabelFor(m => m.OldEmail, new { @class = "col-md-3 required control-label" })
@@ -51,7 +45,7 @@
                     @Html.LabelFor(m => m.NewEmail, new { @class = "col-md-3 required control-label" })
                     <div class="col-md-9">
                         @Html.TextBoxFor(m => m.NewEmail, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.NewEmail, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(m => m.NewEmail, "", new { @class = "text-red" })
                     </div>
                 </div>
 

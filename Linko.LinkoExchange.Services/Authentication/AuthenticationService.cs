@@ -213,7 +213,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 //create history record
                 UserPasswordHistory history = _dbContext.UserPasswordHistories.Create();
                 history.UserProfileId = applicationUser.UserProfileId;
-                history.PasswordHash = _passwordHasher.HashPassword(newPassword); ;
+                history.PasswordHash = _passwordHasher.HashPassword(newPassword);
                 history.LastModificationDateTimeUtc = DateTime.UtcNow;
                 _dbContext.UserPasswordHistories.Add(history);
                 _dbContext.SaveChanges();

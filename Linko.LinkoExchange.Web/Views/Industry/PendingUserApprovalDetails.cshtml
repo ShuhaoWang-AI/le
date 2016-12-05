@@ -34,8 +34,7 @@
 
         <section class="box-body form-horizontal">
 
-            @*TODO uncomment following line later  *@
-            @*@Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "alert alert-danger" })*@
+            @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new { @class = "alert alert-danger" })
             
             @if (ViewBag.ShowSuccessMessage!= null && ViewBag.ShowSuccessMessage)
             {
@@ -116,7 +115,7 @@
                     @Html.DropDownList(name: "Role", selectList: Model.AvailableRoles, htmlAttributes: new { @class = "form-control" })
                     @Html.ValidationMessageFor(m => m.Role, "", new
                     {
-                        @class = "text-danger"
+                        @class = "text-red"
                     })
                 </div>
             </div>        
