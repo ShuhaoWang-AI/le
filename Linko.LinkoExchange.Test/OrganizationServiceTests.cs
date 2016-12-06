@@ -102,13 +102,13 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetRemainingUserLicenseCount_ForAuthority()
         {
-            var dto = orgService.GetRemainingUserLicenseCount(1, true);
+            var dto = orgService.GetRemainingUserLicenseCount(1);
         }
 
         [TestMethod]
         public void GetRemainingUserLicenseCount_ForIndustry()
         {
-            var dto = orgService.GetRemainingUserLicenseCount(2, false);
+            var dto = orgService.GetRemainingUserLicenseCount(2);
         }
 
         [TestMethod]

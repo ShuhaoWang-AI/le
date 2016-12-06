@@ -51,7 +51,7 @@ namespace Linko.LinkoExchange.Services.Organization
 
         void AddChildOrganization(int parentRegOrdId, OrganizationDto childOrganization);
 
-        int GetRemainingUserLicenseCount(int orgRegProgramId, bool isForAuthority);
+        int GetRemainingUserLicenseCount(int orgRegProgramId);
 
         int GetRemainingIndustryLicenseCount(int orgRegProgramId);
 

@@ -47,5 +47,10 @@ namespace Linko.LinkoExchange.Test
             var roles = _pService.GetRoles(1);
         }
 
+        [TestMethod]
+        public void GetApprovalPeople()
+        {
+            var approvers = _pService.GetApprovalPeople(3, 1);
+        }
     }
 }

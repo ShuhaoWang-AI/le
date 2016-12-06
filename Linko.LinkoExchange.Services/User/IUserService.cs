@@ -37,7 +37,7 @@ namespace Linko.LinkoExchange.Services.User
 
         AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, bool isForFailedKBQs);
 
-        bool EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable);
+        void EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable);
 
         void SetHashedPassword(int userProfileId, string passwordHash);
 

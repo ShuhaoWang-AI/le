@@ -238,7 +238,7 @@ namespace Linko.LinkoExchange.Services.Organization
                     return new EnableOrganizationResultDto() { IsSuccess = false, FailureReason = EnableOrganizationFailureReason.TooManyIndustriesForAuthority };
 
                 //Check child organization doesn't have more user's than "UserPerIndustryMaxCount" setting of parent
-                var remainingUserCount = GetRemainingUserLicenseCount(orgRegProgId, false);
+                var remainingUserCount = GetRemainingUserLicenseCount(orgRegProgId);
                 if (remainingUserCount < 1)
                     return new EnableOrganizationResultDto() { IsSuccess = false, FailureReason = EnableOrganizationFailureReason.TooManyUsersForThisIndustry };
 
@@ -381,9 +381,14 @@ namespace Linko.LinkoExchange.Services.Organization
             throw new RuleViolationException("Validation errors", validationIssues);
         }
                 
-        public int GetRemainingUserLicenseCount(int orgRegProgramId, bool isForAuthority)
+        public int GetRemainingUserLicenseCount(int orgRegProgramId)
         {
             int maxCount;
+            
+            //Authority or Industry?
+            var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms
+                .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
+            bool isForAuthority = !orgRegProgram.RegulatorOrganizationId.HasValue;
 
             if (isForAuthority)
                 maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.AuthorityUserLicenseTotalCount));
@@ -400,13 +405,8 @@ namespace Linko.LinkoExchange.Services.Organization
             var currentProgramUserCount = _dbContext.OrganizationRegulatoryProgramUsers
                                                     .Count(u => u.OrganizationRegulatoryProgramId == orgRegProgramId
                                                     && !u.IsRemoved && u.IsRegistrationApproved && u.IsEnabled);
-            var remaining = maxCount - currentProgramUserCount;
 
-            //Handle at caller
-            //if (remaining < 0)
-            //    throw new Exception(string.Format("ERROR: Remaining user license count is a negative number (={0}) for Org Reg Program={1}, IsForAuthority={2}", remaining, orgRegProgramId, isForAuthority));
-
-            return remaining;
+            return maxCount - currentProgramUserCount;
 
         }
 

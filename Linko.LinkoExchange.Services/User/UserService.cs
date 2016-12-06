@@ -18,6 +18,7 @@ using Linko.LinkoExchange.Services.QuestionAnswer;
 using System.Data.Entity.Validation;
 using Linko.LinkoExchange.Core.Validation;
 using System.Data.Entity.Infrastructure;
+using NLog;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -37,7 +38,8 @@ namespace Linko.LinkoExchange.Services.User
         private readonly IRequestCache _requestCache;
         private readonly IDictionary<SystemSettingType, string> _globalSettings;  
         private readonly ITimeZoneService _timeZones; 
-        private readonly IQuestionAnswerService _questionAnswerServices; 
+        private readonly IQuestionAnswerService _questionAnswerServices;
+        private readonly ILogger _logService;
 
         #endregion
 
@@ -47,7 +49,7 @@ namespace Linko.LinkoExchange.Services.User
             IPasswordHasher passwordHasher, IMapper mapper, IHttpContextService httpContext,
             IEmailService emailService, ISettingService settingService, ISessionCache sessionCache,
             IOrganizationService orgService, IRequestCache requestCache, ITimeZoneService timeZones,
-             IQuestionAnswerService questionAnswerServices)
+             IQuestionAnswerService questionAnswerServices, ILogger logService)
         {
             this._dbContext = dbContext;
             _logger = logger;
@@ -62,6 +64,7 @@ namespace Linko.LinkoExchange.Services.User
             _globalSettings = _settingService.GetGlobalSettings();
             _timeZones = timeZones; 
             _questionAnswerServices = questionAnswerServices;
+            _logService = logService;
         }
 
         #endregion
@@ -575,12 +578,41 @@ namespace Linko.LinkoExchange.Services.User
             };
         }
 
-        public bool EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable)
+        public void EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable)
         {
+            _logService.Info($"EnableDisableUserAccount. OrgRegProgUserId={orgRegProgramUserId}, IsAttemptingDisable={isAttemptingDisable}...");
+
             //Check user is not THIS user's own account
             int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
             if (orgRegProgramUserId == thisUserOrgRegProgUserId)
-                return false;
+            {
+                _logService.Info($"EnableDisableUserAccount. OrgRegProgUserId={orgRegProgramUserId}, IsAttemptingDisable={isAttemptingDisable}... CannotUpdateOwnAccount.");
+
+                List<RuleViolation> validationIssues = new List<RuleViolation>();
+                string message = "User cannot update own account.";
+                validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+            }
+
+            if (!isAttemptingDisable)
+            {
+                //Check user license count
+                //
+                //For Authority or Industry?
+                var orgRegProgramId = _dbContext.OrganizationRegulatoryProgramUsers
+                    .Single(o => o.OrganizationRegulatoryProgramUserId == orgRegProgramUserId).OrganizationRegulatoryProgramId;
+                var remainingUsersAllowed = _orgService.GetRemainingUserLicenseCount(orgRegProgramId);
+                if (remainingUsersAllowed < 1)
+                {
+                    _logService.Info($"EnableDisableUserAccount. OrgRegProgUserId={orgRegProgramUserId}, IsAttemptingDisable={isAttemptingDisable}... NoMoreRemainingUserLicenses.");
+
+                    List<RuleViolation> validationIssues = new List<RuleViolation>();
+                    string message = "No more User Licenses are available for this organization. Disable another User and try again.";
+                    validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                    throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+
+                }
+            }
 
             var user = _dbContext.OrganizationRegulatoryProgramUsers
                 .Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgramUserId);
@@ -589,7 +621,8 @@ namespace Linko.LinkoExchange.Services.User
 
             //TO DO: Log user access enable to Audit (UC-2)
 
-            return true;
+            _logService.Info($"EnableDisableUserAccount. OrgRegProgUserId={orgRegProgramUserId}, IsAttemptingDisable={isAttemptingDisable}... Success.");
+
         }
 
         public void SetHashedPassword(int userProfileId, string passwordHash)

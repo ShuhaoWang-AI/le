@@ -192,11 +192,7 @@ namespace Linko.LinkoExchange.Services.Invitation
 
 
             //Check available license count
-            int remaining;
-            if (invitationType == InvitationType.AuthorityToIndustry)
-                remaining = _organizationService.GetRemainingUserLicenseCount(targetOrgRegProgramId, false);
-            else
-                remaining = _organizationService.GetRemainingUserLicenseCount(targetOrgRegProgramId, invitationType == InvitationType.AuthorityToAuthority);
+            int remaining = _organizationService.GetRemainingUserLicenseCount(targetOrgRegProgramId);
             
             if (remaining < 1)
             {
