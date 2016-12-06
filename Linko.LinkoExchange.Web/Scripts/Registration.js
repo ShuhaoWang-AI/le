@@ -6,10 +6,7 @@ $(document).ready(function () {
         $("input").attr("readonly", true);
         $("input[type='checkbox'").prop('checked', true);
         $(".editabledDiv select").attr("readonly", "disabled");
-        // give the password a template value
-        // And select Agree to terms and conditions
 
-        $("#user-info-panel input[type='password'").val("********"); 
     }
     else if (registrationType == 'ResetRegistration') {
         // Everything should be editable except email and username

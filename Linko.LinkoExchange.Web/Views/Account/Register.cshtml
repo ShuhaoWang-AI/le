@@ -328,9 +328,10 @@ new
                            @class = "control-label col-md-2 required"
                        })
                             <div class="col-md-4">
-                                @Html.PasswordFor(model => Model.UserProfile.Password, new
+                                @Html.PasswordFor(model => model.UserProfile.Password, new
                            {
-                               @class = "form-control"
+                               @class = "form-control",
+                               value = Model.UserProfile.Password
                            })
                             </div>
                         </div>

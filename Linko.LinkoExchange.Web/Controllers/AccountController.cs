@@ -140,8 +140,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 model.UserKBQ.KBQAnswer5 = "**********"; 
 
                 // For Registration, we don't update anything to the user's profile, put a fake password here only to by pass the data validation. 
-                model.UserProfile.Password = "FakePassowrd!001";
-                model.AgreeTermsAndConditions = true; 
+                model.UserProfile.Password = "abcdnxtZ1";
+                model.AgreeTermsAndConditions = false; 
             }
 
             model.Token = token;
