@@ -93,8 +93,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             var invitation = _invitationService.GetInvitation(token);
             if (invitation == null)
             {
-                ModelState.AddModelError("Invitation", "Invalid invitation link.");
-                return View("Error");
+                return View("Confirmation", new ConfirmationViewModel()
+                {
+                    Title = "Invitation Expired",
+                    Message = "The invitation has expired.  Please request a new one."
+                });
             }
 
             var model = new RegistrationViewModel();
