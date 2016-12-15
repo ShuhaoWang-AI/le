@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using Linko.LinkoExchange.Core.Enum;
+﻿using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Settings;
 using System;
 using System.Collections.Generic;
@@ -14,14 +14,14 @@ namespace Linko.LinkoExchange.Services.TimeZone
     public class TimeZoneService : ITimeZoneService
     {
         private readonly LinkoExchangeContext _dbContext;
-        private readonly IMapper _mapper;
         private readonly ISettingService _settings;
+        private readonly IMapHelper _mapHelper;
 
-        public TimeZoneService(LinkoExchangeContext dbContext, IMapper mapper, ISettingService settings)
+        public TimeZoneService(LinkoExchangeContext dbContext, ISettingService settings, IMapHelper mapHelper)
         {
             _dbContext = dbContext;
-            _mapper = mapper;
             _settings = settings;
+            _mapHelper = mapHelper;
         }
 
         public string GetTimeZoneName(int timeZoneId)
@@ -31,7 +31,11 @@ namespace Linko.LinkoExchange.Services.TimeZone
 
         public ICollection<TimeZoneDto> GetTimeZones()
         {
-            var dtos = _mapper.Map<IEnumerable<Core.Domain.TimeZone>, ICollection<TimeZoneDto>>(_dbContext.TimeZones);
+            var dtos = new List<TimeZoneDto>();
+            foreach (Core.Domain.TimeZone timeZone in _dbContext.TimeZones)
+            {
+                dtos.Add(_mapHelper.GetTimeZoneDtoFromTimeZone(timeZone));
+            }
             dtos = dtos.OrderBy(t => TimeZoneInfo.FindSystemTimeZoneById(t.Name).BaseUtcOffset).ToList();
             return dtos;
         }
@@ -49,7 +53,6 @@ namespace Linko.LinkoExchange.Services.TimeZone
             TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
             return (TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, authorityLocalZone));
         }
-
 
     }
 }

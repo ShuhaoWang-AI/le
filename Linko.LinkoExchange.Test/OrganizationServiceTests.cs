@@ -1,14 +1,13 @@
 ﻿using System.Configuration;
-using AutoMapper;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services;
-using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NLog;
+using Linko.LinkoExchange.Services.Mapping;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -20,21 +19,6 @@ namespace Linko.LinkoExchange.Test
 
         public OrganizationServiceTests()
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.AddProfile(new UserMapProfile());
-                cfg.AddProfile(new EmailAuditLogEntryMapProfile());
-                cfg.AddProfile(new InvitationMapProfile());
-                cfg.AddProfile(new OrganizationRegulatoryProgramUserMapProfile());
-                cfg.AddProfile(new OrganizationMapProfile());
-                cfg.AddProfile(new OrganizationRegulatoryProgramMapProfile());
-                cfg.AddProfile(new RegulatoryProgramMapperProfile());
-                cfg.AddProfile(new PermissionGroupMapProfile());
-                cfg.AddProfile(new JurisdictionMapProfile());
-            }); 
-
-            //Make sure there no methods were missing in the mappings loaded above via profiles
-            Mapper.AssertConfigurationIsValid();
         }
 
         [TestInitialize]
@@ -43,8 +27,8 @@ namespace Linko.LinkoExchange.Test
             _logger = new Mock<ILogger>();
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             orgService = new OrganizationService(new LinkoExchangeContext(connectionString), 
-                Mapper.Instance, new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance, _logger.Object), new HttpContextService(),
-                new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance));
+                new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper()), new HttpContextService(),
+                new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), new MapHelper());
         }
 
         [TestMethod]

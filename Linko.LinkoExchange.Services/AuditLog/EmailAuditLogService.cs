@@ -2,6 +2,7 @@
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Mapping;
 
 namespace Linko.LinkoExchange.Services.AuditLog
 {
@@ -11,12 +12,15 @@ namespace Linko.LinkoExchange.Services.AuditLog
     public class EmailAuditLogService : IAuditLogService
     {
         private readonly LinkoExchangeContext _dbContext;
-        private readonly IRequestCache _requestCache; 
+        private readonly IRequestCache _requestCache;
+        private readonly IMapHelper _mapHelper;
 
-        public EmailAuditLogService(LinkoExchangeContext linkoExchangeContext, IRequestCache requestCache)
+        public EmailAuditLogService(LinkoExchangeContext linkoExchangeContext, IRequestCache requestCache,
+            IMapHelper mapHelper)
         { 
             _dbContext = linkoExchangeContext;
-            _requestCache = requestCache; 
+            _requestCache = requestCache;
+            _mapHelper = mapHelper;
         }
 
         /// <summary>
@@ -29,11 +33,12 @@ namespace Linko.LinkoExchange.Services.AuditLog
             if (emailLogEntryDto == null)
                 return;
 
-            var emailLogEntry = AutoMapper.Mapper.Map<EmailAuditLog>(emailLogEntryDto);
+            var emailLogEntry = _mapHelper.GetEmailAuditLogFromEmailAuditLogEntryDto(emailLogEntryDto);
             emailLogEntry.Token = _requestCache.GetValue(CacheKey.Token) as string;
 
             this._dbContext.EmailAuditLogs.Add(emailLogEntry);
             this._dbContext.SaveChanges();
         }
+
     }
 }

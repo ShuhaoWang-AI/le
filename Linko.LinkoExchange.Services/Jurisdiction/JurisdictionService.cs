@@ -1,6 +1,6 @@
-﻿using AutoMapper;
-using Linko.LinkoExchange.Data;
+﻿using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +12,12 @@ namespace Linko.LinkoExchange.Services.Jurisdiction
     public class JurisdictionService : IJurisdictionService
     {
         private readonly LinkoExchangeContext _dbContext;
-        private readonly IMapper _mapper;
+        private readonly IMapHelper _mapHelper;
 
-        public JurisdictionService(LinkoExchangeContext dbContext, IMapper mapper)
+        public JurisdictionService(LinkoExchangeContext dbContext, IMapHelper mapHelper)
         {
             _dbContext = dbContext;
-            _mapper = mapper;
+            _mapHelper = mapHelper;
         }
 
         public ICollection<JurisdictionDto> GetStateProvs(int countryId)
@@ -27,7 +27,10 @@ namespace Linko.LinkoExchange.Services.Jurisdiction
             if (states != null)
                 foreach (var state in states)
                 {
-                    dtos.Add(_mapper.Map<Core.Domain.Jurisdiction, JurisdictionDto>(state));
+                    JurisdictionDto dto = _mapHelper.GetJurisdictionDtoFromJurisdiction(state);
+
+                    dtos.Add(dto);
+
                 }
 
 
@@ -36,7 +39,10 @@ namespace Linko.LinkoExchange.Services.Jurisdiction
 
         public JurisdictionDto GetJurisdictionById(int jurisdictionId)
         {
-            return _mapper.Map<Core.Domain.Jurisdiction, JurisdictionDto>(_dbContext.Jurisdictions.Single(j => j.JurisdictionId == jurisdictionId));
+            Core.Domain.Jurisdiction jurisdiction = _dbContext.Jurisdictions.Single(j => j.JurisdictionId == jurisdictionId);
+            JurisdictionDto dto = _mapHelper.GetJurisdictionDtoFromJurisdiction(jurisdiction);
+
+            return dto;
         }
     }
 }

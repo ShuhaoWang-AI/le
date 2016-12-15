@@ -1,8 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Linko.LinkoExchange.Services.Settings;
-using AutoMapper;
-using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using System.Collections.Generic;
@@ -31,13 +29,6 @@ namespace Linko.LinkoExchange.Test
 
         public QuestionAnswerServiceTests()
         {
-            Mapper.Initialize(cfg =>
-            {
-                //cfg.AddProfile(new UserMapProfile());
-                //cfg.AddProfile(new UserQuestionAnswerMapProfile());
-            });
-
-            Mapper.AssertConfigurationIsValid();
         }
 
         [TestInitialize]

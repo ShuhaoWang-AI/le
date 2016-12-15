@@ -1,9 +1,9 @@
-﻿using AutoMapper;
-using Linko.LinkoExchange.Core.Common;
+﻿using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Program;
 using System;
 using System.Collections.Generic;
@@ -15,16 +15,17 @@ namespace Linko.LinkoExchange.Services.Permission
     {
         private readonly IProgramService _programService;
         private readonly LinkoExchangeContext _dbContext;
-        private readonly IMapper _mapper;
+        private readonly IMapHelper _mapHelper;
 
-        public PermissionService(IProgramService programService, LinkoExchangeContext dbContext, IMapper mapper)
+        public PermissionService(IProgramService programService, LinkoExchangeContext dbContext,
+            IMapHelper mapHelper)
         {
             if (programService == null) throw new ArgumentNullException("programService");
             if (dbContext == null) throw new ArgumentNullException("dbContext");
 
             _programService = programService;
             _dbContext = dbContext;
-            _mapper = mapper;
+            _mapHelper = mapHelper;
 
         }
 
@@ -40,7 +41,7 @@ namespace Linko.LinkoExchange.Services.Permission
 
                 var userProfileIds = users.Select(i => i.UserProfileId).Distinct();
                 var userProfiles = _dbContext.Users.Where(i => userProfileIds.Contains(i.UserProfileId)).ToList();
-                var userDtos = userProfiles.Select(i => _mapper.Map<UserDto>(i));
+                var userDtos = userProfiles.Select(i => _mapHelper.GetUserDtoFromUserProfile(i));
 
                 return userDtos;
             }
@@ -59,7 +60,8 @@ namespace Linko.LinkoExchange.Services.Permission
             var roles = _dbContext.PermissionGroups.Where(p => p.OrganizationRegulatoryProgramId == orgRegProgramId);
             foreach (var role in roles)
             {
-                roleList.Add(_mapper.Map<PermissionGroup, PermissionGroupDto>(role));
+                var dto = _mapHelper.GetPermissionGroupDtoFromPermissionGroup(role);
+                roleList.Add(dto);
             }
 
             return roleList;

@@ -1,14 +1,12 @@
 using System;
 using System.Configuration;
 using System.Web;
-using AutoMapper;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Logging;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Authentication;
-using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
@@ -26,7 +24,6 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using Microsoft.Practices.Unity;
 using NLog;
-using Linko.LinkoExchange.Web.AutoMapperProfile;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Web.ViewModels.User;
 
@@ -107,36 +104,13 @@ namespace Linko.LinkoExchange.Web
                 typeof(EmailAuditLogService), 
                 typeof(IProgramService),
                 typeof(ISettingService),
-                typeof(IRequestCache))); 
+                typeof(IRequestCache)));
 
-            //var config = new MapperConfiguration(cfg =>
-            //{
-            //    cfg.AddProfile(new UserMapProfile());
-            //});
-            //container.RegisterInstance<IMapper>(config.CreateMapper());
-            Mapper.Initialize(cfg =>
-            {
-                cfg.AddProfile(new UserMapProfile());
-                cfg.AddProfile(new EmailAuditLogEntryMapProfile()); 
-                cfg.AddProfile(new InvitationMapProfile());
-                cfg.AddProfile(new OrganizationRegulatoryProgramUserMapProfile());
-                cfg.AddProfile(new OrganizationMapProfile());
-                cfg.AddProfile(new OrganizationRegulatoryProgramMapProfile());
-                cfg.AddProfile(new RegulatoryProgramMapperProfile());
-                cfg.AddProfile(new PermissionGroupMapProfile());
-                cfg.AddProfile(new SettingMapProfile());
-                cfg.AddProfile(new UserProfileViewModelProfile());
-                cfg.AddProfile(new JurisdictionMapProfile());
-                cfg.AddProfile(new QuestionAnswerPairViewModelProfile());
-                cfg.AddProfile(new AnswerViewModelProfile());
-                cfg.AddProfile(new QuestionViewModelProfile());
-                cfg.AddProfile(new TimeZoneMapProfile());
-            });
+            //Map POCO <-> DTO
+            container.RegisterType<Services.Mapping.IMapHelper, Services.Mapping.MapHelper>();
 
-            //Make sure there no methods were missing in the mappings loaded above via profiles
-            Mapper.AssertConfigurationIsValid();
-
-            container.RegisterInstance<IMapper>(Mapper.Instance);
+            //Map DTO <-> ViewModel
+            container.RegisterType<Web.Mapping.IMapHelper, Web.Mapping.MapHelper>();
 
 
         }

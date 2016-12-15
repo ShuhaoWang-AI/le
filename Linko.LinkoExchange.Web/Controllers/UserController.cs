@@ -6,7 +6,6 @@ using System.Security.Claims;
 using System.Web.Hosting;
 using System.Web.Mvc;
 using System.Web.Routing;
-using AutoMapper;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
@@ -16,6 +15,7 @@ using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.ViewModels.User;
 using Linko.LinkoExchange.Web.shared;
+using Linko.LinkoExchange.Web.Mapping;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -27,15 +27,15 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IJurisdictionService _jurisdictionService;
         private readonly string fakePassword = "********";
-        private readonly IMapper _mapper;
         private readonly ProfileHelper profileHelper;
+        private readonly IMapHelper _mapHelper;
         public UserController(
             IAuthenticationService authenticateService,
             IQuestionAnswerService questAnswerService,
             ISessionCache sessionCache,
             IUserService userService,
             IJurisdictionService jurisdictionService,
-            IMapper mapper)
+            IMapHelper mapHelper)
         {
             if (authenticateService == null) throw new ArgumentNullException("authenticateService");
             if (sessionCache == null) throw new ArgumentNullException("sessionCache");
@@ -45,10 +45,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             _sessionCache = sessionCache;
             _userService = userService;
             _jurisdictionService = jurisdictionService;
-            _mapper = mapper;
             _questionAnswerService = questAnswerService;
+            _mapHelper = mapHelper;
 
-            profileHelper = new ProfileHelper(questAnswerService, sessionCache, userService, jurisdictionService, mapper);
+            profileHelper = new ProfileHelper(questAnswerService, sessionCache, userService, jurisdictionService, mapHelper);
         }
 
         // GET: UserDto
@@ -214,7 +214,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return View(pristineUserModel);
             }
 
-            var userDto = _mapper.Map<UserDto>(model.UserProfile);
+            var userDto = _mapHelper.GetUserDtoFromUserProfileViewModel(model.UserProfile);
             userDto.UserProfileId = userProfileId; 
 
             var validateResult = _userService.ValidateUserProfileData(userDto);

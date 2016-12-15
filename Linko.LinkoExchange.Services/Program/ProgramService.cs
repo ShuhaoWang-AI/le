@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Data;
 using System.Linq;
-using AutoMapper;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Services.Mapping;
 
 namespace Linko.LinkoExchange.Services.Program
 {
     public class ProgramService : IProgramService
     {
         private readonly LinkoExchangeContext _linkoExchangeDbContext;
-        private readonly IMapper _mapper; 
+        private readonly IMapHelper _mapHelper;
 
         public ProgramService(
             LinkoExchangeContext applicationDbContext, 
-            IMapper mapper
+            IMapHelper mapHelper
             )
         {
             _linkoExchangeDbContext = applicationDbContext;
-            _mapper = mapper; 
+            _mapHelper = mapHelper;
         }
         
         /// <summary>
@@ -35,7 +35,7 @@ namespace Linko.LinkoExchange.Services.Program
                                            i.UserProfileId == userId).ToList();
             return orp.Select(i=>
             {
-                return _mapper.Map<OrganizationRegulatoryProgramDto>(i.OrganizationRegulatoryProgram);
+                return _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(i.OrganizationRegulatoryProgram);
             });
         }
 
@@ -44,7 +44,7 @@ namespace Linko.LinkoExchange.Services.Program
             var  orp =  _linkoExchangeDbContext.OrganizationRegulatoryPrograms.SingleOrDefault(
                 i => i.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId && i.IsRemoved == false);
 
-            return orp == null ? null : _mapper.Map<OrganizationRegulatoryProgramDto>(orp);
+            return orp == null ? null : _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orp);
         }
 
         /// <summary>
@@ -65,11 +65,11 @@ namespace Linko.LinkoExchange.Services.Program
             if (regulatoryProgramUsers.Any()) 
             {
                 organziationRegulatoryProgramUserDtos
-                    .AddRange(regulatoryProgramUsers.Select(user => _mapper.Map<OrganizationRegulatoryProgramUserDto>(user)));
+                    .AddRange(regulatoryProgramUsers.Select(user => _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user)));
 
                 foreach(var u in organziationRegulatoryProgramUserDtos)
                 {
-                    u.UserProfileDto = _mapper.Map<UserProfile, UserDto>(_linkoExchangeDbContext.Users.SingleOrDefault(user => user.UserProfileId == u.UserProfileId));
+                    u.UserProfileDto = _mapHelper.GetUserDtoFromUserProfile(_linkoExchangeDbContext.Users.SingleOrDefault(user => user.UserProfileId == u.UserProfileId));
                 }
 
             }
@@ -108,7 +108,7 @@ namespace Linko.LinkoExchange.Services.Program
 
             _linkoExchangeDbContext.SaveChanges();
 
-            return _mapper.Map<OrganizationRegulatoryProgramUserDto>(orpu);
+            return _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(orpu);
 
         }
     }

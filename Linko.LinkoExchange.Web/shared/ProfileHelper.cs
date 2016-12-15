@@ -1,10 +1,10 @@
-﻿using AutoMapper;
-using Linko.LinkoExchange.Core.Enum;
+﻿using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Web.Mapping;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 using System;
@@ -20,22 +20,22 @@ namespace Linko.LinkoExchange.Web.shared
         private readonly IUserService _userService;
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IJurisdictionService _jurisdictionService;
-        private readonly IMapper _mapper;
         private readonly string fakePassword = "********";
+        private readonly IMapHelper _mapHelper;
 
         public ProfileHelper(
             IQuestionAnswerService questAnswerService,
             ISessionCache sessionCache,
             IUserService userService,
             IJurisdictionService jurisdictionService,
-            IMapper mapper
+            IMapHelper mapHelper
 
             ) { 
             _sessionCache = sessionCache;
             _userService = userService;
             _jurisdictionService = jurisdictionService;
-            _mapper = mapper;
-            _questionAnswerService = questAnswerService; 
+            _questionAnswerService = questAnswerService;
+            _mapHelper = mapHelper;
         }
 
 
@@ -56,7 +56,7 @@ namespace Linko.LinkoExchange.Web.shared
         public UserProfileViewModel GetUserProfileViewModel(int userProfileId)
         {
             var userProileDto = _userService.GetUserProfileById(userProfileId);
-            var userProfileViewModel = _mapper.Map<UserProfileViewModel>(userProileDto);
+            var userProfileViewModel = _mapHelper.GetUserProfileViewModelFromUserDto(userProileDto);
 
             //Need to set the HasSignatory for Org Reg Program User
             string orgRegProgramUserIdString = _sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId);
@@ -85,7 +85,7 @@ namespace Linko.LinkoExchange.Web.shared
 
             var kbqQuestions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, QuestionTypeName.KBQ);
 
-            var kbqs = kbqQuestions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
+            var kbqs = kbqQuestions.Select(i => _mapHelper.GetQuestionAnswerPairViewModelFromQuestionAnswerPairDto(i)).ToList();
 
             userKbqViewModel.QuestionPool = GetQuestionPool(QuestionTypeName.KBQ);
 
@@ -119,7 +119,7 @@ namespace Linko.LinkoExchange.Web.shared
             userSQViewModel.UserProfileId = userProfileId;
 
             var securityQeustions = _questionAnswerService.GetUsersQuestionAnswers(userProfileId, QuestionTypeName.SQ);
-            var sqs = securityQeustions.Select(i => _mapper.Map<QuestionAnswerPairViewModel>(i)).ToList();
+            var sqs = securityQeustions.Select(i => _mapHelper.GetQuestionAnswerPairViewModelFromQuestionAnswerPairDto(i)).ToList();
 
             userSQViewModel.QuestionPool = GetQuestionPool(QuestionTypeName.SQ);
 
@@ -139,7 +139,7 @@ namespace Linko.LinkoExchange.Web.shared
 
         public List<QuestionViewModel> GetQuestionPool(QuestionTypeName type)
         {
-            return _questionAnswerService.GetQuestions().Select(i => _mapper.Map<QuestionViewModel>(i)).ToList()
+            return _questionAnswerService.GetQuestions().Select(i => _mapHelper.GetQuestionViewModelFromQuestionDto(i)).ToList()
                 .Where(i => i.QuestionType == type).ToList();
         }
 

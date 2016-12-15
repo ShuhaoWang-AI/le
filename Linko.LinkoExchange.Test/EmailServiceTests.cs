@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
-using AutoMapper;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.AuditLog;
-using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.Program;
@@ -13,6 +11,7 @@ using Linko.LinkoExchange.Services.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using Linko.LinkoExchange.Services.Mapping;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -24,16 +23,6 @@ namespace Linko.LinkoExchange.Test
 
         public EmailServiceTests()
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.AddProfile(new UserMapProfile());
-                cfg.AddProfile(new EmailAuditLogEntryMapProfile());
-                cfg.AddProfile(new InvitationMapProfile());
-                cfg.AddProfile(new OrganizationMapProfile());
-            });
-
-            //Make sure there no methods were missing in the mappings loaded above via profiles
-            Mapper.AssertConfigurationIsValid();
         } 
 
         [TestInitialize]
@@ -96,7 +85,7 @@ namespace Linko.LinkoExchange.Test
                     i.GetValue(CacheKey.EmailSenderUserProfileId).ToString() == "2000"
             );
              
-            var emailAuditLogService = new EmailAuditLogService(dbContext, requestCache);
+            var emailAuditLogService = new EmailAuditLogService(dbContext, requestCache, new MapHelper());
 
 
             _emailService = new LinkoExchangeEmailService(dbContext, emailAuditLogService, psMockObject.Object,

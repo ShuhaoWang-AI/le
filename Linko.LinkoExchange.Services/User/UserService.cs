@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Extensions;
@@ -19,6 +18,7 @@ using System.Data.Entity.Validation;
 using Linko.LinkoExchange.Core.Validation;
 using System.Data.Entity.Infrastructure;
 using NLog;
+using Linko.LinkoExchange.Services.Mapping;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -29,7 +29,6 @@ namespace Linko.LinkoExchange.Services.User
         private readonly LinkoExchangeContext _dbContext;
         private readonly IAuditLogEntry _logger;
         private readonly IPasswordHasher _passwordHasher;
-        private readonly IMapper _mapper;
         private readonly IHttpContextService _httpContext;
         private readonly IEmailService _emailService;
         private readonly ISettingService _settingService;
@@ -40,21 +39,20 @@ namespace Linko.LinkoExchange.Services.User
         private readonly ITimeZoneService _timeZones; 
         private readonly IQuestionAnswerService _questionAnswerServices;
         private readonly ILogger _logService;
-
+        private readonly IMapHelper _mapHelper;
         #endregion
 
         #region constructor
 
         public UserService(LinkoExchangeContext dbContext, IAuditLogEntry logger,
-            IPasswordHasher passwordHasher, IMapper mapper, IHttpContextService httpContext,
+            IPasswordHasher passwordHasher, IHttpContextService httpContext,
             IEmailService emailService, ISettingService settingService, ISessionCache sessionCache,
             IOrganizationService orgService, IRequestCache requestCache, ITimeZoneService timeZones,
-             IQuestionAnswerService questionAnswerServices, ILogger logService)
+             IQuestionAnswerService questionAnswerServices, ILogger logService, IMapHelper mapHelper)
         {
             this._dbContext = dbContext;
             _logger = logger;
             _passwordHasher = passwordHasher;
-            _mapper = mapper;
             _httpContext = httpContext;
             _emailService = emailService;
             _settingService = settingService;
@@ -65,28 +63,25 @@ namespace Linko.LinkoExchange.Services.User
             _timeZones = timeZones; 
             _questionAnswerServices = questionAnswerServices;
             _logService = logService;
+            _mapHelper = mapHelper;
         }
 
         #endregion
 
         #region public methods
-        
 
         public UserDto GetUserProfileById(int userProfileId)
         {
             var userProfile = _dbContext.Users.Single(up => up.UserProfileId == userProfileId);
-            UserDto dto = _mapper.Map<UserProfile, UserDto>(userProfile);
-            return dto;
+            return _mapHelper.GetUserDtoFromUserProfile(userProfile);
         }
 
         public UserDto GetUserProfileByEmail(string emailAddress)
         {
-            UserDto dto = null;
             UserProfile userProfile = _dbContext.Users.SingleOrDefault(u => u.Email == emailAddress);
             if (userProfile != null)
             {
-                dto = _mapper.Map<UserProfile, UserDto>(userProfile);
-                return dto;
+                return _mapHelper.GetUserDtoFromUserProfile(userProfile);
             }
             else
             {
@@ -105,7 +100,7 @@ namespace Linko.LinkoExchange.Services.User
                 {
                     foreach (var programUser in programUsers)
                     {
-                        var dto = _mapper.Map<OrganizationRegulatoryProgramUser, OrganizationRegulatoryProgramUserDto>(programUser);
+                        var dto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(programUser);
                         //Need to map UserProfileDto manually here
                         dto.UserProfileDto = this.GetUserProfileById(programUser.UserProfileId);
                         dtos.Add(dto);
@@ -129,7 +124,7 @@ namespace Linko.LinkoExchange.Services.User
 
             foreach (var user in users.ToList())
             {
-                var dto = _mapper.Map<OrganizationRegulatoryProgramUser, OrganizationRegulatoryProgramUserDto>(user);
+                var dto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user);
                 //manually map user profile child
                 var userProfileDto = GetUserProfileById(user.UserProfileId);
 
@@ -164,7 +159,7 @@ namespace Linko.LinkoExchange.Services.User
 
             foreach (var user in users.ToList())
             {
-                var dto = _mapper.Map<OrganizationRegulatoryProgramUser, OrganizationRegulatoryProgramUserDto>(user);
+                var dto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user);
                 //manually map user profile child
                 var userProfileDto = GetUserProfileById(user.UserProfileId);
                 
@@ -654,9 +649,7 @@ namespace Linko.LinkoExchange.Services.User
         public void UpdateUser(UserDto dto)
         {
             UserProfile userProfile = _dbContext.Users.Single(up => up.UserProfileId == dto.UserProfileId);
-            userProfile = _mapper.Map<UserDto, UserProfile>(dto, userProfile);
-
-            //Additional manual mappings here
+            userProfile = _mapHelper.GetUserProfileFromUserDto(dto);
 
             _dbContext.SaveChanges();
         }
@@ -845,15 +838,15 @@ namespace Linko.LinkoExchange.Services.User
 
         public OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId)
         {
-            var user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
-            var dto = _mapper.Map<OrganizationRegulatoryProgramUserDto>(user);
-            dto.UserProfileDto = GetUserProfileById(user.UserProfileId);
+            OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+            OrganizationRegulatoryProgramUserDto userDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user);
+            userDto.UserProfileDto = GetUserProfileById(user.UserProfileId);
 
             //Need to modify datetime to local
-            dto.UserProfileDto.CreationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(dto.UserProfileDto.CreationDateTimeUtc.Value.DateTime, orgRegProgUserId);
-            dto.RegistrationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(dto.RegistrationDateTimeUtc.Value.DateTime, orgRegProgUserId);
+            userDto.UserProfileDto.CreationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userDto.UserProfileDto.CreationDateTimeUtc.Value.DateTime, orgRegProgUserId);
+            userDto.RegistrationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userDto.RegistrationDateTimeUtc.Value.DateTime, orgRegProgUserId);
 
-            return dto;
+            return userDto;
         }
 
         public void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, int organizationRegulatoryProgramId,
@@ -1034,7 +1027,7 @@ namespace Linko.LinkoExchange.Services.User
             return new RegistrationResultDto() { Result = RegistrationResult.Success };
 
         }
- 
-        #endregion 
+
+        #endregion
     }
 }

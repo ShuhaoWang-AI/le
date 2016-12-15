@@ -4,7 +4,6 @@ using System.Configuration;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using AutoMapper;
 using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
@@ -49,7 +48,6 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IPasswordHasher _passwordHasher;
 
         private readonly IDictionary<SystemSettingType, string> _globalSettings;
-        private readonly IMapper _mapper;
         private readonly IHttpContextService _httpContext;
         private readonly ILogger _logger;
         private readonly IQuestionAnswerService _questionAnswerService;
@@ -67,7 +65,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             IUserService userService
            , ISessionCache sessionCache
            , IRequestCache requestCache
-           , IMapper mapper
            , IPasswordHasher passwordHasher
            , IHttpContextService httpContext
            , ILogger logger
@@ -87,7 +84,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (userService == null) throw new ArgumentNullException("userService");
             if (sessionCache == null) throw new ArgumentNullException("sessionCache");
             if (requestCache == null) throw new ArgumentNullException("requestCache");
-            if (mapper == null) throw new ArgumentNullException("mapper");
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (logger == null) throw new ArgumentNullException("logger");
             if (questionAnswerService == null) throw new ArgumentNullException("questionAnswerService");
@@ -106,7 +102,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             _userService = userService;
             _sessionCache = sessionCache;
             _requestCache = requestCache;
-            _mapper = mapper;
             _passwordHasher = passwordHasher;
             _httpContext = httpContext;
             _logger = logger;

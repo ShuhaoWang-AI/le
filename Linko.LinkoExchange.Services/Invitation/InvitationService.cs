@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
-using AutoMapper;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
@@ -17,13 +16,13 @@ using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.User;
 using NLog;
 using Linko.LinkoExchange.Services.Program;
+using Linko.LinkoExchange.Services.Mapping;
 
 namespace Linko.LinkoExchange.Services.Invitation
 {
     public class InvitationService : IInvitationService
     {
         private readonly LinkoExchangeContext _dbContext; 
-        private readonly IMapper _mapper;
         private readonly ISettingService _settingService;
         private readonly IUserService _userService;
         private readonly IRequestCache _requestCache;
@@ -34,15 +33,15 @@ namespace Linko.LinkoExchange.Services.Invitation
         private readonly IProgramService _programService;
         private readonly ILogger _logger;
         private readonly ISessionCache _sessionCache;
+        private readonly IMapHelper _mapHelper;
 
-        public InvitationService(LinkoExchangeContext dbContext, IMapper mapper, 
+        public InvitationService(LinkoExchangeContext dbContext,
             ISettingService settingService, IUserService userService, IRequestCache requestCache,
             IEmailService emailService, IOrganizationService organizationService, IHttpContextService httpContext,
             ITimeZoneService timeZones, ILogger logger,
-            IProgramService programService, ISessionCache sessionCache) 
+            IProgramService programService, ISessionCache sessionCache, IMapHelper mapHelper) 
         {
             _dbContext = dbContext; 
-            _mapper = mapper;
             _settingService = settingService;
             _userService = userService;
             _requestCache = requestCache;
@@ -53,6 +52,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             _programService = programService;
             _logger = logger;
             _sessionCache = sessionCache;
+            _mapHelper = mapHelper;
         }
 
         public InvitationDto GetInvitation(string invitationId)
@@ -60,7 +60,8 @@ namespace Linko.LinkoExchange.Services.Invitation
             var invitation = _dbContext.Invitations.SingleOrDefault(i => i.InvitationId == invitationId);
             if (invitation == null) return null;
 
-            var invitationDto = _mapper.Map<InvitationDto>(invitation);
+            var invitationDto = _mapHelper.GetInvitationDtoFromInvitation(invitation);
+
             var senderProgram = _programService.GetOrganizationRegulatoryProgram(invitation.SenderOrganizationRegulatoryProgramId);
             var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitation.RecipientOrganizationRegulatoryProgramId);
 
@@ -121,7 +122,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             {
                 foreach (var invite in invites)
                 {
-                    var dto = _mapper.Map<Core.Domain.Invitation, InvitationDto>(invite);
+                    var dto = _mapHelper.GetInvitationDtoFromInvitation(invite);
 
                     //Get expiry
                     int addExpiryHours = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authority.OrganizationId, org.RegulatoryProgramId, SettingType.InvitationExpiredHours));

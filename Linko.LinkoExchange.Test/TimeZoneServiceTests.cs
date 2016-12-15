@@ -1,8 +1,6 @@
 ﻿using System.Configuration;
-using AutoMapper;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services;
-using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -14,6 +12,7 @@ using System;
 using Moq;
 using NLog;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Services.Mapping;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -25,22 +24,6 @@ namespace Linko.LinkoExchange.Test
 
         public TimeZoneServiceTests()
         {
-            Mapper.Initialize(cfg =>
-            {
-                //cfg.AddProfile(new UserMapProfile());
-                //cfg.AddProfile(new EmailAuditLogEntryMapProfile());
-                //cfg.AddProfile(new InvitationMapProfile());
-                //cfg.AddProfile(new OrganizationRegulatoryProgramUserDtoMapProfile());
-                //cfg.AddProfile(new OrganizationMapProfile());
-                //cfg.AddProfile(new OrganizationRegulatoryProgramMapProfile());
-                //cfg.AddProfile(new RegulatoryProgramMapperProfile());
-                //cfg.AddProfile(new PermissionGroupMapProfile());
-                //cfg.AddProfile(new JurisdictionMapProfile());
-                cfg.AddProfile(new TimeZoneMapProfile());
-            }); 
-
-            //Make sure there no methods were missing in the mappings loaded above via profiles
-            Mapper.AssertConfigurationIsValid();
         }
 
         [TestInitialize]
@@ -51,7 +34,7 @@ namespace Linko.LinkoExchange.Test
             _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), 2, It.IsAny<SettingType>())).Returns("4");
 
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            _tZservice = new TimeZoneService(new LinkoExchangeContext(connectionString), Mapper.Instance, _settings.Object);
+            _tZservice = new TimeZoneService(new LinkoExchangeContext(connectionString), _settings.Object, new MapHelper());
         }
 
         [TestMethod]

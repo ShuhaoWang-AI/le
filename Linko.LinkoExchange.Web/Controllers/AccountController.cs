@@ -6,7 +6,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using AutoMapper;
 using Kendo.Mvc.Extensions;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
@@ -26,6 +25,7 @@ using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 using Linko.LinkoExchange.Web.shared;
 using NLog;
+using Linko.LinkoExchange.Web.Mapping;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -45,9 +45,9 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IJurisdictionService _jurisdictionService;
         private readonly ISettingService _settingService;
         private readonly IProgramService _programService;
-        private readonly IMapper _mapper;
         private readonly ISessionCache _sessionCache;
-        private readonly ProfileHelper profileHelper; 
+        private readonly ProfileHelper profileHelper;
+        private readonly IMapHelper _mapHelper;
 
         public AccountController(
 
@@ -62,7 +62,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             ISettingService settingService,
             IProgramService programService,
             ISessionCache sessionCache,
-            IMapper mapper)
+            IMapHelper mapHelper)
         {
             _authenticationService = authenticationService;
             _organizationService = organizationService;
@@ -75,8 +75,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             _settingService = settingService;
             _programService = programService;
             _sessionCache = sessionCache;
-            _mapper = mapper;
-            profileHelper = new ProfileHelper(questionAnswerService, sessionCache, userService, jurisdictionService, mapper);
+            _mapHelper = mapHelper;
+            profileHelper = new ProfileHelper(questionAnswerService, sessionCache, userService, jurisdictionService, mapHelper);
         }
 
         #endregion
@@ -208,7 +208,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return View(model);
             }
 
-            UserDto userDto = _mapper.Map<UserProfileViewModel, UserDto>(model.UserProfile);
+            UserDto userDto = _mapHelper.GetUserDtoFromUserProfileViewModel(model.UserProfile);
             userDto.Password = model.UserProfile.Password;
             userDto.AgreeTermsAndConditions = model.AgreeTermsAndConditions;
 
@@ -1075,11 +1075,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return stateList;
         }
-        //private List<QuestionViewModel> GetQuestionPool(QuestionTypeName type)
-        //{
-        //    return _questionAnswerService.GetQuestions().Select(i => _mapper.Map<QuestionViewModel>(i)).ToList()
-        //        .Where(i => i.QuestionType == type).ToList();
-        //}         
+
         #endregion
     }
 }

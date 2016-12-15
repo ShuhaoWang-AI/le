@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
-using AutoMapper;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NLog;
+using Linko.LinkoExchange.Services.Mapping;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -21,19 +20,6 @@ namespace Linko.LinkoExchange.Test
 
         public SettingServiceTests()
         {
-            Mapper.Initialize(cfg =>
-            {
-                //cfg.AddProfile(new UserMapProfile());
-                //cfg.AddProfile(new EmailAuditLogEntryMapProfile());
-                //cfg.AddProfile(new InvitationMapProfile());
-                cfg.AddProfile(new RegulatoryProgramMapperProfile());
-                cfg.AddProfile(new OrganizationMapProfile());
-                //cfg.AddProfile(new OrganizationRegulatoryProgramUserDtoMapProfile());
-                cfg.AddProfile(new SettingMapProfile());
-            });
-
-            //Make sure there no methods were missing in the mappings loaded above via profiles
-            Mapper.AssertConfigurationIsValid();
         }
 
         [TestInitialize]
@@ -41,7 +27,7 @@ namespace Linko.LinkoExchange.Test
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             _logger = new Mock<ILogger>();
-            _settingService = new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance, _logger.Object);
+            _settingService = new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper());
         }
 
         [TestMethod]

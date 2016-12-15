@@ -5,7 +5,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using AutoMapper;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
@@ -83,8 +82,6 @@ namespace Linko.LinkoExchange.Test
                   i.Claims == new List<IdentityUserClaim>()
               );
 
-            AutoMapperConfig.Setup();
-
             progServiceMock = Mock.Get(progService);
             permissionMock = Mock.Get(permService);
 
@@ -136,7 +133,6 @@ namespace Linko.LinkoExchange.Test
                 userService,
                 sessionCache,
                 requestCache,
-                AutoMapper.Mapper.Instance,
                 passwordHasher,
                 httpContextService,
                 logger,
@@ -851,7 +847,6 @@ namespace Linko.LinkoExchange.Test
                 userService,
                 sessionCache,
                 requestCache,
-                Mapper.Instance,
                 passwordHasher,
                 httpContextService,
                 logger,

@@ -31,14 +31,6 @@ namespace Linko.LinkoExchange.Services.Organization
         /// <returns>Collection of organization</returns>
         OrganizationDto GetOrganization(int organizationId);
 
-        /// <summary>
-        /// Update the Organization underneath the Authority or Industry
-        /// Should not be called directly from BL layer
-        /// </summary>
-        /// <param name="organization"></param>
-        void UpdateOrganization(OrganizationDto organization);
-
-
         /// When enabling, we need to check the parent (RegulatorOrganizationId)
         /// to see if there are any available licenses left
         ///
@@ -48,8 +40,6 @@ namespace Linko.LinkoExchange.Services.Organization
         OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int orgRegProgId);
 
         List<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int orgRegProgId, string searchString = null);
-
-        void AddChildOrganization(int parentRegOrdId, OrganizationDto childOrganization);
 
         int GetRemainingUserLicenseCount(int orgRegProgramId);
 

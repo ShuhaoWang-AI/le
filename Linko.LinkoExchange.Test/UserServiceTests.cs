@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
-using AutoMapper;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Authentication;
-using Linko.LinkoExchange.Services.AutoMapperProfile;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
@@ -20,6 +18,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NLog;
+using Linko.LinkoExchange.Services.Mapping;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -43,21 +42,6 @@ namespace Linko.LinkoExchange.Test
 
         public UserServiceTests()
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.AddProfile(new UserMapProfile());
-                //cfg.AddProfile(new EmailAuditLogEntryMapProfile());
-                //cfg.AddProfile(new InvitationMapProfile());
-                cfg.AddProfile(new PermissionGroupMapProfile());
-                cfg.AddProfile(new RegulatoryProgramMapperProfile());
-                cfg.AddProfile(new OrganizationRegulatoryProgramMapProfile());
-                cfg.AddProfile(new OrganizationRegulatoryProgramUserMapProfile());
-                cfg.AddProfile(new OrganizationMapProfile());
-                cfg.AddProfile(new SettingMapProfile());
-            });
-
-            //Make sure there no methods were missing in the mappings loaded above via profiles
-            Mapper.AssertConfigurationIsValid();
         }
 
         [TestInitialize]
@@ -87,17 +71,17 @@ namespace Linko.LinkoExchange.Test
             _settingService.Setup(x => x.GetGlobalSettings()).Returns(globalSettingLookup);
             _settingService.Setup(x => x.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<int>(), SettingType.TimeZone)).Returns("1");
 
-            _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString), Mapper.Instance, _settingService.Object);
-            _realSettingService = new SettingService(new LinkoExchangeContext(connectionString), Mapper.Instance, _logger.Object);
+            _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString), _settingService.Object, new MapHelper());
+            _realSettingService = new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper());
             _realOrgService = new OrganizationService(new LinkoExchangeContext(connectionString),
-                Mapper.Instance, _realSettingService, new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), Mapper.Instance));
+                _realSettingService, new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), new MapHelper());
             _realUserService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(),
-                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _realSettingService,
-                _sessionCache.Object, _realOrgService, _requestCache, _timeZones, _qaService.Object, _logger.Object);
+                new PasswordHasher(), _httpContext.Object, _emailService, _realSettingService,
+                _sessionCache.Object, _realOrgService, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper());
 
             _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
-                new PasswordHasher(), Mapper.Instance, _httpContext.Object, _emailService, _settingService.Object, 
-                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones, _qaService.Object, _logger.Object);
+                new PasswordHasher(), _httpContext.Object, _emailService, _settingService.Object, 
+                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper());
         }
 
         [TestMethod]

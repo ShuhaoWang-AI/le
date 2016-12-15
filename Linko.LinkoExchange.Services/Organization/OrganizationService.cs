@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
-using AutoMapper;
 using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
@@ -14,26 +13,27 @@ using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using System.Data.Entity;
+using Linko.LinkoExchange.Services.Mapping;
 
 namespace Linko.LinkoExchange.Services.Organization
 {
     public class OrganizationService : IOrganizationService
     {
         private readonly LinkoExchangeContext _dbContext;
-        //private readonly IAuditLogEntry _logger;
-        private readonly IMapper _mapper;
         private readonly ISettingService _settingService;
         private readonly IHttpContextService _httpContext;
         private readonly IJurisdictionService _jurisdictionService;
+        private readonly IMapHelper _mapHelper;
 
-        public OrganizationService(LinkoExchangeContext dbContext, IMapper mapper,
-            ISettingService settingService, IHttpContextService httpContext, IJurisdictionService jurisdictionService)
+        public OrganizationService(LinkoExchangeContext dbContext, ISettingService settingService,
+             IHttpContextService httpContext, IJurisdictionService jurisdictionService,
+            IMapHelper mapHelper)
         {
             _dbContext = dbContext;
-            _mapper = mapper;
             _settingService = settingService;
             _httpContext = httpContext;
             _jurisdictionService = jurisdictionService;
+            _mapHelper = mapHelper;
         }
 
         public IEnumerable<OrganizationDto> GetUserOrganizationsByOrgRegProgUserId(int orgRegProgUserId)
@@ -46,7 +46,7 @@ namespace Linko.LinkoExchange.Services.Organization
             {
                 foreach (var org in orgList)
                 {
-                    orgDtoList.Add(_mapper.Map<Core.Domain.Organization, OrganizationDto>(org.Organization));
+                    orgDtoList.Add(_mapHelper.GetOrganizationDtoFromOrganization(org.Organization));
                 }
             }
             return orgDtoList;
@@ -79,7 +79,7 @@ namespace Linko.LinkoExchange.Services.Organization
             }
             return  orpUsers.Select(i =>
             {
-                return _mapper.Map<OrganizationRegulatoryProgramDto>(i.OrganizationRegulatoryProgram);
+                return _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(i.OrganizationRegulatoryProgram);
             }); 
         }
 
@@ -117,7 +117,7 @@ namespace Linko.LinkoExchange.Services.Organization
                         //Check for duplicates before adding
                         if (!orgs.Any(i => i.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId))
                         {
-                            AuthorityDto authorityDto = _mapper.Map<Core.Domain.Organization, AuthorityDto>(authority.Organization);
+                            AuthorityDto authorityDto = _mapHelper.GetAuthorityDtoFromOrganization(authority.Organization);
                             authorityDto.RegulatoryProgramId = authority.RegulatoryProgramId;
                             authorityDto.OrganizationRegulatoryProgramId = authority.OrganizationRegulatoryProgramId;
                             authorityDto.EmailContactInfoName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
@@ -173,7 +173,7 @@ namespace Linko.LinkoExchange.Services.Organization
             try
             {
                 var foundOrg = _dbContext.Organizations.Single(o => o.OrganizationId == organizationId);
-                returnDto = _mapper.Map<Core.Domain.Organization, OrganizationDto>(foundOrg);
+                returnDto = _mapHelper.GetOrganizationDtoFromOrganization(foundOrg);
                 var jurisdiction = _jurisdictionService.GetJurisdictionById(foundOrg.JurisdictionId);
                 returnDto.State = jurisdiction == null ? "" : jurisdiction.Code;
             }
@@ -183,35 +183,6 @@ namespace Linko.LinkoExchange.Services.Organization
             }
 
             return returnDto;
-        }
-
-        public void UpdateOrganization(OrganizationDto organization)
-        {
-            try
-            {
-                var foundOrg = _dbContext.Organizations.Single(o => o.OrganizationId == organization.OrganizationId);
-                foundOrg = _mapper.Map<OrganizationDto, Core.Domain.Organization>(organization);
-                _dbContext.SaveChanges();
-            }
-            catch (DbEntityValidationException ex)
-            {
-                List<RuleViolation> validationIssues = new List<RuleViolation>();
-                foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
-                {
-                    DbEntityEntry entry = item.Entry;
-                    string entityTypeName = entry.Entity.GetType().Name;
-
-                    foreach (DbValidationError subItem in item.ValidationErrors)
-                    {
-                        string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
-                        validationIssues.Add(new RuleViolation(string.Empty, null, message));
-
-                    }
-                }
-                //_logger.Info("???");
-                throw new RuleViolationException("Validation errors", validationIssues);
-            }
-
         }
 
         /// When enabling, we need to check the parent (RegulatorOrganizationId)
@@ -253,7 +224,7 @@ namespace Linko.LinkoExchange.Services.Organization
         public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int orgRegProgId)
         {
             var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId);
-            OrganizationRegulatoryProgramDto dto = _mapper.Map<OrganizationRegulatoryProgram, OrganizationRegulatoryProgramDto>(orgRegProgram);
+            OrganizationRegulatoryProgramDto dto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram);
             var signatoryUserCount = _dbContext.OrganizationRegulatoryProgramUsers
                 .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
                 && o.IsSignatory == true);
@@ -296,7 +267,7 @@ namespace Linko.LinkoExchange.Services.Organization
                     var dtoList = new List<OrganizationRegulatoryProgramDto>();
                     foreach (var orgRegProg in childOrgRegProgs.ToList())
                     {
-                        OrganizationRegulatoryProgramDto dto = _mapper.Map<OrganizationRegulatoryProgram, OrganizationRegulatoryProgramDto>(orgRegProg);
+                        OrganizationRegulatoryProgramDto dto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProg);
                         dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
                             .Count(o => o.OrganizationRegulatoryProgramId == orgRegProg.OrganizationRegulatoryProgramId
                             && o.IsSignatory == true) > 0;
@@ -335,33 +306,6 @@ namespace Linko.LinkoExchange.Services.Organization
 
         }
 
-        public void AddChildOrganization(int parentRegOrdId, OrganizationDto childOrganization)
-        {
-            //ASSUMPTION: Organization record does not already exist
-            try
-            {
-                var newOrg = _mapper.Map<OrganizationDto, Core.Domain.Organization>(childOrganization);
-
-                var newOrgRegProg = _dbContext.OrganizationRegulatoryPrograms.Create();
-                newOrgRegProg.Organization = newOrg;
-                newOrgRegProg.RegulatorOrganizationId = parentRegOrdId;
-                _dbContext.SaveChanges();
-            }
-            catch (DbEntityValidationException ex)
-            {
-                HandleEntityException(ex);
-            }
-            catch (Exception e)
-            {
-                var linkoException = new LinkoExchangeException();
-                linkoException.ErrorType = LinkoExchangeError.OrganizationSetting;
-                linkoException.Errors = new List<string> { e.Message };
-                throw linkoException;
-            } 
-        }
-
-       
-        
         private void HandleEntityException(DbEntityValidationException ex)
         {
             List<RuleViolation> validationIssues = new List<RuleViolation>();
@@ -466,7 +410,7 @@ namespace Linko.LinkoExchange.Services.Organization
             else
                 authority = org;
 
-            authorityDto = _mapper.Map<OrganizationRegulatoryProgram, OrganizationRegulatoryProgramDto>(authority);
+            authorityDto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(authority);
             return authorityDto;
         }
 
