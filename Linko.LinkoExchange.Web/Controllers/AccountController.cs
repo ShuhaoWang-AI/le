@@ -296,7 +296,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     break;
                 case RegistrationResult.UserNameIsUsed:
                     ViewBag.inValidProfile = true;
-                    ModelState.AddModelError(key: "", errorMessage: "UserName is being used by another person, please change a different one.");
+                    ModelState.AddModelError(key: "", errorMessage: "User Name is already in use on another account. Please select a different User Name.");
                     break;
                 case RegistrationResult.EmailIsUsed:
                     ViewBag.inValidProfile = true;
