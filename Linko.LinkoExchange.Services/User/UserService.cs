@@ -649,7 +649,7 @@ namespace Linko.LinkoExchange.Services.User
         public void UpdateUser(UserDto dto)
         {
             UserProfile userProfile = _dbContext.Users.Single(up => up.UserProfileId == dto.UserProfileId);
-            userProfile = _mapHelper.GetUserProfileFromUserDto(dto);
+            userProfile = _mapHelper.GetUserProfileFromUserDto(dto, userProfile);
 
             _dbContext.SaveChanges();
         }

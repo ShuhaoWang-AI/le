@@ -9,10 +9,12 @@ namespace Linko.LinkoExchange.Web.Mapping
 {
     public class MapHelper : IMapHelper
     {
-        public UserDto GetUserDtoFromUserProfileViewModel(UserProfileViewModel viewModel)
+        public UserDto GetUserDtoFromUserProfileViewModel(UserProfileViewModel viewModel, UserDto dto = null)
         {
-            var dto = new UserDto();
-
+            if (dto == null)
+            {
+                dto = new UserDto();
+            }
             dto.UserProfileId = viewModel.UserProfileId;
             dto.TitleRole = viewModel.TitleRole;
             dto.FirstName = viewModel.FirstName;
@@ -44,10 +46,12 @@ namespace Linko.LinkoExchange.Web.Mapping
             return dto;
         }
 
-        public UserProfileViewModel GetUserProfileViewModelFromUserDto(UserDto userDto)
+        public UserProfileViewModel GetUserProfileViewModelFromUserDto(UserDto userDto, UserProfileViewModel viewModel = null)
         {
-            var viewModel = new UserProfileViewModel();
-
+            if (viewModel == null)
+            {
+                viewModel = new UserProfileViewModel();
+            }
             viewModel.UserProfileId = userDto.UserProfileId;
             //IGNORE Role
             //IGNORE HasSigntory
@@ -72,18 +76,29 @@ namespace Linko.LinkoExchange.Web.Mapping
             return viewModel;
         }
 
-        public QuestionAnswerPairViewModel GetQuestionAnswerPairViewModelFromQuestionAnswerPairDto(QuestionAnswerPairDto dto)
+        public QuestionAnswerPairViewModel GetQuestionAnswerPairViewModelFromQuestionAnswerPairDto(QuestionAnswerPairDto dto, QuestionAnswerPairViewModel viewModel = null)
         {
-            var viewModel = new QuestionAnswerPairViewModel();
-            viewModel.Question = this.GetQuestionViewModelFromQuestionDto(dto.Question);
-            viewModel.Answer = this.GetAnswerViewModelFromAnswerDto(dto.Answer);
+            if (viewModel == null)
+            {
+                viewModel = new QuestionAnswerPairViewModel();
+                viewModel.Question = this.GetQuestionViewModelFromQuestionDto(dto.Question);
+                viewModel.Answer = this.GetAnswerViewModelFromAnswerDto(dto.Answer);
+            }
+            else
+            {
+                viewModel.Question = this.GetQuestionViewModelFromQuestionDto(dto.Question, viewModel.Question);
+                viewModel.Answer = this.GetAnswerViewModelFromAnswerDto(dto.Answer, viewModel.Answer);
+            }
 
             return viewModel;
         }
 
-        public QuestionViewModel GetQuestionViewModelFromQuestionDto(QuestionDto dto)
+        public QuestionViewModel GetQuestionViewModelFromQuestionDto(QuestionDto dto, QuestionViewModel viewModel = null)
         {
-            var viewModel = new QuestionViewModel();
+            if (viewModel == null)
+            {
+                viewModel = new QuestionViewModel();
+            }
             viewModel.QuestionId = dto.QuestionId;
             viewModel.QuestionType = dto.QuestionType;
             viewModel.Content = dto.Content;
@@ -92,9 +107,12 @@ namespace Linko.LinkoExchange.Web.Mapping
             return viewModel;
         }
 
-        private AnswerViewModel GetAnswerViewModelFromAnswerDto(AnswerDto dto)
+        private AnswerViewModel GetAnswerViewModelFromAnswerDto(AnswerDto dto, AnswerViewModel viewModel = null)
         {
-            var viewModel = new AnswerViewModel();
+            if (viewModel == null)
+            {
+                viewModel = new AnswerViewModel();
+            }
             viewModel.UserQuestionAnswerId = dto.UserQuestionAnswerId;
             viewModel.Content = dto.Content;
             viewModel.QuestionId = dto.QuestionId;

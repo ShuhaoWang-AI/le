@@ -16,17 +16,24 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         }
 
-        public OrganizationDto GetOrganizationDtoFromOrganization(Core.Domain.Organization organization)
+        public OrganizationDto GetOrganizationDtoFromOrganization(Core.Domain.Organization organization, OrganizationDto dto = null)
         {
-            var dto = new OrganizationDto();
+            if (dto == null)
+            {
+                dto = new OrganizationDto();
+                dto.OrganizationType = this.GetOrganizationTypeDtoFromOrganizationType(organization.OrganizationType);
+            }
+            else
+            {
+                dto.OrganizationType = this.GetOrganizationTypeDtoFromOrganizationType(organization.OrganizationType, dto.OrganizationType);
+            }
+
             dto.AddressLine1 = organization.AddressLine1;
             dto.AddressLine2 = organization.AddressLine2;
             dto.CityName = organization.CityName;
             dto.State = organization.Jurisdiction.Code;
             dto.OrganizationId = organization.OrganizationId;
             dto.OrganizationTypeId = organization.OrganizationTypeId;
-
-            dto.OrganizationType = this.GetOrganizationTypeDtoFromOrganizationType(organization.OrganizationType);
 
             dto.OrganizationName = organization.Name;
             dto.ZipCode = organization.ZipCode;
@@ -41,9 +48,13 @@ namespace Linko.LinkoExchange.Services.Mapping
             return dto;
         }
 
-        public AuthorityDto GetAuthorityDtoFromOrganization(Core.Domain.Organization organization)
+        public AuthorityDto GetAuthorityDtoFromOrganization(Core.Domain.Organization organization, AuthorityDto dto = null)
         {
-            var dto = new AuthorityDto();
+            if (dto == null)
+            {
+                dto = new AuthorityDto();
+                dto.OrganizationType = new Dto.OrganizationTypeDto();
+            }
             dto.AddressLine1 = organization.AddressLine1;
             dto.AddressLine2 = organization.AddressLine2;
             dto.CityName = organization.CityName;
@@ -51,7 +62,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.OrganizationId = organization.OrganizationId;
             dto.OrganizationTypeId = organization.OrganizationTypeId;
 
-            dto.OrganizationType = new Dto.OrganizationTypeDto();
             dto.OrganizationType.Name = organization.OrganizationType.Name;
             dto.OrganizationType.Description = organization.OrganizationType.Description;
 
@@ -68,9 +78,12 @@ namespace Linko.LinkoExchange.Services.Mapping
             return dto;
         }
 
-        public UserDto GetUserDtoFromUserProfile(UserProfile userProfile)
+        public UserDto GetUserDtoFromUserProfile(UserProfile userProfile, UserDto dto = null)
         {
-            var dto = new UserDto();
+            if (dto == null)
+            {
+                dto = new UserDto();
+            }
             dto.UserProfileId = userProfile.UserProfileId;
             dto.TitleRole = userProfile.TitleRole;
             dto.FirstName = userProfile.FirstName;
@@ -102,9 +115,12 @@ namespace Linko.LinkoExchange.Services.Mapping
             return dto;
         }
 
-        public UserProfile GetUserProfileFromUserDto(UserDto dto)
+        public UserProfile GetUserProfileFromUserDto(UserDto dto, UserProfile userProfile = null)
         {
-            var userProfile = new UserProfile();
+            if (userProfile == null)
+            {
+                userProfile = new UserProfile();
+            }
             //IGNORE userProfile.UserProfileId
             userProfile.FirstName = dto.FirstName;
             userProfile.LastName = dto.LastName;
@@ -129,9 +145,14 @@ namespace Linko.LinkoExchange.Services.Mapping
             return userProfile;
         }
 
-        public OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(OrganizationRegulatoryProgramUser user)
+        public OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser
+            (OrganizationRegulatoryProgramUser user, OrganizationRegulatoryProgramUserDto userDto = null)
         {
-            var userDto = new OrganizationRegulatoryProgramUserDto();
+            if (userDto == null)
+            {
+                userDto = new OrganizationRegulatoryProgramUserDto();
+                userDto.PermissionGroup = new PermissionGroupDto();
+            }
 
             userDto.OrganizationRegulatoryProgramUserId = user.OrganizationRegulatoryProgramUserId;
             userDto.UserProfileId = user.UserProfileId;
@@ -145,7 +166,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             userDto.RegistrationDateTimeUtc = user.RegistrationDateTimeUtc;
 
             //Map PermissionGroupDto
-            userDto.PermissionGroup = new PermissionGroupDto();
             userDto.PermissionGroup.PermissionGroupId = user.PermissionGroup.PermissionGroupId;
             userDto.PermissionGroup.Name = user.PermissionGroup.Name;
             userDto.PermissionGroup.Description = user.PermissionGroup.Description;
@@ -163,45 +183,8 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         }
 
-        //OrganizationDto, Core.Domain.Organization
-        public Core.Domain.Organization GetOrganizationFromOrganizationDto(OrganizationDto dto)
-        {
-            var org = new Core.Domain.Organization();
-            org.OrganizationId = dto.OrganizationTypeId;
-            org.OrganizationTypeId = dto.OrganizationTypeId;
-
-            org.OrganizationType = new Core.Domain.OrganizationType();
-            org.OrganizationType.Name = dto.OrganizationType.Name;
-            org.OrganizationType.Description = dto.OrganizationType.Description;
-
-            org.Name = dto.OrganizationName;
-            org.AddressLine1 = dto.AddressLine1;
-            org.AddressLine2 = dto.AddressLine2;
-            org.CityName = dto.CityName;
-            org.ZipCode = dto.ZipCode;
-            //org.JurisdictionId = dto.JurisdictionId;
-            //org.Jurisdiction = dto.Jurisdiction;
-            org.PhoneNumber = dto.PhoneNumber;
-            int phoneExtInt;
-            if (Int32.TryParse(dto.PhoneExt, out phoneExtInt))
-            {
-                org.PhoneExt = phoneExtInt;
-            }
-            org.FaxNumber = dto.FaxNumber;
-            //org.WebsiteUrl = dto.WebsiteUrl;
-            org.PermitNumber = dto.PermitNumber;
-            org.Signer = dto.Signer;
-            //org.CreationDateTimeUtc = dto.CreationDateTimeUtc;
-            //org.LastModificationDateTimeUtc = dto.LastModificationDateTimeUtc;
-            //org.LastModifierUserId = dto.LastModifierUserId;
-            //org.OrganizationRegulatoryPrograms = dto.OrganizationRegulatoryPrograms;
-            //org.RegulatorOrganizationRegulatoryPrograms = dto.RegulatorOrganizationRegulatoryPrograms;
-            //org.OrganizationSettings = dto.OrganizationSettings;
-
-            return org;
-        }
-
-        public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(OrganizationRegulatoryProgram org)
+        public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram
+            (OrganizationRegulatoryProgram org, OrganizationRegulatoryProgramDto dto = null)
         {
             //var dto = new OrganizationRegulatoryProgramDto();
             //dto.OrganizationRegulatoryProgramId = org.
@@ -216,8 +199,10 @@ namespace Linko.LinkoExchange.Services.Mapping
             //dto.AssignedTo = org.
             //IGNORE dto.HasSignatory
             //IGNORE dto.HasAdmin
-
-            var dto = new OrganizationRegulatoryProgramDto();
+            if (dto == null)
+            {
+                dto = new OrganizationRegulatoryProgramDto();
+            }
             dto.OrganizationRegulatoryProgramId = org.OrganizationRegulatoryProgramId;
             dto.RegulatoryProgramId = org.RegulatoryProgramId;
 
@@ -243,26 +228,35 @@ namespace Linko.LinkoExchange.Services.Mapping
             return dto;
         }
 
-        public ProgramDto GetProgramDtoFromOrganizationRegulatoryProgram(RegulatoryProgram org)
+        public ProgramDto GetProgramDtoFromOrganizationRegulatoryProgram(RegulatoryProgram org, ProgramDto dto = null)
         {
-            var dto = new ProgramDto();
+            if (dto == null)
+            {
+                dto = new ProgramDto();
+            }
             dto.RegulatoryProgramId = org.RegulatoryProgramId;
             dto.Name = org.Name;
             dto.Description = org.Description;
             return dto;
         }
 
-        public OrganizationTypeDto GetOrganizationTypeDtoFromOrganizationType(OrganizationType orgType)
+        public OrganizationTypeDto GetOrganizationTypeDtoFromOrganizationType(OrganizationType orgType, OrganizationTypeDto dto = null)
         {
-            var dto = new OrganizationTypeDto();
+            if (dto == null)
+            {
+                dto = new OrganizationTypeDto();
+            }
             dto.Name = orgType.Name;
             dto.Description = orgType.Description;
             return dto;
         }
 
-        public SettingDto GetSettingDtoFromOrganizationRegulatoryProgramSetting(OrganizationRegulatoryProgramSetting setting)
+        public SettingDto GetSettingDtoFromOrganizationRegulatoryProgramSetting(OrganizationRegulatoryProgramSetting setting, SettingDto dto = null)
         {
-            var dto = new SettingDto();
+            if (dto == null)
+            {
+                dto = new SettingDto();
+            }
             dto.TemplateName = (SettingType)Enum.Parse(typeof(SettingType), setting.SettingTemplate.Name);
             dto.OrgTypeName = (OrganizationTypeName)Enum.Parse(typeof(OrganizationTypeName), setting.OrganizationRegulatoryProgram.Organization.OrganizationType.Name);
             dto.Value = setting.Value;
@@ -270,9 +264,12 @@ namespace Linko.LinkoExchange.Services.Mapping
             return dto;
         }
 
-        public SettingDto GetSettingDtoFromOrganizationSetting(OrganizationSetting setting)
+        public SettingDto GetSettingDtoFromOrganizationSetting(OrganizationSetting setting, SettingDto dto = null)
         {
-            var dto = new SettingDto();
+            if (dto == null)
+            {
+                dto = new SettingDto();
+            }
             dto.TemplateName = (SettingType)Enum.Parse(typeof(SettingType), setting.SettingTemplate.Name);
             dto.OrgTypeName = (OrganizationTypeName)Enum.Parse(typeof(OrganizationTypeName), setting.SettingTemplate.OrganizationType.Name);
             dto.Value = setting.Value;
@@ -280,9 +277,12 @@ namespace Linko.LinkoExchange.Services.Mapping
             return dto;
         }
 
-        public InvitationDto GetInvitationDtoFromInvitation(Core.Domain.Invitation invitation)
+        public InvitationDto GetInvitationDtoFromInvitation(Core.Domain.Invitation invitation, InvitationDto dto = null)
         {
-            var dto = new InvitationDto();
+            if (dto == null)
+            {
+                dto = new InvitationDto();
+            }
             dto.InvitationId = invitation.InvitationId;
             dto.FirstName = invitation.FirstName;
             dto.LastName = invitation.LastName;
@@ -299,9 +299,12 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         }
 
-        public PermissionGroupDto GetPermissionGroupDtoFromPermissionGroup(PermissionGroup permissionGroup)
+        public PermissionGroupDto GetPermissionGroupDtoFromPermissionGroup(PermissionGroup permissionGroup, PermissionGroupDto dto = null)
         {
-            var dto = new PermissionGroupDto();
+            if (dto == null)
+            {
+                dto = new PermissionGroupDto();
+            }
             dto.PermissionGroupId = permissionGroup.PermissionGroupId;
             dto.Name = permissionGroup.Name;
             dto.Description = permissionGroup.Description;
@@ -312,22 +315,28 @@ namespace Linko.LinkoExchange.Services.Mapping
             return dto;
         }
 
-        public TimeZoneDto GetTimeZoneDtoFromTimeZone(Core.Domain.TimeZone timeZone)
+        public TimeZoneDto GetTimeZoneDtoFromTimeZone(Core.Domain.TimeZone timeZone, TimeZoneDto dto = null)
         {
-            var dto = new TimeZoneDto();
+            if (dto == null)
+            {
+                dto = new TimeZoneDto();
+            }
             dto.TimeZoneId = timeZone.TimeZoneId;
             dto.Name = timeZone.Name;
             return dto;
         }
 
-        public EmailAuditLog GetEmailAuditLogFromEmailAuditLogEntryDto(EmailAuditLogEntryDto dto)
+        public EmailAuditLog GetEmailAuditLogFromEmailAuditLogEntryDto(EmailAuditLogEntryDto dto, EmailAuditLog emailAuditLog = null)
         {
-            var emailAuditLog = new EmailAuditLog();
+            if (emailAuditLog == null)
+            {
+                emailAuditLog = new EmailAuditLog();
+            }
             emailAuditLog.EmailAuditLogId = dto.EmailAuditLogId;
             emailAuditLog.AuditLogTemplateId = dto.AuditLogTemplateId;
             //IGNORE AuditLogTemplate
             emailAuditLog.SenderRegulatoryProgramId = dto.SenderRegulatoryProgramId;
-            emailAuditLog.SenderOrganizationId = dto.SenderRegulatorOrganizationId;
+            emailAuditLog.SenderOrganizationId = dto.SenderOrganizationId;
             emailAuditLog.SenderRegulatorOrganizationId = dto.SenderRegulatorOrganizationId;
             emailAuditLog.SenderUserProfileId = dto.SenderUserProfileId;
             emailAuditLog.SenderUserName = dto.SenderUserName;
@@ -350,9 +359,12 @@ namespace Linko.LinkoExchange.Services.Mapping
             return emailAuditLog;
         }
 
-        public JurisdictionDto GetJurisdictionDtoFromJurisdiction(Core.Domain.Jurisdiction jurisdiction)
+        public JurisdictionDto GetJurisdictionDtoFromJurisdiction(Core.Domain.Jurisdiction jurisdiction, JurisdictionDto dto = null)
         {
-            var dto = new JurisdictionDto();
+            if (dto == null)
+            {
+                dto = new JurisdictionDto();
+            }
             dto.JurisdictionId = jurisdiction.JurisdictionId;
             dto.CountryId = jurisdiction.JurisdictionId;
             dto.StateId = jurisdiction.JurisdictionId;

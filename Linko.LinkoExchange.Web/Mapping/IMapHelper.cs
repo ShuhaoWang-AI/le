@@ -10,9 +10,9 @@ namespace Linko.LinkoExchange.Web.Mapping
 {
     public interface IMapHelper
     {
-        UserDto GetUserDtoFromUserProfileViewModel(UserProfileViewModel viewModel);
-        UserProfileViewModel GetUserProfileViewModelFromUserDto(UserDto userDto);
-        QuestionAnswerPairViewModel GetQuestionAnswerPairViewModelFromQuestionAnswerPairDto(QuestionAnswerPairDto dto);
-        QuestionViewModel GetQuestionViewModelFromQuestionDto(QuestionDto dto);
+        UserDto GetUserDtoFromUserProfileViewModel(UserProfileViewModel viewModel, UserDto dto = null);
+        UserProfileViewModel GetUserProfileViewModelFromUserDto(UserDto userDto, UserProfileViewModel viewModel = null);
+        QuestionAnswerPairViewModel GetQuestionAnswerPairViewModelFromQuestionAnswerPairDto(QuestionAnswerPairDto dto, QuestionAnswerPairViewModel viewModel = null);
+        QuestionViewModel GetQuestionViewModelFromQuestionDto(QuestionDto dto, QuestionViewModel viewModel = null);
     }
 }
