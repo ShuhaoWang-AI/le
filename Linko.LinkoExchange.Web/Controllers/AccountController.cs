@@ -369,6 +369,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                         _logger.Info(string.Format(format: "SignIn. User={0} has been locked out for exceeding the maximum login attempts.", arg0: model.UserName));
                         return RedirectToAction(actionName: "LockedOut", controllerName: "Account");
                     case AuthenticationResult.AccountResetRequired:
+                        _logger.Info(string.Format(format: "SignIn. User={0} has been reset and requires re-reg.", arg0: model.UserName));
+                        TempData["RegulatoryList"] = result.RegulatoryList;
+                        return RedirectToAction(actionName: "AccountReset", controllerName: "Account");
                     case AuthenticationResult.UserIsLocked:                 // 3.a
                         _logger.Info(string.Format(format: "SignIn. User={0} has been locked out.", arg0: model.UserName));
                         TempData["RegulatoryList"] = result.RegulatoryList;
@@ -414,6 +417,40 @@ namespace Linko.LinkoExchange.Web.Controllers
             ConfirmationViewModel model = new ConfirmationViewModel();
             model.Title = "Account Locked";
             model.HtmlStr = Core.Resources.Message.AccountLocked + "<br/>";
+
+            if (TempData["RegulatoryList"] != null)
+            {
+                var regulatoryList = TempData["RegulatoryList"] as IEnumerable<AuthorityDto>;
+
+                model.HtmlStr += "<div class=\"table-responsive\">";
+                model.HtmlStr += "<table class=\"table no-margin\">";
+                model.HtmlStr += "<tbody>";
+
+                foreach (AuthorityDto regulator in regulatoryList)
+                {
+                    model.HtmlStr += "<tr><td>" + regulator.EmailContactInfoName + "</td><td>" + regulator.EmailContactInfoEmailAddress + "</td><td>" + regulator.EmailContactInfoPhone + " </td></tr>";
+                }
+
+                model.HtmlStr += "</tbody>";
+                model.HtmlStr += "</table>";
+                model.HtmlStr += "</div>";
+            }
+            else if (TempData["Message"] != null)
+            {
+                model.HtmlStr += TempData["Message"] as string;
+            }
+
+            return View(viewName: "Confirmation", model: model);
+        }
+
+        // Account reset by Administrator
+        // GET: /Account/AccountReset
+        [AllowAnonymous]
+        public ActionResult AccountReset()
+        {
+            ConfirmationViewModel model = new ConfirmationViewModel();
+            model.Title = "Account Reset";
+            model.HtmlStr = Core.Resources.Message.AccountReset + "<br/>";
 
             if (TempData["RegulatoryList"] != null)
             {

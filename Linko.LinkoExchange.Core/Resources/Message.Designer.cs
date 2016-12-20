@@ -79,6 +79,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your account has been reset and re-registration is required.  Please contact your Authority for assistance..
+        /// </summary>
+        public static string AccountReset {
+            get {
+                return ResourceManager.GetString("AccountReset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Email not found..
         /// </summary>
         public static string EmailNotFound {
