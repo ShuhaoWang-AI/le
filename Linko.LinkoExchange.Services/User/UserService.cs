@@ -611,7 +611,7 @@ namespace Linko.LinkoExchange.Services.User
 
             var user = _dbContext.OrganizationRegulatoryProgramUsers
                 .Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgramUserId);
-            user.IsEnabled = isAttemptingDisable;
+            user.IsEnabled = !isAttemptingDisable;
             _dbContext.SaveChanges();
 
             //TO DO: Log user access enable to Audit (UC-2)

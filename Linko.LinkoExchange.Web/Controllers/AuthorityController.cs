@@ -502,7 +502,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                _userService.EnableDisableUserAccount(model.Id, !model.Status);
+                _userService.EnableDisableUserAccount(model.Id, model.Status);
 
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = model.Status ? "User disabled!" : "User enabled!";
@@ -1055,7 +1055,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                _userService.EnableDisableUserAccount(model.Id, !model.Status);
+                _userService.EnableDisableUserAccount(model.Id, model.Status);
 
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = model.Status ? "User disabled!" : "User enabled!";
