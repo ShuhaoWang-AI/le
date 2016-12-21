@@ -194,12 +194,12 @@
                     </div>
             </div>
             <div class="form-group">
-                @Html.LabelFor(model => model.FacilityName, htmlAttributes: new
+                @Html.LabelFor(model => model.BusinessName, htmlAttributes: new
                {
                    @class = "control-label col-md-2"
                })
                 <div class="col-md-4">
-                    @Html.EditorFor(model => model.FacilityName, new
+                    @Html.EditorFor(model => model.BusinessName, new
                {
                    htmlAttributes = new
                    {
@@ -281,7 +281,7 @@
                         columns.Bound(c => c.FirstName);
                         columns.Bound(c => c.LastName);
                         columns.Bound(c => c.PhoneNumber);
-                        columns.Bound(c => c.FacilityName);
+                        columns.Bound(c => c.BusinessName);
                         columns.Template(m =>
                         {
                         })

@@ -26,8 +26,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
-        [Display(Name = "Facility Name")]
-        public string FacilityName { get; set; }
+        [Display(Name = "Business Name")]
+        public string BusinessName { get; set; }
 
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
@@ -46,7 +46,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string EmailAddress { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string FacilityName { get; set; }
+        public string BusinessName { get; set; }
         public string PhoneNumber { get; set; }
     }
 }

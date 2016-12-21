@@ -61,8 +61,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                     FirstName = foundUsers.ExistingUserSameProgram.UserProfileDto.FirstName,
                     LastName = foundUsers.ExistingUserSameProgram.UserProfileDto.LastName,
                     EmailAddress = foundUsers.ExistingUserSameProgram.UserProfileDto.Email,
-                    FacilityName = foundUsers.ExistingUserSameProgram.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName,
-                    PhoneNumber = foundUsers.ExistingUserSameProgram.OrganizationRegulatoryProgramDto.OrganizationDto.PhoneNumber
+                    BusinessName = foundUsers.ExistingUserSameProgram.UserProfileDto.BusinessName,
+                    PhoneNumber = foundUsers.ExistingUserSameProgram.UserProfileDto.PhoneNumber
 
                 };
             }
@@ -75,16 +75,20 @@ namespace Linko.LinkoExchange.Web.Controllers
                 };
 
                 viewModel.ExistingUsers = new List<InviteExistingUserViewModel>();
-                foreach (var existingUser in foundUsers.ExistingUsersDifferentPrograms)
+                foreach (var distinctExistingUser in 
+                    foundUsers.ExistingUsersDifferentPrograms
+                    .GroupBy(user => user.UserProfileId)
+                    .Select(user => user.First())
+                    .ToList())
                 {
                     viewModel.ExistingUsers.Add(new InviteExistingUserViewModel()
                     {
-                        OrgRegProgramUserId = existingUser.OrganizationRegulatoryProgramUserId,
-                        FirstName = existingUser.UserProfileDto.FirstName,
-                        LastName = existingUser.UserProfileDto.LastName,
-                        EmailAddress = existingUser.UserProfileDto.Email,
-                        FacilityName = existingUser.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName,
-                        PhoneNumber = existingUser.OrganizationRegulatoryProgramDto.OrganizationDto.PhoneNumber
+                        OrgRegProgramUserId = distinctExistingUser.OrganizationRegulatoryProgramUserId,
+                        FirstName = distinctExistingUser.UserProfileDto.FirstName,
+                        LastName = distinctExistingUser.UserProfileDto.LastName,
+                        EmailAddress = distinctExistingUser.UserProfileDto.Email,
+                        BusinessName = distinctExistingUser.UserProfileDto.BusinessName,
+                        PhoneNumber = distinctExistingUser.UserProfileDto.PhoneNumber
                     });
                 }
 
