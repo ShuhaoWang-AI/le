@@ -483,7 +483,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     _requestCache.SetValue(CacheKey.Token, registrationToken);
 
-                    var authorityOrg = _organizationService.GetOrganization(recipientProgram.RegulatorOrganizationId.Value);
+                    var authorityOrg = _organizationService.GetAuthority(recipientProgram.OrganizationRegulatoryProgramId);
 
                     #region Send registration email to approvals
 
@@ -498,7 +498,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
                     emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
                     emailContentReplacements.Add("authorityName", authorityName);
-                    emailContentReplacements.Add("authorityOrganizationName", authorityOrg.OrganizationName);
+                    emailContentReplacements.Add("authorityOrganizationName", authorityOrg.OrganizationDto.OrganizationName);
                     emailContentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
 
                     if (sendTo == null || sendTo.Count() == 0)
