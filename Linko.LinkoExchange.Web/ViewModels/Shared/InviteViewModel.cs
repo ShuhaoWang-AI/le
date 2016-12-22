@@ -26,7 +26,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
-        [Display(Name = "Business Name")]
+        [Display(Name = "Organization Name")]
         public string BusinessName { get; set; }
 
         [Display(Name = "Phone Number")]
