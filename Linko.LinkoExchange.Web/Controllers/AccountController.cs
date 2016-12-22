@@ -483,7 +483,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult LockedOut()
         {
             ConfirmationViewModel model = new ConfirmationViewModel();
-            model.Title = "Locked Out";
+            model.Title = "Password Lockout";
             model.HtmlStr = Core.Resources.Message.ExceedMaximumLoginAttempt + "<br/>";
             model.HtmlStr += "Use <span class='alert-link'> <a href= " + Url.Action(actionName: "ForgotPassword", controllerName: "Account");
             model.HtmlStr += ">Forgot Password </a></span> to reset your password or try again later.";
