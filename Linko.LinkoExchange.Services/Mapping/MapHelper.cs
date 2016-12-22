@@ -166,12 +166,15 @@ namespace Linko.LinkoExchange.Services.Mapping
             userDto.RegistrationDateTimeUtc = user.RegistrationDateTimeUtc;
 
             //Map PermissionGroupDto
-            userDto.PermissionGroup.PermissionGroupId = user.PermissionGroup.PermissionGroupId;
-            userDto.PermissionGroup.Name = user.PermissionGroup.Name;
-            userDto.PermissionGroup.Description = user.PermissionGroup.Description;
-            userDto.PermissionGroup.OrganizationRegulatoryProgramId = user.PermissionGroup.OrganizationRegulatoryProgramId;
-            userDto.PermissionGroup.CreationDateTimeUtc = user.PermissionGroup.CreationDateTimeUtc;
-            userDto.PermissionGroup.LastModificationDateTimeUtc = user.PermissionGroup.LastModificationDateTimeUtc;
+            if (user.PermissionGroup != null)
+            {
+                userDto.PermissionGroup.PermissionGroupId = user.PermissionGroup.PermissionGroupId;
+                userDto.PermissionGroup.Name = user.PermissionGroup.Name;
+                userDto.PermissionGroup.Description = user.PermissionGroup.Description;
+                userDto.PermissionGroup.OrganizationRegulatoryProgramId = user.PermissionGroup.OrganizationRegulatoryProgramId;
+                userDto.PermissionGroup.CreationDateTimeUtc = user.PermissionGroup.CreationDateTimeUtc;
+                userDto.PermissionGroup.LastModificationDateTimeUtc = user.PermissionGroup.LastModificationDateTimeUtc;
+            }
 
             //Map OrganizationRegulatoryProgramDto
             userDto.OrganizationRegulatoryProgramDto = this.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(user.OrganizationRegulatoryProgram);
