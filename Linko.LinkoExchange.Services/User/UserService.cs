@@ -909,7 +909,7 @@ namespace Linko.LinkoExchange.Services.User
 
                 //Is the logged in actor user in the set of IU admins?
                 var isCurrentUserIUAdmin = false;
-                int loggedInUsersOrgRegProgUserId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+                int loggedInUsersOrgRegProgUserId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
                 if (IUAdmins != null && IUAdmins.Any(x => x.OrganizationRegulatoryProgramUserId == loggedInUsersOrgRegProgUserId))
                 {
                     //Logged in user is one of the IU Admins
