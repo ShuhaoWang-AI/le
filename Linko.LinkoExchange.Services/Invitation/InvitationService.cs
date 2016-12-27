@@ -58,7 +58,10 @@ namespace Linko.LinkoExchange.Services.Invitation
         public InvitationDto GetInvitation(string invitationId)
         {
             var invitation = _dbContext.Invitations.SingleOrDefault(i => i.InvitationId == invitationId);
-            if (invitation == null) return null;
+            if (invitation == null)
+            {
+                return null;
+            }
 
             var invitationDto = _mapHelper.GetInvitationDtoFromInvitation(invitation);
 
@@ -69,6 +72,12 @@ namespace Linko.LinkoExchange.Services.Invitation
             {
                 throw new Exception("Invalid invitation data");
             }
+
+            //If Recipient Org Reg Program is disabled, treat same as expired invitation (Bug 1865)
+            if (!recipientProgram.IsEnabled)
+            {
+                return null;
+            } 
 
             // Industry Invite Industry
             if (senderProgram.RegulatorOrganization != null)
