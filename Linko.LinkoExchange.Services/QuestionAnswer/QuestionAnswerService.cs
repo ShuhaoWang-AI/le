@@ -14,13 +14,14 @@ using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Email;
+using NLog;
 
 namespace Linko.LinkoExchange.Services.QuestionAnswer
 {
     public class QuestionAnswerService : IQuestionAnswerService
     {
         private readonly LinkoExchangeContext _dbContext;
-        private readonly IAuditLogEntry _logger;
+        private readonly ILogger _logger;
         private readonly IHttpContextService _httpContext;
         private readonly IEncryptionService _encryption;
         private readonly IPasswordHasher _passwordHasher;
@@ -29,7 +30,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         private readonly IOrganizationService _orgService;
         private readonly IEmailService _emailService;
 
-        public QuestionAnswerService(LinkoExchangeContext dbContext, IAuditLogEntry logger, IHttpContextService httpContext,
+        public QuestionAnswerService(LinkoExchangeContext dbContext, ILogger logger, IHttpContextService httpContext,
             IEncryptionService encryption, IPasswordHasher passwordHasher, ISettingService settingService,
             IOrganizationService orgService, IEmailService emailService)
         {
@@ -238,19 +239,46 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             if (duplicateQuestions.Count() > 0)
                 return CreateOrUpdateAnswersResult.DuplicateQuestionsInNewAndExisting;
 
-            //Persist to DB
+
             int questionCountKBQ = 0;
             int questionCountSQ = 0;
-            foreach (var questionAnswer in answerDtosToUpdate)
+            //Persist to DB
+            //
+            using (var transaction = _dbContext.BeginTransaction())
             {
-                var questionTypeName = _dbContext.Questions.Include(q => q.QuestionType)
-                    .Single(q => q.QuestionId == questionAnswer.QuestionId).QuestionType.Name;
-                questionCountKBQ += questionTypeName == QuestionTypeName.KBQ.ToString() ? 1 : 0;
-                questionCountSQ += questionTypeName == QuestionTypeName.SQ.ToString() ? 1 : 0;
+                try
+                {
+                    foreach (var questionAnswer in answerDtosToUpdate)
+                    {
+                        var questionTypeName = _dbContext.Questions.Include(q => q.QuestionType)
+                            .Single(q => q.QuestionId == questionAnswer.QuestionId).QuestionType.Name;
+                        questionCountKBQ += questionTypeName == QuestionTypeName.KBQ.ToString() ? 1 : 0;
+                        questionCountSQ += questionTypeName == QuestionTypeName.SQ.ToString() ? 1 : 0;
 
-                CreateOrUpdateUserQuestionAnswer(userProfileId, questionAnswer);
+                        CreateOrUpdateUserQuestionAnswer(userProfileId, questionAnswer);
+                    }
+
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    
+                    var errors = new List<string>() { ex.Message };
+
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                    throw;
+                }
+               
             }
-
+               
             var userProfile = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
 
             //Send Emails

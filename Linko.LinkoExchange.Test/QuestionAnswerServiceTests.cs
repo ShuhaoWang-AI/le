@@ -14,6 +14,7 @@ using Moq;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Core.Enum;
+using NLog;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -42,7 +43,7 @@ namespace Linko.LinkoExchange.Test
 
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             _questionAnswerService = new QuestionAnswerService(new LinkoExchangeContext(connectionString),
-                                                               new EmailAuditLogEntryDto(),
+                                                               new Mock<ILogger>().Object,
                                                                new HttpContextService(),
                                                                new EncryptionService(),
                                                                new PasswordHasher(),
