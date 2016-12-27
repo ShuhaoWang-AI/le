@@ -532,6 +532,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     // 4 Remove the invitation from table 
                     _invitationService.DeleteInvitation(invitationDto.InvitationId);
 
+                    _dbContext.SaveChanges();
                     transaction.Commit(); 
                     registrationResult.Result = RegistrationResult.Success; 
                 }
