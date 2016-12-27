@@ -333,6 +333,7 @@ new
                                @class = "form-control",
                                value = Model.UserProfile.Password
                            })
+                                @Html.ValidationMessageFor(m => m.UserProfile.Password, "", new { @class = "text-danger" })
                             </div>
                         </div>
 
