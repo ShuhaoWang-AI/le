@@ -411,6 +411,17 @@ namespace Linko.LinkoExchange.Services.Authentication
                             return registrationResult; 
                         }
 
+                        applicationUser.FirstName = userInfo.FirstName;
+                        applicationUser.LastName = userInfo.LastName;
+                        applicationUser.BusinessName = userInfo.BusinessName;
+                        applicationUser.TitleRole = userInfo.TitleRole;
+                        applicationUser.PhoneNumber = userInfo.PhoneNumber;
+                        applicationUser.PhoneExt = userInfo.PhoneExt;
+                        applicationUser.AddressLine1 = userInfo.AddressLine1;
+                        applicationUser.AddressLine2 = userInfo.AddressLine2;
+                        applicationUser.CityName = userInfo.CityName;
+                        applicationUser.JurisdictionId = userInfo.JurisdictionId;
+                        applicationUser.ZipCode = userInfo.ZipCode;
                         applicationUser.PasswordHash = passwordHash;  
 
                         // Clear KBQ questions and Security Questions for existing user re-registration 
