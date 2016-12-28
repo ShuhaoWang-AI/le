@@ -262,8 +262,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             try
             {
                 _userService.UpdateUserPermissionGroupId(model.Id, model.Role);
+                _userService.UpdateUserSignatoryStatus(model.Id, model.IsSignatory);
                 ViewBag.ShowSuccessMessage = true;
-                ViewBag.SuccessMessage = "User role updated successfully!";
+                ViewBag.SuccessMessage = "User updated successfully!";
                 ModelState.Clear();
                 model = PrepareIndustryUserDetails(id);
             }
