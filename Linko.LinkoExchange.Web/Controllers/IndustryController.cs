@@ -102,7 +102,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             int id = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var industry = _organizationService.GetOrganizationRegulatoryProgram(id);
             ViewBag.Title = string.Format(format: "{0} Users", arg0: industry.OrganizationDto.OrganizationName);
-            ViewBag.CanInvite = _sessionCache.GetClaimValue(CacheKey.UserRole).IsCaseInsensitiveEqual(UserRole.Administrator.ToString());
+
+            var remainingUserLicenseCount = _organizationService.GetRemainingUserLicenseCount(id);
+            ViewBag.CanInvite = _sessionCache.GetClaimValue(CacheKey.UserRole).IsCaseInsensitiveEqual(UserRole.Administrator.ToString())
+                                && remainingUserLicenseCount > 0;
             return View();
         }
 
