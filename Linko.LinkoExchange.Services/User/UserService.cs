@@ -952,6 +952,18 @@ namespace Linko.LinkoExchange.Services.User
 
             }
 
+            //Check user license count
+            if (isApproved)
+            {
+                var remainingUserLicenseCount = _orgService.GetRemainingUserLicenseCount(orgRegProgramId);
+                if (remainingUserLicenseCount < 1)
+                {
+                    //ACTION BLOCKED -- NO MORE USER LICENSES
+                    return new RegistrationResultDto() { Result = RegistrationResult.NoMoreUserLicenses };
+                }
+
+            }
+
             var transaction = _dbContext.BeginTransaction();
             try
             {
