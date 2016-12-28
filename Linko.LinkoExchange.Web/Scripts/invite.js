@@ -39,7 +39,7 @@ $(document).ready(function () {
                     //$("#OrgRegProgramUserId").val(data.OrgRegProgramUserId);
                     $("[id=FirstName]").val(data.FirstName);
                     $("[id=LastName]").val(data.LastName);
-                    $("#FacilityName").val(data.FacilityName);
+                    $("#BusinessName").val(data.BusinessName);
                     $("#PhoneNumber").val(data.PhoneNumber);
 
                     $("#boxFoundUser").show();
@@ -87,7 +87,7 @@ $(document).ready(function () {
         //$("#OrgRegProgramUserId").val(null);
         $("[id=FirstName]").val(null);
         $("[id=LastName]").val(null);
-        $("#FacilityName").val(null);
+        $("#BusinessName").val(null);
         $("#PhoneNumber").val(null);
     }
 
