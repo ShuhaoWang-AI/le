@@ -379,5 +379,29 @@ namespace Linko.LinkoExchange.Services.Mapping
             return dto;
         }
 
+        public CromerrAuditLog GetCromerrAuditLogFromCromerrAuditLogEntryDto(CromerrAuditLogEntryDto dto, CromerrAuditLog cromerrAuditLog = null)
+        {
+            if (cromerrAuditLog == null)
+            {
+                cromerrAuditLog = new CromerrAuditLog();
+            }
+
+            cromerrAuditLog.AuditLogTemplateId = dto.AuditLogTemplateId;
+            cromerrAuditLog.RegulatoryProgramId = dto.RegulatoryProgramId;
+            cromerrAuditLog.OrganizationId = dto.OrganizationId;
+            cromerrAuditLog.RegulatorOrganizationId = dto.RegulatorOrganizationId;
+            cromerrAuditLog.UserProfileId = dto.UserProfileId;
+            cromerrAuditLog.UserName = dto.UserName;
+            cromerrAuditLog.UserFirstName = dto.UserFirstName;
+            cromerrAuditLog.UserLastName = dto.UserLastName;
+            cromerrAuditLog.UserEmailAddress = dto.UserEmailAddress;
+            cromerrAuditLog.IPAddress = dto.IPAddress;
+            cromerrAuditLog.HostName = dto.HostName;
+            cromerrAuditLog.Comment = dto.Comment;
+            cromerrAuditLog.LogDateTimeUtc = dto.LogDateTimeUtc;
+
+            return cromerrAuditLog;
+        }
+
     }
 }

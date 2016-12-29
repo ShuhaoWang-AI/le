@@ -40,5 +40,33 @@ namespace Linko.LinkoExchange.Services
 
             return -1;
         }
+
+        public string CurrentUserIPAddress()
+        {
+            if (System.Web.HttpContext.Current?.Request?.UserHostAddress != null)
+            {
+                string userIPAddress = System.Web.HttpContext.Current.Request.UserHostAddress;
+                if (!String.IsNullOrEmpty(userIPAddress))
+                {
+                    return userIPAddress;
+                }
+            }
+
+            return "";
+        }
+        public string CurrentUserHostName()
+        {
+            if (System.Web.HttpContext.Current?.Request?.UserHostName != null)
+            {
+                string userHostName = System.Web.HttpContext.Current.Request.UserHostName;
+                if (!String.IsNullOrEmpty(userHostName))
+                {
+                    return userHostName;
+                }
+            }
+
+            return "";
+
+        }
     }
 }

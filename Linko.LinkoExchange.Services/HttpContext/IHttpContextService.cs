@@ -9,5 +9,7 @@
         void SetSessionValue(string key, object value);
 
         int CurrentUserProfileId();
+        string CurrentUserIPAddress();
+        string CurrentUserHostName();
     } 
 }

@@ -19,6 +19,7 @@ using Linko.LinkoExchange.Core.Validation;
 using System.Data.Entity.Infrastructure;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.AuditLog;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -40,6 +41,7 @@ namespace Linko.LinkoExchange.Services.User
         private readonly IQuestionAnswerService _questionAnswerServices;
         private readonly ILogger _logService;
         private readonly IMapHelper _mapHelper;
+        private readonly ICromerrAuditLogService _crommerAuditLogService;
         #endregion
 
         #region constructor
@@ -48,7 +50,8 @@ namespace Linko.LinkoExchange.Services.User
             IPasswordHasher passwordHasher, IHttpContextService httpContext,
             IEmailService emailService, ISettingService settingService, ISessionCache sessionCache,
             IOrganizationService orgService, IRequestCache requestCache, ITimeZoneService timeZones,
-             IQuestionAnswerService questionAnswerServices, ILogger logService, IMapHelper mapHelper)
+             IQuestionAnswerService questionAnswerServices, ILogger logService, IMapHelper mapHelper,
+             ICromerrAuditLogService crommerAuditLogService)
         {
             this._dbContext = dbContext;
             _logger = logger;
@@ -64,6 +67,7 @@ namespace Linko.LinkoExchange.Services.User
             _questionAnswerServices = questionAnswerServices;
             _logService = logService;
             _mapHelper = mapHelper;
+            _crommerAuditLogService = crommerAuditLogService;
         }
 
         #endregion
@@ -261,6 +265,20 @@ namespace Linko.LinkoExchange.Services.User
             EmailType adminEmailType = isSignatory ? EmailType.Signature_SignatoryGrantedToAdmin : EmailType.Signature_SignatoryRevokedToAdmin;
             _emailService.SendEmail(new[] { user.Email }, emailType, contentReplacements);
 
+            //Log Cromerr
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = programUser.OrganizationRegulatoryProgram.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = programUser.OrganizationRegulatoryProgram.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.UserProfileId = programUser.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = user.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = user.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
+            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            _crommerAuditLogService.Log(emailType, cromerrAuditLogEntryDto, contentReplacements);
+
             //Email all IU Admins
             var admins = _dbContext.OrganizationRegulatoryProgramUsers
                 .Where(o => o.PermissionGroup.Name == "Administrator"
@@ -287,8 +305,6 @@ namespace Linko.LinkoExchange.Services.User
                 _emailService.SendEmail(new[] { adminProfile.Email }, adminEmailType, contentReplacements);
 
             }
-
-            //Cromerr Log TO DO
 
         }
 

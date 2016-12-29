@@ -112,6 +112,8 @@ namespace Linko.LinkoExchange.Web
             //Map DTO <-> ViewModel
             container.RegisterType<Web.Mapping.IMapHelper, Web.Mapping.MapHelper>();
 
+            container.RegisterType<ICromerrAuditLogService, CromerrAuditLogService>();
+
 
         }
     }

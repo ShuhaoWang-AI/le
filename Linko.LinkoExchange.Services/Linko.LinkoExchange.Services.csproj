@@ -109,9 +109,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuditLog\CrommerAuditLogService.cs" />
+    <Compile Include="AuditLog\CromerrAuditLogService.cs" />
     <Compile Include="AuditLog\EmailAuditLogService.cs" />
     <Compile Include="AuditLog\IAuditLogService.cs" />
+    <Compile Include="AuditLog\ICromerrAuditLogService.cs" />
     <Compile Include="Authentication\AuthenticationService.cs" />
     <Compile Include="Authentication\IAuthenticationService.cs" />
     <Compile Include="Authentication\IdentityConfig.cs" />
@@ -124,7 +125,7 @@
     <Compile Include="Dto\JurisdictionDto.cs" />
     <Compile Include="Dto\ResetUserResultDto.cs" />
     <Compile Include="Dto\AccountLockoutResultDto.cs" />
-    <Compile Include="Dto\CrommerAuditLogEntry.cs" />
+    <Compile Include="Dto\CromerrAuditLogEntryDto.cs" />
     <Compile Include="Dto\EmailAuditLogEntryDto.cs" />
     <Compile Include="Dto\IAuditLogEntry.cs" />
     <Compile Include="Dto\InvitationDto.cs" />

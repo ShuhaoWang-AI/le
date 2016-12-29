@@ -44,7 +44,6 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IUserService _userService;
         private readonly ISessionCache _sessionCache;
         private readonly IRequestCache _requestCache;
-        private readonly IAuditLogService _auditLogService = new CrommerAuditLogService();
         private readonly IPasswordHasher _passwordHasher;
 
         private readonly IDictionary<SystemSettingType, string> _globalSettings;

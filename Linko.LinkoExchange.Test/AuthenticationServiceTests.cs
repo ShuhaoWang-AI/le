@@ -1079,4 +1079,14 @@ public class HttpContextServiceMock : IHttpContextService
     {
         return 1;
     }
+
+    public string CurrentUserIPAddress()
+    {
+        return "000.000.000.000";
+    }
+
+    public string CurrentUserHostName()
+    {
+        return "test.dns.hostname";
+    }
 }

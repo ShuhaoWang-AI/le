@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.AuditLog;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -39,6 +40,7 @@ namespace Linko.LinkoExchange.Test
         Mock<ApplicationUserManager> _userManager;
         Mock<IQuestionAnswerService> _qaService;
         Mock<ILogger> _logger;
+        Mock<ICromerrAuditLogService> _cromerrLogger;
 
         public UserServiceTests()
         {
@@ -62,6 +64,7 @@ namespace Linko.LinkoExchange.Test
             _userManager = new Mock<ApplicationUserManager>(userStore.Object);
             _qaService = new Mock<IQuestionAnswerService>();
             _logger = new Mock<ILogger>();
+            _cromerrLogger = new Mock<ICromerrAuditLogService>();
 
             //_settingService.GetGlobalSettings()
             var globalSettingLookup = new Dictionary<SystemSettingType, string>();
@@ -77,11 +80,11 @@ namespace Linko.LinkoExchange.Test
                 _realSettingService, new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), new MapHelper());
             _realUserService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(),
                 new PasswordHasher(), _httpContext.Object, _emailService, _realSettingService,
-                _sessionCache.Object, _realOrgService, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper());
+                _sessionCache.Object, _realOrgService, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper(), _cromerrLogger.Object);
 
             _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
                 new PasswordHasher(), _httpContext.Object, _emailService, _settingService.Object, 
-                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper());
+                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper(), _cromerrLogger.Object);
         }
 
         [TestMethod]

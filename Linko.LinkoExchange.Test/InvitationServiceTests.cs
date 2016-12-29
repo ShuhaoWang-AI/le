@@ -20,6 +20,7 @@ using Linko.LinkoExchange.Services.QuestionAnswer;
 using NLog;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.AuditLog;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -39,6 +40,7 @@ namespace Linko.LinkoExchange.Test
         Mock<IHttpContextService> _httpContext;
         
         Mock<ILogger> _logger;
+        Mock<ICromerrAuditLogService> _cromerrLogger;
 
         public InvitationServiceTests()
         {
@@ -57,23 +59,39 @@ namespace Linko.LinkoExchange.Test
             _httpContext = new Mock<IHttpContextService>();
              
             _logger = new Mock<ILogger>();
+            _cromerrLogger = new Mock<ICromerrAuditLogService>();
 
             _httpContext.Setup(x => x.GetRequestBaseUrl()).Returns("http://test.linkoexchange.com/");
 
             invitationService = new InvitationService(
                 new LinkoExchangeContext(connectionString),
                 new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper()),
-                new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), new PasswordHasher(), new HttpContextService(), _emailService, _settingService, _sessionCache.Object, _orgService.Object, _requestCache, _timeZones.Object, _qaService.Object, _logger.Object, new MapHelper()),
+                new UserService(new LinkoExchangeContext(connectionString),
+                                new EmailAuditLogEntryDto(),
+                                new PasswordHasher(),
+                                new HttpContextService(),
+                                _emailService,
+                                _settingService,
+                                _sessionCache.Object,
+                                _orgService.Object,
+                                _requestCache,
+                                _timeZones.Object,
+                                _qaService.Object,
+                                _logger.Object,
+                                new MapHelper(),
+                                _cromerrLogger.Object),
                 _requestCache,//new RequestCache(),
                 _emailService,
                 new OrganizationService(new LinkoExchangeContext(connectionString), 
-                new SettingService(
-                    new LinkoExchangeContext(connectionString),
-                    _logger.Object, new MapHelper()),
-                new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), new MapHelper()),
-                _httpContext.Object, _timeZones.Object, _logger.Object,
-                _programService, new SessionCache(_httpContext.Object),
-                new MapHelper()
+                                        new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper()),
+                                        new HttpContextService(), 
+                                        new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), new MapHelper()),
+                                        _httpContext.Object,
+                                        _timeZones.Object,
+                                        _logger.Object,
+                                        _programService,
+                                        new SessionCache(_httpContext.Object),
+                                        new MapHelper()
                 );
         }
 
