@@ -277,6 +277,8 @@ namespace Linko.LinkoExchange.Services.User
             cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
             cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
             cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            contentReplacements.Add("userName", user.UserName);
+
             _crommerAuditLogService.Log(emailType, cromerrAuditLogEntryDto, contentReplacements);
 
             //Email all IU Admins

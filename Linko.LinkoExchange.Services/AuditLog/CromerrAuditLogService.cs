@@ -62,7 +62,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
             var comment = commentTemplate.MessageTemplate;
             foreach (var pair in replacements)
             {
-                comment.Replace(pair.Key, pair.Value);
+                comment = comment.Replace(pair.Key, pair.Value);
             }
 
             return Task.FromResult(comment);
