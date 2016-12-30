@@ -3114,7 +3114,623 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
                 </pre>
             </body>
         </html>'
-    )   
+    )
+	
+	-- Cromerr Event Log Templates
+	
+	    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Registration_InviteSent', 
+        'CromerrEvent',
+        'Registration',   
+        'InviteSent', 
+        '',
+        'An invitation was sent to:
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+For:
+{authorityName}
+{businessName}
+{regulatoryProgram}
+
+By:
+{inviterFirstName} {inviterLastName} 
+User Name: {inviterUserName}
+Email:  {inviterEmailAddress}
+' 
+    )
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Registration_InviteDeleted', 
+        'CromerrEvent',
+        'Registration',   
+        'InviteDeleted', 
+        '',
+        'An invitation was deleted for:
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+For:
+{authorityName}
+{businessName}
+{regulatoryProgram}
+
+By:
+{inviterFirstName} {inviterLastName} 
+User Name: {inviterUserName}
+Email:  {inviterEmailAddress}
+' 
+    )
+    
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Registration_RegistrationPending', 
+        'CromerrEvent',
+        'Registration',   
+        'RegistrationPending', 
+        '',
+        'A registration request was received.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+For:
+{authorityName}
+{businessName}
+{regulatoryProgram}
+' 
+    )
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Registration_RegistrationApproved', 
+        'CromerrEvent',
+        'Registration',   
+        'RegistrationApproved', 
+        '',
+        'A registration request was approved.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+For:
+{authorityName}
+{businessName}
+{regulatoryProgram}
+
+By:
+{ApproverFirstName} {approverLastName} 
+Approver User Name: {approverUserName}
+Approver Email:  {approverEmailaddress}
+' 
+    )
+    
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Registration_RegistrationDenied', 
+        'CromerrEvent',
+        'Registration',   
+        'RegistrationDenied', 
+        '',
+        'A registration request was denied.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+For:
+{authorityName}
+{businessName}
+{regulatoryProgram}
+
+By:
+{DenierFirstName} {DenierLastName} 
+Denier User Name: {DenierUserName}
+Denier Email:  {DenierEmailaddress}
+' 
+    )
+    
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_UserAccess_Disabled', 
+        'CromerrEvent',
+        'UserAccess',   
+        'Disabled', 
+        '',
+        'Account access to {organizationName} was disabled.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+By:
+{actorFirstName} {actorLastName} 
+User Name: {actorUserName}
+' 
+    )
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_UserAccess_Enabled', 
+        'CromerrEvent',
+        'UserAccess',   
+        'Enabled', 
+        '',
+        'Account access to {organizationName} was enabled.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+By:
+{actorFirstName} {actorLastName} 
+User Name: {actorUserName}
+' 
+    )
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_UserAccess_Removed', 
+        'CromerrEvent',
+        'UserAccess',   
+        'Removed', 
+        '',
+        'User was removed from {organizationName}.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+By:
+{actorFirstName} {actorLastName} 
+User Name: {actorUserName}
+' 
+    )
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_UserAccess_RoleChange', 
+        'CromerrEvent',
+        'UserAccess',   
+        'RoleChange', 
+        '',
+        'User roles changed for {organizationName}.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+Old Roles:
+{oldRole}
+
+New Roles:
+{newRole}
+
+By:
+{actorFirstName} {actorLastName} 
+User Name: {actorUserName}
+' 
+    )
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_UserAccess_ManualAccountLock', 
+        'CromerrEvent',
+        'UserAccess',   
+        'ManualAccountLock', 
+        '',
+        'Account was manually locked.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+By:
+{authorityName}
+{authorityFirstName} {authorityLastName} 
+User Name: {authorityUserName}
+Email:  {authorityEmailaddress}
+' 
+    )
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_UserAccess_ManualAccountUnlock', 
+        'CromerrEvent',
+        'UserAccess',   
+        'ManualAccountUnlock', 
+        '',
+        'Account was manually unlocked.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+By:
+{authorityName}
+{authorityFirstName} {authorityLastName} 
+User Name: {authorityUserName}
+Email:  {authorityEmailaddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_UserAccess_AccountResetInitiated', 
+        'CromerrEvent',
+        'UserAccess',   
+        'AccountResetInitiated', 
+        '',
+        'Account reset initiated.  Re-registration pending.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+By:
+{authorityName}
+{authorityFirstName} {authorityLastName} 
+User Name: {authorityUserName}
+Email:  {authorityEmailaddress}
+' 
+)
+    
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_UserAccess_AccountResetExpired', 
+        'CromerrEvent',
+        'UserAccess',   
+        'AccountResetExpired', 
+        '',
+        'An attempt to reset an account failed because the reset link expired.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_UserAccess_AccountResetSuccessful', 
+        'CromerrEvent',
+        'UserAccess',   
+        'AccountResetSuccessful', 
+        '',
+        'Account re-registration from reset complete.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Login_Success', 
+        'CromerrEvent',
+        'Login',   
+        'Success', 
+        '',
+        'Login successful to {businessName}
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Login_PasswordLockout', 
+        'CromerrEvent',
+        'Login',   
+        'PasswordLockout', 
+        '',
+        'Login Failed. Consecutive invalid password attempts resulted in a password lock.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Login_AccountLocked', 
+        'CromerrEvent',
+        'Login',   
+        'AccountLocked', 
+        '',
+        'Login failed.  User attempted to log into a Locked Account.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Login_AccountResetRequired', 
+        'CromerrEvent',
+        'Login',   
+        'AccountResetRequired', 
+        '',
+        'Login failed.  User attempted to log in when an Account Reset was required.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Login_UserDisabled', 
+        'CromerrEvent',
+        'Login',   
+        'UserDisabled', 
+        '',
+        'Login Failed.  User account is disabled.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Login_RegistrationPending', 
+        'CromerrEvent',
+        'Login',   
+        'RegistrationPending', 
+        '',
+        'Login failed. User registration is pending.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Login_NoAssociation', 
+        'CromerrEvent',
+        'Login',   
+        'NoAssociation', 
+        '',
+        'Login failed.  User is not associated with an enabled account.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_ForgotPassword_Success', 
+        'CromerrEvent',
+        'ForgotPassword',   
+        'Success', 
+        '',
+        'Successful password reset.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_ForgotPassword_PasswordResetExpired', 
+        'CromerrEvent',
+        'ForgotPassword',   
+        'PasswordResetExpired', 
+        '',
+        'Forgot Password reset attempted on an expired link.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_ForgotPassword_AccountLocked', 
+        'CromerrEvent',
+        'ForgotPassword',   
+        'AccountLocked', 
+        '',
+        'Login failed.  Account locked for exceeding Knowledge Based Question attempts during password reset.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Profile_AccountLocked', 
+        'CromerrEvent',
+        'Profile',   
+        'AccountLocked', 
+        '',
+        'Account locked for exceeding Knowledge Based Question attempts during profile access.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Profile_PasswordChanged', 
+        'CromerrEvent',
+        'Profile',   
+        'PasswordChanged', 
+        '',
+        'Password was changed.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Profile_EmailChanged', 
+        'CromerrEvent',
+        'Profile',   
+        'EmailChanged', 
+        '',
+        'Email was changed from {oldEmail} to {newEmail}
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Profile_KBQChanged', 
+        'CromerrEvent',
+        'Profile',   
+        'KBQChanged', 
+        '',
+        'KBQ were changed
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Profile_SQChanged', 
+        'CromerrEvent',
+        'Profile',   
+        'SQChanged', 
+        '',
+        'Security Questions were changed
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Signature_IdentityProofed', 
+        'CromerrEvent',
+        'Signature',   
+        'IdentityProofed', 
+        '',
+        'The user has successfully been identity proofed.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Signature_SignatoryPending', 
+        'CromerrEvent',
+        'Signature',   
+        'SignatoryPending', 
+        '',
+        'Signatory rights have been requested for {businessName}.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+
+INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Signature_SignatoryGranted', 
+        'CromerrEvent',
+        'Signature',   
+        'SignatoryGranted', 
+        '',
+        'A role has changed from {oldRole} to {newrole} for {businessName}.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Signature_SignatoryRevoked', 
+        'CromerrEvent',
+        'Signature',   
+        'SignatoryRevoked', 
+        '',
+        'A role has changed from {oldRole} to {newRole} for {businessName}.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Signature_SignFailed', 
+        'CromerrEvent',
+        'Signature',   
+        'SignFailed', 
+        '',
+        'Signature ceremony failed because the user entered and incorrect KBQ answer for {businessName}.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Signature_AccountLocked', 
+        'CromerrEvent',
+        'Signature',   
+        'AccountLocked', 
+        '',
+        'Failed KBQ’s during signature.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+   
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tPermissionGroupTemplate)
