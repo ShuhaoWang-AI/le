@@ -628,12 +628,43 @@ namespace Linko.LinkoExchange.Services.User
                 }
             }
 
-            var user = _dbContext.OrganizationRegulatoryProgramUsers
+            var programUser = _dbContext.OrganizationRegulatoryProgramUsers
                 .Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgramUserId);
-            user.IsEnabled = !isAttemptingDisable;
+            programUser.IsEnabled = !isAttemptingDisable;
             _dbContext.SaveChanges();
 
             //TO DO: Log user access enable to Audit (UC-2)
+            //Log Cromerr
+            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+            var actorUser = actorProgramUserDto.UserProfileDto;
+
+            var userDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(programUser);
+            var user = userDto.UserProfileDto;
+            CromerrEvent cromerrEvent = isAttemptingDisable ? CromerrEvent.UserAccess_Disabled : CromerrEvent.UserAccess_Enabled;
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = programUser.OrganizationRegulatoryProgram.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = programUser.OrganizationRegulatoryProgram.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.UserProfileId = programUser.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = user.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = user.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
+            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            var contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("organizationName", programUser.OrganizationRegulatoryProgram.Organization.Name);
+            contentReplacements.Add("firstName", user.FirstName);
+            contentReplacements.Add("lastName", user.LastName);
+            contentReplacements.Add("userName", user.UserName);
+            contentReplacements.Add("emailAddress", user.Email);
+            contentReplacements.Add("actorFirstName", actorUser.FirstName);
+            contentReplacements.Add("actorLastName", actorUser.LastName);
+            contentReplacements.Add("actorUserName", actorUser.UserName);
+
+            _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
 
             _logService.Info($"EnableDisableUserAccount. OrgRegProgUserId={orgRegProgramUserId}, IsAttemptingDisable={isAttemptingDisable}... Success.");
 
