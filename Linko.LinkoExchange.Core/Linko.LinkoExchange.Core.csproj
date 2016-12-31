@@ -106,6 +106,7 @@
     <Compile Include="Enum\Country.cs" />
     <Compile Include="Enum\CreateOrUpdateAnswersResult.cs" />
     <Compile Include="Enum\CurrentUserInfo.cs" />
+    <Compile Include="Enum\CromerrEvent.cs" />
     <Compile Include="Enum\EmailType.cs" />
     <Compile Include="Enum\InvitationError.cs" />
     <Compile Include="Enum\LinkoExchangeError.cs" />

@@ -26,7 +26,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
             _mapHelper = mapHelper;
         }
 
-        public async Task Log(EmailType eventType, CromerrAuditLogEntryDto dto, IDictionary<string, string> contentReplacements)
+        public async Task Log(CromerrEvent eventType, CromerrAuditLogEntryDto dto, IDictionary<string, string> contentReplacements)
         {
             var auditLogTemplate = await GetAuditLogTemplate(eventType);
             if (auditLogTemplate == null) return;
@@ -43,7 +43,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
 
         }
 
-        private Task<AuditLogTemplate> GetAuditLogTemplate(EmailType eventType)
+        private Task<AuditLogTemplate> GetAuditLogTemplate(CromerrEvent eventType)
         {
             var auditLogTemplateName = string.Format("CromerrEvent_{0}", eventType.ToString());
             return Task.FromResult(_dbContext.AuditLogTemplates.First(i => i.Name == auditLogTemplateName));

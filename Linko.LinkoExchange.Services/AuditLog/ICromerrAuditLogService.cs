@@ -13,7 +13,10 @@ namespace Linko.LinkoExchange.Services.AuditLog
         /// <summary>
         /// Creates a CROMERR audit log entry in the database
         /// </summary>
-        /// <param name="logEntry"></param>
-        Task Log(EmailType eventType, CromerrAuditLogEntryDto dto, IDictionary<string, string> contentReplacements);
+        /// <param name="eventType">The event that occured that requires logging</param>
+        /// <param name="dto">Id fields to populate a row</param>
+        /// <param name="contentReplacements">Words to populate comment field</param>
+        /// <returns></returns>
+        Task Log(CromerrEvent eventType, CromerrAuditLogEntryDto dto, IDictionary<string, string> contentReplacements);
     }
 }

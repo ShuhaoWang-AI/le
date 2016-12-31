@@ -266,6 +266,7 @@ namespace Linko.LinkoExchange.Services.User
             _emailService.SendEmail(new[] { user.Email }, emailType, contentReplacements);
 
             //Log Cromerr
+            CromerrEvent cromerrEvent = isSignatory ? CromerrEvent.Signature_SignatoryGranted : CromerrEvent.Signature_SignatoryRevoked;
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
             cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
             cromerrAuditLogEntryDto.OrganizationId = programUser.OrganizationRegulatoryProgram.OrganizationId;
@@ -279,7 +280,7 @@ namespace Linko.LinkoExchange.Services.User
             cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
             contentReplacements.Add("userName", user.UserName);
 
-            _crommerAuditLogService.Log(emailType, cromerrAuditLogEntryDto, contentReplacements);
+            _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
 
             //Email all IU Admins
             var admins = _dbContext.OrganizationRegulatoryProgramUsers
