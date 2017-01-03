@@ -17,6 +17,7 @@ using Linko.LinkoExchange.Services.User;
 using NLog;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.AuditLog;
 
 namespace Linko.LinkoExchange.Services.Invitation
 {
@@ -34,12 +35,14 @@ namespace Linko.LinkoExchange.Services.Invitation
         private readonly ILogger _logger;
         private readonly ISessionCache _sessionCache;
         private readonly IMapHelper _mapHelper;
+        private readonly ICromerrAuditLogService _crommerAuditLogService;
 
         public InvitationService(LinkoExchangeContext dbContext,
             ISettingService settingService, IUserService userService, IRequestCache requestCache,
             IEmailService emailService, IOrganizationService organizationService, IHttpContextService httpContext,
             ITimeZoneService timeZones, ILogger logger,
-            IProgramService programService, ISessionCache sessionCache, IMapHelper mapHelper) 
+            IProgramService programService, ISessionCache sessionCache, IMapHelper mapHelper,
+            ICromerrAuditLogService crommerAuditLogService) 
         {
             _dbContext = dbContext; 
             _settingService = settingService;
@@ -53,6 +56,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             _logger = logger;
             _sessionCache = sessionCache;
             _mapHelper = mapHelper;
+            _crommerAuditLogService = crommerAuditLogService;
         }
 
         public InvitationDto GetInvitation(string invitationId)
@@ -150,12 +154,14 @@ namespace Linko.LinkoExchange.Services.Invitation
 
         public InvitationServiceResultDto SendUserInvite(int targetOrgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType, int? existingOrgRegProgramUserId = null)
         {
+            string existingUserUserName = "[unknown]";
             if (existingOrgRegProgramUserId.HasValue) //Existing user in a different program -- lookup required invitation fields
             {
                 var existingUser = _userService.GetOrganizationRegulatoryProgramUser(existingOrgRegProgramUserId.Value);
                 email = existingUser.UserProfileDto.Email;
                 firstName = existingUser.UserProfileDto.FirstName;
                 lastName = existingUser.UserProfileDto.LastName;
+                existingUserUserName = existingUser.UserProfileDto.UserName;
             }
             else
             {
@@ -292,6 +298,38 @@ namespace Linko.LinkoExchange.Services.Invitation
             }
 
             _emailService.SendEmail(new[] { email }, emailType, contentReplacements);
+
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+            var actorUser = actorProgramUserDto.UserProfileDto;
+
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = actorProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = actorProgramUser.OrganizationRegulatoryProgram.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.UserProfileId = actorProgramUser.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = actorUser.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = actorUser.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = actorUser.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = actorUser.Email;
+            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("authorityName", authorityName);
+            contentReplacements.Add("businessName", authority.Organization.Name);
+            contentReplacements.Add("regulatoryProgram", authority.RegulatoryProgram.Name);
+            contentReplacements.Add("firstName", firstName);
+            contentReplacements.Add("lastName", lastName);
+            contentReplacements.Add("userName", existingUserUserName);
+            contentReplacements.Add("emailAddress", email);
+            contentReplacements.Add("inviterFirstName", actorUser.FirstName);
+            contentReplacements.Add("inviterLastName", actorUser.LastName);
+            contentReplacements.Add("inviterUserName", actorUser.UserName);
+            contentReplacements.Add("inviterEmailAddress", actorUser.Email);
+
+            _crommerAuditLogService.Log(CromerrEvent.Registration_InviteSent, cromerrAuditLogEntryDto, contentReplacements);
 
             return new InvitationServiceResultDto()
             {
