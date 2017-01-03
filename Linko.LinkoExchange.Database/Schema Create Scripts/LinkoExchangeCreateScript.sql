@@ -3207,9 +3207,9 @@ For:
 {regulatoryProgram}
 
 By:
-{ApproverFirstName} {approverLastName} 
-Approver User Name: {approverUserName}
-Approver Email:  {approverEmailaddress}
+{actorFirstName} {actorLastName} 
+Approver User Name: {actorUserName}
+Approver Email:  {actorEmailAddress}
 ' 
     )
     
@@ -3232,9 +3232,9 @@ For:
 {regulatoryProgram}
 
 By:
-{DenierFirstName} {DenierLastName} 
-Denier User Name: {DenierUserName}
-Denier Email:  {DenierEmailaddress}
+{actorFirstName} {actorLastName} 
+Denier User Name: {actorUserName}
+Denier Email:  {actorEmailAddress}
 ' 
     )
     
