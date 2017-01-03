@@ -3162,9 +3162,9 @@ For:
 {regulatoryProgram}
 
 By:
-{inviterFirstName} {inviterLastName} 
-User Name: {inviterUserName}
-Email:  {inviterEmailAddress}
+{actorFirstName} {actorLastName} 
+User Name: {actorUserName}
+Email:  {actorEmailAddress}
 ' 
     )
     
