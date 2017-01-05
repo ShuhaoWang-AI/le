@@ -172,13 +172,13 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void LockUserAccount()
         {
-            var resultDto = _userService.LockUnlockUserAccount(13, true, false);
+            var resultDto = _userService.LockUnlockUserAccount(13, true, AccountLockEvent.ManualAction);
         }
 
         [TestMethod]
         public void UnLockUserAccount()
         {
-            var resultDto = _userService.LockUnlockUserAccount(13, false, false);
+            var resultDto = _userService.LockUnlockUserAccount(13, false, AccountLockEvent.ManualAction);
         }
 
         [TestMethod]

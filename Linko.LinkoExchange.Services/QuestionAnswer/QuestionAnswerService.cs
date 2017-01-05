@@ -15,6 +15,9 @@ using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Email;
 using NLog;
+using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.AuditLog;
 
 namespace Linko.LinkoExchange.Services.QuestionAnswer
 {
@@ -29,10 +32,14 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         private readonly IDictionary<SystemSettingType, string> _globalSettings;
         private readonly IOrganizationService _orgService;
         private readonly IEmailService _emailService;
+        private readonly ISessionCache _sessionCache;
+        private readonly IMapHelper _mapHelper;
+        private readonly ICromerrAuditLogService _crommerAuditLogService;
 
         public QuestionAnswerService(LinkoExchangeContext dbContext, ILogger logger, IHttpContextService httpContext,
             IEncryptionService encryption, IPasswordHasher passwordHasher, ISettingService settingService,
-            IOrganizationService orgService, IEmailService emailService)
+            IOrganizationService orgService, IEmailService emailService, ISessionCache sessionCache,
+            IMapHelper mapHelper, ICromerrAuditLogService crommerAuditLogService)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -43,7 +50,10 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             _globalSettings = _settingService.GetGlobalSettings();
             _orgService = orgService;
             _emailService = emailService;
-        }
+            _sessionCache = sessionCache;
+            _mapHelper = mapHelper;
+            _crommerAuditLogService = crommerAuditLogService;
+    }
 
         public void AddUserQuestionAnswer(int userProfileId, AnswerDto answer)
         {
@@ -298,6 +308,35 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 _emailService.SendEmail(new[] { userProfile.Email }, EmailType.Profile_KBQChanged, contentReplacements);
             if (questionCountSQ > 0)
                 _emailService.SendEmail(new[] { userProfile.Email }, EmailType.Profile_SecurityQuestionsChanged, contentReplacements);
+
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+            var actorUser = actorProgramUserDto.UserProfileDto;
+
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = actorProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = actorProgramUser.OrganizationRegulatoryProgram.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.UserProfileId = userProfile.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = userProfile.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = userProfile.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = userProfile.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = userProfile.Email;
+            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("firstName", userProfile.FirstName);
+            contentReplacements.Add("lastName", userProfile.LastName);
+            contentReplacements.Add("userName", userProfile.UserName);
+            contentReplacements.Add("emailAddress", userProfile.Email);
+
+            if (questionCountKBQ > 0)
+                _crommerAuditLogService.Log(CromerrEvent.Profile_KBQChanged, cromerrAuditLogEntryDto, contentReplacements);
+            if (questionCountSQ > 0)
+                _crommerAuditLogService.Log(CromerrEvent.Profile_SQChanged, cromerrAuditLogEntryDto, contentReplacements);
+
 
             return CreateOrUpdateAnswersResult.Success;
 

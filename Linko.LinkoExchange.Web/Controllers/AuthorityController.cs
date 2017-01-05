@@ -478,7 +478,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                _userService.LockUnlockUserAccount(model.PId, !model.AccountLocked, isForFailedKBQs: false);
+                _userService.LockUnlockUserAccount(model.PId, !model.AccountLocked, AccountLockEvent.ManualAction);
 
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = model.AccountLocked ? "User unlocked!" : "User locked!";
@@ -1031,7 +1031,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                _userService.LockUnlockUserAccount(model.PId, !model.AccountLocked, isForFailedKBQs: false);
+                _userService.LockUnlockUserAccount(model.PId, !model.AccountLocked, AccountLockEvent.ManualAction);
 
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = model.AccountLocked ? "User unlocked!" : "User locked!";

@@ -3315,6 +3315,7 @@ New Roles:
 {newRole}
 
 By:
+{actorOrganizationName}
 {actorFirstName} {actorLastName} 
 User Name: {actorUserName}
 ' 

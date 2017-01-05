@@ -15,6 +15,8 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Core.Enum;
 using NLog;
+using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.AuditLog;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -27,6 +29,9 @@ namespace Linko.LinkoExchange.Test
         Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
         Mock<IEmailService> _emailService = new Mock<IEmailService>();
         private IPasswordHasher _passwordHasher;
+        Mock<ISessionCache> _sessionCache;
+        Mock<IMapHelper> _mapHelper;
+        Mock<ICromerrAuditLogService> _crommerAuditLogService;
 
         public QuestionAnswerServiceTests()
         {
@@ -41,6 +46,10 @@ namespace Linko.LinkoExchange.Test
             globalSettings.Add(SystemSettingType.SupportEmailAddress, "test@test.com");
             _settings.Setup(s => s.GetGlobalSettings()).Returns(globalSettings);
 
+            _sessionCache = new Mock<ISessionCache>();
+            _mapHelper = new Mock<IMapHelper>();
+            _crommerAuditLogService = new Mock<ICromerrAuditLogService>();
+
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             _questionAnswerService = new QuestionAnswerService(new LinkoExchangeContext(connectionString),
                                                                new Mock<ILogger>().Object,
@@ -49,7 +58,10 @@ namespace Linko.LinkoExchange.Test
                                                                new PasswordHasher(),
                                                                _settings.Object,
                                                                _orgService.Object,
-                                                               _emailService.Object
+                                                               _emailService.Object,
+                                                               _sessionCache.Object,
+                                                               _mapHelper.Object,
+                                                               _crommerAuditLogService.Object
                                                                );
             _encrypter = new EncryptionService();
             _passwordHasher = new PasswordHasher();

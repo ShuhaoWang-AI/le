@@ -1018,7 +1018,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     _authenticationService.SignOff(); 
 
                     // Lock the account; 
-                    var result = _userService.LockUnlockUserAccount(userProfileId, true, true);
+                    var result = _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringProfileAccess);
                     if (result.IsSuccess)
                     {
                         _logger.Info(string.Format(format: "KBQ question. Failed to Answer KBQ Question {0} times. Account is locked. UserProfileId:{1}",
