@@ -43,6 +43,10 @@ namespace Linko.LinkoExchange.Web
                 ExpireTimeSpan = TimeSpan.FromMinutes(cookieValidateInterval),
                 Provider = new CookieAuthenticationProvider
                 {
+                    OnResponseSignIn = context =>
+                    {
+                        context.Properties.IsPersistent = false;
+                    },
                     // Enables the application to validate the security stamp when the user logs in.
                     // This is a security feature which is used when you change a password or add an external SignIn to your account.  
                     OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<ApplicationUserManager, UserProfile>(
