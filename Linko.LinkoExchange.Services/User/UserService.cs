@@ -504,11 +504,11 @@ namespace Linko.LinkoExchange.Services.User
             contentReplacements.Add("lastName", user.LastName);
             contentReplacements.Add("userName", user.UserName);
             contentReplacements.Add("emailAddress", user.Email);
-            contentReplacements.Add("actorOrganizationName", actorProgramUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
-            contentReplacements.Add("actorFirstName", actorUser.FirstName);
-            contentReplacements.Add("actorLastName", actorUser.LastName);
-            contentReplacements.Add("actorUserName", actorUser.UserName);
-            contentReplacements.Add("actorEmailAddress", actorUser.Email);
+            contentReplacements.Add("authorityName", actorProgramUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
+            contentReplacements.Add("authorityFirstName", actorUser.FirstName);
+            contentReplacements.Add("authorityFirstame", actorUser.LastName);
+            contentReplacements.Add("authorityUserName", actorUser.UserName);
+            contentReplacements.Add("authorityEmailaddress", actorUser.Email);
 
             _crommerAuditLogService.Log(CromerrEvent.UserAccess_AccountResetInitiated, cromerrAuditLogEntryDto, contentReplacements);
 
@@ -712,7 +712,7 @@ namespace Linko.LinkoExchange.Services.User
             var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
 
             var programUsers = _dbContext.OrganizationRegulatoryProgramUsers.Where(u => u.UserProfileId == user.UserProfileId);
-            foreach (var programUser in programUsers)
+            foreach (var programUser in programUsers.ToList())
             {
                 var userDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(programUser);
 
@@ -737,6 +737,7 @@ namespace Linko.LinkoExchange.Services.User
                 if (!isAttemptingLock || reason == AccountLockEvent.ManualAction)
                 {
                     contentReplacements.Add("authorityName", actorProgramUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
+                    contentReplacements.Add("authorityUserName", actorUser.UserName);
                     contentReplacements.Add("authorityFirstName", actorUser.FirstName);
                     contentReplacements.Add("authorityLastName", actorUser.LastName);
                     contentReplacements.Add("authorityEmailaddress", actorUser.Email);
@@ -796,7 +797,7 @@ namespace Linko.LinkoExchange.Services.User
             var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
 
             var userDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(programUser);
-            var user = userDto.UserProfileDto;
+            var user = this.GetUserProfileById(userDto.UserProfileId);
             CromerrEvent cromerrEvent = isAttemptingDisable ? CromerrEvent.UserAccess_Disabled : CromerrEvent.UserAccess_Enabled;
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
             cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
