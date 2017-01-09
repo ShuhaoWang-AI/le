@@ -362,6 +362,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     case AuthenticationResult.Success:
                         HttpCookie cookie = new HttpCookie(name: "lastSignInName", value: model.UserName);
+                        cookie.Expires = DateTime.Now.AddMonths(1);
                         HttpContext.Response.SetCookie(cookie);
                         _logger.Info(string.Format(format: "SignIn. User={0} has successfully logged in.", arg0: model.UserName));
                         return RedirectToAction(actionName: "PortalDirector", controllerName: "Account");       // 6.b

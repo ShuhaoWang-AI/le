@@ -898,7 +898,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 var identity = new ClaimsIdentity(_httpContext.Current().User.Identity);
                 identity.AddClaims(claims);
                 _authenticationManager.AuthenticationResponseGrant = new AuthenticationResponseGrant
-                    (identity, new AuthenticationProperties { IsPersistent = true });
+                    (identity, new AuthenticationProperties { IsPersistent = isPersistent });
 
                 _authenticationManager.SignOut();
 
@@ -1279,7 +1279,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             var cookieValidateInterval = ValueParser.TryParseInt(ConfigurationManager.AppSettings["CookieValidateInterval"], 30);
             var authProperties = new AuthenticationProperties
             {
-                ExpiresUtc = DateTime.UtcNow.AddDays(cookieValidateInterval)
             };
 
             foreach (var claim in claims)

@@ -8,7 +8,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.DataProtection;
+//using Microsoft.Owin.Security.DataProtection;
 using Owin;
 
 namespace Linko.LinkoExchange.Web
@@ -16,7 +16,7 @@ namespace Linko.LinkoExchange.Web
     public partial class Startup
     {
         // add this static variable
-        internal static IDataProtectionProvider DataProtectionProvider { get; private set; }
+        //internal static IDataProtectionProvider DataProtectionProvider { get; private set; }
 
         // For more information on configuring authentication, please visit http://go.microsoft.com/fwlink/?LinkId=301864
         public void ConfigureAuth(IAppBuilder app)
@@ -29,7 +29,7 @@ namespace Linko.LinkoExchange.Web
             app.CreatePerOwinContext(() => DependencyResolver.Current.GetService<ApplicationUserManager>());
 
             // add this assignment
-            DataProtectionProvider = app.GetDataProtectionProvider();
+           // DataProtectionProvider = app.GetDataProtectionProvider();
 
             // Enable the application to use a cookie to store information for the signed in user
             // and to use a cookie to temporarily store information about a user logging in with a third party SignIn provider
