@@ -799,6 +799,9 @@ namespace Linko.LinkoExchange.Services.Authentication
             {
                 var claims = GetUserIdentity(applicationUser);
 
+                // Save claim
+                SaveClaims(applicationUser.Id, claims);
+
                 var identity = new ClaimsIdentity(_httpContext.Current().User.Identity);
                 identity.AddClaims(claims);
                 _authenticationManager.AuthenticationResponseGrant = new AuthenticationResponseGrant
@@ -1065,7 +1068,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             claims.Add(new Claim(CacheKey.Email, userProfile.Email));
             claims.Add(new Claim(CacheKey.SessionId, _httpContext.Current().Session.SessionID));
 
-            SaveClaims(userProfile.Id, claims);
             return claims;
         }
 
@@ -1076,8 +1078,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             var cookieValidateInterval = ValueParser.TryParseInt(ConfigurationManager.AppSettings["CookieValidateInterval"], 30);
             var authProperties = new AuthenticationProperties
             {
-                IsPersistent = true,
-
                 ExpiresUtc = DateTime.UtcNow.AddDays(cookieValidateInterval)
             };
 
@@ -1087,7 +1087,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             _sessionCache.SetValue(CacheKey.OwinClaims, claims);
-            _authenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
+            _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             _authenticationManager.SignIn(authProperties, identity);
         }
         private void SetPasswordPolicy(IEnumerable<SettingDto> organizationSettings)
