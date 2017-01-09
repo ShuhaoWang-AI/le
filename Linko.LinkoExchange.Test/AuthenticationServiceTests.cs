@@ -27,6 +27,8 @@ using Microsoft.Owin.Security;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NLog;
+using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Services.Mapping;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -61,7 +63,9 @@ namespace Linko.LinkoExchange.Test
         string registrationToken = "TEST-REGISTRATION-TOKEN";
         private IQuestionAnswerService questionAnswerService = Mock.Of<IQuestionAnswerService>();
         Mock<IProgramService> progServiceMock ;
-        Mock<IPermissionService> permissionMock; 
+        Mock<IPermissionService> permissionMock;
+        Mock<IMapHelper> _mapHelper;
+        Mock<ICromerrAuditLogService> _cromerrLog;
 
         [TestInitialize]
         public void TestInitialize()
@@ -136,7 +140,9 @@ namespace Linko.LinkoExchange.Test
                 passwordHasher,
                 httpContextService,
                 logger,
-                questionAnswerService
+                questionAnswerService,
+                _mapHelper.Object,
+                _cromerrLog.Object
                 );
 
             userManagerObj.Setup(
@@ -850,7 +856,9 @@ namespace Linko.LinkoExchange.Test
                 passwordHasher,
                 httpContextService,
                 logger,
-                null
+                null,
+                _mapHelper.Object,
+                _cromerrLog.Object
                 );
 
             authService.SetClaimsForOrgRegProgramSelection(1);

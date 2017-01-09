@@ -18,5 +18,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
         /// <param name="contentReplacements">Words to populate comment field</param>
         /// <returns></returns>
         Task Log(CromerrEvent eventType, CromerrAuditLogEntryDto dto, IDictionary<string, string> contentReplacements);
+
+        Task SimpleLog(CromerrEvent eventType, OrganizationRegulatoryProgramDto orgRegProgram, UserDto user);
     }
 }

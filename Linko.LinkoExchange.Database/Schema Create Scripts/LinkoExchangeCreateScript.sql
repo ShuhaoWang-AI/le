@@ -2390,7 +2390,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Registration',   
         'IndustryRegistrationDenied', 
         
-        'Registration Denied for {organizationName}({authorityOrganizationName})',
+        'Registration Denied for {organizationName} ({authorityOrganizationName})',
         '<html>
             <body> 
                 <pre>
@@ -2419,7 +2419,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Registration',
         'IndustryRegistrationApproved',
           
-        'Registration Approved for {organizationName}({authorityOrganizationName})',
+        'Registration Approved for {organizationName} ({authorityOrganizationName})',
         '<html>
             <body> 
                 <pre>
@@ -2632,7 +2632,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Signature',
         'SignatoryGranted',
          
-        'Signatory Rights Granted for {organizationName}({authorityOrganizationName})',
+        'Signatory Rights Granted for {organizationName} ({authorityOrganizationName})',
         '<html>
             <body> 
                 <pre>
@@ -2663,7 +2663,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Signature',
         'SignatoryGrantedToAdmin',
          
-        'Signatory Rights Granted for {organizationName}({authorityOrganizationName})',
+        'Signatory Rights Granted for {organizationName} ({authorityOrganizationName})',
         '<html>
 			<body> 
 				<pre>
@@ -2693,7 +2693,7 @@ If you have questions or concerns, please contact {authorityName} at {emailAddre
         'Signature',
         'SignatoryRevoked', 
         
-        'Signatory Rights Revoked for {organizationName}({authorityOrganizationName})',
+        'Signatory Rights Revoked for {organizationName} ({authorityOrganizationName})',
         '<html>
             <body> 
                 <pre>
@@ -2724,7 +2724,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Signature',
         'SignatoryRevokedToAdmin', 
         
-        'Signatory Rights Revoked for {organizationName}({authorityOrganizationName})',
+        'Signatory Rights Revoked for {organizationName} ({authorityOrganizationName})',
         '<html>
 			<body> 
 				<pre>
@@ -3092,7 +3092,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Registration',   
         'IndustryInviteIndustryUser', 
         
-        'Invitation to {organizationName}({authorityOrganizationName})',
+        'Invitation to {organizationName} ({authorityOrganizationName})',
         '<html>
             <body> 
                 <pre>
@@ -3133,7 +3133,7 @@ Email: {emailAddress}
 
 For:
 {authorityName}
-{businessName}
+{organizationName}
 {regulatoryProgram}
 
 By:
@@ -3158,7 +3158,7 @@ Email: {emailAddress}
 
 For:
 {authorityName}
-{businessName}
+{organizationName}
 {regulatoryProgram}
 
 By:
@@ -3183,7 +3183,7 @@ Email: {emailAddress}
 
 For:
 {authorityName}
-{businessName}
+{organizationName}
 {regulatoryProgram}
 ' 
     )
@@ -3203,7 +3203,7 @@ Email: {emailAddress}
 
 For:
 {authorityName}
-{businessName}
+{organizationName}
 {regulatoryProgram}
 
 By:
@@ -3228,7 +3228,7 @@ Email: {emailAddress}
 
 For:
 {authorityName}
-{businessName}
+{organizationName}
 {regulatoryProgram}
 
 By:
@@ -3422,7 +3422,7 @@ Email: {emailAddress}
         'Login',   
         'Success', 
         '',
-        'Login successful to {businessName}
+        'Login successful to {organizationName}
 User: {firstName} {lastName}
 User Name: {userName}
 Email: {emailAddress}
@@ -3664,7 +3664,7 @@ Email: {emailAddress}
         'Signature',   
         'SignatoryPending', 
         '',
-        'Signatory rights have been requested for {businessName}.
+        'Signatory rights have been requested for {organizationName}.
 User: {firstName} {lastName}
 User Name: {userName}
 Email: {emailAddress}
@@ -3680,7 +3680,7 @@ INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType,
         'Signature',   
         'SignatoryGranted', 
         '',
-        'A role has changed from {oldRole} to {newrole} for {businessName}.
+        'A role has changed from {oldRole} to {newRole} for {organizationName}.
 User: {firstName} {lastName}
 User Name: {userName}
 Email: {emailAddress}
@@ -3695,7 +3695,7 @@ Email: {emailAddress}
         'Signature',   
         'SignatoryRevoked', 
         '',
-        'A role has changed from {oldRole} to {newRole} for {businessName}.
+        'A role has changed from {oldRole} to {newRole} for {organizationName}.
 User: {firstName} {lastName}
 User Name: {userName}
 Email: {emailAddress}
@@ -3710,7 +3710,7 @@ Email: {emailAddress}
         'Signature',   
         'SignFailed', 
         '',
-        'Signature ceremony failed because the user entered and incorrect KBQ answer for {businessName}.
+        'Signature ceremony failed because the user entered and incorrect KBQ answer for {organizationName}.
 User: {firstName} {lastName}
 User Name: {userName}
 Email: {emailAddress}

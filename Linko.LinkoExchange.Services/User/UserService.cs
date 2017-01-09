@@ -223,9 +223,61 @@ namespace Linko.LinkoExchange.Services.User
 
         public void UpdateUserPermissionGroupId(int orgRegProgUserId, int permissionGroupId)
         {
-            var user = _dbContext.OrganizationRegulatoryProgramUsers.Single(o => o.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+            int? previousPermissionGroupId;
+            var user = _dbContext.OrganizationRegulatoryProgramUsers
+                .Include("OrganizationRegulatoryProgram")
+                .Single(o => o.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+            previousPermissionGroupId = user.PermissionGroupId;
+            if (previousPermissionGroupId == permissionGroupId)
+            {
+                return;
+            }
+
             user.PermissionGroupId = permissionGroupId;
             _dbContext.SaveChanges();
+
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+            var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
+
+            var targetOrgRegProgram = user.OrganizationRegulatoryProgram;
+            var userProfile = GetUserProfileById(user.UserProfileId);
+
+            string previousRoleLabel = _dbContext.PermissionGroups.Single(pg => pg.PermissionGroupId == previousPermissionGroupId).Name;
+            string newRoleLabel = _dbContext.PermissionGroups.Single(pg => pg.PermissionGroupId == permissionGroupId).Name;
+
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = targetOrgRegProgram.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = targetOrgRegProgram.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.UserProfileId = userProfile.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = userProfile.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = userProfile.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = userProfile.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = userProfile.Email;
+            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            var contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("organizationName", targetOrgRegProgram.Organization.Name);
+            contentReplacements.Add("firstName", userProfile.FirstName);
+            contentReplacements.Add("lastName", userProfile.LastName);
+            contentReplacements.Add("userName", userProfile.UserName);
+            contentReplacements.Add("emailAddress", userProfile.Email);
+
+            contentReplacements.Add("oldRole", previousRoleLabel);
+            contentReplacements.Add("newRole", newRoleLabel);
+
+            contentReplacements.Add("actorOrganizationName", actorProgramUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
+            contentReplacements.Add("actorFirstName", actorUser.FirstName);
+            contentReplacements.Add("actorLastName", actorUser.LastName);
+            contentReplacements.Add("actorUserName", actorUser.UserName);
+            contentReplacements.Add("actorEmailAddress", actorUser.Email);
+
+            _crommerAuditLogService.Log(CromerrEvent.UserAccess_RoleChange, cromerrAuditLogEntryDto, contentReplacements);
+
+
         }
 
         public void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory)
@@ -429,6 +481,36 @@ namespace Linko.LinkoExchange.Services.User
             _requestCache.SetValue(CacheKey.Token, token);
             _emailService.SendEmail(new[] { user.Email }, EmailType.Profile_ResetProfileRequired, contentReplacements);
 
+            //Log to Cromerr
+            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Include("OrganizationRegulatoryProgram")
+                .Single(u => u.OrganizationRegulatoryProgramUserId == senderOrgRegProgramId);
+            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+            var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
+
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = actorProgramUserDto.OrganizationRegulatoryProgramDto.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = actorProgramUserDto.OrganizationRegulatoryProgramDto.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUserDto.OrganizationRegulatoryProgramDto.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = user.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = user.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
+            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("firstName", user.FirstName);
+            contentReplacements.Add("lastName", user.LastName);
+            contentReplacements.Add("userName", user.UserName);
+            contentReplacements.Add("emailAddress", user.Email);
+            contentReplacements.Add("actorOrganizationName", actorProgramUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
+            contentReplacements.Add("actorFirstName", actorUser.FirstName);
+            contentReplacements.Add("actorLastName", actorUser.LastName);
+            contentReplacements.Add("actorUserName", actorUser.UserName);
+            contentReplacements.Add("actorEmailAddress", actorUser.Email);
+
+            _crommerAuditLogService.Log(CromerrEvent.UserAccess_AccountResetInitiated, cromerrAuditLogEntryDto, contentReplacements);
 
             return new ResetUserResultDto()
             {
@@ -437,7 +519,7 @@ namespace Linko.LinkoExchange.Services.User
 
         }
 
-        private void SendAccountLockoutEmails(UserProfile user, bool isForFailedKBQs)
+        private void SendAccountLockoutEmails(UserProfile user, AccountLockEvent reason)
         {
             //Email industry admins and authority admins
             //
@@ -500,7 +582,7 @@ namespace Linko.LinkoExchange.Services.User
 
                 }
 
-                if (!isForFailedKBQs)
+                if (reason == AccountLockEvent.ManualAction)
                 {
                     //Send to user on behalf of each program's authority
                     var authorityName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
@@ -513,11 +595,12 @@ namespace Linko.LinkoExchange.Services.User
                     contentReplacements.Add("authoritySupportEmail", authorityEmail);
                     contentReplacements.Add("authoritySupportPhoneNumber", authorityPhone);
                     _emailService.SendEmail(new[] { user.Email }, EmailType.UserAccess_AccountLockOut, contentReplacements);
+
                 }
             
             }
 
-            if (isForFailedKBQs)
+            if (reason != AccountLockEvent.ManualAction)
             {
                 string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
                 string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
@@ -533,11 +616,11 @@ namespace Linko.LinkoExchange.Services.User
             }
         }
 
-        public AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, bool isForFailedKBQs)
+        public AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, AccountLockEvent reason)
         {
             var user = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
             //Check user is not support role
-            if (user.IsInternalAccount && isAttemptingLock && !isForFailedKBQs)
+            if (user.IsInternalAccount && isAttemptingLock && reason == AccountLockEvent.ManualAction)
                 return new Dto.AccountLockoutResultDto()
                 {
                     IsSuccess = false,
@@ -546,7 +629,7 @@ namespace Linko.LinkoExchange.Services.User
 
             //Check user is not THIS user's own account
             int thisUserProfileId = _httpContext.CurrentUserProfileId();
-            if (thisUserProfileId > 0 && userProfileId == thisUserProfileId   && !isForFailedKBQs)
+            if (thisUserProfileId > 0 && userProfileId == thisUserProfileId && reason == AccountLockEvent.ManualAction)
                 return new Dto.AccountLockoutResultDto()
                 {
                     IsSuccess = false,
@@ -583,13 +666,86 @@ namespace Linko.LinkoExchange.Services.User
             }
 
             if (isAttemptingLock)
-                SendAccountLockoutEmails(user, isForFailedKBQs);
+            {
+                SendAccountLockoutEmails(user, reason);
+            }
+
+            LogLockUnlockActivityToCromerr(isAttemptingLock, user, reason);
 
             //Success
             return new Dto.AccountLockoutResultDto()
             {
                 IsSuccess = true
             };
+        }
+
+        private void LogLockUnlockActivityToCromerr(bool isAttemptingLock, UserProfile user, AccountLockEvent reason)
+        {
+            CromerrEvent cromerrEvent;
+            if (!isAttemptingLock)
+            {
+                cromerrEvent = CromerrEvent.UserAccess_ManualAccountUnlock;
+            }
+            else if (reason == AccountLockEvent.ManualAction)
+            {
+                cromerrEvent = CromerrEvent.UserAccess_ManualAccountLock;
+            }
+            else if (reason == AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset)
+            {
+                cromerrEvent = CromerrEvent.ForgotPassword_AccountLocked;
+            }
+            else if (reason == AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringProfileAccess)
+            {
+                cromerrEvent = CromerrEvent.Profile_AccountLocked;
+            }
+            else
+            {
+                _logService.Info($"LogLockUnlockActivityToCromerr. isAttemptingLock={isAttemptingLock}, reason={reason}, Cannot associate a CromerrEvent with reason provided.");
+                return;
+            }
+
+            //Log Cromerr
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+            var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
+
+            var programUsers = _dbContext.OrganizationRegulatoryProgramUsers.Where(u => u.UserProfileId == user.UserProfileId);
+            foreach (var programUser in programUsers)
+            {
+                var userDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(programUser);
+
+                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+                cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+                cromerrAuditLogEntryDto.OrganizationId = programUser.OrganizationRegulatoryProgram.OrganizationId;
+                cromerrAuditLogEntryDto.RegulatorOrganizationId = programUser.OrganizationRegulatoryProgram.RegulatorOrganizationId;
+                cromerrAuditLogEntryDto.UserProfileId = programUser.UserProfileId;
+                cromerrAuditLogEntryDto.UserName = user.UserName;
+                cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
+                cromerrAuditLogEntryDto.UserLastName = user.LastName;
+                cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
+                cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+                cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+                var contentReplacements = new Dictionary<string, string>();
+                contentReplacements.Add("organizationName", programUser.OrganizationRegulatoryProgram.Organization.Name);
+                contentReplacements.Add("firstName", user.FirstName);
+                contentReplacements.Add("lastName", user.LastName);
+                contentReplacements.Add("userName", user.UserName);
+                contentReplacements.Add("emailAddress", user.Email);
+
+                if (!isAttemptingLock || reason == AccountLockEvent.ManualAction)
+                {
+                    contentReplacements.Add("authorityName", actorProgramUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
+                    contentReplacements.Add("authorityFirstName", actorUser.FirstName);
+                    contentReplacements.Add("authorityLastName", actorUser.LastName);
+                    contentReplacements.Add("authorityEmailaddress", actorUser.Email);
+                }
+
+                _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
+
+            }
+
         }
 
         public void EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable)
@@ -633,12 +789,11 @@ namespace Linko.LinkoExchange.Services.User
             programUser.IsEnabled = !isAttemptingDisable;
             _dbContext.SaveChanges();
 
-            //TO DO: Log user access enable to Audit (UC-2)
             //Log Cromerr
             var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
                 .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
             var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
-            var actorUser = actorProgramUserDto.UserProfileDto;
+            var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
 
             var userDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(programUser);
             var user = userDto.UserProfileDto;
@@ -692,6 +847,36 @@ namespace Linko.LinkoExchange.Services.User
             user.LastModificationDateTimeUtc = DateTime.UtcNow;
             user.LastModifierUserId = Convert.ToInt32(_httpContext.CurrentUserProfileId());
             _dbContext.SaveChanges();
+
+            //Log Cromerr
+            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUsersOrgRegProgUserId);
+            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+            var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
+
+            var userDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user);
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = user.OrganizationRegulatoryProgram.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = user.OrganizationRegulatoryProgram.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = user.OrganizationRegulatoryProgram.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = userDto.UserProfileDto.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = userDto.UserProfileDto.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = userDto.UserProfileDto.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = userDto.UserProfileDto.Email;
+            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            var contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("organizationName", user.OrganizationRegulatoryProgram.Organization.Name);
+            contentReplacements.Add("firstName", userDto.UserProfileDto.FirstName);
+            contentReplacements.Add("lastName", userDto.UserProfileDto.LastName);
+            contentReplacements.Add("userName", userDto.UserProfileDto.UserName);
+            contentReplacements.Add("emailAddress", userDto.UserProfileDto.Email);
+            contentReplacements.Add("actorFirstName", actorUser.FirstName);
+            contentReplacements.Add("actorLastName", actorUser.LastName);
+            contentReplacements.Add("actorUserName", actorUser.UserName);
+
+            _crommerAuditLogService.Log(CromerrEvent.UserAccess_Removed, cromerrAuditLogEntryDto, contentReplacements);
 
             return true;
         }
@@ -883,6 +1068,33 @@ namespace Linko.LinkoExchange.Services.User
             _emailService.SendEmail(new[] { oldEmailAddress }, EmailType.Profile_EmailChanged, contentReplacements);
             _emailService.SendEmail(new[] { newEmailAddress }, EmailType.Profile_EmailChanged, contentReplacements);
 
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+            var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
+
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = actorProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = actorProgramUser.OrganizationRegulatoryProgram.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.UserProfileId = userProfile.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = userProfile.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = userProfile.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = userProfile.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = newEmailAddress;
+            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("firstName", userProfile.FirstName);
+            contentReplacements.Add("lastName", userProfile.LastName);
+            contentReplacements.Add("userName", userProfile.UserName);
+            contentReplacements.Add("oldEmail", oldEmailAddress);
+            contentReplacements.Add("newEmail", newEmailAddress);
+
+            _crommerAuditLogService.Log(CromerrEvent.Profile_EmailChange, cromerrAuditLogEntryDto, contentReplacements);
+
+
             return true;
         }
 
@@ -1035,6 +1247,7 @@ namespace Linko.LinkoExchange.Services.User
             //Send email(s)
             //
             EmailType emailType;
+            CromerrEvent cromerrEvent;
             if (isApproved)
             {
                 //Authority or Industry?
@@ -1042,6 +1255,8 @@ namespace Linko.LinkoExchange.Services.User
                     emailType = EmailType.Registration_AuthorityRegistrationApproved;
                 else
                     emailType = EmailType.Registration_IndustryRegistrationApproved;
+
+                cromerrEvent = CromerrEvent.Registration_RegistrationApproved;
             }
             else
             {
@@ -1050,6 +1265,8 @@ namespace Linko.LinkoExchange.Services.User
                     emailType = EmailType.Registration_AuthorityRegistrationDenied;
                 else
                     emailType = EmailType.Registration_IndustryRegistrationDenied;
+
+                cromerrEvent = CromerrEvent.Registration_RegistrationDenied;
             }
 
             var contentReplacements = new Dictionary<string, string>();
@@ -1084,6 +1301,39 @@ namespace Linko.LinkoExchange.Services.User
             }
 
             _emailService.SendEmail(new[] { programUser.UserProfileDto.Email }, emailType, contentReplacements);
+
+            //Cromerr log
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+            var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
+
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgramDto.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = programUser.OrganizationRegulatoryProgramDto.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = programUser.OrganizationRegulatoryProgramDto.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.UserProfileId = programUser.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = programUser.UserProfileDto.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = programUser.UserProfileDto.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = programUser.UserProfileDto.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = programUser.UserProfileDto.Email;
+            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("authorityName", authorityName);
+            contentReplacements.Add("organizationName", authority.OrganizationDto.OrganizationName);
+            contentReplacements.Add("regulatoryProgram", authority.RegulatoryProgramDto.Name);
+            contentReplacements.Add("firstName", programUser.UserProfileDto.FirstName);
+            contentReplacements.Add("lastName", programUser.UserProfileDto.LastName);
+            contentReplacements.Add("userName", programUser.UserProfileDto.UserName);
+            contentReplacements.Add("emailAddress", programUser.UserProfileDto.Email);
+            contentReplacements.Add("actorFirstName", actorUser.FirstName);
+            contentReplacements.Add("actorLastName", actorUser.LastName);
+            contentReplacements.Add("actorUserName", actorUser.UserName);
+            contentReplacements.Add("actorEmailAddress", actorUser.Email);
+
+            _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
 
 
             return new RegistrationResultDto() { Result = RegistrationResult.Success };

@@ -24,6 +24,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using NLog;
 using System.Web;
+using Linko.LinkoExchange.Services.Mapping;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
@@ -50,6 +51,8 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IHttpContextService _httpContext;
         private readonly ILogger _logger;
         private readonly IQuestionAnswerService _questionAnswerService;
+        private readonly IMapHelper _mapHelper;
+        private readonly ICromerrAuditLogService _crommerAuditLogService;
 
         public AuthenticationService(ApplicationUserManager userManager,
             ApplicationSignInManager signInManager,
@@ -68,6 +71,8 @@ namespace Linko.LinkoExchange.Services.Authentication
            , IHttpContextService httpContext
            , ILogger logger
            , IQuestionAnswerService questionAnswerService
+           , IMapHelper mapHelper
+           , ICromerrAuditLogService crommerAuditLogService
             )
         {
             if (linkoExchangeContext == null) throw new ArgumentNullException(paramName: "linkoExchangeContext");
@@ -86,6 +91,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (logger == null) throw new ArgumentNullException("logger");
             if (questionAnswerService == null) throw new ArgumentNullException("questionAnswerService");
+            if (mapHelper == null) throw new ArgumentNullException("mapHelper");
+            if (crommerAuditLogService == null) throw new ArgumentNullException("crommerAuditLogService");
 
             _dbContext = linkoExchangeContext;
             _userManager = userManager;
@@ -105,6 +112,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             _httpContext = httpContext;
             _logger = logger;
             _questionAnswerService = questionAnswerService;
+            _mapHelper = mapHelper;
+            _crommerAuditLogService = crommerAuditLogService;
         }
 
         public IList<Claim> GetClaims()
@@ -225,6 +234,31 @@ namespace Linko.LinkoExchange.Services.Authentication
                 contentReplacements.Add("supportEmail", supportEmail);
 
                 _emailService.SendEmail(new[] { applicationUser.Email }, EmailType.Profile_PasswordChanged, contentReplacements);
+
+                int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+                var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                    .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+                var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+                var actorUser = _userService.GetUserProfileById(actorProgramUserDto.UserProfileId);
+
+                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+                cromerrAuditLogEntryDto.RegulatoryProgramId = actorProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+                cromerrAuditLogEntryDto.OrganizationId = actorProgramUser.OrganizationRegulatoryProgram.OrganizationId;
+                cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId;
+                cromerrAuditLogEntryDto.UserProfileId = actorProgramUser.UserProfileId;
+                cromerrAuditLogEntryDto.UserName = actorUser.UserName;
+                cromerrAuditLogEntryDto.UserFirstName = actorUser.FirstName;
+                cromerrAuditLogEntryDto.UserLastName = actorUser.LastName;
+                cromerrAuditLogEntryDto.UserEmailAddress = actorUser.Email;
+                cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+                cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+                contentReplacements = new Dictionary<string, string>();
+                contentReplacements.Add("firstName", applicationUser.FirstName);
+                contentReplacements.Add("lastName", applicationUser.LastName);
+                contentReplacements.Add("userName", applicationUser.UserName);
+                contentReplacements.Add("emailAddress", applicationUser.Email);
+
+                _crommerAuditLogService.Log(CromerrEvent.Profile_PasswordChange, cromerrAuditLogEntryDto, contentReplacements);
             }
             catch (Exception ex)
             {
@@ -535,8 +569,45 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     #endregion
 
-                    // 6 TODO logs invite to Audit 
-                    // UC-2 
+                    //Cromerr log
+                    int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+                    var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                        .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+                    var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+                    var actorUser = _userService.GetUserProfileById(actorProgramUserDto.UserProfileId);
+
+                    var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+                    cromerrAuditLogEntryDto.RegulatoryProgramId = recipientProgram.RegulatoryProgramId;
+                    cromerrAuditLogEntryDto.OrganizationId = recipientProgram.OrganizationId;
+                    cromerrAuditLogEntryDto.RegulatorOrganizationId = recipientProgram.RegulatorOrganizationId;
+                    cromerrAuditLogEntryDto.UserProfileId = applicationUser.UserProfileId;
+                    cromerrAuditLogEntryDto.UserName = applicationUser.UserName;
+                    cromerrAuditLogEntryDto.UserFirstName = applicationUser.FirstName;
+                    cromerrAuditLogEntryDto.UserLastName = applicationUser.LastName;
+                    cromerrAuditLogEntryDto.UserEmailAddress = applicationUser.Email;
+                    cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+                    cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+                    var contentReplacements = new Dictionary<string, string>();
+                    contentReplacements.Add("authorityName", recipientProgram.RegulatorOrganization.OrganizationName);
+                    contentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
+                    contentReplacements.Add("regulatoryProgram", recipientProgram.RegulatoryProgramDto.Name);
+                    contentReplacements.Add("firstName", applicationUser.FirstName);
+                    contentReplacements.Add("lastName", applicationUser.LastName);
+                    contentReplacements.Add("userName", applicationUser.UserName);
+                    contentReplacements.Add("emailAddress", applicationUser.Email);
+                    contentReplacements.Add("actorFirstName", actorUser.FirstName);
+                    contentReplacements.Add("actorLastName", actorUser.LastName);
+                    contentReplacements.Add("actorUserName", actorUser.UserName);
+                    contentReplacements.Add("actorEmailAddress", actorUser.Email);
+
+                    await _crommerAuditLogService.Log(CromerrEvent.Registration_RegistrationPending, cromerrAuditLogEntryDto, contentReplacements);
+
+                    if (registrationType == RegistrationType.ResetRegistration)
+                    {
+                        //Also log for this additional Cromerr event
+                        await _crommerAuditLogService.Log(CromerrEvent.UserAccess_AccountResetSuccessful, cromerrAuditLogEntryDto, contentReplacements);
+                    }
+
 
                     // All succeed
                     // 4 Remove the invitation from table 
@@ -604,6 +675,13 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Result = AuthenticationResult.ExpiredRegistrationToken;
                 authenticationResult.Errors = new string[] { "The password reset link has expired.  Please use Forgot Password." };
 
+                int userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
+                foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId))
+                {
+                    var userDto = _userService.GetUserProfileById(userProfileId);
+                    _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_PasswordResetExpired, orgRegProgDto, userDto);
+                }
+
                 return authenticationResult;
             }
 
@@ -632,7 +710,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 int maxAnswerAttempts = Convert.ToInt32(_settingService.GetOrganizationSettingValueByUserId(userProfileId, SettingType.FailedKBQAttemptMaxCount, true, null));
                 if ((failedCount+1) >= maxAnswerAttempts) // from web.config
                 {
-                    _userService.LockUnlockUserAccount(userProfileId, true, true);
+                    _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
                     //Get all associated authorities
                     var userOrgs = _organizationService.GetUserRegulators(userProfileId);
 
@@ -652,6 +730,12 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     authenticationResult.Result = AuthenticationResult.UserIsLocked;
                     authenticationResult.Errors = new string[] { errorString };
+
+                    foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId))
+                    {
+                        var userDto = _userService.GetUserProfileById(userProfileId);
+                        _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_AccountLocked, orgRegProgDto, userDto);
+                    }
                 }
                 else
                 {
@@ -687,6 +771,12 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 authenticationResult.Success = true;
                 authenticationResult.Result = AuthenticationResult.Success;
+
+                foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId))
+                {
+                    var userDto = _userService.GetUserProfileById(userProfileId);
+                    _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_Success, orgRegProgDto, userDto);
+                }
             }
 
             return authenticationResult;
@@ -793,6 +883,9 @@ namespace Linko.LinkoExchange.Services.Authentication
             SetPasswordPolicy(organizationSettings);
 
             _signInManager.UserManager = _userManager;
+
+            bool isUserPasswordLockedOutBeforeSignInAttempt = _userManager.IsLockedOut(applicationUser.Id);
+
             var signInStatus = _signInManager.PasswordSignIn(userName, password, isPersistent, shouldLockout: true);
 
             if (signInStatus == SignInStatus.Success)
@@ -811,6 +904,8 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 if (applicationUser.IsAccountResetRequired)
                 {
+                    LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_AccountResetRequired);
+
                     signInResultDto.AutehticationResult = AuthenticationResult.AccountResetRequired;
                     return Task.FromResult(signInResultDto);
                 }
@@ -819,7 +914,11 @@ namespace Linko.LinkoExchange.Services.Authentication
                 // Check if the user is in 'password lock' status
                 else if (_userManager.IsLockedOut(applicationUser.Id))
                 {
-                    //TODO: log failed login because of Locked to Audit (UC-2) 
+                    if (isUserPasswordLockedOutBeforeSignInAttempt)
+                        LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_AccountLocked);
+                    else
+                        LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_PasswordLockout);
+
                     signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
                     return Task.FromResult(signInResultDto);
                 }
@@ -828,7 +927,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                 // Check if the user has been locked "Account Lockout"  by an authority
                 else if (applicationUser.IsAccountLocked)
                 {
-                    //TODO: log failed login because of Locked to Audit (UC-2) 
+                    LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_AccountLocked);
+
                     signInResultDto.AutehticationResult = AuthenticationResult.UserIsLocked;
                     return Task.FromResult(signInResultDto);
                 }
@@ -868,10 +968,56 @@ namespace Linko.LinkoExchange.Services.Authentication
             else if (signInStatus == SignInStatus.LockedOut)
             {
                 signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
+
+                //Log to Cromerr
+                if (isUserPasswordLockedOutBeforeSignInAttempt)
+                    LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_AccountLocked);
+                else
+                    LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_PasswordLockout);
+
+
             }
 
             _logger.Info(message: "SignInByUserName. signInStatus={0}", argument: signInStatus.ToString());
             return Task.FromResult(signInResultDto);
+        }
+
+        /// <summary>
+        /// Log to Cromerr events: 
+        /// 1) attempting to log into an account that is password locked
+        /// 2) attempting to log into an account that is manually locked by Authority
+        /// 3) getting locked out due to too many password attempts
+        /// 4) attempting to log into an account that has been reset
+        /// </summary>
+        /// <param name="user">Actor attempting the signin activity</param>
+        /// <param name="cromerrEvent">Used to determine if user just got locked out OR they were previously locked out, or reset</param>
+        private void LogProhibitedSignInActivityToCromerr(UserProfile user, CromerrEvent cromerrEvent)
+        {
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+            var actorUser = _userService.GetUserProfileById(actorProgramUserDto.UserProfileId);
+
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = null;
+            cromerrAuditLogEntryDto.OrganizationId = null;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = null;
+            cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = user.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = user.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
+            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            var contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("firstName", user.FirstName);
+            contentReplacements.Add("lastName", user.LastName);
+            contentReplacements.Add("userName", user.UserName);
+            contentReplacements.Add("emailAddress", user.Email);
+
+            _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
+
         }
 
         // Validate user access for UC-29(4.a, 5.a, 6.a)
@@ -884,7 +1030,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 // System confirms user has status “Registration Pending” (and no access to any other portal where registration is not pending or portal is not disabled)
                 if (orpus.All(i => i.IsRegistrationApproved == false && i.OrganizationRegulatoryProgramDto.IsEnabled))
                 {
-                    // TODO: Log failed login because of registration pending to Audit (UC-2)
+                    LogToCromerrThisEvent(orpus, CromerrEvent.Login_RegistrationPending);
                     signInResultDto.AutehticationResult = AuthenticationResult.RegistrationApprovalPending;
                     return false;
                 }
@@ -895,7 +1041,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     userProfile.IsInternalAccount == false   //--- user is disabled for Application administrator.
                 )
                 {
-                    // TODO: Log failed login because userProfile disabled to Audit (UC-2)
+                    LogToCromerrThisEvent(orpus, CromerrEvent.Login_UserDisabled);
                     signInResultDto.AutehticationResult = AuthenticationResult.UserIsDisabled;
                     return false;
                 }
@@ -904,7 +1050,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 if (orpus.Any(i => i.IsRegistrationApproved &&
                                    i.IsEnabled && i.OrganizationRegulatoryProgramDto.IsEnabled) == false)
                 {
-                    // Log failed login because no associations to Audit (UC-2) 
+                    LogToCromerrThisEvent(orpus, CromerrEvent.Login_NoAssociation);
                     signInResultDto.AutehticationResult = AuthenticationResult.AccountIsNotAssociated;
                     return false;
                 }
@@ -914,10 +1060,38 @@ namespace Linko.LinkoExchange.Services.Authentication
             } else {
 
                 // If user doesn't have any program, return below message
+                LogToCromerrThisEvent(orpus, CromerrEvent.Login_NoAssociation);
                 signInResultDto.AutehticationResult = AuthenticationResult.AccountIsNotAssociated;
                 return false;
             }
             return true;
+        }
+
+        private void LogToCromerrThisEvent(IEnumerable<OrganizationRegulatoryProgramUserDto> programUsers, CromerrEvent cromerrEvent)
+        {
+            foreach (var programUser in programUsers)
+            {
+                var user = programUser.UserProfileDto;
+                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+                cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgramDto.RegulatoryProgramId;
+                cromerrAuditLogEntryDto.OrganizationId = programUser.OrganizationRegulatoryProgramDto.OrganizationId;
+                cromerrAuditLogEntryDto.RegulatorOrganizationId = programUser.OrganizationRegulatoryProgramDto.RegulatorOrganizationId;
+                cromerrAuditLogEntryDto.UserProfileId = programUser.UserProfileId;
+                cromerrAuditLogEntryDto.UserName = user.UserName;
+                cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
+                cromerrAuditLogEntryDto.UserLastName = user.LastName;
+                cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
+                cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+                cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+                var contentReplacements = new Dictionary<string, string>();
+                contentReplacements.Add("firstName", user.FirstName);
+                contentReplacements.Add("lastName", user.LastName);
+                contentReplacements.Add("userName", user.UserName);
+                contentReplacements.Add("emailAddress", user.Email);
+
+                _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
+
+            }
         }
 
         public string GetClaimsValue(string claimType)
@@ -946,7 +1120,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             //UserRole <=> PermissionGroup.Name
             //PortalName <=> OrganizationType.Name
 
-            var orgRegProgUser = _dbContext.OrganizationRegulatoryProgramUsers.Include("OrganizationRegulatoryProgram.RegulatoryProgram")
+            var orgRegProgUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Include("OrganizationRegulatoryProgram.RegulatoryProgram")
                 .SingleOrDefault(o => o.UserProfileId == userProfileId && o.OrganizationRegulatoryProgramId == orgRegProgId);
             if (orgRegProgUser == null)
                 throw new Exception(string.Format("ERROR: UserProfileId={0} does not have access to Organization Regulatory Program={1}.", userProfileId, orgRegProgId));
@@ -971,6 +1146,32 @@ namespace Linko.LinkoExchange.Services.Authentication
             claims.Add(CacheKey.PortalName, portalName);
 
             SetCurrentUserClaims(claims);
+
+            //Log to Cromerr
+
+            var programUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(orgRegProgUser);
+            var user = _userService.GetUserProfileById(programUserDto.UserProfileId);
+
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = orgRegProgUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = orgRegProgUser.OrganizationRegulatoryProgram.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgUser.OrganizationRegulatoryProgram.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.UserProfileId = orgRegProgUser.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = user.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = user.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
+            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+            var contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("organizationName", programUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
+            contentReplacements.Add("firstName", user.FirstName);
+            contentReplacements.Add("lastName", user.LastName);
+            contentReplacements.Add("userName", user.UserName);
+            contentReplacements.Add("emailAddress", user.Email);
+
+            _crommerAuditLogService.Log(CromerrEvent.Login_Success, cromerrAuditLogEntryDto, contentReplacements);
+
         }
 
         public void SignOff()
