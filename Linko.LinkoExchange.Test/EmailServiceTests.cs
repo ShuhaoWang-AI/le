@@ -19,7 +19,10 @@ namespace Linko.LinkoExchange.Test
     public class EmailServiceTests
     {
         private IEmailService _emailService;
-        string connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
+        private string connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
+        private string testEmailAddress =  ConfigurationManager.AppSettings["EmailSenderFromEmail"];
+        private string emailServer =   ConfigurationManager.AppSettings["EmailServer"];
+        private string userName ="Test User Name";
 
         public EmailServiceTests()
         {
@@ -67,10 +70,10 @@ namespace Linko.LinkoExchange.Test
             globalSetting.Add(SystemSettingType.PasswordExpiredDays, "90");
             globalSetting.Add(SystemSettingType.SupportPhoneNumber, "+1-604-418-3201");
             globalSetting.Add(SystemSettingType.SupportEmailAddress, "support@linkoExchange.com");
-            globalSetting.Add(SystemSettingType.SystemEmailEmailAddress, "shuhao.wang@watertrax.com");
+            globalSetting.Add(SystemSettingType.SystemEmailEmailAddress, testEmailAddress);
             globalSetting.Add(SystemSettingType.SystemEmailFirstName, "LinkoExchange ");
             globalSetting.Add(SystemSettingType.SystemEmailLastName, "System");
-            globalSetting.Add(SystemSettingType.EmailServer, "wtraxadc2.watertrax.local");
+            globalSetting.Add(SystemSettingType.EmailServer, emailServer);
 
             var settingService = Mock.Of<ISettingService>(
                 s => s.GetGlobalSettings() == globalSetting
@@ -95,12 +98,12 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Registration_AuthorityRegistrationDenied()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
 
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"authorityName", "Grand Rapids"},
-                {"userName", "Shuhao Wang"},
+                {"userName", userName},
            
                 {"supportEmail", "support@linkoexchange.com" },
                 {"supportPhoneNumber","616-456-3260" }
@@ -113,7 +116,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Registration_IndustryRegistrationDenied()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"organizationName", "Green Vally Plant"},
@@ -132,7 +135,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Registration_IndustryRegistrationApproved()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"organizationName", "Green Vally Plant"},
@@ -152,12 +155,12 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Registration_AuthorityRegistrationApproved()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
 
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"authorityName", "Grand Rapids"},
-                {"userName", "Shuhao Wang"},
+                {"userName", userName},
                 {"link", "http://localhost:71" },
                 {"supportEmail", "support@linkoexchange.com" },
                 {"supportPhoneNumber","616-456-3260" }
@@ -170,13 +173,13 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Registration_AuthorityInviteIndustryUser()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
 
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"organizationName", "Green Vally Plant"},
                 {"authorityName", "Grand Rapids"},
-                {"userName", "Shuhao Wang"},
+                {"userName", userName},
                 {"addressLine1", "1055 Pender Street"},
                 {"cityName", "Vancouver"},
                 {"stateName", "BC"},
@@ -191,7 +194,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_UserAccess_AccountLockOut()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" }; 
+            List<string> receivers = new List<string> { testEmailAddress }; 
 
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
@@ -206,7 +209,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_UserAccess_LockOutToSysAdmins()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"firstName", "Registrant_firstName" },
@@ -225,7 +228,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Registration_resetRequired()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"authorityName", "Grand Rapids"}, 
@@ -240,11 +243,11 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Registration_InviteAuthorityUser()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"authorityName", "Grand Rapids"},
-                {"userName", "Shuhao Wang"},
+                {"userName", userName},
                 {"link", "http://localhost:71" },
                 {"supportEmail", "support@linkoexchange.com" },
                 {"supportPhoneNumber","616-456-3260" }
@@ -256,12 +259,12 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Signature_SignatoryGranted()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"organizationName", "Green Vally Plant"},
                 {"authorityName", "Grand Rapids"},
-                {"userName", "Shuhao Wang"},
+                {"userName", userName},
                 {"addressLine1", "1055 Pender Street"},
                 {"cityName", "Vancouver"},
                 {"stateName", "BC"},
@@ -277,12 +280,12 @@ namespace Linko.LinkoExchange.Test
         public void Test_Signature_SignatoryRevoked()
         {
 
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"organizationName", "Green Vally Plant"},
                 {"authorityName", "Grand Rapids"},
-                {"userName", "Shuhao Wang"},
+                {"userName", userName},
                 {"addressLine1", "1055 Pender Street"},
                 {"cityName", "Vancouver"},
                 {"stateName", "BC"},
@@ -301,7 +304,7 @@ namespace Linko.LinkoExchange.Test
                      "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 " + Environment.NewLine +
                      "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 ";
 
-            List <string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List <string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"authorityList", authorityList},
@@ -320,7 +323,7 @@ namespace Linko.LinkoExchange.Test
                     "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 ";
 
 
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 { "userName", "test-user-name" },
@@ -340,7 +343,7 @@ namespace Linko.LinkoExchange.Test
                      "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 ";
 
 
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 { "userName", "test-user-name" },
@@ -362,7 +365,7 @@ namespace Linko.LinkoExchange.Test
                        "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 " + Environment.NewLine +
                        "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 ";
 
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 { "userName", "test-user-name" },
@@ -381,7 +384,7 @@ namespace Linko.LinkoExchange.Test
                                   "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 " + Environment.NewLine +
                                   "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 ";
 
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 { "userName", "test-user-name" },
@@ -400,7 +403,7 @@ namespace Linko.LinkoExchange.Test
                     "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 " + Environment.NewLine +
                     "City of Grand Rapids at linkoexchange@grand-rapids.mi.us Or 616-456-3260 ";
 
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 { "userName", "test-user-name" },
@@ -416,7 +419,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_ForgetPassword_ForgetPassword()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 { "link", "http://localhost:71?token=this-is-the-token"  },
@@ -431,7 +434,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Profile_ResetProfileRequired()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 { "link", "http://localhost:71"  },
@@ -446,7 +449,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Registration_IndustryUserRegistrationPendingToApprovers()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"organizationName", "Green Vally Plant"},
@@ -466,7 +469,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Registration_AuthorityUserRegistrationPendingToApprovers()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"organizationName", "Green Vally Plant"},
@@ -486,7 +489,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_ForgotUserName_ForgotUserName()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 { "userName","test-userName"},
@@ -502,7 +505,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Registration_RegistrationResetPending()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"authorityName", "Grand Rapids"},
@@ -519,12 +522,12 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_Registration_IndustryInviteIndustryUser()
         {
-            List<string> receivers = new List<string> { "shuhao.wang@watertrax.com" };
+            List<string> receivers = new List<string> { testEmailAddress };
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"organizationName", "Green Vally Plant"},
                 {"authorityName", "Grand Rapids"},
-                {"userName", "Shuhao Wang"},
+                {"userName", userName},
                 {"addressLine1", "1055 Pender Street"},
                 {"cityName", "Vancouver"},
                 {"link", "http://localhost:71" },
@@ -538,13 +541,13 @@ namespace Linko.LinkoExchange.Test
 
         private void SendEmail(EmailType emailType)
         {
-            List<string> receivers = new List<string> {"shuhao.wang@watertrax.com"};
+            List<string> receivers = new List<string> {testEmailAddress};
 
             Dictionary<string, string> contentReplacements = new Dictionary<string, string>
             {
                 {"organizationName", "Green Vally Plant"},
                 {"authorityName", "Grand Rapids"},
-                {"userName", "Shuhao Wang"},
+                {"userName", userName},
                 {"addressLine1", "1055 Pender Street"},
                 {"cityName", "Vancouver"},
                 {"stateName", "BC"},
