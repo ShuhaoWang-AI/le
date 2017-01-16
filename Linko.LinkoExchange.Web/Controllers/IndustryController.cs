@@ -17,6 +17,7 @@ using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.ViewModels.Industry;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
+using Linko.LinkoExchange.Web.Mvc;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -243,6 +244,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         // GET: /Industry/User/{id}/Details
         [Route("User/{id:int}/Details")]
+        [AuthorizeIndustryAdminsOnly]
         public ActionResult IndustryUserDetails(int id)
         {
             IndustryUserViewModel viewModel = PrepareIndustryUserDetails(id);
@@ -253,6 +255,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("User/{id:int}/Details")]
+        [AuthorizeIndustryAdminsOnly]
         public ActionResult IndustryUserDetails(int id, IndustryUserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -280,6 +283,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("User/{id:int}/Details/UserRemove")]
+        [AuthorizeIndustryAdminsOnly]
         public ActionResult IndustryUserRemove(int id, IndustryUserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -325,6 +329,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("User/{id:int}/Details/ChangeStatus")]
+        [AuthorizeIndustryAdminsOnly]
         public ActionResult IndustryUserChangeStatus(int id, IndustryUserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -488,6 +493,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         // GET: /Industry/PendingUserApprovals
         [Route("PendingUserApprovals/{id:int}/Details")]
+        [AuthorizeIndustryAdminsOnly]
         public ActionResult PendingUserApprovalDetails(int id)
         {
             var viewModel = PreparePendingUserApprovalDetails(id);
@@ -497,6 +503,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("PendingUserApprovals/{id:int}/Details/PendingUserApprove")]
+        [AuthorizeIndustryAdminsOnly]
         public ActionResult PendingUserApprove(int id, PendingUserApprovalViewModel model)
         {
             if (ModelState.IsValid)
@@ -535,6 +542,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("PendingUserApprovals/{id:int}/Details/PendingUserDeny")]
+        [AuthorizeIndustryAdminsOnly]
         public ActionResult PendingUserDeny(int id, PendingUserApprovalViewModel model)
         {
             if (ModelState.IsValid)

@@ -19,6 +19,7 @@ using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.ViewModels.Authority;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
+using Linko.LinkoExchange.Web.Mvc;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -434,6 +435,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         // GET: /Authority/AuthorityUserDetails
         [Route("User/{id:int}/Details")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult AuthorityUserDetails(int id)
         {
             AuthorityUserViewModel viewModel = PrepareAuthorityUserDetails(id);
@@ -444,6 +446,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("User/{id:int}/Details")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult AuthorityUserDetails(int id, AuthorityUserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -470,6 +473,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("User/{id:int}/Details/UserLockUnLock")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult AuthorityUserLockUnLock(int id, AuthorityUserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -497,6 +501,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("User/{id:int}/Details/ChangeStatus")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult AuthorityUserChangeStatus(int id, AuthorityUserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -524,6 +529,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("User/{id:int}/Details/UserRemove")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult AuthorityUserRemove(int id, AuthorityUserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -569,6 +575,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("User/{id:int}/Details/UserReset")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult AuthorityUserReset(int id, AuthorityUserViewModel model)
         {
             string newEmail = model.ResetEmail;
@@ -762,6 +769,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         // GET: /Authority/IndustryDetails
         [Route("Industry/{id:int}/Details")]
+        [AuthorizeCorrectAuthorityOnly(false)]
         public ActionResult IndustryDetails(int id)
         {
             IndustryViewModel viewModel = PrepareIndustryDetails(id);
@@ -772,6 +780,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         // POST: /Authority/IndustryDetails
         [AcceptVerbs(HttpVerbs.Post)]
         [Route("Industry/{id:int}/Details")]
+        [AuthorizeCorrectAuthorityOnly(false)]
         public ActionResult IndustryDetails(int id, IndustryViewModel model)
         {
             try
@@ -837,6 +846,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         // GET: /Authority/IndustryUsers
         [Route("Industry/{id:int}/Users")]
+        [AuthorizeCorrectAuthorityOnly(false)]
         public ActionResult IndustryUsers(int id)
         {
             ViewBag.IndustryId = id;
@@ -987,6 +997,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         // GET: /Authority/IndustryUserDetails
         [Route("Industry/{iid:int}/User/{id:int}/Details")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult IndustryUserDetails(int iid , int id)
         {
             IndustryUserViewModel viewModel = PrepareIndustryUserDetails(id);
@@ -997,6 +1008,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("Industry/{iid:int}/User/{id:int}/Details/UpdateSignatoryStatus")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult IndustryUserUpdateSignatoryStatus(int iid, int id, IndustryUserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -1023,6 +1035,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("Industry/{iid:int}/User/{id:int}/Details/UserLockUnLock")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult IndustryUserLockUnLock(int iid, int id, IndustryUserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -1050,6 +1063,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("Industry/{iid:int}/User/{id:int}/Details/ChangeStatus")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult IndustryUserChangeStatus(int iid, int id, IndustryUserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -1077,6 +1091,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("Industry/{iid:int}/User/{id:int}/Details/UserReset")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult IndustryUserReset(int iid, int id, IndustryUserViewModel model)
         {
             string newEmail = model.ResetEmail;
@@ -1245,6 +1260,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         // GET: /Authority/PendingUserApprovals
         [Route("PendingUserApprovals/{id:int}/Details")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult PendingUserApprovalDetails(int id)
         {
             var viewModel = PreparePendingUserApprovalDetails(id);
@@ -1254,6 +1270,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("PendingUserApprovals/{id:int}/Details/PendingUserApprove")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult PendingUserApprove( int id, PendingUserApprovalViewModel model)
         {
             if (ModelState.IsValid)
@@ -1291,6 +1308,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route("PendingUserApprovals/{id:int}/Details/PendingUserDeny")]
+        [AuthorizeCorrectAuthorityOnly(true)]
         public ActionResult PendingUserDeny(int id, PendingUserApprovalViewModel model)
         {
             if (ModelState.IsValid)
