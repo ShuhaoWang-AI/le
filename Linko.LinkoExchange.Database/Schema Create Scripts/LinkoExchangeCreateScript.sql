@@ -2099,6 +2099,13 @@ BEGIN
 	INSERT INTO dbo.tSystemSetting (Name, Value, Description)
 		VALUES 
 		(
+		    'PasswordRequiredMaxLength'
+		    , '16'
+		    , ''
+		)
+	INSERT INTO dbo.tSystemSetting (Name, Value, Description)
+		VALUES 
+		(
 		    'PasswordRequireDigit'
 		    , '1'
 		    , ''
