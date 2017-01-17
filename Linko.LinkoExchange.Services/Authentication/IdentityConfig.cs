@@ -76,9 +76,10 @@ namespace Linko.LinkoExchange.Services.Authentication
             };
 
             // Configure validation logic for passwords
+            var passwordRequiredLength = ValueParser.TryParseInt(ConfigurationManager.AppSettings["PasswordRequiredLength"], defaultValue: 8);
             manager.PasswordValidator = new PasswordValidator
             {
-                RequiredLength = 8,                
+                RequiredLength = passwordRequiredLength,                
                 RequireNonLetterOrDigit = false,
                 RequireDigit = true,
                 RequireLowercase = true,

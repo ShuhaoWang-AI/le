@@ -16,6 +16,7 @@ namespace Linko.LinkoExchange.Core.Enum
         SupportEmailAddress = 8,
         EmailServer = 9,
         PasswordRequiredLength,
+        PasswordRequiredMaxLength,
         PasswordRequireDigit
     }
 }

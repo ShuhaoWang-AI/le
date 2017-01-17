@@ -1408,8 +1408,12 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return RegistrationResult.NotAgreedTermsAndConditions;
             }
 
-            // To verify user's password 
-            if (userProfile.Password.Length < 8 || userProfile.Password.Length > 15)
+            // To verify user's password  
+            var passwordRequiredLengthFromWebConfig = ValueParser.TryParseInt(ConfigurationManager.AppSettings["PasswordRequiredLength"], defaultValue: 8);
+            var passwordRequiredLength = ValueParser.TryParseInt(_globalSettings[SystemSettingType.PasswordRequiredLength], defaultValue: passwordRequiredLengthFromWebConfig);
+            var passwordRequiredMaxLength = ValueParser.TryParseInt(_globalSettings[SystemSettingType.PasswordRequiredMaxLength], defaultValue: 16);
+
+            if (userProfile.Password.Length < passwordRequiredLength || userProfile.Password.Length > passwordRequiredMaxLength)
             {
                 return RegistrationResult.BadPassword;
             }

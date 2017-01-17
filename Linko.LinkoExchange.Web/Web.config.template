@@ -65,7 +65,9 @@ For more information on how to configure your ASP.NET application, please visit 
     <!-- hours  7 days 7 * 24 -->
     <add key="ResetPasswordTokenValidateInterval"
          value="168" />
-
+    <add key="PasswordRequiredLength" 
+         value="8" />  
+    
     <add key="webpages:Version"
          value="3.0.0.0" />
     <add key="webpages:Enabled"
