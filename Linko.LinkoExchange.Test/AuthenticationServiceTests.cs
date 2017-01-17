@@ -35,7 +35,11 @@ namespace Linko.LinkoExchange.Test
     [TestClass]
     public class AuthenticationServiceTests
     {
-        string connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
+        string connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString; 
+        private string testEmailAddress = ConfigurationManager.AppSettings["EmailSenderFromEmail"];
+        private string emailServer = ConfigurationManager.AppSettings["EmailServer"];
+        private string userName = "Test User Name";
+
         ISettingService settService = Mock.Of<ISettingService>();
         IOrganizationService orgService = Mock.Of<IOrganizationService>();
         IProgramService progService = Mock.Of<IProgramService>();
@@ -106,13 +110,15 @@ namespace Linko.LinkoExchange.Test
 
             //settingDict.Add(SystemSettingType.FailedPasswordAttemptMaxCount, "1"); //Does not exist in system settings
 
-            //settingDict.Add(SystemSettingType.PasswordHistoryMaxCount, "10"); //Does not exist in system settings
-            systemSettingDict.Add(SystemSettingType.EmailServer, "wtraxadc2.watertrax.local");
+            //settingDict.Add(SystemSettingType.PasswordHistoryMaxCount, "10"); //Does not exist in system settings 
+
+            systemSettingDict.Add(SystemSettingType.EmailServer, emailServer);
             systemSettingDict.Add(SystemSettingType.SupportPhoneNumber, "+1-604-418-3201");
             systemSettingDict.Add(SystemSettingType.SupportEmailAddress, "support@linkoExchange.com");
-            systemSettingDict.Add(SystemSettingType.SystemEmailEmailAddress, "shuhao.wang@watertrax.com");
+            systemSettingDict.Add(SystemSettingType.SystemEmailEmailAddress, testEmailAddress);
             systemSettingDict.Add(SystemSettingType.SystemEmailFirstName, "LinkoExchange");
-            systemSettingDict.Add(SystemSettingType.SystemEmailLastName, "System");
+            systemSettingDict.Add(SystemSettingType.SystemEmailLastName, "System"); 
+
 
             settingServiceMock.Setup(i => i.GetGlobalSettings()).Returns(systemSettingDict);
             settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordHistoryMaxCount, It.IsAny<OrganizationTypeName>())).Returns("10");
