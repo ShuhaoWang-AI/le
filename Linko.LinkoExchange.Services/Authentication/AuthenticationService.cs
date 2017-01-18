@@ -875,9 +875,9 @@ namespace Linko.LinkoExchange.Services.Authentication
             applicationUser.Claims.Clear();
 
             var userId = applicationUser.UserProfileId;
-            var organizationIds = GetUserOrganizationIds(userId);
+            var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userId);
 
-            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
+            var organizationSettings = _settingService.GetOrganizationSettingsByIds(authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
 
             SetPasswordPolicy(organizationSettings);
 
@@ -1357,8 +1357,20 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         private IEnumerable<int> GetUserOrganizationIds(int userid)
         {
-            var orgnizations = _organizationService.GetUserOrganizations(userid);
-            return orgnizations.Select(i => i.OrganizationId).ToArray();
+            var orgRegPrograms = _organizationService.GetUserOrganizations(userid);
+            return orgRegPrograms.Select(i => i.OrganizationId).ToArray();
+        }
+
+        private IEnumerable<int> GetUserAuthorityOrganizationIds(int userid)
+        {
+            var authorityOrgIds = new List<int>();
+            var orgRegPrograms = _organizationService.GetUserOrganizations(userid);
+            foreach (var orgRegProgram in orgRegPrograms)
+            {
+                authorityOrgIds.Add(orgRegProgram.RegulatorOrganizationId ?? orgRegProgram.OrganizationId);
+            }
+
+            return authorityOrgIds;
         }
 
         private void SendResetPasswordConfirmationEmail(UserProfile userProfile)
