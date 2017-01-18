@@ -5,6 +5,7 @@ using Linko.LinkoExchange.Services.Organization;
 using Microsoft.Practices.Unity;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Dto;
+using System.Configuration;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {
@@ -22,9 +23,12 @@ namespace Linko.LinkoExchange.Web.Mvc
         //If false  : passed in "id" is an Organization Regulatory Program Id (Industry)
         bool _isIdParameterForUser;
 
+        private string _unauthorizedPagePath;
+
         public AuthorizeCorrectAuthorityOnly(bool isIdParameterForUser)
         {
             _isIdParameterForUser = isIdParameterForUser;
+            _unauthorizedPagePath = ConfigurationManager.AppSettings["UnauthorizedPagePath"];
         }
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
@@ -100,7 +104,7 @@ namespace Linko.LinkoExchange.Web.Mvc
                 //Not authorized
                 result = new ViewResult
                 {
-                    ViewName = "~/Views/Common/Unauthorized.cshtml",
+                    ViewName = _unauthorizedPagePath,
                 };
                 filterContext.Result = result;
 

@@ -3,6 +3,7 @@ using Linko.LinkoExchange.Services.Cache;
 using System.Web.Routing;
 using Microsoft.Practices.Unity;
 using Linko.LinkoExchange.Services.User;
+using System.Configuration;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {
@@ -13,6 +14,13 @@ namespace Linko.LinkoExchange.Web.Mvc
         public IUserService _userService { get; set; }
         [Dependency]
         public ISessionCache _sessionCache { get; set; }
+
+        private string _unauthorizedPagePath;
+
+        public AuthorizeIndustryAdminsOnly()
+        {
+            _unauthorizedPagePath = ConfigurationManager.AppSettings["UnauthorizedPagePath"];
+        }
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
@@ -37,7 +45,7 @@ namespace Linko.LinkoExchange.Web.Mvc
             //Not authorized
             var result = new ViewResult
             {
-                ViewName = "~/Views/Common/Unauthorized.cshtml",
+                ViewName = _unauthorizedPagePath,
             };
             filterContext.Result = result;
 
