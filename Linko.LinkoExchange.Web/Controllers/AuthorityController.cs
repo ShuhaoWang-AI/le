@@ -1358,7 +1358,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 AddressLine1 = result.UserProfileDto.AddressLine1,
                 AddressLine2 = result.UserProfileDto.AddressLine2,
                 CityName = result.UserProfileDto.CityName,
-                State = result.OrganizationRegulatoryProgramDto.OrganizationDto.State,
+                State = result.UserProfileDto.Jurisdiction.Code,
                 ZipCode = result.UserProfileDto.ZipCode,
                 Email = result.UserProfileDto.Email,
                 PhoneNumber = result.UserProfileDto.PhoneNumber,
