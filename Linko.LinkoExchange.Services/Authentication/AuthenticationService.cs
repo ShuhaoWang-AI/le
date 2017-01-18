@@ -432,7 +432,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     {
                         string passwordHash = _passwordHasher.HashPassword(userInfo.Password); 
 
-                        var organizationIds = GetUserOrganizationIds(applicationUser.UserProfileId);
+                        var organizationIds = GetUserAuthorityOrganizationIds(applicationUser.UserProfileId);
                         var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
 
                         if (!IsValidPasswordCheckInHistory(userInfo.Password, applicationUser.UserProfileId, organizationSettings))
