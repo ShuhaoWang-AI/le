@@ -330,8 +330,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             var inivitationRecipintOrganizationSettings =
                 _settingService.GetOrganizationSettingsById(invitationRecipientProgram.OrganizationId);
 
-            // If nowhere defines this value, set it as 72 hrs.
-            var invitationExpirationHours = 72;
+            var invitationExpirationHours = ValueParser.TryParseInt(ConfigurationManager.AppSettings["DefaultInviteExpirationHours"], 72);
             if (inivitationRecipintOrganizationSettings.Settings.Any())
             {
                 invitationExpirationHours = ValueParser.TryParseInt(inivitationRecipintOrganizationSettings

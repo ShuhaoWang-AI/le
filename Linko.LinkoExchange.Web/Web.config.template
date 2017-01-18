@@ -66,8 +66,11 @@ For more information on how to configure your ASP.NET application, please visit 
     <add key="ResetPasswordTokenValidateInterval"
          value="168" />
     <add key="PasswordRequiredLength" 
-         value="8" />  
-    
+         value="8" />
+    <add key="UnauthorizedPagePath" value="~/Views/Common/Unauthorized.cshtml" />
+    <add key="DefaultInviteExpirationHours" value="72" />
+    <add key="EncryptionPassword" value="L1nk0Exch@ng3" />
+
     <add key="webpages:Version"
          value="3.0.0.0" />
     <add key="webpages:Enabled"
