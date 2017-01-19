@@ -578,7 +578,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
                     cromerrAuditLogEntryDto.RegulatoryProgramId = recipientProgram.RegulatoryProgramId;
                     cromerrAuditLogEntryDto.OrganizationId = recipientProgram.OrganizationId;
-                    cromerrAuditLogEntryDto.RegulatorOrganizationId = recipientProgram.RegulatorOrganizationId;
+                    cromerrAuditLogEntryDto.RegulatorOrganizationId = authorityOrg.OrganizationId;
                     cromerrAuditLogEntryDto.UserProfileId = applicationUser.UserProfileId;
                     cromerrAuditLogEntryDto.UserName = applicationUser.UserName;
                     cromerrAuditLogEntryDto.UserFirstName = applicationUser.FirstName;
@@ -587,7 +587,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
                     cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
                     var contentReplacements = new Dictionary<string, string>();
-                    contentReplacements.Add("authorityName", recipientProgram.RegulatorOrganization.OrganizationName);
+                    contentReplacements.Add("authorityName", authorityOrg.OrganizationDto.OrganizationName);
                     contentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
                     contentReplacements.Add("regulatoryProgram", recipientProgram.RegulatoryProgramDto.Name);
                     contentReplacements.Add("firstName", applicationUser.FirstName);
