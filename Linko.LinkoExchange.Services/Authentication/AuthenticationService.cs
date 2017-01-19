@@ -712,6 +712,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
                     //Get all associated authorities
                     var userOrgs = _organizationService.GetUserRegulators(userProfileId);
+                    authenticationResult.RegulatoryList = userOrgs;
 
                     string errorString = "<div class=\"table - responsive\">";
                     errorString += "<table class=\"table no-margin\">";

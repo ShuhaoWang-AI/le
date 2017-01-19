@@ -843,6 +843,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 case AuthenticationResult.UserIsLocked:                 // 3.a
                     _logger.Info(string.Format(format: "ResetPassword. User has been locked out for Token = {0}.", arg0: model.Token));
                     TempData["Message"] = result.Errors;
+                    TempData["RegulatoryList"] = result.RegulatoryList;
                     return RedirectToAction(actionName: "AccountLocked", controllerName: "Account");
 
                 // Token expired

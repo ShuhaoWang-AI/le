@@ -8,6 +8,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool Success { get; set; }
         public IEnumerable<string> Errors { get; set; }
         public AuthenticationResult Result { get; set; }
+        public IEnumerable<AuthorityDto> RegulatoryList { get; set; }
 
         public AuthenticationResultDto()
         {

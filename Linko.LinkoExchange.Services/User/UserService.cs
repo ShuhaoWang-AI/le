@@ -705,15 +705,27 @@ namespace Linko.LinkoExchange.Services.User
             }
 
             //Log Cromerr
-            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
-            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
-            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
-            var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
-
             var programUsers = _dbContext.OrganizationRegulatoryProgramUsers.Where(u => u.UserProfileId == user.UserProfileId);
             foreach (var programUser in programUsers.ToList())
             {
+                int thisUserOrgRegProgUserId;
+                if (cromerrEvent == CromerrEvent.UserAccess_ManualAccountLock
+                    || cromerrEvent == CromerrEvent.UserAccess_ManualAccountUnlock)
+                {
+                    //Different actor user
+                    thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+                }
+                else
+                {
+                    //User did this to herself
+                    thisUserOrgRegProgUserId = programUser.OrganizationRegulatoryProgramUserId;
+                }
+
+                var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                    .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+                var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+                var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
+
                 var userDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(programUser);
 
                 var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();

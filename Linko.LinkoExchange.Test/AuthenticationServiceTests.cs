@@ -831,7 +831,7 @@ namespace Linko.LinkoExchange.Test
 
             var invitServiceMock = Mock.Get(invitService);
 
-            invitServiceMock.Verify(i => i.DeleteInvitation(It.IsAny<string>()));
+            invitServiceMock.Verify(i => i.DeleteInvitation(It.IsAny<string>(), It.IsAny<int>()));
 
             Assert.AreEqual(RegistrationResult.Success, result.Result.Result);
 
