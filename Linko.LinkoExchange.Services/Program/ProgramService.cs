@@ -104,6 +104,15 @@ namespace Linko.LinkoExchange.Services.Program
                 orpu.IsRegistrationApproved = false;
                 orpu.IsRegistrationDenied = false;
                 orpu.IsRemoved = false;
+                
+                //Update to new re-reg timestamp
+                orpu.RegistrationDateTimeUtc = DateTimeOffset.UtcNow;
+
+                //RESET SCENARIO
+                //Update because the new "Inviter" is now the Authority
+                //(need to do this so that this pending registration show up under the Authority)
+                orpu.InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgramId; 
+
             }
 
             _linkoExchangeDbContext.SaveChanges();

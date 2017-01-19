@@ -437,7 +437,7 @@ namespace Linko.LinkoExchange.Services.Invitation
 
         }
 
-        public void DeleteInvitation(string invitationId)
+        public void DeleteInvitation(string invitationId, int? registrationActorOrgRegProgUserId = null)
         {             
             var invitation = _dbContext.Invitations
                 .Include(x => x.RecipientOrganizationRegulatoryProgram.Organization)
@@ -458,7 +458,16 @@ namespace Linko.LinkoExchange.Services.Invitation
 
             var existingUser = _userService.GetUserProfileByEmail(invitation.EmailAddress);
 
-            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            int thisUserOrgRegProgUserId;
+            if (registrationActorOrgRegProgUserId.HasValue)
+            {
+                thisUserOrgRegProgUserId = registrationActorOrgRegProgUserId.Value;
+            }
+            else
+            {
+                thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            }
+                
             var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
                 .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
             var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);

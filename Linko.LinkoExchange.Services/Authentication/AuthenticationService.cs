@@ -569,7 +569,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     #endregion
 
                     //Cromerr log
-                    int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+                    int thisUserOrgRegProgUserId = orpu.OrganizationRegulatoryProgramUserId;
                     var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
                         .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
                     var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
@@ -610,7 +610,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     // All succeed
                     // 4 Remove the invitation from table 
-                    _invitationService.DeleteInvitation(invitationDto.InvitationId);
+                    _invitationService.DeleteInvitation(invitationDto.InvitationId, orpu.OrganizationRegulatoryProgramUserId);
 
                     _dbContext.SaveChanges();
                     transaction.Commit(); 
