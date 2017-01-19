@@ -309,8 +309,8 @@ namespace Linko.LinkoExchange.Services.User
             contentReplacements.Add("addressLine1", orgRegProgram.Organization.AddressLine1);
             contentReplacements.Add("cityName", orgRegProgram.Organization.CityName);
             contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == orgRegProgram.Organization.JurisdictionId).Code);
-            contentReplacements.Add("emailAddress", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress));
-            contentReplacements.Add("phoneNumber", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone));
+            contentReplacements.Add("supportEmail", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress));
+            contentReplacements.Add("supportPhoneNumber", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone));
 
             //Email user
             EmailType emailType = isSignatory ? EmailType.Signature_SignatoryGranted : EmailType.Signature_SignatoryRevoked;
