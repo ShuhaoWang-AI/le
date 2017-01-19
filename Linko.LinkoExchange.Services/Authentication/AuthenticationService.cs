@@ -993,12 +993,6 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="cromerrEvent">Used to determine if user just got locked out OR they were previously locked out, or reset</param>
         private void LogProhibitedSignInActivityToCromerr(UserProfile user, CromerrEvent cromerrEvent)
         {
-            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
-            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
-            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
-            var actorUser = _userService.GetUserProfileById(actorProgramUserDto.UserProfileId);
-
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
             cromerrAuditLogEntryDto.RegulatoryProgramId = null;
             cromerrAuditLogEntryDto.OrganizationId = null;

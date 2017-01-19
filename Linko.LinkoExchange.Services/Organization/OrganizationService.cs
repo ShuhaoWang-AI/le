@@ -97,7 +97,7 @@ namespace Linko.LinkoExchange.Services.Organization
                                 u.IsRemoved == false &&
                                // u.IsEnabled == true &&
                                 u.IsRegistrationApproved &&
-                                u.OrganizationRegulatoryProgram.IsEnabled &&
+                                //u.OrganizationRegulatoryProgram.IsEnabled &&
                                 u.OrganizationRegulatoryProgram.IsRemoved == false);
 
                 var orgs = new List<AuthorityDto>();
