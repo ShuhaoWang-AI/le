@@ -263,14 +263,16 @@
                 })
                 <div class="col-md-4">
                     <div class="checkbox">
+                        @Html.HiddenFor(model => model.IsSignatory)
                         @Html.EditorFor(model => model.IsSignatory, new
                         {
                             htmlAttributes = new
                             {
                                 @class = "form-control",
-                                @readonly = "readonly"
+                                disabled="disabled"
                             }
                         })
+
                     </div>
                 </div>
             </div>
