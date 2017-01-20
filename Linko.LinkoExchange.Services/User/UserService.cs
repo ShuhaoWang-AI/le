@@ -412,8 +412,8 @@ namespace Linko.LinkoExchange.Services.User
             }
 
             //reset flags
+            //(DO NOT set password hash to NULL or else they will get "Invalid Login Attempt" when attempting to login instead of "You have been RESET")
             user.IsAccountLocked = false;
-            user.PasswordHash = null; 
             user.IsAccountResetRequired = true;
 
             ////Delete SQs and KBQs //WE NO LONGER DELETE IN CASE INVITATIONS ARE LOST/EXPIRED AND WE NEED TO AUTHENTICATE ANOTHER INVITE REQUEST.
