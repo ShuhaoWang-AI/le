@@ -403,5 +403,32 @@ namespace Linko.LinkoExchange.Services.Mapping
             return cromerrAuditLog;
         }
 
+        public CromerrAuditLogEntryDto GetCromerrAuditLogDtoFromCromerrAuditLog(CromerrAuditLog cromerrAuditLog, CromerrAuditLogEntryDto dto = null)
+        {
+            if (dto == null)
+            {
+                dto = new CromerrAuditLogEntryDto();
+            }
+
+            dto.CromerrAuditLogId = cromerrAuditLog.CromerrAuditLogId;
+            dto.AuditLogTemplateId = cromerrAuditLog.AuditLogTemplateId;
+            dto.RegulatoryProgramId = cromerrAuditLog.RegulatoryProgramId;
+            dto.OrganizationId = cromerrAuditLog.OrganizationId;
+            dto.RegulatorOrganizationId = cromerrAuditLog.RegulatorOrganizationId;
+            dto.UserProfileId = cromerrAuditLog.UserProfileId;
+            dto.EventCategory = cromerrAuditLog.AuditLogTemplate.EventCategory;
+            dto.EventType = cromerrAuditLog.AuditLogTemplate.EventType;
+            dto.UserName = cromerrAuditLog.UserName;
+            dto.UserFirstName = cromerrAuditLog.UserFirstName;
+            dto.UserLastName = cromerrAuditLog.UserLastName;
+            dto.UserEmailAddress = cromerrAuditLog.UserEmailAddress;
+            dto.IPAddress = cromerrAuditLog.IPAddress;
+            dto.HostName = cromerrAuditLog.HostName;
+            dto.Comment = cromerrAuditLog.Comment;
+            dto.LogDateTimeUtc = cromerrAuditLog.LogDateTimeUtc;
+
+            return dto;
+        }
+
     }
 }

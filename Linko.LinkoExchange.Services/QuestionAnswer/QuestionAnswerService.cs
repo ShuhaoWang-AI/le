@@ -316,7 +316,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
             cromerrAuditLogEntryDto.RegulatoryProgramId = actorProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
             cromerrAuditLogEntryDto.OrganizationId = actorProgramUser.OrganizationRegulatoryProgram.OrganizationId;
-            cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
             cromerrAuditLogEntryDto.UserProfileId = userProfile.UserProfileId;
             cromerrAuditLogEntryDto.UserName = userProfile.UserName;
             cromerrAuditLogEntryDto.UserFirstName = userProfile.FirstName;

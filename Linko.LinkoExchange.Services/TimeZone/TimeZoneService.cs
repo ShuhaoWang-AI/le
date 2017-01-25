@@ -54,5 +54,11 @@ namespace Linko.LinkoExchange.Services.TimeZone
             return (TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, authorityLocalZone));
         }
 
+        public DateTime GetLocalizedDateTimeUsingThisTimeZoneId(DateTime utcDateTime, int timeZoneId)
+        {
+            TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
+            return (TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, authorityLocalZone));
+        }
+
     }
 }

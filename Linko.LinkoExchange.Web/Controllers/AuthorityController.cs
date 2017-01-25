@@ -20,6 +20,7 @@ using Linko.LinkoExchange.Web.ViewModels.Authority;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
 using Linko.LinkoExchange.Web.Mvc;
+using Linko.LinkoExchange.Services.AuditLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -37,11 +38,12 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IPermissionService _permissionService;
         private readonly ISessionCache _sessionCache;
         private readonly ILogger _logger;
-        
+        private readonly ICromerrAuditLogService _cromerrLogService;
+
 
         public AuthorityController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService,
             ISettingService settingService, IQuestionAnswerService questionAnswerService, ITimeZoneService timeZoneService, IPermissionService permissionService,
-            ISessionCache sessionCache, ILogger logger)
+            ISessionCache sessionCache, ILogger logger, ICromerrAuditLogService cromerrLogService)
         {
             _organizationService = organizationService;
             _userService = userService;
@@ -52,6 +54,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _permissionService = permissionService;
             _sessionCache = sessionCache;
             _logger = logger;
+            _cromerrLogService = cromerrLogService;
         }
 
         #endregion
@@ -284,7 +287,110 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         #endregion
-        
+
+        #region Show Audit Logs
+
+        // GET: /Authority/AuditLogs
+        public ActionResult AuditLogs()
+        {
+            return View();
+        }
+
+        // POST: /Authority/AuditLogs
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult AuditLogs(AuditLogViewModel model, FormCollection collection)
+        {
+            ViewBag.SearchString = collection["searchString"];
+            return View(model);
+        }
+
+        public ActionResult AuditLogs_Read([DataSourceRequest] DataSourceRequest request, string searchString)
+        {
+            var organizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(organizationRegulatoryProgramId, SettingType.TimeZone));
+            var logEntries = _cromerrLogService.GetCromerrAuditLogEntries(organizationRegulatoryProgramId, searchString);
+
+            var viewModels = logEntries.Select(dto => new AuditLogViewModel
+            {
+                CromerrAuditLogId = dto.CromerrAuditLogId,
+                RegulatoryProgramName = dto.RegulatoryProgramName,
+                OrganizationId = dto.OrganizationId.Value,
+                OrganizationName = dto.OrganizationName,
+                RegulatorName = dto.RegulatorOrganizationName,
+                EventCategory = dto.EventCategory,
+                EventType = dto.EventType,
+                UserProfileId = dto.UserProfileId ?? -1,
+                UserName = dto.UserName,
+                FirstName = dto.UserFirstName,
+                LastName = dto.UserLastName,
+                EmailAddress = dto.UserEmailAddress,
+                IPAddress = dto.IPAddress,
+                HostName = dto.HostName,
+                Comment = dto.Comment,
+                //Need to modify datetime to local
+                LogDateTimeUtc = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(
+                                dto.LogDateTimeUtc.DateTime, timeZoneId)
+            
+            });
+
+            DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
+            {
+                CromerrAuditLogId = vm.CromerrAuditLogId,
+                RegulatoryProgramName = vm.RegulatoryProgramName,
+                OrganizationId = vm.OrganizationId,
+                OrganizationName  = vm.OrganizationName,
+                RegulatorName = vm.RegulatorName,
+                EventCategory = vm.EventCategory,
+                EventType = vm.EventType,
+                UserProfileId = vm.UserProfileId,
+                UserName = vm.UserName,
+                FirstName = vm.FirstName,
+                LastName = vm.LastName,
+                EmailAddress = vm.EmailAddress,
+                IPAddress = vm.IPAddress,
+                HostName = vm.HostName,
+                Comment = vm.Comment,
+                LogDateTimeUtc = vm.LogDateTimeUtc.DateTime.ToString()
+            });
+
+            return Json(result);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        public ActionResult AuditLogs_Select(int cromerrAuditLogId)
+        {
+            try
+            {
+                if (cromerrAuditLogId != -1 && ModelState.IsValid)
+                {
+                    var logDetails = _cromerrLogService.GetCromerrAuditLogEntry(cromerrAuditLogId).Comment;
+                    return Json(new
+                    {
+                        redirect = false,
+                        details = logDetails //$"Log Entry Details for Id = {cromerrAuditLogId}"
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        redirect = false,
+                        message = "Please select a log entry."
+                    });
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                return Json(new
+                {
+                    redirect = false,
+                    message = MvcValidationExtensions.GetViolationMessages(rve)
+                });
+            }
+        }
+
+        #endregion
+
         #region Show Authority Users
 
         // GET: /Authority/Users

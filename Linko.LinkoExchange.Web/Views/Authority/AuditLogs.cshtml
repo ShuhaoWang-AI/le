@@ -1,0 +1,286 @@
+﻿@{
+    ViewBag.Title = "Audit Logs";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <section class="">
+            <ol class="breadcrumb">
+                <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
+                <li class="active">Audit Logs</li>
+            </ol>
+    </section>
+    <div class="box box-primary">
+        <section class="box-body form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-3 col-md-1">
+                    <input type="checkbox" name="onOffSwitchSearchControl" class="onoffswitch" checked="checked"
+                            data-on-text="Advanced" 
+                            data-off-text="Basic" />
+                </div>
+                <div class="col-sm-1">
+                </div>
+                <div id="basicSearch" class="col-sm-6">
+                    <div class="input-group">
+                        <input type="text" name="SearchString" id="searchString" value="@ViewBag.SearchString" class="form-control text-box single-line"
+                                placeholder="Search for User Name, Industry Number, Industry Name">
+                        <div class="input-group-btn">
+                            <button class="btn btn-primary" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    @* grid name should be start with grid for centralized error handling *@
+                    @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Authority.AuditLogViewModel>()
+                          .Name(componentName: "grid")
+                          .Columns(columns =>
+                          {
+                              columns.Bound(c => c.OrganizationId).Hidden()
+                                     .HtmlAttributes(new { @class = "col-sm-1" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.OrganizationName).Hidden()
+                                     .HtmlAttributes(new { @class = "col-sm-2" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-2" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.EventCategory)
+                                     .HtmlAttributes(new { @class = "col-sm-1" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.EventType)
+                                     .HtmlAttributes(new { @class = "col-sm-2" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-2" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.UserName).Hidden()
+                                     .HtmlAttributes(new { @class = "col-sm-1" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.FirstName).Hidden()
+                                     .HtmlAttributes(new { @class = "col-sm-1" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.LastName).Hidden()
+                                     .HtmlAttributes(new { @class = "col-sm-1" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.LogDateTimeUtc)
+                                     .HtmlAttributes(new { @class = "col-sm-2" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-2" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.EmailAddress)
+                                     .HtmlAttributes(new { @class = "col-sm-2" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-2" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Template(m => { })
+                                     .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
+                                     .Width(pixelWidth: 60);
+                          })
+                          .Pageable(pageable => pageable
+                                    .PageSizes(new List<object> { "all", 15, 25, 50, 75})
+                                    .Refresh(enabled: true)
+                                    .Input(enabled: true)
+                                    .Numeric(enabled: false)
+                            )
+                          .Selectable(selectable =>
+                          {
+                              selectable.Mode(GridSelectionMode.Single);
+                              selectable.Type(GridSelectionType.Row);
+                          })
+                          .Sortable(sortable =>
+                          {
+                              sortable.SortMode(GridSortMode.MultipleColumn);
+                          })
+                          .Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                          .Resizable(resizable => resizable.Columns(value: true))
+                          .Scrollable(s => s.Height(value: "auto"))
+                          //.Groupable()
+                          .Events(events =>
+                          {
+                              events.Change(handler: "getLogEntryDetails");
+                          })
+                          .DataSource(dataSource => dataSource
+                              .Ajax()
+                              .ServerOperation(enabled: false)
+                              .Batch(enabled: true)
+                              .Read(read => read.Action(actionName: "AuditLogs_Read", controllerName: "Authority", routeValues: new
+                              {
+                                  searchString = @ViewBag.SearchString
+                              }))
+                              .PageSize(pageSize: 15)
+                              .Events(events => events.Error(handler: "error_handler"))
+                          )
+                    )
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Log Details</div>
+                        <div id="div-log-details" class="panel-body">
+                            <table class="table table-condensed">
+                                <tbody>
+                                    <tr stlye="height:100px;">
+                                        <td class="col-md-1">
+                                            <div style="height: 200px; overflow:auto;">
+                                                Comment:
+                                            </div>
+                                        </td>
+                                        <td class="col-md-3" colspan="3" style="white-space: pre;" id="details-cell-comment"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-md-1">Event Category</td>
+                                        <td class="col-md-1" id="details-cell-eventcategory">[VALUE]</td>
+                                        <td class="col-md-1">User ID</td>
+                                        <td class="col-md-1" id="details-cell-userid">[VALUE]</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Event Type</td>
+                                        <td id="details-cell-eventtype">[VALUE]</td>
+                                        <td>User Name</td>
+                                        <td id="details-cell-username">[VALUE]</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Event Code</td>
+                                        <td id="details-cell-eventcode">[VALUE]</td>
+                                        <td>First and Last Name</td>
+                                        <td id="details-cell-fullname">[VALUE]</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Date and Time</td>
+                                        <td id="details-cell-logdatetime">[VALUE]</td>
+                                        <td>Email</td>
+                                        <td id="details-cell-emailaddress">[VALUE]</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Authority</td>
+                                        <td id="details-cell-authority">[VALUE]</td>
+                                        <td>IP Address</td>
+                                        <td id="details-cell-ipaddress">[VALUE]</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Facility</td>
+                                        <td id="details-cell-facility">[VALUE]</td>
+                                        <td>IP Name</td>
+                                        <td id="details-cell-ipname">[VALUE]</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Regulatory Program</td>
+                                        <td colspan="3" id="details-cell-regulatoryprogramname">[VALUE]</td>
+                                    </tr>
+                                </tbody>
+                            </table>                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>@*.box-body*@
+    </div><!-- /.box -->
+}
+
+
+@section Scripts {
+<script type="text/javascript">
+        $(document).ready(function ()
+        {
+            $("#grid .k-filter-row").hide();
+        });
+
+        $("[name='onOffSwitchSearchControl']").bootstrapSwitch();
+        $("[name='onOffSwitchSearchControl']").on('switchChange.bootstrapSwitch', function (event, state)
+        {
+            $("[id='basicSearch']").toggle(500);
+            $("#grid .k-filter-row").toggle(500);
+
+            //console.log($("#grid .k-filter-row")); // DOM element
+            //console.log(this); // DOM element
+            //console.log(event); // jQuery event
+            //console.log(state); // true | false
+        });
+
+        getLogEntryDetails = function ()
+        {
+            var grid = $("#grid").data("kendoGrid");
+            var selecedItem = grid.dataItem(grid.select());
+            $('#details-cell-comment').text(selecedItem.Comment);
+            $('#details-cell-username').text(selecedItem.UserName);
+            $('#details-cell-eventcategory').text(selecedItem.EventCategory);
+            $('#details-cell-userid').text(selecedItem.UserProfileId);
+            $('#details-cell-eventtype').text(selecedItem.EventType);
+            $('#details-cell-logdatetime').text(selecedItem.LogDateTimeUtc);
+            $('#details-cell-emailaddress').text(selecedItem.EmailAddress);
+            $('#details-cell-eventcode').text(selecedItem.CromerrAuditLogId);
+            $('#details-cell-fullname').text(selecedItem.FirstName + ' ' + selecedItem.LastName);
+            $('#details-cell-authority').text(selecedItem.RegulatorName);
+            $('#details-cell-ipaddress').text(selecedItem.IPAddress);
+            $('#details-cell-facility').text(selecedItem.OrganizationName);
+            $('#details-cell-ipname').text(selecedItem.HostName);
+            $('#details-cell-regulatoryprogramname').text(selecedItem.RegulatoryProgramName);
+            
+            //Don't fetch from server unless grid performance is poor
+            //var postUrl = "/Authority/AuditLogs_Select";
+            //doAjaxGetLogDetails(grid, postUrl, "", "Select a log entry");
+        }
+
+        doAjaxGetLogDetails = function (grid, postUrl, returnUrl, noSelectionMessage) {
+            var cromerrAuditLogId = -1;
+
+            grid.select().each(
+                function () {
+                    var dataItem = grid.dataItem($(this));
+                    cromerrAuditLogId = dataItem.CromerrAuditLogId;
+                }
+            );
+
+            if (cromerrAuditLogId != -1) {
+                $.ajax({
+                    type: "POST",
+                    url: postUrl,
+                    data: JSON.stringify({ returnUrl: returnUrl, cromerrAuditLogId: cromerrAuditLogId }),
+                    dataType: "JSON",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (returnData) {
+                        if ($.trim(returnData.message).length > 0) {
+                            $('body').append('<div class="popup" data-popup="popup-1">' +
+                                                '<div class="popup-inner">' +
+                                                    '<h4>' + returnData.message + '</h4>' +
+                                                    '<a class="popup-close" data-popup-close="popup-1" href="#">x</a>' +
+                                                '</div>' +
+                                            '</div>');
+
+                            $('[data-popup="popup-1"]').fadeIn(350);
+                            $('[data-popup="popup-1"]').delay(2500);
+                            $('[data-popup="popup-1"]').fadeOut(350);
+
+                            $('[data-popup-close]').on('click', function (e) {
+                                $('[data-popup="popup-1"]').fadeOut(350);
+                            });
+                        }
+
+                        //alert(returnData.details);
+                        $('#details-cell-comment').text(returnData.details);
+                    }
+                });
+            }
+            else {
+                $('body').append('<div class="popup" data-popup="popup-1">' +
+                                                '<div class="popup-inner">' +
+                                                    '<h4>' + noSelectionMessage + '</h4>' +
+                                                    '<a class="popup-close" data-popup-close="popup-1" href="#">x</a>' +
+                                                '</div>' +
+                                            '</div>');
+
+                $('[data-popup="popup-1"]').fadeIn(350);
+                $('[data-popup="popup-1"]').fadeOut(3000);
+
+                $('[data-popup-close]').on('click', function (e) {
+                    $('[data-popup="popup-1"]').fadeOut(350);
+                });
+            }
+        };
+
+
+</script>
+}

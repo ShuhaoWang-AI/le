@@ -1,10 +1,10 @@
-﻿@if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.PortalName.ToLower().Equals(value: "authority"))
+﻿@if (Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.PortalName.ToLower().Equals(value: "authority"))
 {
     <aside class="main-sidebar">
         <section class="sidebar">
             @* BEGIN Menu *@
             <ul class="sidebar-menu">
-                <li class="active">
+                <li class="@(ViewContext.RouteData.Values["Action"].ToString().ToLower() == "industries" ? "active" : "")">
                     <a href="#" onclick="location.href = '@Url.Action(actionName: "Industries", controllerName: "Authority")'">
                         <i class="fa fa-industry fa-fw"></i>
                         <span>Industries</span>
@@ -50,15 +50,15 @@
                     </ul>
                 </li>
 
-                <li class="treeview">
+                <li class="@(ViewContext.RouteData.Values["Action"].ToString().ToLower() == "pendinguserapprovals" ? "active" : "")">
                     <a href="#" onclick="location.href = '@Url.Action(actionName: "PendingUserApprovals", controllerName: "Authority")'">
                         <i class="fa fa-user-plus fa-fw"></i>
                         <span>Pending Registrations</span>
                     </a>
                 </li>
 
-                <li class="treeview">
-                    <a href="#">
+                <li class="@(ViewContext.RouteData.Values["Action"].ToString().ToLower() == "auditlogs" ? "active" : "")">
+                    <a href="#" onclick="location.href = '@Url.Action(actionName: "AuditLogs", controllerName: "Authority")'">
                         <i class="fa fa-file-text fa-fw"></i>
                         <span>Audit Logs </span>
                     </a>

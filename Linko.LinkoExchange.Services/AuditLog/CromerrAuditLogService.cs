@@ -93,6 +93,41 @@ namespace Linko.LinkoExchange.Services.AuditLog
 
         }
 
+        public ICollection<CromerrAuditLogEntryDto> GetCromerrAuditLogEntries(int organizationRegulatoryProgramId, string searchString)
+        {
+            var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms
+                .Include("RegulatoryProgram")
+                .Single(o => o.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId);
+            var authorityOrganizationId = orgRegProgram.RegulatorOrganizationId ?? orgRegProgram.OrganizationId;
+            var authorityName = _dbContext.Organizations.Single(o => o.OrganizationId == authorityOrganizationId).Name;
+            var dtos = new List<CromerrAuditLogEntryDto>();
+            var entries = _dbContext.CromerrAuditLogs
+                .Where(l => l.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId
+                    && l.RegulatorOrganizationId == orgRegProgram.OrganizationId);
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                entries = entries.Where(e => e.UserName.Contains(searchString));
+            }
+
+            foreach (var entry in entries)
+            {
+                var dto = _mapHelper.GetCromerrAuditLogDtoFromCromerrAuditLog(entry);
+                dto.OrganizationName = _dbContext.Organizations.Single(o => o.OrganizationId == dto.OrganizationId).Name;
+                dto.RegulatorOrganizationName = authorityName;
+                dto.RegulatoryProgramName = orgRegProgram.RegulatoryProgram.Name;
+
+                dtos.Add(dto);
+            }
+            return dtos;
+        }
+
+        public CromerrAuditLogEntryDto GetCromerrAuditLogEntry(int cromerrAuditLogId)
+        {
+            var entry = _dbContext.CromerrAuditLogs.Single(l => l.CromerrAuditLogId == cromerrAuditLogId);
+            return _mapHelper.GetCromerrAuditLogDtoFromCromerrAuditLog(entry);
+        }
+
         private Task<AuditLogTemplate> GetAuditLogTemplate(CromerrEvent eventType)
         {
             var auditLogTemplateName = string.Format("CromerrEvent_{0}", eventType.ToString());

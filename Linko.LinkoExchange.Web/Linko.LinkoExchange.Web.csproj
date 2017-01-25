@@ -437,6 +437,7 @@
     <Compile Include="ViewModels\Account\RegisterViewModel.cs" />
     <Compile Include="ViewModels\Account\ResetPasswordViewModel.cs" />
     <Compile Include="ViewModels\Account\SignInViewModel.cs" />
+    <Compile Include="ViewModels\Authority\AuditLogViewModel.cs" />
     <Compile Include="ViewModels\Authority\AuthoritySettingsViewModel.cs" />
     <Compile Include="ViewModels\Authority\AuthorityUserViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
@@ -500,6 +501,7 @@
     <Content Include="Views\User\RequestSignatory.cshtml" />
     <Content Include="Views\Shared\Invite.cshtml" />
     <Content Include="Views\Common\Unauthorized.cshtml" />
+    <Content Include="Views\Authority\AuditLogs.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -244,7 +244,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
                 cromerrAuditLogEntryDto.RegulatoryProgramId = actorProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
                 cromerrAuditLogEntryDto.OrganizationId = actorProgramUser.OrganizationRegulatoryProgram.OrganizationId;
-                cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId;
+                cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                 cromerrAuditLogEntryDto.UserProfileId = actorProgramUser.UserProfileId;
                 cromerrAuditLogEntryDto.UserName = actorUser.UserName;
                 cromerrAuditLogEntryDto.UserFirstName = actorUser.FirstName;
@@ -993,24 +993,35 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="cromerrEvent">Used to determine if user just got locked out OR they were previously locked out, or reset</param>
         private void LogProhibitedSignInActivityToCromerr(UserProfile user, CromerrEvent cromerrEvent)
         {
-            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-            cromerrAuditLogEntryDto.RegulatoryProgramId = null;
-            cromerrAuditLogEntryDto.OrganizationId = null;
-            cromerrAuditLogEntryDto.RegulatorOrganizationId = null;
-            cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
-            cromerrAuditLogEntryDto.UserName = user.UserName;
-            cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
-            cromerrAuditLogEntryDto.UserLastName = user.LastName;
-            cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
-            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
-            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-            var contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add("firstName", user.FirstName);
-            contentReplacements.Add("lastName", user.LastName);
-            contentReplacements.Add("userName", user.UserName);
-            contentReplacements.Add("emailAddress", user.Email);
+            //Need to log for all associated regulatory program orgs
+            var orgRegProgUsers = _dbContext.OrganizationRegulatoryProgramUsers
+                                    .Include("OrganizationRegulatoryProgram")
+                                    .Where(u => u.UserProfileId == user.UserProfileId);
+            foreach (var orgRegProgUser in orgRegProgUsers)
+            {
+                var orgRegProgram = orgRegProgUser.OrganizationRegulatoryProgram;
 
-            _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
+                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+                cromerrAuditLogEntryDto.RegulatoryProgramId = orgRegProgram.RegulatoryProgramId;
+                cromerrAuditLogEntryDto.OrganizationId = orgRegProgram.OrganizationId;
+                cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
+                cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
+                cromerrAuditLogEntryDto.UserName = user.UserName;
+                cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
+                cromerrAuditLogEntryDto.UserLastName = user.LastName;
+                cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
+                cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+                cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+                var contentReplacements = new Dictionary<string, string>();
+                contentReplacements.Add("firstName", user.FirstName);
+                contentReplacements.Add("lastName", user.LastName);
+                contentReplacements.Add("userName", user.UserName);
+                contentReplacements.Add("emailAddress", user.Email);
+
+                _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
+
+            }
+
 
         }
 
@@ -1069,7 +1080,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
                 cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgramDto.RegulatoryProgramId;
                 cromerrAuditLogEntryDto.OrganizationId = programUser.OrganizationRegulatoryProgramDto.OrganizationId;
-                cromerrAuditLogEntryDto.RegulatorOrganizationId = programUser.OrganizationRegulatoryProgramDto.RegulatorOrganizationId;
+                cromerrAuditLogEntryDto.RegulatorOrganizationId = programUser.OrganizationRegulatoryProgramDto.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                 cromerrAuditLogEntryDto.UserProfileId = programUser.UserProfileId;
                 cromerrAuditLogEntryDto.UserName = user.UserName;
                 cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
@@ -1149,7 +1160,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
             cromerrAuditLogEntryDto.RegulatoryProgramId = orgRegProgUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
             cromerrAuditLogEntryDto.OrganizationId = orgRegProgUser.OrganizationRegulatoryProgram.OrganizationId;
-            cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgUser.OrganizationRegulatoryProgram.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
             cromerrAuditLogEntryDto.UserProfileId = orgRegProgUser.UserProfileId;
             cromerrAuditLogEntryDto.UserName = user.UserName;
             cromerrAuditLogEntryDto.UserFirstName = user.FirstName;

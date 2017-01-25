@@ -20,5 +20,9 @@ namespace Linko.LinkoExchange.Services.AuditLog
         Task Log(CromerrEvent eventType, CromerrAuditLogEntryDto dto, IDictionary<string, string> contentReplacements);
 
         Task SimpleLog(CromerrEvent eventType, OrganizationRegulatoryProgramDto orgRegProgram, UserDto user);
+
+        ICollection<CromerrAuditLogEntryDto> GetCromerrAuditLogEntries(int organizationRegulatoryProgramId, string searchString);
+
+        CromerrAuditLogEntryDto GetCromerrAuditLogEntry(int cromerrAuditLogId);
     }
 }

@@ -94,7 +94,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                     var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
                     cromerrAuditLogEntryDto.RegulatoryProgramId = recipientProgram.RegulatoryProgramId;
                     cromerrAuditLogEntryDto.OrganizationId = recipientProgram.OrganizationId;
-                    cromerrAuditLogEntryDto.RegulatorOrganizationId = recipientProgram.RegulatorOrganizationId;
+                    cromerrAuditLogEntryDto.RegulatorOrganizationId = recipientProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                     cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
                     cromerrAuditLogEntryDto.UserName = user.UserName;
                     cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
@@ -353,7 +353,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             {
                 cromerrAuditLogEntryDto.RegulatoryProgramId = existingUser.OrganizationRegulatoryProgramDto.RegulatoryProgramId;
                 cromerrAuditLogEntryDto.OrganizationId = existingUser.OrganizationRegulatoryProgramDto.OrganizationId;
-                cromerrAuditLogEntryDto.RegulatorOrganizationId = existingUser.OrganizationRegulatoryProgramDto.RegulatorOrganizationId;
+                cromerrAuditLogEntryDto.RegulatorOrganizationId = existingUser.OrganizationRegulatoryProgramDto.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                 cromerrAuditLogEntryDto.UserProfileId = existingUser.UserProfileId;
                 cromerrAuditLogEntryDto.UserName = existingUser.UserProfileDto.UserName;
                 contentReplacements.Add("userName", existingUser.UserProfileDto.UserName);
@@ -364,7 +364,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                 
                 cromerrAuditLogEntryDto.RegulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;
                 cromerrAuditLogEntryDto.OrganizationId = targetOrgRegProgram.OrganizationId;
-                cromerrAuditLogEntryDto.RegulatorOrganizationId = targetOrgRegProgram.RegulatorOrganizationId;
+                cromerrAuditLogEntryDto.RegulatorOrganizationId = targetOrgRegProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                 cromerrAuditLogEntryDto.UserName = "n/a";
                 contentReplacements.Add("userName", "n/a");
 
@@ -476,7 +476,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
             cromerrAuditLogEntryDto.RegulatoryProgramId = recipientOrganizationRegulatoryProgram.RegulatoryProgramId;
             cromerrAuditLogEntryDto.OrganizationId = recipientOrganizationRegulatoryProgram.OrganizationId;
-            cromerrAuditLogEntryDto.RegulatorOrganizationId = recipientOrganizationRegulatoryProgram.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = recipientOrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
             var existingUserUserName = "[unknown]";
             if (existingUser != null)
             {
