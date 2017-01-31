@@ -406,8 +406,6 @@ namespace Linko.LinkoExchange.Services.User
                     user.Email = newEmailAddress;
                     sendEmailChangedNotifications.Add(user.OldEmailAddress);
                     sendEmailChangedNotifications.Add(user.Email);
-
-                    user.EmailConfirmed = false;
                 }
             }
 
