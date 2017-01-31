@@ -185,9 +185,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
 
                 var programIds = GetUserProgramIds(applicationUser.UserProfileId);
-                var organizationIds = GetUserOrganizationIds(applicationUser.UserProfileId);
-
-                var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
+                var authorityOrganizationIds = GetUserAuthorityOrganizationIds(applicationUser.UserProfileId);
+                var organizationSettings = _settingService.GetOrganizationSettingsByIds(authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
 
                 SetPasswordPolicy(organizationSettings);
                 // Use PasswordValidator
@@ -432,8 +431,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                     {
                         string passwordHash = _passwordHasher.HashPassword(userInfo.Password); 
 
-                        var organizationIds = GetUserAuthorityOrganizationIds(applicationUser.UserProfileId);
-                        var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
+                        var authorityOrganizationIds = GetUserAuthorityOrganizationIds(applicationUser.UserProfileId);
+                        var organizationSettings = _settingService.GetOrganizationSettingsByIds(authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
 
                         if (!IsValidPasswordCheckInHistory(userInfo.Password, applicationUser.UserProfileId, organizationSettings))
                         {
@@ -724,8 +723,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             int userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
             string passwordHash = _passwordHasher.HashPassword(newPassword);
             string correctSavedHashedAnswer = _dbContext.UserQuestionAnswers.Single(a => a.UserQuestionAnswerId == userQuestionAnswerId).Content;
-            var organizationIds = GetUserOrganizationIds(userProfileId);
-            var organizationSettings = _settingService.GetOrganizationSettingsByIds(organizationIds).SelectMany(i => i.Settings).ToList();
+            var authorityOrganizationIds = GetUserAuthorityOrganizationIds(userProfileId);
+            var organizationSettings = _settingService.GetOrganizationSettingsByIds(authorityOrganizationIds).SelectMany(i => i.Settings).ToList();
 
             var authenticationResult = new AuthenticationResultDto();
 
