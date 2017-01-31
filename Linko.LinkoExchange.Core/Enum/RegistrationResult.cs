@@ -28,6 +28,7 @@ namespace Linko.LinkoExchange.Core.Enum
         UnauthorizedApprovalAfterReset,
         UnauthorizedNotIUAdmin,
         ApprovalAfterResetCannotChangeRole,
-        NoMoreUserLicenses
+        NoMoreUserLicensesForIndustry,
+        NoMoreUserLicensesForAuthority
     }
 }

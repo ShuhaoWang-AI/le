@@ -1234,7 +1234,10 @@ namespace Linko.LinkoExchange.Services.User
                 if (remainingUserLicenseCount < 1)
                 {
                     //ACTION BLOCKED -- NO MORE USER LICENSES
-                    return new RegistrationResultDto() { Result = RegistrationResult.NoMoreUserLicenses };
+                    if (isAuthorityUser)
+                        return new RegistrationResultDto() { Result = RegistrationResult.NoMoreUserLicensesForAuthority };
+                    else
+                        return new RegistrationResultDto() { Result = RegistrationResult.NoMoreUserLicensesForIndustry };
                 }
 
             }

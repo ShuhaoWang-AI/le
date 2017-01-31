@@ -1400,7 +1400,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                             ModelState.Clear();
                             _logger.Info(string.Format(format: "PendingUserApprove. User={0} - id={1} Registration Approved!", arg0: model.UserName, arg1: model.Id));
                             break;
-                        case RegistrationResult.NoMoreUserLicenses:
+                        case RegistrationResult.NoMoreUserLicensesForIndustry:
+                            _logger.Info(string.Format(format: "PendingUserApprove. User={0} - id={1} No more user licenses", arg0: model.UserName, arg1: model.Id));
+                            ModelState.AddModelError(key: "", errorMessage: "No more User Licenses are available for this Industry.  Disable another User and try again");
+                            break;
+                        case RegistrationResult.NoMoreUserLicensesForAuthority:
                             _logger.Info(string.Format(format: "PendingUserApprove. User={0} - id={1} No more user licenses", arg0: model.UserName, arg1: model.Id));
                             ModelState.AddModelError(key: "", errorMessage: "No more User Licenses are available for this Authority.  Disable another User and try again");
                             break;
