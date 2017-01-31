@@ -1391,12 +1391,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             return programs.Select(i => i.RegulatoryProgramId).Distinct().ToArray();
         }
 
-        private IEnumerable<int> GetUserOrganizationIds(int userid)
-        {
-            var orgRegPrograms = _organizationService.GetUserOrganizations(userid);
-            return orgRegPrograms.Select(i => i.OrganizationId).ToArray();
-        }
-
         private IEnumerable<int> GetUserAuthorityOrganizationIds(int userid)
         {
             var authorityOrgIds = new List<int>();
