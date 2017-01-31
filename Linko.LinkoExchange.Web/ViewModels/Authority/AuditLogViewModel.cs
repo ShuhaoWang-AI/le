@@ -8,62 +8,54 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 {
     public class AuditLogViewModel
     {
-        [ScaffoldColumn(false)]
-        [Display(Name = "CromerrAuditLogId")]
         public int CromerrAuditLogId
         {
             get; set;
         }
 
         [ScaffoldColumn(false)]
-        [Display(Name = "AuditLogTemplateId")]
         public int AuditLogTemplateId
         {
             get; set;
         }
 
         [ScaffoldColumn(false)]
-        [Display(Name = "RegulatoryProgramId")]
         public int RegulatoryProgramId
         {
             get; set;
         }
 
-        [ScaffoldColumn(false)]
-        [Display(Name = "RegulatoryProgramName")]
+        [Display(Name = "Regulatory Program")]
         public string RegulatoryProgramName
         {
             get; set;
         }
 
-        [Display(Name = "Industry Number")]
+        [Display(Name = "Facility Number")]
         public int OrganizationId
         {
             get; set;
         }
 
-        [Display(Name = "Industry Name")]
+        [Display(Name = "Facility")]
         public string OrganizationName
         {
             get; set;
         }
 
         [ScaffoldColumn(false)]
-        [Display(Name = "RegulatorOrganizationId")]
         public int RegulatorOrganizationId
         {
             get; set;
         }
 
-        [ScaffoldColumn(false)]
-        [Display(Name = "RegulatorName")]
+        [Display(Name = "Authority")]
         public string RegulatorName
         {
             get; set;
         }
 
-        [ScaffoldColumn(false)]
-        [Display(Name = "UserProfileId")]
+        [Display(Name = "User ID")]
         public int UserProfileId
         {
             get; set;
@@ -118,7 +110,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         }
 
         [Editable(false)]
-        [Display(Name = "Host Name")]
+        [Display(Name = "IP Name")]
         public string HostName
         {
             get; set;
@@ -132,8 +124,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         }
 
         [Editable(false)]
-        [Display(Name = "Timestamp")]
-        public DateTimeOffset LogDateTimeUtc
+        [Display(Name = "Date and Time")]
+        public DateTime LogDateTimeUtc
         {
             get; set;
         }

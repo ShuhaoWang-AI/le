@@ -350,7 +350,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 IPAddress = vm.IPAddress,
                 HostName = vm.HostName,
                 Comment = vm.Comment,
-                LogDateTimeUtc = vm.LogDateTimeUtc.DateTime.ToString()
+                LogDateTimeUtc = vm.LogDateTimeUtc.ToString()
             });
 
             return Json(result);
@@ -387,6 +387,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                     message = MvcValidationExtensions.GetViolationMessages(rve)
                 });
             }
+        }
+
+        [HttpPost]
+        public ActionResult AuditLogs_Excel_Export_Save(string contentType, string base64, string fileName)
+        {
+            var fileContents = Convert.FromBase64String(base64);
+
+            return File(fileContents, contentType, fileName);
         }
 
         #endregion

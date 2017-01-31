@@ -38,14 +38,6 @@
                           .Name(componentName: "grid")
                           .Columns(columns =>
                           {
-                              columns.Bound(c => c.OrganizationId).Hidden()
-                                     .HtmlAttributes(new { @class = "col-sm-1" })
-                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                              columns.Bound(c => c.OrganizationName).Hidden()
-                                     .HtmlAttributes(new { @class = "col-sm-2" })
-                                     .HeaderHtmlAttributes(new { @class = "col-sm-2" })
-                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
                               columns.Bound(c => c.EventCategory)
                                      .HtmlAttributes(new { @class = "col-sm-1" })
                                      .HeaderHtmlAttributes(new { @class = "col-sm-1" })
@@ -53,6 +45,34 @@
                               columns.Bound(c => c.EventType)
                                      .HtmlAttributes(new { @class = "col-sm-2" })
                                      .HeaderHtmlAttributes(new { @class = "col-sm-2" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.LogDateTimeUtc)
+                                     .HtmlAttributes(new { @class = "col-sm-2" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-2" })
+                                     .Format("{0:MM/dd/yyyy}");
+                              columns.Bound(c => c.CromerrAuditLogId).Hidden()
+                                     .HtmlAttributes(new { @class = "col-sm-1" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.OrganizationId).Hidden()
+                                     .HtmlAttributes(new { @class = "col-sm-1" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.RegulatorName).Hidden()
+                                     .HtmlAttributes(new { @class = "col-sm-2" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-2" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.OrganizationName).Hidden()
+                                     .HtmlAttributes(new { @class = "col-sm-2" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-2" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.RegulatoryProgramName).Hidden()
+                                     .HtmlAttributes(new { @class = "col-sm-2" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-2" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.UserProfileId).Hidden()
+                                     .HtmlAttributes(new { @class = "col-sm-1" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
                               columns.Bound(c => c.UserName).Hidden()
                                      .HtmlAttributes(new { @class = "col-sm-1" })
@@ -66,11 +86,19 @@
                                      .HtmlAttributes(new { @class = "col-sm-1" })
                                      .HeaderHtmlAttributes(new { @class = "col-sm-1" })
                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                              columns.Bound(c => c.LogDateTimeUtc)
+                              columns.Bound(c => c.EmailAddress)
                                      .HtmlAttributes(new { @class = "col-sm-2" })
                                      .HeaderHtmlAttributes(new { @class = "col-sm-2" })
                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                              columns.Bound(c => c.EmailAddress)
+                              columns.Bound(c => c.IPAddress).Hidden()
+                                     .HtmlAttributes(new { @class = "col-sm-2" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-2" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.HostName).Hidden()
+                                     .HtmlAttributes(new { @class = "col-sm-2" })
+                                     .HeaderHtmlAttributes(new { @class = "col-sm-2" })
+                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                              columns.Bound(c => c.Comment).Hidden()
                                      .HtmlAttributes(new { @class = "col-sm-2" })
                                      .HeaderHtmlAttributes(new { @class = "col-sm-2" })
                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
@@ -78,6 +106,7 @@
                                      .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
                                      .Width(pixelWidth: 60);
                           })
+                          .ToolBar(tools => tools.Excel())
                           .Pageable(pageable => pageable
                                     .PageSizes(new List<object> { "all", 15, 25, 50, 75})
                                     .Refresh(enabled: true)
@@ -93,10 +122,15 @@
                           {
                               sortable.SortMode(GridSortMode.MultipleColumn);
                           })
-                          .Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                          .Filterable(filterable => filterable.Enabled(value: true).Mode(GridFilterMode.Row))
                           .Resizable(resizable => resizable.Columns(value: true))
                           .Scrollable(s => s.Height(value: "auto"))
                           //.Groupable()
+                          .Excel(excel => excel
+                                .FileName("Audit Logs Grid Export.xlsx")
+                                .Filterable(true)
+                                .ProxyURL(Url.Action("AuditLogs_Excel_Export_Save", "Authority"))
+                          )
                           .Events(events =>
                           {
                               events.Change(handler: "getLogEntryDetails");
@@ -186,6 +220,63 @@
         $(document).ready(function ()
         {
             $("#grid .k-filter-row").hide();
+
+            var exportFlag = false;
+            var grid = $("#grid").data("kendoGrid");
+            grid.bind("excelExport", function(e) {
+                if (!exportFlag) {
+                    e.sender.showColumn("CromerrAuditLogId");
+                    e.sender.showColumn("RegulatorName");
+                    e.sender.showColumn("OrganizationName");
+                    e.sender.showColumn("RegulatoryProgramName");
+                    e.sender.showColumn("UserProfileId");
+                    e.sender.showColumn("UserName");
+                    e.sender.showColumn("FirstName");
+                    e.sender.showColumn("LastName");
+                    e.sender.showColumn("IPAddress");
+                    e.sender.showColumn("HostName");
+                    e.sender.showColumn("Comment");
+
+                    e.preventDefault();
+                    exportFlag = true;
+                    setTimeout(function () {
+                        e.sender.saveAsExcel();
+                    });
+                } else {
+                    e.sender.hideColumn("CromerrAuditLogId");
+                    e.sender.hideColumn("RegulatorName");
+                    e.sender.hideColumn("OrganizationName");
+                    e.sender.hideColumn("RegulatoryProgramName");
+                    e.sender.hideColumn("UserProfileId");
+                    e.sender.hideColumn("UserName");
+                    e.sender.hideColumn("FirstName");
+                    e.sender.hideColumn("LastName");
+                    e.sender.hideColumn("IPAddress");
+                    e.sender.hideColumn("HostName");
+                    e.sender.hideColumn("Comment");
+
+                    exportFlag = false;
+                }
+
+                //Uncomment this for color formatting in Excel worksheet.
+                //var sheet = e.workbook.sheets[0];
+                //for (var rowIndex = 0; rowIndex < sheet.rows.length; rowIndex++) {
+                //    var row = sheet.rows[rowIndex];
+                //    if (rowIndex == 0) {
+                //        for (var cellIndex = 0; cellIndex < row.cells.length; cellIndex++) {
+                //            row.cells[cellIndex].background = "#0070C0";
+                //            row.cells[cellIndex].color = "#FFFFFF";
+                //            row.cells[cellIndex].bold = true;
+                //        }
+                //    }
+ 
+                //    if (rowIndex > 0 && rowIndex % 2 == 0) {
+                //        for (var cellIndex = 0; cellIndex < row.cells.length; cellIndex++) {
+                //            row.cells[cellIndex].background = "#DCE6F1";
+                //        }
+                //    }
+                //}            
+            });
         });
 
         $("[name='onOffSwitchSearchControl']").bootstrapSwitch();
@@ -280,7 +371,6 @@
                 });
             }
         };
-
 
 </script>
 }
