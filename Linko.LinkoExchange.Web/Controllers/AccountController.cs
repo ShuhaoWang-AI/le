@@ -774,6 +774,14 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 return View(viewName: "Error");
             }
+            else if (!_authenticationService.CheckPasswordResetUrlNotExpired(token))
+            {
+                ConfirmationViewModel model = new ConfirmationViewModel();
+                model.Title = "Password Reset Link Expiry";
+                model.Message = "The password reset link has expired.  Please use Forgot Password.";
+
+                return View(viewName: "Confirmation", model: model);
+            }
             else
             {
                 var userQuestion = _questionAnswerService.GetRandomQuestionAnswerFromToken(token, QuestionTypeName.KBQ);

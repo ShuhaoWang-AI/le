@@ -62,9 +62,9 @@ For more information on how to configure your ASP.NET application, please visit 
     <!--change sessionState timeout value with same value-->
     <add key="CookieValidateInterval"
          value="30" />
-    <!-- hours  7 days 7 * 24 -->
-    <add key="ResetPasswordTokenValidateInterval"
-         value="168" />
+    <!-- hours = should be 24 hours (reference: Bug 1909) -->
+    <add key="ResetPasswordTokenValidateInterval" 
+         value="24" />
     <add key="PasswordRequiredLength" 
          value="8" />
     <add key="UnauthorizedPagePath" value="~/Views/Common/Unauthorized.cshtml" />

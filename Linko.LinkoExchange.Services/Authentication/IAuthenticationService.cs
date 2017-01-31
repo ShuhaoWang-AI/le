@@ -40,6 +40,8 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         Task<AuthenticationResultDto> ResetPasswordAsync(int userQuestionAnswerId, string answer, int attempCount, string password);
 
+        bool CheckPasswordResetUrlNotExpired(string token);
+
         /// <summary>
         /// To request a password reset. This will do follow:
         /// 1. generate a reset password token

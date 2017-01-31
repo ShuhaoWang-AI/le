@@ -640,6 +640,37 @@ namespace Linko.LinkoExchange.Services.Authentication
             return registrationResult;
         }
 
+        public bool CheckPasswordResetUrlNotExpired(string token)
+        {
+            bool isNotExpiredYet;
+            int resetPasswordTokenValidateInterval = Convert.ToInt32(ConfigurationManager.AppSettings["ResetPasswordTokenValidateInterval"]);
+            var emailAuditLog = _dbContext.EmailAuditLogs.FirstOrDefault(e => e.Token == token);
+            if (emailAuditLog == null)
+            {
+                throw new Exception(string.Format("ERROR: Cannot find email audit log associated with token={0}", token));
+            }
+
+            DateTimeOffset tokenCreated = emailAuditLog.SentDateTimeUtc;
+            if (DateTimeOffset.Now.AddHours(-resetPasswordTokenValidateInterval) > tokenCreated)
+            {
+                //Check token expiry (5.1.a)
+                isNotExpiredYet = false;
+                var userProfileId = emailAuditLog.RecipientUserProfileId.Value;
+                foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId))
+                {
+                    var userDto = _userService.GetUserProfileById(userProfileId);
+                    _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_PasswordResetExpired, orgRegProgDto, userDto);
+                }
+
+            }
+            else
+            {
+                isNotExpiredYet = true;
+            }
+
+            return isNotExpiredYet;
+        }
+
         public async Task<AuthenticationResultDto> ResetPasswordAsync(string resetPasswordToken, int userQuestionAnswerId,
             string answer, int failedCount, string newPassword)
         {
