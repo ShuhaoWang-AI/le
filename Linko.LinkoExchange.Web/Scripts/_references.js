@@ -3,6 +3,7 @@
 /// <reference path="adminlte/bootstrap-datepicker.js" />
 /// <reference path="adminlte/init.js" />
 /// <reference path="adminlte/jquery.slimscroll.js" />
+/// <reference path="auditlogs.js" />
 /// <reference path="bootstrap.js" />
 /// <reference path="bootstrap-switch.min.js" />
 /// <reference path="fastclick.js" />

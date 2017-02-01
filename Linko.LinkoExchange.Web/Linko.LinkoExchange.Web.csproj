@@ -352,6 +352,7 @@
     <Content Include="Scripts\AdminLTE\init.js" />
     <Content Include="Scripts\AdminLTE\jquery.slimscroll.js" />
     <Content Include="Scripts\AdminLTE\jquery.slimscroll.min.js" />
+    <Content Include="Scripts\AuditLogs.js" />
     <Content Include="Scripts\bootstrap-switch.js" />
     <Content Include="Scripts\bootstrap-switch.min.js" />
     <Content Include="Scripts\bootstrap.js" />
