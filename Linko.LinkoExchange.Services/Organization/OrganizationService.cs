@@ -96,7 +96,7 @@ namespace Linko.LinkoExchange.Services.Organization
                     .FindAll(u => u.UserProfileId == userId &&
                                 u.IsRemoved == false &&
                                // u.IsEnabled == true &&
-                                u.IsRegistrationApproved &&
+                                //u.IsRegistrationApproved &&
                                 //u.OrganizationRegulatoryProgram.IsEnabled &&
                                 u.OrganizationRegulatoryProgram.IsRemoved == false);
 

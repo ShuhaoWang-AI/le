@@ -387,6 +387,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                         return RedirectToAction(actionName: "AccountIsNotAssociated", controllerName: "Account");
                     case AuthenticationResult.RegistrationApprovalPending:  // 4.a
                         _logger.Info(string.Format(format: "SignIn. User={0} registration approval pending.", arg0: model.UserName));
+                        TempData["RegulatoryList"] = result.RegulatoryList;
                         return RedirectToAction(actionName: "RegistrationApprovalPending", controllerName: "Account");
                     case AuthenticationResult.PasswordExpired:              // 7.a
                         _logger.Info(string.Format(format: "SignIn. User={0} password is expired.", arg0: model.UserName));

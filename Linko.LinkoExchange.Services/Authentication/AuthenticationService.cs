@@ -1063,7 +1063,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             {
                 // UC-29 4.a
                 // System confirms user has status “Registration Pending” (and no access to any other portal where registration is not pending or portal is not disabled)
-                if (orpus.All(i => i.IsRegistrationApproved == false && i.OrganizationRegulatoryProgramDto.IsEnabled))
+                if (orpus.All(i => i.IsRegistrationApproved == false && i.IsRegistrationDenied != true && i.OrganizationRegulatoryProgramDto.IsEnabled))
                 {
                     LogToCromerrThisEvent(orpus, CromerrEvent.Login_RegistrationPending);
                     signInResultDto.AutehticationResult = AuthenticationResult.RegistrationApprovalPending;
