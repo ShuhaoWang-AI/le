@@ -391,7 +391,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                         return RedirectToAction(actionName: "RegistrationApprovalPending", controllerName: "Account");
                     case AuthenticationResult.PasswordExpired:              // 7.a
                         _logger.Info(string.Format(format: "SignIn. User={0} password is expired.", arg0: model.UserName));
-                        return RedirectToAction(actionName: "PasswordExpired", controllerName: "Account");
+                        TempData["UserProfileId"] = result.UserProfileId;
+                        TempData["OwinUserId"] = result.OwinUserId;
+                        return RedirectToAction(actionName: "ResetExpiredPassword", controllerName: "Account");
                     case AuthenticationResult.UserNotFound:                 // 2.a
                     case AuthenticationResult.InvalidUserNameOrPassword:    // 2.b
                     case AuthenticationResult.Failed:
@@ -796,6 +798,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 model.ConfirmPassword = "";
                 model.FailedCount = 0;
 
+                ViewBag.PostedToAction = "ResetPassword";
                 return View(model);
             }
         } 
@@ -884,7 +887,96 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #region  Change password and change email address   
 
-        [Authorize]
+        [AllowAnonymous]
+        public ActionResult ResetExpiredPassword()
+        {
+            var userProfileId = int.Parse(TempData["UserProfileId"].ToString());
+            var userQuestion = _questionAnswerService.GetRandomQuestionAnswerFromUserProfileId(userProfileId, QuestionTypeName.KBQ);
+
+            ResetPasswordViewModel model = new ResetPasswordViewModel();
+           
+            model.Id = userQuestion.Answer.UserQuestionAnswerId.Value;
+            model.Question = userQuestion.Question.Content;
+            model.UserProfileId = userProfileId;
+            model.OwinUserId = TempData["OwinUserId"].ToString(); 
+            model.Answer = "";
+            model.Password = "";
+            model.ConfirmPassword = "";
+            model.FailedCount = 0;
+
+            ViewBag.PostedToAction = "ResetExpiredPassword";
+            ViewBag.ReminderMessage = "Your password has expired and a new password must be created.";
+
+            return View(viewName: "ResetPassword", model: model);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ResetExpiredPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // check KBQ question
+            if (!_questionAnswerService.ConfirmCorrectAnswer(model.Id, model.Answer.ToLower()))
+            {
+                model.FailedCount++;
+                int maxAnswerAttempts = Convert.ToInt32(_settingService.GetOrganizationSettingValueByUserId(model.UserProfileId, SettingType.FailedKBQAttemptMaxCount, true, null));
+                if (maxAnswerAttempts <= model.FailedCount)
+                {
+                    // Lock the account; 
+                    var locckAccountResult = _userService.LockUnlockUserAccount(model.UserProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringProfileAccess);
+                    if (locckAccountResult.IsSuccess)
+                    {
+                        _logger.Info(string.Format(format: "KBQ question. Failed to Answer KBQ Question {0} times. Account is locked. UserProfileId:{1}",
+                                     arg0: maxAnswerAttempts, arg1: model.UserProfileId));
+
+                        var regulatoryList = _organizationService.GetUserRegulators(model.UserProfileId);
+                        if (regulatoryList == null)
+                        {
+                            regulatoryList = new List<AuthorityDto>();
+                        }
+
+                        TempData["RegulatoryList"] = regulatoryList;
+
+                        return RedirectToAction(actionName: "AccountLocked", controllerName: "Account");
+                    }
+                    else
+                    {
+                        _logger.Info(string.Format(format: "KBQ question. Failed to Answer KBQ Question {0} times. Failed to locked the Account. UserProfileId:{1}",
+                                    arg0: maxAnswerAttempts, arg1: model.UserProfileId));
+                    }
+                }
+                else
+                {
+                    ModelState.Remove(key: "FailedCount");
+                    ModelState.AddModelError(key: "", errorMessage: "Wrong Answer.");
+                    ModelState.Remove(key: "Answer");
+                    model.Answer = "";
+                }
+
+                return View(viewName: "ResetPassword", model: model);
+            }
+ 
+            var result = _authenticationService.ChangePasswordAsync(model.OwinUserId, model.Password).Result;
+            if (result.Success)
+            {
+                TempData["SubTitle"] = "Change Password";
+                TempData["Message"] = "Change password succeeded.";
+                return RedirectToAction(actionName: "ChangeAccountSucceed");
+            }
+            var errorMessage = result.Errors.Aggregate((i, j) => {
+                return i + j;
+            });
+            ModelState.AddModelError(string.Empty, errorMessage: errorMessage);
+            return View(viewName: "ResetPassword", model: model);
+        }
+
+
+        [AllowAnonymous]
         public ActionResult ChangeAccountSucceed()
         {
             ViewBag.SuccessMessage = TempData["Message"];

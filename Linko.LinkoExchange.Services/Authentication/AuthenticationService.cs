@@ -979,8 +979,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                 else if (IsUserPasswordExpired(userId, organizationSettings))
                 {
                     // Put user profile Id into session, to request user change their password. 
-                    _sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId);
-
+                    //_sessionCache.SetValue(CacheKey.UserProfileId, applicationUser.UserProfileId);
+                    signInResultDto.OwinUserId = applicationUser.Id;
+                    signInResultDto.UserProfileId = applicationUser.UserProfileId; 
                     signInResultDto.AutehticationResult = AuthenticationResult.PasswordExpired;
                     return Task.FromResult(signInResultDto);
                 }

@@ -44,6 +44,17 @@ namespace Linko.LinkoExchange.Web.ViewModels.Account
         }
 
         [ScaffoldColumn(false)]
+        public int UserProfileId
+        {
+            get;set;
+        }
+
+        public string OwinUserId
+        {
+            get;set;
+        }
+
+        [ScaffoldColumn(false)]
         public int FailedCount
         {
             get; set;
