@@ -866,6 +866,7 @@ namespace Linko.LinkoExchange.Services.User
             var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
 
             var userDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user);
+            userDto.UserProfileDto = GetUserProfileById(user.UserProfileId);
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
             cromerrAuditLogEntryDto.RegulatoryProgramId = user.OrganizationRegulatoryProgram.RegulatoryProgramId;
             cromerrAuditLogEntryDto.OrganizationId = user.OrganizationRegulatoryProgram.OrganizationId;
