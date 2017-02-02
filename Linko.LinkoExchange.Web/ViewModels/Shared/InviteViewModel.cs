@@ -16,7 +16,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Email Address")]
         public string EmailAddress { get; set; }
 
-        public int OrgRegProgramUserId { get; set; }
+        public int OrgRegProgramId { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [Display(Name = "First Name")]

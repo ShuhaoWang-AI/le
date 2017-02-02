@@ -19,7 +19,7 @@ $(document).ready(function () {
         $.post("/Invite/InviteCheckEmail",
         {
             emailAddress: $("#EmailAddress").val(),
-            orgRegProgramIdString: $("#OrgRegProgramUserId").val()
+            orgRegProgramIdString: $("#OrgRegProgramId").val()
         },
         function (data, status) {
             //alert("Data: " + data + "\nStatus: " + status);
@@ -55,14 +55,23 @@ $(document).ready(function () {
                 }
             }
             else {
-                var grid = $('#gridExistingUsers').getKendoGrid();
-                grid.dataSource.data(data.ExistingUsers);
-                grid.refresh();
 
                 $("#searchEmailBtn").hide();
                 $("#boxFoundUser").hide();
                 $("#boxFoundUsers").show();
                 $("#foundUserInDifferentProgramsMessage").html(data.DisplayMessage);
+
+                $('#FoundUser_FirstName').val(data.ExistingUsers[0].FirstName);
+                $('#FoundUser_LastName').val(data.ExistingUsers[0].LastName);
+                $('#FoundUser_OrganizationName').val(data.ExistingUsers[0].BusinessName);
+                $('#FoundUser_PhoneNumber').val(data.ExistingUsers[0].PhoneNumber);
+
+                var orgRegProgramUserId = data.ExistingUsers[0].OrgRegProgramUserId;
+                var invitationType = $('#InvitationType').val();
+                var industryOrgRegProgramId = $('#OrgRegProgramId').val();
+
+                var inviteExistingUrl = "/Invite/InviteExistingUser?orgRegProgUserIdString=" + orgRegProgramUserId + "&industryOrgRegProgramId=" + industryOrgRegProgramId + "&invitationType=" + invitationType;
+                $('#sendToExistingInviteBtn').attr("formaction", inviteExistingUrl);
             }
 
             return false;

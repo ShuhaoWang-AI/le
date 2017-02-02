@@ -30,7 +30,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var model = new InviteViewModel();
             if (!String.IsNullOrEmpty(industryOrgRegProgramId))
             {
-                model.OrgRegProgramUserId = Convert.ToInt32(industryOrgRegProgramId);
+                model.OrgRegProgramId = Convert.ToInt32(industryOrgRegProgramId);
             }
 
             model.InvitationType = (InvitationType)Enum.Parse(typeof(InvitationType), invitationType);
@@ -108,10 +108,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             var orgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            if (viewModel.OrgRegProgramUserId > 0)
+            if (viewModel.OrgRegProgramId > 0)
             {
                 //Inviting Admin user to UI
-                orgRegProgramId = viewModel.OrgRegProgramUserId;
+                orgRegProgramId = viewModel.OrgRegProgramId;
             }
 
             string redirectUrl = GetRedirectUrl(viewModel.InvitationType, orgRegProgramId);

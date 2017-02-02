@@ -17,8 +17,8 @@
         {
             <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
             <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Industries", controllerName: "Authority")'"><i class=""></i> Industries </a></li>
-            <li><a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryDetails", controllerName: "Authority", routeValues: new { id = Model.OrgRegProgramUserId })'"><i class=""></i> Details </a></li>
-            <li><a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryUsers", controllerName: "Authority", routeValues: new { id = Model.OrgRegProgramUserId })'"><i class=""></i> Users </a></li>
+            <li><a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryDetails", controllerName: "Authority", routeValues: new { id = Model.OrgRegProgramId })'"><i class=""></i> Details </a></li>
+            <li><a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryUsers", controllerName: "Authority", routeValues: new { id = Model.OrgRegProgramId })'"><i class=""></i> Users </a></li>
         }
         else if (Model.InvitationType == InvitationType.IndustryToIndustry)
         {
@@ -32,7 +32,7 @@
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    @Html.HiddenFor(model => model.OrgRegProgramUserId)
+    @Html.HiddenFor(model => model.OrgRegProgramId)
     @Html.HiddenFor(model => model.InvitationType)
 
     <div class="box box-primary">
@@ -238,7 +238,7 @@
 }
 @using (Html.BeginForm())
 {
-    @Html.HiddenFor(model => model.OrgRegProgramUserId)
+    @Html.HiddenFor(model => model.OrgRegProgramId)
     @Html.HiddenFor(model => model.InvitationType)
     <div id="boxFoundUsers" class="box box-primary" style="display:none;">
         <div class="box-header with-border">
@@ -269,47 +269,38 @@
                 </div>
             </div>
 
-
             <div class="form-group">
-                <div class="col-md-12">
-                    @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Shared.InviteExistingUserViewModel>()
-                    .Name(componentName: "gridExistingUsers")
-                    .AutoBind(false)
-                    .Columns(columns =>
-                    {
-                        columns.Bound(p => p.OrgRegProgramUserId).Hidden();
-                        columns.Bound(c => c.FirstName);
-                        columns.Bound(c => c.LastName);
-                        columns.Bound(c => c.PhoneNumber);
-                        columns.Bound(c => c.BusinessName).Title("Organization Name");
-                        columns.Template(m =>
-                        {
-                        })
-                                .ClientTemplate(value: "<input type='submit' value='Send Invite' class='btn btn-sm btn-primary' formaction='/Invite/InviteExistingUser?orgRegProgUserIdString=#: OrgRegProgramUserId #&industryOrgRegProgramId=" + Model.OrgRegProgramUserId + "&invitationType=" + Model.InvitationType + "' formmethod='post' />")
-                                .Width(pixelWidth: 90);
-                    })
-                    .Pageable(pageable => pageable.Enabled(false))
-                    .Selectable(selectable => selectable.Enabled(false))
-                    .Sortable(sortable => sortable.Enabled(false))
-                    //.Filterable(filterable => filterable.Enabled(false))
-                    .Resizable(resizable => resizable.Columns(false))
-                    .Scrollable(s => s.Height(value: "auto"))
-                    .DataSource(dataSource => dataSource
-                            .Ajax()
-                            .Model(model => model.Id(p => p.OrgRegProgramUserId))
-                            .ServerOperation(enabled: false)
-                            .Batch(enabled: true)
-                        )
-                    )
+                <label class="control-label col-md-2">First Name</label>
+                <div class="col-md-4">
+                    <input class="form-control text-box single-line valid" data-val="true" id="FoundUser_FirstName" name="FoundUser_FirstName" type="text" readonly="readonly">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">Last Name</label>
+                <div class="col-md-4">
+                    <input class="form-control text-box single-line valid" data-val="true" id="FoundUser_LastName" name="FoundUser_LastName" type="text" readonly="readonly">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">Organization Name</label>
+                <div class="col-md-4">
+                    <input class="form-control text-box single-line valid" data-val="true" id="FoundUser_OrganizationName" name="FoundUser_OrganizationName" type="text" readonly="readonly">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">Phone Number</label>
+                <div class="col-md-4">
+                    <input class="form-control text-box single-line valid" data-val="true" id="FoundUser_PhoneNumber" name="FoundUser_PhoneNumber" type="text" readonly="readonly">
                 </div>
             </div>
 
-
         </section>@*.box-body*@
         <div class="box-footer">
-            <div class="form-group pull-right">
+            <div class="form-group col-md-6 text-right">
+                <input type="submit" id="sendToExistingInviteBtn" value="Send Invite" class="btn btn-sm btn-primary" formaction="" formmethod="post" />
                 <input type="button" id="cancelInviteBtn" value="Cancel" class="btn btn-sm btn-primary" />
             </div>
+            <div class="form-group col-md-6"></div>
         </div><!-- box-footer -->
     </div>
 
