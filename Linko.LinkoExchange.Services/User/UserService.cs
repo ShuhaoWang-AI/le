@@ -486,9 +486,10 @@ namespace Linko.LinkoExchange.Services.User
             _emailService.SendEmail(new[] { user.Email }, EmailType.Profile_ResetProfileRequired, contentReplacements);
 
             //Log to Cromerr
+            int actorOrgRegProgUserId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
             var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
                 .Include("OrganizationRegulatoryProgram")
-                .Single(u => u.OrganizationRegulatoryProgramUserId == senderOrgRegProgramId);
+                .Single(u => u.OrganizationRegulatoryProgramUserId == actorOrgRegProgUserId);
             var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
             var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
 
@@ -510,7 +511,7 @@ namespace Linko.LinkoExchange.Services.User
             contentReplacements.Add("emailAddress", user.Email);
             contentReplacements.Add("authorityName", actorProgramUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
             contentReplacements.Add("authorityFirstName", actorUser.FirstName);
-            contentReplacements.Add("authorityFirstame", actorUser.LastName);
+            contentReplacements.Add("authorityLastName", actorUser.LastName);
             contentReplacements.Add("authorityUserName", actorUser.UserName);
             contentReplacements.Add("authorityEmailaddress", actorUser.Email);
 
