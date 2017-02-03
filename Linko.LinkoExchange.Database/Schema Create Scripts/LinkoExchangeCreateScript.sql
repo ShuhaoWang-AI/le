@@ -3687,7 +3687,7 @@ INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType,
         'Signature',   
         'SignatoryGranted', 
         '',
-        'A role has changed from {oldRole} to {newRole} for {organizationName}.
+        'Signatory rights granted to {organizationName}.
 User: {firstName} {lastName}
 User Name: {userName}
 Email: {emailAddress}
@@ -3702,7 +3702,7 @@ Email: {emailAddress}
         'Signature',   
         'SignatoryRevoked', 
         '',
-        'A role has changed from {oldRole} to {newRole} for {organizationName}.
+        'Signatory rights revoked for {organizationName}.
 User: {firstName} {lastName}
 User Name: {userName}
 Email: {emailAddress}

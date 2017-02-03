@@ -302,7 +302,8 @@ namespace Linko.LinkoExchange.Services.User
             var contentReplacements = new Dictionary<string, string>();
             contentReplacements.Add("firstName", user.FirstName);
             contentReplacements.Add("lastName", user.LastName);
-
+            contentReplacements.Add("userName", user.UserName);
+            contentReplacements.Add("emailAddress", user.Email);
             contentReplacements.Add("authorityName", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName));
             contentReplacements.Add("authorityOrganizationName", authority.Organization.Name);
             contentReplacements.Add("organizationName", orgRegProgram.Organization.Name);
@@ -330,7 +331,7 @@ namespace Linko.LinkoExchange.Services.User
             cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
             cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
             cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-            contentReplacements.Add("userName", user.UserName);
+            
 
             _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
 
