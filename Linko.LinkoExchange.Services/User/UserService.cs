@@ -847,7 +847,7 @@ namespace Linko.LinkoExchange.Services.User
         public bool RemoveUser(int orgRegProgUserId)
         {
             //Ensure this is not the calling User's account
-            int thisUsersOrgRegProgUserId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            int thisUsersOrgRegProgUserId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
             if (thisUsersOrgRegProgUserId == orgRegProgUserId)
                 return false;
 
