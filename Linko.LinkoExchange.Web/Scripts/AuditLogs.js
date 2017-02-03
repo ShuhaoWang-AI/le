@@ -82,7 +82,7 @@ getLogEntryDetails = function ()
     $('#details-cell-eventcategory').text(selecedItem.EventCategory);
     $('#details-cell-userid').text(selecedItem.UserProfileId);
     $('#details-cell-eventtype').text(selecedItem.EventType);
-    $('#details-cell-logdatetime').text(selecedItem.LogDateTimeUtc);
+    $('#details-cell-logdatetime').text(selecedItem.LogDateTimeUtcDetailString);
     $('#details-cell-emailaddress').text(selecedItem.EmailAddress);
     $('#details-cell-eventcode').text(selecedItem.CromerrAuditLogId);
     $('#details-cell-fullname').text(selecedItem.FirstName + ' ' + selecedItem.LastName);

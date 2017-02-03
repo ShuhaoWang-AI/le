@@ -129,5 +129,14 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         {
             get; set;
         }
+
+        [ScaffoldColumn(false)]
+        public string LogDateTimeUtcDetailString
+        {
+            get
+            {
+                return this.LogDateTimeUtc.ToString("MM/dd/yyyy h:mm tt");
+            }
+        }
     }
 }

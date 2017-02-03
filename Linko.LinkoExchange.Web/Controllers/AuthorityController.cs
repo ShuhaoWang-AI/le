@@ -350,7 +350,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 IPAddress = vm.IPAddress,
                 HostName = vm.HostName,
                 Comment = vm.Comment,
-                LogDateTimeUtc = vm.LogDateTimeUtc.ToString()
+                LogDateTimeUtc = vm.LogDateTimeUtc.ToString(),
+                LogDateTimeUtcDetailString = vm.LogDateTimeUtcDetailString
             });
 
             return Json(result);
