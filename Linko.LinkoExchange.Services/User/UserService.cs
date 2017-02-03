@@ -283,6 +283,11 @@ namespace Linko.LinkoExchange.Services.User
         public void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory)
         {
             OrganizationRegulatoryProgramUser programUser = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
+            if (programUser.IsSignatory == isSignatory)
+            {
+                //No change therefore...
+                return;
+            }
             programUser.IsSignatory = isSignatory;
             programUser.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
             programUser.LastModifierUserId = _httpContext.CurrentUserProfileId();
