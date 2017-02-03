@@ -260,7 +260,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     contentReplacements.Add("userName", applicationUser.UserName);
                     contentReplacements.Add("emailAddress", applicationUser.Email);
 
-                    _crommerAuditLogService.Log(CromerrEvent.Profile_PasswordChange, cromerrAuditLogEntryDto, contentReplacements);
+                    _crommerAuditLogService.Log(CromerrEvent.Profile_PasswordChanged, cromerrAuditLogEntryDto, contentReplacements);
                 }
                
             }
@@ -898,7 +898,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return Task.FromResult(signInResultDto);
             }
 
-            var regulatoryList = _organizationService.GetUserRegulators(applicationUser.UserProfileId);
+            var regulatoryList = _organizationService.GetUserRegulators(applicationUser.UserProfileId).ToList();
             if (regulatoryList == null)
             {
                 regulatoryList = new List<AuthorityDto>();

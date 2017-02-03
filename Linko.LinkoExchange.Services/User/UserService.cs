@@ -1104,8 +1104,9 @@ namespace Linko.LinkoExchange.Services.User
             contentReplacements.Add("userName", userProfile.UserName);
             contentReplacements.Add("oldEmail", oldEmailAddress);
             contentReplacements.Add("newEmail", newEmailAddress);
+            contentReplacements.Add("emailAddress", newEmailAddress);
 
-            _crommerAuditLogService.Log(CromerrEvent.Profile_EmailChange, cromerrAuditLogEntryDto, contentReplacements);
+            _crommerAuditLogService.Log(CromerrEvent.Profile_EmailChanged, cromerrAuditLogEntryDto, contentReplacements);
 
 
             return true;
