@@ -4,6 +4,7 @@ using System.Web.Routing;
 using Microsoft.Practices.Unity;
 using Linko.LinkoExchange.Services.User;
 using System.Configuration;
+using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {
@@ -13,7 +14,7 @@ namespace Linko.LinkoExchange.Web.Mvc
         [Dependency]
         public IUserService _userService { get; set; }
         [Dependency]
-        public ISessionCache _sessionCache { get; set; }
+        public IHttpContextService _httpContextService { get; set; }
 
         private string _unauthorizedPagePath;
 
@@ -29,7 +30,7 @@ namespace Linko.LinkoExchange.Web.Mvc
                 int urlOrgRegProgUserId = int.Parse(filterContext.Controller.ControllerContext.RouteData.Values["id"].ToString());
                 var targetsOrgRegProgramUserDto = _userService.GetOrganizationRegulatoryProgramUser(urlOrgRegProgUserId);
 
-                int usersOrgRegProgUserId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+                int usersOrgRegProgUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
                 var thisOrgRegProgramUserDto = _userService.GetOrganizationRegulatoryProgramUser(usersOrgRegProgUserId);
 
                 bool isAdmin = thisOrgRegProgramUserDto.PermissionGroup.Name.ToLower().StartsWith("admin")
@@ -52,5 +53,5 @@ namespace Linko.LinkoExchange.Web.Mvc
         }
 
     }
-    
+
 }

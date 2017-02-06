@@ -1,4 +1,5 @@
 ﻿using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Jurisdiction;
@@ -20,6 +21,7 @@ namespace Linko.LinkoExchange.Web.shared
         private readonly IUserService _userService;
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IJurisdictionService _jurisdictionService;
+        private readonly IHttpContextService _httpContextService;
         private readonly string fakePassword = "********";
         private readonly IMapHelper _mapHelper;
 
@@ -28,14 +30,16 @@ namespace Linko.LinkoExchange.Web.shared
             ISessionCache sessionCache,
             IUserService userService,
             IJurisdictionService jurisdictionService,
-            IMapHelper mapHelper
-
-            ) { 
+            IMapHelper mapHelper,
+            IHttpContextService httpContextService
+            )
+        {
             _sessionCache = sessionCache;
             _userService = userService;
             _jurisdictionService = jurisdictionService;
             _questionAnswerService = questAnswerService;
             _mapHelper = mapHelper;
+            _httpContextService = httpContextService;
         }
 
 
@@ -59,7 +63,7 @@ namespace Linko.LinkoExchange.Web.shared
             var userProfileViewModel = _mapHelper.GetUserProfileViewModelFromUserDto(userProileDto);
 
             //Need to set the HasSignatory for Org Reg Program User
-            string orgRegProgramUserIdString = _sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId);
+            string orgRegProgramUserIdString = _httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId);
             if (!String.IsNullOrEmpty(orgRegProgramUserIdString))
             {
                 int orgRegProgramUserId = int.Parse(orgRegProgramUserIdString);
@@ -72,7 +76,7 @@ namespace Linko.LinkoExchange.Web.shared
 
             // Get state list   
             userProfileViewModel.StateList = GetStateList();
-            userProfileViewModel.Role = _sessionCache.GetClaimValue(CacheKey.UserRole);
+            userProfileViewModel.Role = _httpContextService.GetClaimValue(CacheKey.UserRole);
 
             return userProfileViewModel;
         }

@@ -59,7 +59,6 @@ namespace Linko.LinkoExchange.Test
                                                                _settings.Object,
                                                                _orgService.Object,
                                                                _emailService.Object,
-                                                               _sessionCache.Object,
                                                                _mapHelper.Object,
                                                                _crommerAuditLogService.Object
                                                                );
@@ -70,7 +69,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void CreateOrUpdateQuestionAnswerPair()
         {
-            
+
             var answerDto = new AnswerDto();
             answerDto.Content = "Blue";
             answerDto.QuestionId = 8;
@@ -94,10 +93,13 @@ namespace Linko.LinkoExchange.Test
         public void UpdateQuestion()
         {
             _questionAnswerService.UpdateQuestion(
-                new QuestionDto() { QuestionId = 10,
+                new QuestionDto()
+                {
+                    QuestionId = 10,
                     QuestionType = QuestionTypeName.KBQ,
-                    IsActive = true,                
-                    Content = "Color of your first bike?" });
+                    IsActive = true,
+                    Content = "Color of your first bike?"
+                });
         }
 
         [TestMethod]

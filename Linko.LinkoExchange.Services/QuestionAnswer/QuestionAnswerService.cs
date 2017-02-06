@@ -32,13 +32,12 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         private readonly IDictionary<SystemSettingType, string> _globalSettings;
         private readonly IOrganizationService _orgService;
         private readonly IEmailService _emailService;
-        private readonly ISessionCache _sessionCache;
         private readonly IMapHelper _mapHelper;
         private readonly ICromerrAuditLogService _crommerAuditLogService;
 
         public QuestionAnswerService(LinkoExchangeContext dbContext, ILogger logger, IHttpContextService httpContext,
             IEncryptionService encryption, IPasswordHasher passwordHasher, ISettingService settingService,
-            IOrganizationService orgService, IEmailService emailService, ISessionCache sessionCache,
+            IOrganizationService orgService, IEmailService emailService,
             IMapHelper mapHelper, ICromerrAuditLogService crommerAuditLogService)
         {
             _dbContext = dbContext;
@@ -50,10 +49,9 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             _globalSettings = _settingService.GetGlobalSettings();
             _orgService = orgService;
             _emailService = emailService;
-            _sessionCache = sessionCache;
             _mapHelper = mapHelper;
             _crommerAuditLogService = crommerAuditLogService;
-    }
+        }
 
         public void AddUserQuestionAnswer(int userProfileId, AnswerDto answer)
         {
@@ -189,7 +187,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             var answerDtosToUpdate = new List<AnswerDto>();
             foreach (var answerDto in questionAnswers)
             {
-                if (!answerDto.UserQuestionAnswerId.HasValue 
+                if (!answerDto.UserQuestionAnswerId.HasValue
                     || _dbContext.UserQuestionAnswers
                         .Single(q => q.UserQuestionAnswerId == answerDto.UserQuestionAnswerId).Content != answerDto.Content)
                 {
@@ -273,7 +271,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 catch (Exception ex)
                 {
                     transaction.Rollback();
-                    
+
                     var errors = new List<string>() { ex.Message };
 
                     while (ex.InnerException != null)
@@ -286,9 +284,9 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
                     throw;
                 }
-               
+
             }
-               
+
             var userProfile = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
 
             //Send Emails
@@ -309,7 +307,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             if (questionCountSQ > 0)
                 _emailService.SendEmail(new[] { userProfile.Email }, EmailType.Profile_SecurityQuestionsChanged, contentReplacements);
 
-            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
             var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
                 .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
 
@@ -512,7 +510,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
                     newQADto.Question.QuestionId = foundQA.Question.QuestionId;
                     newQADto.Question.IsActive = foundQA.Question.IsActive;
-                    newQADto.Question.QuestionType = (QuestionTypeName)Enum.Parse(typeof(QuestionTypeName), foundQA.Question.QuestionType.Name, true);
+                    newQADto.Question.QuestionType = (QuestionTypeName) Enum.Parse(typeof(QuestionTypeName), foundQA.Question.QuestionType.Name, true);
                     newQADto.Question.Content = foundQA.Question.Content;
 
                     usersQAList.Add(newQADto);
@@ -544,10 +542,10 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         }
 
         public void CreateUserQuestionAnswers(int userProfileId, IEnumerable<AnswerDto> questionAnswers)
-        { 
-            if(questionAnswers != null && questionAnswers.Any())
+        {
+            if (questionAnswers != null && questionAnswers.Any())
             {
-                 foreach(var qa in questionAnswers)
+                foreach (var qa in questionAnswers)
                 {
                     CreateOrUpdateUserQuestionAnswer(userProfileId, qa);
                 }
@@ -556,7 +554,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         public void DeleteUserQuestionAndAnswers(int userProfileId)
         {
-            var userQuestionAndAnswers = _dbContext.UserQuestionAnswers.Where(i => i.UserProfileId == userProfileId); 
+            var userQuestionAndAnswers = _dbContext.UserQuestionAnswers.Where(i => i.UserProfileId == userProfileId);
 
             if (userQuestionAndAnswers != null && userQuestionAndAnswers.Any())
             {
@@ -582,7 +580,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                     QuestionId = question.QuestionId,
                     Content = question.Content
                 };
-                dto.QuestionType = (QuestionTypeName)Enum.Parse(typeof(QuestionTypeName), question.QuestionType.Name, true);
+                dto.QuestionType = (QuestionTypeName) Enum.Parse(typeof(QuestionTypeName), question.QuestionType.Name, true);
 
                 list.Add(dto);
             }

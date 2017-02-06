@@ -35,7 +35,7 @@ namespace Linko.LinkoExchange.Test
     [TestClass]
     public class AuthenticationServiceTests
     {
-        string connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString; 
+        string connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
         private string testEmailAddress = ConfigurationManager.AppSettings["EmailSenderFromEmail"];
         private string emailServer = ConfigurationManager.AppSettings["EmailServer"];
         private string userName = "Test User Name";
@@ -66,7 +66,7 @@ namespace Linko.LinkoExchange.Test
         UserDto userInfo;
         string registrationToken = "TEST-REGISTRATION-TOKEN";
         private IQuestionAnswerService questionAnswerService = Mock.Of<IQuestionAnswerService>();
-        Mock<IProgramService> progServiceMock ;
+        Mock<IProgramService> progServiceMock;
         Mock<IPermissionService> permissionMock;
         Mock<IMapHelper> _mapHelper;
         Mock<ICromerrAuditLogService> _cromerrLog;
@@ -117,7 +117,7 @@ namespace Linko.LinkoExchange.Test
             systemSettingDict.Add(SystemSettingType.SupportEmailAddress, "support@linkoExchange.com");
             systemSettingDict.Add(SystemSettingType.SystemEmailEmailAddress, testEmailAddress);
             systemSettingDict.Add(SystemSettingType.SystemEmailFirstName, "LinkoExchange");
-            systemSettingDict.Add(SystemSettingType.SystemEmailLastName, "System"); 
+            systemSettingDict.Add(SystemSettingType.SystemEmailLastName, "System");
 
 
             settingServiceMock.Setup(i => i.GetGlobalSettings()).Returns(systemSettingDict);
@@ -643,9 +643,9 @@ namespace Linko.LinkoExchange.Test
         {
             var kbqQuestions = CreateQuestions(QuestionTypeName.KBQ, 5);
             var sqQuestions = CreateQuestions(QuestionTypeName.SQ, 3);
-  
+
             var invitServiceMock = Mock.Get(invitService);
-            invitServiceMock.Setup(i => i.GetInvitation(It.IsAny<string>())).Returns((InvitationDto)null); 
+            invitServiceMock.Setup(i => i.GetInvitation(It.IsAny<string>())).Returns((InvitationDto) null);
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
@@ -661,15 +661,15 @@ namespace Linko.LinkoExchange.Test
 
             // set invitation 5 days ago
             var invitationDto = Mock.Of<InvitationDto>(i => i.InvitationDateTimeUtc == DateTimeOffset.UtcNow.AddDays(-5)
-                &&  i.RecipientOrganizationRegulatoryProgramId == 1000
-            );  
+                && i.RecipientOrganizationRegulatoryProgramId == 1000
+            );
 
             var invitServiceMock = Mock.Get(invitService);
             invitServiceMock.Setup(i => i.GetInvitation(It.IsAny<string>())).Returns(invitationDto);
 
             // set invitationRecipientProgram 
-            var orgRegulatoryProgramDto = Mock.Of<OrganizationRegulatoryProgramDto>(i => i.OrganizationId == 2000); 
-                 
+            var orgRegulatoryProgramDto = Mock.Of<OrganizationRegulatoryProgramDto>(i => i.OrganizationId == 2000);
+
             // set prgramService
             var progServiceMock = Mock.Get(progService);
             progServiceMock.Setup(i => i.GetOrganizationRegulatoryProgram(1000)).Returns(orgRegulatoryProgramDto);
@@ -689,17 +689,17 @@ namespace Linko.LinkoExchange.Test
                             TemplateName = SettingType.PasswordHistoryMaxCount,
                             Value = "10"
                         }
-                }); 
+                });
 
-            var orgSettingDto = Mock.Of<OrganizationSettingDto>(i=>i.Settings == settings );
+            var orgSettingDto = Mock.Of<OrganizationSettingDto>(i => i.Settings == settings);
             var settingServiceMock = Mock.Get(settService);
             settingServiceMock.Setup(i => i.GetOrganizationSettingsById(It.IsAny<int>()))
                 .Returns(orgSettingDto);
 
 
             settingServiceMock.Setup(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>()))
-               .Returns(new[] { orgSettingDto } );
-            
+               .Returns(new[] { orgSettingDto });
+
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
             Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result.Result);
@@ -712,11 +712,11 @@ namespace Linko.LinkoExchange.Test
             IEnumerable<AnswerDto> sqQuestions;
             IEnumerable<AnswerDto> kbqQuestions;
 
-            SetRegistrations(out sqQuestions, out kbqQuestions); 
-                
-            userManagerObj.Setup(i => i.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult((UserProfile)null));
+            SetRegistrations(out sqQuestions, out kbqQuestions);
 
-            IdentityResult createUserResult = IdentityResult.Success; 
+            userManagerObj.Setup(i => i.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult((UserProfile) null));
+
+            IdentityResult createUserResult = IdentityResult.Success;
 
             userManagerObj.Setup(i => i.CreateAsync(It.IsAny<UserProfile>(), It.IsAny<string>())).
                 Returns(Task.FromResult(createUserResult));
@@ -727,11 +727,11 @@ namespace Linko.LinkoExchange.Test
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
             userManagerObj.Verify(i => i.CreateAsync(It.IsAny<UserProfile>(), It.IsAny<string>()));
-            
+
             var qaServiceMock = Mock.Get(questionAnswerService);
-            qaServiceMock.Verify(i => i.CreateUserQuestionAnswers(It.IsAny<int>(), It.IsAny<IEnumerable<AnswerDto>>()), Times.Once); 
-            progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())); 
-            permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>(), It.IsAny<int>()));  
+            qaServiceMock.Verify(i => i.CreateUserQuestionAnswers(It.IsAny<int>(), It.IsAny<IEnumerable<AnswerDto>>()), Times.Once);
+            progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()));
+            permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>(), It.IsAny<int>()));
         }
 
         // Test new existing user re-register
@@ -742,15 +742,15 @@ namespace Linko.LinkoExchange.Test
             IEnumerable<AnswerDto> kbqQuestions;
 
             SetRegistrations(out sqQuestions, out kbqQuestions);
-  
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration); 
+
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
             var settingServiceMock = Mock.Get(settService);
-            settingServiceMock.Verify(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>())); 
+            settingServiceMock.Verify(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>()));
 
             var qaServiceMock = Mock.Get(questionAnswerService);
             qaServiceMock.Verify(i => i.CreateUserQuestionAnswers(It.IsAny<int>(), It.IsAny<IEnumerable<AnswerDto>>()), Times.Once);
-            qaServiceMock.Verify(i => i.DeleteUserQuestionAndAnswers(It.IsAny<int>())); 
+            qaServiceMock.Verify(i => i.DeleteUserQuestionAndAnswers(It.IsAny<int>()));
 
             progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()));
             permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>(), It.IsAny<int>()));
@@ -766,12 +766,12 @@ namespace Linko.LinkoExchange.Test
             SetRegistrations(out sqQuestions, out kbqQuestions);
 
             // To test new user fails   
-            userManagerObj.Setup(i => i.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult((UserProfile)null));
+            userManagerObj.Setup(i => i.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult((UserProfile) null));
 
             IdentityResult createUserResult = null;
 
             userManagerObj.Setup(i => i.CreateAsync(It.IsAny<UserProfile>(), It.IsAny<string>())).
-                Returns(Task.FromResult((IdentityResult)createUserResult));
+                Returns(Task.FromResult((IdentityResult) createUserResult));
 
             var ret = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration).Result;
         }
@@ -788,10 +788,10 @@ namespace Linko.LinkoExchange.Test
             progServiceMock.Setup(i => i.GetOrganizationRegulatoryProgram(1001)).Returns(
                 Mock.Of<OrganizationRegulatoryProgramDto>(
                       i => i.IsEnabled == false)
-                    ); 
+                    );
 
             // To test new user register    
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);   
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
             Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result.Result);
         }
 
@@ -820,8 +820,8 @@ namespace Linko.LinkoExchange.Test
             IEnumerable<AnswerDto> sqQuestions;
             IEnumerable<AnswerDto> kbqQuestions;
 
-            SetRegistrations(out sqQuestions, out kbqQuestions); 
-         
+            SetRegistrations(out sqQuestions, out kbqQuestions);
+
             // To test new user register    
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
             var emailServiceMock = Mock.Get(emailService);
@@ -871,14 +871,14 @@ namespace Linko.LinkoExchange.Test
         }
 
 
-        private void SetRegistrations(out IEnumerable<AnswerDto>  sqQuestions, out IEnumerable<AnswerDto> kbqQuestions)
+        private void SetRegistrations(out IEnumerable<AnswerDto> sqQuestions, out IEnumerable<AnswerDto> kbqQuestions)
         {
             kbqQuestions = CreateQuestions(QuestionTypeName.KBQ, 5);
             sqQuestions = CreateQuestions(QuestionTypeName.SQ, 3);
 
             // set invitation 5 days ago
             var invitationDto = Mock.Of<InvitationDto>(i => i.InvitationDateTimeUtc == DateTimeOffset.UtcNow.AddDays(-5)
-                && i.RecipientOrganizationRegulatoryProgramId == 1000 && 
+                && i.RecipientOrganizationRegulatoryProgramId == 1000 &&
                    i.SenderOrganizationRegulatoryProgramId == 1001
             );
 
@@ -886,10 +886,10 @@ namespace Linko.LinkoExchange.Test
             invitServiceMock.Setup(i => i.GetInvitation(It.IsAny<string>())).Returns(invitationDto);
 
             // set invitationRecipientProgram 
-            var orgRegulatoryProgramDto = Mock.Of<OrganizationRegulatoryProgramDto>(i => i.OrganizationId == 2000 
-                 && i.IsEnabled == true 
+            var orgRegulatoryProgramDto = Mock.Of<OrganizationRegulatoryProgramDto>(i => i.OrganizationId == 2000
+                 && i.IsEnabled == true
                  && i.RegulatorOrganizationId == 1000
-                 && i.OrganizationDto == Mock.Of<OrganizationDto>(b=>b.OrganizationId== 5000)
+                 && i.OrganizationDto == Mock.Of<OrganizationDto>(b => b.OrganizationId == 5000)
             );
 
             // set prgramService 
@@ -905,7 +905,7 @@ namespace Linko.LinkoExchange.Test
 
             var orgServiceMock = Mock.Get(orgService);
             orgServiceMock.Setup(i => i.GetOrganization(It.IsAny<int>())).Returns(
-                    Mock.Of<OrganizationDto>(i=>i.OrganizationName=="test-org-name")
+                    Mock.Of<OrganizationDto>(i => i.OrganizationName == "test-org-name")
                 );
 
             orgServiceMock.Setup(i => i.GetUserOrganizations(It.IsAny<int>())).
@@ -914,20 +914,20 @@ namespace Linko.LinkoExchange.Test
                   {
                       Mock.Of<OrganizationRegulatoryProgramDto>(i=>i.OrganizationId == 1000),
                       Mock.Of<OrganizationRegulatoryProgramDto>(i=>i.OrganizationId == 1001)
-                  }); 
+                  });
 
             progServiceMock.Setup(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(
-                   Mock.Of<OrganizationRegulatoryProgramUserDto>(i=>i.IsEnabled == true && i.OrganizationRegulatoryProgramId == 100  
+                   Mock.Of<OrganizationRegulatoryProgramUserDto>(i => i.IsEnabled == true && i.OrganizationRegulatoryProgramId == 100
                    )
                 );
 
             permissionMock.Setup(i => i.GetApprovalPeople(It.IsAny<int>(), It.IsAny<int>())).Returns(
-                 new []{
+                 new[]{
                            Mock.Of<UserDto>(i=>i.Email=="test@water.com"),
                            Mock.Of<UserDto>(i=>i.Email=="test2@water.com"),
-                       } 
-                ); 
-            
+                       }
+                );
+
             // set setting service 
             var settings = new List<SettingDto>();
             settings.AddRange(
@@ -941,7 +941,7 @@ namespace Linko.LinkoExchange.Test
                     {
                         TemplateName = SettingType.PasswordHistoryMaxCount,
                         Value="10"
-                    }} ); 
+                    }});
 
 
             var orgSettingDto = Mock.Of<OrganizationSettingDto>(i => i.Settings == settings);
@@ -951,7 +951,7 @@ namespace Linko.LinkoExchange.Test
 
             var orgSettings = new List<OrganizationSettingDto> { orgSettingDto };
 
-            settingServiceMock.Setup(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>())).Returns(orgSettings); 
+            settingServiceMock.Setup(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>())).Returns(orgSettings);
 
             // Setup for dbContext 
             var passwordHistries = new List<UserPasswordHistory>
@@ -1077,7 +1077,7 @@ public class HttpContextServiceMock : IHttpContextService
 
     public object GetSessionValue(string key)
     {
-        if(session.ContainsKey(key))
+        if (session.ContainsKey(key))
         {
             return session[key];
         }
@@ -1102,5 +1102,10 @@ public class HttpContextServiceMock : IHttpContextService
     public string CurrentUserHostName()
     {
         return "test.dns.hostname";
+    }
+
+    public string GetClaimValue(string claimType)
+    {
+        throw new NotImplementedException();
     }
 }

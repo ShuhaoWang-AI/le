@@ -21,6 +21,7 @@ using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
 using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -28,22 +29,23 @@ namespace Linko.LinkoExchange.Web.Controllers
     public class AuthorityController : Controller
     {
         #region constructor
-        
+
         private readonly IOrganizationService _organizationService;
         private readonly IUserService _userService;
-        private readonly IInvitationService _invitationService; 
+        private readonly IInvitationService _invitationService;
         private readonly ISettingService _settingService;
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly ITimeZoneService _timeZoneService;
         private readonly IPermissionService _permissionService;
         private readonly ISessionCache _sessionCache;
+        private readonly IHttpContextService _httpContextService;
         private readonly ILogger _logger;
         private readonly ICromerrAuditLogService _cromerrLogService;
 
 
         public AuthorityController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService,
             ISettingService settingService, IQuestionAnswerService questionAnswerService, ITimeZoneService timeZoneService, IPermissionService permissionService,
-            ISessionCache sessionCache, ILogger logger, ICromerrAuditLogService cromerrLogService)
+            ISessionCache sessionCache, ILogger logger, ICromerrAuditLogService cromerrLogService, IHttpContextService httpContextService)
         {
             _organizationService = organizationService;
             _userService = userService;
@@ -55,6 +57,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _sessionCache = sessionCache;
             _logger = logger;
             _cromerrLogService = cromerrLogService;
+            _httpContextService = httpContextService;
         }
 
         #endregion
@@ -91,7 +94,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             try
             {
-                int id = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+                int id = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
                 var authority = _organizationService.GetOrganizationRegulatoryProgram(id);
                 var authoritySettings = _settingService.GetOrganizationSettingsById(authority.OrganizationId).Settings;
 
@@ -139,7 +142,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             try
             {
-                int id = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+                int id = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
                 var programSettings = _settingService.GetProgramSettingsById(id).Settings;
 
                 //ReportRepudiatedDays
@@ -172,11 +175,11 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private AuthoritySettingsViewModel PrepareAuthoritySettings()
         {
-            int id = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            int id = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authority = _organizationService.GetOrganizationRegulatoryProgram(id);
             var authoritySettings = _settingService.GetOrganizationSettingsById(authority.OrganizationId);
             var programSettings = _settingService.GetProgramSettingsById(authority.OrganizationRegulatoryProgramId);
-            var userRole = _sessionCache.GetClaimValue(CacheKey.UserRole) ?? "";
+            var userRole = _httpContextService.GetClaimValue(CacheKey.UserRole) ?? "";
 
             var viewModel = new AuthoritySettingsViewModel
             {
@@ -196,75 +199,75 @@ namespace Linko.LinkoExchange.Web.Controllers
                 WebsiteUrl = authority.OrganizationDto.WebsiteURL,
                 HasPermissionForUpdate = userRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString()),
 
-                FailedPasswordAttemptMaxCount           = authoritySettings.Settings
+                FailedPasswordAttemptMaxCount = authoritySettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.FailedPasswordAttemptMaxCount))
                                                                  .Select(s => s.Value).First(),
-                FailedPasswordAttemptMaxCountDefault    = authoritySettings.Settings
+                FailedPasswordAttemptMaxCountDefault = authoritySettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.FailedPasswordAttemptMaxCount))
                                                                  .Select(s => s.DefaultValue).First(),
-                FailedKbqAttemptMaxCount                = authoritySettings.Settings
+                FailedKbqAttemptMaxCount = authoritySettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.FailedKBQAttemptMaxCount))
                                                                  .Select(s => s.Value).First(),
-                FailedKbqAttemptMaxCountDefault         = authoritySettings.Settings
+                FailedKbqAttemptMaxCountDefault = authoritySettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.FailedKBQAttemptMaxCount))
                                                                  .Select(s => s.DefaultValue).First(),
-                InvitationExpiredHours                  = authoritySettings.Settings
+                InvitationExpiredHours = authoritySettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.InvitationExpiredHours))
                                                                  .Select(s => s.Value).First(),
-                InvitationExpiredHoursDefault           = authoritySettings.Settings
+                InvitationExpiredHoursDefault = authoritySettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.InvitationExpiredHours))
                                                                  .Select(s => s.DefaultValue).First(),
-                PasswordChangeRequiredDays              = authoritySettings.Settings
+                PasswordChangeRequiredDays = authoritySettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.PasswordChangeRequiredDays))
                                                                  .Select(s => s.Value).First(),
-                PasswordChangeRequiredDaysDefault       = authoritySettings.Settings
+                PasswordChangeRequiredDaysDefault = authoritySettings.Settings
                                                                 .Where(s => s.TemplateName.Equals(SettingType.PasswordChangeRequiredDays))
                                                                  .Select(s => s.DefaultValue).First(),
-                PasswordHistoryMaxCount                 = authoritySettings.Settings
+                PasswordHistoryMaxCount = authoritySettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.PasswordHistoryMaxCount))
                                                                  .Select(s => s.Value).First(),
-                PasswordHistoryMaxCountDefault          = authoritySettings.Settings
+                PasswordHistoryMaxCountDefault = authoritySettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.PasswordHistoryMaxCount))
                                                                  .Select(s => s.DefaultValue).First(),
-                TimeZone                                = authoritySettings.Settings
+                TimeZone = authoritySettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.TimeZone))
                                                                  .Select(s => s.Value).First(),
 
-                ReportRepudiatedDays                    = programSettings.Settings
+                ReportRepudiatedDays = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.ReportRepudiatedDays))
                                                                  .Select(s => s.Value).First(),
-                ReportRepudiatedDaysDefault             = programSettings.Settings
+                ReportRepudiatedDaysDefault = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.ReportRepudiatedDays))
                                                                  .Select(s => s.DefaultValue).First(),
-                MassLoadingConversionFactorPounds       = programSettings.Settings
+                MassLoadingConversionFactorPounds = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.MassLoadingConversionFactorPounds))
                                                                  .Select(s => s.Value).First(),
-                MassLoadingResultToUseLessThanSign      = programSettings.Settings
+                MassLoadingResultToUseLessThanSign = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.MassLoadingResultToUseLessThanSign))
                                                                  .Select(s => s.Value).First(),
-                MassLoadingCalculationDecimalPlaces     = programSettings.Settings
+                MassLoadingCalculationDecimalPlaces = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.MassLoadingCalculationDecimalPlaces))
                                                                  .Select(s => s.Value).First(),
-                EmailContactInfoName                    = programSettings.Settings
+                EmailContactInfoName = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.EmailContactInfoName))
                                                                  .Select(s => s.Value).First(),
-                EmailContactInfoNameDefault             = authority.OrganizationDto.OrganizationName,
-                EmailContactInfoPhone                   = programSettings.Settings
+                EmailContactInfoNameDefault = authority.OrganizationDto.OrganizationName,
+                EmailContactInfoPhone = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.EmailContactInfoPhone))
                                                                  .Select(s => s.Value).First(),
-                EmailContactInfoPhoneDefault            = authority.OrganizationDto.PhoneNumber,
-                EmailContactInfoEmailAddress            = programSettings.Settings
+                EmailContactInfoPhoneDefault = authority.OrganizationDto.PhoneNumber,
+                EmailContactInfoEmailAddress = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.EmailContactInfoEmailAddress))
                                                                  .Select(s => s.Value).First(),
-                AuthorityUserLicenseTotalCount          = programSettings.Settings
+                AuthorityUserLicenseTotalCount = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.AuthorityUserLicenseTotalCount))
                                                                  .Select(s => s.Value).First(),
-                AuthorityUserLicenseUsedCount           = _organizationService.GetCurrentUserLicenseCount(id).ToString(),
-                IndustryLicenseTotalCount               = programSettings.Settings
+                AuthorityUserLicenseUsedCount = _organizationService.GetCurrentUserLicenseCount(id).ToString(),
+                IndustryLicenseTotalCount = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.IndustryLicenseTotalCount))
                                                                  .Select(s => s.Value).First(),
-                IndustryLicenseUsedCount                = _organizationService.GetCurrentIndustryLicenseCount(id).ToString(),
-                UserPerIndustryMaxCount                 = programSettings.Settings
+                IndustryLicenseUsedCount = _organizationService.GetCurrentIndustryLicenseCount(id).ToString(),
+                UserPerIndustryMaxCount = programSettings.Settings
                                                                  .Where(s => s.TemplateName.Equals(SettingType.UserPerIndustryMaxCount))
                                                                  .Select(s => s.Value).First(),
             };
@@ -306,7 +309,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public ActionResult AuditLogs_Read([DataSourceRequest] DataSourceRequest request, string searchString)
         {
-            var organizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var organizationRegulatoryProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(organizationRegulatoryProgramId, SettingType.TimeZone));
             var logEntries = _cromerrLogService.GetCromerrAuditLogEntries(organizationRegulatoryProgramId, searchString);
 
@@ -330,7 +333,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 //Need to modify datetime to local
                 LogDateTimeUtc = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(
                                 dto.LogDateTimeUtc.DateTime, timeZoneId)
-            
+
             });
 
             DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
@@ -338,7 +341,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 CromerrAuditLogId = vm.CromerrAuditLogId,
                 RegulatoryProgramName = vm.RegulatoryProgramName,
                 OrganizationId = vm.OrganizationId,
-                OrganizationName  = vm.OrganizationName,
+                OrganizationName = vm.OrganizationName,
                 RegulatorName = vm.RegulatorName,
                 EventCategory = vm.EventCategory,
                 EventType = vm.EventType,
@@ -406,19 +409,19 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route("Users")]
         public ActionResult AuthorityUsers()
         {
-            int id = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            int id = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authority = _organizationService.GetOrganizationRegulatoryProgram(id);
             ViewBag.Title = string.Format(format: "{0} Users", arg0: authority.OrganizationDto.OrganizationName);
 
             var remainingUserLicenseCount = _organizationService.GetRemainingUserLicenseCount(id);
-            ViewBag.CanInvite = _sessionCache.GetClaimValue(CacheKey.UserRole).IsCaseInsensitiveEqual(UserRole.Administrator.ToString())
+            ViewBag.CanInvite = _httpContextService.GetClaimValue(CacheKey.UserRole).IsCaseInsensitiveEqual(UserRole.Administrator.ToString())
                                 && remainingUserLicenseCount > 0;
             return View();
         }
 
         public ActionResult AuthorityUsers_Read([DataSourceRequest] DataSourceRequest request)
         {
-            var organizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var organizationRegulatoryProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var users = _userService.GetUserProfilesForOrgRegProgram(organizationRegulatoryProgramId, isRegApproved: true, isRegDenied: false, isEnabled: null, isRemoved: false);
 
             var viewModels = users.Select(vm => new AuthorityUserViewModel
@@ -494,7 +497,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public ActionResult AuthorityUsers_PendingInvitations_Read([DataSourceRequest] DataSourceRequest request)
         {
-            var organizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var organizationRegulatoryProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var invitations = _invitationService.GetInvitationsForOrgRegProgram(organizationRegulatoryProgramId, organizationRegulatoryProgramId);
 
             var viewModels = invitations.Select(vm => new PendingInvitationViewModel
@@ -743,12 +746,12 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var user = _userService.GetOrganizationRegulatoryProgramUser(id);
             var userQuesAns = _questionAnswerService.GetUsersQuestionAnswers(user.UserProfileId, QuestionTypeName.SQ);
-            var currentUserRole = _sessionCache.GetClaimValue(CacheKey.UserRole) ?? "";
-            var currentUserProfileId = _sessionCache.GetClaimValue(CacheKey.UserProfileId);
+            var currentUserRole = _httpContextService.GetClaimValue(CacheKey.UserRole) ?? "";
+            var currentUserProfileId = _httpContextService.GetClaimValue(CacheKey.UserProfileId);
 
             ViewBag.HasPermissionForUpdate = currentUserRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString()) &&
                 !currentUserProfileId.IsCaseInsensitiveEqual(user.UserProfileId.ToString());
-            ViewBag.HasPermissionForChangeRole= currentUserRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString());
+            ViewBag.HasPermissionForChangeRole = currentUserRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString());
 
             var viewModel = new AuthorityUserViewModel
             {
@@ -803,9 +806,25 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(model);
         }
 
+        private string GetClaimValue(string key)
+        {
+            var claims = ((System.Security.Claims.ClaimsPrincipal) HttpContext.User).Claims;
+            var claim = claims.SingleOrDefault(i => i.Type == key);
+            if (claim != null)
+            {
+                return claim.Value;
+            }
+
+            return "";
+
+            //_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)
+        }
+
         public ActionResult Industries_Read([DataSourceRequest] DataSourceRequest request, string searchString)
         {
-            int currentOrganizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            int currentOrganizationRegulatoryProgramId = int.Parse(GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+            // int currentOrganizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var industries = _organizationService.GetChildOrganizationRegulatoryPrograms(currentOrganizationRegulatoryProgramId, searchString);
 
             var viewModels = industries.Select(vm => new IndustryViewModel
@@ -879,7 +898,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
         }
         #endregion
-        
+
         #region Show Industry Details
 
         // GET: /Authority/IndustryDetails
@@ -931,7 +950,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private IndustryViewModel PrepareIndustryDetails(int id)
         {
             var industry = _organizationService.GetOrganizationRegulatoryProgram(id);
-            var userRole = _sessionCache.GetClaimValue(CacheKey.UserRole) ?? "";
+            var userRole = _httpContextService.GetClaimValue(CacheKey.UserRole) ?? "";
 
             var viewModel = new IndustryViewModel
             {
@@ -973,7 +992,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return View();
         }
-        
+
         public ActionResult IndustryUsers_Read([DataSourceRequest] DataSourceRequest request, string industryId)
         {
             var organizationRegulatoryProgramId = int.Parse(industryId);
@@ -1015,7 +1034,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return Json(result);
         }
-        
+
         [AcceptVerbs(HttpVerbs.Post)]
         public ActionResult IndustryUsers_Select(IEnumerable<IndustryUserViewModel> items)
         {
@@ -1052,11 +1071,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                 });
             }
         }
-        
+
         public ActionResult IndustryUsers_PendingInvitations_Read([DataSourceRequest] DataSourceRequest request, string industryId)
         {
             var industryOrgRegProgramId = int.Parse(industryId);
-            int senderOrgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            int senderOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var invitations = _invitationService.GetInvitationsForOrgRegProgram(senderOrgRegProgramId, industryOrgRegProgramId);
 
             var viewModels = invitations.Select(vm => new PendingInvitationViewModel
@@ -1107,13 +1126,13 @@ namespace Linko.LinkoExchange.Web.Controllers
             return Json(items.ToDataSourceResult(request, ModelState));
         }
         #endregion
-        
+
         #region Show Industry User Details
 
         // GET: /Authority/IndustryUserDetails
         [Route("Industry/{iid:int}/User/{id:int}/Details")]
         [AuthorizeCorrectAuthorityOnly(true)]
-        public ActionResult IndustryUserDetails(int iid , int id)
+        public ActionResult IndustryUserDetails(int iid, int id)
         {
             IndustryUserViewModel viewModel = PrepareIndustryUserDetails(id);
 
@@ -1297,9 +1316,9 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public ActionResult PendingUserApprovals_Read([DataSourceRequest] DataSourceRequest request)
         {
-            var organizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var organizationRegulatoryProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var users = _userService.GetPendingRegistrationProgramUsers(organizationRegulatoryProgramId);
-            
+
             var viewModels = users.Select(vm => new PendingUserApprovalViewModel
             {
                 Id = vm.OrganizationRegulatoryProgramUserId,
@@ -1370,7 +1389,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
         }
         #endregion
-        
+
         #region Show Pending User Approval Details
 
         // GET: /Authority/PendingUserApprovals
@@ -1386,7 +1405,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [ValidateAntiForgeryToken]
         [Route("PendingUserApprovals/{id:int}/Details/PendingUserApprove")]
         [AuthorizeCorrectAuthorityOnly(true)]
-        public ActionResult PendingUserApprove( int id, PendingUserApprovalViewModel model)
+        public ActionResult PendingUserApprove(int id, PendingUserApprovalViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -1501,24 +1520,24 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             viewModel.AvailableRoles.Insert(index: 0, item: new SelectListItem { Text = "Select User Role", Value = "0" });
 
-            var currentUserRole = _sessionCache.GetClaimValue(CacheKey.UserRole) ?? "";
+            var currentUserRole = _httpContextService.GetClaimValue(CacheKey.UserRole) ?? "";
             ViewBag.HasPermissionForApproveDeny = false;
             if (viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Industry.ToString()))
             {
                 ViewBag.HasPermissionForApproveDeny = true;
             }
             else
-            { 
+            {
                 // For authority user registration request, only authority admin can approve 
                 if (currentUserRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString()))
                 {
                     ViewBag.HasPermissionForApproveDeny = true;
-                }  
+                }
             }
-             
+
             ViewBag.CanChangeRole = viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Authority.ToString());
 
-            if (viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Industry.ToString()) 
+            if (viewModel.Type.IsCaseInsensitiveEqual(OrganizationTypeName.Industry.ToString())
                 && (!viewModel.Role.HasValue || viewModel.Role.Value == 0))
             {
                 viewModel.Role = roles.Where(r => r.Name.IsCaseInsensitiveEqual(UserRole.Administrator.ToString())).First().PermissionGroupId;

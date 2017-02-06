@@ -1,4 +1,5 @@
 ﻿using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Web.ViewModels.Authority;
@@ -17,12 +18,14 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IInvitationService _invitationService;
         private readonly ISessionCache _sessionCache;
         private readonly ILogger _logger;
+        private readonly IHttpContextService _httpContextService;
 
-        public InviteController(IInvitationService invitationService, ISessionCache sessionCache, ILogger logger)
+        public InviteController(IInvitationService invitationService, ISessionCache sessionCache, ILogger logger, IHttpContextService httpContextService)
         {
             _invitationService = invitationService;
             _sessionCache = sessionCache;
             _logger = logger;
+            _httpContextService = httpContextService;
         }
 
         public ActionResult Invite(string industryOrgRegProgramId, string invitationType)
@@ -33,7 +36,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 model.OrgRegProgramId = Convert.ToInt32(industryOrgRegProgramId);
             }
 
-            model.InvitationType = (InvitationType)Enum.Parse(typeof(InvitationType), invitationType);
+            model.InvitationType = (InvitationType) Enum.Parse(typeof(InvitationType), invitationType);
             return View(model);
         }
 
@@ -43,7 +46,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             int orgRegProgramId;
             if (String.IsNullOrEmpty(orgRegProgramIdString) || int.Parse(orgRegProgramIdString) < 1)
             {
-                orgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+                orgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             }
             else
             {
@@ -75,7 +78,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 };
 
                 viewModel.ExistingUsers = new List<InviteExistingUserViewModel>();
-                foreach (var distinctExistingUser in 
+                foreach (var distinctExistingUser in
                     foundUsers.ExistingUsersDifferentPrograms
                     .GroupBy(user => user.UserProfileId)
                     .Select(user => user.First())
@@ -107,7 +110,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return View(viewModel);
             }
 
-            var orgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var orgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             if (viewModel.OrgRegProgramId > 0)
             {
                 //Inviting Admin user to UI
@@ -149,8 +152,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult InviteExistingUser(string orgRegProgUserIdString, string industryOrgRegProgramId, string invitationType)
         {
             var orgRegProgramUserId = int.Parse(orgRegProgUserIdString);
-            var orgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            InvitationType thisInvitationType = (InvitationType)Enum.Parse(typeof(InvitationType), invitationType);
+            var orgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            InvitationType thisInvitationType = (InvitationType) Enum.Parse(typeof(InvitationType), invitationType);
             if (!String.IsNullOrEmpty(industryOrgRegProgramId) && int.Parse(industryOrgRegProgramId) > 0)
             {
                 //Inviting Admin user to UI

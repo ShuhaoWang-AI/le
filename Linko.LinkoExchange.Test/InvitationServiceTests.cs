@@ -38,7 +38,7 @@ namespace Linko.LinkoExchange.Test
         Mock<ApplicationUserManager> _userManager;
         Mock<IQuestionAnswerService> _qaService;
         Mock<IHttpContextService> _httpContext;
-        
+
         Mock<ILogger> _logger;
         Mock<ICromerrAuditLogService> _cromerrLogger;
 
@@ -51,7 +51,7 @@ namespace Linko.LinkoExchange.Test
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             _sessionCache = new Mock<ISessionCache>();
-            _sessionCache.Setup(x => x.GetClaimValue(It.IsAny<string>())).Returns("1");
+            _httpContext.Setup(x => x.GetClaimValue(It.IsAny<string>())).Returns("1");
             _orgService = new Mock<IOrganizationService>();
             _timeZones = new Mock<ITimeZoneService>();
             _userManager = new Mock<ApplicationUserManager>();
@@ -82,9 +82,9 @@ namespace Linko.LinkoExchange.Test
                                 _cromerrLogger.Object),
                 _requestCache,//new RequestCache(),
                 _emailService,
-                new OrganizationService(new LinkoExchangeContext(connectionString), 
+                new OrganizationService(new LinkoExchangeContext(connectionString),
                                         new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper()),
-                                        new HttpContextService(), 
+                                        new HttpContextService(),
                                         new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), new MapHelper()),
                                         _httpContext.Object,
                                         _timeZones.Object,
@@ -100,13 +100,15 @@ namespace Linko.LinkoExchange.Test
         public void CreateInvitation()
         {
             invitationService.CreateInvitation(new InvitationDto()
-                                                        { EmailAddress = "test@test.com",
-                                                         FirstName = "Ryan",
-                                                         LastName = "Lee",
-                                                         InvitationId = Guid.NewGuid().ToString(),
-                                                         InvitationDateTimeUtc = DateTimeOffset.Now,
-                                                         SenderOrganizationRegulatoryProgramId = 1,
-                                                         RecipientOrganizationRegulatoryProgramId = 1});
+            {
+                EmailAddress = "test@test.com",
+                FirstName = "Ryan",
+                LastName = "Lee",
+                InvitationId = Guid.NewGuid().ToString(),
+                InvitationDateTimeUtc = DateTimeOffset.Now,
+                SenderOrganizationRegulatoryProgramId = 1,
+                RecipientOrganizationRegulatoryProgramId = 1
+            });
         }
 
         [TestMethod]

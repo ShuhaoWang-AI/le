@@ -17,7 +17,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="kbqQuestions">KBQ question and answers</param>
         /// <param name="registrationType">Registration type</param>
         /// <returns></returns>
-        Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions, RegistrationType registrationType); 
+        Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions, RegistrationType registrationType);
 
         // Change or reset password
         /// <summary>
@@ -61,9 +61,9 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// Set current user's additional claims, such as current organizationId, current authorityId, current programId
         /// </summary>
         /// <param name="claims">The claims to set</param>
-        void SetCurrentUserClaims(IDictionary<string,string> claims);
+        void SetCurrentUserClaims(IDictionary<string, string> claims);
 
-        void UpdateClaim(string key, string value); 
+        void UpdateClaim(string key, string value);
 
         IList<Claim> GetClaims();
         //sign off

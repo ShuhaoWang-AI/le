@@ -36,8 +36,8 @@ namespace Linko.LinkoExchange.Services.User
         private readonly ISessionCache _sessionCache;
         private readonly IOrganizationService _orgService;
         private readonly IRequestCache _requestCache;
-        private readonly IDictionary<SystemSettingType, string> _globalSettings;  
-        private readonly ITimeZoneService _timeZones; 
+        private readonly IDictionary<SystemSettingType, string> _globalSettings;
+        private readonly ITimeZoneService _timeZones;
         private readonly IQuestionAnswerService _questionAnswerServices;
         private readonly ILogger _logService;
         private readonly IMapHelper _mapHelper;
@@ -63,7 +63,7 @@ namespace Linko.LinkoExchange.Services.User
             _orgService = orgService;
             _requestCache = requestCache;
             _globalSettings = _settingService.GetGlobalSettings();
-            _timeZones = timeZones; 
+            _timeZones = timeZones;
             _questionAnswerServices = questionAnswerServices;
             _logService = logService;
             _mapHelper = mapHelper;
@@ -151,7 +151,7 @@ namespace Linko.LinkoExchange.Services.User
         {
             var dtos = new List<OrganizationRegulatoryProgramUserDto>();
             var users = _dbContext.OrganizationRegulatoryProgramUsers.Where(u => u.OrganizationRegulatoryProgramId == orgRegProgramId);
-            
+
             if (isRegApproved.HasValue)
                 users = users.Where(u => u.IsRegistrationApproved == isRegApproved);
             if (isRegDenied.HasValue)
@@ -166,7 +166,7 @@ namespace Linko.LinkoExchange.Services.User
                 var dto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user);
                 //manually map user profile child
                 var userProfileDto = GetUserProfileById(user.UserProfileId);
-                
+
                 //Need to modify datetime to local
                 dto.RegistrationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(dto.RegistrationDateTimeUtc.Value.DateTime, orgRegProgramId);
                 userProfileDto.CreationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userProfileDto.CreationDateTimeUtc.Value.DateTime, orgRegProgramId);
@@ -194,7 +194,7 @@ namespace Linko.LinkoExchange.Services.User
 
             return _dbContext.SaveChanges();
         }
-        
+
         public void UpdateUserState(int orgRegProgUserId, bool? isRegApproved, bool? isRegDenied, bool? isEnabled, bool? isRemoved)
         {
             OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
@@ -236,7 +236,7 @@ namespace Linko.LinkoExchange.Services.User
             user.PermissionGroupId = permissionGroupId;
             _dbContext.SaveChanges();
 
-            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
             var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
                 .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
             var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
@@ -336,7 +336,7 @@ namespace Linko.LinkoExchange.Services.User
             cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
             cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
             cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-            
+
 
             _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
 
@@ -464,7 +464,7 @@ namespace Linko.LinkoExchange.Services.User
             //
             //Case "Authority Reset Authority" : sender org reg program is same as target/recipient org reg program
             //Case "Authority Reset Industry" : sender org reg program is different than target/recipient org reg program
-            int senderOrgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            int senderOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var newInvitation = _dbContext.Invitations.Create();
             newInvitation.InvitationId = token;
             newInvitation.InvitationDateTimeUtc = DateTimeOffset.Now;
@@ -486,7 +486,7 @@ namespace Linko.LinkoExchange.Services.User
             _emailService.SendEmail(new[] { user.Email }, EmailType.Profile_ResetProfileRequired, contentReplacements);
 
             //Log to Cromerr
-            int actorOrgRegProgUserId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            int actorOrgRegProgUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
             var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
                 .Include("OrganizationRegulatoryProgram")
                 .Single(u => u.OrganizationRegulatoryProgramUserId == actorOrgRegProgUserId);
@@ -542,7 +542,7 @@ namespace Linko.LinkoExchange.Services.User
             {
                 //Find admin users in each of these
                 var admins = _dbContext.OrganizationRegulatoryProgramUsers
-                    .Where(o => o.PermissionGroup.Name == "Administrator" 
+                    .Where(o => o.PermissionGroup.Name == "Administrator"
                     && o.OrganizationRegulatoryProgramId == program.OrganizationRegulatoryProgramId);
                 foreach (var admin in admins.ToList())
                 {
@@ -557,7 +557,7 @@ namespace Linko.LinkoExchange.Services.User
                 }
 
                 //Get authority's org id, if it exists. If not, they ARE the authority
-                int authorityOrganizationId = program.RegulatorOrganizationId.HasValue ? 
+                int authorityOrganizationId = program.RegulatorOrganizationId.HasValue ?
                     program.RegulatorOrganizationId.Value : program.OrganizationId;
 
                 //Find distinct authorities
@@ -568,7 +568,7 @@ namespace Linko.LinkoExchange.Services.User
                     authorityList.Add(authority);
             }
 
-         
+
             foreach (var authority in authorityList)
             {
                 //Find admin users in each of these
@@ -602,7 +602,7 @@ namespace Linko.LinkoExchange.Services.User
                     _emailService.SendEmail(new[] { user.Email }, EmailType.UserAccess_AccountLockOut, contentReplacements);
 
                 }
-            
+
             }
 
             if (reason != AccountLockEvent.ManualAction)
@@ -643,7 +643,8 @@ namespace Linko.LinkoExchange.Services.User
 
             user.IsAccountLocked = isAttemptingLock;
 
-            try {
+            try
+            {
                 _dbContext.SaveChanges();
 
             }
@@ -718,7 +719,7 @@ namespace Linko.LinkoExchange.Services.User
                     || cromerrEvent == CromerrEvent.UserAccess_ManualAccountUnlock)
                 {
                     //Different actor user
-                    thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+                    thisUserOrgRegProgUserId = Convert.ToInt32(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
                 }
                 else
                 {
@@ -771,7 +772,7 @@ namespace Linko.LinkoExchange.Services.User
             _logService.Info($"EnableDisableUserAccount. OrgRegProgUserId={orgRegProgramUserId}, IsAttemptingDisable={isAttemptingDisable}...");
 
             //Check user is not THIS user's own account
-            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
             if (orgRegProgramUserId == thisUserOrgRegProgUserId)
             {
                 _logService.Info($"EnableDisableUserAccount. OrgRegProgUserId={orgRegProgramUserId}, IsAttemptingDisable={isAttemptingDisable}... CannotUpdateOwnAccount.");
@@ -853,7 +854,7 @@ namespace Linko.LinkoExchange.Services.User
         public bool RemoveUser(int orgRegProgUserId)
         {
             //Ensure this is not the calling User's account
-            int thisUsersOrgRegProgUserId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            int thisUsersOrgRegProgUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
             if (thisUsersOrgRegProgUserId == orgRegProgUserId)
                 return false;
 
@@ -968,17 +969,17 @@ namespace Linko.LinkoExchange.Services.User
                 string.IsNullOrWhiteSpace(userProfile.CityName) ||
                 string.IsNullOrWhiteSpace(userProfile.ZipCode) ||
                 string.IsNullOrWhiteSpace(userProfile.Email) ||
-                string.IsNullOrWhiteSpace(userProfile.UserName) 
+                string.IsNullOrWhiteSpace(userProfile.UserName)
                )
             {
                 return RegistrationResult.BadUserProfileData;
-            } 
+            }
 
             return RegistrationResult.Success;
         }
 
         public RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions)
-        { 
+        {
             if (userProfile == null ||
                 string.IsNullOrWhiteSpace(userProfile.FirstName) ||
                 string.IsNullOrWhiteSpace(userProfile.LastName) ||
@@ -1087,7 +1088,7 @@ namespace Linko.LinkoExchange.Services.User
             _emailService.SendEmail(new[] { oldEmailAddress }, EmailType.Profile_EmailChanged, contentReplacements);
             _emailService.SendEmail(new[] { newEmailAddress }, EmailType.Profile_EmailChanged, contentReplacements);
 
-            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
             var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
                 .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
             var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
@@ -1137,7 +1138,7 @@ namespace Linko.LinkoExchange.Services.User
             bool isApproved)
         {
             var user = _dbContext.OrganizationRegulatoryProgramUsers
-                .SingleOrDefault(u => u.UserProfileId == userProfileId && u.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId); 
+                .SingleOrDefault(u => u.UserProfileId == userProfileId && u.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId);
 
             if (user == null) return;
 
@@ -1160,7 +1161,7 @@ namespace Linko.LinkoExchange.Services.User
                 user.IsRegistrationApproved = isApproved;
                 user.IsRegistrationDenied = true;
             }
-            _dbContext.SaveChanges(); 
+            _dbContext.SaveChanges();
         }
 
         public void UpdateOrganizationRegulatoryProgramUserRole(int orgRegProgUserId, int permissionGroupId)
@@ -1193,7 +1194,7 @@ namespace Linko.LinkoExchange.Services.User
 
                 //Is the logged in actor user in the set of IU admins?
                 var isCurrentUserIUAdmin = false;
-                int loggedInUsersOrgRegProgUserId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+                int loggedInUsersOrgRegProgUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
                 if (IUAdmins != null && IUAdmins.Any(x => x.OrganizationRegulatoryProgramUserId == loggedInUsersOrgRegProgUserId))
                 {
                     //Logged in user is one of the IU Admins
@@ -1258,7 +1259,7 @@ namespace Linko.LinkoExchange.Services.User
                 UpdateOrganizationRegulatoryProgramUserRole(orgRegProgUserId, permissionGroupId);
                 transaction.Commit();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 transaction.Rollback();
                 throw ex;
@@ -1328,7 +1329,7 @@ namespace Linko.LinkoExchange.Services.User
             _emailService.SendEmail(new[] { programUser.UserProfileDto.Email }, emailType, contentReplacements);
 
             //Cromerr log
-            int thisUserOrgRegProgUserId = Convert.ToInt32(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
             var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
                 .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
             var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);

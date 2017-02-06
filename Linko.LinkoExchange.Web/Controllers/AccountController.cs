@@ -26,11 +26,12 @@ using Linko.LinkoExchange.Web.ViewModels.User;
 using Linko.LinkoExchange.Web.shared;
 using NLog;
 using Linko.LinkoExchange.Web.Mapping;
+using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
     [RoutePrefix("Account")]
-    [Route("{action=Index}")] 
+    [Route("{action=Index}")]
     public class AccountController : Controller
     {
         #region constructor
@@ -48,21 +49,24 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly ISessionCache _sessionCache;
         private readonly ProfileHelper profileHelper;
         private readonly IMapHelper _mapHelper;
+        private readonly IHttpContextService _httpContextService;
 
         public AccountController(
 
-            IAuthenticationService authenticationService, 
+            IAuthenticationService authenticationService,
             IOrganizationService organizationService,
-            IQuestionAnswerService questionAnswerService, 
-            IRequestCache requestCache, 
-            ILogger logger, 
+            IQuestionAnswerService questionAnswerService,
+            IRequestCache requestCache,
+            ILogger logger,
             IUserService userService,
             IInvitationService invitationService,
-            IJurisdictionService jurisdictionService, 
+            IJurisdictionService jurisdictionService,
             ISettingService settingService,
             IProgramService programService,
             ISessionCache sessionCache,
-            IMapHelper mapHelper)
+            IMapHelper mapHelper,
+            IHttpContextService httpContextService
+            )
         {
             _authenticationService = authenticationService;
             _organizationService = organizationService;
@@ -76,7 +80,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             _programService = programService;
             _sessionCache = sessionCache;
             _mapHelper = mapHelper;
-            profileHelper = new ProfileHelper(questionAnswerService, sessionCache, userService, jurisdictionService, mapHelper);
+            _httpContextService = httpContextService;
+            profileHelper = new ProfileHelper(questionAnswerService, sessionCache, userService, jurisdictionService, mapHelper, httpContextService);
         }
 
         #endregion
@@ -101,7 +106,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             var model = new RegistrationViewModel();
-            model.Email = invitation.EmailAddress; 
+            model.Email = invitation.EmailAddress;
             model.UserProfile = new UserProfileViewModel();
             model.UserProfile.StateList = GetStateList();
             model.UserKBQ = new UserKBQViewModel();
@@ -111,12 +116,12 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             model.ProgramName = invitation.ProgramName;
             model.IndustryName = invitation.IndustryName;
-            model.AuthorityName = invitation.AuthorityName; 
-             
+            model.AuthorityName = invitation.AuthorityName;
+
             model.UserProfile.FirstName = invitation.FirstName;
             model.UserProfile.LastName = invitation.LastName;
             model.UserProfile.Email = invitation.EmailAddress;
- 
+
             var user = _userService.GetUserProfileByEmail(invitation.EmailAddress);
             if (user == null)
             {
@@ -129,22 +134,22 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             else
             {
-                model.RegistrationType = RegistrationType.ReRegistration; 
-                
+                model.RegistrationType = RegistrationType.ReRegistration;
+
                 //TODO fill out the kbq questions and security questions 
                 model.UserProfile = profileHelper.GetUserProfileViewModel(user.UserProfileId);
                 model.UserKBQ = profileHelper.GetUserKbqViewModel(user.UserProfileId);
-                model.UserSQ  = profileHelper.GetUserSecurityQuestionViewModel(user.UserProfileId);
+                model.UserSQ = profileHelper.GetUserSecurityQuestionViewModel(user.UserProfileId);
                 // For re-registration, set the kbq questions to be **** so that we do not display guly hashed string.
                 model.UserKBQ.KBQAnswer1 = "**********";
                 model.UserKBQ.KBQAnswer2 = "**********";
                 model.UserKBQ.KBQAnswer3 = "**********";
                 model.UserKBQ.KBQAnswer4 = "**********";
-                model.UserKBQ.KBQAnswer5 = "**********"; 
+                model.UserKBQ.KBQAnswer5 = "**********";
 
                 // For Registration, we don't update anything to the user's profile, put a fake password here only to by pass the data validation. 
                 model.UserProfile.Password = "abcdnxtZ1";
-                model.AgreeTermsAndConditions = false; 
+                model.AgreeTermsAndConditions = false;
             }
 
             model.Token = token;
@@ -227,7 +232,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 case RegistrationResult.Success:
                     _logger.Info($"Registration successfully completed. Email={userDto.Email}, FirstName={userDto.FirstName}, LastName={userDto.LastName}.");
-                    
+
                     var authorityProgramSettings = _settingService.GetAuthorityProgramSettingsById(invitation.RecipientOrganizationRegulatoryProgramId);
                     string authorityName = authorityProgramSettings.Settings.Where(s => s.TemplateName.Equals(SettingType.EmailContactInfoName)).First().Value;
                     string authorityEmail = authorityProgramSettings.Settings.Where(s => s.TemplateName.Equals(SettingType.EmailContactInfoEmailAddress)).First().Value;
@@ -249,12 +254,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                     messageBody += $"<p>If you have questions or concerns, please contact {authorityName} at {authorityEmail} or {authorityPhone}.</p>";
 
                     return View(viewName: "Confirmation",
-                        model: new ConfirmationViewModel() {
+                        model: new ConfirmationViewModel()
+                        {
                             Title = $"Thanks for Registering {model.UserProfile.FirstName} {model.UserProfile.LastName}!",
                             HtmlStr = messageBody
-                        }); 
+                        });
 
-                case RegistrationResult.BadUserProfileData: 
+                case RegistrationResult.BadUserProfileData:
                     ViewBag.inValidProfile = true;
                     ModelState.AddModelError(key: "", errorMessage: "Invalid user profile data.");
                     break;
@@ -285,11 +291,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                 case RegistrationResult.MissingSecurityQuestion:
                     ViewBag.inValidSQ = true;
                     ModelState.AddModelError(key: "", errorMessage: "Not enough security questions.");
-                    break; 
+                    break;
                 case RegistrationResult.DuplicatedSecurityQuestionAnswer:
                     ViewBag.inValidSQ = true;
                     ModelState.AddModelError(key: "", errorMessage: "Security question answers can not be duplicated.");
-                    break; 
+                    break;
                 case RegistrationResult.BadKBQAndAnswer:
                     ViewBag.inValidKBQ = true;
                     ModelState.AddModelError(key: "", errorMessage: "Invalid knowledge based question and answers.");
@@ -303,15 +309,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                     ModelState.AddModelError(key: "", errorMessage: "Email is being used by another person, please change a different one.");
                     break;
                 default:
-                    break; 
+                    break;
             }
 
-             _logger.Info($"Registration failed. Email={userDto.Email}, FirstName={userDto.FirstName}, LastName={userDto.LastName}, Result={result.Result.ToString()}");
+            _logger.Info($"Registration failed. Email={userDto.Email}, FirstName={userDto.FirstName}, LastName={userDto.LastName}, Result={result.Result.ToString()}");
             return View(model);
-         } 
+        }
 
         #endregion
-        
+
         #region default action
 
         [AllowAnonymous]
@@ -330,7 +336,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         #endregion
 
         #region sign in action
-        
+
         // GET: Account/SignIn
         [AllowAnonymous]
         public ActionResult SignIn(string returnUrl)
@@ -653,7 +659,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
         }
         #endregion
-        
+
         #region forgot password action
 
         // GET: /Account/ForgotPassword
@@ -801,7 +807,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 ViewBag.PostedToAction = "ResetPassword";
                 return View(model);
             }
-        } 
+        }
 
         //
         // POST: /Account/ResetPassword
@@ -894,11 +900,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             var userQuestion = _questionAnswerService.GetRandomQuestionAnswerFromUserProfileId(userProfileId, QuestionTypeName.KBQ);
 
             ResetPasswordViewModel model = new ResetPasswordViewModel();
-           
+
             model.Id = userQuestion.Answer.UserQuestionAnswerId.Value;
             model.Question = userQuestion.Question.Content;
             model.UserProfileId = userProfileId;
-            model.OwinUserId = TempData["OwinUserId"].ToString(); 
+            model.OwinUserId = TempData["OwinUserId"].ToString();
             model.Answer = "";
             model.Password = "";
             model.ConfirmPassword = "";
@@ -960,7 +966,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 return View(viewName: "ResetPassword", model: model);
             }
- 
+
             var result = _authenticationService.ChangePasswordAsync(model.OwinUserId, model.Password).Result;
             if (result.Success)
             {
@@ -968,7 +974,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 TempData["Message"] = "Change password succeeded.";
                 return RedirectToAction(actionName: "ChangeAccountSucceed");
             }
-            var errorMessage = result.Errors.Aggregate((i, j) => {
+            var errorMessage = result.Errors.Aggregate((i, j) =>
+            {
                 return i + j;
             });
             ModelState.AddModelError(string.Empty, errorMessage: errorMessage);
@@ -999,7 +1006,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             else
             {
-                var model = new ChangePasswordViewModel(); 
+                var model = new ChangePasswordViewModel();
                 return View(model);
             }
         }
@@ -1007,11 +1014,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         public ActionResult ChangePassword(ChangePasswordViewModel model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(model);
             }
-            
+
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var userId = claimsIdentity.Claims.First(i => i.Type == CacheKey.OwinUserId).Value;
 
@@ -1022,9 +1029,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                 TempData["Message"] = "Change password succeeded.";
                 return RedirectToAction(actionName: "ChangeAccountSucceed");
             }
-            var errorMessage = result.Errors.Aggregate((i, j) => { return i + j; }); 
+            var errorMessage = result.Errors.Aggregate((i, j) => { return i + j; });
             ModelState.AddModelError(string.Empty, errorMessage: errorMessage);
-            return View(model); 
+            return View(model);
         }
 
         [Authorize]
@@ -1032,8 +1039,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var userId = claimsIdentity.Claims.First(i => i.Type == CacheKey.OwinUserId).Value;
-            var email = claimsIdentity.Claims.First(i => i.Type == CacheKey.Email).Value; 
-          
+            var email = claimsIdentity.Claims.First(i => i.Type == CacheKey.Email).Value;
+
             if (NeedToValidKbq())
             {
                 return RedirectToAction("KbqChallenge", new { returnUrl = Request.Url.ToString() });
@@ -1072,7 +1079,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (!result)
             {
                 ViewBag.inValidData = true;
-                ModelState.AddModelError(string.Empty, errorMessage: "Change email address failed."); 
+                ModelState.AddModelError(string.Empty, errorMessage: "Change email address failed.");
 
                 return View(model);
             }
@@ -1084,7 +1091,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 TempData["Message"] = "Change email address succeeded.";
                 return RedirectToAction(actionName: "ChangeAccountSucceed");
             }
-            
+
         }
 
         public ActionResult KbqChallenge(string returnUrl)
@@ -1093,12 +1100,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
             var userProfileId = int.Parse(profileIdStr);
 
-            KbqChallengeViewModel kbqChallange = new KbqChallengeViewModel(); 
-            var questionAndAnswer = _questionAnswerService.GetRandomQuestionAnswerFromUserProfileId(userProfileId, QuestionTypeName.KBQ); 
+            KbqChallengeViewModel kbqChallange = new KbqChallengeViewModel();
+            var questionAndAnswer = _questionAnswerService.GetRandomQuestionAnswerFromUserProfileId(userProfileId, QuestionTypeName.KBQ);
 
             kbqChallange.Question = questionAndAnswer.Question.Content;
             kbqChallange.QuestionAnswerId = questionAndAnswer.Answer.UserQuestionAnswerId.Value;
-            ViewBag.returnUrl = returnUrl; 
+            ViewBag.returnUrl = returnUrl;
 
             return View(kbqChallange);
         }
@@ -1109,23 +1116,23 @@ namespace Linko.LinkoExchange.Web.Controllers
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
             var userProfileId = int.Parse(profileIdStr);
-            ViewBag.returnUrl = returnUrl; 
+            ViewBag.returnUrl = returnUrl;
 
             if (!_questionAnswerService.ConfirmCorrectAnswer(model.QuestionAnswerId, model.Answer.ToLower()))
             {
-                model.FailedCount++; 
+                model.FailedCount++;
                 int maxAnswerAttempts = Convert.ToInt32(_settingService.GetOrganizationSettingValueByUserId(userProfileId, SettingType.FailedKBQAttemptMaxCount, true, null));
                 if (maxAnswerAttempts <= model.FailedCount)
                 {
                     // Logout user
-                    _authenticationService.SignOff(); 
+                    _authenticationService.SignOff();
 
                     // Lock the account; 
                     var result = _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringProfileAccess);
                     if (result.IsSuccess)
                     {
                         _logger.Info(string.Format(format: "KBQ question. Failed to Answer KBQ Question {0} times. Account is locked. UserProfileId:{1}",
-                                     arg0: maxAnswerAttempts, arg1:userProfileId));
+                                     arg0: maxAnswerAttempts, arg1: userProfileId));
 
                         var regulatoryList = _organizationService.GetUserRegulators(userProfileId);
                         if (regulatoryList == null)
@@ -1141,7 +1148,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         _logger.Info(string.Format(format: "KBQ question. Failed to Answer KBQ Question {0} times. Failed to locked the Account. UserProfileId:{1}",
                                     arg0: maxAnswerAttempts, arg1: userProfileId));
-                    } 
+                    }
                 }
                 else
                 {
@@ -1178,7 +1185,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var kbqPass = TempData["KbqPass"] as string;
             var previousUri = HttpContext.Request.UrlReferrer;
-            return ( previousUri == null ||  previousUri.AbsolutePath.ToLower().IndexOf("user/profile") < 0 ) &&
+            return (previousUri == null || previousUri.AbsolutePath.ToLower().IndexOf("user/profile") < 0) &&
                    (string.IsNullOrWhiteSpace(kbqPass) || kbqPass != "true");
         }
 
@@ -1202,7 +1209,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private List<JurisdictionViewModel> GetStateList()
         {
-            var list = _jurisdictionService.GetStateProvs((int)(Country.USA));
+            var list = _jurisdictionService.GetStateProvs((int) (Country.USA));
             var stateList = new List<JurisdictionViewModel>();
             foreach (var jur in list)
             {

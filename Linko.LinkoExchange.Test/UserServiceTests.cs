@@ -55,7 +55,7 @@ namespace Linko.LinkoExchange.Test
             _httpContext.Setup(x => x.CurrentUserProfileId()).Returns(2);
 
             _sessionCache = new Mock<ISessionCache>();
-            _sessionCache.Setup(x => x.GetClaimValue(It.IsAny<string>())).Returns("2");
+            _httpContext.Setup(x => x.GetClaimValue(It.IsAny<string>())).Returns("2");
 
             _orgService = new Mock<IOrganizationService>();
             _orgService.Setup(x => x.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });
@@ -82,8 +82,8 @@ namespace Linko.LinkoExchange.Test
                 new PasswordHasher(), _httpContext.Object, _emailService, _realSettingService,
                 _sessionCache.Object, _realOrgService, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper(), _cromerrLogger.Object);
 
-            _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(), 
-                new PasswordHasher(), _httpContext.Object, _emailService, _settingService.Object, 
+            _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(),
+                new PasswordHasher(), _httpContext.Object, _emailService, _settingService.Object,
                 _sessionCache.Object, _orgService.Object, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper(), _cromerrLogger.Object);
         }
 
@@ -116,7 +116,7 @@ namespace Linko.LinkoExchange.Test
             _realUserService.ApprovePendingRegistration(orgRegProgUserId, permissionGroupId, false);
         }
 
-        
+
         [TestMethod]
         public void GetPendingRegistrationsProgramUsers()
         {

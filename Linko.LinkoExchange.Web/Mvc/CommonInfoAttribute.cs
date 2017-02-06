@@ -1,16 +1,17 @@
 ﻿using System.Web.Mvc;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {
     public class CommonInfoAttribute : ActionFilterAttribute
     {
         #region constructor
-        
-        private readonly ISessionCache _sessionCache; 
-        public CommonInfoAttribute(ISessionCache sessionCache)
-        {  
-            _sessionCache = sessionCache; 
+
+        private readonly IHttpContextService _httpContextService;
+        public CommonInfoAttribute(IHttpContextService httpContextService)
+        {
+            _httpContextService = httpContextService;
         }
 
         #endregion
@@ -21,11 +22,11 @@ namespace Linko.LinkoExchange.Web.Mvc
         {
             if (filterContext.HttpContext.User.Identity.IsAuthenticated)
             {
-                var portalName = _sessionCache.GetClaimValue(CacheKey.PortalName);
+                var portalName = _httpContextService.GetClaimValue(CacheKey.PortalName);
                 filterContext.Controller.ViewBag.PortalName = string.IsNullOrWhiteSpace(portalName) ? "" : portalName;
-                filterContext.Controller.ViewBag.OrganizationName = string.IsNullOrWhiteSpace(portalName) ? "" : _sessionCache.GetClaimValue(CacheKey.OrganizationName);
-                filterContext.Controller.ViewBag.UserName = _sessionCache.GetClaimValue(CacheKey.UserName);
-                filterContext.Controller.ViewBag.UserRole = _sessionCache.GetClaimValue(CacheKey.UserRole); 
+                filterContext.Controller.ViewBag.OrganizationName = string.IsNullOrWhiteSpace(portalName) ? "" : _httpContextService.GetClaimValue(CacheKey.OrganizationName);
+                filterContext.Controller.ViewBag.UserName = _httpContextService.GetClaimValue(CacheKey.UserName);
+                filterContext.Controller.ViewBag.UserRole = _httpContextService.GetClaimValue(CacheKey.UserRole);
             }
             else
             {

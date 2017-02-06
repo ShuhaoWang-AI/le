@@ -1,5 +1,7 @@
 ﻿using System;
 using Linko.LinkoExchange.Core.Extensions;
+using System.Security.Claims;
+using System.Linq;
 
 namespace Linko.LinkoExchange.Services
 {
@@ -18,6 +20,29 @@ namespace Linko.LinkoExchange.Services
         public void SetSessionValue(string key, object value)
         {
             System.Web.HttpContext.Current.Session[key] = value;
+        }
+
+        public string GetClaimValue(string claimType)
+        {
+            if (Current().User.Identity.IsAuthenticated)
+            {
+                var identity = Current().User.Identity as ClaimsIdentity;
+                var claims = identity.Claims.ToList();
+
+                var claim = claims.FirstOrDefault(i => i.Type == claimType);
+                if (claim != null)
+                {
+                    return claim.Value;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
 
         public string GetRequestBaseUrl()
@@ -66,7 +91,6 @@ namespace Linko.LinkoExchange.Services
             }
 
             return "";
-
         }
     }
 }

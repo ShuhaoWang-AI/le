@@ -18,6 +18,7 @@ using Linko.LinkoExchange.Web.ViewModels.Industry;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
 using Linko.LinkoExchange.Web.Mvc;
+using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -25,7 +26,7 @@ namespace Linko.LinkoExchange.Web.Controllers
     public class IndustryController : Controller
     {
         #region constructor
-        
+
         private readonly IOrganizationService _organizationService;
         private readonly IUserService _userService;
         private readonly IInvitationService _invitationService;
@@ -33,9 +34,10 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IPermissionService _permissionService;
         private readonly ISessionCache _sessionCache;
         private readonly ILogger _logger;
+        private readonly IHttpContextService _httpContextService;
 
         public IndustryController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService,
-            IQuestionAnswerService questionAnswerService, IPermissionService permissionService, ISessionCache sessionCache, ILogger logger)
+            IQuestionAnswerService questionAnswerService, IPermissionService permissionService, ISessionCache sessionCache, ILogger logger, IHttpContextService httpContextService)
         {
             _organizationService = organizationService;
             _userService = userService;
@@ -44,6 +46,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _permissionService = permissionService;
             _sessionCache = sessionCache;
             _logger = logger;
+            _httpContextService = httpContextService;
         }
 
         #endregion
@@ -63,7 +66,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route("Settings")]
         public ActionResult Settings()
         {
-            int currentOrganizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            int currentOrganizationRegulatoryProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var industry = _organizationService.GetOrganizationRegulatoryProgram(currentOrganizationRegulatoryProgramId);
 
             var viewModel = new IndustryViewModel
@@ -100,19 +103,19 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route("Users")]
         public ActionResult IndustryUsers()
         {
-            int id = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            int id = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var industry = _organizationService.GetOrganizationRegulatoryProgram(id);
             ViewBag.Title = string.Format(format: "{0} Users", arg0: industry.OrganizationDto.OrganizationName);
 
             var remainingUserLicenseCount = _organizationService.GetRemainingUserLicenseCount(id);
-            ViewBag.CanInvite = _sessionCache.GetClaimValue(CacheKey.UserRole).IsCaseInsensitiveEqual(UserRole.Administrator.ToString())
+            ViewBag.CanInvite = _httpContextService.GetClaimValue(CacheKey.UserRole).IsCaseInsensitiveEqual(UserRole.Administrator.ToString())
                                 && remainingUserLicenseCount > 0;
             return View();
         }
 
         public ActionResult IndustryUsers_Read([DataSourceRequest] DataSourceRequest request)
         {
-            var organizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var organizationRegulatoryProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var users = _userService.GetUserProfilesForOrgRegProgram(organizationRegulatoryProgramId, isRegApproved: true, isRegDenied: false, isEnabled: null, isRemoved: false);
 
             var viewModels = users.Select(vm => new IndustryUserViewModel
@@ -188,7 +191,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public ActionResult IndustryUsers_PendingInvitations_Read([DataSourceRequest] DataSourceRequest request)
         {
-            var organizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var organizationRegulatoryProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var invitations = _invitationService.GetInvitationsForOrgRegProgram(organizationRegulatoryProgramId, organizationRegulatoryProgramId);
 
             var viewModels = invitations.Select(vm => new PendingInvitationViewModel
@@ -358,8 +361,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var user = _userService.GetOrganizationRegulatoryProgramUser(id);
             var userQuesAns = _questionAnswerService.GetUsersQuestionAnswers(user.UserProfileId, QuestionTypeName.SQ);
-            var currentUserRole = _sessionCache.GetClaimValue(CacheKey.UserRole) ?? "";
-            var currentUserProfileId = _sessionCache.GetClaimValue(CacheKey.UserProfileId);
+            var currentUserRole = _httpContextService.GetClaimValue(CacheKey.UserRole) ?? "";
+            var currentUserProfileId = _httpContextService.GetClaimValue(CacheKey.UserProfileId);
 
             ViewBag.HasPermissionForUpdate = currentUserRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString()) &&
                 !currentUserProfileId.IsCaseInsensitiveEqual(user.UserProfileId.ToString());
@@ -414,7 +417,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public ActionResult PendingUserApprovals_Read([DataSourceRequest] DataSourceRequest request)
         {
-            var organizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var organizationRegulatoryProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var users = _userService.GetPendingRegistrationProgramUsers(organizationRegulatoryProgramId);
 
             // TODO: Change service as not including industry users
@@ -616,9 +619,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             viewModel.AvailableRoles.Insert(index: 0, item: new SelectListItem { Text = "Select User Role", Value = "0" });
 
-            var currentUserRole = _sessionCache.GetClaimValue(CacheKey.UserRole) ?? "";
+            var currentUserRole = _httpContextService.GetClaimValue(CacheKey.UserRole) ?? "";
             ViewBag.HasPermissionForApproveDeny = currentUserRole.IsCaseInsensitiveEqual(UserRole.Administrator.ToString()); // TODO: call service when implement
-            
+
             return viewModel;
         }
         #endregion

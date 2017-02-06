@@ -6,6 +6,7 @@ using Microsoft.Practices.Unity;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Dto;
 using System.Configuration;
+using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {
@@ -17,7 +18,7 @@ namespace Linko.LinkoExchange.Web.Mvc
         [Dependency]
         public IUserService _userService { get; set; }
         [Dependency]
-        public ISessionCache _sessionCache { get; set; }
+        public IHttpContextService _httpContextService { get; set; }
 
         //If true   : passed in "id" is an Organization Regulatory Program User Id
         //If false  : passed in "id" is an Organization Regulatory Program Id (Industry)
@@ -68,7 +69,7 @@ namespace Linko.LinkoExchange.Web.Mvc
                 {
 
                     var targetUserDto = _userService.GetOrganizationRegulatoryProgramUser(targetOrgRegProgUserId.Value);
-                    int usersOrgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+                    int usersOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
                     if (usersOrgRegProgramId != _orgService.GetAuthority(targetUserDto.OrganizationRegulatoryProgramId).OrganizationRegulatoryProgramId)
                     {
                         //This is not the authorized Authority of this Industry User
@@ -79,7 +80,7 @@ namespace Linko.LinkoExchange.Web.Mvc
 
                 if (targetOrgRegProgramId.HasValue)
                 {
-                    int usersOrgRegProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+                    int usersOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
                     if (usersOrgRegProgramId != _orgService.GetAuthority(targetOrgRegProgramId.Value).OrganizationRegulatoryProgramId)
                     {
                         //This is not the authorized Authority of this Industry
@@ -89,7 +90,8 @@ namespace Linko.LinkoExchange.Web.Mvc
                 }
 
             }
-            else {
+            else
+            {
                 //This is not the authorized Authority if this Industry
                 isCorrectAuthority = false;
 

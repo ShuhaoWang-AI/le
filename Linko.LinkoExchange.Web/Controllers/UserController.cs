@@ -16,6 +16,7 @@ using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.ViewModels.User;
 using Linko.LinkoExchange.Web.shared;
 using Linko.LinkoExchange.Web.Mapping;
+using Linko.LinkoExchange.Services;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -26,6 +27,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IUserService _userService;
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IJurisdictionService _jurisdictionService;
+        private readonly IHttpContextService _httpContextService;
+
         private readonly string fakePassword = "********";
         private readonly ProfileHelper profileHelper;
         private readonly IMapHelper _mapHelper;
@@ -35,7 +38,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             ISessionCache sessionCache,
             IUserService userService,
             IJurisdictionService jurisdictionService,
-            IMapHelper mapHelper)
+            IMapHelper mapHelper,
+            IHttpContextService httpContextService
+            )
         {
             if (authenticateService == null) throw new ArgumentNullException("authenticateService");
             if (sessionCache == null) throw new ArgumentNullException("sessionCache");
@@ -47,8 +52,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             _jurisdictionService = jurisdictionService;
             _questionAnswerService = questAnswerService;
             _mapHelper = mapHelper;
+            _httpContextService = httpContextService;
 
-            profileHelper = new ProfileHelper(questAnswerService, sessionCache, userService, jurisdictionService, mapHelper);
+            profileHelper = new ProfileHelper(questAnswerService, sessionCache, userService, jurisdictionService, mapHelper, httpContextService);
         }
 
         // GET: UserDto
@@ -64,15 +70,15 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return View();
         }
-        
+
         public ActionResult DownloadSignatory()
         {
             var file = HostingEnvironment.MapPath(virtualPath: "~/Temp/GRESD Electronic Signature Agreement.pdf");
             var fileDownloadName = "GRESD Electronic Signature Agreement.pdf";
             var contentType = "application/pdf";
-            
+
             var fileStream = System.IO.File.OpenRead(file);
-            fileStream.Position = 0; 
+            fileStream.Position = 0;
             return File(fileStream, contentType, fileDownloadName);
         }
 
@@ -164,16 +170,16 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         private bool NeedToValidKbq()
-        {   
+        {
             var previousUri = HttpContext.Request.UrlReferrer;
-            return (previousUri == null || 
-                   (previousUri.AbsolutePath.ToLower().IndexOf(value: "account/changeaccountsucceed")< 0)  &&
-                   (previousUri.AbsolutePath.ToLower().IndexOf(value: "account/changeaccountsucceed")< 0) );
+            return (previousUri == null ||
+                   (previousUri.AbsolutePath.ToLower().IndexOf(value: "account/changeaccountsucceed") < 0) &&
+                   (previousUri.AbsolutePath.ToLower().IndexOf(value: "account/changeaccountsucceed") < 0));
         }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (filterContext.RouteData.Values["action"].ToString().ToLower() == "profile" 
+            if (filterContext.RouteData.Values["action"].ToString().ToLower() == "profile"
                 && Request.HttpMethod != "POST" && NeedToValidKbq())
             {
                 var kbqPass = TempData["KbqPass"] as string;
@@ -203,10 +209,10 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             ValidationContext context = null;
             var validationResult = new List<ValidationResult>();
-            bool isValid = true; 
-            
+            bool isValid = true;
+
             context = new ValidationContext(model.UserProfile, serviceProvider: null, items: null);
-            isValid = Validator.TryValidateObject(model.UserProfile, context, validationResult, validateAllProperties: true); 
+            isValid = Validator.TryValidateObject(model.UserProfile, context, validationResult, validateAllProperties: true);
 
             if (!isValid)
             {
@@ -215,7 +221,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             var userDto = _mapHelper.GetUserDtoFromUserProfileViewModel(model.UserProfile);
-            userDto.UserProfileId = userProfileId; 
+            userDto.UserProfileId = userProfileId;
 
             var validateResult = _userService.ValidateUserProfileData(userDto);
             if (validateResult == RegistrationResult.Success)
@@ -239,11 +245,11 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             ValidationContext context = null;
             var validationResult = new List<ValidationResult>();
-            bool isValid = true; 
+            bool isValid = true;
 
             context = new ValidationContext(model.UserKBQ, serviceProvider: null, items: null);
             isValid = Validator.TryValidateObject(model.UserKBQ, context, validationResult, validateAllProperties: true);
-            
+
             if (!isValid)
             {
                 ViewBag.inValidKBQ = true;
@@ -251,12 +257,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             pristineUserModel.UserKBQ.UserProfileId = userProfileId;
-            var kbqQuestionAnswers = GetPostedUserKbqQuestions(model.UserKBQ); 
+            var kbqQuestionAnswers = GetPostedUserKbqQuestions(model.UserKBQ);
             var validateResult = _questionAnswerService.ValidateUserKbqData(kbqQuestionAnswers);
             switch (validateResult)
             {
                 case RegistrationResult.Success:
-                    _questionAnswerService.CreateOrUpdateUserQuestionAnswers(userProfileId, kbqQuestionAnswers); 
+                    _questionAnswerService.CreateOrUpdateUserQuestionAnswers(userProfileId, kbqQuestionAnswers);
                     ViewBag.SaveKBQSuccessfull = true;
                     ViewBag.SuccessMessage = String.Format(format: "Save Knowledge Based Questions successfully.");
                     break;
@@ -276,7 +282,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     ModelState.AddModelError(string.Empty, errorMessage: "Missing Knowledge Based Question Answers");
                     ViewBag.inValidKBQ = true;
                     break;
-            }  
+            }
 
             return View(pristineUserModel);
         }
@@ -296,7 +302,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 ViewBag.inValidSQ = true;
                 return View(pristineUserModel);
-            } 
+            }
 
             pristineUserModel.UserSQ.UserProfileId = userProfileId;
 
@@ -305,7 +311,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             switch (result)
             {
                 case RegistrationResult.Success:
-                    _questionAnswerService.CreateOrUpdateUserQuestionAnswers(userProfileId, sqQuestionAnswers); 
+                    _questionAnswerService.CreateOrUpdateUserQuestionAnswers(userProfileId, sqQuestionAnswers);
                     ViewBag.SaveSQSuccessfull = true;
                     ViewBag.SuccessMessage = String.Format(format: "Save Security Questions successfully.");
                     break;
@@ -393,6 +399,6 @@ namespace Linko.LinkoExchange.Web.Controllers
             return kbqQuestionAnswers;
         }
 
-       
+
     }
 }
