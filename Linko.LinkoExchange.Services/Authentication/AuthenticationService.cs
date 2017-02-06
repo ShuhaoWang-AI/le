@@ -1032,7 +1032,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             //Need to log for all associated regulatory program orgs
             var orgRegProgUsers = _dbContext.OrganizationRegulatoryProgramUsers
                                     .Include("OrganizationRegulatoryProgram")
-                                    .Where(u => u.UserProfileId == user.UserProfileId);
+                                    .Where(u => u.UserProfileId == user.UserProfileId).ToList();
             foreach (var orgRegProgUser in orgRegProgUsers)
             {
                 var orgRegProgram = orgRegProgUser.OrganizationRegulatoryProgram;
