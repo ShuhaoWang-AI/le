@@ -766,11 +766,6 @@ namespace Linko.LinkoExchange.Services.Authentication
                     authenticationResult.Result = AuthenticationResult.UserIsLocked;
                     authenticationResult.Errors = new string[] { errorString };
 
-                    foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId))
-                    {
-                        var userDto = _userService.GetUserProfileById(userProfileId);
-                        _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_AccountLocked, orgRegProgDto, userDto);
-                    }
                 }
                 else
                 {
