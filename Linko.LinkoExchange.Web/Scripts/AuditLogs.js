@@ -80,7 +80,14 @@ getLogEntryDetails = function ()
     $('#details-cell-comment').text(selecedItem.Comment);
     $('#details-cell-username').text(selecedItem.UserName);
     $('#details-cell-eventcategory').text(selecedItem.EventCategory);
-    $('#details-cell-userid').text(selecedItem.UserProfileId);
+    if (parseInt(selecedItem.UserProfileId) > 0)
+    {
+        $('#details-cell-userid').text(selecedItem.UserProfileId);
+    }
+    else
+    {
+        $('#details-cell-userid').text('n/a');
+    }
     $('#details-cell-eventtype').text(selecedItem.EventType);
     $('#details-cell-logdatetime').text(selecedItem.LogDateTimeUtcDetailString);
     $('#details-cell-emailaddress').text(selecedItem.EmailAddress);

@@ -477,11 +477,10 @@ namespace Linko.LinkoExchange.Services.Invitation
             cromerrAuditLogEntryDto.RegulatoryProgramId = recipientOrganizationRegulatoryProgram.RegulatoryProgramId;
             cromerrAuditLogEntryDto.OrganizationId = recipientOrganizationRegulatoryProgram.OrganizationId;
             cromerrAuditLogEntryDto.RegulatorOrganizationId = recipientOrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
-            var existingUserUserName = "[unknown]";
+            var existingUserUserName = "n/a";
             if (existingUser != null)
             {
                 cromerrAuditLogEntryDto.UserProfileId = existingUser.UserProfileId;
-                cromerrAuditLogEntryDto.UserName = existingUser.UserName;
                 existingUserUserName = existingUser.UserName;
             }
 
