@@ -14,24 +14,6 @@
     <div class="box box-primary">
         <section class="box-body form-horizontal">
             <div class="form-group">
-                <div class="col-sm-3 col-md-1">
-                    <input type="checkbox" name="onOffSwitchSearchControl" class="onoffswitch" checked="checked"
-                            data-on-text="Advanced" 
-                            data-off-text="Basic" />
-                </div>
-                <div class="col-sm-1">
-                </div>
-                <div id="basicSearch" class="col-sm-6">
-                    <div class="input-group">
-                        <input type="text" name="SearchString" id="searchString" value="@ViewBag.SearchString" class="form-control text-box single-line"
-                                placeholder="Search for User Name, Industry Number, Industry Name">
-                        <div class="input-group-btn">
-                            <button class="btn btn-primary" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
                 <div class="col-md-12">
                     @* grid name should be start with grid for centralized error handling *@
                     @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Authority.AuditLogViewModel>()

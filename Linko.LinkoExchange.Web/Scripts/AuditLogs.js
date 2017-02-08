@@ -1,8 +1,6 @@
 ﻿
 $(document).ready(function ()
 {
-    $("#grid .k-filter-row").hide();
-
     var exportFlag = false;
     var grid = $("#grid").data("kendoGrid");
     grid.bind("excelExport", function(e) {
@@ -59,18 +57,6 @@ $(document).ready(function ()
         //    }
         //}            
     });
-});
-
-$("[name='onOffSwitchSearchControl']").bootstrapSwitch();
-$("[name='onOffSwitchSearchControl']").on('switchChange.bootstrapSwitch', function (event, state)
-{
-    $("[id='basicSearch']").toggle(500);
-    $("#grid .k-filter-row").toggle(500);
-
-    //console.log($("#grid .k-filter-row")); // DOM element
-    //console.log(this); // DOM element
-    //console.log(event); // jQuery event
-    //console.log(state); // true | false
 });
 
 getLogEntryDetails = function ()
