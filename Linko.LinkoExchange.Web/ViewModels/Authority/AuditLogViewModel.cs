@@ -8,6 +8,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 {
     public class AuditLogViewModel
     {
+        [Display(Name = "Event Code")]
         public int CromerrAuditLogId
         {
             get; set;
