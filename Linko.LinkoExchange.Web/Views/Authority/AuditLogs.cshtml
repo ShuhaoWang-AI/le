@@ -139,6 +139,7 @@
                               .Ajax()
                               .ServerOperation(enabled: false)
                               .Batch(enabled: true)
+                              .Sort(sort => sort.Add("LogDateTimeUtc").Descending()) // <-- initial sort expression
                               .Read(read => read.Action(actionName: "AuditLogs_Read", controllerName: "Authority", routeValues: new
                               {
                                   searchString = @ViewBag.SearchString
