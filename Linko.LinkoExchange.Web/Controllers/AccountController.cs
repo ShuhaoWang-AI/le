@@ -934,7 +934,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 if (maxAnswerAttempts <= model.FailedCount)
                 {
                     // Lock the account; 
-                    var locckAccountResult = _userService.LockUnlockUserAccount(model.UserProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringProfileAccess);
+                    var locckAccountResult = _userService.LockUnlockUserAccount(model.UserProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
                     if (locckAccountResult.IsSuccess)
                     {
                         _logger.Info(string.Format(format: "KBQ question. Failed to Answer KBQ Question {0} times. Account is locked. UserProfileId:{1}",
