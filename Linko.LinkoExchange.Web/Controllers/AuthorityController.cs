@@ -1196,33 +1196,33 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName: "IndustryUserDetails", model: model);
         }
 
-        [AcceptVerbs(HttpVerbs.Post)]
-        [ValidateAntiForgeryToken]
-        [Route("Industry/{iid:int}/User/{id:int}/Details/ChangeStatus")]
-        [AuthorizeCorrectAuthorityOnly(true)]
-        public ActionResult IndustryUserChangeStatus(int iid, int id, IndustryUserViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            try
-            {
-                _userService.EnableDisableUserAccount(model.Id, model.Status);
+        //[AcceptVerbs(HttpVerbs.Post)]
+        //[ValidateAntiForgeryToken]
+        //[Route("Industry/{iid:int}/User/{id:int}/Details/ChangeStatus")]
+        //[AuthorizeCorrectAuthorityOnly(true)]
+        //public ActionResult IndustryUserChangeStatus(int iid, int id, IndustryUserViewModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(model);
+        //    }
+        //    try
+        //    {
+        //        _userService.EnableDisableUserAccount(model.Id, model.Status);
 
-                ViewBag.ShowSuccessMessage = true;
-                ViewBag.SuccessMessage = model.Status ? "User disabled!" : "User enabled!";
-                ModelState.Clear();
-                model = PrepareIndustryUserDetails(id);
-            }
-            catch (RuleViolationException rve)
-            {
-                MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
-                model = PrepareIndustryUserDetails(id);
-            }
+        //        ViewBag.ShowSuccessMessage = true;
+        //        ViewBag.SuccessMessage = model.Status ? "User disabled!" : "User enabled!";
+        //        ModelState.Clear();
+        //        model = PrepareIndustryUserDetails(id);
+        //    }
+        //    catch (RuleViolationException rve)
+        //    {
+        //        MvcValidationExtensions.UpdateModelStateWithViolations(rve, ViewData.ModelState);
+        //        model = PrepareIndustryUserDetails(id);
+        //    }
 
-            return View(viewName: "IndustryUserDetails", model: model);
-        }
+        //    return View(viewName: "IndustryUserDetails", model: model);
+        //}
 
         [AcceptVerbs(HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
