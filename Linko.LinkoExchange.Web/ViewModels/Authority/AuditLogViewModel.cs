@@ -8,13 +8,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 {
     public class AuditLogViewModel
     {
-        [Display(Name = "Event Code")]
+        [ScaffoldColumn(false)]
         public int CromerrAuditLogId
         {
             get; set;
         }
 
-        [ScaffoldColumn(false)]
+        [Display(Name = "Event Code")]
         public int AuditLogTemplateId
         {
             get; set;
@@ -57,7 +57,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         }
 
         [Display(Name = "User ID")]
-        public int UserProfileId
+        public string UserProfileIdDisplay
         {
             get; set;
         }

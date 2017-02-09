@@ -316,13 +316,14 @@ namespace Linko.LinkoExchange.Web.Controllers
             var viewModels = logEntries.Select(dto => new AuditLogViewModel
             {
                 CromerrAuditLogId = dto.CromerrAuditLogId,
+                AuditLogTemplateId = dto.AuditLogTemplateId,
                 RegulatoryProgramName = dto.RegulatoryProgramName,
                 OrganizationId = dto.OrganizationId.Value,
                 OrganizationName = dto.OrganizationName,
                 RegulatorName = dto.RegulatorOrganizationName,
                 EventCategory = dto.EventCategory,
                 EventType = dto.EventType,
-                UserProfileId = dto.UserProfileId ?? -1,
+                UserProfileIdDisplay = dto.UserProfileId.HasValue && dto.UserProfileId > 0 ? dto.UserProfileId.ToString() : "n/a",
                 UserName = dto.UserName,
                 FirstName = dto.UserFirstName,
                 LastName = dto.UserLastName,
@@ -339,13 +340,14 @@ namespace Linko.LinkoExchange.Web.Controllers
             DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
             {
                 CromerrAuditLogId = vm.CromerrAuditLogId,
+                AuditLogTemplateId = vm.AuditLogTemplateId,
                 RegulatoryProgramName = vm.RegulatoryProgramName,
                 OrganizationId = vm.OrganizationId,
                 OrganizationName = vm.OrganizationName,
                 RegulatorName = vm.RegulatorName,
                 EventCategory = vm.EventCategory,
                 EventType = vm.EventType,
-                UserProfileId = vm.UserProfileId,
+                UserProfileIdDisplay = vm.UserProfileIdDisplay,
                 UserName = vm.UserName,
                 FirstName = vm.FirstName,
                 LastName = vm.LastName,

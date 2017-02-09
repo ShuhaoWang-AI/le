@@ -20,6 +20,10 @@
                           .Name(componentName: "grid")
                           .Columns(columns =>
                           {
+                              columns.Bound(c => c.CromerrAuditLogId).Hidden()
+                                   .HtmlAttributes(new { @class = "col-sm-1" })
+                                   .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                   .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
                               columns.Bound(c => c.EventCategory)
                                      .HtmlAttributes(new { @class = "col-sm-1" })
                                      .HeaderHtmlAttributes(new { @class = "col-sm-1" })
@@ -32,7 +36,7 @@
                                      .HtmlAttributes(new { @class = "col-sm-2" })
                                      .HeaderHtmlAttributes(new { @class = "col-sm-2" })
                                      .Format("{0:MM/dd/yyyy h:mm tt}");
-                              columns.Bound(c => c.CromerrAuditLogId).Hidden()
+                              columns.Bound(c => c.AuditLogTemplateId).Hidden()
                                      .HtmlAttributes(new { @class = "col-sm-1" })
                                      .HeaderHtmlAttributes(new { @class = "col-sm-1" })
                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
@@ -52,7 +56,7 @@
                                      .HtmlAttributes(new { @class = "col-sm-2" })
                                      .HeaderHtmlAttributes(new { @class = "col-sm-2" })
                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                              columns.Bound(c => c.UserProfileId).Hidden()
+                              columns.Bound(c => c.UserProfileIdDisplay).Hidden()
                                      .HtmlAttributes(new { @class = "col-sm-1" })
                                      .HeaderHtmlAttributes(new { @class = "col-sm-1" })
                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));

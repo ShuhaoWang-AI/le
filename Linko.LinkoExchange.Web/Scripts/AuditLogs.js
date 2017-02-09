@@ -5,11 +5,11 @@ $(document).ready(function ()
     var grid = $("#grid").data("kendoGrid");
     grid.bind("excelExport", function(e) {
         if (!exportFlag) {
-            e.sender.showColumn("CromerrAuditLogId");
+            e.sender.showColumn("AuditLogTemplateId");
             e.sender.showColumn("RegulatorName");
             e.sender.showColumn("OrganizationName");
             e.sender.showColumn("RegulatoryProgramName");
-            e.sender.showColumn("UserProfileId");
+            e.sender.showColumn("UserProfileIdDisplay");
             e.sender.showColumn("UserName");
             e.sender.showColumn("FirstName");
             e.sender.showColumn("LastName");
@@ -23,11 +23,11 @@ $(document).ready(function ()
                 e.sender.saveAsExcel();
             });
         } else {
-            e.sender.hideColumn("CromerrAuditLogId");
+            e.sender.hideColumn("AuditLogTemplateId");
             e.sender.hideColumn("RegulatorName");
             e.sender.hideColumn("OrganizationName");
             e.sender.hideColumn("RegulatoryProgramName");
-            e.sender.hideColumn("UserProfileId");
+            e.sender.hideColumn("UserProfileIdDisplay");
             e.sender.hideColumn("UserName");
             e.sender.hideColumn("FirstName");
             e.sender.hideColumn("LastName");
@@ -66,18 +66,11 @@ getLogEntryDetails = function ()
     $('#details-cell-comment').text(selecedItem.Comment);
     $('#details-cell-username').text(selecedItem.UserName);
     $('#details-cell-eventcategory').text(selecedItem.EventCategory);
-    if (parseInt(selecedItem.UserProfileId) > 0)
-    {
-        $('#details-cell-userid').text(selecedItem.UserProfileId);
-    }
-    else
-    {
-        $('#details-cell-userid').text('n/a');
-    }
+    $('#details-cell-userid').text(selecedItem.UserProfileIdDisplay);
     $('#details-cell-eventtype').text(selecedItem.EventType);
     $('#details-cell-logdatetime').text(selecedItem.LogDateTimeUtcDetailString);
     $('#details-cell-emailaddress').text(selecedItem.EmailAddress);
-    $('#details-cell-eventcode').text(selecedItem.CromerrAuditLogId);
+    $('#details-cell-eventcode').text(selecedItem.AuditLogTemplateId);
     $('#details-cell-fullname').text(selecedItem.FirstName + ' ' + selecedItem.LastName);
     $('#details-cell-authority').text(selecedItem.RegulatorName);
     $('#details-cell-ipaddress').text(selecedItem.IPAddress);
