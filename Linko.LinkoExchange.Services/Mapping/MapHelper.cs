@@ -189,19 +189,6 @@ namespace Linko.LinkoExchange.Services.Mapping
         public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram
             (OrganizationRegulatoryProgram org, OrganizationRegulatoryProgramDto dto = null)
         {
-            //var dto = new OrganizationRegulatoryProgramDto();
-            //dto.OrganizationRegulatoryProgramId = org.
-            //dto.RegulatoryProgramId = org.
-            //dto.RegulatoryProgramDto = org.
-            //dto.OrganizationId = org.
-            //dto.RegulatorOrganizationId = org.
-            //dto.OrganizationDto = org.
-            //dto.RegulatorOrganization = org.
-            //dto.IsEnabled = org.
-            //dto.IsRemoved = org.
-            //dto.AssignedTo = org.
-            //IGNORE dto.HasSignatory
-            //IGNORE dto.HasAdmin
             if (dto == null)
             {
                 dto = new OrganizationRegulatoryProgramDto();
