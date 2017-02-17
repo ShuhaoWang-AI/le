@@ -48,6 +48,8 @@ namespace Linko.LinkoExchange.Core.Domain
         /// </summary>
         public string Signer { get; set; }
 
+        public string Classification { get; set; }
+
         public DateTimeOffset CreationDateTimeUtc { get; set; }
 
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }

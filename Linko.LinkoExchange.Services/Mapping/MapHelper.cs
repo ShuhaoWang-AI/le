@@ -44,7 +44,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.WebsiteURL = organization.WebsiteUrl;
             dto.PermitNumber = organization.PermitNumber;
             dto.Signer = organization.Signer;
-
+            dto.Classification = organization.Classification;
             return dto;
         }
 

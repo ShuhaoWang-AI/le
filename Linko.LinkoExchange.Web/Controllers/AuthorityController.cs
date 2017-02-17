@@ -844,9 +844,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                 PhoneExt = vm.OrganizationDto.PhoneExt,
                 FaxNumber = vm.OrganizationDto.FaxNumber,
                 WebsiteUrl = vm.OrganizationDto.WebsiteURL,
+                Classification = vm.OrganizationDto.Classification,
                 IsEnabled = vm.IsEnabled,
                 HasSignatory = vm.HasSignatory,
-                AssignedTo = vm.AssignedTo
+                AssignedTo = vm.AssignedTo,
             });
 
             DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
@@ -856,6 +857,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 IndustryNoText = vm.IndustryNoText,
                 IndustryName = vm.IndustryName,
                 Address = vm.Address,
+                Classification = vm.Classification,
                 IsEnabledText = vm.IsEnabledText,
                 HasSignatoryText = vm.HasSignatoryText,
                 AssignedTo = vm.AssignedTo

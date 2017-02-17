@@ -17,6 +17,7 @@
         public string WebsiteURL { get; set; }
         public string PermitNumber { get; set; }
         public string Signer { get; set; }
+        public string Classification { get; set; }
     }
 
     public class AuthorityDto : OrganizationDto

@@ -273,7 +273,8 @@ BEGIN
         , FaxNumber                     varchar(25) NULL  
         , WebsiteURL                    varchar(256) NULL  
         , PermitNumber                  varchar(50) NULL  
-        , Signer                        varchar(250) NULL  
+        , Signer                        varchar(250) NULL
+		, Classification                varchar(50) NULL  
         , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
         , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
         , LastModifierUserId            int NULL  

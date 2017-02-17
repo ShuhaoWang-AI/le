@@ -107,6 +107,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         }
 
         [Editable(false)]
+        [Display(Name = "Classification")]
+        public string Classification
+        {
+            get; set;
+        }
+
+        [Editable(false)]
         [Display(Name = "Enabled")]
         public bool IsEnabled
         {
