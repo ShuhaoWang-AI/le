@@ -294,6 +294,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         #region Show Audit Logs
 
         // GET: /Authority/AuditLogs
+        [AuthorizeAuthorityOnly]
         public ActionResult AuditLogs()
         {
             return View();
