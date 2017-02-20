@@ -56,20 +56,23 @@ namespace Linko.LinkoExchange.Services.Email
         public async Task SendEmail(IEnumerable<string> recipients, EmailType emailType,
             IDictionary<string, string> contentReplacements)
         {
-            string sendTo = string.Join(separator: ",", values: recipients); 
+            string sendTo = string.Join(separator: ",", values: recipients);
 
             var template = await GetTemplate(emailType);
-            if (template == null) return;
+            if (template == null)
+            {
+                return;
+            }
 
             MailMessage msg = await GetMailMessage(sendTo, template, contentReplacements, _senderEmailAddres);
             if (string.IsNullOrWhiteSpace(_emailServer))
             {
-                _emailServer = _settingService.GetGlobalSettings()[SystemSettingType.EmailServer]; 
+                _emailServer = _settingService.GetGlobalSettings()[SystemSettingType.EmailServer];
             }
 
             if (string.IsNullOrWhiteSpace(_emailServer))
             {
-                throw  new ArgumentException("EmailServer");
+                throw new ArgumentException("EmailServer");
             }
 
             using (var smtpClient = new SmtpClient(_emailServer))
@@ -83,8 +86,8 @@ namespace Linko.LinkoExchange.Services.Email
                 foreach (var log in logEntries)
                 {
                     _emailAuditLogService.Log(log);
-                } 
-            }  
+                }
+            }
         }
 
         private Task<AuditLogTemplate> GetTemplate(EmailType emailType)
@@ -125,7 +128,7 @@ namespace Linko.LinkoExchange.Services.Email
 
             return originText;
         }
-        
+
         /// <summary>
         /// Return recipient log data.  If programFilters has value,  only return programIDs that exist in programFilters
         /// </summary>
@@ -136,7 +139,7 @@ namespace Linko.LinkoExchange.Services.Email
         {
             var emailAuditLogs = new List<EmailAuditLogEntryDto>();
             var oRpUs = _programService.GetUserRegulatoryPrograms(email);
-            if (oRpUs.Any())
+            if (oRpUs != null && oRpUs.Any())
             {
                 foreach (var user in oRpUs)
                 {
@@ -157,6 +160,11 @@ namespace Linko.LinkoExchange.Services.Email
                         emailAuditLogs.Add(auditLog);
                     }
                 }
+            }
+            else
+            {
+                var auditLog = new EmailAuditLogEntryDto();
+                emailAuditLogs.Add(auditLog);
             }
 
             if (programFilters != null && programFilters.Any())
@@ -201,46 +209,46 @@ namespace Linko.LinkoExchange.Services.Email
 
             return emailAuditLogs;
         }
-        
+
         private IEnumerable<EmailAuditLogEntryDto> GetEmailAuditLog(string senderEmail, string receipientEmail, EmailType emailType, string subject, string body, int emailTemplateId)
-        { 
-            var emailAuditLogs = new List<EmailAuditLogEntryDto>(); 
- 
+        {
+            var emailAuditLogs = new List<EmailAuditLogEntryDto>();
+
             switch (emailType)
             {
                 // Below type only needs to log one program or the recipient  
-                case EmailType.Registration_AuthorityRegistrationDenied:   
-                case EmailType.Registration_IndustryRegistrationDenied: 
+                case EmailType.Registration_AuthorityRegistrationDenied:
+                case EmailType.Registration_IndustryRegistrationDenied:
                 case EmailType.Registration_IndustryRegistrationApproved:
                 case EmailType.Registration_AuthorityRegistrationApproved:
                 case EmailType.Registration_InviteAuthorityUser:
                 case EmailType.Registration_AuthorityInviteIndustryUser:
-                case EmailType.Registration_IndustryInviteIndustryUser: 
+                case EmailType.Registration_IndustryInviteIndustryUser:
                 case EmailType.Signature_SignatoryGranted:
                 case EmailType.Signature_SignatoryRevoked:
                 case EmailType.Registration_AuthorityUserRegistrationPendingToApprovers:
                 case EmailType.Registration_IndustryUserRegistrationPendingToApprovers:
-                    emailAuditLogs.AddRange(PopulateSingleRecipientProgramData(receipientEmail));    
-                    break; 
+                    emailAuditLogs.AddRange(PopulateSingleRecipientProgramData(receipientEmail));
+                    break;
 
                 // Below type needs to log for all programs 
-                case EmailType.UserAccess_AccountLockOut:    
-                case EmailType.UserAccess_LockOutToSysAdmins: 
-                case EmailType.Registration_ResetRequired:    
-                case EmailType.Profile_KBQFailedLockOut: 
-                case EmailType.Profile_KBQChanged:  
-                case EmailType.Profile_EmailChanged:  
-                case EmailType.Profile_ProfileChanged:  
-                case EmailType.Profile_SecurityQuestionsChanged:  
-                case EmailType.Profile_PasswordChanged: 
+                case EmailType.UserAccess_AccountLockOut:
+                case EmailType.UserAccess_LockOutToSysAdmins:
+                case EmailType.Registration_ResetRequired:
+                case EmailType.Profile_KBQFailedLockOut:
+                case EmailType.Profile_KBQChanged:
+                case EmailType.Profile_EmailChanged:
+                case EmailType.Profile_ProfileChanged:
+                case EmailType.Profile_SecurityQuestionsChanged:
+                case EmailType.Profile_PasswordChanged:
                 case EmailType.ForgotPassword_ForgotPassword:
                 case EmailType.Profile_ResetProfileRequired:
                 case EmailType.ForgotUserName_ForgotUserName:
                 case EmailType.Registration_RegistrationResetPending:
-                    emailAuditLogs.AddRange(PopulateRecipientLogDataForAllPrograms(receipientEmail)); 
+                    emailAuditLogs.AddRange(PopulateRecipientLogDataForAllPrograms(receipientEmail));
                     break;
                 default:
-                    throw new Exception("Not valid EmailType");  
+                    throw new Exception("Not valid EmailType");
             }
 
             foreach (var log in emailAuditLogs)
