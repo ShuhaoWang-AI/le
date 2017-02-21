@@ -123,13 +123,10 @@
                           })
                           .DataSource(dataSource => dataSource
                               .Ajax()
-                              .ServerOperation(enabled: false)
+                              .ServerOperation(enabled: true)
                               .Batch(enabled: true)
                               .Sort(sort => sort.Add("LogDateTimeUtc").Descending()) // <-- initial sort expression
-                              .Read(read => read.Action(actionName: "AuditLogs_Read", controllerName: "Authority", routeValues: new
-                              {
-                                  searchString = @ViewBag.SearchString
-                              }))
+                              .Read(read => read.Action(actionName: "AuditLogs_Read", controllerName: "Authority"))
                               .PageSize(pageSize: 15)
                               .Events(events => events.Error(handler: "error_handler"))
                           )

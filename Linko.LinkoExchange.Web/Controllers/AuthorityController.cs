@@ -22,6 +22,7 @@ using NLog;
 using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services;
+using Kendo.Mvc;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -308,11 +309,68 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(model);
         }
 
-        public ActionResult AuditLogs_Read([DataSourceRequest] DataSourceRequest request, string searchString)
+        public ActionResult AuditLogs_Read([DataSourceRequest] DataSourceRequest request)
         {
+            //Extract DateTime Range Filters to handle special case
+            //where we must include all entries that take place for a given day
+            DateTime? dateRangeStart = null;
+            DateTime? dateRangeEnd = null;
+            DateTime? dateToExclude = null;
+
+            for (int filterIndex = 0; filterIndex < request.Filters.Count; filterIndex++)
+            {
+                FilterDescriptor filter = (FilterDescriptor)request.Filters[filterIndex];
+                if (filter.Member == "LogDateTimeUtc")
+                {
+                    if (filter.Operator == FilterOperator.IsEqualTo)
+                    {
+                        dateRangeStart = (DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value;
+                        dateRangeEnd = ((DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value).AddDays(1);
+                        //Disable filtering that will happen on client
+                        request.Filters.RemoveAt(filterIndex);
+
+                    }
+                    else if (filter.Operator == FilterOperator.IsGreaterThan)
+                    {
+                        dateRangeStart = ((DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value).AddDays(1);
+                        //Disable filtering that will happen on client
+                        request.Filters.RemoveAt(filterIndex);
+
+                    }
+                    else if (filter.Operator == FilterOperator.IsGreaterThanOrEqualTo)
+                    {
+                        dateRangeStart = (DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value;
+                        //Disable filtering that will happen on client
+                        request.Filters.RemoveAt(filterIndex);
+
+                    }
+                    else if (filter.Operator == FilterOperator.IsLessThan)
+                    {
+                        dateRangeEnd = (DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value;
+                        //Disable filtering that will happen on client
+                        request.Filters.RemoveAt(filterIndex);
+
+                    }
+                    else if (filter.Operator == FilterOperator.IsLessThanOrEqualTo)
+                    {
+                        dateRangeEnd = ((DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value).AddDays(1);
+                        //Disable filtering that will happen on client
+                        request.Filters.RemoveAt(filterIndex);
+                    }
+                    else if (filter.Operator == FilterOperator.IsNotEqualTo)
+                    {
+                        dateToExclude = (DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value;
+                        //Disable filtering that will happen on client
+                        request.Filters.RemoveAt(filterIndex);
+                    }
+
+                    break;
+                }
+            }
+
             var organizationRegulatoryProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(organizationRegulatoryProgramId, SettingType.TimeZone));
-            var logEntries = _cromerrLogService.GetCromerrAuditLogEntries(organizationRegulatoryProgramId, searchString);
+            var logEntries = _cromerrLogService.GetCromerrAuditLogEntries(organizationRegulatoryProgramId, dateRangeStart, dateRangeEnd, dateToExclude);
 
             var viewModels = logEntries.Select(dto => new AuditLogViewModel
             {

@@ -93,7 +93,8 @@ namespace Linko.LinkoExchange.Services.AuditLog
 
         }
 
-        public ICollection<CromerrAuditLogEntryDto> GetCromerrAuditLogEntries(int organizationRegulatoryProgramId, string searchString)
+        public ICollection<CromerrAuditLogEntryDto> GetCromerrAuditLogEntries(int organizationRegulatoryProgramId, 
+            DateTime? dateRangeStart, DateTime? dateRangeEnd, DateTime? dateToExclude)
         {
             var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms
                 .Include("RegulatoryProgram")
@@ -105,9 +106,20 @@ namespace Linko.LinkoExchange.Services.AuditLog
                 .Where(l => l.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId
                     && l.RegulatorOrganizationId == orgRegProgram.OrganizationId);
 
-            if (!String.IsNullOrEmpty(searchString))
+            if (dateRangeStart.HasValue)
             {
-                entries = entries.Where(e => e.UserName.Contains(searchString));
+                entries = entries.Where(e => e.LogDateTimeUtc > dateRangeStart.Value);
+            }
+
+            if (dateRangeEnd.HasValue)
+            {
+                entries = entries.Where(e => e.LogDateTimeUtc < dateRangeEnd.Value);
+            }
+
+            if (dateToExclude.HasValue)
+            {
+                DateTime endOfDateToExclude = dateToExclude.Value.AddDays(1);
+                entries = entries.Where(e => e.LogDateTimeUtc < dateToExclude || e.LogDateTimeUtc > endOfDateToExclude);
             }
 
             foreach (var entry in entries)
