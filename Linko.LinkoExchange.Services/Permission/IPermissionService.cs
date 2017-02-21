@@ -12,7 +12,7 @@ namespace Linko.LinkoExchange.Services.Permission
 {
     public interface IPermissionService
     {
-        IEnumerable<UserDto> GetApprovalPeople(int userId, int organizationId);
+        IEnumerable<UserDto> GetApprovalPeople(int organizationId);
 
         IEnumerable<PermissionGroupDto> GetRoles(int orgRegProgramId);
     }

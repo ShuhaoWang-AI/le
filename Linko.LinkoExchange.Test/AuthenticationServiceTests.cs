@@ -731,7 +731,7 @@ namespace Linko.LinkoExchange.Test
             var qaServiceMock = Mock.Get(questionAnswerService);
             qaServiceMock.Verify(i => i.CreateUserQuestionAnswers(It.IsAny<int>(), It.IsAny<IEnumerable<AnswerDto>>()), Times.Once);
             progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()));
-            permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>(), It.IsAny<int>()));
+            permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>()));
         }
 
         // Test new existing user re-register
@@ -753,7 +753,7 @@ namespace Linko.LinkoExchange.Test
             qaServiceMock.Verify(i => i.DeleteUserQuestionAndAnswers(It.IsAny<int>()));
 
             progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()));
-            permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>(), It.IsAny<int>()));
+            permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>()));
         }
 
         [TestMethod]
@@ -921,7 +921,7 @@ namespace Linko.LinkoExchange.Test
                    )
                 );
 
-            permissionMock.Setup(i => i.GetApprovalPeople(It.IsAny<int>(), It.IsAny<int>())).Returns(
+            permissionMock.Setup(i => i.GetApprovalPeople(It.IsAny<int>())).Returns(
                  new[]{
                            Mock.Of<UserDto>(i=>i.Email=="test@water.com"),
                            Mock.Of<UserDto>(i=>i.Email=="test2@water.com"),

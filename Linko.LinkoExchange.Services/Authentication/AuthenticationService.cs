@@ -500,7 +500,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     // UC-42 7, 8
                     // Find out who have approval permission   
-                    var approvalPeople = _permissionService.GetApprovalPeople(applicationUser.UserProfileId, orpu.OrganizationRegulatoryProgramId);
+                    var approvalPeople = _permissionService.GetApprovalPeople(invitationDto.SenderOrganizationRegulatoryProgramId);
                     var sendTo = approvalPeople.Select(i => i.Email);
 
                     //  Determine if user is authority user or is industry user; 

@@ -30,7 +30,7 @@ namespace Linko.LinkoExchange.Services.Permission
         }
 
         // TODO: to implement 
-        public IEnumerable<UserDto> GetApprovalPeople(int userId, int organizationRegulatoryProgramId)
+        public IEnumerable<UserDto> GetApprovalPeople(int organizationRegulatoryProgramId)
         {
             try
             {

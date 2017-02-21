@@ -35,7 +35,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetApprovalPeople()
         {
-            var approvers = _pService.GetApprovalPeople(3, 1);
+            var approvers = _pService.GetApprovalPeople(1);
         }
     }
 }
