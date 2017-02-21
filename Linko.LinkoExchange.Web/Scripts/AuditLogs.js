@@ -4,6 +4,23 @@ $(document).ready(function ()
     var exportFlag = false;
     var grid = $("#grid").data("kendoGrid");
     grid.bind("excelExport", function(e) {
+
+        //================================================
+        var dateTimeColumnIndex = 2;
+        // USED FOR FORMATTING EXPORT TO EXCEL
+        // Only apply special formatting to the "date/time" column (index = 2).
+        // This index will need to be updated if the column ordering gets modified.
+        // Without this logic, the exported excel grid will have the time component 
+        // missing from the date field by default.
+        //================================================
+        var sheet = e.workbook.sheets[0];
+        sheet.columns[2].width = 180;
+        sheet.columns[2].autoWidth = false;
+        for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
+            var row = sheet.rows[rowIndex];
+            row.cells[dateTimeColumnIndex].format = "MM/dd/yyyy hh:mm AM/PM";
+        }
+
         if (!exportFlag) {
             e.sender.showColumn("AuditLogTemplateId");
             e.sender.showColumn("RegulatorName");
