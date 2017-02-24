@@ -8,6 +8,6 @@ namespace Linko.LinkoExchange.Services.Email
     public interface IEmailService
     {
         Task SendEmail(IEnumerable<string> recipients, EmailType emailType,
-            IDictionary<string, string> contentReplacements);
+            IDictionary<string, string> contentReplacements, bool perRegulatoryProgram = true);
     }
 }

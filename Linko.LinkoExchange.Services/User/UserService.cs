@@ -544,6 +544,9 @@ namespace Linko.LinkoExchange.Services.User
                 var admins = _dbContext.OrganizationRegulatoryProgramUsers
                     .Where(o => o.PermissionGroup.Name == "Administrator"
                     && o.OrganizationRegulatoryProgramId == program.OrganizationRegulatoryProgramId);
+
+                var perProgram = program.RegulatorOrganizationId.HasValue ? true : false;
+
                 foreach (var admin in admins.ToList())
                 {
                     string adminEmail = GetUserProfileById(admin.UserProfileId).Email;
@@ -552,8 +555,7 @@ namespace Linko.LinkoExchange.Services.User
                     contentReplacements.Add("lastName", user.LastName);
                     contentReplacements.Add("userName", user.UserName);
                     contentReplacements.Add("email", user.Email);
-                    _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockOutToSysAdmins, contentReplacements);
-
+                    _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_AccountLockOut, contentReplacements, perProgram);
                 }
 
                 //Get authority's org id, if it exists. If not, they ARE the authority

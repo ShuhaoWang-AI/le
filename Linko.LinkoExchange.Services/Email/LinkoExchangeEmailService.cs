@@ -54,7 +54,7 @@ namespace Linko.LinkoExchange.Services.Email
         }
 
         public async Task SendEmail(IEnumerable<string> recipients, EmailType emailType,
-            IDictionary<string, string> contentReplacements)
+            IDictionary<string, string> contentReplacements, bool perRegulatoryProgram)
         {
             string sendTo = string.Join(separator: ",", values: recipients);
 
@@ -82,7 +82,7 @@ namespace Linko.LinkoExchange.Services.Email
 
             foreach (var receipientEmail in recipients)
             {
-                var logEntries = GetEmailAuditLog(_senderEmailAddres, receipientEmail, emailType, msg.Subject, msg.Body, template.AuditLogTemplateId);
+                var logEntries = GetEmailAuditLog(_senderEmailAddres, receipientEmail, emailType, msg.Subject, msg.Body, template.AuditLogTemplateId, perRegulatoryProgram);
                 foreach (var log in logEntries)
                 {
                     _emailAuditLogService.Log(log);
@@ -210,7 +210,7 @@ namespace Linko.LinkoExchange.Services.Email
             return emailAuditLogs;
         }
 
-        private IEnumerable<EmailAuditLogEntryDto> GetEmailAuditLog(string senderEmail, string receipientEmail, EmailType emailType, string subject, string body, int emailTemplateId)
+        private IEnumerable<EmailAuditLogEntryDto> GetEmailAuditLog(string senderEmail, string receipientEmail, EmailType emailType, string subject, string body, int emailTemplateId, bool perRegulatoryPrrogram)
         {
             var emailAuditLogs = new List<EmailAuditLogEntryDto>();
 
@@ -233,6 +233,15 @@ namespace Linko.LinkoExchange.Services.Email
 
                 // Below type needs to log for all programs 
                 case EmailType.UserAccess_AccountLockOut:
+                    if (perRegulatoryPrrogram)
+                    {
+                        emailAuditLogs.AddRange(PopulateRecipientLogDataForAllPrograms(receipientEmail));
+                    }
+                    else
+                    {
+                        emailAuditLogs.AddRange(PopulateSingleRecipientProgramData(receipientEmail));
+                    }
+                    break;
                 case EmailType.UserAccess_LockOutToSysAdmins:
                 case EmailType.Registration_ResetRequired:
                 case EmailType.Profile_KBQFailedLockOut:
