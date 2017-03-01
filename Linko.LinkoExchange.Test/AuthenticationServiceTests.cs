@@ -827,7 +827,7 @@ namespace Linko.LinkoExchange.Test
             var emailServiceMock = Mock.Get(emailService);
 
             emailServiceMock.Verify(i => i.SendEmail(It.IsAny<IEnumerable<string>>(),
-                It.IsAny<EmailType>(), It.IsAny<IDictionary<string, string>>()));
+                It.IsAny<EmailType>(), It.IsAny<IDictionary<string, string>>(), true));
 
             var invitServiceMock = Mock.Get(invitService);
 

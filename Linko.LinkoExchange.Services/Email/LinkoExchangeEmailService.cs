@@ -54,7 +54,7 @@ namespace Linko.LinkoExchange.Services.Email
         }
 
         public async Task SendEmail(IEnumerable<string> recipients, EmailType emailType,
-            IDictionary<string, string> contentReplacements, bool perRegulatoryProgram)
+            IDictionary<string, string> contentReplacements, bool perRegulatoryProgram = true)
         {
             string sendTo = string.Join(separator: ",", values: recipients);
 
