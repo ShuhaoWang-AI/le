@@ -21,7 +21,11 @@ namespace Linko.LinkoExchange.Services.AuditLog
 
         Task SimpleLog(CromerrEvent eventType, OrganizationRegulatoryProgramDto orgRegProgram, UserDto user);
 
-        ICollection<CromerrAuditLogEntryDto> GetCromerrAuditLogEntries(int organizationRegulatoryProgramId, DateTime? dateRangeStart, DateTime? dateRangeEnd, DateTime? dateToExclude);
+        ICollection<CromerrAuditLogEntryDto> GetCromerrAuditLogEntries(int organizationRegulatoryProgramId,
+            int page, int pageSize, string sortColumn, bool isSortAscending,
+            DateTime? dateRangeStart, DateTime? dateRangeEnd, DateTime? dateToExclude, 
+            string eventCategoryContains, string eventTypeContains, string emailAddressContains,
+            out int totalCount);
 
         CromerrAuditLogEntryDto GetCromerrAuditLogEntry(int cromerrAuditLogId);
     }

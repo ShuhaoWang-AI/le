@@ -93,8 +93,11 @@ namespace Linko.LinkoExchange.Services.AuditLog
 
         }
 
-        public ICollection<CromerrAuditLogEntryDto> GetCromerrAuditLogEntries(int organizationRegulatoryProgramId, 
-            DateTime? dateRangeStart, DateTime? dateRangeEnd, DateTime? dateToExclude)
+        public ICollection<CromerrAuditLogEntryDto> GetCromerrAuditLogEntries(int organizationRegulatoryProgramId,
+            int page, int pageSize, string sortColumn, bool isSortAscending,
+            DateTime? dateRangeStart, DateTime? dateRangeEnd, DateTime? dateToExclude,
+            string eventCategoryContains, string eventTypeContains, string emailAddressContains,
+            out int totalCount)
         {
             var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms
                 .Include("RegulatoryProgram")
@@ -105,6 +108,32 @@ namespace Linko.LinkoExchange.Services.AuditLog
             var entries = _dbContext.CromerrAuditLogs
                 .Where(l => l.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId
                     && l.RegulatorOrganizationId == orgRegProgram.OrganizationId);
+
+            //Sort is required by EF before paging operations
+            if (isSortAscending)
+            {
+                switch (sortColumn)
+                {
+                    case "LogDateTimeUtc":
+                        entries = entries.OrderBy(entry => entry.LogDateTimeUtc);
+                        break;
+                    default:
+                        entries = entries.OrderBy(entry => entry.LogDateTimeUtc);
+                        break;
+                }
+            }
+            else
+            {
+                switch (sortColumn)
+                {
+                    case "LogDateTimeUtc":
+                        entries = entries.OrderByDescending(entry => entry.LogDateTimeUtc);
+                        break;
+                    default:
+                        entries = entries.OrderByDescending(entry => entry.LogDateTimeUtc);
+                        break;
+                }
+            }
 
             if (dateRangeStart.HasValue)
             {
@@ -121,6 +150,26 @@ namespace Linko.LinkoExchange.Services.AuditLog
                 DateTime endOfDateToExclude = dateToExclude.Value.AddDays(1);
                 entries = entries.Where(e => e.LogDateTimeUtc < dateToExclude || e.LogDateTimeUtc > endOfDateToExclude);
             }
+
+            if (!String.IsNullOrEmpty(eventCategoryContains))
+            {
+                entries = entries.Where(e => e.AuditLogTemplate.EventCategory.Contains(eventCategoryContains));
+            }
+
+            if (!String.IsNullOrEmpty(eventTypeContains))
+            {
+                entries = entries.Where(e => e.AuditLogTemplate.EventType.Contains(eventTypeContains));
+            }
+
+            if (!String.IsNullOrEmpty(emailAddressContains))
+            {
+                entries = entries.Where(e => e.UserEmailAddress.Contains(emailAddressContains));
+            }
+            
+            //Apply paging
+            totalCount = entries.Count();
+            entries = entries.Skip((page - 1) * pageSize);
+            entries = entries.Take(pageSize);
 
             foreach (var entry in entries)
             {

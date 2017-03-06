@@ -309,6 +309,21 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(model);
         }
 
+        private void GetFilterDescriptersFromTree(IList<IFilterDescriptor> filterDescriptors, ref List<FilterDescriptor> foundFilterDescriptors)
+        {
+            foreach (var filter in filterDescriptors)
+            {
+                if (filter is CompositeFilterDescriptor)
+                {
+                    GetFilterDescriptersFromTree(((CompositeFilterDescriptor)filter).FilterDescriptors, ref foundFilterDescriptors);
+                }
+                else if (filter is FilterDescriptor)
+                {
+                    foundFilterDescriptors.Add((FilterDescriptor)filter);
+                }
+            }
+        }
+
         public ActionResult AuditLogs_Read([DataSourceRequest] DataSourceRequest request)
         {
             //Extract DateTime Range Filters to handle special case
@@ -316,61 +331,87 @@ namespace Linko.LinkoExchange.Web.Controllers
             DateTime? dateRangeStart = null;
             DateTime? dateRangeEnd = null;
             DateTime? dateToExclude = null;
+            string eventCategoryContains = null;
+            string eventTypeContains = null;
+            string emailAddressContains = null;
 
-            for (int filterIndex = 0; filterIndex < request.Filters.Count; filterIndex++)
+            List<FilterDescriptor> foundFilterDescriptors = new List<FilterDescriptor>();
+            GetFilterDescriptersFromTree(request.Filters, ref foundFilterDescriptors);
+
+            foreach (var filterDescriptor in foundFilterDescriptors)
             {
-                FilterDescriptor filter = (FilterDescriptor)request.Filters[filterIndex];
-                if (filter.Member == "LogDateTimeUtc")
+                if (filterDescriptor.Member == "LogDateTimeUtc")
                 {
-                    if (filter.Operator == FilterOperator.IsEqualTo)
+                    if (filterDescriptor.Operator == FilterOperator.IsEqualTo)
                     {
-                        dateRangeStart = (DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value;
-                        dateRangeEnd = ((DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value).AddDays(1);
-                        //Disable filtering that will happen on client
-                        request.Filters.RemoveAt(filterIndex);
+                        dateRangeStart = (DateTime)((Kendo.Mvc.FilterDescriptor)filterDescriptor).Value;
+                        dateRangeEnd = ((DateTime)((Kendo.Mvc.FilterDescriptor)filterDescriptor).Value).AddDays(1);
 
                     }
-                    else if (filter.Operator == FilterOperator.IsGreaterThan)
+                    else if (filterDescriptor.Operator == FilterOperator.IsGreaterThan)
                     {
-                        dateRangeStart = ((DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value).AddDays(1);
-                        //Disable filtering that will happen on client
-                        request.Filters.RemoveAt(filterIndex);
+                        dateRangeStart = ((DateTime)((Kendo.Mvc.FilterDescriptor)filterDescriptor).Value).AddDays(1);
 
                     }
-                    else if (filter.Operator == FilterOperator.IsGreaterThanOrEqualTo)
+                    else if (filterDescriptor.Operator == FilterOperator.IsGreaterThanOrEqualTo)
                     {
-                        dateRangeStart = (DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value;
-                        //Disable filtering that will happen on client
-                        request.Filters.RemoveAt(filterIndex);
+                        dateRangeStart = (DateTime)((Kendo.Mvc.FilterDescriptor)filterDescriptor).Value;
 
                     }
-                    else if (filter.Operator == FilterOperator.IsLessThan)
+                    else if (filterDescriptor.Operator == FilterOperator.IsLessThan)
                     {
-                        dateRangeEnd = (DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value;
-                        //Disable filtering that will happen on client
-                        request.Filters.RemoveAt(filterIndex);
+                        dateRangeEnd = (DateTime)((Kendo.Mvc.FilterDescriptor)filterDescriptor).Value;
 
                     }
-                    else if (filter.Operator == FilterOperator.IsLessThanOrEqualTo)
+                    else if (filterDescriptor.Operator == FilterOperator.IsLessThanOrEqualTo)
                     {
-                        dateRangeEnd = ((DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value).AddDays(1);
-                        //Disable filtering that will happen on client
-                        request.Filters.RemoveAt(filterIndex);
+                        dateRangeEnd = ((DateTime)((Kendo.Mvc.FilterDescriptor)filterDescriptor).Value).AddDays(1);
                     }
-                    else if (filter.Operator == FilterOperator.IsNotEqualTo)
+                    else if (filterDescriptor.Operator == FilterOperator.IsNotEqualTo)
                     {
-                        dateToExclude = (DateTime)((Kendo.Mvc.FilterDescriptor)filter).Value;
-                        //Disable filtering that will happen on client
-                        request.Filters.RemoveAt(filterIndex);
+                        dateToExclude = (DateTime)((Kendo.Mvc.FilterDescriptor)filterDescriptor).Value;
                     }
 
                     break;
+                }
+                else if (filterDescriptor.Member == "EventCategory")
+                {
+                    eventCategoryContains = filterDescriptor.Value.ToString();
+                }
+                else if (filterDescriptor.Member == "EventType")
+                {
+                    eventTypeContains = filterDescriptor.Value.ToString();
+                }
+                else if (filterDescriptor.Member == "EmailAddress")
+                {
+                    emailAddressContains = filterDescriptor.Value.ToString();
+                }
+
+            }
+
+
+            int page = request.Page;
+            int pageSize = request.PageSize;
+            string sortColumn = "LogDateTimeUtc";
+            bool isSortAscending = false;
+
+            if (request.Sorts.Any())
+            {
+                foreach (SortDescriptor sortDescriptor in request.Sorts)
+                {
+                    isSortAscending = sortDescriptor.SortDirection == System.ComponentModel.ListSortDirection.Ascending;
+                    sortColumn = sortDescriptor.Member;
                 }
             }
 
             var organizationRegulatoryProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             int timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(organizationRegulatoryProgramId, SettingType.TimeZone));
-            var logEntries = _cromerrLogService.GetCromerrAuditLogEntries(organizationRegulatoryProgramId, dateRangeStart, dateRangeEnd, dateToExclude);
+            var totalCount = 0;
+            var logEntries = _cromerrLogService.GetCromerrAuditLogEntries(organizationRegulatoryProgramId, 
+                page, pageSize, sortColumn, isSortAscending, 
+                dateRangeStart, dateRangeEnd, dateToExclude,
+                eventCategoryContains, eventTypeContains, emailAddressContains,
+                out totalCount);
 
             var viewModels = logEntries.Select(dto => new AuditLogViewModel
             {
@@ -417,6 +458,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                 LogDateTimeUtc = vm.LogDateTimeUtc.ToString(),
                 LogDateTimeUtcDetailString = vm.LogDateTimeUtcDetailString
             });
+            result.Total = totalCount;
+
+            //var result = new DataSourceResult()
+            //{
+            //    Data = viewModels,
+            //    Total = totalCount
+            //};
 
             return Json(result);
         }
