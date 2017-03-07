@@ -21,7 +21,7 @@
         // UC-5.5 Lock/UnLock  (for authority user account / and IU User Account)
         UserAccess_AccountLockOut,
 
-        // UC-5.5 Lock/UnLock (for Authority Sys Admin / IU Authority sys Admin
+        // UC-5.5 Lock/UnLock (for Authority Sys Admin / IU Authority sys Admin)
         UserAccess_LockOutToSysAdmins,
 
         // UC-5.6 UC-7.6 Reset Authority User Account/Reset IU User Account
