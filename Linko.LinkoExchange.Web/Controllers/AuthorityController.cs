@@ -311,8 +311,9 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private void GetFilterDescriptersFromTree(IList<IFilterDescriptor> filterDescriptors, ref List<FilterDescriptor> foundFilterDescriptors)
         {
-            foreach (var filter in filterDescriptors)
+            for (var i = 0; i < filterDescriptors.Count(); i++)
             {
+                var filter = filterDescriptors[i];
                 if (filter is CompositeFilterDescriptor)
                 {
                     GetFilterDescriptersFromTree(((CompositeFilterDescriptor)filter).FilterDescriptors, ref foundFilterDescriptors);
@@ -320,6 +321,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                 else if (filter is FilterDescriptor)
                 {
                     foundFilterDescriptors.Add((FilterDescriptor)filter);
+
+                    //Disable filtering that will happen automatically via ToDataSourceResult
+                    //to get around bug 2099 (incorrect filtering with date only)
+                    filterDescriptors.RemoveAt(i);
                 }
             }
         }
@@ -346,7 +351,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         dateRangeStart = (DateTime)((Kendo.Mvc.FilterDescriptor)filterDescriptor).Value;
                         dateRangeEnd = ((DateTime)((Kendo.Mvc.FilterDescriptor)filterDescriptor).Value).AddDays(1);
-
                     }
                     else if (filterDescriptor.Operator == FilterOperator.IsGreaterThan)
                     {
