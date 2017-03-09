@@ -74,6 +74,7 @@
     <Compile Include="Common\ValueParser.cs" />
     <Compile Include="Domain\AuditLogTemplate.cs" />
     <Compile Include="Domain\CromerrAuditLog.cs" />
+    <Compile Include="Domain\CtsEventType.cs" />
     <Compile Include="Domain\EmailAuditLog.cs" />
     <Compile Include="Domain\Invitation.cs" />
     <Compile Include="Domain\Jurisdiction.cs" />
@@ -86,6 +87,9 @@
     <Compile Include="Domain\OrganizationSetting.cs" />
     <Compile Include="Domain\OrganizationType.cs" />
     <Compile Include="Domain\OrganizationTypeRegulatoryProgram.cs" />
+    <Compile Include="Domain\Parameter.cs" />
+    <Compile Include="Domain\ParameterGroup.cs" />
+    <Compile Include="Domain\ParameterGroupParameter.cs" />
     <Compile Include="Domain\Permission.cs" />
     <Compile Include="Domain\PermissionGroup.cs" />
     <Compile Include="Domain\PermissionGroupPermission.cs" />
@@ -94,11 +98,18 @@
     <Compile Include="Domain\Question.cs" />
     <Compile Include="Domain\QuestionType.cs" />
     <Compile Include="Domain\RegulatoryProgram.cs" />
+    <Compile Include="Domain\ReportElementCategory.cs" />
+    <Compile Include="Domain\ReportElementType.cs" />
+    <Compile Include="Domain\ReportPackageTemplate.cs" />
+    <Compile Include="Domain\ReportPackageTemplateAssignment.cs" />
+    <Compile Include="Domain\ReportPackageTemplateElementCategory.cs" />
+    <Compile Include="Domain\ReportPackageTemplateElementType.cs" />
     <Compile Include="Domain\SettingTemplate.cs" />
     <Compile Include="Domain\SignatoryRequest.cs" />
     <Compile Include="Domain\SignatoryRequestStatus.cs" />
     <Compile Include="Domain\SystemSetting.cs" />
     <Compile Include="Domain\TimeZone.cs" />
+    <Compile Include="Domain\Unit.cs" />
     <Compile Include="Domain\UserPasswordHistory.cs" />
     <Compile Include="Domain\UserProfile.cs" />
     <Compile Include="Domain\UserQuestionAnswer.cs" />
