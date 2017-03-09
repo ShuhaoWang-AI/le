@@ -574,9 +574,13 @@ namespace Linko.LinkoExchange.Services.User
             foreach (var authority in authorityList)
             {
                 //Find admin users in each of these
+                //
+                //(Bug 2206 - when a user is both an Auth Admin and IU Admin; multiple emails sent to same person)
+                //
                 var admins = _dbContext.OrganizationRegulatoryProgramUsers
                     .Where(o => o.PermissionGroup.Name == "Administrator"
-                    && o.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId);
+                    && o.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId)
+                    .GroupBy(u => u.UserProfileId).Select(grp => grp.First()); //Ensures distinct user profiles/email addresses
                 foreach (var admin in admins.ToList())
                 {
                     string adminEmail = GetUserProfileById(admin.UserProfileId).Email;
