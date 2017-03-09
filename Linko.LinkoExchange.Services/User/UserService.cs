@@ -538,6 +538,10 @@ namespace Linko.LinkoExchange.Services.User
             var authorityList = new List<OrganizationRegulatoryProgram>(); //distinct authorities
             Dictionary<string, string> contentReplacements;
 
+            //To ensure we don't send duplicate admin emails to the same person (if they are Auth admin and locked person belongs
+            //to more than one IU under the same program) 
+            var adminEmailList = new List<string>();
+             
             foreach (var program in programs.ToList())
             {
                 //Find admin users in each of these
@@ -550,12 +554,17 @@ namespace Linko.LinkoExchange.Services.User
                 foreach (var admin in admins.ToList())
                 {
                     string adminEmail = GetUserProfileById(admin.UserProfileId).Email;
-                    contentReplacements = new Dictionary<string, string>();
-                    contentReplacements.Add("firstName", user.FirstName);
-                    contentReplacements.Add("lastName", user.LastName);
-                    contentReplacements.Add("userName", user.UserName);
-                    contentReplacements.Add("email", user.Email);
-                    _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_AccountLockOut, contentReplacements, perProgram);
+                    if (!adminEmailList.Contains(adminEmail))
+                    {
+                        contentReplacements = new Dictionary<string, string>();
+                        contentReplacements.Add("firstName", user.FirstName);
+                        contentReplacements.Add("lastName", user.LastName);
+                        contentReplacements.Add("userName", user.UserName);
+                        contentReplacements.Add("email", user.Email);
+                        _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockOutToSysAdmins, contentReplacements, perProgram);
+                        adminEmailList.Add(adminEmail);
+                    }
+                    
                 }
 
                 //Get authority's org id, if it exists. If not, they ARE the authority
@@ -580,13 +589,16 @@ namespace Linko.LinkoExchange.Services.User
                 foreach (var admin in admins.ToList())
                 {
                     string adminEmail = GetUserProfileById(admin.UserProfileId).Email;
-                    contentReplacements = new Dictionary<string, string>();
-                    contentReplacements.Add("firstName", user.FirstName);
-                    contentReplacements.Add("lastName", user.LastName);
-                    contentReplacements.Add("userName", user.UserName);
-                    contentReplacements.Add("email", user.Email);
-                    _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockOutToSysAdmins, contentReplacements);
-
+                    if (!adminEmailList.Contains(adminEmail))
+                    {
+                        contentReplacements = new Dictionary<string, string>();
+                        contentReplacements.Add("firstName", user.FirstName);
+                        contentReplacements.Add("lastName", user.LastName);
+                        contentReplacements.Add("userName", user.UserName);
+                        contentReplacements.Add("email", user.Email);
+                        _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockOutToSysAdmins, contentReplacements);
+                        adminEmailList.Add(adminEmail);
+                    }
                 }
 
                 if (reason == AccountLockEvent.ManualAction)
