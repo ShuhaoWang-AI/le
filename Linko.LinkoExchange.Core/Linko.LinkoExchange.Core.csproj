@@ -126,6 +126,7 @@
     <Compile Include="Enum\RegistrationResult.cs" />
     <Compile Include="Enum\OrganizationTypeName.cs" />
     <Compile Include="Enum\RegistrationType.cs" />
+    <Compile Include="Enum\ReportPackageTemplateStatus.cs" />
     <Compile Include="Enum\SettingType.cs" />
     <Compile Include="Enum\SystemSettingType.cs" />
     <Compile Include="Enum\UserRole.cs" />
