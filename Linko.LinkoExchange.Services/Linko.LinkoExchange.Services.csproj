@@ -160,6 +160,8 @@
     <Compile Include="Mapping\MapHelper.cs" />
     <Compile Include="Organization\IOrganizationService.cs" />
     <Compile Include="Organization\OrganizationService.cs" />
+    <Compile Include="Parameter\IParameterService.cs" />
+    <Compile Include="Parameter\ParameterService.cs" />
     <Compile Include="Permission\IPermissionService.cs" />
     <Compile Include="Permission\PermissionService.cs" />
     <Compile Include="Program\IProgramService.cs" />
@@ -168,6 +170,7 @@
     <Compile Include="QuestionAnswer\EncryptionService.cs" />
     <Compile Include="QuestionAnswer\IEncryptionService.cs" />
     <Compile Include="QuestionAnswer\StringCipher.cs" />
+    <Compile Include="Report\IReportElementService.cs" />
     <Compile Include="Settings\ISettingService.cs" />
     <Compile Include="Settings\SettingService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -417,5 +417,10 @@ namespace Linko.LinkoExchange.Services.Mapping
             return dto;
         }
 
+        public Linko.LinkoExchange.Services.Parameter.ParameterDto GetParameterDtoFromParameter(Core.Domain.Parameter parameter)
+        {
+            return new Parameter.ParameterDto();
+        }
+
     }
 }

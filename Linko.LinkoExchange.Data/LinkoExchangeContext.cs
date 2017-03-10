@@ -53,6 +53,11 @@ namespace Linko.LinkoExchange.Data
         public DbSet<UserPasswordHistory> UserPasswordHistories { get; set; }
         public DbSet<UserQuestionAnswer> UserQuestionAnswers { get; set; }
 
+        public DbSet<ParameterGroup> ParameterGroups { get; set; }
+        public DbSet<ParameterGroupParameter> ParameterGroupParameters { get; set; }
+        public DbSet<Parameter> Parameters { get; set; }
+
+
         #endregion
 
 

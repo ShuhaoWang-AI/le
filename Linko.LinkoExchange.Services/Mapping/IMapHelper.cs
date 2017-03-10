@@ -25,5 +25,7 @@ namespace Linko.LinkoExchange.Services.Mapping
         JurisdictionDto GetJurisdictionDtoFromJurisdiction(Core.Domain.Jurisdiction jurisdiction, JurisdictionDto dto = null);
         CromerrAuditLog GetCromerrAuditLogFromCromerrAuditLogEntryDto(CromerrAuditLogEntryDto dto, CromerrAuditLog cromerrAuditLog = null);
         CromerrAuditLogEntryDto GetCromerrAuditLogDtoFromCromerrAuditLog(CromerrAuditLog cromerrAuditLog, CromerrAuditLogEntryDto dto = null);
+
+        Linko.LinkoExchange.Services.Parameter.ParameterDto GetParameterDtoFromParameter(Core.Domain.Parameter parameter);
     }
 }
