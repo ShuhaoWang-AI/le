@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Linko.LinkoExchange.Services.Dto;
+using System.Collections.Generic;
 
 namespace Linko.LinkoExchange.Services.Attachment
 {

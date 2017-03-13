@@ -498,5 +498,10 @@ namespace Linko.LinkoExchange.Services.Mapping
             return unitDto;
         }
 
+        public ReportElementType GetReportElementTypeFromCertificationTypeDto(CertificationTypeDto certificationType, ReportElementType reportTypeElement = null)
+        {
+            return new ReportElementType();
+        }
+
     }
 }

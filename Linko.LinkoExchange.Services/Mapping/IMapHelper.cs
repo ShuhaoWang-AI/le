@@ -28,6 +28,7 @@ namespace Linko.LinkoExchange.Services.Mapping
         ParameterDto GetParameterDtoFromParameter(Core.Domain.Parameter parameter);
         ParameterGroupDto GetParameterGroupDtoFromParameterGroup(ParameterGroup parameterGroup);
         ParameterGroup GetParameterGroupFromParameterGroupDto(ParameterGroupDto parameterGroupDto, ParameterGroup parameterGroup = null);
+        ReportElementType GetReportElementTypeFromCertificationTypeDto(CertificationTypeDto certificationType, ReportElementType reportTypeElement = null);
 
     }
 }

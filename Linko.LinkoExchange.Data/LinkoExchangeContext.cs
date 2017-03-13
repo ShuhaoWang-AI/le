@@ -57,6 +57,8 @@ namespace Linko.LinkoExchange.Data
         public DbSet<ParameterGroupParameter> ParameterGroupParameters { get; set; }
         public DbSet<Parameter> Parameters { get; set; }
 
+        public DbSet<ReportElementType> ReportElementTypes { get; set; }
+
 
         #endregion
 
