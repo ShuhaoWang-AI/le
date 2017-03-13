@@ -35,9 +35,13 @@ namespace Linko.LinkoExchange.Services.Report
         public IEnumerable<CertificationTypeDto> GetCertificationTypes()
         {
             var certTypes = new List<CertificationTypeDto>();
+            var certReportElementCategoryId = _dbContext.ReportElementCategories
+                .Single(r => r.Name == ReportElementCategoryName.Certifications.ToString()).ReportElementCategoryId;
+
             var foundReportElementTypes = _dbContext.ReportElementTypes
                 .Include(c => c.CtsEventType)
-                .Where(c => c.OrganizationRegulatoryProgramId == _orgRegProgramId)
+                .Where(c => c.OrganizationRegulatoryProgramId == _orgRegProgramId
+                    && c.ReportElementCategoryId == certReportElementCategoryId)
                 .ToList();
             foreach (var reportElementType in foundReportElementTypes)
             {
@@ -72,6 +76,24 @@ namespace Linko.LinkoExchange.Services.Report
                 .Single(r => r.ReportElementTypeId == certificationTypeId);
             _dbContext.ReportElementTypes.Remove(foundReportElementType);
             _dbContext.SaveChanges();
+        }
+
+        public IEnumerable<AttachmentTypeDto> GetAttachmentTypes()
+        {
+            var attachmentTypes = new List<AttachmentTypeDto>();
+            var attachmentReportElementCategoryId = _dbContext.ReportElementCategories
+                .Single(r => r.Name == ReportElementCategoryName.Attachments.ToString()).ReportElementCategoryId;
+            var foundReportElementTypes = _dbContext.ReportElementTypes
+                .Include(c => c.CtsEventType)
+                .Where(c => c.OrganizationRegulatoryProgramId == _orgRegProgramId
+                        && c.ReportElementCategoryId == attachmentReportElementCategoryId)
+                .ToList();
+            foreach (var reportElementType in foundReportElementTypes)
+            {
+                var dto = _mapHelper.GetAttachmentTypeDtoFromReportElementType(reportElementType);
+                attachmentTypes.Add(dto);
+            }
+            return attachmentTypes;
         }
     }
 }

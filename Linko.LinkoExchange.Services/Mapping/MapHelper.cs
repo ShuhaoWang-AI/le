@@ -549,6 +549,22 @@ namespace Linko.LinkoExchange.Services.Mapping
             return mappedCertType;
         }
 
+        public AttachmentTypeDto GetAttachmentTypeDtoFromReportElementType(ReportElementType reportElementType)
+        {
+            var mappedAttachmentType = new AttachmentTypeDto();
+            mappedAttachmentType.ReportElementCategoryId = reportElementType.ReportElementCategoryId;
+            mappedAttachmentType.AttachmentTypeID = reportElementType.ReportElementTypeId;
+            mappedAttachmentType.AttachmentTypeName = reportElementType.Name;
+            mappedAttachmentType.AttachmentTypeDescription = reportElementType.Description;
+            mappedAttachmentType.CtsEventType = GetCtsEventTypeDtoFromCtsEventType(reportElementType.CtsEventType);
+            //mappedCertType.IsDeleted = row removed via hard delete? (TO-DO: confirm)
+            mappedAttachmentType.OrganizationRegulatoryProgramId = reportElementType.OrganizationRegulatoryProgramId;
+            mappedAttachmentType.CreationDateTimeUtc = reportElementType.CreationDateTimeUtc;
+            mappedAttachmentType.LastModificationDateTimeUtc = reportElementType.LastModificationDateTimeUtc;
+            mappedAttachmentType.LastModifierUserId = reportElementType.LastModifierUserId;
+            return mappedAttachmentType;
+        }
+
         public ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(Core.Domain.ReportPackageTemplateElementCategory reportPackageTmeplateElementCategory)
         {
             //TODO
