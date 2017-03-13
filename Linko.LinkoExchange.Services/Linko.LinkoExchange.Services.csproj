@@ -130,6 +130,7 @@
     <Compile Include="Dto\ReportElementCategoryDto.cs" />
     <Compile Include="Dto\ParameterDto.cs" />
     <Compile Include="Dto\ParameterGroupDto.cs" />
+    <Compile Include="Dto\ReportElementTypeDto.cs" />
     <Compile Include="Dto\ResetUserResultDto.cs" />
     <Compile Include="Dto\AccountLockoutResultDto.cs" />
     <Compile Include="Dto\CromerrAuditLogEntryDto.cs" />

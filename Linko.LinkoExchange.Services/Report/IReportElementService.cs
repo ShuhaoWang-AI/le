@@ -13,5 +13,7 @@ namespace Linko.LinkoExchange.Services.Report
         void SaveCertificationType(CertificationTypeDto certType);
         void DeleteCertificationType(int certificationTypeId);
         IEnumerable<AttachmentTypeDto> GetAttachmentTypes();
+        void SaveAttachmentType(AttachmentTypeDto attachmentType);
+        void DeleteAttachmentType(int attachmentTypeId);
     }
 }

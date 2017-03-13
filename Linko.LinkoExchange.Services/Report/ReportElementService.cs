@@ -70,10 +70,37 @@ namespace Linko.LinkoExchange.Services.Report
 
         }
 
+        public void SaveAttachmentType(AttachmentTypeDto attachmentType)
+        {
+            ReportElementType attachmentTypeToPersist = null;
+            if (attachmentType.AttachmentTypeID.HasValue && attachmentType.AttachmentTypeID.Value > 0)
+            {
+                //Update existing
+                attachmentTypeToPersist = _dbContext.ReportElementTypes.Single(c => c.ReportElementTypeId == attachmentType.AttachmentTypeID);
+                attachmentTypeToPersist = _mapHelper.GetReportElementTypeFromAttachmentTypeDto(attachmentType, attachmentTypeToPersist);
+            }
+            else
+            {
+                //Get new
+                attachmentTypeToPersist = _mapHelper.GetReportElementTypeFromAttachmentTypeDto(attachmentType);
+                _dbContext.ReportElementTypes.Add(attachmentTypeToPersist);
+            }
+            _dbContext.SaveChanges();
+
+        }
+
         public void DeleteCertificationType(int certificationTypeId)
         {
             var foundReportElementType = _dbContext.ReportElementTypes
                 .Single(r => r.ReportElementTypeId == certificationTypeId);
+            _dbContext.ReportElementTypes.Remove(foundReportElementType);
+            _dbContext.SaveChanges();
+        }
+
+        public void DeleteAttachmentType(int attachmentTypeId)
+        {
+            var foundReportElementType = _dbContext.ReportElementTypes
+                .Single(r => r.ReportElementTypeId == attachmentTypeId);
             _dbContext.ReportElementTypes.Remove(foundReportElementType);
             _dbContext.SaveChanges();
         }

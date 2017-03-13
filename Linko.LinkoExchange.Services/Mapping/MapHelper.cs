@@ -506,8 +506,8 @@ namespace Linko.LinkoExchange.Services.Mapping
                 reportElementType = new ReportElementType();
             }
 
-            reportElementType.Name  = certificationType.CertificationTypeName;
-            reportElementType.Description  = certificationType.CertificationTypeDescription;
+            reportElementType.Name  = certificationType.Name;
+            reportElementType.Description  = certificationType.Description;
             reportElementType.Content  = certificationType.CertificationText;
             reportElementType.IsContentProvided = true;
             reportElementType.CtsEventTypeId  = certificationType.CtsEventType.CtsEventTypeId;
@@ -519,6 +519,30 @@ namespace Linko.LinkoExchange.Services.Mapping
             reportElementType.CreationDateTimeUtc = certificationType.CreationDateTimeUtc;
             reportElementType.LastModificationDateTimeUtc  = certificationType.LastModificationDateTimeUtc;
             reportElementType.LastModifierUserId  = certificationType.LastModifierUserId;
+
+            return reportElementType;
+        }
+
+        public ReportElementType GetReportElementTypeFromAttachmentTypeDto(AttachmentTypeDto attachmentType, ReportElementType reportElementType = null)
+        {
+            if (reportElementType == null)
+            {
+                reportElementType = new ReportElementType();
+            }
+
+            reportElementType.Name = attachmentType.Name;
+            reportElementType.Description = attachmentType.Description;
+            //IGNORE reportElementType.Content
+            reportElementType.IsContentProvided = false;
+            reportElementType.CtsEventTypeId = attachmentType.CtsEventType.CtsEventTypeId;
+            //IGNORE reportElementType.CtsEventType
+            reportElementType.ReportElementCategoryId = attachmentType.ReportElementCategoryId;
+            //IGNORE reportElementType.ReportElementCategory
+            reportElementType.OrganizationRegulatoryProgramId = attachmentType.OrganizationRegulatoryProgramId;
+            //IGNORE reportElementType.OrganizationRegulatoryProgram
+            reportElementType.CreationDateTimeUtc = attachmentType.CreationDateTimeUtc;
+            reportElementType.LastModificationDateTimeUtc = attachmentType.LastModificationDateTimeUtc;
+            reportElementType.LastModifierUserId = attachmentType.LastModifierUserId;
 
             return reportElementType;
         }
@@ -537,8 +561,8 @@ namespace Linko.LinkoExchange.Services.Mapping
             var mappedCertType = new CertificationTypeDto();
             mappedCertType.ReportElementCategoryId = reportElementType.ReportElementCategoryId;
             mappedCertType.CertificationTypeID = reportElementType.ReportElementTypeId;
-            mappedCertType.CertificationTypeName = reportElementType.Name;
-            mappedCertType.CertificationTypeDescription = reportElementType.Description;
+            mappedCertType.Name = reportElementType.Name;
+            mappedCertType.Description = reportElementType.Description;
             mappedCertType.CtsEventType = GetCtsEventTypeDtoFromCtsEventType(reportElementType.CtsEventType);
             mappedCertType.CertificationText = reportElementType.Content;
             //mappedCertType.IsDeleted = row removed via hard delete? (TO-DO: confirm)
@@ -554,8 +578,8 @@ namespace Linko.LinkoExchange.Services.Mapping
             var mappedAttachmentType = new AttachmentTypeDto();
             mappedAttachmentType.ReportElementCategoryId = reportElementType.ReportElementCategoryId;
             mappedAttachmentType.AttachmentTypeID = reportElementType.ReportElementTypeId;
-            mappedAttachmentType.AttachmentTypeName = reportElementType.Name;
-            mappedAttachmentType.AttachmentTypeDescription = reportElementType.Description;
+            mappedAttachmentType.Name = reportElementType.Name;
+            mappedAttachmentType.Description = reportElementType.Description;
             mappedAttachmentType.CtsEventType = GetCtsEventTypeDtoFromCtsEventType(reportElementType.CtsEventType);
             //mappedCertType.IsDeleted = row removed via hard delete? (TO-DO: confirm)
             mappedAttachmentType.OrganizationRegulatoryProgramId = reportElementType.OrganizationRegulatoryProgramId;
