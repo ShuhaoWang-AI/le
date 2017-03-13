@@ -1,6 +1,6 @@
-﻿namespace Linko.LinkoExchange.Services
+﻿namespace Linko.LinkoExchange.Services.Dto
 {
-    public class CTSEventTypeDto
+    public class CtsEventTypeDto
     {
         public int CTSEventTypeId { get; set; }
         public string Name { get; set; }

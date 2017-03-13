@@ -1,9 +1,9 @@
 ﻿using Linko.LinkoExchange.Services.Dto;
 using System.Collections.Generic;
 
-namespace Linko.LinkoExchange.Services.Attachment
+namespace Linko.LinkoExchange.Services
 {
-    interface IAttachmentService
+    public interface IAttachmentService
     {
         List<AttachmentTypeDto> GetAttachmentTypes();
         List<CertificationTypeDto> GetCertificationTypes();

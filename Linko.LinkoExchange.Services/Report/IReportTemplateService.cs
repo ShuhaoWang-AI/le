@@ -1,3 +1,4 @@
+using Linko.LinkoExchange.Services.Dto;
 using System;
 using System.Collections.Generic;
 
@@ -5,9 +6,9 @@ namespace Linko.LinkoExchange.Services
 {
     public interface IReportTemplateService
     {
-        IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates();
-        IEnumerable<CTSEventTypeDto> GetCTSEventTypes();
-        void SaveReportPackageTemplate(ReportPackageTemplateDto rpt);
+        IEnumerable<Dto.ReportPackageTemplateDto> GetReportPackageTemplates();
+        IEnumerable<CtsEventTypeDto> GetCTSEventTypes();
+        void SaveReportPackageTemplate(Dto.ReportPackageTemplateDto rpt);
         ReportPackageTemplateDto GetReportPackageTemplate(int reportPackageTemplateId);
         void deleteReportPackageTemplate(int reportPackageTemplateId);
     }

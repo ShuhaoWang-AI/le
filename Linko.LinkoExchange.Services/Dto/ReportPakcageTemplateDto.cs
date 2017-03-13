@@ -16,7 +16,7 @@ namespace Linko.LinkoExchange.Services
         public DateTimeOffset? CreatedDate { get; set; }
         public UserProfile LastModifiedBy { get; set; }
         public DateTimeOffset? LastModifiedDate { get; set; }
-        public CTSEventTypeDto CTSEventType { get; set; }
+        public CtsEventTypeDto CTSEventType { get; set; }
         public List<AttachmentDto> Attachments { get; set; }
         public List<OrganizationRegulatoryProgramDto> AssignedIndustries { get; set; }
     }

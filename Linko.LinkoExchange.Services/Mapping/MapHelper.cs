@@ -248,8 +248,8 @@ namespace Linko.LinkoExchange.Services.Mapping
             {
                 dto = new SettingDto();
             }
-            dto.TemplateName = (SettingType)Enum.Parse(typeof(SettingType), setting.SettingTemplate.Name);
-            dto.OrgTypeName = (OrganizationTypeName)Enum.Parse(typeof(OrganizationTypeName), setting.OrganizationRegulatoryProgram.Organization.OrganizationType.Name);
+            dto.TemplateName = (SettingType) Enum.Parse(typeof(SettingType), setting.SettingTemplate.Name);
+            dto.OrgTypeName = (OrganizationTypeName) Enum.Parse(typeof(OrganizationTypeName), setting.OrganizationRegulatoryProgram.Organization.OrganizationType.Name);
             dto.Value = setting.Value;
             dto.DefaultValue = setting.SettingTemplate.DefaultValue;
             return dto;
@@ -261,8 +261,8 @@ namespace Linko.LinkoExchange.Services.Mapping
             {
                 dto = new SettingDto();
             }
-            dto.TemplateName = (SettingType)Enum.Parse(typeof(SettingType), setting.SettingTemplate.Name);
-            dto.OrgTypeName = (OrganizationTypeName)Enum.Parse(typeof(OrganizationTypeName), setting.SettingTemplate.OrganizationType.Name);
+            dto.TemplateName = (SettingType) Enum.Parse(typeof(SettingType), setting.SettingTemplate.Name);
+            dto.OrgTypeName = (OrganizationTypeName) Enum.Parse(typeof(OrganizationTypeName), setting.SettingTemplate.OrganizationType.Name);
             dto.Value = setting.Value;
             dto.DefaultValue = setting.SettingTemplate.DefaultValue;
             return dto;
@@ -433,7 +433,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             paramDto.LastModifierUserId = parameter.LastModifierUserId;
 
             return paramDto;
-    }
+        }
 
         public ParameterGroupDto GetParameterGroupDtoFromParameterGroup(ParameterGroup parameterGroup)
         {
@@ -501,6 +501,77 @@ namespace Linko.LinkoExchange.Services.Mapping
         public ReportElementType GetReportElementTypeFromCertificationTypeDto(CertificationTypeDto certificationType, ReportElementType reportTypeElement = null)
         {
             return new ReportElementType();
+        }
+
+        public ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(Core.Domain.ReportPackageTemplateElementCategory reportPackageTmeplateElementCategory)
+        {
+            //TODO
+            return new ReportElementCategoryDto();
+        }
+
+        public CtsEventTypeDto GetEventTypeDtoFromEventType(CtsEventType ctsEventType)
+        {
+            //TODO 
+            if (ctsEventType == null)
+            {
+                return null;
+            }
+
+            var ctsEventTypeDto = new CtsEventTypeDto();
+            return ctsEventTypeDto;
+        }
+
+        public CtsEventType GetEventTypeFromEventTypeDto(CtsEventTypeDto ctsEventTypeDto)
+        {
+            //TODO 
+            if (ctsEventTypeDto == null)
+            {
+                return null;
+            }
+
+            var ctsEventType = new CtsEventType();
+            return ctsEventType;
+        }
+
+        public ReportPackageTemplateDto GetReportPackageTemplateDtoFromReportPackageTemplate(ReportPackageTemplate reportPackageTemplate)
+        {
+            if (reportPackageTemplate == null)
+            {
+                return null;
+            }
+
+            var rpt = new Dto.ReportPackageTemplateDto();
+            // TODO:  Add other fields that can be convert here
+
+            rpt.TemplateName = reportPackageTemplate.Name;
+            rpt.LastModifiedDate = reportPackageTemplate.LastModificationDateTimeUtc;
+            rpt.CtsEventType = GetEventTypeDtoFromEventType(reportPackageTemplate.CtsEventType);
+            rpt.Description = reportPackageTemplate.Description;
+            rpt.EffectiveDate = reportPackageTemplate.EffectiveDateTimeUtc;
+            rpt.Id = reportPackageTemplate.ReportPackageTemplateId;
+
+            return rpt;
+        }
+
+        public ReportPackageTemplate GetReportPackageTemplateFromReportPackageTemplateDto(Dto.ReportPackageTemplateDto reportPackageTemplateDto)
+        {
+            if (reportPackageTemplateDto == null)
+            {
+                return null;
+            }
+
+            var rpt = new ReportPackageTemplate();
+            // TODO:  Add other fields that can be convert here
+
+            rpt.Name = reportPackageTemplateDto.TemplateName;
+            rpt.LastModificationDateTimeUtc = reportPackageTemplateDto.LastModifiedDate;
+
+            rpt.CtsEventType = GetEventTypeFromEventTypeDto(reportPackageTemplateDto.CtsEventType);
+            rpt.Description = reportPackageTemplateDto.Description;
+            rpt.EffectiveDateTimeUtc = reportPackageTemplateDto.EffectiveDate;
+            rpt.ReportPackageTemplateId = reportPackageTemplateDto.Id;
+
+            return rpt;
         }
 
     }

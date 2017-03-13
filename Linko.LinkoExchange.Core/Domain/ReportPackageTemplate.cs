@@ -39,7 +39,7 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public DateTimeOffset CreationDateTimeUtc { get; set; }
 
-        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
+        public DateTimeOffset LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
 

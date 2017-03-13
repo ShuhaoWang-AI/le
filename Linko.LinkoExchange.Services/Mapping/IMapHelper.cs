@@ -29,6 +29,10 @@ namespace Linko.LinkoExchange.Services.Mapping
         ParameterGroupDto GetParameterGroupDtoFromParameterGroup(ParameterGroup parameterGroup);
         ParameterGroup GetParameterGroupFromParameterGroupDto(ParameterGroupDto parameterGroupDto, ParameterGroup parameterGroup = null);
         ReportElementType GetReportElementTypeFromCertificationTypeDto(CertificationTypeDto certificationType, ReportElementType reportTypeElement = null);
-
+        ReportPackageTemplateDto GetReportPackageTemplateDtoFromReportPackageTemplate(ReportPackageTemplate reportPackageTemplate);
+        ReportPackageTemplate GetReportPackageTemplateFromReportPackageTemplateDto(Dto.ReportPackageTemplateDto reportPackageTemplateDto);
+        ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(Core.Domain.ReportPackageTemplateElementCategory reportPackageTmeplateElementCategory);
+        CtsEventTypeDto GetEventTypeDtoFromEventType(CtsEventType ctsEventType);
+        CtsEventType GetEventTypeFromEventTypeDto(CtsEventTypeDto ctsEventTypeDto);
     }
 }

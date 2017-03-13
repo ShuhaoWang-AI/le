@@ -14,14 +14,14 @@ namespace Linko.LinkoExchange.Services.Program
         private readonly IMapHelper _mapHelper;
 
         public ProgramService(
-            LinkoExchangeContext applicationDbContext, 
+            LinkoExchangeContext applicationDbContext,
             IMapHelper mapHelper
             )
         {
             _linkoExchangeDbContext = applicationDbContext;
             _mapHelper = mapHelper;
         }
-        
+
         /// <summary>
         /// Get programs that a user can access
         /// </summary>
@@ -30,10 +30,10 @@ namespace Linko.LinkoExchange.Services.Program
         public IEnumerable<OrganizationRegulatoryProgramDto> GetUserRegulatoryPrograms(int userId)
         {
             var orp = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Include("OrganizationRegulatoryProgram")
-                                    .Where(i => i.IsRemoved == false && 
-                                           i.OrganizationRegulatoryProgram.IsRemoved == false && 
+                                    .Where(i => i.IsRemoved == false &&
+                                           i.OrganizationRegulatoryProgram.IsRemoved == false &&
                                            i.UserProfileId == userId).ToList();
-            return orp.Select(i=>
+            return orp.Select(i =>
             {
                 return _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(i.OrganizationRegulatoryProgram);
             });
@@ -41,7 +41,7 @@ namespace Linko.LinkoExchange.Services.Program
 
         public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int organizationRegulatoryProgramId)
         {
-            var  orp =  _linkoExchangeDbContext.OrganizationRegulatoryPrograms.SingleOrDefault(
+            var orp = _linkoExchangeDbContext.OrganizationRegulatoryPrograms.SingleOrDefault(
                 i => i.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId && i.IsRemoved == false);
 
             return orp == null ? null : _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orp);
@@ -62,12 +62,12 @@ namespace Linko.LinkoExchange.Services.Program
             var regulatoryProgramUsers = _linkoExchangeDbContext
                 .OrganizationRegulatoryProgramUsers.ToList()
                 .FindAll(i => !i.IsRemoved && i.UserProfileId == userProfile.UserProfileId);
-            if (regulatoryProgramUsers.Any()) 
+            if (regulatoryProgramUsers.Any())
             {
                 organziationRegulatoryProgramUserDtos
                     .AddRange(regulatoryProgramUsers.Select(user => _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user)));
 
-                foreach(var u in organziationRegulatoryProgramUserDtos)
+                foreach (var u in organziationRegulatoryProgramUserDtos)
                 {
                     u.UserProfileDto = _mapHelper.GetUserDtoFromUserProfile(_linkoExchangeDbContext.Users.SingleOrDefault(user => user.UserProfileId == u.UserProfileId));
                 }
@@ -84,6 +84,7 @@ namespace Linko.LinkoExchange.Services.Program
                  i.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId);
             if (orpu == null)
             {
+                // To create a new OrgRegProgram
                 orpu = new OrganizationRegulatoryProgramUser();
                 orpu.IsEnabled = true;
                 orpu.IsRegistrationApproved = false;
@@ -101,24 +102,38 @@ namespace Linko.LinkoExchange.Services.Program
             }
             else
             {
+                // To update the exsiting one.  
                 orpu.IsRegistrationApproved = false;
                 orpu.IsRegistrationDenied = false;
                 orpu.IsRemoved = false;
-                
+
                 //Update to new re-reg timestamp
                 orpu.RegistrationDateTimeUtc = DateTimeOffset.UtcNow;
 
                 //RESET SCENARIO
                 //Update because the new "Inviter" is now the Authority
                 //(need to do this so that this pending registration show up under the Authority)
-                orpu.InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgramId; 
+                orpu.InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgramId;
 
+                // Update all other OrgRegProgm  IsRegistrationApproved to be false to enforce all the user be approved again by all program administrators 
+                var orpus = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Where
+                        (i => i.UserProfileId == userProfileId && i.OrganizationRegulatoryProgramId != organizationRegulatoryProgramId && i.IsRemoved == false).ToList();
+
+                foreach (var prog in orpus)
+                {
+                    prog.IsRegistrationApproved = false;
+                }
             }
 
             _linkoExchangeDbContext.SaveChanges();
 
             return _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(orpu);
 
+        }
+
+        public IEnumerable<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int currentOrganizationRegulatoryProgramId, string searchString)
+        {
+            throw new NotImplementedException();
         }
     }
 }

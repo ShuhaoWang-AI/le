@@ -367,7 +367,13 @@ namespace Linko.LinkoExchange.Services.Invitation
                 cromerrAuditLogEntryDto.RegulatorOrganizationId = targetOrgRegProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                 cromerrAuditLogEntryDto.UserName = "n/a";
                 contentReplacements.Add("userName", "n/a");
+            }
 
+            // Per discussion between Sundoro, Rejeeb, Shuhao, during re-invitation,
+            // tOrganizationRegulatoryProgramUser.IsRemoved should be set to false
+            if (existingUser != null)
+            {
+                existingUser.IsRemoved = false;
             }
 
             cromerrAuditLogEntryDto.UserFirstName = firstName;
