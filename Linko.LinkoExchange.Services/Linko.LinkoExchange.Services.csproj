@@ -126,6 +126,8 @@
     <Compile Include="Dto\EnableOrganizationResultDto.cs" />
     <Compile Include="Dto\InvitationCheckEmailResultDto.cs" />
     <Compile Include="Dto\JurisdictionDto.cs" />
+    <Compile Include="Dto\ParameterDto.cs" />
+    <Compile Include="Dto\ParameterGroupDto.cs" />
     <Compile Include="Dto\ResetUserResultDto.cs" />
     <Compile Include="Dto\AccountLockoutResultDto.cs" />
     <Compile Include="Dto\CromerrAuditLogEntryDto.cs" />
@@ -146,6 +148,7 @@
     <Compile Include="Dto\RegistrationResultDto.cs" />
     <Compile Include="Dto\SettingDto.cs" />
     <Compile Include="Dto\TimeZoneDto.cs" />
+    <Compile Include="Dto\UnitDto.cs" />
     <Compile Include="Email\IEmailService.cs" />
     <Compile Include="Email\EmailService.cs" />
     <Compile Include="Dto\UserDto.cs" />

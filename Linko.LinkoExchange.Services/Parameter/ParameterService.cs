@@ -2,109 +2,34 @@
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Entity;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Services.Parameter
 {
-    public class UnitDto
-    {
-        /// <summary>
-        /// Primary key.
-        /// </summary>
-        public int UnitId { get; set; }
-
-        /// <summary>
-        /// Unique within a particular OrganizationRegulatoryProgramId.
-        /// </summary>
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        public bool IsFlow { get; set; }
-
-        public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgram { get; set; }
-
-        public bool IsRemoved { get; set; }
-
-        public DateTimeOffset CreationDateTimeUtc { get; set; }
-
-        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
-
-        public int? LastModifierUserId { get; set; }
-    }
-
-    public class ParameterDto
-    {
-        public int ParameterId { get; set; }
-
-        /// <summary>
-        /// Unique within a particular OrganizationRegulatoryProgramId.
-        /// </summary>
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        public UnitDto DefaultUnit { get; set; }
-
-        public double? TrcFactor { get; set; }
-
-        public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgram { get; set; }
-
-        public bool IsRemoved { get; set; }
-
-        public DateTimeOffset CreationDateTimeUtc { get; set; }
-
-        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
-
-        public int? LastModifierUserId { get; set; }
-    }
-
-    public class ParameterGroupDto
-    {
-        /// <summary>
-        /// Primary key.
-        /// </summary>
-        public int ParameterGroupId { get; set; }
-
-        /// <summary>
-        /// Unique within a particular OrganizationRegulatoryProgramId.
-        /// </summary>
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgram { get; set; }
-
-        public bool IsActive { get; set; }
-
-        public DateTimeOffset CreationDateTimeUtc { get; set; }
-
-        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
-
-        public int? LastModifierUserId { get; set; }
-
-        public virtual ICollection<ParameterDto> Parameters { get; set; }
-    }
-
-
     public class ParameterService : IParameterService
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly IMapHelper _mapHelper;
+        private readonly ILogger _logger;
 
         private int _orgRegProgramId;
 
         public ParameterService(LinkoExchangeContext dbContext,
             IHttpContextService httpContext,
-            IMapHelper mapHelper)
+            IMapHelper mapHelper,
+            ILogger logger)
         {
             _dbContext = dbContext;
             _mapHelper = mapHelper;
             _orgRegProgramId = int.Parse(httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            _logger = logger;
         }
 
         /// <summary>
@@ -124,21 +49,64 @@ namespace Linko.LinkoExchange.Services.Parameter
             return parameterDtos;
         }
 
+        /// <summary>
+        /// Returns all Parameter Groups associated with this Organization Regulatory Program
+        /// including children parameters
+        /// </summary>
+        /// <returns></returns>
         public ICollection<ParameterGroupDto> GetParameterGroups()
         {
-            //TO-DO
-            return new List<ParameterGroupDto>();
+            var parameterGroupDtos = new List<ParameterGroupDto>();
+            var foundParamGroups = _dbContext.ParameterGroups
+                .Include(param => param.ParameterGroupParameters)
+                .Where(param => param.OrganizationRegulatoryProgramId == _orgRegProgramId)
+                .ToList();
+            foreach (var paramGroup in foundParamGroups)
+            {
+                var dto = _mapHelper.GetParameterGroupDtoFromParameterGroup(paramGroup);
+                parameterGroupDtos.Add(dto);
+            }
+            return parameterGroupDtos;
         }
 
+        /// <summary>
+        /// Returns single Paramater Group associated with Id
+        /// including children parameters
+        /// </summary>
+        /// <param name="parameterGroupId">Id</param>
+        /// <returns></returns>
         public ParameterGroupDto GetParameterGroup(int parameterGroupId)
         {
-            //TO-DO
-            return new ParameterGroupDto();
+            var foundParamGroup = _dbContext.ParameterGroups
+                .Include(param => param.ParameterGroupParameters)
+                .Single(param => param.ParameterGroupId == parameterGroupId);
+
+            var parameterGroupDto = _mapHelper.GetParameterGroupDtoFromParameterGroup(foundParamGroup);
+            return parameterGroupDto;
         }
 
+        /// <summary>
+        /// If ParameterGroupId exists in passed in Dto, finds existing ParameterGroup to update 
+        /// OR creates new object to persist.
+        /// </summary>
+        /// <param name="parameterGroup"></param>
         public void SaveParameterGroup(ParameterGroupDto parameterGroup)
         {
-            //TO-DO
+            ParameterGroup paramGroupToPersist = null;
+            if (parameterGroup.ParameterGroupId.HasValue && parameterGroup.ParameterGroupId.Value > 0)
+            {
+                //Update existing
+                paramGroupToPersist = _dbContext.ParameterGroups.Single(param => param.ParameterGroupId == parameterGroup.ParameterGroupId);
+                paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup, paramGroupToPersist);
+            }
+            else
+            {
+                //Get new
+                paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup);
+                _dbContext.ParameterGroups.Add(paramGroupToPersist);
+            }
+            _dbContext.SaveChanges();
+
         }
 
         /// <summary>
@@ -148,17 +116,44 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <param name="parameterGroupId">Id</param>
         public void DeleteParameterGroup(int parameterGroupId)
         {
-            //TO-DO
-            //using (var transaction = _dbContext.BeginTransaction())
-            //{
+            using (var transaction = _dbContext.BeginTransaction())
+            {
+                try {
 
-            //}
+                    var childAssociations = _dbContext.ParameterGroupParameters
+                        .Where(child => child.ParameterGroupId == parameterGroupId);
 
-            var foundParameterGroup = _dbContext.ParameterGroups
-                .Single(pg => pg.ParameterGroupId == parameterGroupId);
+                    if (childAssociations.Count() > 0)
+                    {
+                        _dbContext.ParameterGroupParameters.RemoveRange(childAssociations);
+                    }
 
-            _dbContext.ParameterGroups.Remove(foundParameterGroup);
-            _dbContext.SaveChanges();
+                    var foundParameterGroup = _dbContext.ParameterGroups
+                        .Single(pg => pg.ParameterGroupId == parameterGroupId);
+
+                    _dbContext.ParameterGroups.Remove(foundParameterGroup);
+
+                    _dbContext.SaveChanges();
+
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    var errors = new List<string>() { ex.Message };
+
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error occurred {0} ", String.Join("," + Environment.NewLine, errors));
+
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+
         }
 
     }

@@ -1,6 +1,7 @@
 ﻿using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Parameter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -417,9 +418,84 @@ namespace Linko.LinkoExchange.Services.Mapping
             return dto;
         }
 
-        public Linko.LinkoExchange.Services.Parameter.ParameterDto GetParameterDtoFromParameter(Core.Domain.Parameter parameter)
+        public ParameterDto GetParameterDtoFromParameter(Core.Domain.Parameter parameter)
         {
-            return new Parameter.ParameterDto();
+            var paramDto = new ParameterDto();
+            paramDto.ParameterId = parameter.ParameterId;
+            paramDto.Name = parameter.Name;
+            paramDto.Description = parameter.Description;
+            paramDto.DefaultUnit = GetUnitDtoFromUnit(parameter.DefaultUnit);
+            paramDto.TrcFactor = parameter.TrcFactor;
+            paramDto.OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(parameter.OrganizationRegulatoryProgram);
+            paramDto.IsRemoved = parameter.IsRemoved;
+            paramDto.CreationDateTimeUtc = parameter.CreationDateTimeUtc;
+            paramDto.LastModificationDateTimeUtc = parameter.LastModificationDateTimeUtc;
+            paramDto.LastModifierUserId = parameter.LastModifierUserId;
+
+            return paramDto;
+    }
+
+        public ParameterGroupDto GetParameterGroupDtoFromParameterGroup(ParameterGroup parameterGroup)
+        {
+            var paramGroupDto = new ParameterGroupDto();
+            paramGroupDto.ParameterGroupId = parameterGroup.ParameterGroupId;
+            paramGroupDto.Name = parameterGroup.Name;
+            paramGroupDto.Description = parameterGroup.Description;
+            paramGroupDto.OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(parameterGroup.OrganizationRegulatoryProgram);
+            paramGroupDto.IsActive = parameterGroup.IsActive;
+            paramGroupDto.CreationDateTimeUtc = parameterGroup.CreationDateTimeUtc;
+            paramGroupDto.LastModificationDateTimeUtc = parameterGroup.LastModificationDateTimeUtc;
+            paramGroupDto.LastModifierUserId = parameterGroup.LastModifierUserId;
+
+            paramGroupDto.Parameters = new List<ParameterDto>();
+            foreach (var paramAssocation in parameterGroup.ParameterGroupParameters)
+            {
+                paramGroupDto.Parameters.Add(GetParameterDtoFromParameter(paramAssocation.Parameter));
+            }
+
+            return paramGroupDto;
+
+        }
+
+        public ParameterGroup GetParameterGroupFromParameterGroupDto(ParameterGroupDto parameterGroupDto, ParameterGroup parameterGroup = null)
+        {
+            if (parameterGroup == null)
+            {
+                parameterGroup = new ParameterGroup();
+            }
+
+            //TO-DO: make sure the right properties are being set
+            parameterGroup.Name = parameterGroupDto.Name;
+            parameterGroup.Description = parameterGroupDto.Description;
+            //OrganizationRegulatoryProgramId
+            parameterGroup.IsActive = parameterGroupDto.IsActive;
+            //CreationDateTimeUtc
+            parameterGroup.LastModificationDateTimeUtc = parameterGroupDto.LastModificationDateTimeUtc;
+            parameterGroup.LastModifierUserId = parameterGroupDto.LastModifierUserId;
+
+            parameterGroup.ParameterGroupParameters = new List<ParameterGroupParameter>();
+            foreach (var param in parameterGroupDto.Parameters)
+            {
+                parameterGroup.ParameterGroupParameters.Add(new ParameterGroupParameter() { ParameterId = param.ParameterId });
+            }
+
+            return parameterGroup;
+        }
+
+        private UnitDto GetUnitDtoFromUnit(Unit unit)
+        {
+            var unitDto = new UnitDto();
+            unitDto.UnitId = unit.UnitId;
+            unitDto.Name = unit.Name;
+            unitDto.Description = unit.Description;
+            unitDto.IsFlow = unit.IsFlow;
+            unitDto.OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(unit.OrganizationRegulatoryProgram);
+            unitDto.IsRemoved = unit.IsRemoved;
+            unitDto.CreationDateTimeUtc = unit.CreationDateTimeUtc;
+            unitDto.LastModificationDateTimeUtc = unit.LastModificationDateTimeUtc;
+            unitDto.LastModifierUserId = unit.LastModifierUserId;
+
+            return unitDto;
         }
 
     }
