@@ -58,6 +58,8 @@ namespace Linko.LinkoExchange.Data
         public DbSet<Parameter> Parameters { get; set; }
 
         public DbSet<ReportElementType> ReportElementTypes { get; set; }
+        public DbSet<ReportElementCategory> ReportElementCategories { get; set; }
+        
 
 
         #endregion

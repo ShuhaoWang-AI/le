@@ -34,5 +34,7 @@ namespace Linko.LinkoExchange.Services.Mapping
         ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(Core.Domain.ReportPackageTemplateElementCategory reportPackageTmeplateElementCategory);
         CtsEventTypeDto GetEventTypeDtoFromEventType(CtsEventType ctsEventType);
         CtsEventType GetEventTypeFromEventTypeDto(CtsEventTypeDto ctsEventTypeDto);
+        CertificationTypeDto GetCertificationTypeDtoFromReportElementType(ReportElementType reportElementType);
+
     }
 }

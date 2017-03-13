@@ -2,6 +2,7 @@
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Parameter;
+using Linko.LinkoExchange.Services.Report;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -498,9 +499,54 @@ namespace Linko.LinkoExchange.Services.Mapping
             return unitDto;
         }
 
-        public ReportElementType GetReportElementTypeFromCertificationTypeDto(CertificationTypeDto certificationType, ReportElementType reportTypeElement = null)
+        public ReportElementType GetReportElementTypeFromCertificationTypeDto(CertificationTypeDto certificationType, ReportElementType reportElementType = null)
         {
-            return new ReportElementType();
+            if (reportElementType == null)
+            {
+                reportElementType = new ReportElementType();
+            }
+
+            reportElementType.Name  = certificationType.CertificationTypeName;
+            reportElementType.Description  = certificationType.CertificationTypeDescription;
+            reportElementType.Content  = certificationType.CertificationText;
+            reportElementType.IsContentProvided = true;
+            reportElementType.CtsEventTypeId  = certificationType.CtsEventType.CtsEventTypeId;
+            //IGNORE reportElementType.CtsEventType
+            reportElementType.ReportElementCategoryId = certificationType.ReportElementCategoryId;
+            //IGNORE reportElementType.ReportElementCategory
+            reportElementType.OrganizationRegulatoryProgramId = certificationType.OrganizationRegulatoryProgramId;
+            //IGNORE reportElementType.OrganizationRegulatoryProgram
+            reportElementType.CreationDateTimeUtc = certificationType.CreationDateTimeUtc;
+            reportElementType.LastModificationDateTimeUtc  = certificationType.LastModificationDateTimeUtc;
+            reportElementType.LastModifierUserId  = certificationType.LastModifierUserId;
+
+            return reportElementType;
+        }
+
+        private CtsEventTypeDto GetCtsEventTypeDtoFromCtsEventType(CtsEventType ctsEventType)
+        {
+            var mappedDto = new CtsEventTypeDto();
+            mappedDto.CtsEventTypeId = ctsEventType.CtsEventTypeId;
+            mappedDto.Name = ctsEventType.Name;
+            mappedDto.Description = ctsEventType.Description;
+            return mappedDto;
+        }
+
+        public CertificationTypeDto GetCertificationTypeDtoFromReportElementType(ReportElementType reportElementType)
+        {
+            var mappedCertType = new CertificationTypeDto();
+            mappedCertType.ReportElementCategoryId = reportElementType.ReportElementCategoryId;
+            mappedCertType.CertificationTypeID = reportElementType.ReportElementTypeId;
+            mappedCertType.CertificationTypeName = reportElementType.Name;
+            mappedCertType.CertificationTypeDescription = reportElementType.Description;
+            mappedCertType.CtsEventType = GetCtsEventTypeDtoFromCtsEventType(reportElementType.CtsEventType);
+            mappedCertType.CertificationText = reportElementType.Content;
+            //mappedCertType.IsDeleted = row removed via hard delete? (TO-DO: confirm)
+            mappedCertType.OrganizationRegulatoryProgramId = reportElementType.OrganizationRegulatoryProgramId;
+            mappedCertType.CreationDateTimeUtc = reportElementType.CreationDateTimeUtc;
+            mappedCertType.LastModificationDateTimeUtc = reportElementType.LastModificationDateTimeUtc;
+            mappedCertType.LastModifierUserId = reportElementType.LastModifierUserId;
+            return mappedCertType;
         }
 
         public ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(Core.Domain.ReportPackageTemplateElementCategory reportPackageTmeplateElementCategory)

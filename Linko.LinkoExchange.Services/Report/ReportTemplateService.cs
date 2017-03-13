@@ -33,7 +33,7 @@ namespace Linko.LinkoExchange.Services
             throw new NotImplementedException();
         }
 
-        public IEnumerable<CtsEventTypeDto> GetCTSEventTypes()
+        public IEnumerable<CtsEventTypeDto> GetCtsEventTypes()
         {
             throw new NotImplementedException();
         }

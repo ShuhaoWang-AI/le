@@ -9,6 +9,8 @@ namespace Linko.LinkoExchange.Services.Report
 {
     public interface IReportElementService
     {
+        IEnumerable<CertificationTypeDto> GetCertificationTypes();
         void SaveCertificationType(CertificationTypeDto certType);
+        void DeleteCertificationType(int certificationTypeId);
     }
 }

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Linko.LinkoExchange.Services.Dto;
+using System.Data.Entity;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -31,6 +32,21 @@ namespace Linko.LinkoExchange.Services.Report
             _logger = logger;
         }
 
+        public IEnumerable<CertificationTypeDto> GetCertificationTypes()
+        {
+            var certTypes = new List<CertificationTypeDto>();
+            var foundReportElementTypes = _dbContext.ReportElementTypes
+                .Include(c => c.CtsEventType)
+                .Where(c => c.OrganizationRegulatoryProgramId == _orgRegProgramId)
+                .ToList();
+            foreach (var reportElementType in foundReportElementTypes)
+            {
+                var dto = _mapHelper.GetCertificationTypeDtoFromReportElementType(reportElementType);
+                certTypes.Add(dto);
+            }
+            return certTypes;
+        }
+
         public void SaveCertificationType(CertificationTypeDto certType)
         {
             ReportElementType certificationTypeToPersist = null;
@@ -48,6 +64,14 @@ namespace Linko.LinkoExchange.Services.Report
             }
             _dbContext.SaveChanges();
 
+        }
+
+        public void DeleteCertificationType(int certificationTypeId)
+        {
+            var foundReportElementType = _dbContext.ReportElementTypes
+                .Single(r => r.ReportElementTypeId == certificationTypeId);
+            _dbContext.ReportElementTypes.Remove(foundReportElementType);
+            _dbContext.SaveChanges();
         }
     }
 }
