@@ -166,7 +166,6 @@
     <Compile Include="Dto\CtsEventTypeDto.cs" />
     <Compile Include="Report\IReportTemplateService.cs" />
     <Compile Include="Report\ReportElementService.cs" />
-    <Compile Include="Report\ReportPackageTemplateStatus.cs" />
     <Compile Include="Jurisdiction\IJurisdictionService.cs" />
     <Compile Include="Jurisdiction\JurisdictionService.cs" />
     <Compile Include="Mapping\IMapHelper.cs" />

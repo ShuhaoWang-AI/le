@@ -553,7 +553,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             return rpt;
         }
 
-        public ReportPackageTemplate GetReportPackageTemplateFromReportPackageTemplateDto(Dto.ReportPackageTemplateDto reportPackageTemplateDto)
+        public ReportPackageTemplate GetReportPackageTemplateFromReportPackageTemplateDto(ReportPackageTemplateDto reportPackageTemplateDto)
         {
             if (reportPackageTemplateDto == null)
             {
