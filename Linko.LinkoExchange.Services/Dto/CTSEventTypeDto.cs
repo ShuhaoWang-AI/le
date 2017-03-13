@@ -1,4 +1,5 @@
-﻿namespace Linko.LinkoExchange.Services.Dto
+﻿
+namespace Linko.LinkoExchange.Services.Dto
 {
     public class CtsEventTypeDto
     {

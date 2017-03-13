@@ -43,7 +43,7 @@ namespace Linko.LinkoExchange.Services
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Dto.ReportPackageTemplateDto> GetReportPackageTemplates()
+        public IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates()
         {
             //TODO get  reportPackageTempates 
 
