@@ -29,14 +29,31 @@ namespace Linko.LinkoExchange.Services.Mapping
         ParameterGroupDto GetParameterGroupDtoFromParameterGroup(ParameterGroup parameterGroup);
         ParameterGroup GetParameterGroupFromParameterGroupDto(ParameterGroupDto parameterGroupDto, ParameterGroup parameterGroup = null);
         ReportElementType GetReportElementTypeFromCertificationTypeDto(CertificationTypeDto certificationType, ReportElementType reportTypeElement = null);
-        ReportPackageTemplateDto GetReportPackageTemplateDtoFromReportPackageTemplate(ReportPackageTemplate reportPackageTemplate);
-        ReportPackageTemplate GetReportPackageTemplateFromReportPackageTemplateDto(Dto.ReportPackageTemplateDto reportPackageTemplateDto);
-        ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(Core.Domain.ReportPackageTemplateElementCategory reportPackageTmeplateElementCategory);
+
+
+        Core.Domain.ReportElementCategory GetReportElementCategoryFromReportElementCategoryDto(ReportElementCategoryDto cat);
+        ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(Core.Domain.ReportElementCategory cat);
+
+        ReportPackageTemplateElementCategoryDto GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(ReportPackageTemplateElementCategory cat);
+        ReportPackageTemplateElementCategory GetReportPackageTemplateElementCategoryFromReportPackageTemplateElementCategoryDto(ReportPackageTemplateElementCategoryDto cat);
+
+        ReportPackageTemplateElementTypeDto GetReportPackageTemplateElememtTypeDtoFromReportPackageTemplateElementType(ReportPackageTemplateElementType rptet);
+        ReportPackageTemplateElementType GetReportPackageTemplateElememtTypeFromReportPackageTemplateElementTypeDto(ReportPackageTemplateElementTypeDto rptetDto);
+
         CtsEventTypeDto GetEventTypeDtoFromEventType(CtsEventType ctsEventType);
         CtsEventType GetEventTypeFromEventTypeDto(CtsEventTypeDto ctsEventTypeDto);
         CertificationTypeDto GetCertificationTypeDtoFromReportElementType(ReportElementType reportElementType);
         AttachmentTypeDto GetAttachmentTypeDtoFromReportElementType(ReportElementType reportElementType);
         ReportElementType GetReportElementTypeFromAttachmentTypeDto(AttachmentTypeDto attachmentType, ReportElementType reportTypeElement = null);
 
+
+        ReportPackageTemplateDto GetReportPackageTemplateDtoFromReportPackageTemplate(ReportPackageTemplate reportPackageTemplate);
+        ReportPackageTemplate GetReportPackageTemplateFromReportPackageTemplateDto(ReportPackageTemplateDto reportPackageTemplateDto);
+
+        ReportPackageTemplateElementTypeDto GetReportPackageTemplateElmentTypeDtoFromReportPackageTemplateType(ReportPackageTemplateElementType rptet);
+        ReportPackageTemplateElementType GetReportPackageTemplateElmentTypeFromReportPackageTemplateTypeDto(ReportPackageTemplateElementTypeDto rptet);
+
+        ReportElementTypeDto GetReportElementTypeDtoFromReportElementType(ReportElementType reportElementType);
+        ReportElementType GetReportElementTypeFromReportElementTypeDto(ReportElementTypeDto reportElementType);
     }
 }

@@ -131,6 +131,7 @@
     <Compile Include="Dto\ParameterDto.cs" />
     <Compile Include="Dto\ParameterGroupDto.cs" />
     <Compile Include="Dto\ReportElementTypeDto.cs" />
+    <Compile Include="Dto\ReportPackageTemplateElementTypeDto.cs" />
     <Compile Include="Dto\ResetUserResultDto.cs" />
     <Compile Include="Dto\AccountLockoutResultDto.cs" />
     <Compile Include="Dto\CromerrAuditLogEntryDto.cs" />
@@ -164,7 +165,7 @@
     <Compile Include="Invitation\IInvitationService.cs" />
     <Compile Include="Invitation\InvitationService.cs" />
     <Compile Include="Dto\CtsEventTypeDto.cs" />
-    <Compile Include="Report\IReportElementCategoryService.cs" />
+    <Compile Include="Dto\ReportPackageTemplateElementCategoryDto.cs" />
     <Compile Include="Report\IReportTemplateService.cs" />
     <Compile Include="Dto\ReportPackageTemplateDto.cs" />
     <Compile Include="Report\ReportElementService.cs" />

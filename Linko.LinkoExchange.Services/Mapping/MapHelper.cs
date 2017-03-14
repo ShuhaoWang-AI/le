@@ -589,10 +589,103 @@ namespace Linko.LinkoExchange.Services.Mapping
             return mappedAttachmentType;
         }
 
-        public ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(Core.Domain.ReportPackageTemplateElementCategory reportPackageTmeplateElementCategory)
+        public ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(Core.Domain.ReportElementCategory cat)
         {
-            //TODO
-            return new ReportElementCategoryDto();
+            var reportElementCategory = new ReportElementCategoryDto();
+            reportElementCategory.ReportElementCategoryId = cat.ReportElementCategoryId;
+            reportElementCategory.Name = cat.Name;
+            reportElementCategory.Description = cat.Description;
+            reportElementCategory.CreationDateTimeUtc = cat.CreationDateTimeUtc;
+            reportElementCategory.LastModificationDateTimeUtc = cat.LastModificationDateTimeUtc;
+            reportElementCategory.LastModifierUserId = cat.LastModifierUserId;
+
+            return reportElementCategory;
+        }
+
+        public ReportPackageTemplateElementCategoryDto GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(ReportPackageTemplateElementCategory cat)
+        {
+            var reportPackageTemplateElementCategory = new ReportPackageTemplateElementCategoryDto();
+            reportPackageTemplateElementCategory.ReportPackageTemplateElementCategoryId = cat.ReportPackageTemplateElementCategoryId;
+
+            reportPackageTemplateElementCategory.ReportPackageTemplateId = cat.ReportPackageTemplateId;
+            reportPackageTemplateElementCategory.ReportPackageTemplate = this.GetReportPackageTemplateDtoFromReportPackageTemplate(cat.ReportPackageTemplate);
+
+            reportPackageTemplateElementCategory.ReportElementCategoryId = cat.ReportElementCategoryId;
+            reportPackageTemplateElementCategory.ReportElementCategory = this.GetReportElementCategoryDtoFromReportElementCategory(cat.ReportElementCategory);
+
+            reportPackageTemplateElementCategory.SortOrder = cat.SortOrder;
+
+            var dtos = new List<ReportPackageTemplateElementTypeDto>();
+            foreach (var c in cat.ReportPackageTemplateElementTypes)
+            {
+                dtos.Add(this.GetReportPackageTemplateElememtTypeDtoFromReportPackageTemplateElementType(c));
+            }
+
+            reportPackageTemplateElementCategory.ReportPackageTemplateElementTypes = dtos;
+
+            return reportPackageTemplateElementCategory;
+        }
+        public ReportPackageTemplateElementTypeDto GetReportPackageTemplateElememtTypeDtoFromReportPackageTemplateElementType(ReportPackageTemplateElementType rptet)
+        {
+            var rptetDto = new ReportPackageTemplateElementTypeDto();
+            rptetDto.ReportPackageTemplateElementTypeId = rptet.ReportPackageTemplateElementTypeId;
+            rptetDto.ReportPackageTemplateElementCategoryId = rptet.ReportPackageTemplateElementCategoryId;
+            rptetDto.ReportPackageTemplateElementCategory = this.GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(rptet.ReportPackageTemplateElementCategory);
+            rptetDto.ReportElementTypeId = rptet.ReportElementTypeId;
+            rptetDto.ReportElementType = this.GetReportElementTypeDtoFromReportElementType(rptet.ReportElementType);
+            rptetDto.IsRequired = rptet.IsRequired;
+            rptetDto.SortOrder = rptet.SortOrder;
+            return rptetDto;
+        }
+
+        public ReportPackageTemplateElementType GetReportPackageTemplateElememtTypeFromReportPackageTemplateElementTypeDto(ReportPackageTemplateElementTypeDto rptetDto)
+        {
+            var rptet = new ReportPackageTemplateElementType();
+            rptet.ReportPackageTemplateElementTypeId = rptetDto.ReportPackageTemplateElementTypeId;
+            rptet.ReportPackageTemplateElementCategoryId = rptetDto.ReportPackageTemplateElementCategoryId;
+            rptet.ReportPackageTemplateElementCategory = this.GetReportPackageTemplateElementCategoryFromReportPackageTemplateElementCategoryDto(rptetDto.ReportPackageTemplateElementCategory);
+            rptet.ReportElementTypeId = rptetDto.ReportElementTypeId;
+            rptet.ReportElementType = this.GetReportElementTypeFromReportElementTypeDto(rptetDto.ReportElementType);
+            rptet.IsRequired = rptetDto.IsRequired;
+            rptet.SortOrder = rptetDto.SortOrder;
+            return rptet;
+        }
+
+        public ReportPackageTemplateElementCategory GetReportPackageTemplateElementCategoryFromReportPackageTemplateElementCategoryDto(ReportPackageTemplateElementCategoryDto cat)
+        {
+            var reportPackageTemplateElementCategory = new ReportPackageTemplateElementCategory();
+            reportPackageTemplateElementCategory.ReportPackageTemplateElementCategoryId = cat.ReportPackageTemplateElementCategoryId;
+
+            reportPackageTemplateElementCategory.ReportPackageTemplateId = cat.ReportPackageTemplateId;
+            reportPackageTemplateElementCategory.ReportPackageTemplate = this.GetReportPackageTemplateFromReportPackageTemplateDto(cat.ReportPackageTemplate);
+
+            reportPackageTemplateElementCategory.ReportElementCategoryId = cat.ReportElementCategoryId;
+            reportPackageTemplateElementCategory.ReportElementCategory = this.GetReportElementCategoryFromReportElementCategoryDto(cat.ReportElementCategory);
+
+            reportPackageTemplateElementCategory.SortOrder = cat.SortOrder;
+
+            var rptetps = new List<ReportPackageTemplateElementType>();
+            foreach (var rptetDto in cat.ReportPackageTemplateElementTypes)
+            {
+                rptetps.Add(this.GetReportPackageTemplateElememtTypeFromReportPackageTemplateElementTypeDto(rptetDto));
+            }
+
+            reportPackageTemplateElementCategory.ReportPackageTemplateElementTypes = rptetps;
+
+            return reportPackageTemplateElementCategory;
+        }
+
+        public Core.Domain.ReportElementCategory GetReportElementCategoryFromReportElementCategoryDto(ReportElementCategoryDto cat)
+        {
+            var reportElementCategory = new Core.Domain.ReportElementCategory();
+            reportElementCategory.ReportElementCategoryId = cat.ReportElementCategoryId;
+            reportElementCategory.Name = cat.Name;
+            reportElementCategory.Description = cat.Description;
+            reportElementCategory.CreationDateTimeUtc = cat.CreationDateTimeUtc;
+            reportElementCategory.LastModificationDateTimeUtc = cat.LastModificationDateTimeUtc;
+            reportElementCategory.LastModifierUserId = cat.LastModifierUserId;
+
+            return reportElementCategory;
         }
 
         public CtsEventTypeDto GetEventTypeDtoFromEventType(CtsEventType ctsEventType)
@@ -636,6 +729,17 @@ namespace Linko.LinkoExchange.Services.Mapping
             rpt.EffectiveDate = reportPackageTemplate.EffectiveDateTimeUtc;
             rpt.Id = reportPackageTemplate.ReportPackageTemplateId;
 
+            rpt.ReportPackageTemplateElementCategories = new List<ReportPackageTemplateElementCategoryDto>();
+            foreach (var cat in reportPackageTemplate.ReportPackageTemplateElementCategories)
+            {
+                rpt.ReportPackageTemplateElementCategories.Add(this.GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(cat));
+            }
+
+            //rpt.Attachments = new List<ReportElementCategoryDto>(); 
+
+            //rpt.Attachments = reportPackageTemplate.ReportPackageTemplateElementCategories
+            //    .Select(i => this.GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(i));
+
             return rpt;
         }
 
@@ -655,10 +759,36 @@ namespace Linko.LinkoExchange.Services.Mapping
             rpt.CtsEventType = GetEventTypeFromEventTypeDto(reportPackageTemplateDto.CtsEventType);
             rpt.Description = reportPackageTemplateDto.Description;
             rpt.EffectiveDateTimeUtc = reportPackageTemplateDto.EffectiveDate;
-            rpt.ReportPackageTemplateId = reportPackageTemplateDto.Id;
+            rpt.ReportPackageTemplateId = reportPackageTemplateDto.Id.Value;
 
             return rpt;
         }
 
+        public ReportPackageTemplateElementTypeDto GetReportPackageTemplateElmentTypeDtoFromReportPackageTemplateType(ReportPackageTemplateElementType rptet)
+        {
+            var dto = new ReportPackageTemplateElementTypeDto();
+            dto.ReportPackageTemplateElementTypeId = rptet.ReportPackageTemplateElementTypeId;
+            dto.ReportPackageTemplateElementCategoryId = rptet.ReportPackageTemplateElementCategoryId;
+            dto.ReportPackageTemplateElementCategory = this.GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(rptet.ReportPackageTemplateElementCategory);
+            dto.ReportElementTypeId = rptet.ReportElementTypeId;
+            dto.ReportElementType = this.GetReportElementTypeDtoFromReportElementType(rptet.ReportElementType);
+
+            return dto;
+        }
+
+        public ReportElementTypeDto GetReportElementTypeDtoFromReportElementType(ReportElementType reportElementType)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ReportElementType GetReportElementTypeFromReportElementTypeDto(ReportElementTypeDto reportElementType)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ReportPackageTemplateElementType GetReportPackageTemplateElmentTypeFromReportPackageTemplateTypeDto(ReportPackageTemplateElementTypeDto rptet)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
