@@ -198,12 +198,12 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.OrganizationRegulatoryProgramId = org.OrganizationRegulatoryProgramId;
             dto.RegulatoryProgramId = org.RegulatoryProgramId;
 
-            dto.RegulatoryProgramDto = this.GetProgramDtoFromOrganizationRegulatoryProgram(org.RegulatoryProgram);
+            dto.RegulatoryProgramDto = GetProgramDtoFromOrganizationRegulatoryProgram(org.RegulatoryProgram);
 
             dto.OrganizationId = org.OrganizationId;
             dto.RegulatorOrganizationId = org.RegulatorOrganizationId;
 
-            dto.OrganizationDto = this.GetOrganizationDtoFromOrganization(org.Organization);
+            dto.OrganizationDto = GetOrganizationDtoFromOrganization(org.Organization);
 
             if (org.RegulatorOrganization != null)
             {

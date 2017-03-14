@@ -1,14 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace Linko.LinkoExchange.Services
+namespace Linko.LinkoExchange.Services.Report
 {
     public class ReportTemplateService : IReportTemplateService
     {
@@ -33,7 +33,7 @@ namespace Linko.LinkoExchange.Services
             _logger = logger;
         }
 
-        public void deleteReportPackageTemplate(int reportPackageTemplateId)
+        public void DeleteReportPackageTemplate(int reportPackageTemplateId)
         {
             throw new NotImplementedException();
         }
@@ -51,10 +51,7 @@ namespace Linko.LinkoExchange.Services
         public IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates()
         {
             //TODO get  reportPackageTempates 
-
             var rpts = new List<ReportPackageTemplate>();
-
-
 
             var rptDtos = new List<ReportPackageTemplateDto>();
             foreach (var rpt in rpts)
@@ -62,21 +59,29 @@ namespace Linko.LinkoExchange.Services
                 var rptDto = _mapHelper.GetReportPackageTemplateDtoFromReportPackageTemplate(rpt);
 
                 // TODO 
-                //1. set Attachments  
-                rptDto.Attachments = rptDto.ReportPackageTemplateElementCategories
+                //1. set AttachmentTypes  
+                var atts = rpt.ReportPackageTemplateElementCategories
                     .Where(i => i.ReportElementCategory.Name == ReportElementCategoryName.Attachment.ToString())
-                    .Select(i => i.ReportElementCategory).ToList();
+                    .SelectMany(i => i.ReportPackageTemplateElementTypes).Distinct().ToList();
 
+                var attachments = new List<AttachmentTypeDto>();
+                foreach (var att in atts)
+                {
+                    attachments.Add(_mapHelper.GetAttachmentTypeDtoFromReportElementType(att.ReportElementType));
+                }
+                rptDto.AttachmentTypes = attachments;
 
-                //2. set certifications 
-                rptDto.Certifications = rptDto.ReportPackageTemplateElementCategories
+                //2. set certifications  
+                var certs = rpt.ReportPackageTemplateElementCategories
                    .Where(i => i.ReportElementCategory.Name == ReportElementCategoryName.Certification.ToString())
-                   .Select(i => i.ReportElementCategory).ToList();
+                   .SelectMany(i => i.ReportPackageTemplateElementTypes).Distinct().ToList();
+
+                rptDto.CertificationTypes = certs.Select(cert => _mapHelper.GetCertificationTypeDtoFromReportElementType(cert.ReportElementType)).ToList();
 
                 //3. set assingedIndustries  
                 rptDto.ReportPackageTemplateAssignments = rptDto.ReportPackageTemplateAssignments;
 
-                /// TODO ?
+                /// TODO  
                 /// to can the service to popute OrgRegProg  
                 /// 
                 rptDtos.Add(rptDto);
@@ -108,7 +113,7 @@ namespace Linko.LinkoExchange.Services
 
             //        var
 
-            //        var attachmentDto = rpt.Attachments.ToList();
+            //        var attachmentDto = rpt.AttachmentTypes.ToList();
             //        var category = new ReportPackageTemplateElementCategory
             //        {
             //            ReportElementCategoryId = attachmentDto.,

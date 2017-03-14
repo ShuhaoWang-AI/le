@@ -20,9 +20,9 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTimeOffset LastModifiedDate { get; set; }
         public CtsEventTypeDto CtsEventType { get; set; }
 
-        public List<ReportElementCategoryDto> Attachments { get; set; }
+        public List<AttachmentTypeDto> AttachmentTypes { get; set; }
+        public List<CertificationTypeDto> CertificationTypes { get; set; }
 
-        public List<ReportElementCategoryDto> Certifications { get; set; }
         public List<ReportPackageTemplateAssignmentDto> ReportPackageTemplateAssignments { get; set; }
 
         public List<ReportPackageTemplateElementCategoryDto> ReportPackageTemplateElementCategories { get; set; }
