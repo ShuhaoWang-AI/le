@@ -61,6 +61,10 @@ namespace Linko.LinkoExchange.Data
         public DbSet<ReportElementCategory> ReportElementCategories { get; set; }
         
 
+        public virtual DbSet<ReportPackageTemplate> ReportPackageTempates { get; set; }
+        public virtual DbSet<ReportElementCategory> ReportElementCategories { get; set; }
+        public virtual DbSet<ReportPackageTemplateElementType> ReportPackageTemplateElementTypes { get; set; }
+        public virtual DbSet<ReportPackageTemplateElementCategory> ReportPackageTemplateElementCategories { get; set; }
 
         #endregion
 
@@ -91,7 +95,7 @@ namespace Linko.LinkoExchange.Data
 
         public void Commit(DbContextTransaction transaction)
         {
-            if(transaction!=null)
+            if (transaction != null)
                 transaction.Commit();
         }
 
