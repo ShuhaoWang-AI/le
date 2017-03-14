@@ -14,7 +14,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public string CtsEventCategoryName { get; set; }
 
         public int OrganizationRegulatoryProgramId { get; set; }
-        public virtual OrganizationRegulatoryProgramDto OrganizationRegulatoryProgram { get; set; }
 
         public bool IsRemoved { get; set; }
 

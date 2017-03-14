@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 using NLog;
@@ -18,6 +18,7 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly IMapHelper _mapHelper;
         private readonly ILogger _logger;
 
+        private readonly int _orgRegProgramId;
 
         public ReportTemplateService(
             LinkoExchangeContext dbContext,
@@ -31,6 +32,8 @@ namespace Linko.LinkoExchange.Services.Report
             _attachmentService = attachmentService;
             _mapHelper = mapHelper;
             _logger = logger;
+
+            _orgRegProgramId = int.Parse(httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
         }
 
         public void DeleteReportPackageTemplate(int reportPackageTemplateId)
@@ -50,15 +53,13 @@ namespace Linko.LinkoExchange.Services.Report
 
         public IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates()
         {
-            //TODO get  reportPackageTempates 
-            var rpts = new List<ReportPackageTemplate>();
+            var rpts = _dbContext.ReportPackageTempates.Where(i => i.OrganizationRegulatoryProgramId == _orgRegProgramId).ToArray();
 
             var rptDtos = new List<ReportPackageTemplateDto>();
             foreach (var rpt in rpts)
             {
                 var rptDto = _mapHelper.GetReportPackageTemplateDtoFromReportPackageTemplate(rpt);
 
-                // TODO 
                 //1. set AttachmentTypes  
                 var atts = rpt.ReportPackageTemplateElementCategories
                     .Where(i => i.ReportElementCategory.Name == ReportElementCategoryName.Attachment.ToString())
@@ -82,7 +83,7 @@ namespace Linko.LinkoExchange.Services.Report
                 rptDto.ReportPackageTemplateAssignments = rptDto.ReportPackageTemplateAssignments;
 
                 /// TODO  
-                /// to can the service to popute OrgRegProg  
+                /// Do I need to call the service to popute OrgRegProg   
                 /// 
                 rptDtos.Add(rptDto);
             }
