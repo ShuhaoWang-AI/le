@@ -18,7 +18,7 @@
 </section>
 
 
-<div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-5">
+<div class="col-md-offset-2 col-md-8 col-lg-offset-2 col-lg-7">
     <div>
         <h1 class="h3">@ViewBag.SubTitle</h1>
     </div>
@@ -28,7 +28,8 @@
             <h4 class="box-title">@Label.TitleKBQChanllenge</h4>
         </div> @*.box-header*@
         <section id="Form1" class="box-body">
-            @using (Html.BeginForm(actionName: "KbqChallenge",
+            @using (Html.BeginForm(
+                actionName: "KbqChallenge",
                 controllerName: "Account",
                 method: FormMethod.Post, routeValues:new { returnUrl = ViewBag.returnUrl }, 
                 htmlAttributes: new { @class = "form-horizontal", role = "form" }))
@@ -41,10 +42,10 @@
                     @Html.LabelFor(m => m.Question, new { @class = "col-md-3 control-label" })
                     <div class="col-md-9">
                         @Html.TextBoxFor(m => m.Question, htmlAttributes: new
-                   {
-                       @class = "form-control",
-                       @readonly = "readonly"
-                   })
+                        {
+                            @class = "form-control",
+                            @readonly = "readonly"
+                        })
 
                         @Html.HiddenFor(m => m.QuestionAnswerId)  
                     </div>
@@ -53,7 +54,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.Answer, new { @class = "col-md-3 required control-label" })
                     <div class="col-md-9">
-                        @Html.TextBoxFor(m => m.Answer, new { @class = "form-control" })
+                        @Html.TextBoxFor(m => m.Answer, new { @class = "form-control", autocomplete = "off" })
                         @Html.ValidationMessageFor(m => m.Answer, "", new { @class = "text-red" })
                     </div>
                 </div>

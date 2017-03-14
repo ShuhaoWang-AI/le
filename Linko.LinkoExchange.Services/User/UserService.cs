@@ -1067,7 +1067,9 @@ namespace Linko.LinkoExchange.Services.User
                 var isExistsAlready = _dbContext.Users.Any(u => u.Email == newEmailAddress);
 
                 if (isExistsAlready)
+                {
                     return false;
+                }
 
                 userProfile = _dbContext.Users.Single(up => up.UserProfileId == userProfileId);
                 oldEmailAddress = userProfile.Email;
@@ -1078,6 +1080,8 @@ namespace Linko.LinkoExchange.Services.User
             }
             catch (Exception)
             {
+                // TODO:need to log the exception
+
                 dbContextTransaction.Rollback();
                 return false;
             }

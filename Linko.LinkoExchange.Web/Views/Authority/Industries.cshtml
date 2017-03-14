@@ -31,81 +31,84 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <div class="col-md-12">
-                    @* grid name should be start with grid for centralized error handling *@
-                    @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Authority.IndustryViewModel>()
-                          .Name(componentName: "grid")
-                          .Columns(columns =>
-                          {
-                              columns.Bound(c => c.IndustryNoText)
-                                     .HtmlAttributes(new { @class = "col-sm-1" })
-                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                              columns.Bound(c => c.IndustryName)
-                                     .HtmlAttributes(new { @class = "col-sm-3" })
-                                     .HeaderHtmlAttributes(new { @class = "col-sm-3" })
-                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                              columns.Bound(c => c.Address)
-                                     .HtmlAttributes(new { @class = "col-sm-4" })
-                                     .HeaderHtmlAttributes(new { @class = "col-sm-4" })
-                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                              columns.Bound(c => c.Classification)
-                                     .HtmlAttributes(new { @class = "col-sm-1" })
-                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                              columns.Bound(c => c.IsEnabledText)
-                                     .HtmlAttributes(new { @class = "col-sm-1" })
-                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                              columns.Bound(c => c.HasSignatoryText)
-                                     .HtmlAttributes(new { @class = "col-sm-1" })
-                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                              columns.Bound(c => c.AssignedTo)
-                                     .HtmlAttributes(new { @class = "col-sm-1" })
-                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                              columns.Template(m => { })
-                                     .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
-                                     .Width(pixelWidth: 60);
-                          })
-                          .Pageable(pageable => pageable
-                                    .PageSizes(new List<object> { "all", 15, 25, 50, 75})
-                                    .Refresh(enabled: true)
-                                    .Input(enabled: true)
-                                    .Numeric(enabled: false)
-                            )
-                          .Selectable(selectable =>
-                          {
-                              selectable.Mode(GridSelectionMode.Single);
-                              selectable.Type(GridSelectionType.Row);
-                          })
-                          .Sortable(sortable =>
-                          {
-                              sortable.SortMode(GridSortMode.MultipleColumn);
-                          })
-                          .Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
-                          .Resizable(resizable => resizable.Columns(value: true))
-                          .Scrollable(s => s.Height(value: "auto"))
-                          //.Groupable()
-                          .Events(events =>
-                          {
-                              events.Change(handler: "gotoNextPage");
-                          })
-                          .DataSource(dataSource => dataSource
-                              .Ajax()
-                              .ServerOperation(enabled: false)
-                              .Batch(enabled: true)
-                              .Read(read => read.Action(actionName: "Industries_Read", controllerName: "Authority", routeValues: new
-                              {
-                                  searchString = @ViewBag.SearchString
-                              }))
-                              .PageSize(pageSize: 15)
-                              .Events(events => events.Error(handler: "error_handler"))
-                          )
-                    )
-                </div>
+            <div class="col-md-12">
+                @* grid name should be start with grid for centralized error handling *@
+                @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Authority.IndustryViewModel>()
+                        .Name(componentName: "grid")
+                        .Columns(columns =>
+                        {
+                            columns.Bound(c => c.IndustryNoText)
+                                    .HtmlAttributes(new { @class = "col-sm-1" })
+                                    .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                            columns.Bound(c => c.IndustryName)
+                                    .HtmlAttributes(new { @class = "col-sm-3" })
+                                    .HeaderHtmlAttributes(new { @class = "col-sm-3" })
+                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                            columns.Bound(c => c.Address)
+                                    .HtmlAttributes(new { @class = "col-sm-4" })
+                                    .HeaderHtmlAttributes(new { @class = "col-sm-4" })
+                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                            columns.Bound(c => c.Classification)
+                                    .HtmlAttributes(new { @class = "col-sm-1" })
+                                    .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                            columns.Bound(c => c.IsEnabledText)
+                                    .HtmlAttributes(new { @class = "col-sm-1" })
+                                    .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                            columns.Bound(c => c.HasSignatoryText)
+                                    .HtmlAttributes(new { @class = "col-sm-1" })
+                                    .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                            columns.Bound(c => c.AssignedTo)
+                                    .HtmlAttributes(new { @class = "col-sm-1" })
+                                    .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
+                            columns.Template(m => { })
+                                    .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
+                                    .Width(pixelWidth: 40);
+                        })
+                        .Pageable(pageable => pageable
+                                .PageSizes(new List<object> { "all", 15, 25, 50, 75})
+                                .Refresh(enabled: true)
+                                .Input(enabled: true)
+                                .Numeric(enabled: false)
+                        )
+                        .Selectable(selectable =>
+                        {
+                            selectable.Mode(GridSelectionMode.Single);
+                            selectable.Type(GridSelectionType.Row);
+                        })
+                        .Sortable(sortable =>
+                        {
+                            sortable.SortMode(GridSortMode.MultipleColumn);
+                        })
+                        .Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                        .Resizable(resizable => resizable.Columns(value: true))
+                        .Scrollable(s => s.Height(value: "auto"))
+                        //.Groupable()
+
+                        .HtmlAttributes(new
+                        {
+                            //@class = "input-sm"
+                        })
+                        .Events(events =>
+                        {
+                            events.Change(handler: "gotoNextPage");
+                        })
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .ServerOperation(enabled: false)
+                            .Batch(enabled: true)
+                            .Read(read => read.Action(actionName: "Industries_Read", controllerName: "Authority", routeValues: new
+                            {
+                                searchString = @ViewBag.SearchString
+                            }))
+                            .PageSize(pageSize: 15)
+                            .Events(events => events.Error(handler: "error_handler"))
+                        )
+                )
             </div>
         </section>@*.box-body*@
     </div><!-- /.box -->

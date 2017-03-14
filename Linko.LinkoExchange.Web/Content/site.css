@@ -1,4 +1,7 @@
-﻿
+﻿body {
+  font-size: 12px;
+}
+
 /* Set padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
@@ -80,6 +83,24 @@
 }
 
 .control-label.required:before   {
-    content:"*";
+    content:"* ";
     color:#dd4b39; 
 }
+
+.k-grid {
+    font-size: 12px;
+}
+
+.k-grid td {
+    line-height: 1.5em;
+}
+
+.content-header>h1 {
+    font-size: 20px;
+}
+
+.breadcrumb {
+    font-size: 12px;
+    line-height: 1em;
+}
+

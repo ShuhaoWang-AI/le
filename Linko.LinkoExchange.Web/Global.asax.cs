@@ -9,6 +9,7 @@ using Linko.LinkoExchange.Web.Controllers;
 using Microsoft.Practices.Unity;
 using System.Web.Helpers;
 using System.Security.Claims;
+using System.Web;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -27,6 +28,13 @@ namespace Linko.LinkoExchange.Web
             UnityConfig.RegisterTypes(UnityConfig.GetConfiguredContainer());
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;
+        }
+
+        protected void Application_BeginRequest()
+        {
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.Cache.SetExpires(DateTime.UtcNow.AddHours(-1));
+            Response.Cache.SetNoStore();
         }
 
         /// <summary>

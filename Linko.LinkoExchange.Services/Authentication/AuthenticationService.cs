@@ -713,7 +713,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 authenticationResult.Success = false;
                 authenticationResult.Result = AuthenticationResult.ExpiredRegistrationToken;
-                authenticationResult.Errors = new string[] { "The password reset link has expired.  Please use Forgot Password." };
+                authenticationResult.Errors = new string[] { "The password reset link has expired. Please use Forgot Password." };
 
                 int userProfileId = _dbContext.UserQuestionAnswers.Single(u => u.UserQuestionAnswerId == userQuestionAnswerId).UserProfileId;
                 foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId))

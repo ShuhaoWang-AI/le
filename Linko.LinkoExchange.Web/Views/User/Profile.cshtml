@@ -1,23 +1,30 @@
 ﻿@model Linko.LinkoExchange.Web.ViewModels.User.UserViewModel
 
 @{
-    ViewBag.Title = "Profile";
-    var sqQuestionPool = Model.UserSQ.QuestionPool;
+    ViewBag.Title       = "Profile";
+    var sqQuestionPool  = Model.UserSQ.QuestionPool;
     var kbqQuestionPool = Model.UserKBQ.QuestionPool;
-    var inValidProfile = ViewBag.InValidProfile;
-    var inValidKBQ = ViewBag.InValidKBQ;
-    var inValidSQ = ViewBag.InValidSQ;
+    var inValidProfile  = ViewBag.InValidProfile;
+    var inValidKBQ      = ViewBag.InValidKBQ;
+    var inValidSQ       = ViewBag.InValidSQ;
 }
 
 <section>
     <ol class="breadcrumb">
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Home")'"><i class=""></i> Home </a></li>
-        <li class="active">Profile</li>
+        <li>
+            <a href="#" onclick="location.href = '@Url.Action("Index", "Home")'">
+                <i class=""></i> Home
+            </a>
+        </li>
+        <li class="active">
+            Profile
+        </li>
     </ol>
 </section>
 
 <style>
-    .left-flow-link {
+    .left-flow-link
+    {
         margin-left: 0px;
         margin-top: 10px;
         text-align: left;
@@ -29,739 +36,816 @@
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    <input type="hidden" id="profileCollapsed" name="profileCollapsed" value="true" />
-    <input type="hidden" id="kbqCollapsed" name="kbqCollapsed" value="false" />
-    <input type="hidden" id="sqCollapsed" name="sqCollapsed" value="false" />
+    <input id="profileCollapsed" name="profileCollapsed" type="hidden" value="true" />
+    <input id="kbqCollapsed" name="kbqCollapsed" type="hidden" value="false" />
+    <input id="sqCollapsed" name="sqCollapsed" type="hidden" value="false" />
 
-    <div id="user-info-panel" class="profileDiv">
-
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">Profile Details</h3>
-                <div class="box-tools pull-right">
-                    <div class="pull-right">
-                        @if ((ViewBag.PortalName != null) && ViewBag.PortalName.ToLower().Equals(value: "industry") &&  Model.UserProfile.HasSigntory == false)
+    <div class="profileDiv" id="user-info-panel">
+    <div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title">
+            Profile Details
+        </h3>
+        <div class="box-tools pull-right">
+            <div class="pull-right">
+                @if (ViewBag.PortalName != null && ViewBag.PortalName.ToLower().Equals(value: "industry") && Model.UserProfile.HasSigntory == false)
+                {
+                    @Html.ActionLink("Request Signatory", "RequestSignatory", "User", null,
+                        new
                         {
-                            @Html.ActionLink("Request Signatory", "RequestSignatory", "User", null, new
-                               {
-                                   @class = "btn btn-sm btn-primary"
-                               }
-                           )
-                        }
-                        <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                    </div>
-                </div><!-- /.box-tools -->
-            </div>  @*.box-header*@
-
-            <div>
-                @if (ViewData.ModelState.IsValid == false && inValidProfile)
-                {
-                    @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new
-                       {
-                           @class = "alert alert-danger"
-                       }
-                   )
+                            @class = "btn btn-sm btn-primary"
+                        })
                 }
-
-                @if (ViewBag.SaveProfileSuccessfull != null && !string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
-                {
-                    <div class="alert alert-success alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <h5>
-                            <i class="icon fa fa-check"></i>
-                            @ViewBag.SuccessMessage
-                        </h5>
-                    </div>
-                }
-
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
             </div>
+        </div><!-- /.box-tools -->
+    </div> @*.box-header*@
+    <div>
+        @if (ViewData.ModelState.IsValid == false && inValidProfile)
+        {
+            @Html.ValidationSummary(false, "",
+                new
+                {
+                    @class = "alert alert-danger"
+                })
+        }
 
-            <section class="box-body form-horizontal">
-
-                <div class="editabledDiv">
-                    <!-- Line 1   FirstName and  LastName   -->
-                    <div class="form-group required">
-                        @Html.LabelFor(m => m.UserProfile.FirstName, htmlAttributes: new
-                            {
-                                @class = "control-label col-md-2 required "
-                            }
-                        )
-                        <div class="col-md-4">
-                            @Html.EditorFor(m => m.UserProfile.FirstName, new
-                                {
-                                    htmlAttributes = new
-                                    {
-                                        @class = "form-control editable"
-                                    }
-                                }
-                            )
-                            @Html.ValidationMessageFor(m => m.UserProfile.FirstName, "", new { @class = "text-danger" })
-                        </div>
-                       
-
-                        @Html.LabelFor(m => m.UserProfile.LastName, htmlAttributes: new
-                           {
-                               @class = "control-label col-md-2 required"
-                           }
-                        )
-                        <div class="col-md-4">
-                            @Html.EditorFor(m => m.UserProfile.LastName, new
-                                {
-                                    htmlAttributes = new
-                                    {
-                                        @class = "form-control"
-                                    }
-                                }
-                            )
-                            @Html.ValidationMessageFor(m => m.UserProfile.LastName, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                    <!-- Line 2   Organization and  TitleROle   -->
-                    <div class="form-group ">
-                        @Html.LabelFor(m => m.UserProfile.BusinessName, htmlAttributes: new
-                            {
-                                @class = " control-label col-md-2 required "
-                            }
-                        )
-                        <div class="col-md-4">
-                            @Html.EditorFor(m => m.UserProfile.BusinessName, new
-                                {
-                                    htmlAttributes = new
-                                    {
-                                        @class = "form-control "
-                                    }
-                                }
-                            )
-                            @Html.ValidationMessageFor(m => m.UserProfile.BusinessName, "", new { @class = "text-danger" })
-                        </div>
-
-                        @Html.LabelFor(m => m.UserProfile.TitleRole, htmlAttributes: new
-                            {
-                                @class = "control-label col-md-2"
-                            }
-                        )
-                        <div class="col-md-4">
-                            @Html.EditorFor(m => m.UserProfile.TitleRole, new
-                                {
-                                    htmlAttributes = new
-                                    {
-                                        @class = "form-control"
-                                    }
-                                }
-                            )
-                        </div>
-                    </div>
-
-                    <!-- Line 3 AddressLine1 and AddressLine2  -->
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.UserProfile.AddressLine1, htmlAttributes: new
-                            {
-                                @class = "control-label col-md-2 required"
-                            }
-                        )
-                        <div class="col-md-4">
-                            @Html.EditorFor(m => m.UserProfile.AddressLine1, new
-                                {
-                                    htmlAttributes = new
-                                    {
-                                        @class = "form-control"
-                                    }
-                                }
-                            )
-                            @Html.ValidationMessageFor(m => m.UserProfile.AddressLine1, "", new { @class = "text-danger" })
-                        </div>
-
-                        @Html.LabelFor(m => m.UserProfile.AddressLine2, htmlAttributes: new
-                            {
-                                @class = "control-label col-md-2"
-                            }
-                        )
-                        <div class="col-md-4">
-                            @Html.EditorFor(m => m.UserProfile.AddressLine2, new
-                               {
-                                   htmlAttributes = new
-                                   {
-                                       @class = "form-control"
-                                   }
-                               }
-                            )
-                        </div>
-                    </div>
-
-                    <!-- Line 4 City and State   -->
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.UserProfile.CityName, htmlAttributes: new
-                           {
-                               @class = "control-label col-md-2 required"
-                           })
-                        <div class="col-md-4">
-                            @Html.EditorFor(m => m.UserProfile.CityName, new
-                               {
-                                   htmlAttributes = new
-                                   {
-                                       @class = "form-control"
-                                   }
-                               }
-                            )
-                            @Html.ValidationMessageFor(m => m.UserProfile.CityName, "", new { @class = "text-danger" })
-                        </div>
-
-                        @Html.LabelFor(m => m.UserProfile.JurisdictionId, htmlAttributes: new
-                            {
-                                @class = "control-label col-md-2 required"
-                            })
-                        <div class="col-md-4">
-                            @Html.DropDownListFor(m => m.UserProfile.JurisdictionId,
-                                    Model.UserProfile.StateList.Select(i => new SelectListItem
-                                    {
-                                        Text = i.StateName,
-                                        Value = i.JurisdictionId.ToString(),
-                                        Selected = Model.UserProfile.JurisdictionId == i.JurisdictionId
-                                    }).ToList(),
-                                    new
-                                    {
-                                        @class = "form-control",
-                                        disabled = "disabled"
-                                    }
-                            )
-                            @Html.HiddenFor(m => m.UserProfile.JurisdictionId)
-                            @Html.ValidationMessageFor(m => m.UserProfile.JurisdictionId, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                    <!-- Line 5 Zip Code   -->
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.UserProfile.ZipCode, htmlAttributes: new
-                        {
-                            @class = "control-label col-md-2 required"
-                        })
-                        <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.ZipCode, new
-                            {
-                                htmlAttributes = new
-                                {
-                                    @class = "form-control"
-                                }
-                            })
-                            @Html.ValidationMessageFor(m => m.UserProfile.ZipCode, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                    <!-- Line 6   Phone and  Ext   -->
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.UserProfile.PhoneNumber, htmlAttributes: new
-               {
-                   @class = "control-label col-md-2 required"
-               }
-                    )
-                        <div class="col-md-4">
-                            @Html.EditorFor(m => m.UserProfile.PhoneNumber, new
-                   {
-                       htmlAttributes = new
-                       {
-                           @class = "form-control"
-                       }
-                   }
-                        )
-                            @Html.ValidationMessageFor(m => m.UserProfile.PhoneNumber, "", new { @class = "text-danger" })
-                        </div>
-
-                        @Html.LabelFor(m => m.UserProfile.PhoneExt, htmlAttributes: new
-               {
-                   @class = "control-label col-md-2"
-               }
-                    )
-                        <div class="col-md-4">
-                            @Html.EditorFor(m => m.UserProfile.PhoneExt, new
-                   {
-                       htmlAttributes = new
-                       {
-                           @class = "form-control",
-                           @type = "text"
-                       }
-                   }
-                        )
-                        </div>
-                    </div>
-
-                </div>            
-
-                <hr />
-
-                <!-- Line 7 Email -->
-                <div class="form-group">
-                    @Html.LabelFor(m => m.UserProfile.Email, htmlAttributes: new
-                    {
-                        @class = "control-label col-md-2 required"
-                    })
-                    <div class="col-md-4">
-                        @Html.EditorFor(m => m.UserProfile.Email, new
-                        {
-                            htmlAttributes = new
-                            {
-                                @class = "form-control",
-                                @readonly = "true"
-                            }
-                        })
-                        @*@Html.ValidationMessageFor(m => m.UserProfile.Email, "", new { @class = "text-danger" })*@
-                    </div>
-                    <div>
-                        @Html.ActionLink("Change", "ChangeEmail", "Account", null, htmlAttributes: new
-                        {
-                            @class = "left-flow-link",
-                        })
-                    </div>
-
-                </div>
-
-                <!-- Line 8 UserName -->
-                <div class="form-group">
-                    @Html.LabelFor(m => m.UserProfile.UserName, htmlAttributes: new
-                    {
-                        @class = "control-label col-md-2 required"
-                    })
-                    <div class="col-md-4">
-                        @Html.EditorFor(m => m.UserProfile.UserName, new
-                        {
-                            htmlAttributes = new
-                            {
-                                @class = "form-control",
-                                @readonly = "true"
-                            }
-                        })
-                        @*@Html.ValidationMessageFor(m => m.UserProfile.UserName, "", new { @class = "text-danger" })*@
-                    </div>
-                </div>
-
-                <!-- Line 9 Password -->
-                <div class="form-group">
-                    @Html.LabelFor(m => m.UserProfile.Password, htmlAttributes: new
-                    {
-                        @class = "control-label col-md-2 required"
-                    })
-                    <div class="col-md-4">
-                        @Html.PasswordFor(m => m.UserProfile.Password, new {
-                       @class = "form-control",
-                       @readonly = "true" 
-                   })
-                        @*@Html.ValidationMessageFor(m => m.UserProfile.Password, "", new { @class = "text-danger" })*@
-                    </div>
-                    @Html.ActionLink("Change", "ChangePassword", "Account", null, htmlAttributes: new
-                    {
-                        @class = "left-flow-link",
-                    })
-                </div>
-
-                <hr />
-
-                <!-- Line 10   Role and  signatory-->
-                <div class="form-group">
-                    @Html.LabelFor(m => m.UserProfile.Role, htmlAttributes: new
-                    {
-                        @class = "control-label col-md-2"
-                    })
-
-                    <div class="col-md-4">
-                        @Html.EditorFor(m => m.UserProfile.Role, new
-                        {
-                            htmlAttributes = new
-                            {
-                                @class = "form-control",
-                                @readonly = "true"
-                            }
-                        })
-                    </div>
-
-                    @Html.LabelFor(m => m.UserProfile.HasSigntory, htmlAttributes: new
-                    {
-                        @class = "control-label col-md-2"
-                    })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => Model.UserProfile.HasSigntoryText, new
-                        {
-                            htmlAttributes = new
-                            {
-                                @class = "form-control",
-                                @readonly = "true"
-                            }
-                        })
-                    </div>
-                </div>
-
-            </section>@*.box-body*@
-            <div class="box-footer">
-                <div class="form-group">
-                    <div id="profileEditBtn" class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
-                    <input id="profileSubmit" type="submit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right"
-                           formaction="@Url.Action(actionName: "Profile", controllerName: "User",routeValues: new { part = "Profile" })#user-info-panel" formmethod="post" />
-                </div>
-            </div><!-- box-footer -->
-        </div><!-- /.box -->
+        @if (ViewBag.SaveProfileSuccessfull != null && !string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
+        {
+            <div class="alert alert-dismissible alert-success">
+                <button aria-hidden="true" class="close" data-dismiss="alert" type="button">
+                    &times;
+                </button>
+                <h5>
+                    <i class="fa fa-check icon"></i>
+                    @ViewBag.SuccessMessage
+                </h5>
+            </div>
+        }
     </div>
 
-}
-
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
-    <input type="hidden" id="profileCollapsed" name="profileCollapsed" value="true" />
-    <input type="hidden" id="kbqCollapsed" name="kbqCollapsed" value="false" />
-    <input type="hidden" id="sqCollapsed" name="sqCollapsed" value="false" />
-
-    <div id="kbq-panel" class="profileDiv">
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title"> Knowledge Based Questions </h3>
-                <div class="box-tools pull-right">
-                    <div class="pull-right">
-                        <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                    </div>
-                </div><!-- /.box-tools -->
-            </div>  @*.box-header*@
-
-            <div>
-                @if (ViewData.ModelState.IsValid == false && inValidKBQ)
+    <section class="box-body form-horizontal">
+    <div class="editabledDiv">
+    <!-- Line 1 FirstName and LastName -->
+    <div class="form-group required">
+        @Html.LabelFor(m => m.UserProfile.FirstName, new
+                                                     {
+                                                         @class = "control-label col-md-2 required "
+                                                     })
+        <div class="col-md-4">
+            @Html.EditorFor(m => m.UserProfile.FirstName,
+                new
                 {
-                    @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new
-                    {
-                        @class = "alert alert-danger"
-                    })
-                }
-
-                @if (ViewBag.SaveKBQSuccessfull != null && !string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control editable"
+                                     }
+                })
+            @Html.ValidationMessageFor(m => m.UserProfile.FirstName, "",
+                new
                 {
-                    <div class="alert alert-success alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <h5>
-                            <i class="icon fa fa-check"></i>
-                            @ViewBag.SuccessMessage
-                        </h5>
-                    </div>
+                    @class = "text-danger"
+                })
+        </div>
+
+        @Html.LabelFor(m => m.UserProfile.LastName, new
+                                                    {
+                                                        @class = "control-label col-md-2 required"
+                                                    })
+        <div class="col-md-4">
+            @Html.EditorFor(m => m.UserProfile.LastName,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control"
+                                     }
+                })
+            @Html.ValidationMessageFor(m => m.UserProfile.LastName, "",
+                new
+                {
+                    @class = "text-danger"
+                })
+        </div>
+    </div>
+
+    <!-- Line 2 Organization and TitleROle -->
+    <div class="form-group ">
+        @Html.LabelFor(m => m.UserProfile.BusinessName, new
+                                                        {
+                                                            @class = " control-label col-md-2 required "
+                                                        })
+        <div class="col-md-4">
+            @Html.EditorFor(m => m.UserProfile.BusinessName,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control "
+                                     }
+                })
+            @Html.ValidationMessageFor(m => m.UserProfile.BusinessName, "",
+                new
+                {
+                    @class = "text-danger"
+                })
+        </div>
+
+        @Html.LabelFor(m => m.UserProfile.TitleRole, new
+                                                     {
+                                                         @class = "control-label col-md-2"
+                                                     })
+        <div class="col-md-4">
+            @Html.EditorFor(m => m.UserProfile.TitleRole,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control"
+                                     }
+                })
+        </div>
+    </div>
+
+    <!-- Line 3 AddressLine1 and AddressLine2 -->
+    <div class="form-group">
+        @Html.LabelFor(m => m.UserProfile.AddressLine1, new
+                                                        {
+                                                            @class = "control-label col-md-2 required"
+                                                        })
+        <div class="col-md-4">
+            @Html.EditorFor(m => m.UserProfile.AddressLine1,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control"
+                                     }
+                })
+            @Html.ValidationMessageFor(m => m.UserProfile.AddressLine1, "",
+                new
+                {
+                    @class = "text-danger"
+                })
+        </div>
+
+        @Html.LabelFor(m => m.UserProfile.AddressLine2, new
+                                                        {
+                                                            @class = "control-label col-md-2"
+                                                        })
+        <div class="col-md-4">
+            @Html.EditorFor(m => m.UserProfile.AddressLine2,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control"
+                                     }
+                })
+        </div>
+    </div>
+
+    <!-- Line 4 City and State -->
+    <div class="form-group">
+        @Html.LabelFor(m => m.UserProfile.CityName, new
+                                                    {
+                                                        @class = "control-label col-md-2 required"
+                                                    })
+        <div class="col-md-4">
+            @Html.EditorFor(m => m.UserProfile.CityName,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control"
+                                     }
+                })
+            @Html.ValidationMessageFor(m => m.UserProfile.CityName, "",
+                new
+                {
+                    @class = "text-danger"
+                })
+        </div>
+
+        @Html.LabelFor(m => m.UserProfile.JurisdictionId, new
+                                                          {
+                                                              @class = "control-label col-md-2 required"
+                                                          })
+        <div class="col-md-4">
+            @Html.DropDownListFor(m => m.UserProfile.JurisdictionId,
+                Model.UserProfile.StateList.Select(i => new SelectListItem
+                                                        {
+                                                            Text = i.StateName,
+                                                            Value = i.JurisdictionId.ToString(),
+                                                            Selected = Model.UserProfile.JurisdictionId == i.JurisdictionId
+                                                        }).ToList(),
+                new
+                {
+                    @class = "form-control",
+                    disabled = "disabled"
                 }
+                )
+            @Html.HiddenFor(m => m.UserProfile.JurisdictionId)
+            @Html.ValidationMessageFor(m => m.UserProfile.JurisdictionId, "",
+                new
+                {
+                    @class = "text-danger"
+                }
+                )
+        </div>
+    </div>
+
+    <!-- Line 5 Zip Code -->
+    <div class="form-group">
+        @Html.LabelFor(m => m.UserProfile.ZipCode, new
+                                                   {
+                                                       @class = "control-label col-md-2 required"
+                                                   })
+        <div class="col-md-4">
+            @Html.EditorFor(model => Model.UserProfile.ZipCode,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control"
+                                     }
+                })
+            @Html.ValidationMessageFor(m => m.UserProfile.ZipCode, "",
+                new
+                {
+                    @class = "text-danger"
+                })
+        </div>
+    </div>
+
+    <!-- Line 6 Phone and Ext -->
+    <div class="form-group">
+        @Html.LabelFor(m => m.UserProfile.PhoneNumber, new
+                                                       {
+                                                           @class = "control-label col-md-2 required"
+                                                       })
+        <div class="col-md-4">
+            @Html.EditorFor(m => m.UserProfile.PhoneNumber,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control"
+                                     }
+                })
+            @Html.ValidationMessageFor(m => m.UserProfile.PhoneNumber, "",
+                new
+                {
+                    @class = "text-danger"
+                })
+        </div>
+
+        @Html.LabelFor(m => m.UserProfile.PhoneExt,
+            new
+            {
+                @class = "control-label col-md-2"
+            })
+        <div class="col-md-4">
+            @Html.EditorFor(m => m.UserProfile.PhoneExt,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control",
+                                         @type = "text"
+                                     }
+                })
+        </div>
+    </div>
+    </div>
+    <hr />
+
+    <!-- Line 7 Email -->
+    <div class="form-group">
+        @Html.LabelFor(m => m.UserProfile.Email,
+            new
+            {
+                @class = "control-label col-md-2 required"
+            })
+        <div class="col-md-4">
+            @Html.EditorFor(m => m.UserProfile.Email,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control",
+                                         @readonly = "true"
+                                     }
+                })
+            @*@Html.ValidationMessageFor(m => m.UserProfile.Email, "", new { @class = "text-danger" })*@
+        </div>
+        <div>
+            @Html.ActionLink("Change", "ChangeEmail", "Account", null,
+                new
+                {
+                    @class = "left-flow-link",
+                })
+        </div>
+
+    </div>
+
+    <!-- Line 8 UserName -->
+    <div class="form-group">
+        @Html.LabelFor(m => m.UserProfile.UserName,
+            new
+            {
+                @class = "control-label col-md-2 required"
+            })
+        <div class="col-md-4">
+            @Html.EditorFor(m => m.UserProfile.UserName,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control",
+                                         @readonly = "true"
+                                     }
+                })
+            @*@Html.ValidationMessageFor(m => m.UserProfile.UserName, "", new { @class = "text-danger" })*@
+        </div>
+    </div>
+
+    <!-- Line 9 Password -->
+    <div class="form-group">
+        @Html.LabelFor(m => m.UserProfile.Password,
+            new
+            {
+                @class = "control-label col-md-2 required"
+            })
+        <div class="col-md-4">
+            @Html.PasswordFor(m => m.UserProfile.Password,
+                new
+                {
+                    @class = "form-control",
+                    @readonly = "true"
+                })
+            @*@Html.ValidationMessageFor(m => m.UserProfile.Password, "", new { @class = "text-danger" })*@
+        </div>
+        @Html.ActionLink("Change", "ChangePassword", "Account", null,
+            new
+            {
+                @class = "left-flow-link",
+            })
+    </div>
+    <hr />
+    <!-- Line 10 Role and signatory-->
+    <div class="form-group">
+        @Html.LabelFor(m => m.UserProfile.Role,
+            new
+            {
+                @class = "control-label col-md-2"
+            })
+
+        <div class="col-md-4">
+            @Html.EditorFor(m => m.UserProfile.Role,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control",
+                                         @readonly = "true"
+                                     }
+                })
+        </div>
+
+        @Html.LabelFor(m => m.UserProfile.HasSigntory,
+            new
+            {
+                @class = "control-label col-md-2"
+            })
+        <div class="col-md-4">
+            @Html.EditorFor(model => Model.UserProfile.HasSigntoryText,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control",
+                                         @readonly = "true"
+                                     }
+                })
+        </div>
+    </div>
+
+    </section>@*.box-body*@
+    <div class="box-footer">
+        <div class="form-group">
+            <div class="btn btn-primary btn-sm edit-button pull-right" id="profileEditBtn">
+                Edit
             </div>
-
-            <section class="box-body form-horizontal">
-                <h4>Select Answers to 5 Knowledge Based Questions</h4>
-                Knowledge Based Questions are used along with your password to further prove your identity during report submission.
-                During report submission you will be required to enter an answer that matches what you enter below.
-                <br />
-                <br />
-                <br />
-                <div class="editabledDiv">
-
-                    <!-- question 1 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(m => m.UserKBQ.KBQ1)
-                        </div>
-                        <div class="col-md-8">
-
-                            @Html.DropDownListFor(
-                               m => m.UserKBQ.KBQ1,
-                               kbqQuestionPool.Select(i => new SelectListItem
-                               {
-                                   Text = i.Content,
-                                   Value = i.QuestionId.Value.ToString(),
-                                   Selected = Model.UserKBQ.KBQ1 == i.QuestionId.Value
-                               }),
-
-                               new
-                               {
-                                   @class = "form-control",
-                                   disabled = "disabled"
-                               }
-                            )
-                        </div>
-                    </div>
-
-                    <!-- anwser 1 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(m => m.UserKBQ.KBQAnswer1, htmlAttributes: new
-                               {
-                                   @class = "control-label required"
-                               })
-                        </div>
-
-                        <div class="col-md-8">
-                            <input type="password" value="*******" class="form-control disabled" style="margin-top:5px" />
-                            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ1, new
-                               {
-                                   htmlAttributes = new
-                                   {
-                                       @class = "form-control readonly kbq-answer"
-                                   }
-                               })
-
-                            @Html.EditorFor(m => m.UserKBQ.KBQAnswer1, new
-                               {
-                                   htmlAttributes = new
-                                   {
-                                       @class = "form-control",
-                                       @style = "margin-top:5px",
-                                       @maxlength = 50
-                                   }
-                               })
-                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer1, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                    <!-- question 2 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(m => m.UserKBQ.KBQ2)
-                        </div>
-                        <div class="col-md-8">
-                            @Html.DropDownListFor(
-                                m => m.UserKBQ.KBQ2,
-                                kbqQuestionPool.Select(i => new SelectListItem
-                                {
-                                    Text = i.Content,
-                                    Value = i.QuestionId.Value.ToString(),
-                                    Selected = Model.UserKBQ.KBQ2 == i.QuestionId.Value
-                                }),
-                                new
-                                {
-                                    @class = "form-control",
-                                    disabled = "disabled"
-                                })
-                            @Html.HiddenFor(m => m.UserKBQ.KBQ2)
-
-                        </div>
-                    </div>
-
-                    <!-- anwser 2 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(m => m.UserKBQ.KBQAnswer2, htmlAttributes: new
-                               {
-                                   @class = "control-label required"
-                               })
-                        </div>
-
-                        <div class="col-md-8">
-                            <input type="password" value="*******" class="form-control disabled" style="margin-top:5px" />
-                            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ2, new
-                               {
-                                   htmlAttributes = new
-                                   {
-                                       @class = "form-control readonly"
-                                   }
-                               })
-                            @Html.EditorFor(m => m.UserKBQ.KBQAnswer2, new
-                               {
-                                   htmlAttributes = new
-                                   {
-                                       @class = "form-control",
-                                       @style = "margin-top:5px",
-                                       @maxlength = 50
-                                   }
-                               })
-                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer2, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                    <!-- question 3 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(m => m.UserKBQ.KBQ3)
-                        </div>
-                        <div class="col-md-8">
-                            @Html.DropDownListFor(
-                                m => m.UserKBQ.KBQ3,
-                                kbqQuestionPool.Select(i => new SelectListItem
-                                {
-                                    Text = i.Content,
-                                    Value = i.QuestionId.Value.ToString(),
-                                    Selected = Model.UserKBQ.KBQ3 == i.QuestionId.Value
-                                }),
-                                new
-                                {
-                                    @class = "form-control",
-                                    disabled = "disabled"
-                                })
-                            @Html.HiddenFor(model => Model.UserKBQ.KBQ3)
-                        </div>
-                    </div>
-
-                    <!-- anwser 3 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(m => m.UserKBQ.KBQAnswer3, htmlAttributes: new
-                               {
-                                   @class = "control-label required"
-                               })
-                        </div>
-
-                        <div class="col-md-8">
-                            <input type="password" value="*******" class="form-control disabled" style="margin-top:5px" />
-                            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ3, new
-                               {
-                                   htmlAttributes = new
-                                   {
-                                       @class = "form-control readonly"
-                                   }
-                               })
-                            @Html.EditorFor(m => m.UserKBQ.KBQAnswer3, new
-                               {
-                                   htmlAttributes = new
-                                   {
-                                       @class = "form-control",
-                                       @style = "margin-top:5px",
-                                       @maxlength = 50
-                                   }
-                               })
-                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer3, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                    <!-- question 4 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(m => m.UserKBQ.KBQ4)
-                        </div>
-                        <div class="col-md-8">
-
-                            @Html.DropDownListFor(
-                                m => m.UserKBQ.KBQ4,
-                                kbqQuestionPool.Select(i => new SelectListItem
-                                {
-                                    Text = i.Content,
-                                    Value = i.QuestionId.Value.ToString(),
-                                    Selected = Model.UserKBQ.KBQ4 == i.QuestionId.Value
-                                }),
-                                new
-                                {
-                                    @class = "form-control",
-                                    disabled = "disabled"
-                                })
-                            @Html.HiddenFor(model => Model.UserKBQ.KBQ4)
-
-                        </div>
-                    </div>
-
-                    <!-- anwser 4 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(m => m.UserKBQ.KBQAnswer4, htmlAttributes: new
-                                {
-                                    @class = "control-label required"
-                                })
-                        </div>
-
-                        <div class="col-md-8">
-                            <input type="password" value="*******" class="form-control disabled" style="margin-top:5px" />
-                            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ4, new
-                               {
-                                   htmlAttributes = new
-                                   {
-                                       @class = "form-control readonly"
-                                   }
-                               })
-                            @Html.EditorFor(m => m.UserKBQ.KBQAnswer4, new
-                               {
-                                   htmlAttributes = new
-                                   {
-                                       @class = "form-control",
-                                       @style = "margin-top:5px",
-                                       @maxlength = 50
-                                   }
-                               })
-                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer4, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                    <!-- question 5 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(m => m.UserKBQ.KBQ5)
-                        </div>
-                        <div class="col-md-8">
-                            @Html.DropDownListFor(
-                                m => m.UserKBQ.KBQ5,
-                                kbqQuestionPool.Select(i => new SelectListItem
-                                {
-                                    Text = i.Content,
-                                    Value = i.QuestionId.Value.ToString(),
-                                    Selected = Model.UserKBQ.KBQ5 == i.QuestionId.Value
-                                }),
-                                new
-                                {
-                                    @class = "form-control",
-                                    disabled = "disabled"
-                                })
-                            @Html.HiddenFor(m => m.UserKBQ.KBQ5)
-                        </div>
-                    </div>
-
-                    <!-- anwser 5 -->
-                    <div class="form-group">
-                        <div class="col-lg-2 control-label">
-                            @Html.LabelFor(m => m.UserKBQ.KBQAnswer5, htmlAttributes: new
-                            {
-                                @class = "control-label required"
-                            })
-                        </div>
-
-                        <div class="col-md-8">
-                            <input type="password" value="*******" class="form-control disabled" style="margin-top:5px" />
-                            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ5, new
-                            {
-                                htmlAttributes = new
-                                {
-                                    @class = "form-control readonly"
-                                }
-                            })
-                            @Html.EditorFor(m => m.UserKBQ.KBQAnswer5, new
-                            {
-                                htmlAttributes = new
-                                {
-                                    @class = "form-control",
-                                    @style = "margin-top:5px",
-                                    @maxlength = 50
-                                }
-                            })
-                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer5, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                </div>
-
-            </section>@*.box-body*@
-            <div class="box-footer">
-                <div class="form-group">
-                    <div id="kbqEditBtn" class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
-                    <input type="submit" id="kbqSubmit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right"
-                           formaction="@Url.Action(actionName: "Profile", controllerName: "User",routeValues: new { part = "KBQ" })#kbq-panel" formmethod="post" />
-                </div>
-            </div><!-- box-footer -->
-        </div><!-- /.box -->
+            <input id="profileSubmit" type="submit" value="Save" name="Command" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action("Profile", "User", new {part = "Profile"})#user-info-panel" formmethod="post" />
+        </div>
+    </div><!-- box-footer -->
+    </div><!-- /.box -->
     </div>
 }
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    <input type="hidden" id="profileCollapsed" name="profileCollapsed" />
-    <input type="hidden" id="kbqCollapsed" name="kbqCollapsed" />
-    <input type="hidden" id="sqCollapsed" name="sqCollapsed" />
+    <input id="profileCollapsed" name="profileCollapsed" type="hidden" value="true" />
+    <input id="kbqCollapsed" name="kbqCollapsed" type="hidden" value="false" />
+    <input id="sqCollapsed" name="sqCollapsed" type="hidden" value="false" />
 
-    <div id="sq-panel" class="profileDiv">
+    <div class="profileDiv" id="kbq-panel">
+    <div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title">
+            Knowledge Based Questions
+        </h3>
+        <div class="box-tools pull-right">
+            <div class="pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div><!-- /.box-tools -->
+    </div> @*.box-header*@
+
+    <div>
+        @if (ViewData.ModelState.IsValid == false && inValidKBQ)
+        {
+            @Html.ValidationSummary(false, "",
+                new
+                {
+                    @class = "alert alert-danger"
+                })
+        }
+
+        @if (ViewBag.SaveKBQSuccessfull != null && !string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
+        {
+            <div class="alert alert-dismissible alert-success">
+                <button aria-hidden="true" class="close" data-dismiss="alert" type="button">
+                    &times;
+                </button>
+                <h5>
+                    <i class="fa fa-check icon"></i>
+                    @ViewBag.SuccessMessage
+                </h5>
+            </div>
+        }
+    </div>
+
+    <section class="box-body form-horizontal">
+    <h4>Select Answers to 5 Knowledge Based Questions</h4>
+    <span>
+        Knowledge Based Questions are used along with your password to further prove your identity during report submission.
+        During report submission you will be required to enter an answer that matches what you enter below.
+    </span>
+    <br />
+    <br />
+    <br />
+    <div class="editabledDiv">
+    <!-- question 1 -->
+    <div class="form-group">
+        <div class="col-lg-2 control-label">
+            @Html.LabelFor(m => m.UserKBQ.KBQ1)
+        </div>
+        <div class="col-md-8">
+            @Html.DropDownListFor(
+                                  m => m.UserKBQ.KBQ1,
+                kbqQuestionPool.Select(i => new SelectListItem
+                                            {
+                                                Text = i.Content,
+                                                Value = i.QuestionId.Value.ToString(),
+                                                Selected = Model.UserKBQ.KBQ1 == i.QuestionId.Value
+                                            }),
+                new
+                {
+                    @class = "form-control",
+                    disabled = "disabled"
+                })
+        </div>
+    </div>
+
+    <!-- anwser 1 -->
+    <div class="form-group">
+        <div class="col-lg-2 control-label">
+            @Html.LabelFor(m => m.UserKBQ.KBQAnswer1,
+                new
+                {
+                    @class = "control-label required"
+                })
+        </div>
+
+        <div class="col-md-8">
+            <input class="disabled form-control" type="password" value="*******" />
+            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ1,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control readonly kbq-answer"
+                                     }
+                })
+
+            @Html.EditorFor(m => m.UserKBQ.KBQAnswer1,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control",
+                                         autocomplete = "off",
+                                         @maxlength = 50
+                                     }
+                })
+            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer1, "",
+                new
+                {
+                    @class = "text-danger"
+                })
+        </div>
+    </div>
+
+    <!-- question 2 -->
+    <div class="form-group">
+        <div class="col-lg-2 control-label">
+            @Html.LabelFor(m => m.UserKBQ.KBQ2)
+        </div>
+        <div class="col-md-8">
+            @Html.DropDownListFor(
+                                  m => m.UserKBQ.KBQ2,
+                kbqQuestionPool.Select(i => new SelectListItem
+                                            {
+                                                Text = i.Content,
+                                                Value = i.QuestionId.Value.ToString(),
+                                                Selected = Model.UserKBQ.KBQ2 == i.QuestionId.Value
+                                            }),
+                new
+                {
+                    @class = "form-control",
+                    disabled = "disabled"
+                })
+            @Html.HiddenFor(m => m.UserKBQ.KBQ2)
+        </div>
+    </div>
+
+    <!-- anwser 2 -->
+    <div class="form-group">
+        <div class="col-lg-2 control-label">
+            @Html.LabelFor(m => m.UserKBQ.KBQAnswer2,
+                new
+                {
+                    @class = "control-label required"
+                })
+        </div>
+
+        <div class="col-md-8">
+            <input class="disabled form-control" type="password" value="*******" />
+            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ2,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control readonly"
+                                     }
+                })
+            @Html.EditorFor(m => m.UserKBQ.KBQAnswer2,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control",
+                                         autocomplete = "off",
+                                         @maxlength = 50
+                                     }
+                })
+            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer2, "",
+                new
+                {
+                    @class = "text-danger"
+                })
+        </div>
+    </div>
+
+    <!-- question 3 -->
+    <div class="form-group">
+        <div class="col-lg-2 control-label">
+            @Html.LabelFor(m => m.UserKBQ.KBQ3)
+        </div>
+        <div class="col-md-8">
+            @Html.DropDownListFor(
+                                  m => m.UserKBQ.KBQ3,
+                kbqQuestionPool.Select(i => new SelectListItem
+                                            {
+                                                Text = i.Content,
+                                                Value = i.QuestionId.Value.ToString(),
+                                                Selected = Model.UserKBQ.KBQ3 == i.QuestionId.Value
+                                            }),
+                new
+                {
+                    @class = "form-control",
+                    disabled = "disabled"
+                })
+            @Html.HiddenFor(model => Model.UserKBQ.KBQ3)
+        </div>
+    </div>
+
+    <!-- anwser 3 -->
+    <div class="form-group">
+        <div class="col-lg-2 control-label">
+            @Html.LabelFor(m => m.UserKBQ.KBQAnswer3,
+                new
+                {
+                    @class = "control-label required"
+                })
+        </div>
+
+        <div class="col-md-8">
+            <input class="disabled form-control" type="password" value="*******" />
+            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ3,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control readonly"
+                                     }
+                })
+            @Html.EditorFor(m => m.UserKBQ.KBQAnswer3,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control",
+                                         autocomplete = "off",
+                                         @maxlength = 50
+                                     }
+                })
+            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer3, "",
+                new
+                {
+                    @class = "text-danger"
+                })
+        </div>
+    </div>
+
+    <!-- question 4 -->
+    <div class="form-group">
+        <div class="col-lg-2 control-label">
+            @Html.LabelFor(m => m.UserKBQ.KBQ4)
+        </div>
+        <div class="col-md-8">
+            @Html.DropDownListFor(
+                                  m => m.UserKBQ.KBQ4,
+                kbqQuestionPool.Select(i => new SelectListItem
+                                            {
+                                                Text = i.Content,
+                                                Value = i.QuestionId.Value.ToString(),
+                                                Selected = Model.UserKBQ.KBQ4 == i.QuestionId.Value
+                                            }),
+                new
+                {
+                    @class = "form-control",
+                    disabled = "disabled"
+                })
+            @Html.HiddenFor(model => Model.UserKBQ.KBQ4)
+        </div>
+    </div>
+
+    <!-- anwser 4 -->
+    <div class="form-group">
+        <div class="col-lg-2 control-label">
+            @Html.LabelFor(m => m.UserKBQ.KBQAnswer4,
+                new
+                {
+                    @class = "control-label required"
+                })
+        </div>
+
+        <div class="col-md-8">
+            <input class="disabled form-control" type="password" value="*******" />
+            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ4, new
+                                                                     {
+                                                                         htmlAttributes = new
+                                                                                          {
+                                                                                              @class = "form-control readonly"
+                                                                                          }
+                                                                     })
+            @Html.EditorFor(m => m.UserKBQ.KBQAnswer4,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control",
+                                         autocomplete = "off",
+                                         @maxlength = 50
+                                     }
+                })
+            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer4, "",
+                new
+                {
+                    @class = "text-danger"
+                })
+        </div>
+    </div>
+
+    <!-- question 5 -->
+    <div class="form-group">
+        <div class="col-lg-2 control-label">
+            @Html.LabelFor(m => m.UserKBQ.KBQ5)
+        </div>
+        <div class="col-md-8">
+            @Html.DropDownListFor(
+                                  m => m.UserKBQ.KBQ5,
+                kbqQuestionPool.Select(i => new SelectListItem
+                                            {
+                                                Text = i.Content,
+                                                Value = i.QuestionId.Value.ToString(),
+                                                Selected = Model.UserKBQ.KBQ5 == i.QuestionId.Value
+                                            }),
+                new
+                {
+                    @class = "form-control",
+                    disabled = "disabled"
+                })
+            @Html.HiddenFor(m => m.UserKBQ.KBQ5)
+        </div>
+    </div>
+
+    <!-- anwser 5 -->
+    <div class="form-group">
+        <div class="col-lg-2 control-label">
+            @Html.LabelFor(m => m.UserKBQ.KBQAnswer5,
+                new
+                {
+                    @class = "control-label required"
+                })
+        </div>
+
+        <div class="col-md-8">
+            <input class="disabled form-control" type="password" value="*******" />
+            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ5,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control readonly"
+                                     }
+                })
+            @Html.EditorFor(m => m.UserKBQ.KBQAnswer5,
+                new
+                {
+                    htmlAttributes = new
+                                     {
+                                         @class = "form-control",
+                                         autocomplete = "off",
+                                         @maxlength = 50
+                                     }
+                })
+            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer5, "",
+                new
+                {
+                    @class = "text-danger"
+                })
+        </div>
+    </div>
+    </div>
+    </section>@*.box-body*@
+    <div class="box-footer">
+        <div class="form-group">
+            <div class="btn btn-primary btn-sm edit-button pull-right" id="kbqEditBtn">
+                Edit
+            </div>
+            <input type="submit" id="kbqSubmit" value="Save" name="Command" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action("Profile", "User", new {part = "KBQ"})#kbq-panel" formmethod="post" />
+        </div>
+    </div><!-- box-footer -->
+    </div><!-- /.box -->
+    </div>
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <input id="profileCollapsed" name="profileCollapsed" type="hidden" />
+    <input id="kbqCollapsed" name="kbqCollapsed" type="hidden" />
+    <input id="sqCollapsed" name="sqCollapsed" type="hidden" />
+
+    <div class="profileDiv" id="sq-panel">
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"> Security Questions </h3>
+                <h3 class="box-title">
+                    Security Questions
+                </h3>
                 <div class="box-tools pull-right">
                     <div class="pull-right">
-                        <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                        <button class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
                     </div>
                 </div><!-- /.box-tools -->
-            </div>  @*.box-header*@
+            </div> @*.box-header*@
 
             <div>
                 @if (ViewData.ModelState.IsValid == false && inValidSQ)
                 {
-                    @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new
+                    @Html.ValidationSummary(false, "",
+                        new
                         {
                             @class = "alert alert-danger"
                         })
@@ -769,10 +853,12 @@
 
                 @if (ViewBag.SaveSQSuccessfull != null && !string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
                 {
-                    <div class="alert alert-success alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <div class="alert alert-dismissible alert-success">
+                        <button aria-hidden="true" class="close" data-dismiss="alert" type="button">
+                            &times;
+                        </button>
                         <h5>
-                            <i class="icon fa fa-check"></i>
+                            <i class="fa fa-check icon"></i>
                             @ViewBag.SuccessMessage
                         </h5>
                     </div>
@@ -781,34 +867,36 @@
             </div>
 
             <section class="box-body form-horizontal">
-                <h4>Select Answers to 2 Security Questions</h4>
-                Security Questions are used to unlock your account if it is locked because of suspicion of compromise.
-                You may be asked the answer to these questions by your authority.
+                <h4>
+                    Select Answers to 2 Security Questions
+                </h4>
+                <span>
+                    Security Questions are used to unlock your account if it is locked because of suspicion of compromise.
+                    You may be asked the answer to these questions by your authority.
+                </span>
                 <br />
                 <br />
                 <br />
                 <div class="editabledDiv">
-
                     <!-- question 1 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
                             @Html.LabelFor(m => m.UserSQ.SecurityQuestion1)
                         </div>
                         <div class="col-md-8">
-
                             @Html.DropDownListFor(
-                              m => m.UserSQ.SecurityQuestion1,
-                              sqQuestionPool.Select(i => new SelectListItem
-                              {
-                                  Text = i.Content,
-                                  Value = i.QuestionId.Value.ToString(),
-                                  Selected = Model.UserSQ.SecurityQuestion1 == i.QuestionId.Value
-                              }),
-                              new
-                              {
-                                  @class = "form-control",
-                                  disabled = "disabled"
-                              })
+                                                  m => m.UserSQ.SecurityQuestion1,
+                                sqQuestionPool.Select(i => new SelectListItem
+                                                           {
+                                                               Text = i.Content,
+                                                               Value = i.QuestionId.Value.ToString(),
+                                                               Selected = Model.UserSQ.SecurityQuestion1 == i.QuestionId.Value
+                                                           }),
+                                new
+                                {
+                                    @class = "form-control",
+                                    disabled = "disabled"
+                                })
                             @*@Html.HiddenFor(m => m.UserSQ.SecurityQuestionAnswer1)*@
                         </div>
                     </div>
@@ -816,73 +904,81 @@
                     <!-- anwser 1 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
-                            @Html.LabelFor(m => m.UserSQ.SecurityQuestionAnswer1, htmlAttributes: new
-                                {
-                                    @class = "control-label required"
-                                })
+                            @Html.LabelFor(m => m.UserSQ.SecurityQuestionAnswer1, new
+                                                                                  {
+                                                                                      @class = "control-label required"
+                                                                                  })
                         </div>
 
                         <div class="col-md-8">
                             @Html.HiddenFor(m => m.UserSQ.UserQuestionAnserId_SQ1)
-                            @Html.EditorFor(m => m.UserSQ.SecurityQuestionAnswer1, new
-                               {
-                                   htmlAttributes = new
-                                   {
-                                       @class = "form-control readonly",
-                                       @style = "margin-top:5px",
-                                       @maxlength = 50
-                                   }
-                               })
-                            @Html.ValidationMessageFor(m => m.UserSQ.SecurityQuestionAnswer1, "", new { @class = "text-danger" })
+                            @Html.EditorFor(m => m.UserSQ.SecurityQuestionAnswer1,
+                                new
+                                {
+                                    htmlAttributes = new
+                                                     {
+                                                         @class = "form-control readonly",
+                                                         autocomplete = "off",
+                                                         @maxlength = 50
+                                                     }
+                                })
+                            @Html.ValidationMessageFor(m => m.UserSQ.SecurityQuestionAnswer1, "",
+                                new
+                                {
+                                    @class = "text-danger"
+                                })
                         </div>
                     </div>
-                    
+
                     <!-- question 2 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
                             @Html.LabelFor(m => m.UserSQ.SecurityQuestion2)
                         </div>
                         <div class="col-md-8">
-
                             @Html.DropDownListFor(
-                                m => m.UserSQ.SecurityQuestion2,
+                                                  m => m.UserSQ.SecurityQuestion2,
                                 sqQuestionPool.Select(i => new SelectListItem
-                                {
-                                    Text = i.Content,
-                                    Value = i.QuestionId.Value.ToString(),
-                                    Selected = Model.UserSQ.SecurityQuestion1 == i.QuestionId.Value
-                                }),
+                                                           {
+                                                               Text = i.Content,
+                                                               Value = i.QuestionId.Value.ToString(),
+                                                               Selected = Model.UserSQ.SecurityQuestion1 == i.QuestionId.Value
+                                                           }),
                                 new
                                 {
                                     @class = "form-control",
                                     disabled = "disabled"
                                 })
                             @*@Html.HiddenFor(m => m.UserSQ.SecurityQuestionAnswer2)*@
-
                         </div>
                     </div>
 
                     <!-- anwser 2 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
-                            @Html.LabelFor(m => m.UserSQ.SecurityQuestionAnswer2, htmlAttributes: new
-                            {
-                                @class = "control-label required"
-                            })
+                            @Html.LabelFor(m => m.UserSQ.SecurityQuestionAnswer2, new
+                                                                                  {
+                                                                                      @class = "control-label required"
+                                                                                  })
                         </div>
 
                         <div class="col-md-8">
                             @Html.HiddenFor(m => m.UserSQ.UserQuestionAnserId_SQ2)
-                            @Html.EditorFor(m => m.UserSQ.SecurityQuestionAnswer2, new
-                            {
-                                htmlAttributes = new
+                            @Html.EditorFor(m => m.UserSQ.SecurityQuestionAnswer2,
+                                new
                                 {
-                                    @class = "form-control readonly",
-                                    @style = "margin-top:5px;",
-                                    @maxlength = 50
-                                }
-                            })
-                            @Html.ValidationMessageFor(m => m.UserSQ.SecurityQuestionAnswer2, "", new { @class = "text-danger" })
+                                    htmlAttributes = new
+                                                     {
+                                                         @class = "form-control readonly",
+                                                         autocomplete = "off",
+                                                         @maxlength = 50
+                                                     }
+                                })
+                            @Html.ValidationMessageFor(m => m.UserSQ.SecurityQuestionAnswer2, "",
+                                new
+                                {
+                                    @class = "text-danger"
+                                })
                         </div>
                     </div>
                 </div>
@@ -890,9 +986,10 @@
             </section>@*.box-body*@
             <div class="box-footer">
                 <div class="form-group">
-                    <div id="sqEditBtn" class="btn btn-sm btn-primary pull-right edit-button">Edit</div>
-                    <input type="submit" id="sqSubmit" value="Save" name="Command" class="btn btn-sm btn-primary pull-right"
-                           formaction="@Url.Action(actionName: "Profile", controllerName: "User",routeValues: new { part = "SQ" })#sq-panel" formmethod="post" />
+                    <div class="btn btn-primary btn-sm edit-button pull-right" id="sqEditBtn">
+                        Edit
+                    </div>
+                    <input type="submit" id="sqSubmit" value="Save" name="Command" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action("Profile", "User", new {part = "SQ"})#sq-panel" formmethod="post" />
                 </div>
             </div><!-- box-footer -->
         </div><!-- /.box -->
@@ -901,12 +998,11 @@
 @section Scripts {
     @Scripts.Render(paths: "~/bundles/profile")
     @Scripts.Render(paths: "~/bundles/jqueryval")
-    
+
     <script type="text/javascript">
         var profileCollapsed = '@Html.Raw(ViewBag.profileCollapsed)';
-        var kbqCollapsed = '@Html.Raw(ViewBag.kbqCollapsed)';
-        var sqCollapsed = '@Html.Raw(ViewBag.sqCollapsed)';
-        var newRegistration = '@Html.Raw(ViewBag.newRegistration)';
+        var kbqCollapsed     = '@Html.Raw(ViewBag.kbqCollapsed)';
+        var sqCollapsed      = '@Html.Raw(ViewBag.sqCollapsed)';
+        var newRegistration  = '@Html.Raw(ViewBag.newRegistration)';
     </script>
 }
-

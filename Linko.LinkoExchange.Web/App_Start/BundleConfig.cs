@@ -7,7 +7,7 @@ namespace Linko.LinkoExchange.Web
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
-            bundles.Add(new StyleBundle(virtualPath: "~/Bundles/css")
+            bundles.Add(new StyleBundle(virtualPath: "~/bundles/css")
                 .Include(virtualPath: "~/Content/bootstrap.css")
                 //.Include(virtualPath: "~/Content/select2.css")
                 .Include(virtualPath: "~/Content/bootstrap-switch/bootstrap3/bootstrap-switch.css")
@@ -16,14 +16,14 @@ namespace Linko.LinkoExchange.Web
                 //.Include(virtualPath: "~/Content/AdminLTE/css/skins/skin-blue-light.css")
                 .Include(virtualPath: "~/Content/site.css"));
 
-            bundles.Add(new StyleBundle(virtualPath: "~/Bundles/font-awesome")
+            bundles.Add(new StyleBundle(virtualPath: "~/bundles/font-awesome")
                 .Include(virtualPath: "~/Content/font-awesome.css"));
 
-            bundles.Add(new StyleBundle(virtualPath: "~/Bundles/icheck")
+            bundles.Add(new StyleBundle(virtualPath: "~/bundles/icheck")
                 .Include(virtualPath: "~/Content/icheck/minimal/blue.css", 
                 transforms: new IItemTransform[] { new CssRewriteUrlTransform() }));
 
-            bundles.Add(new ScriptBundle(virtualPath: "~/Bundles/js")
+            bundles.Add(new ScriptBundle(virtualPath: "~/bundles/js")
                 .Include(virtualPath: "~/Scripts/bootstrap.js")
                 .Include(virtualPath: "~/Scripts/bootstrap-switch.js")
                 .Include(virtualPath: "~/Scripts/fastclick.js")

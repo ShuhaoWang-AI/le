@@ -343,7 +343,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
             SignInViewModel model = new SignInViewModel();
-            model.UserName = (HttpContext.Request.Cookies["lastSignInName"] != null) ? HttpContext.Request.Cookies.Get(name: "lastSignInName").Value : "";
+            //model.UserName = (HttpContext.Request.Cookies["lastSignInName"] != null) ? HttpContext.Request.Cookies.Get(name: "lastSignInName").Value : "";
 
             return View(model);
         }
@@ -367,9 +367,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                 switch (result.AutehticationResult)
                 {
                     case AuthenticationResult.Success:
-                        HttpCookie cookie = new HttpCookie(name: "lastSignInName", value: model.UserName);
-                        cookie.Expires = DateTime.Now.AddMonths(1);
-                        HttpContext.Response.SetCookie(cookie);
+                        //HttpCookie cookie = new HttpCookie(name: "lastSignInName", value: model.UserName);
+                        //cookie.Expires = DateTime.Now.AddMonths(1);
+                        //HttpContext.Response.SetCookie(cookie);
                         _logger.Info(string.Format(format: "SignIn. User={0} has successfully logged in.", arg0: model.UserName));
                         return RedirectToAction(actionName: "PortalDirector", controllerName: "Account");       // 6.b
                     case AuthenticationResult.PasswordLockedOut:            // 2.c
@@ -550,7 +550,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult AccountIsNotAssociated()
         {
             ConfirmationViewModel model = new ConfirmationViewModel();
-            model.Title = "Account Is Not Associated";
+            model.Title = "No Active Organizations Found";
             model.HtmlStr = Core.Resources.Message.AccountIsNotAssociated + "<br/>";
 
             if (TempData["RegulatoryList"] != null)
@@ -709,7 +709,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult ForgotPasswordConfirmation()
         {
             ConfirmationViewModel model = new ConfirmationViewModel();
-            model.Title = "Forgot password confirmation";
+            model.Title = "Forgot Password Confirmation";
             model.Message = "Please check your email to reset your password.";
 
             return View(viewName: "Confirmation", model: model);
@@ -882,7 +882,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult ResetPasswordConfirmation()
         {
             ConfirmationViewModel model = new ConfirmationViewModel();
-            model.Title = "Reset password confirmation";
+            model.Title = "Reset Password Confirmation";
             model.HtmlStr = "Your password has been successfully reset. Please click <a href= ";
             model.HtmlStr += Url.Action(actionName: "SignIn", controllerName: "Account") + ">here </a> to Sign in.";
 
@@ -971,7 +971,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (result.Success)
             {
                 TempData["SubTitle"] = "Change Password";
-                TempData["Message"] = "Change password succeeded.";
+                TempData["Message"] = "Password successfully changed.";
                 return RedirectToAction(actionName: "ChangeAccountSucceed");
             }
             var errorMessage = result.Errors.Aggregate((i, j) =>
@@ -986,12 +986,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AllowAnonymous]
         public ActionResult ChangeAccountSucceed()
         {
-            ViewBag.SuccessMessage = TempData["Message"];
-            ViewBag.SubTitle = TempData["SubTitle"];
-            TempData["SubTitle"] = "Change Email";
-            TempData["Message"] = "Change email address succeeded.";
+            ConfirmationViewModel model = new ConfirmationViewModel();
+            model.Title = TempData["SubTitle"].ToString();
+            model.Message = TempData["Message"].ToString();
 
-            return View();
+            return View(viewName: "Confirmation", model: model);
         }
 
         [Authorize]
@@ -1068,7 +1067,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             var userDto = _userService.GetUserProfileById(userProfileId);
             if (userDto == null ||
-                userDto != null && userDto.UserProfileId != userProfileId)
+                userDto != null && userDto.UserProfileId != userProfileId) // how it is possible that userDto.UserProfileId != userProfileId ???
             {
                 ModelState.AddModelError(string.Empty, errorMessage: "The email to change is not your email.");
                 ViewBag.inValidData = true;
@@ -1079,7 +1078,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (!result)
             {
                 ViewBag.inValidData = true;
-                ModelState.AddModelError(string.Empty, errorMessage: "Change email address failed.");
+                ModelState.AddModelError(string.Empty, errorMessage: "Email is already in use on another account.");
 
                 return View(model);
             }
@@ -1087,8 +1086,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 _authenticationService.UpdateClaim(CacheKey.Email, model.NewEmail);
 
-                TempData["SubTitle"] = "Change Email";
-                TempData["Message"] = "Change email address succeeded.";
+                TempData["SubTitle"] = "Change Email Address";
+                TempData["Message"] = "Email successfully changed.";
                 return RedirectToAction(actionName: "ChangeAccountSucceed");
             }
 

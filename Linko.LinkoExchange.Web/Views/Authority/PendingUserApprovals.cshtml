@@ -62,6 +62,7 @@
                     // .Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                     .Resizable(resizable => resizable.Columns(value: true))
                     .Scrollable(s => s.Height(value: "auto"))
+                    .NoRecords(text: "No pending registrations exist.")
                     .Events(events =>
                     {
                         events.Change(handler: "gotoNextPage");

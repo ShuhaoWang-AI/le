@@ -15,9 +15,8 @@
 
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-    @Styles.Render(paths: "~/Bundles/font-awesome")
-    @Styles.Render(paths: "~/Bundles/icheck")
-    @Styles.Render(paths: "~/Bundles/css")
+    @Styles.Render(paths: "~/bundles/font-awesome")
+    @Styles.Render(paths: "~/bundles/icheck")
 
     <link href="~/Content/AdminLTE/css/AdminLTE.min.css" rel="stylesheet" />
     <link href="~/Content/AdminLTE/css/skins/skin-blue-light.min.css" rel="stylesheet" />
@@ -41,7 +40,9 @@
 	<script src="https://kendo.cdn.telerik.com/2016.3.1028/js/jszip.min.js"></script>
 	<script src="https://kendo.cdn.telerik.com/2016.3.1028/js/kendo.all.min.js"></script>
 	<script src="https://kendo.cdn.telerik.com/2016.3.1028/js/kendo.aspnetmvc.min.js"></script>
-	<script src="@Url.Content(contentPath: "~/Scripts/kendo.modernizr.custom.js")"></script>
+    <script src="@Url.Content(contentPath: "~/Scripts/kendo.modernizr.custom.js")"></script>
+    
+    @Styles.Render(paths: "~/bundles/css")
 
 </head>
 <body class="hold-transition skin-blue-light fixed">

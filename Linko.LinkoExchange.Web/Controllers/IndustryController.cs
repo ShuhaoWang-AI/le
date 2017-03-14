@@ -518,7 +518,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         case RegistrationResult.Success:
                             ViewBag.ShowSuccessMessage = true;
-                            ViewBag.SuccessMessage = "Registration Approved!";
+                            ViewBag.SuccessMessage = "Registration Approved! An email has been sent to the registrant.";
                             ModelState.Clear();
                             _logger.Info(string.Format(format: "PendingUserApprove. User={0} - id={1} Registration Approved!", arg0: model.UserName, arg1: model.Id));
                             break;

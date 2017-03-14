@@ -651,11 +651,11 @@
         {
             var tbWithIntValue = {
                   '#FailedPasswordAttemptMaxCount': '#FailedPasswordAttemptMaxCountDefault'
-                , '#FailedKbqAttemptMaxCount': '#FailedKbqAttemptMaxCountDefault'
-                , '#InvitationExpiredHours': '#InvitationExpiredHoursDefault'
-                , '#PasswordChangeRequiredDays': '#PasswordChangeRequiredDaysDefault'
-                , '#PasswordHistoryMaxCount': '#PasswordHistoryMaxCountDefault'
-                , '#ReportRepudiatedDays': '#ReportRepudiatedDaysDefault'
+                , '#FailedKbqAttemptMaxCount'     : '#FailedKbqAttemptMaxCountDefault'
+                , '#InvitationExpiredHours'       : '#InvitationExpiredHoursDefault'
+                , '#PasswordChangeRequiredDays'   : '#PasswordChangeRequiredDaysDefault'
+                , '#PasswordHistoryMaxCount'      : '#PasswordHistoryMaxCountDefault'
+                , '#ReportRepudiatedDays'         : '#ReportRepudiatedDaysDefault'
             };
 
             $.each(tbWithIntValue, function (key, value)
@@ -664,7 +664,7 @@
                 {
                     var tb = $(key);
                     var hf = $(value);
-                    tb.val((isNaN(parseInt(tb.val()))) ? ((isNaN(parseInt(hf.val()))) ? 0 : parseInt(hf.val())) : parseInt(tb.val()));
+                    tb.val((isNaN(parseInt(tb.val())) ||$.isBlank(tb.val())) ? ((isNaN(parseInt(hf.val()))) ? 0 : parseInt(hf.val())) : parseInt(tb.val()));
                 });
             });
             
@@ -675,6 +675,10 @@
 
             $.each(tbWithStringValue, function (key, value)
             {
+                var tb = $(key);
+                var hf = $(value);
+                tb.val($.isBlank(tb.val()) ? hf.val() : tb.val());
+
                 $(key).blur(function ()
                 {
                     var tb = $(key);
@@ -686,7 +690,7 @@
 
         (function($){
             $.isBlank = function(obj){
-                return(!obj || $.trim(obj) === "");
+                return(!obj || $.trim(obj) === "" || $.trim(obj) === "0");
             };
         })(jQuery);
     </script>
