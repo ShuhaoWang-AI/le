@@ -1,4 +1,5 @@
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
@@ -56,13 +57,13 @@ namespace Linko.LinkoExchange.Services
                 // TODO 
                 //1. set Attachments 
                 rptDto.Attachments = rpt.ReportPackageTemplateElementCategories
-                    .Where(i => i.ReportElementCategory.Name == Core.Enum.ReportElementCategory.Attachment.ToString())
+                    .Where(i => i.ReportElementCategory.Name == ReportElementCategoryName.Attachment.ToString())
                     .Select(i => _mapHelper.GetReportElementCategoryDtoFromReportElementCategory(i)).ToList();
 
 
                 //2. set certifications 
                 rptDto.Certifications = rpt.ReportPackageTemplateElementCategories
-                   .Where(i => i.ReportElementCategory.Name == Core.Enum.ReportElementCategory.Certification.ToString())
+                   .Where(i => i.ReportElementCategory.Name == ReportElementCategoryName.Certification.ToString())
                    .Select(i => _mapHelper.GetReportElementCategoryDtoFromReportElementCategory(i)).ToList();
 
                 //3. set assingedIndustries 

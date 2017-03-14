@@ -1,6 +1,6 @@
 ﻿namespace Linko.LinkoExchange.Core.Enum
 {
-    public enum ReportElementCategory
+    public enum ReportElementCategoryName
     {
         Attachment,
         Certification,

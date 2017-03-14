@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Linko.LinkoExchange.Services.Dto;
 using System.Data.Entity;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -36,7 +37,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             var certTypes = new List<CertificationTypeDto>();
             var certReportElementCategoryId = _dbContext.ReportElementCategories
-                .Single(r => r.Name == ReportElementCategoryName.Certifications.ToString()).ReportElementCategoryId;
+                .Single(r => r.Name == ReportElementCategoryName.Certification.ToString()).ReportElementCategoryId;
 
             var foundReportElementTypes = _dbContext.ReportElementTypes
                 .Include(c => c.CtsEventType)
@@ -109,7 +110,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             var attachmentTypes = new List<AttachmentTypeDto>();
             var attachmentReportElementCategoryId = _dbContext.ReportElementCategories
-                .Single(r => r.Name == ReportElementCategoryName.Attachments.ToString()).ReportElementCategoryId;
+                .Single(r => r.Name == ReportElementCategoryName.Attachment.ToString()).ReportElementCategoryId;
             var foundReportElementTypes = _dbContext.ReportElementTypes
                 .Include(c => c.CtsEventType)
                 .Where(c => c.OrganizationRegulatoryProgramId == _orgRegProgramId
