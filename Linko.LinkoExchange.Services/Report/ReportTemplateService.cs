@@ -14,7 +14,7 @@ namespace Linko.LinkoExchange.Services.Report
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly IHttpContextService _httpContextService;
-        private readonly IAttachmentService _attachmentService;
+        private readonly IReportElementService _reportElementService;
         private readonly IMapHelper _mapHelper;
         private readonly ILogger _logger;
 
@@ -23,13 +23,13 @@ namespace Linko.LinkoExchange.Services.Report
         public ReportTemplateService(
             LinkoExchangeContext dbContext,
             IHttpContextService httpContextService,
-            IAttachmentService attachmentService,
+            IReportElementService reportElementService,
             IMapHelper mapHelper,
             ILogger logger)
         {
             _dbContext = dbContext;
             _httpContextService = httpContextService;
-            _attachmentService = attachmentService;
+            _reportElementService = reportElementService;
             _mapHelper = mapHelper;
             _logger = logger;
 
@@ -65,10 +65,10 @@ namespace Linko.LinkoExchange.Services.Report
                     .Where(i => i.ReportElementCategory.Name == ReportElementCategoryName.Attachment.ToString())
                     .SelectMany(i => i.ReportPackageTemplateElementTypes).Distinct().ToList();
 
-                var attachments = new List<AttachmentTypeDto>();
+                var attachments = new List<ReportElementTypeDto>();
                 foreach (var att in atts)
                 {
-                    attachments.Add(_mapHelper.GetAttachmentTypeDtoFromReportElementType(att.ReportElementType));
+                    attachments.Add(_mapHelper.GetReportElementTypeDtoFromReportElementType(att.ReportElementType));
                 }
                 rptDto.AttachmentTypes = attachments;
 
@@ -77,7 +77,7 @@ namespace Linko.LinkoExchange.Services.Report
                    .Where(i => i.ReportElementCategory.Name == ReportElementCategoryName.Certification.ToString())
                    .SelectMany(i => i.ReportPackageTemplateElementTypes).Distinct().ToList();
 
-                rptDto.CertificationTypes = certs.Select(cert => _mapHelper.GetCertificationTypeDtoFromReportElementType(cert.ReportElementType)).ToList();
+                rptDto.CertificationTypes = certs.Select(cert => _mapHelper.GetReportElementTypeDtoFromReportElementType(cert.ReportElementType)).ToList();
 
                 //3. set assingedIndustries  
                 rptDto.ReportPackageTemplateAssignments = rptDto.ReportPackageTemplateAssignments;

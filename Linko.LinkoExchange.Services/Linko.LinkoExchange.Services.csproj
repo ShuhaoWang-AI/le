@@ -110,9 +110,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dto\AttachmentDto.cs" />
-    <Compile Include="Dto\AttachmentTypeDto.cs" />
-    <Compile Include="Dto\CertificationTypeDto.cs" />
-    <Compile Include="Attachment\IAttachmentService.cs" />
     <Compile Include="AuditLog\CromerrAuditLogService.cs" />
     <Compile Include="AuditLog\EmailAuditLogService.cs" />
     <Compile Include="AuditLog\IAuditLogService.cs" />
@@ -225,7 +222,9 @@
       <DependentUpon>App.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Attachment\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

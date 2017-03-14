@@ -499,53 +499,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             return unitDto;
         }
 
-        public ReportElementType GetReportElementTypeFromCertificationTypeDto(CertificationTypeDto certificationType, ReportElementType reportElementType = null)
-        {
-            if (reportElementType == null)
-            {
-                reportElementType = new ReportElementType();
-            }
-
-            reportElementType.Name = certificationType.Name;
-            reportElementType.Description = certificationType.Description;
-            reportElementType.Content = certificationType.CertificationText;
-            reportElementType.IsContentProvided = true;
-            reportElementType.CtsEventTypeId = certificationType.CtsEventType.CtsEventTypeId;
-            //IGNORE reportElementType.CtsEventType
-            reportElementType.ReportElementCategoryId = certificationType.ReportElementCategoryId;
-            //IGNORE reportElementType.ReportElementCategory
-            reportElementType.OrganizationRegulatoryProgramId = certificationType.OrganizationRegulatoryProgramId;
-            //IGNORE reportElementType.OrganizationRegulatoryProgram
-            reportElementType.CreationDateTimeUtc = certificationType.CreationDateTimeUtc;
-            reportElementType.LastModificationDateTimeUtc = certificationType.LastModificationDateTimeUtc;
-            reportElementType.LastModifierUserId = certificationType.LastModifierUserId;
-
-            return reportElementType;
-        }
-
-        public ReportElementType GetReportElementTypeFromAttachmentTypeDto(AttachmentTypeDto attachmentType, ReportElementType reportElementType = null)
-        {
-            if (reportElementType == null)
-            {
-                reportElementType = new ReportElementType();
-            }
-
-            reportElementType.Name = attachmentType.Name;
-            reportElementType.Description = attachmentType.Description;
-            //IGNORE reportElementType.Content
-            reportElementType.IsContentProvided = false;
-            reportElementType.CtsEventTypeId = attachmentType.CtsEventType.CtsEventTypeId;
-            //IGNORE reportElementType.CtsEventType
-            reportElementType.ReportElementCategoryId = attachmentType.ReportElementCategoryId;
-            //IGNORE reportElementType.ReportElementCategory
-            reportElementType.OrganizationRegulatoryProgramId = attachmentType.OrganizationRegulatoryProgramId;
-            //IGNORE reportElementType.OrganizationRegulatoryProgram
-            reportElementType.CreationDateTimeUtc = attachmentType.CreationDateTimeUtc;
-            reportElementType.LastModificationDateTimeUtc = attachmentType.LastModificationDateTimeUtc;
-            reportElementType.LastModifierUserId = attachmentType.LastModifierUserId;
-
-            return reportElementType;
-        }
 
         private CtsEventTypeDto GetCtsEventTypeDtoFromCtsEventType(CtsEventType ctsEventType)
         {
@@ -556,38 +509,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             return mappedDto;
         }
 
-        public CertificationTypeDto GetCertificationTypeDtoFromReportElementType(ReportElementType reportElementType)
-        {
-            var mappedCertType = new CertificationTypeDto();
-            mappedCertType.ReportElementCategoryId = reportElementType.ReportElementCategoryId;
-            mappedCertType.CertificationTypeID = reportElementType.ReportElementTypeId;
-            mappedCertType.Name = reportElementType.Name;
-            mappedCertType.Description = reportElementType.Description;
-            mappedCertType.CtsEventType = GetCtsEventTypeDtoFromCtsEventType(reportElementType.CtsEventType);
-            mappedCertType.CertificationText = reportElementType.Content;
-            //mappedCertType.IsDeleted = row removed via hard delete? (TO-DO: confirm)
-            mappedCertType.OrganizationRegulatoryProgramId = reportElementType.OrganizationRegulatoryProgramId;
-            mappedCertType.CreationDateTimeUtc = reportElementType.CreationDateTimeUtc;
-            mappedCertType.LastModificationDateTimeUtc = reportElementType.LastModificationDateTimeUtc;
-            mappedCertType.LastModifierUserId = reportElementType.LastModifierUserId;
-            return mappedCertType;
-        }
 
-        public AttachmentTypeDto GetAttachmentTypeDtoFromReportElementType(ReportElementType reportElementType)
-        {
-            var mappedAttachmentType = new AttachmentTypeDto();
-            mappedAttachmentType.ReportElementCategoryId = reportElementType.ReportElementCategoryId;
-            mappedAttachmentType.AttachmentTypeID = reportElementType.ReportElementTypeId;
-            mappedAttachmentType.Name = reportElementType.Name;
-            mappedAttachmentType.Description = reportElementType.Description;
-            mappedAttachmentType.CtsEventType = GetCtsEventTypeDtoFromCtsEventType(reportElementType.CtsEventType);
-            //mappedCertType.IsDeleted = row removed via hard delete? (TO-DO: confirm)
-            mappedAttachmentType.OrganizationRegulatoryProgramId = reportElementType.OrganizationRegulatoryProgramId;
-            mappedAttachmentType.CreationDateTimeUtc = reportElementType.CreationDateTimeUtc;
-            mappedAttachmentType.LastModificationDateTimeUtc = reportElementType.LastModificationDateTimeUtc;
-            mappedAttachmentType.LastModifierUserId = reportElementType.LastModifierUserId;
-            return mappedAttachmentType;
-        }
 
         public ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(Core.Domain.ReportElementCategory cat)
         {
@@ -801,12 +723,51 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public ReportElementTypeDto GetReportElementTypeDtoFromReportElementType(ReportElementType reportElementType)
         {
-            throw new NotImplementedException();
+            var mappedReportElementType = new ReportElementTypeDto();
+            mappedReportElementType.ReportElementCategoryId = reportElementType.ReportElementCategoryId;
+            if (reportElementType.ReportElementCategory != null)
+            {
+                mappedReportElementType.ReportElementCategory = GetReportElementCategoryDtoFromReportElementCategory(reportElementType.ReportElementCategory);
+            }
+            mappedReportElementType.ReportElementTypeID = reportElementType.ReportElementTypeId;
+            mappedReportElementType.Name = reportElementType.Name;
+            mappedReportElementType.Description = reportElementType.Description;
+            mappedReportElementType.Content = reportElementType.Content;
+            mappedReportElementType.IsContentProvided = reportElementType.IsContentProvided;
+            mappedReportElementType.CtsEventType = GetCtsEventTypeDtoFromCtsEventType(reportElementType.CtsEventType);
+            mappedReportElementType.OrganizationRegulatoryProgramId = reportElementType.OrganizationRegulatoryProgramId;
+            if (reportElementType.OrganizationRegulatoryProgram != null)
+            {
+                mappedReportElementType.OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(reportElementType.OrganizationRegulatoryProgram);
+            }
+            mappedReportElementType.CreationDateTimeUtc = reportElementType.CreationDateTimeUtc;
+            mappedReportElementType.LastModificationDateTimeUtc = reportElementType.LastModificationDateTimeUtc;
+            mappedReportElementType.LastModifierUserId = reportElementType.LastModifierUserId;
+            return mappedReportElementType;
         }
 
-        public ReportElementType GetReportElementTypeFromReportElementTypeDto(ReportElementTypeDto reportElementType)
+        public ReportElementType GetReportElementTypeFromReportElementTypeDto(ReportElementTypeDto reportElementTypeDto, ReportElementType reportElementType = null)
         {
-            throw new NotImplementedException();
+            if (reportElementType == null)
+            {
+                reportElementType = new ReportElementType();
+            }
+
+            reportElementType.Name = reportElementTypeDto.Name;
+            reportElementType.Description = reportElementTypeDto.Description;
+            reportElementType.Content = reportElementTypeDto.Content;
+            reportElementType.IsContentProvided = reportElementTypeDto.IsContentProvided;
+            reportElementType.CtsEventTypeId = reportElementTypeDto.CtsEventType.CtsEventTypeId;
+            //IGNORE reportElementType.CtsEventType
+            reportElementType.ReportElementCategoryId = reportElementTypeDto.ReportElementCategoryId;
+            //IGNORE reportElementType.ReportElementCategory
+            reportElementType.OrganizationRegulatoryProgramId = reportElementTypeDto.OrganizationRegulatoryProgramId;
+            //IGNORE reportElementType.OrganizationRegulatoryProgram
+            reportElementType.CreationDateTimeUtc = reportElementTypeDto.CreationDateTimeUtc;
+            reportElementType.LastModificationDateTimeUtc = reportElementTypeDto.LastModificationDateTimeUtc;
+            reportElementType.LastModifierUserId = reportElementTypeDto.LastModifierUserId;
+
+            return reportElementType;
         }
 
         public ReportPackageTemplateElementType GetReportPackageTemplateElmentTypeFromReportPackageTemplateTypeDto(ReportPackageTemplateElementTypeDto rptet)
@@ -835,5 +796,17 @@ namespace Linko.LinkoExchange.Services.Mapping
             return rpta;
 
         }
+
+        public CtsEventTypeDto GetEventTypeDtoFromEventType(CtsEventType ctsEventType)
+        {
+            throw new NotImplementedException();
+        }
+
+        public CtsEventType GetEventTypeFromEventTypeDto(CtsEventTypeDto ctsEventTypeDto)
+        {
+            throw new NotImplementedException();
+        }
+
+
     }
 }
