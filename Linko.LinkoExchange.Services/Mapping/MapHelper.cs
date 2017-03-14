@@ -506,19 +506,19 @@ namespace Linko.LinkoExchange.Services.Mapping
                 reportElementType = new ReportElementType();
             }
 
-            reportElementType.Name  = certificationType.Name;
-            reportElementType.Description  = certificationType.Description;
-            reportElementType.Content  = certificationType.CertificationText;
+            reportElementType.Name = certificationType.Name;
+            reportElementType.Description = certificationType.Description;
+            reportElementType.Content = certificationType.CertificationText;
             reportElementType.IsContentProvided = true;
-            reportElementType.CtsEventTypeId  = certificationType.CtsEventType.CtsEventTypeId;
+            reportElementType.CtsEventTypeId = certificationType.CtsEventType.CtsEventTypeId;
             //IGNORE reportElementType.CtsEventType
             reportElementType.ReportElementCategoryId = certificationType.ReportElementCategoryId;
             //IGNORE reportElementType.ReportElementCategory
             reportElementType.OrganizationRegulatoryProgramId = certificationType.OrganizationRegulatoryProgramId;
             //IGNORE reportElementType.OrganizationRegulatoryProgram
             reportElementType.CreationDateTimeUtc = certificationType.CreationDateTimeUtc;
-            reportElementType.LastModificationDateTimeUtc  = certificationType.LastModificationDateTimeUtc;
-            reportElementType.LastModifierUserId  = certificationType.LastModifierUserId;
+            reportElementType.LastModificationDateTimeUtc = certificationType.LastModificationDateTimeUtc;
+            reportElementType.LastModifierUserId = certificationType.LastModifierUserId;
 
             return reportElementType;
         }
@@ -729,16 +729,19 @@ namespace Linko.LinkoExchange.Services.Mapping
             rpt.EffectiveDate = reportPackageTemplate.EffectiveDateTimeUtc;
             rpt.Id = reportPackageTemplate.ReportPackageTemplateId;
 
+            // This will include attachment, TTO, comments etc categories
             rpt.ReportPackageTemplateElementCategories = new List<ReportPackageTemplateElementCategoryDto>();
             foreach (var cat in reportPackageTemplate.ReportPackageTemplateElementCategories)
             {
                 rpt.ReportPackageTemplateElementCategories.Add(this.GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(cat));
             }
 
-            //rpt.Attachments = new List<ReportElementCategoryDto>(); 
-
-            //rpt.Attachments = reportPackageTemplate.ReportPackageTemplateElementCategories
-            //    .Select(i => this.GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(i));
+            // For ReportPackageTemplateAssignments fields  
+            rpt.ReportPackageTemplateAssignments = new List<ReportPackageTemplateAssignmentDto>();
+            foreach (var rpta in reportPackageTemplate.ReportPackageTemplateAssignments)
+            {
+                rpt.ReportPackageTemplateAssignments.Add(this.GetReportPackageTemplateAssignmentDtoFromReportPackageTemplateAssignment(rpta));
+            }
 
             return rpt;
         }
@@ -789,6 +792,28 @@ namespace Linko.LinkoExchange.Services.Mapping
         public ReportPackageTemplateElementType GetReportPackageTemplateElmentTypeFromReportPackageTemplateTypeDto(ReportPackageTemplateElementTypeDto rptet)
         {
             throw new NotImplementedException();
+        }
+
+        public ReportPackageTemplateAssignmentDto GetReportPackageTemplateAssignmentDtoFromReportPackageTemplateAssignment(ReportPackageTemplateAssignment rpt)
+        {
+            var rptaDto = new ReportPackageTemplateAssignmentDto();
+            rptaDto.ReportPackageTemplateAssignmentId = rpt.ReportPackageTemplateAssignmentId;
+            rptaDto.ReportPackageTemplateId = rpt.ReportPackageTemplateId;
+            rptaDto.ReportPackageTemplate = this.GetReportPackageTemplateDtoFromReportPackageTemplate(rpt.ReportPackageTemplate);
+            rptaDto.OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId;
+            rptaDto.OrganizationRegulatoryProgram = this.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(rpt.OrganizationRegulatoryProgram);
+            return rptaDto;
+        }
+
+        public ReportPackageTemplateAssignment GetReportPackageTemplateAssignmentFromReportPackageTemplateAssignmentDto(ReportPackageTemplateAssignmentDto rptDto)
+        {
+            var rpta = new ReportPackageTemplateAssignment();
+            rpta.ReportPackageTemplateAssignmentId = rptDto.ReportPackageTemplateAssignmentId;
+            rpta.ReportPackageTemplateId = rptDto.ReportPackageTemplateId;
+            rpta.ReportPackageTemplate = this.GetReportPackageTemplateFromReportPackageTemplateDto(rptDto.ReportPackageTemplate);
+            rpta.OrganizationRegulatoryProgramId = rptDto.OrganizationRegulatoryProgramId;
+            return rpta;
+
         }
     }
 }

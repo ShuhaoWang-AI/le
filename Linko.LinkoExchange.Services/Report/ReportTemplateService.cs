@@ -53,26 +53,32 @@ namespace Linko.LinkoExchange.Services
             //TODO get  reportPackageTempates 
 
             var rpts = new List<ReportPackageTemplate>();
+
+
+
             var rptDtos = new List<ReportPackageTemplateDto>();
             foreach (var rpt in rpts)
             {
                 var rptDto = _mapHelper.GetReportPackageTemplateDtoFromReportPackageTemplate(rpt);
 
                 // TODO 
-                //1. set Attachments 
-                //rptDto.Attachments = rpt.ReportPackageTemplateElementCategories
-                //    .Where(i => i.ReportElementCategory.Name == Core.Enum.ReportElementCategory.Attachment.ToString());
+                //1. set Attachments  
+                rptDto.Attachments = rptDto.ReportPackageTemplateElementCategories
+                    .Where(i => i.ReportElementCategory.Name == ReportElementCategoryName.Attachment.ToString())
+                    .Select(i => i.ReportElementCategory).ToList();
+
 
                 //2. set certifications 
-                //rptDto.Certifications = rpt.ReportPackageTemplateElementCategories
-                //   .Where(i => i.ReportElementCategory.Name == Core.Enum.ReportElementCategory.Certification.ToString())
-                //   .Select(i => _mapHelper.GetReportElementCategoryDtoFromReportElementCategory(i)).ToList();
+                rptDto.Certifications = rptDto.ReportPackageTemplateElementCategories
+                   .Where(i => i.ReportElementCategory.Name == ReportElementCategoryName.Certification.ToString())
+                   .Select(i => i.ReportElementCategory).ToList();
 
-                //3. set assingedIndustries 
-                //var assinedIndustries = rpt.ReportPackageTemplateAssignments.Select(i => i.OrganizationRegulatoryProgram);
-                //rptDto.AssignedIndustries = rpt.ReportPackageTemplateAssignments.Select(i => i.OrganizationRegulatoryProgram)
-                //        .Select(i => _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(i)).ToList();
+                //3. set assingedIndustries  
+                rptDto.ReportPackageTemplateAssignments = rptDto.ReportPackageTemplateAssignments;
 
+                /// TODO ?
+                /// to can the service to popute OrgRegProg  
+                /// 
                 rptDtos.Add(rptDto);
             }
 

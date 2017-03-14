@@ -23,7 +23,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public List<ReportElementCategoryDto> Attachments { get; set; }
 
         public List<ReportElementCategoryDto> Certifications { get; set; }
-        public List<OrganizationRegulatoryProgramDto> AssignedIndustries { get; set; }
+        public List<ReportPackageTemplateAssignmentDto> ReportPackageTemplateAssignments { get; set; }
 
         public List<ReportPackageTemplateElementCategoryDto> ReportPackageTemplateElementCategories { get; set; }
 
