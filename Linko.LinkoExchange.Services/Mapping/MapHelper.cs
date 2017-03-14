@@ -688,27 +688,47 @@ namespace Linko.LinkoExchange.Services.Mapping
             return reportElementCategory;
         }
 
-        public CtsEventTypeDto GetEventTypeDtoFromEventType(CtsEventType ctsEventType)
+        public CtsEventTypeDto GetCtsEventTypeDtoFromEventType(CtsEventType ctsEventType)
         {
-            //TODO 
             if (ctsEventType == null)
             {
                 return null;
             }
 
-            var ctsEventTypeDto = new CtsEventTypeDto();
+            var ctsEventTypeDto = new CtsEventTypeDto
+            {
+                Name = ctsEventType.Name,
+                Description = ctsEventType.Description,
+                CtsEventCategoryName = ctsEventType.CtsEventCategoryName,
+                OrganizationRegulatoryProgramId = ctsEventType.OrganizationRegulatoryProgramId,
+                IsRemoved = ctsEventType.IsRemoved,
+                CreationDateTimeUtc = ctsEventType.CreationDateTimeUtc,
+                LastModificationDateTimeUtc = ctsEventType.LastModificationDateTimeUtc,
+                LastModifierUserId = ctsEventType.LastModifierUserId
+            };
+
             return ctsEventTypeDto;
         }
 
-        public CtsEventType GetEventTypeFromEventTypeDto(CtsEventTypeDto ctsEventTypeDto)
+        public CtsEventType GetCtsEventTypeFromEventTypeDto(CtsEventTypeDto ctsEventTypeDto)
         {
-            //TODO 
             if (ctsEventTypeDto == null)
             {
                 return null;
             }
 
-            var ctsEventType = new CtsEventType();
+            var ctsEventType = new CtsEventType
+            {
+                Name = ctsEventTypeDto.Name,
+                Description = ctsEventTypeDto.Description,
+                CtsEventCategoryName = ctsEventTypeDto.CtsEventCategoryName,
+                OrganizationRegulatoryProgramId = ctsEventTypeDto.OrganizationRegulatoryProgramId,
+                IsRemoved = ctsEventTypeDto.IsRemoved,
+                CreationDateTimeUtc = ctsEventTypeDto.CreationDateTimeUtc,
+                LastModificationDateTimeUtc = ctsEventTypeDto.LastModificationDateTimeUtc,
+                LastModifierUserId = ctsEventTypeDto.LastModifierUserId
+            };
+
             return ctsEventType;
         }
 
@@ -724,7 +744,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             rpt.TemplateName = reportPackageTemplate.Name;
             rpt.LastModifiedDate = reportPackageTemplate.LastModificationDateTimeUtc;
-            rpt.CtsEventType = GetEventTypeDtoFromEventType(reportPackageTemplate.CtsEventType);
+            rpt.CtsEventType = GetCtsEventTypeDtoFromEventType(reportPackageTemplate.CtsEventType);
             rpt.Description = reportPackageTemplate.Description;
             rpt.EffectiveDate = reportPackageTemplate.EffectiveDateTimeUtc;
             rpt.Id = reportPackageTemplate.ReportPackageTemplateId;
@@ -759,7 +779,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             rpt.Name = reportPackageTemplateDto.TemplateName;
             rpt.LastModificationDateTimeUtc = reportPackageTemplateDto.LastModifiedDate;
 
-            rpt.CtsEventType = GetEventTypeFromEventTypeDto(reportPackageTemplateDto.CtsEventType);
+            rpt.CtsEventType = GetCtsEventTypeFromEventTypeDto(reportPackageTemplateDto.CtsEventType);
             rpt.Description = reportPackageTemplateDto.Description;
             rpt.EffectiveDateTimeUtc = reportPackageTemplateDto.EffectiveDate;
             rpt.ReportPackageTemplateId = reportPackageTemplateDto.Id.Value;

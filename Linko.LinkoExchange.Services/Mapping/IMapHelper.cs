@@ -40,8 +40,8 @@ namespace Linko.LinkoExchange.Services.Mapping
         ReportPackageTemplateElementTypeDto GetReportPackageTemplateElememtTypeDtoFromReportPackageTemplateElementType(ReportPackageTemplateElementType rptet);
         ReportPackageTemplateElementType GetReportPackageTemplateElememtTypeFromReportPackageTemplateElementTypeDto(ReportPackageTemplateElementTypeDto rptetDto);
 
-        CtsEventTypeDto GetEventTypeDtoFromEventType(CtsEventType ctsEventType);
-        CtsEventType GetEventTypeFromEventTypeDto(CtsEventTypeDto ctsEventTypeDto);
+        CtsEventTypeDto GetCtsEventTypeDtoFromEventType(CtsEventType ctsEventType);
+        CtsEventType GetCtsEventTypeFromEventTypeDto(CtsEventTypeDto ctsEventTypeDto);
         CertificationTypeDto GetCertificationTypeDtoFromReportElementType(ReportElementType reportElementType);
         AttachmentTypeDto GetAttachmentTypeDtoFromReportElementType(ReportElementType reportElementType);
         ReportElementType GetReportElementTypeFromAttachmentTypeDto(AttachmentTypeDto attachmentType, ReportElementType reportTypeElement = null);
