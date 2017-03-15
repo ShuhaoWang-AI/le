@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Report
 {
     public interface IReportElementService
     {
-        IEnumerable<ReportElementTypeDto> GetReportElementTypes();
-        void SaveReportElementType(ReportElementTypeDto certType);
+        IEnumerable<ReportElementTypeDto> GetReportElementTypes(ReportElementCategoryName categoryName);
+        void SaveReportElementType(ReportElementTypeDto reportElementType);
         void DeleteReportElementType(int reportElementTypeId);
     }
 }

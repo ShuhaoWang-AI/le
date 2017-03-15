@@ -33,16 +33,16 @@ namespace Linko.LinkoExchange.Services.Report
             _logger = logger;
         }
 
-        public IEnumerable<ReportElementTypeDto> GetReportElementTypes()
+        public IEnumerable<ReportElementTypeDto> GetReportElementTypes(ReportElementCategoryName categoryName)
         {
             var reportElementTypes = new List<ReportElementTypeDto>();
-            var certReportElementCategoryId = _dbContext.ReportElementCategories
-                .Single(r => r.Name == ReportElementCategoryName.Certification.ToString()).ReportElementCategoryId;
+            var reportElementCategoryId = _dbContext.ReportElementCategories
+                .Single(r => r.Name == categoryName.ToString()).ReportElementCategoryId;
 
             var foundReportElementTypes = _dbContext.ReportElementTypes
                 .Include(c => c.CtsEventType)
                 .Where(c => c.OrganizationRegulatoryProgramId == _orgRegProgramId
-                    && c.ReportElementCategoryId == certReportElementCategoryId)
+                    && c.ReportElementCategoryId == reportElementCategoryId)
                 .ToList();
             foreach (var reportElementType in foundReportElementTypes)
             {
