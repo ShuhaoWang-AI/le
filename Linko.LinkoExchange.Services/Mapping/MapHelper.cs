@@ -575,16 +575,17 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public ReportPackageTemplateElementCategory GetReportPackageTemplateElementCategoryFromReportPackageTemplateElementCategoryDto(ReportPackageTemplateElementCategoryDto cat)
         {
-            var reportPackageTemplateElementCategory = new ReportPackageTemplateElementCategory();
-            reportPackageTemplateElementCategory.ReportPackageTemplateElementCategoryId = cat.ReportPackageTemplateElementCategoryId;
-
-            reportPackageTemplateElementCategory.ReportPackageTemplateId = cat.ReportPackageTemplateId;
-            reportPackageTemplateElementCategory.ReportPackageTemplate = this.GetReportPackageTemplateFromReportPackageTemplateDto(cat.ReportPackageTemplate);
-
-            reportPackageTemplateElementCategory.ReportElementCategoryId = cat.ReportElementCategoryId;
-            reportPackageTemplateElementCategory.ReportElementCategory = this.GetReportElementCategoryFromReportElementCategoryDto(cat.ReportElementCategory);
-
-            reportPackageTemplateElementCategory.SortOrder = cat.SortOrder;
+            var reportPackageTemplateElementCategory = new ReportPackageTemplateElementCategory
+            {
+                ReportPackageTemplateElementCategoryId = cat.ReportPackageTemplateElementCategoryId,
+                ReportPackageTemplateId = cat.ReportPackageTemplateId,
+                ReportPackageTemplate =
+                    this.GetReportPackageTemplateFromReportPackageTemplateDto(cat.ReportPackageTemplate),
+                ReportElementCategoryId = cat.ReportElementCategoryId,
+                ReportElementCategory =
+                    this.GetReportElementCategoryFromReportElementCategoryDto(cat.ReportElementCategory),
+                SortOrder = cat.SortOrder
+            };
 
             var rptetps = new List<ReportPackageTemplateElementType>();
             foreach (var rptetDto in cat.ReportPackageTemplateElementTypes)
@@ -599,13 +600,15 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public Core.Domain.ReportElementCategory GetReportElementCategoryFromReportElementCategoryDto(ReportElementCategoryDto cat)
         {
-            var reportElementCategory = new Core.Domain.ReportElementCategory();
-            reportElementCategory.ReportElementCategoryId = cat.ReportElementCategoryId;
-            reportElementCategory.Name = cat.Name;
-            reportElementCategory.Description = cat.Description;
-            reportElementCategory.CreationDateTimeUtc = cat.CreationDateTimeUtc;
-            reportElementCategory.LastModificationDateTimeUtc = cat.LastModificationDateTimeUtc;
-            reportElementCategory.LastModifierUserId = cat.LastModifierUserId;
+            var reportElementCategory = new Core.Domain.ReportElementCategory
+            {
+                ReportElementCategoryId = cat.ReportElementCategoryId,
+                Name = cat.Name,
+                Description = cat.Description,
+                CreationDateTimeUtc = cat.CreationDateTimeUtc,
+                LastModificationDateTimeUtc = cat.LastModificationDateTimeUtc,
+                LastModifierUserId = cat.LastModifierUserId
+            };
 
             return reportElementCategory;
         }
@@ -661,18 +664,28 @@ namespace Linko.LinkoExchange.Services.Mapping
                 return null;
             }
 
-            var rpt = new Dto.ReportPackageTemplateDto();
-            // TODO:  Add other fields that can be convert here
+            var rpt = new ReportPackageTemplateDto
+            {
+                ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId,
+                Name = reportPackageTemplate.Name,
+                Description = reportPackageTemplate.Description,
+                EffectiveDateTimeUtc = reportPackageTemplate.EffectiveDateTimeUtc,
+                RetirementDateTimeUtc = reportPackageTemplate.RetirementDateTimeUtc,
+                IsSubmissionSignatoryRequired = reportPackageTemplate.IsSubmissionSignatoryRequired,
+                CtsEventTypeId = reportPackageTemplate.CtsEventTypeId,
+                CtsEventType = GetCtsEventTypeDtoFromEventType(reportPackageTemplate.CtsEventType),
 
-            rpt.TemplateName = reportPackageTemplate.Name;
-            rpt.LastModifiedDate = reportPackageTemplate.LastModificationDateTimeUtc;
-            rpt.CtsEventType = GetCtsEventTypeDtoFromEventType(reportPackageTemplate.CtsEventType);
-            rpt.Description = reportPackageTemplate.Description;
-            rpt.EffectiveDate = reportPackageTemplate.EffectiveDateTimeUtc;
-            rpt.Id = reportPackageTemplate.ReportPackageTemplateId;
+                OrganizationRegulatoryProgramId = reportPackageTemplate.OrganizationRegulatoryProgramId,
+
+                IsActive = reportPackageTemplate.IsActive,
+                CreationDateTimeUtc = reportPackageTemplate.CreationDateTimeUtc,
+                LastModificationDateTimeUtc = reportPackageTemplate.LastModificationDateTimeUtc,
+                LastModifierUserId = reportPackageTemplate.LastModifierUserId,
+
+                ReportPackageTemplateElementCategories = new List<ReportPackageTemplateElementCategoryDto>()
+            };
 
             // This will include attachment, TTO, comments etc categories
-            rpt.ReportPackageTemplateElementCategories = new List<ReportPackageTemplateElementCategoryDto>();
             foreach (var cat in reportPackageTemplate.ReportPackageTemplateElementCategories)
             {
                 rpt.ReportPackageTemplateElementCategories.Add(this.GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(cat));
@@ -695,16 +708,38 @@ namespace Linko.LinkoExchange.Services.Mapping
                 return null;
             }
 
-            var rpt = new ReportPackageTemplate();
-            // TODO:  Add other fields that can be convert here
+            var rpt = new ReportPackageTemplate
+            {
+                Name = reportPackageTemplateDto.Name,
+                Description = reportPackageTemplateDto.Description,
+                EffectiveDateTimeUtc = reportPackageTemplateDto.EffectiveDateTimeUtc,
+                RetirementDateTimeUtc = reportPackageTemplateDto.RetirementDateTimeUtc,
+                IsSubmissionSignatoryRequired = reportPackageTemplateDto.IsSubmissionSignatoryRequired,
+                CtsEventTypeId = reportPackageTemplateDto.CtsEventTypeId,
+                OrganizationRegulatoryProgramId = reportPackageTemplateDto.OrganizationRegulatoryProgramId,
+                IsActive = reportPackageTemplateDto.IsActive,
+                CreationDateTimeUtc = reportPackageTemplateDto.CreationDateTimeUtc,
+                LastModificationDateTimeUtc = reportPackageTemplateDto.LastModificationDateTimeUtc,
+                LastModifierUserId = reportPackageTemplateDto.LastModifierUserId,
+                CtsEventType = GetCtsEventTypeFromEventTypeDto(reportPackageTemplateDto.CtsEventType),
+                ReportPackageTemplateAssignments = new List<ReportPackageTemplateAssignment>(),
+                ReportPackageTemplateElementCategories = new List<ReportPackageTemplateElementCategory>()
+            };
 
-            rpt.Name = reportPackageTemplateDto.TemplateName;
-            rpt.LastModificationDateTimeUtc = reportPackageTemplateDto.LastModifiedDate;
+            foreach (var asDto in reportPackageTemplateDto.ReportPackageTemplateAssignments)
+            {
+                rpt.ReportPackageTemplateAssignments.Add(GetReportPackageTemplateAssignmentFromReportPackageTemplateAssignmentDto(asDto));
+            }
 
-            rpt.CtsEventType = GetCtsEventTypeFromEventTypeDto(reportPackageTemplateDto.CtsEventType);
-            rpt.Description = reportPackageTemplateDto.Description;
-            rpt.EffectiveDateTimeUtc = reportPackageTemplateDto.EffectiveDate;
-            rpt.ReportPackageTemplateId = reportPackageTemplateDto.Id.Value;
+            foreach (var rptec in reportPackageTemplateDto.ReportPackageTemplateElementCategories)
+            {
+                rpt.ReportPackageTemplateElementCategories.Add(GetReportPackageTemplateElementCategoryFromReportPackageTemplateElementCategoryDto(rptec));
+            }
+
+            if (reportPackageTemplateDto.ReportPackageTemplateId.HasValue)
+            {
+                rpt.ReportPackageTemplateId = reportPackageTemplateDto.ReportPackageTemplateId.Value;
+            }
 
             return rpt;
         }
@@ -714,9 +749,9 @@ namespace Linko.LinkoExchange.Services.Mapping
             var dto = new ReportPackageTemplateElementTypeDto();
             dto.ReportPackageTemplateElementTypeId = rptet.ReportPackageTemplateElementTypeId;
             dto.ReportPackageTemplateElementCategoryId = rptet.ReportPackageTemplateElementCategoryId;
-            dto.ReportPackageTemplateElementCategory = this.GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(rptet.ReportPackageTemplateElementCategory);
+            dto.ReportPackageTemplateElementCategory = GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(rptet.ReportPackageTemplateElementCategory);
             dto.ReportElementTypeId = rptet.ReportElementTypeId;
-            dto.ReportElementType = this.GetReportElementTypeDtoFromReportElementType(rptet.ReportElementType);
+            dto.ReportElementType = GetReportElementTypeDtoFromReportElementType(rptet.ReportElementType);
 
             return dto;
         }
@@ -796,17 +831,5 @@ namespace Linko.LinkoExchange.Services.Mapping
             return rpta;
 
         }
-
-        public CtsEventTypeDto GetEventTypeDtoFromEventType(CtsEventType ctsEventType)
-        {
-            throw new NotImplementedException();
-        }
-
-        public CtsEventType GetEventTypeFromEventTypeDto(CtsEventTypeDto ctsEventTypeDto)
-        {
-            throw new NotImplementedException();
-        }
-
-
     }
 }

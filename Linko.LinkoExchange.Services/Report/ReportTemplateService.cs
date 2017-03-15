@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
@@ -94,59 +95,78 @@ namespace Linko.LinkoExchange.Services.Report
         public void SaveReportPackageTemplate(ReportPackageTemplateDto rpt)
         {
 
-            //    if (rpt.Id.HasValue)
-            //    {
-            //Update existing
-            //        certificationTypeToPersist = _dbContext.ReportElementTypes.Single(c => c.ReportElementTypeId == certType.CertificationTypeID);
-            //        certificationTypeToPersist = _mapHelper.GetReportElementTypeFromCertificationTypeDto(certType, certificationTypeToPersist);
-            //    }
-            //    else
-            //    {
-            //Create new
-            //        var reportPackageTemplate = _mapHelper.GetReportPackageTemplateFromReportPackageTemplateDto(rpt);
-            //        _dbContext.ReportPackageTempates.Add(reportPackageTemplate);
+            if (rpt.ReportPackageTemplateId.HasValue)
+            {
+                //   Update existing
+                //certificationTypeToPersist = _dbContext.ReportElementTypes.Single(c => c.ReportElementTypeId == certType.CertificationTypeID);
+                //certificationTypeToPersist = _mapHelper.GetReportElementTypeFromCertificationTypeDto(certType, certificationTypeToPersist);
+            }
+            else
+            {
+                //   Create new
+                var reportPackageTemplate = _mapHelper.GetReportPackageTemplateFromReportPackageTemplateDto(rpt);
+                _dbContext.ReportPackageTempates.Add(reportPackageTemplate);
 
-            // Step 1
-            // Create records in table tReportPackageTemplateElementCatory 
-            // Fill in all catergories that belong to the reportPackageTemplate   
+                // Step 1
+                //Create records in table tReportPackageTemplateElementCatory
+                //Fill in all catergories that belong to the reportPackageTemplate
 
-            // category 1, attachment
+                // TODO:  Add other fields that can be convert here 
+                // 1. AttachmentType collections 
+                var attachmentTypes = rpt.AttachmentTypes.ToArray();
+                foreach (var reportElementTypeDto in attachmentTypes)
+                {
+                    var reportElementTypeId = reportElementTypeDto.ReportElementTypeID;
+                    var reportElementCategoryId = reportElementTypeDto.ReportElementCategoryId;
 
-            //        var
+                    //TODO 
+                    var rptec = new ReportPackageTemplateElementCategory
+                    {
+                        ReportPackageTemplateId = reportElementTypeId.Value,
+                        ReportElementCategoryId = reportElementCategoryId
+                    };
 
-            //        var attachmentDto = rpt.AttachmentTypes.ToList();
-            //        var category = new ReportPackageTemplateElementCategory
-            //        {
-            //            ReportElementCategoryId = attachmentDto.,
-            //            ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId
-            //        };
+                    _dbContext.ReportPackageTemplateElementCategories.Add(rptec);
+
+                    // Go Step 2,  save to table ReportPackageTemplateElementType 
+                    var rptecId = rptec.ReportPackageTemplateElementCategoryId;
+
+                    var rptet = new ReportPackageTemplateElementType
+                    {
+                        ReportPackageTemplateElementCategoryId = rptecId,
+                        ReportElementTypeId = reportElementTypeDto.ReportElementTypeID.Value
+                    };
+
+                    _dbContext.ReportPackageTemplateElementTypes.Add(rptet);
+                }
 
 
-            //        var category = rpt.ReportPackageTemplateElementCategories.OrderBy(i => i.SortOrder);
-            //        foreach (var cat in categoreis)
-            //        {
-            //            var category = new ReportPackageTemplateElementCategory
-            //            {
-            //                ReportElementCategoryId = cat.ReportPackageTemplateElementCategoryId,
-            //                ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId
-            //            };
+                //var category = rpt.ReportPackageTemplateElementCategories.OrderBy(i => i.SortOrder);
+                //foreach (var cat in categoreis)
+                //{
+                //    var category = new ReportPackageTemplateElementCategory
+                //    {
+                //        ReportElementCategoryId = cat.ReportPackageTemplateElementCategoryId,
+                //        ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId
+                //    };
 
-            //add into table 
-            //            _dbContext.ReportPackageTemplateElementCategories.Add(category);
+                // add into table
+                //    _dbContext.ReportPackageTemplateElementCategories.Add(category);
 
 
-            // Step 2 
-            // Create records in table tReportPackageTempalteElememtType 
-            // To fill in reportElementType data that belong to each category 
-            // 
+                //       Step 2
+                //Create records in table tReportPackageTempalteElememtType
+                //To fill in reportElementType data that belong to each category
 
-            //        }
 
-            //        var rptts = reportPackageTemplate.ReportPackageTemplateElementCategories.Select(i => i.ReportElementCategory.t)
 
-            // Create records in table :  tReportPackageTemplateType 
-            //}
-            //    _dbContext.SaveChanges();
+                //}
+
+                //var rptts = reportPackageTemplate.ReportPackageTemplateElementCategories.Select(i => i.ReportElementCategory.t)
+
+
+            }
+            _dbContext.SaveChanges();
 
         }
     }
