@@ -80,6 +80,7 @@
     <Compile Include="LinkoExchangeContext.cs" />
     <Compile Include="Mapping\AuditLogTemplateMap.cs" />
     <Compile Include="Mapping\CromerrAuditLogMap.cs" />
+    <Compile Include="Mapping\CtsEventTypeMap.cs" />
     <Compile Include="Mapping\EmailAuditLogMap.cs" />
     <Compile Include="Mapping\InvitationMap.cs" />
     <Compile Include="Mapping\JurisdictionMap.cs" />
@@ -91,6 +92,12 @@
     <Compile Include="Mapping\PermissionGroupTemplatePermissionMap.cs" />
     <Compile Include="Mapping\PermissionMap.cs" />
     <Compile Include="Mapping\QuestionTypeMap.cs" />
+    <Compile Include="Mapping\ReportElementCategoryMap.cs" />
+    <Compile Include="Mapping\ReportElementTypeMap.cs" />
+    <Compile Include="Mapping\ReportPackageTemplateAssignmentMap.cs" />
+    <Compile Include="Mapping\ReportPackageTemplateElementCategoryMap.cs" />
+    <Compile Include="Mapping\ReportPackageTemplateElementTypemap.cs" />
+    <Compile Include="Mapping\ReportPackageTemplateMap.cs" />
     <Compile Include="Mapping\SignatoryRequestMap.cs" />
     <Compile Include="Mapping\SignatoryRequestStatusMap.cs" />
     <Compile Include="Mapping\SystemSettingMap.cs" />

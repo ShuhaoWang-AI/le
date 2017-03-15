@@ -60,7 +60,9 @@ namespace Linko.LinkoExchange.Data
         public DbSet<ReportElementType> ReportElementTypes { get; set; }
         public DbSet<ReportElementCategory> ReportElementCategories { get; set; }
 
+        public DbSet<CtsEventType> CtsEventTypes { get; set; }
 
+        public virtual DbSet<ReportPackageTemplateAssignment> ReportPackageTemplateAssignments { get; set; }
         public virtual DbSet<ReportPackageTemplate> ReportPackageTempates { get; set; }
         public virtual DbSet<ReportPackageTemplateElementType> ReportPackageTemplateElementTypes { get; set; }
         public virtual DbSet<ReportPackageTemplateElementCategory> ReportPackageTemplateElementCategories { get; set; }
