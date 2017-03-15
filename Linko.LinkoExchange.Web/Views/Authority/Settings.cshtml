@@ -675,10 +675,6 @@
 
             $.each(tbWithStringValue, function (key, value)
             {
-                var tb = $(key);
-                var hf = $(value);
-                tb.val($.isBlank(tb.val()) ? hf.val() : tb.val());
-
                 $(key).blur(function ()
                 {
                     var tb = $(key);

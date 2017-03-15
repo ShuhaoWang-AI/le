@@ -5,11 +5,11 @@
         <a href="@Url.Action(actionName: "Index", controllerName: "Home")" class="logo">
             <!-- mini logo for sidebar mini 50x50 pixels -->
             <span class="logo-mini">
-                <img title=" " alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo-min.png")" width="40" height="40" />
+                <img title="LinkoExchange Logo" alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo-min.png")" width="40" height="40" />
             </span>
             <!-- logo for regular state and mobile devices -->
             <span class="logo-lg">
-                <img title=" " alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo.png")" width="200" height="40" />
+                <img title="LinkoExchange Logo" alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo.png")" width="200" height="40" />
             </span>
         </a>
         @* END Logo *@
@@ -19,7 +19,7 @@
             <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
                 <span class="sr-only">Toggle navigation</span>
             </a>
-            <span class="navbar-brand program-font">
+            <span class="navbar-brand">
                 @if (!string.IsNullOrWhiteSpace(ViewBag.PortalName))
                 {
                     <span>@string.Format(format: "{0} Portal", arg0: ViewBag.PortalName)</span>
@@ -28,12 +28,12 @@
             @if(!string.IsNullOrWhiteSpace(ViewBag.OrganizationName))
             {
                 <span class="navbar-brand">-</span>
-                <span class="navbar-brand  program-font">
+                <span class="navbar-brand">
                     @ViewBag.OrganizationName
                 </span>
             }
             <div class="navbar-custom-menu">
-                @using(Html.BeginForm(actionName: "SignOff", controllerName: "Account", method: FormMethod.Post, htmlAttributes: new { id = "formSignOut", @class = "navbar-right" }))
+                @using(Html.BeginForm(actionName: "SignOut", controllerName: "Account", method: FormMethod.Post, htmlAttributes: new { id = "formSignOut", @class = "navbar-right" }))
                 {
                     <ul class="nav navbar-nav">
                         @* BEGIN User Account Menu *@
@@ -112,7 +112,7 @@
 
                 $('[data-popup="popup-1"]').fadeIn(350);
 
-                $('[data-popup-close]').on('click', function (e) {
+                $('[data-popup-close]').on('click', function () {
                     $('[data-popup="popup-1"]').fadeOut(350);
                     location.reload();
                 });
@@ -132,7 +132,7 @@
             @* BEGIN Logo *@
             <span class="logo">
                 <a href="@Url.Action(actionName: "Index", controllerName: "Home")">
-                    <img title=" " alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo.png")" width="200" height="40" />
+                    <img title="LinkoExchange Logo" alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo.png")" width="200" height="40" />
                 </a>
             </span>
             @* END Logo *@

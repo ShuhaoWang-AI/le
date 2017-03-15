@@ -47,7 +47,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly ISettingService _settingService;
         private readonly IProgramService _programService;
         private readonly ISessionCache _sessionCache;
-        private readonly ProfileHelper profileHelper;
+        private readonly ProfileHelper _profileHelper;
         private readonly IMapHelper _mapHelper;
         private readonly IHttpContextService _httpContextService;
 
@@ -81,7 +81,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _sessionCache = sessionCache;
             _mapHelper = mapHelper;
             _httpContextService = httpContextService;
-            profileHelper = new ProfileHelper(questionAnswerService, sessionCache, userService, jurisdictionService, mapHelper, httpContextService);
+            _profileHelper = new ProfileHelper(questionAnswerService, sessionCache, userService, jurisdictionService, mapHelper, httpContextService);
         }
 
         #endregion
@@ -111,8 +111,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.UserProfile.StateList = GetStateList();
             model.UserKBQ = new UserKBQViewModel();
             model.UserSQ = new UserSQViewModel();
-            model.UserKBQ.QuestionPool = profileHelper.GetQuestionPool(QuestionTypeName.KBQ);
-            model.UserSQ.QuestionPool = profileHelper.GetQuestionPool(QuestionTypeName.SQ);
+            model.UserKBQ.QuestionPool = _profileHelper.GetQuestionPool(QuestionTypeName.KBQ);
+            model.UserSQ.QuestionPool = _profileHelper.GetQuestionPool(QuestionTypeName.SQ);
 
             model.ProgramName = invitation.ProgramName;
             model.IndustryName = invitation.IndustryName;
@@ -130,16 +130,16 @@ namespace Linko.LinkoExchange.Web.Controllers
             else if (user.IsAccountResetRequired)
             {
                 model.RegistrationType = RegistrationType.ResetRegistration;
-                model.UserProfile = profileHelper.GetUserProfileViewModel(user.UserProfileId);
+                model.UserProfile = _profileHelper.GetUserProfileViewModel(user.UserProfileId);
             }
             else
             {
                 model.RegistrationType = RegistrationType.ReRegistration;
 
                 //TODO fill out the kbq questions and security questions 
-                model.UserProfile = profileHelper.GetUserProfileViewModel(user.UserProfileId);
-                model.UserKBQ = profileHelper.GetUserKbqViewModel(user.UserProfileId);
-                model.UserSQ = profileHelper.GetUserSecurityQuestionViewModel(user.UserProfileId);
+                model.UserProfile = _profileHelper.GetUserProfileViewModel(user.UserProfileId);
+                model.UserKBQ = _profileHelper.GetUserKbqViewModel(user.UserProfileId);
+                model.UserSQ = _profileHelper.GetUserSecurityQuestionViewModel(user.UserProfileId);
                 // For re-registration, set the kbq questions to be **** so that we do not display guly hashed string.
                 model.UserKBQ.KBQAnswer1 = "**********";
                 model.UserKBQ.KBQAnswer2 = "**********";
@@ -159,7 +159,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         [AllowAnonymous]
         [AcceptVerbs(HttpVerbs.Post)]
-        async public Task<ActionResult> Register(RegistrationViewModel model, FormCollection form)
+        public async Task<ActionResult> Register(RegistrationViewModel model, FormCollection form)
         {
             var invitation = _invitationService.GetInvitation(model.Token);
             ViewBag.newRegistration = true;
@@ -168,8 +168,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.sqCollapsed = Convert.ToString(form["sqCollapsed"]);
 
             model.UserProfile.StateList = GetStateList();
-            model.UserKBQ.QuestionPool = profileHelper.GetQuestionPool(QuestionTypeName.KBQ);
-            model.UserSQ.QuestionPool = profileHelper.GetQuestionPool(QuestionTypeName.SQ);
+            model.UserKBQ.QuestionPool = _profileHelper.GetQuestionPool(QuestionTypeName.KBQ);
+            model.UserSQ.QuestionPool = _profileHelper.GetQuestionPool(QuestionTypeName.SQ);
             if (!ModelState.IsValid)
             {
                 ViewBag.inValidProfile = false;
@@ -323,14 +323,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AllowAnonymous]
         public ActionResult Index()
         {
-            if (Request.IsAuthenticated)
-            {
-                return RedirectToAction(actionName: "UpdateUser"); // TODO: change to appropriate action
-            }
-            else
-            {
-                return RedirectToAction(actionName: "SignIn");
-            }
+            return Request.IsAuthenticated ? RedirectToAction(actionName: "Profile", controllerName: "User") : RedirectToAction(actionName: "SignIn");
         }
 
         #endregion
@@ -923,7 +916,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewName: "ResetPassword", model: model);
             }
 
             // check KBQ question
@@ -1066,8 +1059,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             var userDto = _userService.GetUserProfileById(userProfileId);
-            if (userDto == null ||
-                userDto != null && userDto.UserProfileId != userProfileId) // how it is possible that userDto.UserProfileId != userProfileId ???
+            if (userDto == null || userDto.Email != model.OldEmail)
             {
                 ModelState.AddModelError(string.Empty, errorMessage: "The email to change is not your email.");
                 ViewBag.inValidData = true;

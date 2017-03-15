@@ -138,7 +138,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewName: "Settings", model:model);
             }
 
             try
@@ -709,7 +709,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewName: "AuthorityUserDetails", model: model);
             }
             try
             {
@@ -737,7 +737,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewName: "AuthorityUserDetails", model: model);
             }
             try
             {
@@ -765,7 +765,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewName: "AuthorityUserDetails", model: model);
             }
             try
             {
@@ -812,7 +812,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             string newEmail = model.ResetEmail;
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewName: "AuthorityUserDetails", model: model);
             }
             try
             {
@@ -1262,7 +1262,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewName: "IndustryUserDetails", model:model);
             }
             try
             {
@@ -1289,7 +1289,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewName: "IndustryUserDetails", model:model);
             }
             try
             {
@@ -1346,7 +1346,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             string newEmail = model.ResetEmail;
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewName: "IndustryUserDetails", model: model);
             }
             try
             {

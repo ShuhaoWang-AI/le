@@ -291,7 +291,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewName: "IndustryUserDetails", model: model);
             }
             try
             {
@@ -315,7 +315,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 model = PrepareIndustryUserDetails(id);
             }
 
-            return View(viewName: "AuthorityUserDetails", model: model);
+            return View(viewName: "IndustryUserDetails", model: model);
         }
 
         // user remove successfully
@@ -337,7 +337,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(viewName: "IndustryUserDetails", model: model);
             }
             try
             {

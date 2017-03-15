@@ -29,8 +29,10 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IJurisdictionService _jurisdictionService;
         private readonly IHttpContextService _httpContextService;
 
+/*
         private readonly string fakePassword = "********";
-        private readonly ProfileHelper profileHelper;
+*/
+        private readonly ProfileHelper _profileHelper;
         private readonly IMapHelper _mapHelper;
         public UserController(
             IAuthenticationService authenticateService,
@@ -42,9 +44,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             IHttpContextService httpContextService
             )
         {
-            if (authenticateService == null) throw new ArgumentNullException("authenticateService");
-            if (sessionCache == null) throw new ArgumentNullException("sessionCache");
-            if (questAnswerService == null) throw new ArgumentNullException("questAnswerService");
+            if (authenticateService == null) throw new ArgumentNullException(paramName: "authenticateService");
+            if (sessionCache == null) throw new ArgumentNullException(paramName: "sessionCache");
+            if (questAnswerService == null) throw new ArgumentNullException(paramName: "questAnswerService");
 
             _authenticateService = authenticateService;
             _sessionCache = sessionCache;
@@ -54,21 +56,13 @@ namespace Linko.LinkoExchange.Web.Controllers
             _mapHelper = mapHelper;
             _httpContextService = httpContextService;
 
-            profileHelper = new ProfileHelper(questAnswerService, sessionCache, userService, jurisdictionService, mapHelper, httpContextService);
+            _profileHelper = new ProfileHelper(questAnswerService, sessionCache, userService, jurisdictionService, mapHelper, httpContextService);
         }
 
         // GET: UserDto
         public ActionResult Index()
         {
-            // TODO: to test get claims 
-            //var claims = _authenticationService.GetClaims();
-            //var organization = claims?.FirstOrDefault(i => i.Type == "OrganizationName");
-            //if (organization != null)
-            //{
-            //    ViewBag.organizationName = organization.Value;
-            //}
-
-            return View();
+            return View(viewName: "Profile");
         }
 
         public ActionResult DownloadSignatory()
@@ -101,9 +95,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
             var userProfileId = int.Parse(profileIdStr);
 
-            var userProfileViewModel = profileHelper.GetUserProfileViewModel(userProfileId);
-            var userSQViewModel = profileHelper.GetUserSecurityQuestionViewModel(userProfileId);
-            var userKbqViewModel = profileHelper.GetUserKbqViewModel(userProfileId);
+            var userProfileViewModel = _profileHelper.GetUserProfileViewModel(userProfileId);
+            var userSQViewModel = _profileHelper.GetUserSecurityQuestionViewModel(userProfileId);
+            var userKbqViewModel = _profileHelper.GetUserKbqViewModel(userProfileId);
 
             //set the fake password, just make sure data validation pass
             userProfileViewModel.Password = "Tiger12345";
@@ -150,8 +144,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
             var userProfileId = int.Parse(profileIdStr);
 
-            var pristineUser = profileHelper.GetUserViewModel(userProfileId);
-            pristineUser.UserProfile.StateList = profileHelper.GetStateList();
+            var pristineUser = _profileHelper.GetUserViewModel(userProfileId);
+            pristineUser.UserProfile.StateList = _profileHelper.GetStateList();
 
             if (part == "Profile")
             {
@@ -241,7 +235,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult SaveUserKbq(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)
         {
-            pristineUserModel.UserKBQ.QuestionPool = profileHelper.GetQuestionPool(QuestionTypeName.KBQ);
+            pristineUserModel.UserKBQ.QuestionPool = _profileHelper.GetQuestionPool(QuestionTypeName.KBQ);
 
             ValidationContext context = null;
             var validationResult = new List<ValidationResult>();
@@ -289,7 +283,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult SaveUserSQ(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)
         {
-            pristineUserModel.UserSQ.QuestionPool = profileHelper.GetQuestionPool(QuestionTypeName.SQ);
+            pristineUserModel.UserSQ.QuestionPool = _profileHelper.GetQuestionPool(QuestionTypeName.SQ);
 
             ValidationContext context = null;
             var validationResult = new List<ValidationResult>();
