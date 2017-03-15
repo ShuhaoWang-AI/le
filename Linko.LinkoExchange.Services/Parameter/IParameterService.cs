@@ -9,8 +9,8 @@ namespace Linko.LinkoExchange.Services.Parameter
 {
     public interface IParameterService
     {
-        ICollection<ParameterDto> GetGlobalParameters();
-        ICollection<ParameterGroupDto> GetParameterGroups();
+        IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null);
+        IEnumerable<ParameterGroupDto> GetParameterGroups();
         ParameterGroupDto GetParameterGroup(int parameterGroupId);
         void SaveParameterGroup(ParameterGroupDto parameterGroup);
         void DeleteParameterGroup(int parameterGroupId);

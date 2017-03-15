@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Core.Validation;
 
 namespace Linko.LinkoExchange.Services.Parameter
 {
@@ -36,11 +37,17 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// Returns a complete list of parameters associated with this Organization Regulatory Program
         /// </summary>
         /// <returns></returns>
-        public ICollection<ParameterDto> GetGlobalParameters()
+        public IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null)
         {
             var parameterDtos = new List<ParameterDto>();
             var foundParams = _dbContext.Parameters
                 .Where(param => param.OrganizationRegulatoryProgramId == _orgRegProgramId);
+
+            if (!string.IsNullOrEmpty(startsWith))
+            {
+                foundParams = foundParams.Where(param => param.Name.StartsWith(startsWith));
+            }
+
             foreach (var parameter in foundParams)
             {
                 var dto = _mapHelper.GetParameterDtoFromParameter(parameter);
@@ -54,7 +61,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// including children parameters
         /// </summary>
         /// <returns></returns>
-        public ICollection<ParameterGroupDto> GetParameterGroups()
+        public IEnumerable<ParameterGroupDto> GetParameterGroups()
         {
             var parameterGroupDtos = new List<ParameterGroupDto>();
             var foundParamGroups = _dbContext.ParameterGroups
@@ -92,20 +99,88 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <param name="parameterGroup"></param>
         public void SaveParameterGroup(ParameterGroupDto parameterGroup)
         {
-            ParameterGroup paramGroupToPersist = null;
-            if (parameterGroup.ParameterGroupId.HasValue && parameterGroup.ParameterGroupId.Value > 0)
+            using (var transaction = _dbContext.BeginTransaction())
             {
-                //Update existing
-                paramGroupToPersist = _dbContext.ParameterGroups.Single(param => param.ParameterGroupId == parameterGroup.ParameterGroupId);
-                paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup, paramGroupToPersist);
+                try
+                {
+                    //Find existing groups with same Name (UC-33-1 7.1)
+                    string proposedParamGroupName = parameterGroup.Name.Trim().ToLower();
+                    var paramGroupsWithMatchingName = _dbContext.ParameterGroups.Where(param => param.Name.Trim().ToLower() == proposedParamGroupName);
+
+                    //Make sure there is at least 1 parameter
+                    if (parameterGroup.Parameters.Count() < 1)
+                    {
+                        List<RuleViolation> validationIssues = new List<RuleViolation>();
+                        string message = "At least 1 parameter must be added to the group.";
+                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    }
+
+                    ParameterGroup paramGroupToPersist = null;
+                    if (parameterGroup.ParameterGroupId.HasValue && parameterGroup.ParameterGroupId.Value > 0)
+                    {
+                        //Ensure there are no other groups with same name
+                        foreach (var paramGroupWithMatchingName in paramGroupsWithMatchingName)
+                        {
+                            if (paramGroupWithMatchingName.ParameterGroupId == parameterGroup.ParameterGroupId.Value)
+                            {
+                                List<RuleViolation> validationIssues = new List<RuleViolation>();
+                                string message = "A Parameter Group with that name already exists.  Please select another name.";
+                                validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                            }
+                        }
+                
+                        //Update existing
+                        paramGroupToPersist = _dbContext.ParameterGroups.Single(param => param.ParameterGroupId == parameterGroup.ParameterGroupId);
+                        paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup, paramGroupToPersist);
+                    }
+                    else
+                    {
+                        //Ensure there are no other groups with same name
+                        if (paramGroupsWithMatchingName.Count() > 0)
+                        {
+                            List<RuleViolation> validationIssues = new List<RuleViolation>();
+                            string message = "A Parameter Group with that name already exists.  Please select another name.";
+                            validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                            throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                        }
+                
+                        //Get new
+                        paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup);
+                        _dbContext.ParameterGroups.Add(paramGroupToPersist);
+                    }
+
+                    _dbContext.SaveChanges();
+
+                    transaction.Commit();
+                }
+                catch (RuleViolationException ex)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                    throw;
+                }
+
             }
-            else
-            {
-                //Get new
-                paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup);
-                _dbContext.ParameterGroups.Add(paramGroupToPersist);
-            }
-            _dbContext.SaveChanges();
+           
+            
+            
 
         }
 
