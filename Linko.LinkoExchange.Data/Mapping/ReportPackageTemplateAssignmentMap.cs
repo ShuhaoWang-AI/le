@@ -9,8 +9,16 @@ namespace Linko.LinkoExchange.Data.Mapping
         {
             ToTable("tReportPackageTemplateAssignment");
             HasKey(x => x.ReportPackageTemplateAssignmentId);
-            Property(x => x.ReportPackageTemplateId);
-            Property(x => x.OrganizationRegulatoryProgramId);
+
+            HasRequired(a => a.ReportPackageTemplate)
+                .WithMany(b => b.ReportPackageTemplateAssignments)
+                .HasForeignKey(c => c.ReportPackageTemplateId)
+                .WillCascadeOnDelete(false);
+
+            HasRequired(a => a.OrganizationRegulatoryProgram)
+                .WithMany()
+                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
+                .WillCascadeOnDelete(false);
         }
     }
 }

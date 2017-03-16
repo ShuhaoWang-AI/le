@@ -405,6 +405,7 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Views\ReprotPackage\index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -417,6 +418,7 @@
     <Compile Include="Controllers\AuthorityController.cs" />
     <Compile Include="Controllers\IndustryController.cs" />
     <Compile Include="Controllers\InviteController.cs" />
+    <Compile Include="Controllers\ReprotPackageController.cs" />
     <Compile Include="GlimpseSecurityPolicy.cs" />
     <Compile Include="Mapping\IMapHelper.cs" />
     <Compile Include="Mapping\MapHelper.cs" />

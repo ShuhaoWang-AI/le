@@ -26,6 +26,7 @@ using Microsoft.Practices.Unity;
 using NLog;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Web.ViewModels.User;
+using Linko.LinkoExchange.Services.Report;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -69,7 +70,7 @@ namespace Linko.LinkoExchange.Web
 
             // Logger
             container.AddNewExtension<NLogExtension>();
-            
+
             // Custom filter
             container.RegisterType<CustomHandleErrorAttribute>(new InjectionConstructor(typeof(ILogger)));
             container.RegisterType<CommonInfoAttribute>();
@@ -93,7 +94,7 @@ namespace Linko.LinkoExchange.Web
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
-            container.RegisterType<ApplicationUserManager>(); 
+            container.RegisterType<ApplicationUserManager>();
             container.RegisterType<IUserStore<UserProfile>, UserStore<UserProfile>>(new InjectionConstructor(typeof(LinkoExchangeContext)));
             container.RegisterType<IPermissionService, PermissionService>();
             container.RegisterType<IAuditLogEntry, EmailAuditLogEntryDto>();
@@ -101,7 +102,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IRequestCache, RequestCache>();
             container.RegisterType<IAuditLogService, EmailAuditLogService>();
             container.RegisterType<IEmailService, LinkoExchangeEmailService>(new InjectionConstructor(typeof(LinkoExchangeContext),
-                typeof(EmailAuditLogService), 
+                typeof(EmailAuditLogService),
                 typeof(IProgramService),
                 typeof(ISettingService),
                 typeof(IRequestCache)));
@@ -113,8 +114,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<Web.Mapping.IMapHelper, Web.Mapping.MapHelper>();
 
             container.RegisterType<ICromerrAuditLogService, CromerrAuditLogService>();
-
-
+            container.RegisterType<IReportTemplateService, ReportTemplateService>();
         }
     }
 }

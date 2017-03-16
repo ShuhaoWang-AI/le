@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
@@ -15,7 +16,7 @@ namespace Linko.LinkoExchange.Services.Report
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly IHttpContextService _httpContextService;
-        private readonly IReportElementService _reportElementService;
+        //private readonly IReportElementService _reportElementService;
         private readonly IMapHelper _mapHelper;
         private readonly ILogger _logger;
 
@@ -24,13 +25,13 @@ namespace Linko.LinkoExchange.Services.Report
         public ReportTemplateService(
             LinkoExchangeContext dbContext,
             IHttpContextService httpContextService,
-            IReportElementService reportElementService,
+            //IReportElementService reportElementService,
             IMapHelper mapHelper,
             ILogger logger)
         {
             _dbContext = dbContext;
             _httpContextService = httpContextService;
-            _reportElementService = reportElementService;
+            //_reportElementService = reportElementService;
             _mapHelper = mapHelper;
             _logger = logger;
 
@@ -54,7 +55,10 @@ namespace Linko.LinkoExchange.Services.Report
 
         public IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates()
         {
-            var rpts = _dbContext.ReportPackageTempates.Where(i => i.OrganizationRegulatoryProgramId == _orgRegProgramId).ToArray();
+            var rpts =
+                _dbContext.ReportPackageTempates.Where(i => i.OrganizationRegulatoryProgramId == _orgRegProgramId)
+
+                    .ToArray();
 
             var rptDtos = new List<ReportPackageTemplateDto>();
             foreach (var rpt in rpts)
