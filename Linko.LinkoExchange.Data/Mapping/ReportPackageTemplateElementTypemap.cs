@@ -12,6 +12,11 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(x => x.ReportPackageTemplateElementCategoryId);
             Property(x => x.ReportElementTypeId);
             Property(x => x.SortOrder);
+
+            HasRequired(a => a.ReportPackageTemplateElementCategory)
+                .WithMany(b => b.ReportPackageTemplateElementTypes)
+                .HasForeignKey(c => c.ReportPackageTemplateElementCategoryId)
+                .WillCascadeOnDelete(false);
         }
     }
 }

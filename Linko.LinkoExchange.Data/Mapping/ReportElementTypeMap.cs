@@ -18,6 +18,10 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(x => x.CreationDateTimeUtc);
             Property(x => x.LastModificationDateTimeUtc);
             Property(x => x.LastModifierUserId);
+
+            HasRequired(x => x.CtsEventType)
+                .WithMany()
+                .HasForeignKey(x => x.CtsEventTypeId);
         }
     }
 }

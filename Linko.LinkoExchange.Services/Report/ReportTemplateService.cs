@@ -57,7 +57,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             var rpts =
                 _dbContext.ReportPackageTempates.Where(i => i.OrganizationRegulatoryProgramId == _orgRegProgramId)
-
+                    .Include(i => i.ReportPackageTemplateElementCategories)
                     .ToArray();
 
             var rptDtos = new List<ReportPackageTemplateDto>();
@@ -66,23 +66,31 @@ namespace Linko.LinkoExchange.Services.Report
                 var rptDto = _mapHelper.GetReportPackageTemplateDtoFromReportPackageTemplate(rpt);
 
                 //1. set AttachmentTypes  
-                var atts = rpt.ReportPackageTemplateElementCategories
-                    .Where(i => i.ReportElementCategory.Name == ReportElementCategoryName.Attachment.ToString())
-                    .SelectMany(i => i.ReportPackageTemplateElementTypes).Distinct().ToList();
+                var cat = rpt.ReportPackageTemplateElementCategories
+                    .FirstOrDefault(i => i.ReportElementCategory.Name == ReportElementCategoryName.Attachment.ToString());
 
-                var attachments = new List<ReportElementTypeDto>();
-                foreach (var att in atts)
+                if (cat != null)
                 {
-                    attachments.Add(_mapHelper.GetReportElementTypeDtoFromReportElementType(att.ReportElementType));
+                    var rets = GetReportElementType(cat);
+
+                    rptDto.AttachmentTypes =
+                        rets.Select(i => _mapHelper.GetReportElementTypeDtoFromReportElementType(i)).ToList();
                 }
-                rptDto.AttachmentTypes = attachments;
 
-                //2. set certifications  
-                var certs = rpt.ReportPackageTemplateElementCategories
-                   .Where(i => i.ReportElementCategory.Name == ReportElementCategoryName.Certification.ToString())
-                   .SelectMany(i => i.ReportPackageTemplateElementTypes).Distinct().ToList();
+                //2. set certifications   
+                cat = rpt.ReportPackageTemplateElementCategories
+                    .FirstOrDefault(
+                        i => i.ReportElementCategory.Name == ReportElementCategoryName.Certification.ToString());
 
-                rptDto.CertificationTypes = certs.Select(cert => _mapHelper.GetReportElementTypeDtoFromReportElementType(cert.ReportElementType)).ToList();
+                if (cat != null)
+                {
+                    var rets = GetReportElementType(cat);
+
+                    rptDto.CertificationTypes =
+                        rets.Select(i => _mapHelper.GetReportElementTypeDtoFromReportElementType(i)).ToList();
+                }
+
+                //  rptDto.CertificationTypes = certs.Select(cert => _mapHelper.GetReportElementTypeDtoFromReportElementType(cert.ReportElementType)).ToList();
 
                 //3. set assingedIndustries  
                 rptDto.ReportPackageTemplateAssignments = rptDto.ReportPackageTemplateAssignments;
@@ -94,6 +102,23 @@ namespace Linko.LinkoExchange.Services.Report
             }
 
             return rptDtos;
+        }
+
+        private IEnumerable<ReportElementType> GetReportElementType(ReportPackageTemplateElementCategory cat)
+        {
+            var rptets = _dbContext.ReportPackageTemplateElementTypes.Where(
+                    i =>
+                        i.ReportPackageTemplateElementCategoryId ==
+                        cat.ReportPackageTemplateElementCategoryId)
+                .ToList();
+
+            var rets = rptets.Select(i => i.ReportElementType);
+            foreach (var ret in rets)
+            {
+                ret.CtsEventType =
+                    _dbContext.CtsEventTypes.FirstOrDefault(i => i.CtsEventTypeId == ret.CtsEventTypeId);
+            }
+            return rets;
         }
 
         public void SaveReportPackageTemplate(ReportPackageTemplateDto rpt)

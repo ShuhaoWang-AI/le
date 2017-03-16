@@ -530,20 +530,21 @@ namespace Linko.LinkoExchange.Services.Mapping
             reportPackageTemplateElementCategory.ReportPackageTemplateElementCategoryId = cat.ReportPackageTemplateElementCategoryId;
 
             reportPackageTemplateElementCategory.ReportPackageTemplateId = cat.ReportPackageTemplateId;
-            reportPackageTemplateElementCategory.ReportPackageTemplate = this.GetReportPackageTemplateDtoFromReportPackageTemplate(cat.ReportPackageTemplate);
 
             reportPackageTemplateElementCategory.ReportElementCategoryId = cat.ReportElementCategoryId;
             reportPackageTemplateElementCategory.ReportElementCategory = this.GetReportElementCategoryDtoFromReportElementCategory(cat.ReportElementCategory);
 
             reportPackageTemplateElementCategory.SortOrder = cat.SortOrder;
 
-            var dtos = new List<ReportPackageTemplateElementTypeDto>();
-            foreach (var c in cat.ReportPackageTemplateElementTypes)
-            {
-                dtos.Add(this.GetReportPackageTemplateElememtTypeDtoFromReportPackageTemplateElementType(c));
-            }
+            //// deep naviagation cause error 
+            /// 
+            //var dtos = new List<ReportPackageTemplateElementTypeDto>();
+            //foreach (var c in cat.ReportPackageTemplateElementTypes)
+            //{
+            //    dtos.Add(this.GetReportPackageTemplateElememtTypeDtoFromReportPackageTemplateElementType(c));
+            //}
 
-            reportPackageTemplateElementCategory.ReportPackageTemplateElementTypes = dtos;
+            //reportPackageTemplateElementCategory.ReportPackageTemplateElementTypes = dtos;
 
             return reportPackageTemplateElementCategory;
         }
