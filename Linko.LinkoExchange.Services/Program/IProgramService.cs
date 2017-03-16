@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Services.Program
@@ -20,7 +21,7 @@ namespace Linko.LinkoExchange.Services.Program
         /// <returns></returns>
         OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int organizationRegulatoryProgramId);
 
-        OrganizationRegulatoryProgramUserDto CreateOrganizationRegulatoryProgramForUser(int userProfileId, int organizationRegulatoryProgramId, int inviterOrganizationRegulatoryProgramId);
+        OrganizationRegulatoryProgramUserDto CreateOrganizationRegulatoryProgramForUser(int userProfileId, int organizationRegulatoryProgramId, int inviterOrganizationRegulatoryProgramId, RegistrationType registrationType);
 
         IEnumerable<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int currentOrganizationRegulatoryProgramId, string searchString);
 

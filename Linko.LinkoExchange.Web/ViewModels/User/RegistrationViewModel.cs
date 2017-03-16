@@ -14,10 +14,15 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         public bool AgreeTermsAndConditions { get; set; }
 
         [Display(Name ="Email")]
-        [DataType(DataType.EmailAddress, ErrorMessage = "Email is not valid")]
-        public string Email { get; set; }
+        public string InvitationEmail { get; set; }
+
+        [Display(Name ="Program")]
         public string ProgramName { get; set; }
+
+        [Display(Name ="Authority")]
         public string AuthorityName { get; set; }
+
+        [Display(Name ="Facility")]
         public string IndustryName { get; set; }
         public RegistrationType RegistrationType { get; set; }
     }

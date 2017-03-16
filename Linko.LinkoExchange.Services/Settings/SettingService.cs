@@ -88,8 +88,8 @@ namespace Linko.LinkoExchange.Services.Settings
 		/// <summary>
 		/// Get settings for one program
 		/// </summary>
-		/// <param name="programId">The program Id to get for</param>
-		/// <returns>The PrrogramSetting object</returns>
+		/// <param name="orgRegProgramId">The program Id to get for</param>
+		/// <returns>The ProgramSetting object</returns>
 		public ProgramSettingDto GetProgramSettingsById(int orgRegProgramId)
 		{
             var progSettingDto = new ProgramSettingDto() { OrgRegProgId = orgRegProgramId };
@@ -106,8 +106,8 @@ namespace Linko.LinkoExchange.Services.Settings
         /// <summary>
         /// Get settings for one program. If industry it will find the authority first and return the settings for the authority 
         /// </summary>
-        /// <param name="programId">The program Id to get for</param>
-        /// <returns>The PrrogramSetting object</returns>
+        /// <param name="orgRegProgramId">The program Id to get for</param>
+        /// <returns>The ProgramSetting object</returns>
         public ProgramSettingDto GetAuthorityProgramSettingsById(int orgRegProgramId)
         {
             var progSettingDto = new ProgramSettingDto() { OrgRegProgId = orgRegProgramId };
@@ -147,10 +147,10 @@ namespace Linko.LinkoExchange.Services.Settings
 
                 transaction.Commit();
             }
-            catch (RuleViolationException rve)
+            catch (RuleViolationException)
             {
                 transaction.Rollback();
-                throw rve;
+                throw;
             }
             catch
             {
@@ -175,10 +175,10 @@ namespace Linko.LinkoExchange.Services.Settings
 
                 transaction.Commit();
             }
-            catch (RuleViolationException rve)
+            catch (RuleViolationException)
             {
                 transaction.Rollback();
-                throw rve;
+                throw;
             }
             catch
             {

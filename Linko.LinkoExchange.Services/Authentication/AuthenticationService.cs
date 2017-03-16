@@ -313,7 +313,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     return registrationResult;
                 }
 
-                _logger.Info("Register. userName={0}, email={1}", userInfo.UserName, registrationToken);
+                _logger.Info("Register. userName={0}, registrationToken={1}", userInfo.UserName, registrationToken);
 
                 var validatResult = ValidateRegistrationData(userInfo, securityQuestions, kbqQuestions);
                 if (validatResult != RegistrationResult.Success)
@@ -338,7 +338,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             var invitationRecipientProgram =
                 _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
             var inivitationRecipintOrganizationSettings =
-                _settingService.GetOrganizationSettingsById(invitationRecipientProgram.OrganizationId);
+                _settingService.GetOrganizationSettingsById(invitationRecipientProgram.RegulatorOrganizationId ?? invitationRecipientProgram.OrganizationId); // always get the authority settings as currently industry don't have settings 
 
             var invitationExpirationHours = ValueParser.TryParseInt(ConfigurationManager.AppSettings["DefaultInviteExpirationHours"], 72);
             if (inivitationRecipintOrganizationSettings.Settings.Any())
@@ -354,6 +354,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
 
             #endregion  End of Checking invitation expiration 
+
+            // TODO: Need to check invitation email address same as user info email address. Otherwise, in future if user can update email address then it might update wrong user info
 
             // Email should be unique.
             UserProfile applicationUser = _userManager.FindByEmail(userInfo.Email);
@@ -402,8 +404,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                         applicationUser.AddressLine1 = userInfo.AddressLine1;
                         applicationUser.AddressLine2 = userInfo.AddressLine2;
                         applicationUser.CityName = userInfo.CityName;
-                        applicationUser.ZipCode = userInfo.ZipCode;
                         applicationUser.JurisdictionId = userInfo.JurisdictionId;
+                        applicationUser.ZipCode = userInfo.ZipCode;
                         applicationUser.PhoneNumber = userInfo.PhoneNumber;
                         applicationUser.PhoneExt = userInfo.PhoneExt;
                         applicationUser.PhoneNumberConfirmed = true;
@@ -426,7 +428,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                         }
                         else
                         {
-                            var errText = string.Format("Creating user failed. Email={0}, userName={1}", userInfo.Email, userInfo.UserName);
+                            var errText = $"Creating user failed. Email={userInfo.Email}, userName={userInfo.UserName}";
                             _logger.Error(errText);
                             throw new Exception(errText);
                         }
@@ -436,7 +438,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     #region User is from re-registration 
 
-                    // Exsiting user re-register
+                    // Existing user re-register
                     // Check if the password has been in # password in history
                     if (registrationType == RegistrationType.ResetRegistration)
                     {
@@ -449,22 +451,26 @@ namespace Linko.LinkoExchange.Services.Authentication
                         {
                             var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings, null);
                             registrationResult.Result = RegistrationResult.CanNotUseLastNumberOfPasswords;
-                            registrationResult.Errors = new string[] { string.Format("You cannot use the last {0} passwords.", numberOfPasswordsInHistory) };
+                            registrationResult.Errors = new string[] {
+                                                                         $"You cannot use the last {numberOfPasswordsInHistory} passwords."
+                                                                     };
                             return registrationResult;
                         }
 
+                        applicationUser.TitleRole = userInfo.TitleRole;
+                        applicationUser.BusinessName = userInfo.BusinessName;
                         applicationUser.FirstName = userInfo.FirstName;
                         applicationUser.LastName = userInfo.LastName;
-                        applicationUser.BusinessName = userInfo.BusinessName;
-                        applicationUser.TitleRole = userInfo.TitleRole;
-                        applicationUser.PhoneNumber = userInfo.PhoneNumber;
-                        applicationUser.PhoneExt = userInfo.PhoneExt;
                         applicationUser.AddressLine1 = userInfo.AddressLine1;
                         applicationUser.AddressLine2 = userInfo.AddressLine2;
                         applicationUser.CityName = userInfo.CityName;
                         applicationUser.JurisdictionId = userInfo.JurisdictionId;
                         applicationUser.ZipCode = userInfo.ZipCode;
+                        applicationUser.PhoneNumber = userInfo.PhoneNumber;
+                        applicationUser.PhoneExt = userInfo.PhoneExt;
                         applicationUser.PasswordHash = passwordHash;
+
+                        applicationUser.EmailConfirmed = true;
 
                         // Clear KBQ questions and Security Questions for existing user re-registration 
                         _questionAnswerService.DeleteUserQuestionAndAnswers(applicationUser.UserProfileId);
@@ -496,8 +502,9 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     // UC-42 6
                     // 2 Create organization regulatory program userProfile, and set the approved statue to false  
-                    var orpu = _programService.CreateOrganizationRegulatoryProgramForUser(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId, invitationDto.SenderOrganizationRegulatoryProgramId);
+                    var orpu = _programService.CreateOrganizationRegulatoryProgramForUser(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId, invitationDto.SenderOrganizationRegulatoryProgramId, registrationType);
 
+                    // need to move inside _programService.CreateOrganizationRegulatoryProgramForUser otherwise it will be send email to all approver when registrationType == RegistrationType.ResetRegistration 
                     // UC-42 7, 8
                     // Find out who have approval permission   
                     var approvalPeople = _permissionService.GetApprovalPeople(invitationDto.SenderOrganizationRegulatoryProgramId);
@@ -514,21 +521,22 @@ namespace Linko.LinkoExchange.Services.Authentication
                          recipientProgram.OrganizationDto == null
                          )
                     {
-                        registrationResult.Result = RegistrationResult.InvitationExpired;
+                        registrationResult.Result = RegistrationResult.InvitationExpired; //TODO: Is it correct Enum ???
                         return registrationResult;
                     }
 
-                    var inviteIndustryUser = false;
-                    // Invites authority user
+                    var isInvitedToIndustry = false;
+                    
                     if (recipientProgram.RegulatorOrganizationId.HasValue)
                     {
-                        inviteIndustryUser = true;
+                        // Invites Industry user
+                        isInvitedToIndustry = true;
                     }
                     else
                     {
-                        // AU invite authority user, but RegulatorOrganizationId has value
                         if (senderProgram.RegulatorOrganizationId.HasValue)
                         {
+                            // IU invited the authority user; AU can only invite authority user
                             registrationResult.Result = RegistrationResult.Failed;
                             return registrationResult;
                         }
@@ -556,9 +564,9 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     if (sendTo == null || sendTo.Count() == 0)
                     {
-                        sendTo = new[] { emailAddressOnEmail };
+                        sendTo = new[] { emailAddressOnEmail }; // send email to authority support email when no approval email found
                     }
-                    if (inviteIndustryUser)
+                    if (isInvitedToIndustry)
                     {
                         var receipientOrg = _organizationService.GetOrganization(recipientProgram.OrganizationId);
 
@@ -566,8 +574,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                         emailContentReplacements.Add("cityName", receipientOrg.CityName);
                         emailContentReplacements.Add("stateName", receipientOrg.State);
                     }
-
-                    if (inviteIndustryUser)
+                    
+                    if (isInvitedToIndustry)
                     {
                         await _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
                     }
@@ -636,7 +644,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                         errors.Add(ex.Message);
                     }
 
-                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+                    _logger.Error("Error happens {0} ", argument: string.Join("," + Environment.NewLine, errors));
 
                     registrationResult.Result = RegistrationResult.Failed;
                     registrationResult.Errors = errors;
@@ -645,7 +653,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
             }
 
-            _logger.Info("Register. userName={0}, email={1}, registrationResult{2}", userInfo.UserName, registrationToken, registrationResult.ToString());
+            _logger.Info("Register. userName={0}, email={1}, registrationResult{2}", argument1: userInfo.UserName, argument2: registrationToken, argument3: registrationResult.ToString());
 
             return registrationResult;
         }

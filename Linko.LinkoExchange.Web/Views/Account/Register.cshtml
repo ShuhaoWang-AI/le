@@ -5,14 +5,14 @@
 }
 
 @{
-    ViewBag.Title       = "User Details";
-    var sqQuestionPool  = Model.UserSQ.QuestionPool;
+    ViewBag.Title = "User Details";
+    var sqQuestionPool = Model.UserSQ.QuestionPool;
     var kbqQuestionPool = Model.UserKBQ.QuestionPool;
-    var inValidProfile  = ViewBag.InValidProfile == null ? false : ViewBag.InValidProfile;
-    var inValidKBQ      = ViewBag.InValidKBQ     == null ? false : ViewBag.InValidKBQ;
-    var inValidSQ       = ViewBag.InValidSQ      == null ? false : ViewBag.InValidSQ;
+    var inValidProfile = ViewBag.InValidProfile == null ? false : ViewBag.InValidProfile;
+    var inValidKBQ = ViewBag.InValidKBQ == null ? false : ViewBag.InValidKBQ;
+    var inValidSQ = ViewBag.InValidSQ == null ? false : ViewBag.InValidSQ;
 
-    var activeLink      = "Register";
+    var activeLink = "Register";
 }
 
 <section>
@@ -25,13 +25,12 @@
 </section>
 
 <style>
-    .left-flow-link
-    {
-        margin-left   : 0px;
-        margin-top    : 10px;
-        text-align    : left;
+    .left-flow-link {
+        margin-left: 0px;
+        margin-top: 10px;
+        text-align: left;
         vertical-align: bottom;
-        float         : left;
+        float: left;
     }
 </style>
 
@@ -40,14 +39,13 @@
     @Html.HiddenFor(model => model.Token)
 
     @Html.AntiForgeryToken()
-    <input id="profileCollapsed" name="profileCollapsed" type="hidden" value="true" />
+    <input id="profileCollapsed" name="profileCollapsed" type="hidden" value="false" />
     <input id="kbqCollapsed" name="kbqCollapsed" type="hidden" value="false" />
     <input id="sqCollapsed" name="sqCollapsed" type="hidden" value="false" />
 
     @Html.HiddenFor(m => m.RegistrationType)
 
     <div class="profileDiv" id="user-info-panel">
-
         <div class="box box-primary">
             <div class="box-header with-border">
                 <h3 class="box-title">User Information</h3>
@@ -64,45 +62,44 @@
                 @if (ViewData.ModelState.IsValid == false && inValidProfile)
                 {
                     @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new
-                                                                                                       {
-                                                                                                           @class = "alert alert-danger"
-                                                                                                       })
+               {
+                   @class = "alert alert-danger"
+               })
                 }
             </div>
 
             <section class="box-body form-horizontal">
-            @*<div class="form-group">
-                                <label class="control-label col-md-2">Authority Name:</label>
-                                <div class="col-md-4">
-                                    <label class="control-label ">@Model.AuthorityName</label>
-                                </div>
-                            </div>
+                <div class="form-group">
+                    <label class="control-label col-md-2">Authority Name:</label>
+                    <div class="col-md-4">
+                        <label class="control-label ">@Model.AuthorityName</label>
+                    </div>
+                </div>
 
-                            @{
-                                if (Model.IndustryName != null)
-                                {
-                                    <div class="form-group">
-                                        <label class="control-label col-md-2">Industry Name:</label>
+                @{
+                if (Model.IndustryName != null)
+                {
+                <div class="form-group">
+                    <label class="control-label col-md-2">Industry Name:</label>
 
-                                        <div class="col-md-4">
-                                            <label class="control-label ">@Model.IndustryName</label>
-                                        </div>
-                                  </div>
-                                }
-                            }
-                            <div class="form-group">
-                                <label class="control-label col-md-2">Program Name:</label>
+                    <div class="col-md-4">
+                        <label class="control-label ">@Model.IndustryName</label>
+                    </div>
+                </div>
+                }
+                }
+                <div class="form-group">
+                    <label class="control-label col-md-2">Program Name:</label>
 
-                                <div class="col-md-4">
-                                    <label class="control-label ">@Model.ProgramName</label>
-                                </div>
-                            </div>
+                    <div class="col-md-4">
+                        <label class="control-label ">@Model.ProgramName</label>
+                    </div>
+                </div>
 
-                                <hr />
-                        *@
+                <hr />
+
 
                 <div class="editabledDiv">
-
                     <!-- Line2 FirstName and LastName -->
                     <div class="form-group required">
                         @Html.LabelFor(model => Model.UserProfile.FirstName, htmlAttributes: new
@@ -281,7 +278,6 @@
                         </div>
 
                     </div>
-
                 </div>
                 <hr />
 
@@ -301,7 +297,6 @@
                                                                                                }
                                                                           })
                     </div>
-
                 </div>
 
                 <!-- Line 10 UserName -->
@@ -339,12 +334,36 @@
                                                                                     })
                     </div>
                 </div>
-            </section>
-            @*<div class="box-footer">
+
+                @Html.HiddenFor(m => m.UserProfile.ShowConfirmPassword)
+                @if (Model.UserProfile.ShowConfirmPassword)
+                {
                 <div class="form-group">
-                    <div id="profileNextBtn" class="btn btn-sm btn-primary pull-right edit-button">Next</div>
+                    @Html.LabelFor(m => m.UserProfile.ConfirmPassword, new
+                                                                            {
+                                                                                @class = "control-label col-md-2 required"
+                                                                            })
+
+                    <div class="col-md-4">
+                        @Html.PasswordFor(m => m.UserProfile.ConfirmPassword, new
+                                                                                  {
+                                                                                      @class = "form-control"
+                                                                                  })
+                        @Html.ValidationMessageFor(m => m.UserProfile.ConfirmPassword, "", new
+                                                                                               {
+                                                                                                   @class = "text-red"
+                                                                                               })
+                    </div>
                 </div>
-            </div>*@
+                }
+
+            </section>
+
+            @*<div class="box-footer">
+                    <div class="form-group">
+                        <div id="profileNextBtn" class="btn btn-sm btn-primary pull-right edit-button">Next</div>
+                    </div>
+                </div>*@
         </div>
     </div>
 
@@ -366,17 +385,19 @@
                 @if (ViewData.ModelState.IsValid == false && inValidKBQ)
                 {
                     @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new
-                                                                                                       {
-                                                                                                           @class = "alert alert-danger"
-                                                                                                       })
+               {
+                   @class = "alert alert-danger"
+               })
                 }
 
             </div>
 
             <section class="box-body form-horizontal">
                 <h3>Select Answers to 5 Knowledge Based Questions</h3>
-                <span>Knowledge Based Questions are used along with your password to further prove your identity during report submission.
-                    During report submission you will be required to enter an answer that matches what you enter below.</span>
+                <span>
+                    Knowledge Based Questions are used along with your password to further prove your identity during report submission.
+                    During report submission you will be required to enter an answer that matches what you enter below.
+                </span>
                 <br />
                 <br />
                 <br />
@@ -414,13 +435,7 @@
                         </div>
 
                         <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ1, new
-                                                                                             {
-                                                                                                 htmlAttributes = new
-                                                                                                                  {
-                                                                                                                      @class = "form-control readonly kbq-answer"
-                                                                                                                  }
-                                                                                             })
+                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ1)
 
                             @Html.EditorFor(model => Model.UserKBQ.KBQAnswer1, new
                                                                                {
@@ -431,6 +446,10 @@
                                                                                                         autocomplete = "off"
                                                                                                     }
                                                                                })
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer1, "", new
+                                {
+                                    @class = "text-danger"
+                                })
                         </div>
                     </div>
 
@@ -467,13 +486,7 @@
                         </div>
 
                         <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ2, new
-                                                                                             {
-                                                                                                 htmlAttributes = new
-                                                                                                                  {
-                                                                                                                      @class = "form-control readonly"
-                                                                                                                  }
-                                                                                             })
+                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ2)
                             @Html.EditorFor(model => Model.UserKBQ.KBQAnswer2, new
                                                                                {
                                                                                    htmlAttributes = new
@@ -483,6 +496,10 @@
                                                                                                         autocomplete = "off"
                                                                                                     }
                                                                                })
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer2, "", new
+                                {
+                                    @class = "text-danger"
+                                })
                         </div>
                     </div>
 
@@ -518,13 +535,7 @@
                         </div>
 
                         <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ3, new
-                                                                                             {
-                                                                                                 htmlAttributes = new
-                                                                                                                  {
-                                                                                                                      @class = "form-control readonly"
-                                                                                                                  }
-                                                                                             })
+                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ3)
                             @Html.EditorFor(model => Model.UserKBQ.KBQAnswer3, new
                                                                                {
                                                                                    htmlAttributes = new
@@ -534,6 +545,10 @@
                                                                                                         autocomplete = "off"
                                                                                                     }
                                                                                })
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer3, "", new
+                                {
+                                    @class = "text-danger"
+                                })
                         </div>
                     </div>
 
@@ -552,10 +567,10 @@
                                                                 Value = i.QuestionId.Value.ToString(),
                                                                 Selected = Model.UserKBQ.KBQ4 == i.QuestionId.Value
                                                             }),
-                                new
-                                {
-                                    @class = "form-control"
-                                })
+                                                            new
+                                                            {
+                                                                @class = "form-control"
+                                                            })
                             @Html.HiddenFor(model => Model.UserKBQ.KBQ4)
 
                         </div>
@@ -571,13 +586,7 @@
                         </div>
 
                         <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ4, new
-                                                                                             {
-                                                                                                 htmlAttributes = new
-                                                                                                                  {
-                                                                                                                      @class = "form-control readonly"
-                                                                                                                  }
-                                                                                             })
+                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ4)
                             @Html.EditorFor(model => Model.UserKBQ.KBQAnswer4, new
                                                                                {
                                                                                    htmlAttributes = new
@@ -587,6 +596,10 @@
                                                                                                         autocomplete = "off"
                                                                                                     }
                                                                                })
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer4, "", new
+                                {
+                                    @class = "text-danger"
+                                })
                         </div>
                     </div>
 
@@ -624,13 +637,7 @@
                         </div>
 
                         <div class="col-md-8">
-                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ5, new
-                                                                                             {
-                                                                                                 htmlAttributes = new
-                                                                                                                  {
-                                                                                                                      @class = "form-control readonly"
-                                                                                                                  }
-                                                                                             })
+                            @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ5)
                             @Html.EditorFor(model => Model.UserKBQ.KBQAnswer5, new
                                                                                {
                                                                                    htmlAttributes = new
@@ -640,16 +647,20 @@
                                                                                                         autocomplete = "off"
                                                                                                     }
                                                                                })
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer5, "", new
+                                {
+                                    @class = "text-danger"
+                                })
                         </div>
                     </div>
                 </div>
 
             </section>@*.box-body*@
             @*<div class="box-footer">
-                                <div class="form-group">
-                                    <div id="kbqNextBtn" class="btn btn-sm btn-primary pull-right edit-button">Next</div>
-                                </div>
-                            </div>*@
+                    <div class="form-group">
+                        <div id="kbqNextBtn" class="btn btn-sm btn-primary pull-right edit-button">Next</div>
+                    </div>
+                </div>*@
         </div>
     </div>
 
@@ -679,8 +690,10 @@
 
             <section class="box-body form-horizontal">
                 <h3>Select Answers to 2 Security Questions</h3>
-                Security Questions are used to unlock your account if it is locked because of suspicion of compromise.
-                You may be asked the answer to these questions by your authority.
+                <span>
+                    Security Questions are used to unlock your account if it is locked because of suspicion of compromise.
+                    You may be asked the answer to these questions by your authority.
+                </span>
                 <br />
                 <br />
                 <br />
@@ -728,6 +741,10 @@
                                                                                                                     autocomplete = "off"
                                                                                                                 }
                                                                                            })
+                            @Html.ValidationMessageFor(m => m.UserSQ.SecurityQuestionAnswer1, "", new
+                                                                                                  {
+                                                                                                      @class = "text-danger"
+                                                                                                  })
                         </div>
                     </div>
 
@@ -775,42 +792,49 @@
                                                                                                                     autocomplete = "off"
                                                                                                                 }
                                                                                            })
+                            @Html.ValidationMessageFor(m => m.UserSQ.SecurityQuestionAnswer2, "", new
+                                                                                                  {
+                                                                                                      @class = "text-danger"
+                                                                                                  })
                         </div>
                     </div>
                 </div>
-
             </section>
-            @*<div class="box-footer">
-                        <div class="form-group">
-                            <div id="sqNextBtn" class="btn btn-sm btn-primary pull-right edit-button">Next</div>
-                        </div>
-                    </div>*@
-            <!-- box-footer -->
         </div>
     </div>
 
-    <div class="profileDiv">
-        <div class="form-group">
-            <div class="col-lg-offset-2  col-md-8">
-                @Html.CheckBoxFor(model => model.AgreeTermsAndConditions)
-                <span> @Html.LabelFor(m => m.AgreeTermsAndConditions)</span>
+    <div class="box box-primary">
+        <div class="box-body">
+            <div class="profileDiv">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="input-group checkbox-inline">
+                            @Html.CheckBoxFor(model => model.AgreeTermsAndConditions)
+                            <span> @Html.LabelFor(m => m.AgreeTermsAndConditions)</span>
+                            @Html.ValidationMessageFor(m => m.AgreeTermsAndConditions, "", new
+                                                                                            {
+                                                                                                @class = "text-danger"
+                                                                                            })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-footer">
+                <input type="submit" id="register" value="Register" name="Command" class="btn btn-primary btn-sm pull-right" formaction='@Url.Action(actionName: "Register", controllerName: "Account")' formmethod="post" />
             </div>
         </div>
     </div>
-
-    <div class="box-footer">
-        <input type="submit" id="register" value="Register" name="Command" class="btn btn-primary btn-sm pull-right" formaction='@Url.Action(actionName: "Register", controllerName: "Account")' formmethod="post" />
-    </div>
-}
+                    }
 @section Scripts {
     @Scripts.Render(paths: "~/bundles/registration")
     @Scripts.Render(paths: "~/bundles/jqueryval")
 
     <script type="text/javascript">
         var profileCollapsed = '@Html.Raw(ViewBag.profileCollapsed)';
-        var kbqCollapsed     = '@Html.Raw(ViewBag.kbqCollapsed)';
-        var sqCollapsed      = '@Html.Raw(ViewBag.sqCollapsed)';
-        var newRegistration  = '@Html.Raw(ViewBag.newRegistration)';
+        var kbqCollapsed = '@Html.Raw(ViewBag.kbqCollapsed)';
+        var sqCollapsed = '@Html.Raw(ViewBag.sqCollapsed)';
+        var newRegistration = '@Html.Raw(ViewBag.newRegistration)';
 
         var registrationType = '@Html.Raw(Model.RegistrationType.ToString())';
     </script>

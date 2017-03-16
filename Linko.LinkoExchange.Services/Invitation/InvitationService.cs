@@ -71,8 +71,10 @@ namespace Linko.LinkoExchange.Services.Invitation
             }
 
             var invitationDto = _mapHelper.GetInvitationDtoFromInvitation(invitation);
-            var senderProgram = _programService.GetOrganizationRegulatoryProgram(invitation.SenderOrganizationRegulatoryProgramId);
-            var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitation.RecipientOrganizationRegulatoryProgramId);
+            var senderProgram =
+                _programService.GetOrganizationRegulatoryProgram(invitation.SenderOrganizationRegulatoryProgramId);
+            var recipientProgram =
+                _programService.GetOrganizationRegulatoryProgram(invitation.RecipientOrganizationRegulatoryProgramId);
 
             if (senderProgram == null || recipientProgram == null)
             {
@@ -80,7 +82,9 @@ namespace Linko.LinkoExchange.Services.Invitation
             }
 
             //Check expiration here
-            int addExpiryHours = Convert.ToInt32(_settingService.GetOrganizationSettingValue(invitation.SenderOrganizationRegulatoryProgramId, SettingType.InvitationExpiredHours));
+            int addExpiryHours =
+                Convert.ToInt32(_settingService.GetOrganizationSettingValue(invitation.SenderOrganizationRegulatoryProgramId,
+                                                                            SettingType.InvitationExpiredHours));
             var expiryDateTimeUtc = invitation.InvitationDateTimeUtc.AddHours(addExpiryHours);
             if (DateTime.UtcNow > expiryDateTimeUtc)
             {
@@ -94,7 +98,8 @@ namespace Linko.LinkoExchange.Services.Invitation
                     var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
                     cromerrAuditLogEntryDto.RegulatoryProgramId = recipientProgram.RegulatoryProgramId;
                     cromerrAuditLogEntryDto.OrganizationId = recipientProgram.OrganizationId;
-                    cromerrAuditLogEntryDto.RegulatorOrganizationId = recipientProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
+                    cromerrAuditLogEntryDto.RegulatorOrganizationId = recipientProgram.RegulatorOrganizationId ??
+                                                                      cromerrAuditLogEntryDto.OrganizationId;
                     cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
                     cromerrAuditLogEntryDto.UserName = user.UserName;
                     cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
@@ -108,7 +113,8 @@ namespace Linko.LinkoExchange.Services.Invitation
                     contentReplacements.Add("userName", user.UserName);
                     contentReplacements.Add("emailAddress", user.Email);
 
-                    _crommerAuditLogService.Log(CromerrEvent.UserAccess_AccountResetExpired, cromerrAuditLogEntryDto, contentReplacements);
+                    _crommerAuditLogService.Log(CromerrEvent.UserAccess_AccountResetExpired, cromerrAuditLogEntryDto,
+                                                contentReplacements);
                 }
                 else
                 {
@@ -125,27 +131,28 @@ namespace Linko.LinkoExchange.Services.Invitation
             {
                 return null;
             }
-
-            // Industry Invite Industry
-            if (senderProgram.RegulatorOrganization != null)
+            
+            if (recipientProgram != null)
             {
-                invitationDto.AuthorityName = senderProgram.RegulatorOrganization.OrganizationName;
-                if (senderProgram.OrganizationDto != null)
+                if (recipientProgram.OrganizationDto != null)
                 {
-                    invitationDto.IndustryName = senderProgram.OrganizationDto.OrganizationName;
+                    if (recipientProgram.RegulatorOrganizationId.HasValue)
+                    {
+                        // recipient is IndustryName user
+                        invitationDto.IndustryName = recipientProgram.OrganizationDto.OrganizationName;
+                        invitationDto.AuthorityName = recipientProgram.RegulatorOrganization.OrganizationName; // get authority
+                    }
+                    else
+                    {
+                        // recipient is authority user 
+                        invitationDto.AuthorityName = recipientProgram.OrganizationDto.OrganizationName;
+                    }
                 }
-            }
 
-            if (recipientProgram != null && !recipientProgram.RegulatorOrganizationId.HasValue
-                && recipientProgram.OrganizationDto != null)
-            {
-                // recipient is authority user 
-                invitationDto.AuthorityName = recipientProgram.OrganizationDto.CityName;
-            }
-
-            if (recipientProgram != null && recipientProgram.RegulatoryProgramDto != null)
-            {
-                invitationDto.ProgramName = recipientProgram.RegulatoryProgramDto.Name;
+                if (recipientProgram.RegulatoryProgramDto != null)
+                {
+                    invitationDto.ProgramName = recipientProgram.RegulatoryProgramDto.Name;
+                }
             }
 
             return invitationDto;

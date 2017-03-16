@@ -5,6 +5,7 @@ using Linko.LinkoExchange.Data;
 using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Program
 {
@@ -76,7 +77,7 @@ namespace Linko.LinkoExchange.Services.Program
             return organziationRegulatoryProgramUserDtos;
         }
 
-        public OrganizationRegulatoryProgramUserDto CreateOrganizationRegulatoryProgramForUser(int userProfileId, int organizationRegulatoryProgramId, int inviterOrganizationRegulatoryProgramId)
+        public OrganizationRegulatoryProgramUserDto CreateOrganizationRegulatoryProgramForUser(int userProfileId, int organizationRegulatoryProgramId, int inviterOrganizationRegulatoryProgramId, RegistrationType registrationType)
         {
             //var orpu = new OrganizationRegulatoryProgramUser();
             var orpu = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault
@@ -102,26 +103,32 @@ namespace Linko.LinkoExchange.Services.Program
             }
             else
             {
-                // To update the exsiting one.  
+                // To update the existing one.  
                 orpu.IsRegistrationApproved = false;
                 orpu.IsRegistrationDenied = false;
                 orpu.IsRemoved = false;
 
-                //Update to new re-reg timestamp
+                //Update to new re-reg time-stamp
                 orpu.RegistrationDateTimeUtc = DateTimeOffset.UtcNow;
 
-                //RESET SCENARIO
                 //Update because the new "Inviter" is now the Authority
                 //(need to do this so that this pending registration show up under the Authority)
                 orpu.InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgramId;
 
-                // Update all other OrgRegProgm  IsRegistrationApproved to be false to enforce all the user be approved again by all program administrators 
-                var orpus = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Where
-                        (i => i.UserProfileId == userProfileId && i.OrganizationRegulatoryProgramId != organizationRegulatoryProgramId && i.IsRemoved == false).ToList();
-
-                foreach (var prog in orpus)
+                //RESET SCENARIO
+                if (registrationType == RegistrationType.ResetRegistration)
                 {
-                    prog.IsRegistrationApproved = false;
+                    // Update all other OrgRegProgm  IsRegistrationApproved to be false to enforce all the user be approved again by all program administrators where they were approved before 
+                    var orpus = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Where
+                        (i =>
+                             i.UserProfileId == userProfileId &&
+                             i.OrganizationRegulatoryProgramId != organizationRegulatoryProgramId &&
+                             i.IsRemoved == false && i.IsRegistrationApproved).ToList();
+
+                    foreach (var prog in orpus)
+                    {
+                        prog.IsRegistrationApproved = false;
+                    }
                 }
             }
 

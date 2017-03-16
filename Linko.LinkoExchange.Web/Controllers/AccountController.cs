@@ -86,6 +86,16 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
+        #region default action
+
+        [AllowAnonymous]
+        public ActionResult Index()
+        {
+            return Request.IsAuthenticated ? RedirectToAction(actionName: "Profile", controllerName: "User") : RedirectToAction(actionName: "SignIn");
+        }
+
+        #endregion
+
         #region Register
         [AllowAnonymous]
         public ActionResult Register(string token)
@@ -101,16 +111,17 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return View("Confirmation", new ConfirmationViewModel()
                 {
                     Title = "Invitation Expired",
-                    Message = "The invitation has expired.  Please request a new one."
+                    Message = "The invitation has expired. Please request a new one."
                 });
             }
 
-            var model = new RegistrationViewModel();
-            model.Email = invitation.EmailAddress;
-            model.UserProfile = new UserProfileViewModel();
-            model.UserProfile.StateList = GetStateList();
-            model.UserKBQ = new UserKBQViewModel();
-            model.UserSQ = new UserSQViewModel();
+            var model = new RegistrationViewModel
+            {
+                InvitationEmail = invitation.EmailAddress,
+                UserProfile = new UserProfileViewModel { StateList = GetStateList() },
+                UserKBQ = new UserKBQViewModel(),
+                UserSQ = new UserSQViewModel()
+            };
             model.UserKBQ.QuestionPool = _profileHelper.GetQuestionPool(QuestionTypeName.KBQ);
             model.UserSQ.QuestionPool = _profileHelper.GetQuestionPool(QuestionTypeName.SQ);
 
@@ -126,28 +137,30 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (user == null)
             {
                 model.RegistrationType = RegistrationType.NewRegistration;
+                model.UserProfile.ShowConfirmPassword = true;
             }
             else if (user.IsAccountResetRequired)
             {
                 model.RegistrationType = RegistrationType.ResetRegistration;
                 model.UserProfile = _profileHelper.GetUserProfileViewModel(user.UserProfileId);
+                model.UserProfile.ShowConfirmPassword = true;
             }
             else
             {
                 model.RegistrationType = RegistrationType.ReRegistration;
+                model.UserProfile.ShowConfirmPassword = false;
 
-                //TODO fill out the kbq questions and security questions 
                 model.UserProfile = _profileHelper.GetUserProfileViewModel(user.UserProfileId);
                 model.UserKBQ = _profileHelper.GetUserKbqViewModel(user.UserProfileId);
                 model.UserSQ = _profileHelper.GetUserSecurityQuestionViewModel(user.UserProfileId);
-                // For re-registration, set the kbq questions to be **** so that we do not display guly hashed string.
+                // For re-registration, set the kbq questions to be **** so that we do not display gully hashed string.
                 model.UserKBQ.KBQAnswer1 = "**********";
                 model.UserKBQ.KBQAnswer2 = "**********";
                 model.UserKBQ.KBQAnswer3 = "**********";
                 model.UserKBQ.KBQAnswer4 = "**********";
                 model.UserKBQ.KBQAnswer5 = "**********";
 
-                // For Registration, we don't update anything to the user's profile, put a fake password here only to by pass the data validation. 
+                // For re-registration, we don't update anything to the user's profile, put a fake password here only to by pass the data validation. 
                 model.UserProfile.Password = "abcdnxtZ1";
                 model.AgreeTermsAndConditions = false;
             }
@@ -170,19 +183,25 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.UserProfile.StateList = GetStateList();
             model.UserKBQ.QuestionPool = _profileHelper.GetQuestionPool(QuestionTypeName.KBQ);
             model.UserSQ.QuestionPool = _profileHelper.GetQuestionPool(QuestionTypeName.SQ);
+
             if (!ModelState.IsValid)
             {
                 ViewBag.inValidProfile = false;
                 ViewBag.inValidKBQ = false;
                 ViewBag.inValidSQ = false;
 
+                model.ProgramName = invitation.ProgramName;
+                model.IndustryName = invitation.IndustryName;
+                model.AuthorityName = invitation.AuthorityName;
+                model.UserProfile.Password = "";
+                model.UserProfile.ConfirmPassword = "";
+
                 // Validate Profile
                 ValidationContext context = null;
                 var validationResult = new List<ValidationResult>();
-                bool isValid = true;
 
                 context = new ValidationContext(model.UserProfile, serviceProvider: null, items: null);
-                isValid = Validator.TryValidateObject(model.UserProfile, context, validationResult, validateAllProperties: true);
+                bool isValid = Validator.TryValidateObject(model.UserProfile, context, validationResult, validateAllProperties: true);
 
                 if (!isValid)
                 {
@@ -314,16 +333,6 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             _logger.Info($"Registration failed. Email={userDto.Email}, FirstName={userDto.FirstName}, LastName={userDto.LastName}, Result={result.Result.ToString()}");
             return View(model);
-        }
-
-        #endregion
-
-        #region default action
-
-        [AllowAnonymous]
-        public ActionResult Index()
-        {
-            return Request.IsAuthenticated ? RedirectToAction(actionName: "Profile", controllerName: "User") : RedirectToAction(actionName: "SignIn");
         }
 
         #endregion
@@ -994,7 +1003,10 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             if (NeedToValidKbq())
             {
-                return RedirectToAction("KbqChallenge", new { returnUrl = Request.Url.ToString() });
+                return RedirectToAction("KbqChallenge", new
+                {
+                    returnUrl = Request.Url.ToString()
+                });
             }
             else
             {
@@ -1021,7 +1033,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                 TempData["Message"] = "Change password succeeded.";
                 return RedirectToAction(actionName: "ChangeAccountSucceed");
             }
-            var errorMessage = result.Errors.Aggregate((i, j) => { return i + j; });
+            var errorMessage = result.Errors.Aggregate((i, j) =>
+            {
+                return i + j;
+            });
             ModelState.AddModelError(string.Empty, errorMessage: errorMessage);
             return View(model);
         }
@@ -1035,7 +1050,10 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             if (NeedToValidKbq())
             {
-                return RedirectToAction("KbqChallenge", new { returnUrl = Request.Url.ToString() });
+                return RedirectToAction("KbqChallenge", new
+                {
+                    returnUrl = Request.Url.ToString()
+                });
             }
             else
             {
@@ -1201,17 +1219,12 @@ namespace Linko.LinkoExchange.Web.Controllers
         private List<JurisdictionViewModel> GetStateList()
         {
             var list = _jurisdictionService.GetStateProvs((int) (Country.USA));
-            var stateList = new List<JurisdictionViewModel>();
-            foreach (var jur in list)
-            {
-                stateList.Add(new JurisdictionViewModel
-                {
-                    JurisdictionId = jur.JurisdictionId,
-                    StateName = jur.Name
-                });
-            };
 
-            return stateList;
+            return list.Select(jur => new JurisdictionViewModel
+            {
+                JurisdictionId = jur.JurisdictionId,
+                StateName = jur.Name
+            }).ToList();
         }
 
         #endregion
