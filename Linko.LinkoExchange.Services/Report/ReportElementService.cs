@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Linko.LinkoExchange.Services.Dto;
 using System.Data.Entity;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Validation;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -72,12 +73,64 @@ namespace Linko.LinkoExchange.Services.Report
         }
 
     
-        public void DeleteReportElementType(int ReportElementTypeId)
+        public void DeleteReportElementType(int reportElementTypeId)
         {
-            var foundReportElementType = _dbContext.ReportElementTypes
-                .Single(r => r.ReportElementTypeId == ReportElementTypeId);
-            _dbContext.ReportElementTypes.Remove(foundReportElementType);
-            _dbContext.SaveChanges();
+            using (var transaction = _dbContext.BeginTransaction())
+            {
+                try {
+
+                    //Find all Report Package Templates using this Report Element Type
+                    var rpTemplatesUsingThis = _dbContext.ReportPackageTemplateElementTypes
+                        .Include(r => r.ReportPackageTemplateElementCategory)
+                        .Where(r => r.ReportElementTypeId == reportElementTypeId)
+                            .Select(r => r.ReportPackageTemplateElementCategory.ReportPackageTemplate)
+                            .Where(r => r.OrganizationRegulatoryProgramId == _orgRegProgramId);
+
+                    if (rpTemplatesUsingThis.Count() > 0)
+                    {
+                        string warningMessage = "This Report Package Element is in use in the following Report Package Templates and cannot be deleted:";
+                        foreach (var rpTemplate in rpTemplatesUsingThis)
+                        {
+                            warningMessage += $"{Environment.NewLine} - \"{rpTemplate.Name}\"";
+                        }
+
+                        List<RuleViolation> validationIssues = new List<RuleViolation>();
+                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: warningMessage));
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    }
+
+                    var foundReportElementType = _dbContext.ReportElementTypes
+                        .Single(r => r.ReportElementTypeId == reportElementTypeId);
+                    _dbContext.ReportElementTypes.Remove(foundReportElementType);
+
+                    _dbContext.SaveChanges();
+
+                    transaction.Commit();
+                }
+                catch (RuleViolationException ex)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                    throw;
+                }
+
+            }
+           
         }
     }
 }
