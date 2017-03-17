@@ -1684,7 +1684,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 Name = vm.Name,
                 Description = vm.Description,
                 IsActive = vm.IsActive,
-                LastModificationDateTimeUtc =  vm.LastModificationDateTimeUtc ?? vm.CreationDateTimeUtc,
+                CreationDateTime = vm.CreationDateTimeUtc,
+                LastModificationDateTime =  vm.LastModificationDateTimeUtc,
                 LastModifierUserName = vm.LastModifierUserId.HasValue ?  _userService.GetUserProfileById(vm.LastModifierUserId.Value).FullName : ""
             });
 
@@ -1694,7 +1695,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 Name = vm.Name,
                 Description = vm.Description,
                 IsActive = vm.IsActive,
-                LastModificationDateTimeUtc =  vm.LastModificationDateTimeUtc,
+                CreationOrModificationDateTime =  vm.CreationOrModificationDateTime,
                 LastModifierUserName = vm.LastModifierUserName
             });
 

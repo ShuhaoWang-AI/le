@@ -27,6 +27,7 @@ using NLog;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Web.ViewModels.User;
 using Linko.LinkoExchange.Services.Report;
+using Linko.LinkoExchange.Services.Parameter;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -91,6 +92,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<ITimeZoneService, TimeZoneService>();
             container.RegisterType<IEncryptionService, EncryptionService>();
             container.RegisterType<IJurisdictionService, JurisdictionService>();
+            container.RegisterType<IParameterService, ParameterService>();
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
