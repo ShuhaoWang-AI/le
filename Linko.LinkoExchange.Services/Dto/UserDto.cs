@@ -9,6 +9,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string TitleRole { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string FullName => FirstName + " " + LastName;
         public string UserName { get; set; }
         public string BusinessName { get; set; }
 

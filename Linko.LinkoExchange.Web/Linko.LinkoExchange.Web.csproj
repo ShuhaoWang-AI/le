@@ -450,6 +450,8 @@
     <Compile Include="ViewModels\Authority\AuthorityUserViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
+    <Compile Include="ViewModels\Shared\ParameterGroupViewModel.cs" />
+    <Compile Include="ViewModels\Shared\ParameterViewModel.cs" />
     <Compile Include="ViewModels\Shared\PendingInvitationViewModel.cs" />
     <Compile Include="ViewModels\Industry\IndustryUserViewModel.cs" />
     <Compile Include="ViewModels\Shared\InviteViewModel.cs" />

@@ -41,7 +41,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         {
             var parameterDtos = new List<ParameterDto>();
             var foundParams = _dbContext.Parameters
-                .Where(param => param.OrganizationRegulatoryProgramId == _orgRegProgramId);
+                .Where(param => param.OrganizationRegulatoryProgramId == _orgRegProgramId); // need to find authority OrganizationRegulatoryProgramId
 
             if (!string.IsNullOrEmpty(startsWith))
             {
@@ -61,7 +61,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// including children parameters
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<ParameterGroupDto> GetParameterGroups()
+        public IEnumerable<ParameterGroupDto> GetStaticParameterGroups()
         {
             var parameterGroupDtos = new List<ParameterGroupDto>();
             var foundParamGroups = _dbContext.ParameterGroups
@@ -124,7 +124,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                         //Ensure there are no other groups with same name
                         foreach (var paramGroupWithMatchingName in paramGroupsWithMatchingName)
                         {
-                            if (paramGroupWithMatchingName.ParameterGroupId != parameterGroup.ParameterGroupId.Value)
+                            if (paramGroupWithMatchingName.ParameterGroupId != parameterGroup.ParameterGroupId.Value) //TODO: NotImplemented: Different ORP can have same ParameterGroupName
                             {
                                 List<RuleViolation> validationIssues = new List<RuleViolation>();
                                 string message = "A Parameter Group with that name already exists.  Please select another name.";
@@ -134,7 +134,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                         }
                 
                         //Update existing
-                        paramGroupToPersist = _dbContext.ParameterGroups.Single(param => param.ParameterGroupId == parameterGroup.ParameterGroupId);
+                        paramGroupToPersist = _dbContext.ParameterGroups.Single(param => param.ParameterGroupId == parameterGroup.ParameterGroupId); // TODO: Need to update lastModificationDate and UserID
                         paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup, paramGroupToPersist);
                     }
                     else

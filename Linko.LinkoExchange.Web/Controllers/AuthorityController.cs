@@ -1,32 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web.Mvc;
-using Kendo.Mvc.Extensions;
-using Kendo.Mvc.UI;
-using Linko.LinkoExchange.Core.Enum;
-using Linko.LinkoExchange.Core.Validation;
-using Linko.LinkoExchange.Services.Cache;
-using Linko.LinkoExchange.Services.Dto;
-using Linko.LinkoExchange.Services.Invitation;
-using Linko.LinkoExchange.Services.Organization;
-using Linko.LinkoExchange.Services.Permission;
-using Linko.LinkoExchange.Services.QuestionAnswer;
-using Linko.LinkoExchange.Services.Settings;
-using Linko.LinkoExchange.Services.TimeZone;
-using Linko.LinkoExchange.Services.User;
-using Linko.LinkoExchange.Web.Extensions;
-using Linko.LinkoExchange.Web.ViewModels.Authority;
-using Linko.LinkoExchange.Web.ViewModels.Shared;
+using System.Linq;
+using System.Collections.Generic;
 using NLog;
+using Linko.LinkoExchange.Web.ViewModels.Shared;
+using Linko.LinkoExchange.Web.ViewModels.Authority;
 using Linko.LinkoExchange.Web.Mvc;
-using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Services.TimeZone;
+using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.Permission;
+using Linko.LinkoExchange.Services.Parameter;
+using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Core.Validation;
+using Linko.LinkoExchange.Core.Enum;
 using Kendo.Mvc;
+using Kendo.Mvc.UI;
+using Kendo.Mvc.Extensions;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
-    [RoutePrefix("Authority")]
+    [RoutePrefix(prefix:"Authority")]
     public class AuthorityController : Controller
     {
         #region constructor
@@ -42,11 +43,12 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IHttpContextService _httpContextService;
         private readonly ILogger _logger;
         private readonly ICromerrAuditLogService _cromerrLogService;
+        private readonly IParameterService _parameterService;
 
 
         public AuthorityController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService,
             ISettingService settingService, IQuestionAnswerService questionAnswerService, ITimeZoneService timeZoneService, IPermissionService permissionService,
-            ISessionCache sessionCache, ILogger logger, ICromerrAuditLogService cromerrLogService, IHttpContextService httpContextService)
+            ISessionCache sessionCache, ILogger logger, ICromerrAuditLogService cromerrLogService, IHttpContextService httpContextService, IParameterService parameterService)
         {
             _organizationService = organizationService;
             _userService = userService;
@@ -59,6 +61,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _logger = logger;
             _cromerrLogService = cromerrLogService;
             _httpContextService = httpContextService;
+            _parameterService = parameterService;
         }
 
         #endregion
@@ -1660,6 +1663,42 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             return viewModel;
+        }
+        #endregion
+
+        #region Show Static Parameter Group List
+        
+        // GET: /Authority/ParameterGroups
+        public ActionResult ParameterGroups()
+        {
+            return View();
+        }
+        
+        public ActionResult ParameterGroups_Read([DataSourceRequest] DataSourceRequest request)
+        {
+            var parameterGroups = _parameterService.GetStaticParameterGroups();
+
+            var viewModels = parameterGroups.Select(vm => new ParameterGroupViewModel()
+            {
+                Id = vm.ParameterGroupId,
+                Name = vm.Name,
+                Description = vm.Description,
+                IsActive = vm.IsActive,
+                LastModificationDateTimeUtc =  vm.LastModificationDateTimeUtc ?? vm.CreationDateTimeUtc,
+                LastModifierUserName = vm.LastModifierUserId.HasValue ?  _userService.GetUserProfileById(vm.LastModifierUserId.Value).FullName : ""
+            });
+
+            DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new
+            {
+                Id = vm.Id,
+                Name = vm.Name,
+                Description = vm.Description,
+                IsActive = vm.IsActive,
+                LastModificationDateTimeUtc =  vm.LastModificationDateTimeUtc,
+                LastModifierUserName = vm.LastModifierUserName
+            });
+
+            return Json(result);
         }
         #endregion
     }
