@@ -49,5 +49,9 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         ReportElementTypeDto GetReportElementTypeDtoFromReportElementType(ReportElementType reportElementType);
         ReportElementType GetReportElementTypeFromReportElementTypeDto(ReportElementTypeDto reportElementTypeDto, ReportElementType existingReportElementType = null);
+
+        ReportPackageTemplateAssignment GetReportPackageTemplateAssignmentFromReportPackageTemplateAssignmentDto(ReportPackageTemplateAssignmentDto rptDto);
+
+        ReportPackageTemplateAssignmentDto GetReportPackageTemplateAssignmentDtoFromReportPackageTemplateAssignment(ReportPackageTemplateAssignment rpt);
     }
 }

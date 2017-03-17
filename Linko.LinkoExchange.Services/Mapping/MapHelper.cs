@@ -813,22 +813,28 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public ReportPackageTemplateAssignmentDto GetReportPackageTemplateAssignmentDtoFromReportPackageTemplateAssignment(ReportPackageTemplateAssignment rpt)
         {
-            var rptaDto = new ReportPackageTemplateAssignmentDto();
-            rptaDto.ReportPackageTemplateAssignmentId = rpt.ReportPackageTemplateAssignmentId;
-            rptaDto.ReportPackageTemplateId = rpt.ReportPackageTemplateId;
-            rptaDto.ReportPackageTemplate = this.GetReportPackageTemplateDtoFromReportPackageTemplate(rpt.ReportPackageTemplate);
-            rptaDto.OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId;
-            rptaDto.OrganizationRegulatoryProgram = this.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(rpt.OrganizationRegulatoryProgram);
+            var rptaDto = new ReportPackageTemplateAssignmentDto
+            {
+                ReportPackageTemplateAssignmentId = rpt.ReportPackageTemplateAssignmentId,
+                ReportPackageTemplateId = rpt.ReportPackageTemplateId,
+                OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId,
+                OrganizationRegulatoryProgram =
+                    this.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(
+                        rpt.OrganizationRegulatoryProgram)
+            };
             return rptaDto;
         }
 
         public ReportPackageTemplateAssignment GetReportPackageTemplateAssignmentFromReportPackageTemplateAssignmentDto(ReportPackageTemplateAssignmentDto rptDto)
         {
-            var rpta = new ReportPackageTemplateAssignment();
-            rpta.ReportPackageTemplateAssignmentId = rptDto.ReportPackageTemplateAssignmentId;
-            rpta.ReportPackageTemplateId = rptDto.ReportPackageTemplateId;
-            rpta.ReportPackageTemplate = this.GetReportPackageTemplateFromReportPackageTemplateDto(rptDto.ReportPackageTemplate);
-            rpta.OrganizationRegulatoryProgramId = rptDto.OrganizationRegulatoryProgramId;
+            var rpta = new ReportPackageTemplateAssignment
+            {
+                ReportPackageTemplateAssignmentId = rptDto.ReportPackageTemplateAssignmentId,
+                ReportPackageTemplateId = rptDto.ReportPackageTemplateId,
+                ReportPackageTemplate =
+                    this.GetReportPackageTemplateFromReportPackageTemplateDto(rptDto.ReportPackageTemplate),
+                OrganizationRegulatoryProgramId = rptDto.OrganizationRegulatoryProgramId
+            };
             return rpta;
 
         }

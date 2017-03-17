@@ -22,8 +22,6 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly ILogger _logger;
         private readonly UserService _userService;
 
-        private readonly int _orgRegProgramId;
-
         public ReportTemplateService(
             LinkoExchangeContext dbContext,
             IHttpContextService httpContextService,
@@ -38,51 +36,55 @@ namespace Linko.LinkoExchange.Services.Report
             _mapHelper = mapHelper;
             _logger = logger;
             _userService = userService;
-            _orgRegProgramId = int.Parse(httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
         }
+
+        /// <summary>
+        ///  Delete data from other tables before delete from  ReportPackageTempates 
+        ///  1. Delete from tReportPackageTemplateAssignment
+        ///  2. Delete from tReportPackageTemplateElementCategory 
+        ///      2.1  Delete from  tReportPackageTemplateElementType table
+        ///      2.2  Delete from  tReportPackageTemplateElementCategory table 
+        ///  3.  Delete from tReportPackageTempates  
+        /// </summary>
+        /// <param name="reportPackageTemplateId"></param>
 
         public void DeleteReportPackageTemplate(int reportPackageTemplateId)
         {
-            //Delete data from other tables before delete from  ReportPackageTempates 
-            //// 1. Delete from tReportPackageTemplateAssignment
-            ///  2. Delete from tReportPackageTemplateElementCategory 
-            ///      2.1  Delete from  tReportPackageTemplateElementType table
-            ///      2.2  Delete from  tReportPackageTemplateElementCategory table 
-            ///  3.  Delete from tReportPackageTempates 
-
-            var rpt =
-                _dbContext.ReportPackageTempates.FirstOrDefault(
-                    i => i.ReportPackageTemplateId == reportPackageTemplateId);
-            if (rpt == null)
+            using (var transaction = _dbContext.BeginTransaction())
             {
-                return;
-            }
-
-            foreach (var rptec in rpt.ReportPackageTemplateElementCategories)
-            {
-                var rptetId = rptec.ReportPackageTemplateElementCategoryId;
-                var rptets =
-                    _dbContext.ReportPackageTemplateElementTypes.Where(
-                        i => i.ReportPackageTemplateElementCategoryId == rptetId);
-
-                foreach (var rptet in rptets)
+                try
                 {
-                    _dbContext.ReportPackageTemplateElementTypes.Remove(rptet);
+                    var rpt =
+                        _dbContext.ReportPackageTempates.FirstOrDefault(
+                            i => i.ReportPackageTemplateId == reportPackageTemplateId);
+                    if (rpt == null)
+                    {
+                        return;
+                    }
+
+                    // Step 1, 2 
+                    DeleteReportPackageChildrenObjects(rpt);
+
+                    // Step 3
+                    _dbContext.ReportPackageTempates.Remove(rpt);
+
+                    _dbContext.SaveChanges();
                 }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
 
-                _dbContext.ReportPackageTemplateElementCategories.Remove(rptec);
+                    var errors = new List<string>() { ex.Message };
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error happens {0} ", string.Join("," + Environment.NewLine, errors));
+                    throw;
+                }
             }
-
-            var assignments =
-                _dbContext.ReportPackageTemplateAssignments.Where(
-                    i => i.ReportPackageTemplateId == reportPackageTemplateId);
-            foreach (var assignment in assignments)
-            {
-                _dbContext.ReportPackageTemplateAssignments.Remove(assignment);
-            }
-
-            _dbContext.SaveChanges();
-
         }
 
         public IEnumerable<CtsEventTypeDto> GetCtsEventTypes()
@@ -102,89 +104,145 @@ namespace Linko.LinkoExchange.Services.Report
 
         public IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates()
         {
+            var currentRegulatoryProgramId =
+                       int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
             var rpts =
-                _dbContext.ReportPackageTempates.Where(i => i.OrganizationRegulatoryProgramId == _orgRegProgramId)
+                _dbContext.ReportPackageTempates.Where(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId)
                     .Include(i => i.ReportPackageTemplateElementCategories)
                     .ToArray();
 
             return rpts.Select(GetReportOneReportPackageTemplate).ToList();
         }
 
+        /// <summary>
+        // This function provides update existing one, and create a new one functionalities 
+        // 
+        // For update, after update tReportPackageTemplate table, do following steps
+        //  1 Delete from tReprotPackageTemplateAssignment table,
+        //  2 Delete from tReportPackageTemplateElementType table,
+        //  3 Delete from tReportPackageTemplateElementCategory table,
+        //  4 Create records in tReprotPackageTemplateAssignment table,
+        //  5 Create records in tReportPackageTemplateElementCategory table,
+        //  6 Create records in tReportPackageTemplateElementElementType table
+
+        // For new creation, do following steps
+        //  1. Create on record in tReportPackageTempate,
+        //  2. Create one records in  tReprotPackageTemplateAssignment,
+        //  3. For AttachmentType and CertificationTypes, do below: 
+        //      2.1 Create one record in tReportPackageTemplateElementCategory 
+        //      2.2 Create records in table tReportPackageTemplateElementType
+        /// </summary>
+        /// <param name="rpt">The ReportPackageTemplateDto Object</param> 
         public void SaveReportPackageTemplate(ReportPackageTemplateDto rpt)
         {
-
-            if (rpt.ReportPackageTemplateId.HasValue)
+            using (var transaction = _dbContext.BeginTransaction())
             {
-                //   Update existing
-                //certificationTypeToPersist = _dbContext.ReportElementTypes.Single(c => c.ReportElementTypeId == certType.CertificationTypeID);
-                //certificationTypeToPersist = _mapHelper.GetReportElementTypeFromCertificationTypeDto(certType, certificationTypeToPersist);
-            }
-            else
-            {
-                //   Create new
-                var reportPackageTemplate = _mapHelper.GetReportPackageTemplateFromReportPackageTemplateDto(rpt);
-                _dbContext.ReportPackageTempates.Add(reportPackageTemplate);
-
-                // Step 1
-                //Create records in table tReportPackageTemplateElementCatory
-                //Fill in all catergories that belong to the reportPackageTemplate
-
-                // TODO:  Add other fields that can be convert here 
-                // 1. AttachmentType collections 
-                var attachmentTypes = rpt.AttachmentTypes.ToArray();
-                foreach (var reportElementTypeDto in attachmentTypes)
+                try
                 {
-                    var reportElementTypeId = reportElementTypeDto.ReportElementTypeId;
-                    var reportElementCategoryId = reportElementTypeDto.ReportElementCategoryId;
+                    var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+                    var currentRegulatoryProgramId =
+                        int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
-                    //TODO 
-                    var rptec = new ReportPackageTemplateElementCategory
+                    var reportPackageTemplate = _mapHelper.GetReportPackageTemplateFromReportPackageTemplateDto(rpt);
+
+                    if (rpt.ReportPackageTemplateId.HasValue)
                     {
-                        ReportPackageTemplateId = reportElementTypeId.Value,
-                        ReportElementCategoryId = reportElementCategoryId
-                    };
+                        var currentReportPackageTempalte =
+                            _dbContext.ReportPackageTempates.Single(i => i.ReportPackageTemplateId == rpt.ReportPackageTemplateId.Value);
 
-                    _dbContext.ReportPackageTemplateElementCategories.Add(rptec);
+                        //// Update current reportPackageTampate 
+                        currentReportPackageTempalte.Name = rpt.Name;
+                        currentReportPackageTempalte.Description = rpt.Description;
+                        currentReportPackageTempalte.EffectiveDateTimeUtc = rpt.EffectiveDateTimeUtc;
+                        currentReportPackageTempalte.RetirementDateTimeUtc = rpt.RetirementDateTimeUtc;
+                        currentReportPackageTempalte.CtsEventTypeId = rpt.CtsEventTypeId;
+                        currentReportPackageTempalte.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
+                        currentReportPackageTempalte.IsActive = rpt.IsActive;
+                        currentReportPackageTempalte.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                        currentReportPackageTempalte.LastModifierUserId = currentUserId;
 
-                    // Go Step 2,  save to table ReportPackageTemplateElementType 
-                    var rptecId = rptec.ReportPackageTemplateElementCategoryId;
-
-                    var rptet = new ReportPackageTemplateElementType
+                        //  1 Delete from tReprotPackageTemplateAssignment table,
+                        //  2 Delete from tReportPackageTemplateElementType table,
+                        //  3 Delete from tReportPackageTemplateElementCategory table 
+                        DeleteReportPackageChildrenObjects(reportPackageTemplate);
+                    }
+                    else
                     {
-                        ReportPackageTemplateElementCategoryId = rptecId,
-                        ReportElementTypeId = reportElementTypeDto.ReportElementTypeId.Value
-                    };
+                        // 1 Create new in tReportPackageTempate table
+                        reportPackageTemplate.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
+                        reportPackageTemplate.IsActive = rpt.IsActive;
+                        reportPackageTemplate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                        reportPackageTemplate.LastModifierUserId = currentUserId;
 
-                    _dbContext.ReportPackageTemplateElementTypes.Add(rptet);
+                        reportPackageTemplate = _dbContext.ReportPackageTempates.Add(reportPackageTemplate);
+                    }
+
+                    // 2 Create records in tReportTemplateAssignment table
+                    foreach (var assignment in reportPackageTemplate.ReportPackageTemplateAssignments)
+                    {
+                        _dbContext.ReportPackageTemplateAssignments.Add(assignment);
+                    }
+
+                    // 3 AttachmentType   
+                    var attachmentTypes = rpt.AttachmentTypes.ToArray();
+                    CreateReportPackageElementCatergoryType(attachmentTypes, reportPackageTemplate, false);
+
+                    // 4 CertificationType 
+                    var certificationTypes = rpt.CertificationTypes.ToArray();
+                    CreateReportPackageElementCatergoryType(certificationTypes, reportPackageTemplate, true);
+
+                    _dbContext.SaveChanges();
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error happens {0} ", string.Join("," + Environment.NewLine, errors));
+                    throw;
+                }
+            }
+        }
+
+        private void CreateReportPackageElementCatergoryType(IEnumerable<ReportElementTypeDto> reportElementTypeDtos,
+            ReportPackageTemplate reportPackageTemplate, bool setOrder)
+        {
+            foreach (var elementTypeDto in reportElementTypeDtos)
+            {
+                var reportElementCategoryId = elementTypeDto.ReportElementCategoryId;
+                var rptec = new ReportPackageTemplateElementCategory
+                {
+                    ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId,
+                    ReportElementCategoryId = reportElementCategoryId,
+                    SortOrder = setOrder
+                };
+
+                rptec = _dbContext.ReportPackageTemplateElementCategories.Add(rptec);
+
+                // Go Step 2,  Save to table tReportPackageTemplateElementType 
+                var rptecId = rptec.ReportPackageTemplateElementCategoryId;
+
+                if (elementTypeDto.ReportElementTypeId.HasValue == false)
+                {
+                    throw new Exception("Invalid ReportElementType");
                 }
 
+                var rptet = new ReportPackageTemplateElementType
+                {
+                    ReportPackageTemplateElementCategoryId = rptecId,
+                    ReportElementTypeId = elementTypeDto.ReportElementTypeId.Value
+                };
 
-                //var category = rpt.ReportPackageTemplateElementCategories.OrderBy(i => i.SortOrder);
-                //foreach (var cat in categoreis)
-                //{
-                //    var category = new ReportPackageTemplateElementCategory
-                //    {
-                //        ReportElementCategoryId = cat.ReportPackageTemplateElementCategoryId,
-                //        ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId
-                //    };
-
-                // add into table
-                //    _dbContext.ReportPackageTemplateElementCategories.Add(category);
-
-
-                //       Step 2
-                //Create records in table tReportPackageTempalteElememtType
-                //To fill in reportElementType data that belong to each category
-
-
-
-                //}
-
-                //var rptts = reportPackageTemplate.ReportPackageTemplateElementCategories.Select(i => i.ReportElementCategory.t)
-
-
+                _dbContext.ReportPackageTemplateElementTypes.Add(rptet);
             }
-            _dbContext.SaveChanges();
         }
 
         private ReportPackageTemplateDto GetReportOneReportPackageTemplate(ReportPackageTemplate rpt)
@@ -216,12 +274,10 @@ namespace Linko.LinkoExchange.Services.Report
                     rets.Select(i => _mapHelper.GetReportElementTypeDtoFromReportElementType(i)).ToList();
             }
 
-            //  rptDto.CertificationTypes = certs.Select(cert => _mapHelper.GetReportElementTypeDtoFromReportElementType(cert.ReportElementType)).ToList();
-
             //3. set assingedIndustries  
             rptDto.ReportPackageTemplateAssignments = rptDto.ReportPackageTemplateAssignments;
 
-            //// TODO  
+            //// TODO ?
             //// Do I need to call the service to popute OrgRegProg    
 
             if (rpt.LastModifierUserId.HasValue)
@@ -248,5 +304,35 @@ namespace Linko.LinkoExchange.Services.Report
             return rets;
         }
 
+        private void DeleteReportPackageTemplateAssignments(
+            IEnumerable<ReportPackageTemplateAssignment> reportPackageTemplateAssignments)
+        {
+            foreach (var assignment in reportPackageTemplateAssignments)
+            {
+                _dbContext.ReportPackageTemplateAssignments.Remove(assignment);
+            }
+        }
+
+        private void DeleteReportPackageChildrenObjects(ReportPackageTemplate rpt)
+        {
+            DeleteReportPackageTemplateAssignments(rpt.ReportPackageTemplateAssignments);
+
+            foreach (var rptec in rpt.ReportPackageTemplateElementCategories)
+            {
+                var rptetId = rptec.ReportPackageTemplateElementCategoryId;
+                var rptets =
+                    _dbContext.ReportPackageTemplateElementTypes.Where(
+                        i => i.ReportPackageTemplateElementCategoryId == rptetId);
+
+                foreach (var rptet in rptets)
+                {
+                    // Step 2.1
+                    _dbContext.ReportPackageTemplateElementTypes.Remove(rptet);
+                }
+
+                // Step 2.2
+                _dbContext.ReportPackageTemplateElementCategories.Remove(rptec);
+            }
+        }
     }
 }
