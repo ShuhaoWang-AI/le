@@ -55,6 +55,23 @@ namespace Linko.LinkoExchange.Services.Report
 
         public void SaveReportElementType(ReportElementTypeDto reportElementType)
         {
+            List<RuleViolation> validationIssues = new List<RuleViolation>();
+
+            //Check required fields (Name and Certification Text as per UC-53.3 4.b.)
+            if (string.IsNullOrEmpty(reportElementType.Name.Trim()))
+            {
+                string message = "Name is required.";
+                validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+            }
+            if (reportElementType.ReportElementCategory.Name == ReportElementCategoryName.Certification.ToString() 
+                && string.IsNullOrEmpty(reportElementType.Content.Trim()))
+            {
+                string message = "Certification Text is required.";
+                validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+            }
+
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try {
@@ -72,7 +89,6 @@ namespace Linko.LinkoExchange.Services.Report
                         {
                             if (elementTypeWithMatchingName.ReportElementTypeId != reportElementType.ReportElementTypeId.Value)
                             {
-                                List<RuleViolation> validationIssues = new List<RuleViolation>();
                                 string message = "A Report Element Type with that name already exists.  Please select another name.";
                                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
@@ -88,7 +104,6 @@ namespace Linko.LinkoExchange.Services.Report
                         //Ensure there are no other element types with same name
                         if (elementTypesWithMatchingName.Count() > 0)
                         {
-                            List<RuleViolation> validationIssues = new List<RuleViolation>();
                             string message = "A Report Element Type with that name already exists.  Please select another name.";
                             validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                             throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
