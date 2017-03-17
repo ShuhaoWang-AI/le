@@ -12,6 +12,7 @@ using Linko.LinkoExchange.Services.Dto;
 using System.Data.Entity;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
+using Linko.LinkoExchange.Services.Organization;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -25,12 +26,13 @@ namespace Linko.LinkoExchange.Services.Report
 
         public ReportElementService(LinkoExchangeContext dbContext,
             IHttpContextService httpContext,
+            IOrganizationService orgService,
             IMapHelper mapHelper,
             ILogger logger)
         {
             _dbContext = dbContext;
             _mapHelper = mapHelper;
-            _orgRegProgramId = int.Parse(httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            _orgRegProgramId = orgService.GetAuthority(int.Parse(httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
             _logger = logger;
         }
 

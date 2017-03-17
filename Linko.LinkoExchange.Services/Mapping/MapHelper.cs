@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace Linko.LinkoExchange.Services.Mapping
 {
@@ -463,6 +464,15 @@ namespace Linko.LinkoExchange.Services.Mapping
             if (parameterGroup == null)
             {
                 parameterGroup = new ParameterGroup();
+                parameterGroup.CreationDateTimeUtc = parameterGroupDto.CreationDateTimeUtc;
+            }
+            else
+            {
+                if (parameterGroup.ParameterGroupParameters != null && parameterGroup.ParameterGroupParameters.Count() > 0)
+                {
+                    parameterGroup.ParameterGroupParameters.Clear();
+                }
+                parameterGroup.LastModificationDateTimeUtc = parameterGroupDto.LastModificationDateTimeUtc;
             }
 
             //TO-DO: make sure the right properties are being set
@@ -470,10 +480,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             parameterGroup.Description = parameterGroupDto.Description;
             //OrganizationRegulatoryProgramId
             parameterGroup.IsActive = parameterGroupDto.IsActive;
-            //CreationDateTimeUtc
-            parameterGroup.LastModificationDateTimeUtc = parameterGroupDto.LastModificationDateTimeUtc;
             parameterGroup.LastModifierUserId = parameterGroupDto.LastModifierUserId;
-
             parameterGroup.ParameterGroupParameters = new List<ParameterGroupParameter>();
             foreach (var param in parameterGroupDto.Parameters)
             {
