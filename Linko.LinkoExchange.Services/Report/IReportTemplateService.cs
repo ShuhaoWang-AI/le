@@ -5,10 +5,13 @@ namespace Linko.LinkoExchange.Services.Report
 {
     public interface IReportTemplateService
     {
-        IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates();
-        IEnumerable<CtsEventTypeDto> GetCtsEventTypes();
-        void SaveReportPackageTemplate(ReportPackageTemplateDto rpt);
-        ReportPackageTemplateDto GetReportPackageTemplate(int reportPackageTemplateId);
         void DeleteReportPackageTemplate(int reportPackageTemplateId);
+        ReportPackageTemplateDto GetReportPackageTemplate(int reportPackageTemplateId);
+        IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates();
+        void SaveReportPackageTemplate(ReportPackageTemplateDto rpt);
+
+        IEnumerable<CtsEventTypeDto> GetCtsEventTypes();
+        IEnumerable<ReportElementTypeDto> GetCertificationTypes();
+        IEnumerable<ReportElementTypeDto> GetAttachmentTypes();
     }
 }

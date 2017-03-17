@@ -25,14 +25,12 @@ namespace Linko.LinkoExchange.Services.Report
         public ReportTemplateService(
             LinkoExchangeContext dbContext,
             IHttpContextService httpContextService,
-            //IReportElementService reportElementService,
             UserService userService,
             IMapHelper mapHelper,
             ILogger logger)
         {
             _dbContext = dbContext;
             _httpContextService = httpContextService;
-            //_reportElementService = reportElementService;
             _mapHelper = mapHelper;
             _logger = logger;
             _userService = userService;
@@ -85,12 +83,6 @@ namespace Linko.LinkoExchange.Services.Report
                     throw;
                 }
             }
-        }
-
-        public IEnumerable<CtsEventTypeDto> GetCtsEventTypes()
-        {
-            var ctsEventTypes = _dbContext.CtsEventTypes.ToList();
-            return ctsEventTypes.Select(i => _mapHelper.GetCtsEventTypeDtoFromEventType(i));
         }
 
         public ReportPackageTemplateDto GetReportPackageTemplate(int reportPackageTemplateId)
@@ -210,6 +202,49 @@ namespace Linko.LinkoExchange.Services.Report
                     throw;
                 }
             }
+        }
+
+        public IEnumerable<CtsEventTypeDto> GetCtsEventTypes()
+        {
+            var ctsEventTypes = _dbContext.CtsEventTypes.ToList();
+            return ctsEventTypes.Select(i => _mapHelper.GetCtsEventTypeDtoFromEventType(i));
+        }
+
+        public IEnumerable<ReportElementTypeDto> GetCertificationTypes()
+        {
+            return ReportElementTypeDtos(ReportElementCategoryName.Certification.ToString());
+        }
+
+        public IEnumerable<ReportElementTypeDto> GetAttachmentTypes()
+        {
+            return ReportElementTypeDtos(ReportElementCategoryName.Attachment.ToString());
+        }
+
+        #region private section
+
+        private IEnumerable<ReportElementTypeDto> ReportElementTypeDtos(string categoryName)
+        {
+            var currentRegulatoryProgramId =
+                int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+            var reprotElementTypes = _dbContext.ReportElementTypes.Where(
+                    i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId &&
+                         i.ReportElementCategory.Name == categoryName
+                )
+                .Select(_mapHelper.GetReportElementTypeDtoFromReportElementType)
+                .ToList();
+
+            foreach (var rpt in reprotElementTypes)
+            {
+                if (rpt.LastModifierUserId.HasValue)
+                {
+                    rpt.LastModifierUser =
+                        _mapHelper.GetUserDtoFromUserProfile(
+                            _dbContext.Users.FirstOrDefault(i => i.UserProfileId == rpt.LastModifierUserId.Value));
+                }
+            }
+
+            return reprotElementTypes;
         }
 
         private void CreateReportPackageElementCatergoryType(IEnumerable<ReportElementTypeDto> reportElementTypeDtos,
@@ -334,5 +369,7 @@ namespace Linko.LinkoExchange.Services.Report
                 _dbContext.ReportPackageTemplateElementCategories.Remove(rptec);
             }
         }
+
+        #endregion
     }
 }
