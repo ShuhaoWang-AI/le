@@ -55,20 +55,76 @@ namespace Linko.LinkoExchange.Services.Report
 
         public void SaveReportElementType(ReportElementTypeDto reportElementType)
         {
-            ReportElementType ReportElementTypeToPersist = null;
-            if (reportElementType.ReportElementTypeID.HasValue && reportElementType.ReportElementTypeID.Value > 0)
+            using (var transaction = _dbContext.BeginTransaction())
             {
-                //Update existing
-                ReportElementTypeToPersist = _dbContext.ReportElementTypes.Single(c => c.ReportElementTypeId == reportElementType.ReportElementTypeID);
-                ReportElementTypeToPersist = _mapHelper.GetReportElementTypeFromReportElementTypeDto(reportElementType, ReportElementTypeToPersist);
+                try {
+                    //Find existing element types with same Name (UC-53-3 4.c.)
+                    string proposedElementTypeName = reportElementType.Name.Trim().ToLower();
+                    var elementTypesWithMatchingName = _dbContext.ReportElementTypes
+                        .Where(ret => ret.Name.Trim().ToLower() == proposedElementTypeName
+                                && ret.OrganizationRegulatoryProgramId == _orgRegProgramId);
+
+                    ReportElementType ReportElementTypeToPersist = null;
+                    if (reportElementType.ReportElementTypeId.HasValue && reportElementType.ReportElementTypeId.Value > 0)
+                    {
+                        //Ensure there are no other element types with same name
+                        foreach (var elementTypeWithMatchingName in elementTypesWithMatchingName)
+                        {
+                            if (elementTypeWithMatchingName.ReportElementTypeId != reportElementType.ReportElementTypeId.Value)
+                            {
+                                List<RuleViolation> validationIssues = new List<RuleViolation>();
+                                string message = "A Report Element Type with that name already exists.  Please select another name.";
+                                validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                            }
+                        }
+
+                        //Update existing
+                        ReportElementTypeToPersist = _dbContext.ReportElementTypes.Single(c => c.ReportElementTypeId == reportElementType.ReportElementTypeId);
+                        ReportElementTypeToPersist = _mapHelper.GetReportElementTypeFromReportElementTypeDto(reportElementType, ReportElementTypeToPersist);
+                    }
+                    else
+                    {
+                        //Ensure there are no other element types with same name
+                        if (elementTypesWithMatchingName.Count() > 0)
+                        {
+                            List<RuleViolation> validationIssues = new List<RuleViolation>();
+                            string message = "A Report Element Type with that name already exists.  Please select another name.";
+                            validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                            throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                        }
+
+                        //Get new
+                        ReportElementTypeToPersist = _mapHelper.GetReportElementTypeFromReportElementTypeDto(reportElementType);
+                        _dbContext.ReportElementTypes.Add(ReportElementTypeToPersist);
+                    }
+                    _dbContext.SaveChanges();
+
+                    transaction.Commit();
+                }
+                catch (RuleViolationException ex)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                    throw;
+                }
+
             }
-            else
-            {
-                //Get new
-                ReportElementTypeToPersist = _mapHelper.GetReportElementTypeFromReportElementTypeDto(reportElementType);
-                _dbContext.ReportElementTypes.Add(ReportElementTypeToPersist);
-            }
-            _dbContext.SaveChanges();
 
         }
 
@@ -131,6 +187,25 @@ namespace Linko.LinkoExchange.Services.Report
 
             }
            
+        }
+
+        public bool IsReportElementTypeInUse(int reportElementTypeId)
+        {
+            //Find all Report Package Templates using this Report Element Type
+            var rpTemplatesUsingThis = _dbContext.ReportPackageTemplateElementTypes
+                .Include(r => r.ReportPackageTemplateElementCategory)
+                .Where(r => r.ReportElementTypeId == reportElementTypeId)
+                    .Select(r => r.ReportPackageTemplateElementCategory.ReportPackageTemplate)
+                    .Where(r => r.OrganizationRegulatoryProgramId == _orgRegProgramId);
+
+            if (rpTemplatesUsingThis.Count() > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

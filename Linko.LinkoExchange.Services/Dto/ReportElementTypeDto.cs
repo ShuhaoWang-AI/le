@@ -9,7 +9,7 @@ namespace Linko.LinkoExchange.Services.Dto
 {
     public class ReportElementTypeDto
     {
-        public int? ReportElementTypeID { get; set; }
+        public int? ReportElementTypeId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Content { get; set; }

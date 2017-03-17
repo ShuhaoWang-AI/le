@@ -105,7 +105,9 @@ namespace Linko.LinkoExchange.Services.Parameter
                 {
                     //Find existing groups with same Name (UC-33-1 7.1)
                     string proposedParamGroupName = parameterGroup.Name.Trim().ToLower();
-                    var paramGroupsWithMatchingName = _dbContext.ParameterGroups.Where(param => param.Name.Trim().ToLower() == proposedParamGroupName);
+                    var paramGroupsWithMatchingName = _dbContext.ParameterGroups
+                        .Where(param => param.Name.Trim().ToLower() == proposedParamGroupName
+                                && param.OrganizationRegulatoryProgramId == _orgRegProgramId);
 
                     //Make sure there is at least 1 parameter
                     if (parameterGroup.Parameters.Count() < 1)
@@ -122,7 +124,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                         //Ensure there are no other groups with same name
                         foreach (var paramGroupWithMatchingName in paramGroupsWithMatchingName)
                         {
-                            if (paramGroupWithMatchingName.ParameterGroupId == parameterGroup.ParameterGroupId.Value)
+                            if (paramGroupWithMatchingName.ParameterGroupId != parameterGroup.ParameterGroupId.Value)
                             {
                                 List<RuleViolation> validationIssues = new List<RuleViolation>();
                                 string message = "A Parameter Group with that name already exists.  Please select another name.";

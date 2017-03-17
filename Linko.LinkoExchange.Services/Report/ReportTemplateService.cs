@@ -145,7 +145,7 @@ namespace Linko.LinkoExchange.Services.Report
                 var attachmentTypes = rpt.AttachmentTypes.ToArray();
                 foreach (var reportElementTypeDto in attachmentTypes)
                 {
-                    var reportElementTypeId = reportElementTypeDto.ReportElementTypeID;
+                    var reportElementTypeId = reportElementTypeDto.ReportElementTypeId;
                     var reportElementCategoryId = reportElementTypeDto.ReportElementCategoryId;
 
                     //TODO 
@@ -163,7 +163,7 @@ namespace Linko.LinkoExchange.Services.Report
                     var rptet = new ReportPackageTemplateElementType
                     {
                         ReportPackageTemplateElementCategoryId = rptecId,
-                        ReportElementTypeId = reportElementTypeDto.ReportElementTypeID.Value
+                        ReportElementTypeId = reportElementTypeDto.ReportElementTypeId.Value
                     };
 
                     _dbContext.ReportPackageTemplateElementTypes.Add(rptet);

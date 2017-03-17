@@ -765,7 +765,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             {
                 mappedReportElementType.ReportElementCategory = GetReportElementCategoryDtoFromReportElementCategory(reportElementType.ReportElementCategory);
             }
-            mappedReportElementType.ReportElementTypeID = reportElementType.ReportElementTypeId;
+            mappedReportElementType.ReportElementTypeId = reportElementType.ReportElementTypeId;
             mappedReportElementType.Name = reportElementType.Name;
             mappedReportElementType.Description = reportElementType.Description;
             mappedReportElementType.Content = reportElementType.Content;
