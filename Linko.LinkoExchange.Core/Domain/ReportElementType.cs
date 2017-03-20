@@ -26,7 +26,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public string Content { get; set; }
 
         /// <summary>
-        /// When a content is provided, it should be displayed on the UI.
+        /// True: the content is provided and should be displayed on the UI. False, otherwise.
         /// </summary>
         public bool IsContentProvided { get; set; }
 
@@ -36,6 +36,9 @@ namespace Linko.LinkoExchange.Core.Domain
         public int ReportElementCategoryId { get; set; }
         public virtual ReportElementCategory ReportElementCategory { get; set; }
 
+        /// <summary>
+        /// Typical value: Authority Regulatory Program id.
+        /// </summary>
         public int OrganizationRegulatoryProgramId { get; set; }
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 

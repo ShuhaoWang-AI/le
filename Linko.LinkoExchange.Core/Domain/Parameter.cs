@@ -24,6 +24,9 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public double? TrcFactor { get; set; }
 
+        /// <summary>
+        /// Typical value: Authority Organization Regulatory Program id.
+        /// </summary>
         public int OrganizationRegulatoryProgramId { get; set; }
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 

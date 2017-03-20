@@ -1,5 +1,5 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using Linko.LinkoExchange.Core.Domain;
+﻿using Linko.LinkoExchange.Core.Domain;
+using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
@@ -8,6 +8,7 @@ namespace Linko.LinkoExchange.Data.Mapping
         public ReportPackageTemplateAssignmentMap()
         {
             ToTable("tReportPackageTemplateAssignment");
+
             HasKey(x => x.ReportPackageTemplateAssignmentId);
 
             HasRequired(a => a.ReportPackageTemplate)

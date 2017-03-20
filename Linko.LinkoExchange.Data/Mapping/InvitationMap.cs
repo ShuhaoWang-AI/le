@@ -28,6 +28,8 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .WithMany()
                 .HasForeignKey(c => c.SenderOrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(false);
+
+            Property(x => x.IsResetInvitation).IsRequired();
         }
     }
 }

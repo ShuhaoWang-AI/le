@@ -1,5 +1,5 @@
-using System.Data.Entity.ModelConfiguration;
 using Linko.LinkoExchange.Core.Domain;
+using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
@@ -8,12 +8,18 @@ namespace Linko.LinkoExchange.Data.Mapping
         public ReportElementCategoryMap()
         {
             ToTable("tReportElementCategory");
+
             HasKey(x => x.ReportElementCategoryId);
-            Property(x => x.Name);
-            Property(x => x.Description);
-            Property(x => x.CreationDateTimeUtc);
-            Property(x => x.LastModificationDateTimeUtc);
-            Property(x => x.LastModifierUserId);
+
+            Property(x => x.Name).IsRequired().HasMaxLength(100);
+
+            Property(x => x.Description).IsOptional().HasMaxLength(500);
+
+            Property(x => x.CreationDateTimeUtc).IsRequired();
+
+            Property(x => x.LastModificationDateTimeUtc).IsOptional();
+
+            Property(x => x.LastModifierUserId).IsOptional();
         }
     }
 }

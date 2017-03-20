@@ -19,10 +19,21 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public string Description { get; set; }
 
-        public bool IsFlow { get; set; }
+        /// <summary>
+        /// True: the current unit is for flow. False, otherwise.
+        /// </summary>
+        public bool IsFlowUnit { get; set; }
 
-        public int OrganizationRegulatoryProgramId { get; set; }
-        public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
+        /// <summary>
+        /// True: the flow unit is displayed to the Industry. False, otherwise.
+        /// </summary>
+        public bool IsFlowUnitVisible { get; set; }
+
+        /// <summary>
+        /// Typical value: Authority id.
+        /// </summary>
+        public int OrganizationId { get; set; }
+        public virtual Organization Organization { get; set; }
 
         public bool IsRemoved { get; set; }
 

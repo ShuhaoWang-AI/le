@@ -11,8 +11,8 @@ namespace Linko.LinkoExchange.Services.Dto
         public int UnitId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public bool IsFlow { get; set; }
-        public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgram { get; set; }
+        public bool IsFlowUnit { get; set; }
+        public OrganizationDto Organization { get; set; }
         public bool IsRemoved { get; set; }
         public DateTimeOffset CreationDateTimeUtc { get; set; }
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }

@@ -1,25 +1,43 @@
-using System.Data.Entity.ModelConfiguration;
 using Linko.LinkoExchange.Core.Domain;
+using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public class ReportPackageTemplateMap : EntityTypeConfiguration<ReportPackageTemplate>
+    public partial class ReportPackageTemplateMap : EntityTypeConfiguration<ReportPackageTemplate>
     {
         public ReportPackageTemplateMap()
         {
             ToTable("tReportPackageTemplate");
 
             HasKey(x => x.ReportPackageTemplateId);
-            Property(x => x.Name);
-            Property(x => x.Description);
-            Property(x => x.EffectiveDateTimeUtc);
-            Property(x => x.RetirementDateTimeUtc);
-            Property(x => x.CtsEventTypeId);
-            Property(x => x.OrganizationRegulatoryProgramId);
-            Property(x => x.IsActive);
-            Property(x => x.CreationDateTimeUtc);
-            Property(x => x.LastModificationDateTimeUtc);
-            Property(x => x.LastModifierUserId);
+
+            Property(x => x.Name).IsRequired().HasMaxLength(100);
+
+            Property(x => x.Description).IsOptional().HasMaxLength(500);
+
+            Property(x => x.EffectiveDateTimeUtc).IsRequired();
+
+            Property(x => x.RetirementDateTimeUtc).IsOptional();
+
+            Property(x => x.IsSubmissionBySignatoryRequired).IsRequired();
+
+            HasOptional(a => a.CtsEventType)
+                .WithMany()
+                .HasForeignKey(c => c.CtsEventTypeId)
+                .WillCascadeOnDelete(false);
+
+            HasRequired(a => a.OrganizationRegulatoryProgram)
+                .WithMany(b => b.ReportPackageTemplates)
+                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
+                .WillCascadeOnDelete(false);
+
+            Property(x => x.IsActive).IsRequired();
+
+            Property(x => x.CreationDateTimeUtc).IsRequired();
+
+            Property(x => x.LastModificationDateTimeUtc).IsOptional();
+
+            Property(x => x.LastModifierUserId).IsOptional();
         }
     }
 }

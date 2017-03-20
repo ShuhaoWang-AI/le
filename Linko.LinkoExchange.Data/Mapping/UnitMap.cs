@@ -1,28 +1,28 @@
-using Linko.LinkoExchange.Core.Domain;
+﻿using Linko.LinkoExchange.Core.Domain;
 using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public partial class CtsEventTypeMap : EntityTypeConfiguration<CtsEventType>
+    public class UnitMap : EntityTypeConfiguration<Unit>
     {
-        public CtsEventTypeMap()
+        public UnitMap()
         {
-            ToTable("tCtsEventType");
+            ToTable("tUnit");
 
-            HasKey(x => x.CtsEventTypeId);
+            HasKey(x => x.UnitId);
 
             Property(x => x.Name).IsRequired().HasMaxLength(100);
 
             Property(x => x.Description).IsOptional().HasMaxLength(500);
 
-            Property(x => x.CtsEventCategoryName).IsRequired().HasMaxLength(100);
+            Property(x => x.IsFlowUnit).IsRequired();
 
-            HasRequired(a => a.OrganizationRegulatoryProgram)
+            Property(x => x.IsFlowUnitVisible).IsRequired();
+
+            HasRequired(a => a.Organization)
                 .WithMany()
-                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
+                .HasForeignKey(c => c.OrganizationId)
                 .WillCascadeOnDelete(false);
-
-            Property(x => x.IsEnabled).IsRequired();
 
             Property(x => x.IsRemoved).IsRequired();
 

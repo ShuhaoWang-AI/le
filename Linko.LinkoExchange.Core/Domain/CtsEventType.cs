@@ -23,8 +23,16 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public string CtsEventCategoryName { get; set; }
 
+        /// <summary>
+        /// Typical value: Authority Regulatory Program id.
+        /// </summary>
         public int OrganizationRegulatoryProgramId { get; set; }
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
+
+        /// <summary>
+        /// True: CTS Event Type is visible to the Industry. False, otherwise.
+        /// </summary>
+        public bool IsEnabled { get; set; }
 
         public bool IsRemoved { get; set; }
 

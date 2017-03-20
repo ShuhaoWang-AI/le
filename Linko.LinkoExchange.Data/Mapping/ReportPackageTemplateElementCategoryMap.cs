@@ -1,5 +1,5 @@
-using System.Data.Entity.ModelConfiguration;
 using Linko.LinkoExchange.Core.Domain;
+using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
@@ -8,10 +8,8 @@ namespace Linko.LinkoExchange.Data.Mapping
         public ReportPackageTemplateElementCategoryMap()
         {
             ToTable("tReportPackageTemplateElementCategory");
+
             HasKey(x => x.ReportPackageTemplateElementCategoryId);
-            Property(x => x.ReportPackageTemplateId);
-            Property(x => x.ReportElementCategoryId);
-            Property(x => x.SortOrder);
 
             HasRequired(a => a.ReportPackageTemplate)
                 .WithMany(b => b.ReportPackageTemplateElementCategories)
@@ -22,6 +20,8 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .WithMany()
                 .HasForeignKey(c => c.ReportElementCategoryId)
                 .WillCascadeOnDelete(false);
+
+            Property(x => x.SortOrder).IsRequired();
         }
     }
 }

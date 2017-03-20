@@ -25,13 +25,16 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? RetirementDateTimeUtc { get; set; }
 
         /// <summary>
-        /// Whether a signatory role is required to submit the Report Package.
+        /// True: a signatory role is required to submit the Report Package. False, otherwise.
         /// </summary>
-        public bool IsSubmissionSignatoryRequired { get; set; }
+        public bool IsSubmissionBySignatoryRequired { get; set; }
 
         public int? CtsEventTypeId { get; set; }
         public virtual CtsEventType CtsEventType { get; set; }
 
+        /// <summary>
+        /// Typical value: Authority Regulatory Program id.
+        /// </summary>
         public int OrganizationRegulatoryProgramId { get; set; }
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 

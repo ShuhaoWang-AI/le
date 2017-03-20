@@ -86,6 +86,9 @@
     <Compile Include="Mapping\JurisdictionMap.cs" />
     <Compile Include="Mapping\OrganizationRegulatoryProgramModuleMap.cs" />
     <Compile Include="Mapping\OrganizationTypeRegulatoryProgramMap.cs" />
+    <Compile Include="Mapping\ParameterGroupMap.cs" />
+    <Compile Include="Mapping\ParameterGroupParameterMap.cs" />
+    <Compile Include="Mapping\ParameterMap.cs" />
     <Compile Include="Mapping\PermissionGroupMap.cs" />
     <Compile Include="Mapping\PermissionGroupPermissionMap.cs" />
     <Compile Include="Mapping\PermissionGroupTemplateMap.cs" />
@@ -96,7 +99,7 @@
     <Compile Include="Mapping\ReportElementTypeMap.cs" />
     <Compile Include="Mapping\ReportPackageTemplateAssignmentMap.cs" />
     <Compile Include="Mapping\ReportPackageTemplateElementCategoryMap.cs" />
-    <Compile Include="Mapping\ReportPackageTemplateElementTypemap.cs" />
+    <Compile Include="Mapping\ReportPackageTemplateElementTypeMap.cs" />
     <Compile Include="Mapping\ReportPackageTemplateMap.cs" />
     <Compile Include="Mapping\SignatoryRequestMap.cs" />
     <Compile Include="Mapping\SignatoryRequestStatusMap.cs" />
@@ -111,6 +114,7 @@
     <Compile Include="Mapping\QuestionMap.cs" />
     <Compile Include="Mapping\RegulatoryProgramMap.cs" />
     <Compile Include="Mapping\SettingTemplateMap.cs" />
+    <Compile Include="Mapping\UnitMap.cs" />
     <Compile Include="Mapping\UserPasswordHistoryMap.cs" />
     <Compile Include="Mapping\UserQuestionAnswerMap.cs" />
     <Compile Include="Mapping\UserProfileMap.cs" />

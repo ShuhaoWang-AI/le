@@ -496,8 +496,8 @@ namespace Linko.LinkoExchange.Services.Mapping
             unitDto.UnitId = unit.UnitId;
             unitDto.Name = unit.Name;
             unitDto.Description = unit.Description;
-            unitDto.IsFlow = unit.IsFlow;
-            unitDto.OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(unit.OrganizationRegulatoryProgram);
+            unitDto.IsFlowUnit = unit.IsFlowUnit;
+            unitDto.Organization = GetOrganizationDtoFromOrganization(unit.Organization);
             unitDto.IsRemoved = unit.IsRemoved;
             unitDto.CreationDateTimeUtc = unit.CreationDateTimeUtc;
             unitDto.LastModificationDateTimeUtc = unit.LastModificationDateTimeUtc;
@@ -679,7 +679,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 Description = reportPackageTemplate.Description,
                 EffectiveDateTimeUtc = reportPackageTemplate.EffectiveDateTimeUtc,
                 RetirementDateTimeUtc = reportPackageTemplate.RetirementDateTimeUtc,
-                IsSubmissionSignatoryRequired = reportPackageTemplate.IsSubmissionSignatoryRequired,
+                IsSubmissionBySignatoryRequired = reportPackageTemplate.IsSubmissionBySignatoryRequired,
                 CtsEventTypeId = reportPackageTemplate.CtsEventTypeId,
                 CtsEventType = GetCtsEventTypeDtoFromEventType(reportPackageTemplate.CtsEventType),
 
@@ -722,7 +722,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 Description = reportPackageTemplateDto.Description,
                 EffectiveDateTimeUtc = reportPackageTemplateDto.EffectiveDateTimeUtc,
                 RetirementDateTimeUtc = reportPackageTemplateDto.RetirementDateTimeUtc,
-                IsSubmissionSignatoryRequired = reportPackageTemplateDto.IsSubmissionSignatoryRequired,
+                IsSubmissionBySignatoryRequired = reportPackageTemplateDto.IsSubmissionBySignatoryRequired,
                 CtsEventTypeId = reportPackageTemplateDto.CtsEventTypeId,
                 OrganizationRegulatoryProgramId = reportPackageTemplateDto.OrganizationRegulatoryProgramId,
                 IsActive = reportPackageTemplateDto.IsActive,

@@ -1,27 +1,44 @@
-using System.Data.Entity.ModelConfiguration;
 using Linko.LinkoExchange.Core.Domain;
+using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public class ReportElementTypeMap : EntityTypeConfiguration<ReportElementType>
+    public partial class ReportElementTypeMap : EntityTypeConfiguration<ReportElementType>
     {
         public ReportElementTypeMap()
         {
             ToTable("tReportElementType");
-            HasKey(x => x.ReportElementTypeId);
-            Property(x => x.Name);
-            Property(x => x.Description);
-            Property(x => x.Content);
-            Property(x => x.CtsEventTypeId);
-            Property(x => x.ReportElementCategoryId);
-            Property(x => x.OrganizationRegulatoryProgramId);
-            Property(x => x.CreationDateTimeUtc);
-            Property(x => x.LastModificationDateTimeUtc);
-            Property(x => x.LastModifierUserId);
 
-            HasRequired(x => x.CtsEventType)
+            HasKey(x => x.ReportElementTypeId);
+
+            Property(x => x.Name).IsRequired().HasMaxLength(100);
+
+            Property(x => x.Description).IsOptional().HasMaxLength(500);
+
+            Property(x => x.Content).IsOptional().HasMaxLength(2000);
+
+            Property(x => x.IsContentProvided).IsRequired();
+
+            HasOptional(a => a.CtsEventType)
                 .WithMany()
-                .HasForeignKey(x => x.CtsEventTypeId);
+                .HasForeignKey(c => c.CtsEventTypeId)
+                .WillCascadeOnDelete(false);
+
+            HasRequired(a => a.ReportElementCategory)
+                .WithMany()
+                .HasForeignKey(c => c.ReportElementCategoryId)
+                .WillCascadeOnDelete(false);
+
+            HasRequired(a => a.OrganizationRegulatoryProgram)
+                .WithMany(b => b.ReportElementTypes)
+                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
+                .WillCascadeOnDelete(false);
+
+            Property(x => x.CreationDateTimeUtc).IsRequired();
+
+            Property(x => x.LastModificationDateTimeUtc).IsOptional();
+
+            Property(x => x.LastModifierUserId).IsOptional();
         }
     }
 }

@@ -33,5 +33,10 @@ namespace Linko.LinkoExchange.Core.Domain
         /// </summary>
         public int RecipientOrganizationRegulatoryProgramId { get; set; }
         public virtual OrganizationRegulatoryProgram RecipientOrganizationRegulatoryProgram { get; set; }
+
+        /// <summary>
+        /// True: this is a user profile reset invitation. False, otherwise.
+        /// </summary>
+        public bool IsResetInvitation { get; set; }
     }
 }
