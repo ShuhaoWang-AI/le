@@ -663,12 +663,8 @@ namespace Linko.LinkoExchange.Services.Mapping
                 IsSubmissionBySignatoryRequired = reportPackageTemplate.IsSubmissionBySignatoryRequired,
                 CtsEventTypeId = reportPackageTemplate.CtsEventTypeId,
                 CtsEventType = GetCtsEventTypeDtoFromEventType(reportPackageTemplate.CtsEventType),
-
                 OrganizationRegulatoryProgramId = reportPackageTemplate.OrganizationRegulatoryProgramId,
-
                 IsActive = reportPackageTemplate.IsActive,
-                CreationDateTimeUtc = reportPackageTemplate.CreationDateTimeUtc,
-                LastModificationDateTimeUtc = reportPackageTemplate.LastModificationDateTimeUtc,
                 LastModifierUserId = reportPackageTemplate.LastModifierUserId,
 
                 ReportPackageTemplateElementCategories = new List<ReportPackageTemplateElementCategoryDto>()
@@ -707,8 +703,6 @@ namespace Linko.LinkoExchange.Services.Mapping
                 CtsEventTypeId = reportPackageTemplateDto.CtsEventTypeId,
                 OrganizationRegulatoryProgramId = reportPackageTemplateDto.OrganizationRegulatoryProgramId,
                 IsActive = reportPackageTemplateDto.IsActive,
-                CreationDateTimeUtc = reportPackageTemplateDto.CreationDateTimeUtc,
-                LastModificationDateTimeUtc = reportPackageTemplateDto.LastModificationDateTimeUtc,
                 LastModifierUserId = reportPackageTemplateDto.LastModifierUserId,
                 CtsEventType = GetCtsEventTypeFromEventTypeDto(reportPackageTemplateDto.CtsEventType),
                 ReportPackageTemplateAssignments = new List<ReportPackageTemplateAssignment>(),

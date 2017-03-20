@@ -19,7 +19,6 @@ namespace Linko.LinkoExchange.Services.Report
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly IHttpContextService _httpContextService;
-        //private readonly IReportElementService _reportElementService;
         private readonly IMapHelper _mapHelper;
         private readonly ILogger _logger;
         private readonly UserService _userService;
@@ -214,7 +213,6 @@ namespace Linko.LinkoExchange.Services.Report
                         reportPackageTemplate.IsActive = rpt.IsActive;
                         reportPackageTemplate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                         reportPackageTemplate.LastModifierUserId = currentUserId;
-
                         reportPackageTemplate = _dbContext.ReportPackageTempates.Add(reportPackageTemplate);
                     }
 
@@ -242,9 +240,6 @@ namespace Linko.LinkoExchange.Services.Report
 
                     _dbContext.SaveChanges();
                     transaction.Commit();
-
-                    //transaction.Rollback();
-
                 }
                 catch (Exception ex)
                 {
@@ -304,6 +299,8 @@ namespace Linko.LinkoExchange.Services.Report
                     var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
                     reportElementTypeDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
                 }
+
+                reportElementTypeDtos.Add(reportElementTypeDto);
             }
 
             return reportElementTypeDtos;
@@ -348,6 +345,9 @@ namespace Linko.LinkoExchange.Services.Report
         private ReportPackageTemplateDto GetReportOneReportPackageTemplate(ReportPackageTemplate rpt)
         {
             var rptDto = _mapHelper.GetReportPackageTemplateDtoFromReportPackageTemplate(rpt);
+
+            rptDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(
+                rpt.LastModificationDateTimeUtc.HasValue ? rpt.LastModificationDateTimeUtc.Value.DateTime : rpt.CreationDateTimeUtc.DateTime, _currentOrgRegProgramId);
 
             //1. set AttachmentTypes  
             var cat = rpt.ReportPackageTemplateElementCategories
