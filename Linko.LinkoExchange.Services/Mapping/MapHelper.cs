@@ -621,14 +621,9 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             var ctsEventTypeDto = new CtsEventTypeDto
             {
+                CtsEventTypeId = ctsEventType.CtsEventTypeId,
                 Name = ctsEventType.Name,
-                Description = ctsEventType.Description,
-                CtsEventCategoryName = ctsEventType.CtsEventCategoryName,
-                OrganizationRegulatoryProgramId = ctsEventType.OrganizationRegulatoryProgramId,
-                IsRemoved = ctsEventType.IsRemoved,
-                CreationDateTimeUtc = ctsEventType.CreationDateTimeUtc,
-                LastModificationDateTimeUtc = ctsEventType.LastModificationDateTimeUtc,
-                LastModifierUserId = ctsEventType.LastModifierUserId
+                Description = ctsEventType.Description
             };
 
             return ctsEventTypeDto;
@@ -643,14 +638,9 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             var ctsEventType = new CtsEventType
             {
+                CtsEventTypeId = ctsEventTypeDto.CtsEventTypeId,
                 Name = ctsEventTypeDto.Name,
-                Description = ctsEventTypeDto.Description,
-                CtsEventCategoryName = ctsEventTypeDto.CtsEventCategoryName,
-                OrganizationRegulatoryProgramId = ctsEventTypeDto.OrganizationRegulatoryProgramId,
-                IsRemoved = ctsEventTypeDto.IsRemoved,
-                CreationDateTimeUtc = ctsEventTypeDto.CreationDateTimeUtc,
-                LastModificationDateTimeUtc = ctsEventTypeDto.LastModificationDateTimeUtc,
-                LastModifierUserId = ctsEventTypeDto.LastModifierUserId
+                Description = ctsEventTypeDto.Description
             };
 
             return ctsEventType;
