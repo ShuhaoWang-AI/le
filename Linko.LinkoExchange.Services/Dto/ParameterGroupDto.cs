@@ -11,6 +11,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public int? ParameterGroupId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public int OrganizationRegulatoryProgramId { get; set; }
         public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgram { get; set; }
         public bool IsActive { get; set; }
         public DateTime LastModificationDateTimeLocal { get; set; }

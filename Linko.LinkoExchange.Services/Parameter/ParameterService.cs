@@ -125,10 +125,18 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <param name="parameterGroup"></param>
         public void SaveParameterGroup(ParameterGroupDto parameterGroup)
         {
+            List<RuleViolation> validationIssues = new List<RuleViolation>();
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try
                 {
+                    if (string.IsNullOrEmpty(parameterGroup.Name))
+                    {
+                        string message = "Name is required.";
+                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    }
+
                     //Find existing groups with same Name (UC-33-1 7.1)
                     string proposedParamGroupName = parameterGroup.Name.Trim().ToLower();
                     var paramGroupsWithMatchingName = _dbContext.ParameterGroups
@@ -136,9 +144,8 @@ namespace Linko.LinkoExchange.Services.Parameter
                                 && param.OrganizationRegulatoryProgramId == _authOrgRegProgramId);
 
                     //Make sure there is at least 1 parameter
-                    if (parameterGroup.Parameters.Count() < 1)
+                    if (parameterGroup.Parameters == null || parameterGroup.Parameters.Count() < 1)
                     {
-                        List<RuleViolation> validationIssues = new List<RuleViolation>();
                         string message = "At least 1 parameter must be added to the group.";
                         validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                         throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
@@ -150,9 +157,8 @@ namespace Linko.LinkoExchange.Services.Parameter
                         //Ensure there are no other groups with same name
                         foreach (var paramGroupWithMatchingName in paramGroupsWithMatchingName)
                         {
-                            if (paramGroupWithMatchingName.ParameterGroupId != parameterGroup.ParameterGroupId.Value) //TODO: NotImplemented: Different ORP can have same ParameterGroupName
+                            if (paramGroupWithMatchingName.ParameterGroupId != parameterGroup.ParameterGroupId.Value)
                             {
-                                List<RuleViolation> validationIssues = new List<RuleViolation>();
                                 string message = "A Parameter Group with that name already exists.  Please select another name.";
                                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
@@ -160,7 +166,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                         }
                 
                         //Update existing
-                        paramGroupToPersist = _dbContext.ParameterGroups.Single(param => param.ParameterGroupId == parameterGroup.ParameterGroupId); // TODO: Need to update lastModificationDate and UserID
+                        paramGroupToPersist = _dbContext.ParameterGroups.Single(param => param.ParameterGroupId == parameterGroup.ParameterGroupId);
                         paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup, paramGroupToPersist);
                         paramGroupToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                         paramGroupToPersist.LastModifierUserId = _currentUserProfileId;
@@ -170,7 +176,6 @@ namespace Linko.LinkoExchange.Services.Parameter
                         //Ensure there are no other groups with same name
                         if (paramGroupsWithMatchingName.Count() > 0)
                         {
-                            List<RuleViolation> validationIssues = new List<RuleViolation>();
                             string message = "A Parameter Group with that name already exists.  Please select another name.";
                             validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                             throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);

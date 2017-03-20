@@ -24,7 +24,7 @@ namespace Linko.LinkoExchange.Test
         Mock<IHttpContextService> _httpContext;
         Mock<IOrganizationService> _orgService;
         Mock<ILogger> _logger;
-        Mock<TimeZoneService> _timeZoneService;
+        Mock<ITimeZoneService> _timeZoneService;
 
         public ParameterServiceTests()
         {
@@ -37,7 +37,7 @@ namespace Linko.LinkoExchange.Test
             _httpContext = new Mock<IHttpContextService>();
             _orgService = new Mock<IOrganizationService>();
             _logger = new Mock<ILogger>();
-            _timeZoneService = new Mock<TimeZoneService>();
+            _timeZoneService = new Mock<ITimeZoneService>();
 
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
             _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });
@@ -62,7 +62,43 @@ namespace Linko.LinkoExchange.Test
             _paramService.SaveParameterGroup(paramGroupDto);
         }
 
-      
+        /// <summary>
+        /// Must throw RuleViolationException if empty Parameter list (or null)
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(RuleViolationException))]
+        public void SaveParameterGroup_Test_Parameter_List_Is_Null()
+        {
+            var paramGroupDto = new ParameterGroupDto();
+            paramGroupDto.Name = "Some Name";
+            //paramGroupDto.Parameters = ???
+            _paramService.SaveParameterGroup(paramGroupDto);
+        }
+
+        /// <summary>
+        /// Must throw RuleViolationException if empty Parameter list (or null)
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(RuleViolationException))]
+        public void SaveParameterGroup_Test_Empty_Parameters_List()
+        {
+            var paramGroupDto = new ParameterGroupDto();
+            paramGroupDto.Name = "Some Name";
+            paramGroupDto.Parameters = new List<ParameterDto>();
+            _paramService.SaveParameterGroup(paramGroupDto);
+        }
+
+        [TestMethod]
+        public void SaveParameterGroup_Test_Valid_CreateNew()
+        {
+            var paramGroupDto = new ParameterGroupDto();
+            paramGroupDto.Name = "Some Name";
+            paramGroupDto.Parameters = new List<ParameterDto>();
+            paramGroupDto.Parameters.Add(new ParameterDto() { });
+            paramGroupDto.OrganizationRegulatoryProgramId = 1;
+            _paramService.SaveParameterGroup(paramGroupDto);
+        }
+
 
     }
 }
