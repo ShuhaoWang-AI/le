@@ -15,5 +15,15 @@ namespace Linko.LinkoExchange.Services.Parameter
         void SaveParameterGroup(ParameterGroupDto parameterGroup);
         void DeleteParameterGroup(int parameterGroupId);
 
+        //
+        //Milestone 2 Services
+        //
+
+        /// <summary>
+        /// Returns a collection of Static and Dynamic Parameter Groups
+        /// </summary>
+        /// <returns>Static and Dynamic Parameter Groups</returns>
+        IEnumerable<ParameterGroupDto> GetAllParameterGroups(int monitoringPointId);
+
     }
 }

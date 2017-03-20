@@ -67,6 +67,9 @@ namespace Linko.LinkoExchange.Data
         public virtual DbSet<ReportPackageTemplateElementType> ReportPackageTemplateElementTypes { get; set; }
         public virtual DbSet<ReportPackageTemplateElementCategory> ReportPackageTemplateElementCategories { get; set; }
 
+        public virtual DbSet<MonitoringPointParameterLimit> MonitoringPointParameterLimits { get; set; }
+        public virtual DbSet<MonitoringPoint> MonitoringPoints { get; set; }
+
         #endregion
 
 

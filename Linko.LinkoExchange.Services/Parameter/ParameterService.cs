@@ -254,5 +254,82 @@ namespace Linko.LinkoExchange.Services.Parameter
 
         }
 
+        public IEnumerable<ParameterGroupDto> GetAllParameterGroups(int monitoringPointId)
+        {
+            string monitoringPointAbbrv = _dbContext.MonitoringPoints
+                                        .Single(mp => mp.MonitoringPointId == monitoringPointId).Name; //TO-DO: Is this the same as Abbreviation? Or do we take Id?
+            //Static Groups
+            var parameterGroupDtos = new List<ParameterGroupDto>();
+            parameterGroupDtos = this.GetStaticParameterGroups().ToList();
+
+            //Add Dyanamic Groups
+            var uniqueNonNullFrequencies = _dbContext.MonitoringPointParameterLimits
+                .Where(x => !string.IsNullOrEmpty(x.IUSampleFrequency) && x.IsRemoved == false)
+                .Select(x => x.IUSampleFrequency)
+                .Distinct();
+
+            var uniqueCollectionMethods = _dbContext.MonitoringPointParameterLimits
+                .Include(x => x.CollectionMethod)
+                .Where(x => x.IsRemoved == false && x.CollectionMethod.IsRemoved == false)
+                .Select(x => x.CollectionMethod.Name)
+                .Distinct();
+
+            foreach (var collectMethod in uniqueCollectionMethods)
+            {
+                foreach (var freq in uniqueNonNullFrequencies)
+                {
+                    //Add "<Frequency> + <Collection Method>" Groups
+                    var dynamicFreqAndCollectMethodParamGroup = new ParameterGroupDto();
+                    dynamicFreqAndCollectMethodParamGroup.Name = $"{freq} {collectMethod}";
+                    dynamicFreqAndCollectMethodParamGroup.Description = $"All {freq} {collectMethod} parameters for Monitoring Point {monitoringPointAbbrv}";
+                    dynamicFreqAndCollectMethodParamGroup.Parameters = new List<ParameterDto>();
+
+                    //Add Parameters
+                    var freqCollectParams = _dbContext.MonitoringPointParameterLimits
+                                        .Include(p => p.Parameter)
+                                        .Where(p => p.IUSampleFrequency == freq 
+                                            && p.CollectionMethod.Name == collectMethod
+                                            && p.IsRemoved == false
+                                            && p.CollectionMethod.IsRemoved == false);
+
+                    foreach (var mpParamLimit in freqCollectParams)
+                    {
+                        var param = _mapHelper.GetParameterDtoFromParameter(mpParamLimit.Parameter);
+
+                        //TO-DO: Set concentration, mass loading, default units
+
+                        dynamicFreqAndCollectMethodParamGroup.Parameters.Add(param);
+                    }
+                    parameterGroupDtos.Add(dynamicFreqAndCollectMethodParamGroup);
+                }
+
+                //Add All "<Collection Method>" Groups
+                var dynamicAllCollectMethodParamGroup = new ParameterGroupDto();
+                dynamicAllCollectMethodParamGroup.Name = $"All {collectMethod}'s";
+                dynamicAllCollectMethodParamGroup.Description = $"All {collectMethod} parameters for Monitoring Point {monitoringPointAbbrv}";
+                dynamicAllCollectMethodParamGroup.Parameters = new List<ParameterDto>();
+
+                //Add Parameters
+                var collectParams = _dbContext.MonitoringPointParameterLimits
+                                       .Include(p => p.Parameter)
+                                       .Where(p => p.CollectionMethod.Name == collectMethod 
+                                            && p.IsRemoved == false 
+                                            && p.CollectionMethod.IsRemoved == false);
+
+                foreach (var mpParamLimit in collectParams)
+                {
+                    var param = _mapHelper.GetParameterDtoFromParameter(mpParamLimit.Parameter);
+
+                    //TO-DO: Set concentration, mass loading, default units
+
+                    dynamicAllCollectMethodParamGroup.Parameters.Add(param);
+                }
+                parameterGroupDtos.Add(dynamicAllCollectMethodParamGroup);
+
+            }
+
+            return parameterGroupDtos;
+        }
+
     }
 }
