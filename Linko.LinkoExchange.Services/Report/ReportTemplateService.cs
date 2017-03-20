@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
@@ -130,11 +131,49 @@ namespace Linko.LinkoExchange.Services.Report
         {
             using (var transaction = _dbContext.BeginTransaction())
             {
+                List<RuleViolation> validationIssues = new List<RuleViolation>();
+
                 try
                 {
                     var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
                     var currentRegulatoryProgramId =
                         int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+                    //// Check report template name and effective date  
+                    if (string.IsNullOrEmpty(rpt.Name.Trim()))
+                    {
+                        string message = "Name is required.";
+                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    }
+
+                    if (rpt.EffectiveDateTimeUtc == DateTimeOffset.MinValue)
+                    {
+                        string message = "EffectiveDateTimeUtc is required.";
+                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    }
+
+                    //// Check if Name and EffectiveDateTimeUtc combination is unique or not 
+                    var testRpt = _dbContext.ReportPackageTempates
+                        .FirstOrDefault(i => i.EffectiveDateTimeUtc == rpt.EffectiveDateTimeUtc &&
+                                  i.Name == rpt.Name &&
+                                  i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
+
+                    if (testRpt != null)
+                    {
+                        //// Creating a new report package template.
+                        //// Or Updating the existing one, but testRpt is another one.
+                        if (rpt.ReportPackageTemplateId.HasValue == false || testRpt.ReportPackageTemplateId != rpt.ReportPackageTemplateId.Value)
+                        {
+                            string message =
+                                "A Template with that Name already exists for this Effective Date.  Select another name or effective date";
+                            validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null,
+                                errorMessage: message));
+                            throw new RuleViolationException(message: "Validation errors",
+                                validationIssues: validationIssues);
+                        }
+                    }
 
                     var reportPackageTemplate = _mapHelper.GetReportPackageTemplateFromReportPackageTemplateDto(rpt);
 
