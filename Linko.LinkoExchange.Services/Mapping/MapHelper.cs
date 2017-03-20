@@ -250,8 +250,8 @@ namespace Linko.LinkoExchange.Services.Mapping
             {
                 dto = new SettingDto();
             }
-            dto.TemplateName = (SettingType) Enum.Parse(typeof(SettingType), setting.SettingTemplate.Name);
-            dto.OrgTypeName = (OrganizationTypeName) Enum.Parse(typeof(OrganizationTypeName), setting.OrganizationRegulatoryProgram.Organization.OrganizationType.Name);
+            dto.TemplateName = (SettingType)Enum.Parse(typeof(SettingType), setting.SettingTemplate.Name);
+            dto.OrgTypeName = (OrganizationTypeName)Enum.Parse(typeof(OrganizationTypeName), setting.OrganizationRegulatoryProgram.Organization.OrganizationType.Name);
             dto.Value = setting.Value;
             dto.DefaultValue = setting.SettingTemplate.DefaultValue;
             return dto;
@@ -263,8 +263,8 @@ namespace Linko.LinkoExchange.Services.Mapping
             {
                 dto = new SettingDto();
             }
-            dto.TemplateName = (SettingType) Enum.Parse(typeof(SettingType), setting.SettingTemplate.Name);
-            dto.OrgTypeName = (OrganizationTypeName) Enum.Parse(typeof(OrganizationTypeName), setting.SettingTemplate.OrganizationType.Name);
+            dto.TemplateName = (SettingType)Enum.Parse(typeof(SettingType), setting.SettingTemplate.Name);
+            dto.OrgTypeName = (OrganizationTypeName)Enum.Parse(typeof(OrganizationTypeName), setting.SettingTemplate.OrganizationType.Name);
             dto.Value = setting.Value;
             dto.DefaultValue = setting.SettingTemplate.DefaultValue;
             return dto;
@@ -586,13 +586,13 @@ namespace Linko.LinkoExchange.Services.Mapping
                 SortOrder = cat.SortOrder
             };
 
-            var rptetps = new List<ReportPackageTemplateElementType>();
-            foreach (var rptetDto in cat.ReportPackageTemplateElementTypes)
-            {
-                rptetps.Add(this.GetReportPackageTemplateElememtTypeFromReportPackageTemplateElementTypeDto(rptetDto));
-            }
+            //var rptetps = new List<ReportPackageTemplateElementType>();
+            //foreach (var rptetDto in cat.ReportPackageTemplateElementTypes)
+            //{
+            //    rptetps.Add(this.GetReportPackageTemplateElememtTypeFromReportPackageTemplateElementTypeDto(rptetDto));
+            //}
 
-            reportPackageTemplateElementCategory.ReportPackageTemplateElementTypes = rptetps;
+            //reportPackageTemplateElementCategory.ReportPackageTemplateElementTypes = rptetps;
 
             return reportPackageTemplateElementCategory;
         }

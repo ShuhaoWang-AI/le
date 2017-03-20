@@ -111,6 +111,7 @@ namespace Linko.LinkoExchange.Services.Report
             var rpts =
                 _dbContext.ReportPackageTempates.Where(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId)
                     .Include(i => i.ReportPackageTemplateElementCategories)
+                    .Distinct()
                     .ToArray();
 
             return rpts.Select(GetReportOneReportPackageTemplate).ToList();
@@ -223,16 +224,27 @@ namespace Linko.LinkoExchange.Services.Report
                         _dbContext.ReportPackageTemplateAssignments.Add(assignment);
                     }
 
-                    // 3 AttachmentType   
-                    var attachmentTypes = rpt.AttachmentTypes.ToArray();
-                    CreateReportPackageElementCatergoryType(attachmentTypes, reportPackageTemplate, false);
+                    _dbContext.SaveChanges();
 
-                    // 4 CertificationType 
-                    var certificationTypes = rpt.CertificationTypes.ToArray();
-                    CreateReportPackageElementCatergoryType(certificationTypes, reportPackageTemplate, true);
+                    // 3 AttachmentType   
+                    if (rpt.AttachmentTypes != null && rpt.AttachmentTypes.Count > 0)
+                    {
+                        var attachmentTypes = rpt.AttachmentTypes.ToArray();
+                        CreateReportPackageElementCatergoryType(attachmentTypes, reportPackageTemplate, false);
+                    }
+
+                    // 4 CertificationType  
+                    if (rpt.CertificationTypes != null && rpt.CertificationTypes.Count > 0)
+                    {
+                        var certificationTypes = rpt.CertificationTypes.ToArray();
+                        CreateReportPackageElementCatergoryType(certificationTypes, reportPackageTemplate, true);
+                    }
 
                     _dbContext.SaveChanges();
                     transaction.Commit();
+
+                    //transaction.Rollback();
+
                 }
                 catch (Exception ex)
                 {
@@ -297,24 +309,26 @@ namespace Linko.LinkoExchange.Services.Report
             return reportElementTypeDtos;
         }
 
-        private void CreateReportPackageElementCatergoryType(IEnumerable<ReportElementTypeDto> reportElementTypeDtos,
+        private void CreateReportPackageElementCatergoryType(ReportElementTypeDto[] reportElementTypeDtos,
             ReportPackageTemplate reportPackageTemplate, bool setOrder)
         {
+            // Step 1, Save to tReportPackageTemplateElementCategory table
+            var reportElementCategoryId = reportElementTypeDtos[0].ReportElementCategoryId;
+            var rptec = new ReportPackageTemplateElementCategory
+            {
+                ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId,
+                ReportElementCategoryId = reportElementCategoryId,
+                SortOrder = setOrder
+            };
+
+            rptec = _dbContext.ReportPackageTemplateElementCategories.Add(rptec);
+            // Save changes to get Id; 
+            _dbContext.SaveChanges();
+            var rptecId = rptec.ReportPackageTemplateElementCategoryId;
+
             foreach (var elementTypeDto in reportElementTypeDtos)
             {
-                var reportElementCategoryId = elementTypeDto.ReportElementCategoryId;
-                var rptec = new ReportPackageTemplateElementCategory
-                {
-                    ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId,
-                    ReportElementCategoryId = reportElementCategoryId,
-                    SortOrder = setOrder
-                };
-
-                rptec = _dbContext.ReportPackageTemplateElementCategories.Add(rptec);
-
                 // Go Step 2,  Save to table tReportPackageTemplateElementType 
-                var rptecId = rptec.ReportPackageTemplateElementCategoryId;
-
                 if (elementTypeDto.ReportElementTypeId.HasValue == false)
                 {
                     throw new Exception("Invalid ReportElementType");
@@ -327,6 +341,7 @@ namespace Linko.LinkoExchange.Services.Report
                 };
 
                 _dbContext.ReportPackageTemplateElementTypes.Add(rptet);
+                _dbContext.SaveChanges();
             }
         }
 
@@ -353,7 +368,6 @@ namespace Linko.LinkoExchange.Services.Report
                     }
                     rptDto.AttachmentTypes.Add(retDto);
                 }
-
             }
 
             //2. set certifications   
@@ -365,6 +379,10 @@ namespace Linko.LinkoExchange.Services.Report
             if (cat != null)
             {
                 var rets = GetReportElementType(cat);
+
+                //rptDto.CertificationTypes =
+                //    rets.Select(i => _mapHelper.GetReportElementTypeDtoFromReportElementType(i)).Distinct().ToList();
+
                 foreach (var ret in rets)
                 {
                     var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(ret);
@@ -374,7 +392,8 @@ namespace Linko.LinkoExchange.Services.Report
                         var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
                         retDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
                     }
-                    rptDto.AttachmentTypes.Add(retDto);
+
+                    rptDto.CertificationTypes.Add(retDto);
                 }
             }
 
@@ -397,9 +416,10 @@ namespace Linko.LinkoExchange.Services.Report
                     i =>
                         i.ReportPackageTemplateElementCategoryId ==
                         cat.ReportPackageTemplateElementCategoryId)
+                .Distinct()
                 .ToList();
 
-            var rets = rptets.Select(i => i.ReportElementType);
+            var rets = rptets.Select(i => i.ReportElementType).Distinct();
             foreach (var ret in rets)
             {
                 ret.CtsEventType =
@@ -413,7 +433,13 @@ namespace Linko.LinkoExchange.Services.Report
         {
             foreach (var assignment in reportPackageTemplateAssignments)
             {
-                _dbContext.ReportPackageTemplateAssignments.Remove(assignment);
+                var temp = _dbContext.ReportPackageTemplateAssignments.Single(
+                        i => i.ReportPackageTemplateAssignmentId == assignment.ReportPackageTemplateAssignmentId);
+
+                if (temp != null)
+                {
+                    _dbContext.ReportPackageTemplateAssignments.Remove(temp);
+                }
             }
         }
 
@@ -435,7 +461,11 @@ namespace Linko.LinkoExchange.Services.Report
                 }
 
                 // Step 2.2
-                _dbContext.ReportPackageTemplateElementCategories.Remove(rptec);
+                var temp =
+                    _dbContext.ReportPackageTemplateElementCategories.Single(
+                        i => i.ReportPackageTemplateElementCategoryId == rptec.ReportPackageTemplateElementCategoryId);
+
+                _dbContext.ReportPackageTemplateElementCategories.Remove(temp);
             }
         }
 

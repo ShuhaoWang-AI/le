@@ -23,8 +23,35 @@ namespace Linko.LinkoExchange.Web.Controllers
         // GET: ReprotPackage 
         public JsonResult Index()
         {
-            var list = _reportTemplateService.GetReportPackageTemplates();
-            return Json(list, JsonRequestBehavior.AllowGet);
+            var templatesList = _reportTemplateService.GetReportPackageTemplates().ToList();
+
+            foreach (var rpt in templatesList)
+            {
+                rpt.Name += "_";
+                rpt.Description += "_";
+            }
+
+            return Json(templatesList, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Testing Update
+        /// </summary>
+        /// <returns></returns>
+        public JsonResult Update()
+        {
+            var templatesList = _reportTemplateService.GetReportPackageTemplates().ToList();
+
+            foreach (var rpt in templatesList)
+            {
+                rpt.Name += "_";
+                rpt.Description += "_";
+            }
+            _reportTemplateService.SaveReportPackageTemplate(templatesList[0]);
+
+            templatesList = _reportTemplateService.GetReportPackageTemplates().ToList();
+
+            return Json(templatesList, JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult AttachmentTypes()
