@@ -119,6 +119,8 @@
     <Compile Include="EmailServiceTests.cs" />
     <Compile Include="InvitationServiceTests.cs" />
     <Compile Include="ProgramServiceTests.cs" />
+    <Compile Include="ParameterServiceTests.cs" />
+    <Compile Include="ReportElementServiceTests.cs" />
     <Compile Include="TimeZoneServiceTests.cs" />
     <Compile Include="JurisdictionTests.cs" />
     <Compile Include="PermissionGroupTests.cs" />

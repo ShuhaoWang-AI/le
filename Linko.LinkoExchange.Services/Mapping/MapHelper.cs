@@ -430,9 +430,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             paramDto.TrcFactor = parameter.TrcFactor;
             paramDto.OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(parameter.OrganizationRegulatoryProgram);
             paramDto.IsRemoved = parameter.IsRemoved;
-            paramDto.CreationDateTimeUtc = parameter.CreationDateTimeUtc;
-            paramDto.LastModificationDateTimeUtc = parameter.LastModificationDateTimeUtc;
-            paramDto.LastModifierUserId = parameter.LastModifierUserId;
 
             return paramDto;
         }
@@ -445,9 +442,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             paramGroupDto.Description = parameterGroup.Description;
             paramGroupDto.OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(parameterGroup.OrganizationRegulatoryProgram);
             paramGroupDto.IsActive = parameterGroup.IsActive;
-            paramGroupDto.CreationDateTimeUtc = parameterGroup.CreationDateTimeUtc;
-            paramGroupDto.LastModificationDateTimeUtc = parameterGroup.LastModificationDateTimeUtc;
-            paramGroupDto.LastModifierUserId = parameterGroup.LastModifierUserId;
 
             paramGroupDto.Parameters = new List<ParameterDto>();
             foreach (var paramAssocation in parameterGroup.ParameterGroupParameters)
@@ -464,7 +458,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             if (parameterGroup == null)
             {
                 parameterGroup = new ParameterGroup();
-                parameterGroup.CreationDateTimeUtc = parameterGroupDto.CreationDateTimeUtc;
             }
             else
             {
@@ -472,7 +465,6 @@ namespace Linko.LinkoExchange.Services.Mapping
                 {
                     parameterGroup.ParameterGroupParameters.Clear();
                 }
-                parameterGroup.LastModificationDateTimeUtc = parameterGroupDto.LastModificationDateTimeUtc;
             }
 
             //TO-DO: make sure the right properties are being set
@@ -480,7 +472,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             parameterGroup.Description = parameterGroupDto.Description;
             //OrganizationRegulatoryProgramId
             parameterGroup.IsActive = parameterGroupDto.IsActive;
-            parameterGroup.LastModifierUserId = parameterGroupDto.LastModifierUserId;
             parameterGroup.ParameterGroupParameters = new List<ParameterGroupParameter>();
             foreach (var param in parameterGroupDto.Parameters)
             {
@@ -783,9 +774,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             {
                 mappedReportElementType.OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(reportElementType.OrganizationRegulatoryProgram);
             }
-            mappedReportElementType.CreationDateTimeUtc = reportElementType.CreationDateTimeUtc;
-            mappedReportElementType.LastModificationDateTimeUtc = reportElementType.LastModificationDateTimeUtc;
-            mappedReportElementType.LastModifierUserId = reportElementType.LastModifierUserId;
             return mappedReportElementType;
         }
 
@@ -806,9 +794,9 @@ namespace Linko.LinkoExchange.Services.Mapping
             //IGNORE reportElementType.ReportElementCategory
             reportElementType.OrganizationRegulatoryProgramId = reportElementTypeDto.OrganizationRegulatoryProgramId;
             //IGNORE reportElementType.OrganizationRegulatoryProgram
-            reportElementType.CreationDateTimeUtc = reportElementTypeDto.CreationDateTimeUtc;
-            reportElementType.LastModificationDateTimeUtc = reportElementTypeDto.LastModificationDateTimeUtc;
-            reportElementType.LastModifierUserId = reportElementTypeDto.LastModifierUserId;
+            //IGNORE reportElementType.CreationDateTimeUtc
+            //IGNORE reportElementType.LastModificationDateTimeUtc
+            //IGNORE reportElementType.LastModifierUserId
 
             return reportElementType;
         }

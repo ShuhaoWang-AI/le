@@ -11,6 +11,7 @@ namespace Linko.LinkoExchange.Core.Domain
     /// </summary>
     public class MonitoringPointParameterLimit
     {
+        public int MonitoringPointParameterLimitId { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
         public int MonitoringPointId { get; set; }
         public virtual MonitoringPoint MonitoringPoint { get; set; }

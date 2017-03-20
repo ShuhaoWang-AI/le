@@ -15,8 +15,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public double? TrcFactor { get; set; }
         public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgram { get; set; }
         public bool IsRemoved { get; set; }
-        public DateTimeOffset CreationDateTimeUtc { get; set; }
-        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
-        public int? LastModifierUserId { get; set; }
+        public DateTime LastModificationDateTimeLocal { get; set; }
+        public string LastModifierFullName { get; set; }
     }
 }

@@ -23,7 +23,8 @@ namespace Linko.LinkoExchange.Services.Parameter
         private readonly ILogger _logger;
         private readonly ITimeZoneService _timeZoneService;
 
-        private int _orgRegProgramId;
+        private int _authOrgRegProgramId;
+        private int _currentOrgRegProgramId;
         private int _currentUserProfileId;
 
         public ParameterService(LinkoExchangeContext dbContext,
@@ -35,7 +36,8 @@ namespace Linko.LinkoExchange.Services.Parameter
         {
             _dbContext = dbContext;
             _mapHelper = mapHelper;
-            _orgRegProgramId = orgService.GetAuthority(int.Parse(httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
+            _authOrgRegProgramId = orgService.GetAuthority(int.Parse(httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
+            _currentOrgRegProgramId = int.Parse(httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             _currentUserProfileId = int.Parse(httpContext.GetClaimValue(CacheKey.UserProfileId));
             _logger = logger;
             _timeZoneService = timeZoneService;
@@ -49,7 +51,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         {
             var parameterDtos = new List<ParameterDto>();
             var foundParams = _dbContext.Parameters
-                .Where(param => param.OrganizationRegulatoryProgramId == _orgRegProgramId); // need to find authority OrganizationRegulatoryProgramId
+                .Where(param => param.OrganizationRegulatoryProgramId == _authOrgRegProgramId); // need to find authority OrganizationRegulatoryProgramId
 
             if (!string.IsNullOrEmpty(startsWith))
             {
@@ -59,6 +61,9 @@ namespace Linko.LinkoExchange.Services.Parameter
             foreach (var parameter in foundParams)
             {
                 var dto = _mapHelper.GetParameterDtoFromParameter(parameter);
+                dto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(parameter.LastModificationDateTimeUtc.Value.DateTime, _currentOrgRegProgramId);
+                var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == parameter.LastModifierUserId);
+                dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
                 parameterDtos.Add(dto);
             }
             return parameterDtos;
@@ -74,14 +79,16 @@ namespace Linko.LinkoExchange.Services.Parameter
             var parameterGroupDtos = new List<ParameterGroupDto>();
             var foundParamGroups = _dbContext.ParameterGroups
                 .Include(param => param.ParameterGroupParameters)
-                .Where(param => param.OrganizationRegulatoryProgramId == _orgRegProgramId)
+                .Where(param => param.OrganizationRegulatoryProgramId == _authOrgRegProgramId)
                 .ToList();
             foreach (var paramGroup in foundParamGroups)
             {
                 var dto = _mapHelper.GetParameterGroupDtoFromParameterGroup(paramGroup);
 
                 //Set LastModificationDateTimeLocal
-                dto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(dto.LastModificationDateTimeUtc.Value.DateTime, _orgRegProgramId);
+                dto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(paramGroup.LastModificationDateTimeUtc.Value.DateTime, _currentOrgRegProgramId);
+                var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == paramGroup.LastModifierUserId);
+                dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
 
                 parameterGroupDtos.Add(dto);
             }
@@ -103,7 +110,10 @@ namespace Linko.LinkoExchange.Services.Parameter
             var parameterGroupDto = _mapHelper.GetParameterGroupDtoFromParameterGroup(foundParamGroup);
             
             //Set LastModificationDateTimeLocal
-            parameterGroupDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(parameterGroupDto.LastModificationDateTimeUtc.Value.DateTime, _orgRegProgramId);
+            parameterGroupDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(foundParamGroup.LastModificationDateTimeUtc.Value.DateTime, _currentOrgRegProgramId);
+            var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == foundParamGroup.LastModifierUserId);
+            parameterGroupDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+
 
             return parameterGroupDto;
         }
@@ -123,7 +133,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                     string proposedParamGroupName = parameterGroup.Name.Trim().ToLower();
                     var paramGroupsWithMatchingName = _dbContext.ParameterGroups
                         .Where(param => param.Name.Trim().ToLower() == proposedParamGroupName
-                                && param.OrganizationRegulatoryProgramId == _orgRegProgramId);
+                                && param.OrganizationRegulatoryProgramId == _authOrgRegProgramId);
 
                     //Make sure there is at least 1 parameter
                     if (parameterGroup.Parameters.Count() < 1)
@@ -151,9 +161,9 @@ namespace Linko.LinkoExchange.Services.Parameter
                 
                         //Update existing
                         paramGroupToPersist = _dbContext.ParameterGroups.Single(param => param.ParameterGroupId == parameterGroup.ParameterGroupId); // TODO: Need to update lastModificationDate and UserID
+                        paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup, paramGroupToPersist);
                         paramGroupToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                         paramGroupToPersist.LastModifierUserId = _currentUserProfileId;
-                        paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup, paramGroupToPersist);
                     }
                     else
                     {
@@ -167,10 +177,10 @@ namespace Linko.LinkoExchange.Services.Parameter
                         }
 
                         //Get new
+                        paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup);
                         paramGroupToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
                         paramGroupToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                         paramGroupToPersist.LastModifierUserId = _currentUserProfileId;
-                        paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup);
                         _dbContext.ParameterGroups.Add(paramGroupToPersist);
                     }
 

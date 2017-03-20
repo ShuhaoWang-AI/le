@@ -1684,9 +1684,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 Name = vm.Name,
                 Description = vm.Description,
                 IsActive = vm.IsActive,
-                CreationDateTime = vm.CreationDateTimeUtc,
-                LastModificationDateTime =  vm.LastModificationDateTimeUtc,
-                LastModifierUserName = vm.LastModifierUserId.HasValue ?  _userService.GetUserProfileById(vm.LastModifierUserId.Value).FullName : ""
+                LastModificationDateTime =  vm.LastModificationDateTimeLocal,
+                LastModifierUserName = vm.LastModifierFullName
             });
 
             DataSourceResult result = viewModels.ToDataSourceResult(request, vm => new

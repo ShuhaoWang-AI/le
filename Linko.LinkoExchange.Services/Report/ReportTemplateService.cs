@@ -11,6 +11,7 @@ using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.User;
 using NLog;
+using Linko.LinkoExchange.Services.TimeZone;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -22,19 +23,26 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly IMapHelper _mapHelper;
         private readonly ILogger _logger;
         private readonly UserService _userService;
+        private readonly ITimeZoneService _timeZoneService;
+
+        private int _currentOrgRegProgramId;
 
         public ReportTemplateService(
             LinkoExchangeContext dbContext,
             IHttpContextService httpContextService,
             UserService userService,
             IMapHelper mapHelper,
-            ILogger logger)
+            ILogger logger,
+            ITimeZoneService timeZoneService)
         {
             _dbContext = dbContext;
             _httpContextService = httpContextService;
             _mapHelper = mapHelper;
             _logger = logger;
             _userService = userService;
+            _timeZoneService = timeZoneService;
+
+            _currentOrgRegProgramId = int.Parse(httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
         }
 
         /// <summary>
@@ -266,24 +274,27 @@ namespace Linko.LinkoExchange.Services.Report
             var currentRegulatoryProgramId =
                 int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
-            var reprotElementTypes = _dbContext.ReportElementTypes.Where(
+            var reportElementTypes = _dbContext.ReportElementTypes.Where(
                     i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId &&
                          i.ReportElementCategory.Name == categoryName
                 )
-                .Select(_mapHelper.GetReportElementTypeDtoFromReportElementType)
+                //.Select(_mapHelper.GetReportElementTypeDtoFromReportElementType)
                 .ToList();
 
-            foreach (var rpt in reprotElementTypes)
+            var reportElementTypeDtos = new List<ReportElementTypeDto>();
+
+            foreach (var rpt in reportElementTypes)
             {
+                var reportElementTypeDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(rpt);
                 if (rpt.LastModifierUserId.HasValue)
                 {
-                    rpt.LastModifierUser =
-                        _mapHelper.GetUserDtoFromUserProfile(
-                            _dbContext.Users.FirstOrDefault(i => i.UserProfileId == rpt.LastModifierUserId.Value));
+                    reportElementTypeDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(rpt.LastModificationDateTimeUtc.Value.DateTime, _currentOrgRegProgramId);
+                    var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
+                    reportElementTypeDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
                 }
             }
 
-            return reprotElementTypes;
+            return reportElementTypeDtos;
         }
 
         private void CreateReportPackageElementCatergoryType(IEnumerable<ReportElementTypeDto> reportElementTypeDtos,
@@ -327,12 +338,22 @@ namespace Linko.LinkoExchange.Services.Report
             var cat = rpt.ReportPackageTemplateElementCategories
                 .FirstOrDefault(i => i.ReportElementCategory.Name == ReportElementCategoryName.Attachments.ToString());
 
+            rptDto.AttachmentTypes = new List<Dto.ReportElementTypeDto>();
             if (cat != null)
             {
                 var rets = GetReportElementType(cat);
+                foreach (var ret in rets)
+                {
+                    var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(ret);
+                    if (ret.LastModifierUserId.HasValue)
+                    {
+                        retDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(ret.LastModificationDateTimeUtc.Value.DateTime, _currentOrgRegProgramId);
+                        var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
+                        retDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+                    }
+                    rptDto.AttachmentTypes.Add(retDto);
+                }
 
-                rptDto.AttachmentTypes =
-                    rets.Select(i => _mapHelper.GetReportElementTypeDtoFromReportElementType(i)).ToList();
             }
 
             //2. set certifications   
@@ -340,12 +361,21 @@ namespace Linko.LinkoExchange.Services.Report
                 .FirstOrDefault(
                     i => i.ReportElementCategory.Name == ReportElementCategoryName.Certifications.ToString());
 
+            rptDto.CertificationTypes = new List<Dto.ReportElementTypeDto>();
             if (cat != null)
             {
                 var rets = GetReportElementType(cat);
-
-                rptDto.CertificationTypes =
-                    rets.Select(i => _mapHelper.GetReportElementTypeDtoFromReportElementType(i)).ToList();
+                foreach (var ret in rets)
+                {
+                    var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(ret);
+                    if (ret.LastModifierUserId.HasValue)
+                    {
+                        retDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(ret.LastModificationDateTimeUtc.Value.DateTime, _currentOrgRegProgramId);
+                        var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
+                        retDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+                    }
+                    rptDto.AttachmentTypes.Add(retDto);
+                }
             }
 
             //3. set assingedIndustries  

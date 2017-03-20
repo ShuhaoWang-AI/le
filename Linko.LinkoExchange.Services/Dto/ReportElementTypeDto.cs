@@ -19,9 +19,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public ReportElementCategoryDto ReportElementCategory { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
         public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgram { get; set; }
-        public DateTimeOffset CreationDateTimeUtc { get; set; }
-        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
-        public int? LastModifierUserId { get; set; }
-        public UserDto LastModifierUser { get; set; }
+        public DateTime LastModificationDateTimeLocal { get; set; }
+        public string LastModifierFullName { get; set; }
     }
 }
