@@ -399,13 +399,10 @@ namespace Linko.LinkoExchange.Services.Report
 
             //3. set assingedIndustries  
             rptDto.ReportPackageTemplateAssignments = rptDto.ReportPackageTemplateAssignments;
-
-            //// TODO ?
-            //// Do I need to call the service to popute OrgRegProg    
-
             if (rpt.LastModifierUserId.HasValue)
             {
-                rptDto.LastModifierUserDto = _userService.GetUserProfileById(rpt.LastModifierUserId.Value);
+                var lastModifierUser = _userService.GetUserProfileById(rpt.LastModifierUserId.Value);
+                rptDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
             }
             return rptDto;
         }

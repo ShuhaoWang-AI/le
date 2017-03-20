@@ -19,7 +19,8 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTimeOffset CreationDateTimeUtc { get; set; }
         public DateTimeOffset LastModificationDateTimeUtc { get; set; }
         public int? LastModifierUserId { get; set; }
-        public UserDto LastModifierUserDto { get; set; }
+        public string LastModifierFullName { get; set; }
+
         public List<ReportElementTypeDto> AttachmentTypes { get; set; }
         public List<ReportElementTypeDto> CertificationTypes { get; set; }
         public List<ReportPackageTemplateAssignmentDto> ReportPackageTemplateAssignments { get; set; }
