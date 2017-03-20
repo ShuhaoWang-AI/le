@@ -66,7 +66,7 @@ namespace Linko.LinkoExchange.Services.Report
                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
             }
-            if (reportElementType.ReportElementCategory.Name == ReportElementCategoryName.Certification.ToString() 
+            if (reportElementType.ReportElementCategory.Name == ReportElementCategoryName.Certifications.ToString() 
                 && string.IsNullOrEmpty(reportElementType.Content.Trim()))
             {
                 string message = "Certification Text is required.";

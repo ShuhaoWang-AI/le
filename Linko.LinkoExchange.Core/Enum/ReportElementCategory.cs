@@ -2,10 +2,8 @@
 {
     public enum ReportElementCategoryName
     {
-        Attachment,
-        Certification,
-        TTO,
-        Comment,
-        Sample
+        Attachments,
+        Certifications,
+        SamplesAndResults
     }
 }

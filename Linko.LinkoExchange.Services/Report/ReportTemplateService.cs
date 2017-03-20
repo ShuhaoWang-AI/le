@@ -251,12 +251,12 @@ namespace Linko.LinkoExchange.Services.Report
 
         public IEnumerable<ReportElementTypeDto> GetCertificationTypes()
         {
-            return ReportElementTypeDtos(ReportElementCategoryName.Certification.ToString());
+            return ReportElementTypeDtos(ReportElementCategoryName.Certifications.ToString());
         }
 
         public IEnumerable<ReportElementTypeDto> GetAttachmentTypes()
         {
-            return ReportElementTypeDtos(ReportElementCategoryName.Attachment.ToString());
+            return ReportElementTypeDtos(ReportElementCategoryName.Attachments.ToString());
         }
 
         #region private section
@@ -325,7 +325,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             //1. set AttachmentTypes  
             var cat = rpt.ReportPackageTemplateElementCategories
-                .FirstOrDefault(i => i.ReportElementCategory.Name == ReportElementCategoryName.Attachment.ToString());
+                .FirstOrDefault(i => i.ReportElementCategory.Name == ReportElementCategoryName.Attachments.ToString());
 
             if (cat != null)
             {
@@ -338,7 +338,7 @@ namespace Linko.LinkoExchange.Services.Report
             //2. set certifications   
             cat = rpt.ReportPackageTemplateElementCategories
                 .FirstOrDefault(
-                    i => i.ReportElementCategory.Name == ReportElementCategoryName.Certification.ToString());
+                    i => i.ReportElementCategory.Name == ReportElementCategoryName.Certifications.ToString());
 
             if (cat != null)
             {
