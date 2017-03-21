@@ -443,7 +443,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             paramGroupDto.ParameterGroupId = parameterGroup.ParameterGroupId;
             paramGroupDto.Name = parameterGroup.Name;
             paramGroupDto.Description = parameterGroup.Description;
-            paramGroupDto.OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(parameterGroup.OrganizationRegulatoryProgram);
+            paramGroupDto.OrganizationRegulatoryProgramId = parameterGroup.OrganizationRegulatoryProgramId;
             paramGroupDto.IsActive = parameterGroup.IsActive;
 
             paramGroupDto.Parameters = new List<ParameterDto>();
