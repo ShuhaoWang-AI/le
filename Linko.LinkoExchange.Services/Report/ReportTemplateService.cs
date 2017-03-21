@@ -24,8 +24,6 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly UserService _userService;
         private readonly ITimeZoneService _timeZoneService;
 
-        private int _currentOrgRegProgramId;
-
         public ReportTemplateService(
             LinkoExchangeContext dbContext,
             IHttpContextService httpContextService,
@@ -40,8 +38,6 @@ namespace Linko.LinkoExchange.Services.Report
             _logger = logger;
             _userService = userService;
             _timeZoneService = timeZoneService;
-
-            _currentOrgRegProgramId = int.Parse(httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
         }
 
         /// <summary>
@@ -278,6 +274,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         private IEnumerable<ReportElementTypeDto> ReportElementTypeDtos(string categoryName)
         {
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var currentRegulatoryProgramId =
                 int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
@@ -295,7 +292,7 @@ namespace Linko.LinkoExchange.Services.Report
                 var reportElementTypeDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(rpt);
                 if (rpt.LastModifierUserId.HasValue)
                 {
-                    reportElementTypeDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(rpt.LastModificationDateTimeUtc.Value.DateTime, _currentOrgRegProgramId);
+                    reportElementTypeDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(rpt.LastModificationDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
                     var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
                     reportElementTypeDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
                 }
@@ -344,10 +341,11 @@ namespace Linko.LinkoExchange.Services.Report
 
         private ReportPackageTemplateDto GetReportOneReportPackageTemplate(ReportPackageTemplate rpt)
         {
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var rptDto = _mapHelper.GetReportPackageTemplateDtoFromReportPackageTemplate(rpt);
 
             rptDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(
-                rpt.LastModificationDateTimeUtc.HasValue ? rpt.LastModificationDateTimeUtc.Value.DateTime : rpt.CreationDateTimeUtc.DateTime, _currentOrgRegProgramId);
+                rpt.LastModificationDateTimeUtc.HasValue ? rpt.LastModificationDateTimeUtc.Value.DateTime : rpt.CreationDateTimeUtc.DateTime, currentOrgRegProgramId);
 
             //1. set AttachmentTypes  
             var cat = rpt.ReportPackageTemplateElementCategories
@@ -362,7 +360,7 @@ namespace Linko.LinkoExchange.Services.Report
                     var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(ret);
                     if (ret.LastModifierUserId.HasValue)
                     {
-                        retDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(ret.LastModificationDateTimeUtc.Value.DateTime, _currentOrgRegProgramId);
+                        retDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(ret.LastModificationDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
                         var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
                         retDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
                     }
@@ -388,7 +386,7 @@ namespace Linko.LinkoExchange.Services.Report
                     var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(ret);
                     if (ret.LastModifierUserId.HasValue)
                     {
-                        retDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(ret.LastModificationDateTimeUtc.Value.DateTime, _currentOrgRegProgramId);
+                        retDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(ret.LastModificationDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
                         var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
                         retDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
                     }
