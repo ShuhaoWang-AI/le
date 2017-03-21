@@ -749,10 +749,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             mappedReportElementType.IsContentProvided = reportElementType.IsContentProvided;
             mappedReportElementType.CtsEventType = GetCtsEventTypeDtoFromCtsEventType(reportElementType.CtsEventType);
             mappedReportElementType.OrganizationRegulatoryProgramId = reportElementType.OrganizationRegulatoryProgramId;
-            if (reportElementType.OrganizationRegulatoryProgram != null)
-            {
-                mappedReportElementType.OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(reportElementType.OrganizationRegulatoryProgram);
-            }
             return mappedReportElementType;
         }
 
