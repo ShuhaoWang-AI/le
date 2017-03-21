@@ -164,6 +164,18 @@ namespace Linko.LinkoExchange.Services.Parameter
                         throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                     }
 
+                    //Make sure parameters are unique
+                    var isDuplicates = parameterGroup.Parameters
+                                        .GroupBy(p => p.ParameterId)
+                                        .Select(grp => new { Count = grp.Count() })
+                                        .Any(grp => grp.Count > 1);
+                    if (isDuplicates)
+                    {
+                        string message = "Parameters added to the group must be unique.";
+                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    }
+
                     ParameterGroup paramGroupToPersist = null;
                     if (parameterGroup.ParameterGroupId.HasValue && parameterGroup.ParameterGroupId.Value > 0)
                     {
@@ -182,10 +194,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                         paramGroupToPersist = _dbContext.ParameterGroups.Single(param => param.ParameterGroupId == parameterGroup.ParameterGroupId);
 
                         //First remove all children (parameter associations)
-                        for (var i = 0; i < paramGroupToPersist.ParameterGroupParameters.Count; i++)
-                        {
-                            _dbContext.ParameterGroupParameters.Remove(paramGroupToPersist.ParameterGroupParameters.ElementAt(i));
-                        }
+                        _dbContext.ParameterGroupParameters.RemoveRange(paramGroupToPersist.ParameterGroupParameters);
 
                         paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup, paramGroupToPersist);
                         paramGroupToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;

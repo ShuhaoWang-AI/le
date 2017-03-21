@@ -34,15 +34,17 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
+            var connection = new LinkoExchangeContext(connectionString);
             _httpContext = new Mock<IHttpContextService>();
             _orgService = new Mock<IOrganizationService>();
             _logger = new Mock<ILogger>();
             _timeZoneService = new Mock<ITimeZoneService>();
+            var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper()), new MapHelper());
 
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
             _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });
 
-            _reportElementService = new ReportElementService(new LinkoExchangeContext(connectionString), _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, _timeZoneService.Object);
+            _reportElementService = new ReportElementService(connection, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService);
         }
 
 
@@ -119,6 +121,11 @@ namespace Linko.LinkoExchange.Test
             reportElementTypeDto.OrganizationRegulatoryProgramId = 1;
 
             _reportElementService.SaveReportElementType(reportElementTypeDto);
+        }
+
+        public void GetReportElementTypes_Certifications_Test()
+        {
+            var certificationReportElementTypes = _reportElementService.GetReportElementTypes(ReportElementCategoryName.Certifications);
         }
 
     }

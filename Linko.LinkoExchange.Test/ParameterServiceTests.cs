@@ -34,20 +34,23 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
+            var connection = new LinkoExchangeContext(connectionString);
             _httpContext = new Mock<IHttpContextService>();
             _orgService = new Mock<IOrganizationService>();
             _logger = new Mock<ILogger>();
             _timeZoneService = new Mock<ITimeZoneService>();
 
+            var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper()), new MapHelper());
+
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
             _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });
 
-            _paramService = new ParameterService(new LinkoExchangeContext(connectionString), 
+            _paramService = new ParameterService(connection, 
                 _httpContext.Object, 
                 _orgService.Object, 
                 new MapHelper(), 
                 _logger.Object,
-                _timeZoneService.Object);
+                actualTimeZoneService);
         }
 
 
@@ -92,7 +95,9 @@ namespace Linko.LinkoExchange.Test
         public void SaveParameterGroup_Test_Valid_CreateNew()
         {
             var paramGroupDto = new ParameterGroupDto();
-            paramGroupDto.Name = "Some Name";
+            paramGroupDto.Name = "Different Name 3";
+            paramGroupDto.Description = "Different description";
+            paramGroupDto.IsActive = true;
             paramGroupDto.Parameters = new List<ParameterDto>();
             paramGroupDto.Parameters.Add(new ParameterDto() { ParameterId = 1 });
             paramGroupDto.OrganizationRegulatoryProgramId = 1;
@@ -114,12 +119,70 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void SaveParameterGroup_Test_Valid_Update()
         {
-            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 3 };
-            paramGroupDto.Name = "Some Name Changed";
+            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 4 };
+            paramGroupDto.Name = "Some Name Changed Again";
+            paramGroupDto.Description = "Sample desc";
             paramGroupDto.Parameters = new List<ParameterDto>();
             paramGroupDto.Parameters.Add(new ParameterDto() { ParameterId = 1 });
             paramGroupDto.OrganizationRegulatoryProgramId = 1;
             _paramService.SaveParameterGroup(paramGroupDto);
+        }
+
+        [TestMethod]
+        public void SaveParameterGroup_Test_Change_Parameter_Update()
+        {
+            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 4 };
+            paramGroupDto.Name = "Some Name Changed Again";
+            paramGroupDto.Description = "Sample desc";
+            paramGroupDto.Parameters = new List<ParameterDto>();
+            paramGroupDto.Parameters.Add(new ParameterDto() { ParameterId = 2 });
+            paramGroupDto.OrganizationRegulatoryProgramId = 1;
+            _paramService.SaveParameterGroup(paramGroupDto);
+        }
+
+        [TestMethod]
+        public void SaveParameterGroup_Test_Multiple_UniqueParameters_Update()
+        {
+            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 4 };
+            paramGroupDto.Name = "Some Name Changed Again";
+            paramGroupDto.Description = "Sample desc";
+            paramGroupDto.Parameters = new List<ParameterDto>();
+            paramGroupDto.Parameters.Add(new ParameterDto() { ParameterId = 1 });
+            paramGroupDto.Parameters.Add(new ParameterDto() { ParameterId = 2 });
+            paramGroupDto.OrganizationRegulatoryProgramId = 1;
+            _paramService.SaveParameterGroup(paramGroupDto);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(RuleViolationException))]
+        public void SaveParameterGroup_Test_Multiple_DuplicateParameters_Update()
+        {
+            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 4 };
+            paramGroupDto.Name = "Some Name Changed Again";
+            paramGroupDto.Description = "Sample desc";
+            paramGroupDto.Parameters = new List<ParameterDto>();
+            paramGroupDto.Parameters.Add(new ParameterDto() { ParameterId = 2 });
+            paramGroupDto.Parameters.Add(new ParameterDto() { ParameterId = 2 });
+            paramGroupDto.OrganizationRegulatoryProgramId = 1;
+            _paramService.SaveParameterGroup(paramGroupDto);
+        }
+
+        [TestMethod]
+        public void GetParameterGroup_Test()
+        {
+            var paramGroupDto = _paramService.GetParameterGroup(3);
+        }
+
+        [TestMethod]
+        public void GetStaticParameterGroups_Test()
+        {
+            var staticParameterGroups = _paramService.GetStaticParameterGroups();
+        }
+
+        [TestMethod]
+        public void DeleteParameterGroup_Test()
+        {
+            _paramService.DeleteParameterGroup(3);
         }
 
     }
