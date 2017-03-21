@@ -151,11 +151,20 @@ namespace Linko.LinkoExchange.Services.Report
                         throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                     }
 
-                    if (rpt.EffectiveDateTimeUtc == DateTimeOffset.MinValue)
+                    if (rpt.EffectiveDateTimeLocal == DateTimeOffset.MinValue)
                     {
                         string message = "EffectiveDateTimeUtc is required.";
                         validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                         throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    }
+
+                    rpt.EffectiveDateTimeUtc =
+                        _timeZoneService.GetUTCDateTimeUsingSettingForThisOrg(rpt.EffectiveDateTimeLocal,
+                            currentRegulatoryProgramId);
+
+                    if (rpt.RetirementDateTimeLocal.HasValue)
+                    {
+                        rpt.RetirementDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingSettingForThisOrg(rpt.RetirementDateTimeLocal.Value, currentRegulatoryProgramId);
                     }
 
                     //// Check if Name and EffectiveDateTimeUtc combination is unique or not 
@@ -346,6 +355,13 @@ namespace Linko.LinkoExchange.Services.Report
 
             rptDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(
                 rpt.LastModificationDateTimeUtc.HasValue ? rpt.LastModificationDateTimeUtc.Value.DateTime : rpt.CreationDateTimeUtc.DateTime, currentOrgRegProgramId);
+
+            rptDto.EffectiveDateTimeLocal =
+                _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(rpt.EffectiveDateTimeUtc.DateTime, currentOrgRegProgramId);
+            if (rpt.RetirementDateTimeUtc.HasValue)
+            {
+                rptDto.RetirementDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(rpt.RetirementDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
+            }
 
             //1. set AttachmentTypes  
             var cat = rpt.ReportPackageTemplateElementCategories
