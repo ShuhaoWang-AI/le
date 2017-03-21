@@ -458,21 +458,13 @@ namespace Linko.LinkoExchange.Services.Mapping
             if (parameterGroup == null)
             {
                 parameterGroup = new ParameterGroup();
-            }
-            else
-            {
-                if (parameterGroup.ParameterGroupParameters != null && parameterGroup.ParameterGroupParameters.Count() > 0)
-                {
-                    parameterGroup.ParameterGroupParameters.Clear();
-                }
+                parameterGroup.ParameterGroupParameters = new List<ParameterGroupParameter>();
             }
 
-            //TO-DO: make sure the right properties are being set
             parameterGroup.Name = parameterGroupDto.Name;
             parameterGroup.Description = parameterGroupDto.Description;
             parameterGroup.OrganizationRegulatoryProgramId = parameterGroupDto.OrganizationRegulatoryProgramId;
             parameterGroup.IsActive = parameterGroupDto.IsActive;
-            parameterGroup.ParameterGroupParameters = new List<ParameterGroupParameter>();
             foreach (var param in parameterGroupDto.Parameters)
             {
                 parameterGroup.ParameterGroupParameters.Add(new ParameterGroupParameter() { ParameterId = param.ParameterId });

@@ -94,11 +94,33 @@ namespace Linko.LinkoExchange.Test
             var paramGroupDto = new ParameterGroupDto();
             paramGroupDto.Name = "Some Name";
             paramGroupDto.Parameters = new List<ParameterDto>();
-            paramGroupDto.Parameters.Add(new ParameterDto() { });
+            paramGroupDto.Parameters.Add(new ParameterDto() { ParameterId = 1 });
             paramGroupDto.OrganizationRegulatoryProgramId = 1;
             _paramService.SaveParameterGroup(paramGroupDto);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(RuleViolationException))]
+        public void SaveParameterGroup_Test_CreateNew_DuplicateName()
+        {
+            var paramGroupDto = new ParameterGroupDto();
+            paramGroupDto.Name = "Some Name";
+            paramGroupDto.Parameters = new List<ParameterDto>();
+            paramGroupDto.Parameters.Add(new ParameterDto() { ParameterId = 1 });
+            paramGroupDto.OrganizationRegulatoryProgramId = 1;
+            _paramService.SaveParameterGroup(paramGroupDto);
+        }
+
+        [TestMethod]
+        public void SaveParameterGroup_Test_Valid_Update()
+        {
+            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 3 };
+            paramGroupDto.Name = "Some Name Changed";
+            paramGroupDto.Parameters = new List<ParameterDto>();
+            paramGroupDto.Parameters.Add(new ParameterDto() { ParameterId = 1 });
+            paramGroupDto.OrganizationRegulatoryProgramId = 1;
+            _paramService.SaveParameterGroup(paramGroupDto);
+        }
 
     }
 }

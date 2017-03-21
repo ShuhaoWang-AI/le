@@ -20,13 +20,11 @@ namespace Linko.LinkoExchange.Services.Report
     public class ReportElementService : IReportElementService
     {
         private readonly LinkoExchangeContext _dbContext;
+        private readonly IHttpContextService _httpContext;
+        private readonly IOrganizationService _orgService;
         private readonly IMapHelper _mapHelper;
         private readonly ILogger _logger;
         private readonly ITimeZoneService _timeZoneService;
-
-        private int _authOrgRegProgramId;
-        private int _currentOrgRegProgramId;
-        private int _currentUserId;
 
         public ReportElementService(LinkoExchangeContext dbContext,
             IHttpContextService httpContext,
@@ -36,29 +34,32 @@ namespace Linko.LinkoExchange.Services.Report
             ITimeZoneService timeZoneService)
         {
             _dbContext = dbContext;
+            _httpContext = httpContext;
+            _orgService = orgService;
             _mapHelper = mapHelper;
-            _authOrgRegProgramId = orgService.GetAuthority(int.Parse(httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
-            _currentOrgRegProgramId = int.Parse(httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            _currentUserId = int.Parse(httpContext.GetClaimValue(CacheKey.UserProfileId));
             _logger = logger;
             _timeZoneService = timeZoneService;
         }
 
         public IEnumerable<ReportElementTypeDto> GetReportElementTypes(ReportElementCategoryName categoryName)
         {
+            var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
+            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var reportElementTypes = new List<ReportElementTypeDto>();
             var reportElementCategoryId = _dbContext.ReportElementCategories
                 .Single(r => r.Name == categoryName.ToString()).ReportElementCategoryId;
 
             var foundReportElementTypes = _dbContext.ReportElementTypes
                 .Include(c => c.CtsEventType)
-                .Where(c => c.OrganizationRegulatoryProgramId == _authOrgRegProgramId
+                .Where(c => c.OrganizationRegulatoryProgramId == authOrgRegProgramId
                     && c.ReportElementCategoryId == reportElementCategoryId)
                 .ToList();
             foreach (var reportElementType in foundReportElementTypes)
             {
                 var dto = _mapHelper.GetReportElementTypeDtoFromReportElementType(reportElementType);
-                dto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(reportElementType.LastModificationDateTimeUtc.Value.DateTime, _currentOrgRegProgramId);
+                dto.LastModificationDateTimeLocal = _timeZoneService
+                    .GetLocalizedDateTimeUsingSettingForThisOrg((reportElementType.LastModificationDateTimeUtc.HasValue ? reportElementType.LastModificationDateTimeUtc.Value.DateTime 
+                                                                    : reportElementType.CreationDateTimeUtc.DateTime), currentOrgRegProgramId);
                 var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == reportElementType.LastModifierUserId);
                 dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
 
@@ -69,6 +70,8 @@ namespace Linko.LinkoExchange.Services.Report
 
         public void SaveReportElementType(ReportElementTypeDto reportElementType)
         {
+            var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
+            var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
             List<RuleViolation> validationIssues = new List<RuleViolation>();
 
             //Check required fields (Name and Certification Text as per UC-53.3 4.b.)
@@ -96,7 +99,7 @@ namespace Linko.LinkoExchange.Services.Report
                     string proposedElementTypeName = reportElementType.Name.Trim().ToLower();
                     var elementTypesWithMatchingName = _dbContext.ReportElementTypes
                         .Where(ret => ret.Name.Trim().ToLower() == proposedElementTypeName
-                                && ret.OrganizationRegulatoryProgramId == _authOrgRegProgramId);
+                                && ret.OrganizationRegulatoryProgramId == authOrgRegProgramId);
 
                     ReportElementType reportElementTypeToPersist = null;
                     if (reportElementType.ReportElementTypeId.HasValue && reportElementType.ReportElementTypeId.Value > 0)
@@ -116,7 +119,7 @@ namespace Linko.LinkoExchange.Services.Report
                         reportElementTypeToPersist = _dbContext.ReportElementTypes.Single(c => c.ReportElementTypeId == reportElementType.ReportElementTypeId);
                         reportElementTypeToPersist = _mapHelper.GetReportElementTypeFromReportElementTypeDto(reportElementType, reportElementTypeToPersist);
                         reportElementTypeToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
-                        reportElementTypeToPersist.LastModifierUserId = _currentUserId;
+                        reportElementTypeToPersist.LastModifierUserId = currentUserId;
 
                     }
                     else
@@ -133,7 +136,7 @@ namespace Linko.LinkoExchange.Services.Report
                         reportElementTypeToPersist = _mapHelper.GetReportElementTypeFromReportElementTypeDto(reportElementType);
                         reportElementTypeToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
                         reportElementTypeToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
-                        reportElementTypeToPersist.LastModifierUserId = _currentUserId;
+                        reportElementTypeToPersist.LastModifierUserId = currentUserId;
                         _dbContext.ReportElementTypes.Add(reportElementTypeToPersist);
                     }
                     _dbContext.SaveChanges();
@@ -169,6 +172,7 @@ namespace Linko.LinkoExchange.Services.Report
     
         public void DeleteReportElementType(int reportElementTypeId)
         {
+            var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try {
@@ -178,7 +182,7 @@ namespace Linko.LinkoExchange.Services.Report
                         .Include(r => r.ReportPackageTemplateElementCategory)
                         .Where(r => r.ReportElementTypeId == reportElementTypeId)
                             .Select(r => r.ReportPackageTemplateElementCategory.ReportPackageTemplate)
-                            .Where(r => r.OrganizationRegulatoryProgramId == _authOrgRegProgramId);
+                            .Where(r => r.OrganizationRegulatoryProgramId == authOrgRegProgramId);
 
                     if (rpTemplatesUsingThis.Count() > 0)
                     {
@@ -229,12 +233,13 @@ namespace Linko.LinkoExchange.Services.Report
 
         public bool IsReportElementTypeInUse(int reportElementTypeId)
         {
+            var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
             //Find all Report Package Templates using this Report Element Type
             var rpTemplatesUsingThis = _dbContext.ReportPackageTemplateElementTypes
                 .Include(r => r.ReportPackageTemplateElementCategory)
                 .Where(r => r.ReportElementTypeId == reportElementTypeId)
                     .Select(r => r.ReportPackageTemplateElementCategory.ReportPackageTemplate)
-                    .Where(r => r.OrganizationRegulatoryProgramId == _authOrgRegProgramId);
+                    .Where(r => r.OrganizationRegulatoryProgramId == authOrgRegProgramId);
 
             if (rpTemplatesUsingThis.Count() > 0)
             {
