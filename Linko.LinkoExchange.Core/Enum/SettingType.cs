@@ -23,7 +23,9 @@ namespace Linko.LinkoExchange.Core.Enum
         EmailContactInfoEmailAddress,
         AuthorityUserLicenseTotalCount,
         IndustryLicenseTotalCount,
-        UserPerIndustryMaxCount
+        UserPerIndustryMaxCount,
+        ResultQualifiersIndustryCanUse,
+        CreateSampleNamesRule
     }
 
 }

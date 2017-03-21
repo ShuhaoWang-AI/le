@@ -4,14 +4,29 @@ using System.Linq;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
+using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Report;
+using Linko.LinkoExchange.Services.Settings;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
+
+    /// <summary>
+    /// This is a testing controller,  dev who implement this controller should replace it. 
+    /// </summary>
     public class ReprotPackageController : Controller
     {
         private readonly IReportTemplateService _reportTemplateService;
-        public ReprotPackageController(IReportTemplateService reportTemplateService)
+        private readonly ISettingService _settingService;
+        private readonly IHttpContextService _httpContextService;
+
+        public ReprotPackageController(
+            IReportTemplateService reportTemplateService,
+            ISettingService settingService,
+            IHttpContextService httpContextService)
         {
             if (reportTemplateService == null)
             {
@@ -19,6 +34,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             _reportTemplateService = reportTemplateService;
+            _settingService = settingService;
+            _httpContextService = httpContextService;
         }
         // GET: ReprotPackage 
         public JsonResult Index()
@@ -65,5 +82,41 @@ namespace Linko.LinkoExchange.Web.Controllers
             var list = _reportTemplateService.GetCertificationTypes();
             return Json(list, JsonRequestBehavior.AllowGet);
         }
+
+        public JsonResult GetIndustryPPT_ResultQualifiersIndustryCanUse()
+        {
+            var currentRegulatoryProgramId =
+                      int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+            var settings = _settingService.GetSettingTemplateValue(SettingType.ResultQualifiersIndustryCanUse);
+
+            return Json(settings, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult update_ResultQualifiersIndustryCanUse()
+        {
+            var currentRegulatoryProgramId =
+                      int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+            var settingDto = new SettingDto();
+            settingDto.TemplateName = SettingType.ResultQualifiersIndustryCanUse;
+            settingDto.Value = "GreaterThan,LessThan";
+            settingDto.OrgTypeName = OrganizationTypeName.Authority;
+
+            _settingService.CreateOrUpdateProgramSetting(currentRegulatoryProgramId, settingDto);
+
+            return Json("Saving good", JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetIndustryPPT_CreateSampleNamesRule()
+        {
+            var currentRegulatoryProgramId =
+                      int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+            var settings = _settingService.GetSettingTemplateValue(SettingType.CreateSampleNamesRule);
+
+            return Json(settings, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }
