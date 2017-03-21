@@ -447,6 +447,7 @@ namespace Linko.LinkoExchange.Services.Report
                         i.ReportPackageTemplateElementCategoryId ==
                         cat.ReportPackageTemplateElementCategoryId)
                 .Distinct()
+                .OrderBy(i => i.SortOrder)
                 .ToList();
 
             var rets = rptets.Select(i => i.ReportElementType).Distinct();
