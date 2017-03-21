@@ -18,7 +18,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public int ReportElementCategoryId { get; set; }
         public virtual ReportElementCategory ReportElementCategory { get; set; }
 
-        public bool SortOrder { get; set; }
+        public int SortOrder { get; set; }
 
 
         // Reverse navigation

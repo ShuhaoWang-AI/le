@@ -18,6 +18,6 @@
 
         public bool IsRequired { get; set; }
 
-        public bool SortOrder { get; set; }
+        public int SortOrder { get; set; }
     }
 }
