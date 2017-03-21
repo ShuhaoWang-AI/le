@@ -32,6 +32,7 @@ namespace Linko.LinkoExchange.Test
             _settings = new Mock<ISettingService>();
             _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), 1, It.IsAny<SettingType>())).Returns("1");
             _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), 2, It.IsAny<SettingType>())).Returns("4");
+            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("4");
 
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             _tZservice = new TimeZoneService(new LinkoExchangeContext(connectionString), _settings.Object, new MapHelper());
@@ -59,6 +60,18 @@ namespace Linko.LinkoExchange.Test
             regDateEST = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(registrationDate.Value.UtcDateTime, 1000, 2);
             Assert.AreEqual(regDateEST, regDatePST.AddHours(3));
            
+        }
+
+        [TestMethod]
+        public void Convert_Current_UTC_To_Local_And_Back_To_UTC_Test()
+        {
+            DateTime now = DateTime.UtcNow;
+            DateTimeOffset? registrationDate = now;
+
+            var localTime = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(now, 1);
+            var convertedBackToUTC = _tZservice.GetUTCDateTimeUsingSettingForThisOrg(localTime, 1);
+
+            Assert.AreEqual(now, convertedBackToUTC);
         }
 
     }
