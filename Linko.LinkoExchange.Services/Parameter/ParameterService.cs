@@ -50,6 +50,7 @@ namespace Linko.LinkoExchange.Services.Parameter
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var parameterDtos = new List<ParameterDto>();
             var foundParams = _dbContext.Parameters
+                .Include(p => p.DefaultUnit)
                 .Where(param => param.OrganizationRegulatoryProgramId == authOrgRegProgramId); // need to find authority OrganizationRegulatoryProgramId
 
             if (!string.IsNullOrEmpty(startsWith))
@@ -57,7 +58,8 @@ namespace Linko.LinkoExchange.Services.Parameter
                 foundParams = foundParams.Where(param => param.Name.StartsWith(startsWith));
             }
 
-            foreach (var parameter in foundParams)
+
+            foreach (var parameter in foundParams.ToList())
             {
                 var dto = _mapHelper.GetParameterDtoFromParameter(parameter);
                 dto.LastModificationDateTimeLocal = _timeZoneService

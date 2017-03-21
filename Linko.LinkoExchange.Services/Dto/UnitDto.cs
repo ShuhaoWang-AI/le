@@ -12,7 +12,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string Name { get; set; }
         public string Description { get; set; }
         public bool IsFlowUnit { get; set; }
-        public OrganizationDto Organization { get; set; }
+        public int OrganizationId { get; set; }
         public bool IsRemoved { get; set; }
         public DateTimeOffset CreationDateTimeUtc { get; set; }
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }

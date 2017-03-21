@@ -182,8 +182,17 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void DeleteParameterGroup_Test()
         {
-            _paramService.DeleteParameterGroup(3);
+            _paramService.DeleteParameterGroup(4);
+            _paramService.DeleteParameterGroup(5);
+            _paramService.DeleteParameterGroup(6);
         }
+
+        [TestMethod]
+        public void GetGlobalParameters_Test()
+        {
+            var resultDtos = _paramService.GetGlobalParameters();
+        }
+
 
     }
 }

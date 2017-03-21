@@ -13,7 +13,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string Description { get; set; }
         public UnitDto DefaultUnit { get; set; }
         public double? TrcFactor { get; set; }
-        public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgram { get; set; }
+        public int OrganizationRegulatoryProgramId { get; set; }
         public bool IsRemoved { get; set; }
         public DateTime LastModificationDateTimeLocal { get; set; }
         public string LastModifierFullName { get; set; }

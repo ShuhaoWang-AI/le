@@ -431,7 +431,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 paramDto.DefaultUnit = GetUnitDtoFromUnit(parameter.DefaultUnit);
             }
             paramDto.TrcFactor = parameter.TrcFactor;
-            paramDto.OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(parameter.OrganizationRegulatoryProgram);
+            paramDto.OrganizationRegulatoryProgramId = parameter.OrganizationRegulatoryProgramId;
             paramDto.IsRemoved = parameter.IsRemoved;
 
             return paramDto;
@@ -483,7 +483,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             unitDto.Name = unit.Name;
             unitDto.Description = unit.Description;
             unitDto.IsFlowUnit = unit.IsFlowUnit;
-            unitDto.Organization = GetOrganizationDtoFromOrganization(unit.Organization);
+            unitDto.OrganizationId = unit.OrganizationId;
             unitDto.IsRemoved = unit.IsRemoved;
             unitDto.CreationDateTimeUtc = unit.CreationDateTimeUtc;
             unitDto.LastModificationDateTimeUtc = unit.LastModificationDateTimeUtc;
