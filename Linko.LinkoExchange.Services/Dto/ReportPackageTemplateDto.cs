@@ -27,5 +27,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public List<ReportElementTypeDto> CertificationTypes { get; set; }
         public List<ReportPackageTemplateAssignmentDto> ReportPackageTemplateAssignments { get; set; }
         public List<ReportPackageTemplateElementCategoryDto> ReportPackageTemplateElementCategories { get; set; }
+        public bool ShowSampleResults { get; set; }
     }
 }

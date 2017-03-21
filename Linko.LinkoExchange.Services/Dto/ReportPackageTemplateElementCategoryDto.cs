@@ -10,7 +10,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public int ReportElementCategoryId { get; set; }
         public virtual ReportElementCategoryDto ReportElementCategory { get; set; }
 
-        public bool SortOrder { get; set; }
+        public int SortOrder { get; set; }
 
         public virtual ICollection<ReportPackageTemplateElementTypeDto> ReportPackageTemplateElementTypes { get; set; }
     }
