@@ -60,5 +60,10 @@ namespace Linko.LinkoExchange.Services.TimeZone
             return (TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, authorityLocalZone));
         }
 
+        public DateTimeOffset GetUTCDateTimeUsingSettingForThisOrg(DateTime localDateTime, int orgRegProgramId)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
