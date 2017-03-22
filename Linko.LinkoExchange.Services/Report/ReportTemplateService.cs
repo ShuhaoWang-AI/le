@@ -290,7 +290,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         public IEnumerable<CtsEventTypeDto> GetCtsEventTypes()
         {
-            var ctsEventTypes = _dbContext.CtsEventTypes.ToList();
+            var ctsEventTypes = _dbContext.CtsEventTypes.Where(i => i.IsEnabled && i.IsRemoved == false).ToList();
             return ctsEventTypes.Select(i => _mapHelper.GetCtsEventTypeDtoFromEventType(i));
         }
 
