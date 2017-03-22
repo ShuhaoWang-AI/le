@@ -74,6 +74,22 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
+        public void SaveReportElementType_Test_Valid_Missing_Content_Attachment_CreateNew()
+        {
+            var reportElementTypeDto = new ReportElementTypeDto();
+
+            reportElementTypeDto.Name = "Attachment Name";
+            reportElementTypeDto.Description = "Attachment Description";
+            //reportElementTypeDto.Content = MISSING
+            reportElementTypeDto.IsContentProvided = false;
+            reportElementTypeDto.CtsEventType = new CtsEventTypeDto() { CtsEventTypeId = 1 };
+            reportElementTypeDto.ReportElementCategoryId = 2; //Attachment;
+            reportElementTypeDto.OrganizationRegulatoryProgramId = 1;
+
+            _reportElementService.SaveReportElementType(reportElementTypeDto);
+        }
+
+        [TestMethod]
         public void SaveReportElementType_Test_Valid_CreateNew()
         {
             var reportElementTypeDto = new ReportElementTypeDto();
@@ -123,10 +139,32 @@ namespace Linko.LinkoExchange.Test
             _reportElementService.SaveReportElementType(reportElementTypeDto);
         }
 
+        [TestMethod]
         public void GetReportElementTypes_Certifications_Test()
         {
             var certificationReportElementTypes = _reportElementService.GetReportElementTypes(ReportElementCategoryName.Certifications);
         }
 
+        [TestMethod]
+        public void GetReportElementTypes_Attachments_Test()
+        {
+            var attachmentReportElementTypes = _reportElementService.GetReportElementTypes(ReportElementCategoryName.Attachments);
+        }
+
+        [TestMethod]
+        public void IsReportElementTypeInUse_Test_NotInUse()
+        {
+            var isInUse = _reportElementService.IsReportElementTypeInUse(1);
+
+            Assert.IsFalse(isInUse);
+        }
+
+        [TestMethod]
+        public void IsReportElementTypeInUse_Test_IsInUse()
+        {
+            var isInUse = _reportElementService.IsReportElementTypeInUse(2);
+
+            Assert.IsTrue(isInUse);
+        }
     }
 }
