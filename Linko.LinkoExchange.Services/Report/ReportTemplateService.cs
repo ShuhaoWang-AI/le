@@ -105,7 +105,11 @@ namespace Linko.LinkoExchange.Services.Report
 
             var rpts =
                 _dbContext.ReportPackageTempates.Where(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId)
-                    .Include(i => i.ReportPackageTemplateElementCategories)
+                    .Include(a => a.CtsEventType)
+                    .Include(a => a.OrganizationRegulatoryProgram)
+                    .Include(a => a.ReportPackageTemplateAssignments.Select(b => b.OrganizationRegulatoryProgram))
+                    .Include(a => a.ReportPackageTemplateElementCategories.Select(b => b.ReportElementCategory))
+                    .Include(a => a.ReportPackageTemplateElementCategories.Select(b => b.ReportPackageTemplateElementTypes.Select(d => d.ReportElementType)))
                     .Distinct()
                     .ToArray();
 
@@ -386,7 +390,7 @@ namespace Linko.LinkoExchange.Services.Report
             var cat = rpt.ReportPackageTemplateElementCategories
                 .FirstOrDefault(i => i.ReportElementCategory.Name == ReportElementCategoryName.Attachments.ToString());
 
-            rptDto.AttachmentTypes = new List<Dto.ReportElementTypeDto>();
+            rptDto.AttachmentTypes = new List<ReportElementTypeDto>();
             if (cat != null)
             {
                 var rets = GetReportElementType(cat);
@@ -408,14 +412,10 @@ namespace Linko.LinkoExchange.Services.Report
                 .FirstOrDefault(
                     i => i.ReportElementCategory.Name == ReportElementCategoryName.Certifications.ToString());
 
-            rptDto.CertificationTypes = new List<Dto.ReportElementTypeDto>();
+            rptDto.CertificationTypes = new List<ReportElementTypeDto>();
             if (cat != null)
             {
                 var rets = GetReportElementType(cat);
-
-                //rptDto.CertificationTypes =
-                //    rets.Select(i => _mapHelper.GetReportElementTypeDtoFromReportElementType(i)).Distinct().ToList();
-
                 foreach (var ret in rets)
                 {
                     var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(ret);

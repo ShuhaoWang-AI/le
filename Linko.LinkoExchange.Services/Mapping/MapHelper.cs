@@ -536,7 +536,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             //{
             //    dtos.Add(this.GetReportPackageTemplateElememtTypeDtoFromReportPackageTemplateElementType(c));
             //}
-
             //reportPackageTemplateElementCategory.ReportPackageTemplateElementTypes = dtos;
 
             return reportPackageTemplateElementCategory;
