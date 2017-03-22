@@ -166,5 +166,18 @@ namespace Linko.LinkoExchange.Test
 
             Assert.IsTrue(isInUse);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(RuleViolationException))]
+        public void DeleteReportElementType_Test_IsInUse()
+        {
+            _reportElementService.DeleteReportElementType(2);
+        }
+
+        [TestMethod]
+        public void DeleteReportElementType_Test_IsNotInUse()
+        {
+            _reportElementService.DeleteReportElementType(1);
+        }
     }
 }

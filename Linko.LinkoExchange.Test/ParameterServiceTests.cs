@@ -25,6 +25,7 @@ namespace Linko.LinkoExchange.Test
         Mock<IOrganizationService> _orgService;
         Mock<ILogger> _logger;
         Mock<ITimeZoneService> _timeZoneService;
+        Mock<ISettingService> _settingsService;
 
         public ParameterServiceTests()
         {
@@ -39,8 +40,10 @@ namespace Linko.LinkoExchange.Test
             _orgService = new Mock<IOrganizationService>();
             _logger = new Mock<ILogger>();
             _timeZoneService = new Mock<ITimeZoneService>();
+            _settingsService = new Mock<ISettingService>();
 
             var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper()), new MapHelper());
+            var actualSettings = new SettingService(connection, _logger.Object, new MapHelper());
 
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
             _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });
@@ -50,7 +53,8 @@ namespace Linko.LinkoExchange.Test
                 _orgService.Object, 
                 new MapHelper(), 
                 _logger.Object,
-                actualTimeZoneService);
+                actualTimeZoneService,
+                actualSettings);
         }
 
 
@@ -95,7 +99,7 @@ namespace Linko.LinkoExchange.Test
         public void SaveParameterGroup_Test_Valid_CreateNew()
         {
             var paramGroupDto = new ParameterGroupDto();
-            paramGroupDto.Name = "Different Name 3";
+            paramGroupDto.Name = "Some Name";
             paramGroupDto.Description = "Different description";
             paramGroupDto.IsActive = true;
             paramGroupDto.Parameters = new List<ParameterDto>();
@@ -119,7 +123,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void SaveParameterGroup_Test_Valid_Update()
         {
-            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 4 };
+            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 7 };
             paramGroupDto.Name = "Some Name Changed Again";
             paramGroupDto.Description = "Sample desc";
             paramGroupDto.Parameters = new List<ParameterDto>();
@@ -131,7 +135,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void SaveParameterGroup_Test_Change_Parameter_Update()
         {
-            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 4 };
+            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 7 };
             paramGroupDto.Name = "Some Name Changed Again";
             paramGroupDto.Description = "Sample desc";
             paramGroupDto.Parameters = new List<ParameterDto>();
@@ -143,7 +147,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void SaveParameterGroup_Test_Multiple_UniqueParameters_Update()
         {
-            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 4 };
+            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 7 };
             paramGroupDto.Name = "Some Name Changed Again";
             paramGroupDto.Description = "Sample desc";
             paramGroupDto.Parameters = new List<ParameterDto>();
@@ -170,7 +174,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetParameterGroup_Test()
         {
-            var paramGroupDto = _paramService.GetParameterGroup(3);
+            var paramGroupDto = _paramService.GetParameterGroup(7);
         }
 
         [TestMethod]
@@ -182,9 +186,9 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void DeleteParameterGroup_Test()
         {
-            _paramService.DeleteParameterGroup(4);
-            _paramService.DeleteParameterGroup(5);
-            _paramService.DeleteParameterGroup(6);
+            _paramService.DeleteParameterGroup(7);
+            //_paramService.DeleteParameterGroup(5);
+            //_paramService.DeleteParameterGroup(6);
         }
 
         [TestMethod]

@@ -13,6 +13,8 @@ using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.TimeZone;
+using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Parameter
 {
@@ -24,13 +26,15 @@ namespace Linko.LinkoExchange.Services.Parameter
         private readonly IMapHelper _mapHelper;
         private readonly ILogger _logger;
         private readonly ITimeZoneService _timeZoneService;
+        private readonly ISettingService _settings;
 
         public ParameterService(LinkoExchangeContext dbContext,
             IHttpContextService httpContext,
             IOrganizationService orgService,
             IMapHelper mapHelper,
             ILogger logger,
-            ITimeZoneService timeZoneService)
+            ITimeZoneService timeZoneService,
+            ISettingService settings)
         {
             _dbContext = dbContext;
             _httpContext = httpContext;
@@ -38,6 +42,7 @@ namespace Linko.LinkoExchange.Services.Parameter
             _mapHelper = mapHelper;
             _logger = logger;
             _timeZoneService = timeZoneService;
+            _settings = settings;
         }
 
         /// <summary>
@@ -58,13 +63,13 @@ namespace Linko.LinkoExchange.Services.Parameter
                 foundParams = foundParams.Where(param => param.Name.StartsWith(startsWith));
             }
 
-
+            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
             foreach (var parameter in foundParams.ToList())
             {
                 var dto = _mapHelper.GetParameterDtoFromParameter(parameter);
                 dto.LastModificationDateTimeLocal = _timeZoneService
-                                        .GetLocalizedDateTimeUsingSettingForThisOrg((parameter.LastModificationDateTimeUtc.HasValue ? parameter.LastModificationDateTimeUtc.Value.DateTime
-                                         : parameter.CreationDateTimeUtc.DateTime), currentOrgRegProgramId);
+                                        .GetLocalizedDateTimeUsingThisTimeZoneId((parameter.LastModificationDateTimeUtc.HasValue ? parameter.LastModificationDateTimeUtc.Value.DateTime
+                                         : parameter.CreationDateTimeUtc.DateTime), timeZoneId);
 
                 var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == parameter.LastModifierUserId);
                 dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
@@ -87,14 +92,16 @@ namespace Linko.LinkoExchange.Services.Parameter
                 .Include(param => param.ParameterGroupParameters)
                 .Where(param => param.OrganizationRegulatoryProgramId == authOrgRegProgramId)
                 .ToList();
+
+            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
             foreach (var paramGroup in foundParamGroups)
             {
                 var dto = _mapHelper.GetParameterGroupDtoFromParameterGroup(paramGroup);
 
                 //Set LastModificationDateTimeLocal
                 dto.LastModificationDateTimeLocal = _timeZoneService
-                        .GetLocalizedDateTimeUsingSettingForThisOrg((paramGroup.LastModificationDateTimeUtc.HasValue ? paramGroup.LastModificationDateTimeUtc.Value.DateTime
-                         : paramGroup.CreationDateTimeUtc.DateTime), currentOrgRegProgramId);
+                        .GetLocalizedDateTimeUsingThisTimeZoneId((paramGroup.LastModificationDateTimeUtc.HasValue ? paramGroup.LastModificationDateTimeUtc.Value.DateTime
+                         : paramGroup.CreationDateTimeUtc.DateTime), timeZoneId);
 
                 var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == paramGroup.LastModifierUserId);
                 dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
