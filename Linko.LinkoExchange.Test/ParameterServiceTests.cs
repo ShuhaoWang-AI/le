@@ -197,6 +197,38 @@ namespace Linko.LinkoExchange.Test
             var resultDtos = _paramService.GetGlobalParameters();
         }
 
+        [TestMethod]
+        public void GetGlobalParameters_StartsWith_All_Caps_Test()
+        {
+            var resultDtos = _paramService.GetGlobalParameters("CHLOR");
+        }
+
+        [TestMethod]
+        public void GetGlobalParameters_StartsWith_All_LowerCase_Test()
+        {
+            var resultDtos = _paramService.GetGlobalParameters("chlor");
+        }
+
+        [TestMethod]
+        public void GetGlobalParameters_StartsWith_All_MixedCase_Test()
+        {
+            var resultDtos = _paramService.GetGlobalParameters("chLOr");
+        }
+
+        [TestMethod]
+        public void GetGlobalParameters_StartsWith_All_Leading_Whitespace_Test()
+        {
+            var resultDtos = _paramService.GetGlobalParameters("  Chlor");
+        }
+
+        [TestMethod]
+        public void GetGlobalParameters_StartsWith_All_Alphanumeric_Test()
+        {
+            var resultDtos = _paramService.GetGlobalParameters("1,2");
+        }
+
+
+
 
     }
 }

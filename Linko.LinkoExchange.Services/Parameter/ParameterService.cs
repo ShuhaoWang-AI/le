@@ -60,6 +60,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 
             if (!string.IsNullOrEmpty(startsWith))
             {
+                startsWith = startsWith.TrimStart();
                 foundParams = foundParams.Where(param => param.Name.StartsWith(startsWith));
             }
 
