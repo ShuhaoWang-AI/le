@@ -652,7 +652,6 @@ namespace Linko.LinkoExchange.Services.Mapping
                 ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId,
                 Name = reportPackageTemplate.Name,
                 Description = reportPackageTemplate.Description,
-                EffectiveDateTimeUtc = reportPackageTemplate.EffectiveDateTimeUtc,
                 RetirementDateTimeUtc = reportPackageTemplate.RetirementDateTimeUtc,
                 IsSubmissionBySignatoryRequired = reportPackageTemplate.IsSubmissionBySignatoryRequired,
                 CtsEventTypeId = reportPackageTemplate.CtsEventTypeId,
@@ -691,7 +690,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             {
                 Name = reportPackageTemplateDto.Name,
                 Description = reportPackageTemplateDto.Description,
-                EffectiveDateTimeUtc = reportPackageTemplateDto.EffectiveDateTimeUtc,
                 RetirementDateTimeUtc = reportPackageTemplateDto.RetirementDateTimeUtc,
                 IsSubmissionBySignatoryRequired = reportPackageTemplateDto.IsSubmissionBySignatoryRequired,
                 CtsEventTypeId = reportPackageTemplateDto.CtsEventTypeId,

@@ -162,7 +162,7 @@ namespace Linko.LinkoExchange.Services.Report
                         throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                     }
 
-                    rpt.EffectiveDateTimeUtc =
+                    var effectiveDateTimeUtc =
                         _timeZoneService.GetUTCDateTimeUsingSettingForThisOrg(rpt.EffectiveDateTimeLocal,
                             currentRegulatoryProgramId);
 
@@ -173,7 +173,7 @@ namespace Linko.LinkoExchange.Services.Report
 
                     //// Check if Name and EffectiveDateTimeUtc combination is unique or not 
                     var testRpt = _dbContext.ReportPackageTempates
-                        .FirstOrDefault(i => i.EffectiveDateTimeUtc == rpt.EffectiveDateTimeUtc &&
+                        .FirstOrDefault(i => i.EffectiveDateTimeUtc == effectiveDateTimeUtc &&
                                   i.Name == rpt.Name &&
                                   i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
 
@@ -202,7 +202,7 @@ namespace Linko.LinkoExchange.Services.Report
                         //// Update current reportPackageTampate 
                         currentReportPackageTempalte.Name = rpt.Name;
                         currentReportPackageTempalte.Description = rpt.Description;
-                        currentReportPackageTempalte.EffectiveDateTimeUtc = rpt.EffectiveDateTimeUtc;
+                        currentReportPackageTempalte.EffectiveDateTimeUtc = effectiveDateTimeUtc;
                         currentReportPackageTempalte.RetirementDateTimeUtc = rpt.RetirementDateTimeUtc;
                         currentReportPackageTempalte.CtsEventTypeId = rpt.CtsEventTypeId;
                         currentReportPackageTempalte.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
@@ -221,7 +221,10 @@ namespace Linko.LinkoExchange.Services.Report
                         reportPackageTemplate.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
                         reportPackageTemplate.IsActive = rpt.IsActive;
                         reportPackageTemplate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                        reportPackageTemplate.EffectiveDateTimeUtc = effectiveDateTimeUtc;
                         reportPackageTemplate.LastModifierUserId = currentUserId;
+
+                        // First time creation recorder DO NOT need to provide creation datetime.
                         reportPackageTemplate = _dbContext.ReportPackageTempates.Add(reportPackageTemplate);
                     }
 
@@ -236,6 +239,7 @@ namespace Linko.LinkoExchange.Services.Report
                     // Determine show sample result section or not
                     if (rpt.ShowSampleResults)
                     {
+                        // TODO replace below code to create sample result type in ReportPackageTemplateElementTypes table;  
                         var sampleCategory =
                             _dbContext.ReportElementCategories.Single(
                                 i => i.Name == ReportElementCategoryName.SamplesAndResults.ToString());

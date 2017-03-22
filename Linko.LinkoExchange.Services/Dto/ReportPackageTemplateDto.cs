@@ -11,7 +11,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public string Description { get; set; }
         public DateTime EffectiveDateTimeLocal { get; set; }
         public DateTime? RetirementDateTimeLocal { get; set; }
-        public DateTimeOffset EffectiveDateTimeUtc { get; set; }
         public DateTimeOffset? RetirementDateTimeUtc { get; set; }
         public bool IsSubmissionBySignatoryRequired { get; set; }
         public int? CtsEventTypeId { get; set; }
