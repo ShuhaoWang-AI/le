@@ -79,5 +79,6 @@
   <ItemGroup>
     <Build Include="Schema Create Scripts\LinkoExchangeCreateScript.sql" />
     <Build Include="Schema Create Scripts\LinkoExchangeTestDataScript.sql" />
+    <Build Include="Schema Create Scripts\GREDS_LE_StagingTablesAndData.sql" />
   </ItemGroup>
 </Project>
