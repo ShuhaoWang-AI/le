@@ -104,8 +104,15 @@ namespace Linko.LinkoExchange.Services.Parameter
                         .GetLocalizedDateTimeUsingThisTimeZoneId((paramGroup.LastModificationDateTimeUtc.HasValue ? paramGroup.LastModificationDateTimeUtc.Value.DateTime
                          : paramGroup.CreationDateTimeUtc.DateTime), timeZoneId);
 
-                var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == paramGroup.LastModifierUserId);
-                dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+                if (paramGroup.LastModifierUserId.HasValue)
+                {
+                    var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == paramGroup.LastModifierUserId.Value);
+                    dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+                }
+                else
+                {
+                    dto.LastModifierFullName = "N/A";
+                }
 
                 parameterGroupDtos.Add(dto);
             }
@@ -328,9 +335,9 @@ namespace Linko.LinkoExchange.Services.Parameter
                 .Select(x => x.CollectionMethod.Name)
                 .Distinct();
 
-            foreach (var collectMethod in uniqueCollectionMethods)
+            foreach (var collectMethod in uniqueCollectionMethods.ToList())
             {
-                foreach (var freq in uniqueNonNullFrequencies)
+                foreach (var freq in uniqueNonNullFrequencies.ToList())
                 {
                     //Add "<Frequency> + <Collection Method>" Groups
                     var dynamicFreqAndCollectMethodParamGroup = new ParameterGroupDto();
@@ -354,7 +361,11 @@ namespace Linko.LinkoExchange.Services.Parameter
 
                         dynamicFreqAndCollectMethodParamGroup.Parameters.Add(param);
                     }
-                    parameterGroupDtos.Add(dynamicFreqAndCollectMethodParamGroup);
+
+                    if (dynamicFreqAndCollectMethodParamGroup.Parameters.Count() > 0)
+                    {
+                        parameterGroupDtos.Add(dynamicFreqAndCollectMethodParamGroup);
+                    }
                 }
 
                 //Add All "<Collection Method>" Groups
@@ -378,6 +389,8 @@ namespace Linko.LinkoExchange.Services.Parameter
 
                     dynamicAllCollectMethodParamGroup.Parameters.Add(param);
                 }
+
+                //No need to check if Group.Count > 0 because this is guaranteed
                 parameterGroupDtos.Add(dynamicAllCollectMethodParamGroup);
 
             }
