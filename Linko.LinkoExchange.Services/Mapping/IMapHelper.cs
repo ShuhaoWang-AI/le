@@ -28,7 +28,7 @@ namespace Linko.LinkoExchange.Services.Mapping
         ParameterDto GetParameterDtoFromParameter(Core.Domain.Parameter parameter);
         ParameterGroupDto GetParameterGroupDtoFromParameterGroup(ParameterGroup parameterGroup);
         ParameterGroup GetParameterGroupFromParameterGroupDto(ParameterGroupDto parameterGroupDto, ParameterGroup parameterGroup = null);
-
+        UnitDto GetUnitDtoFromUnit(Unit unit);
         Core.Domain.ReportElementCategory GetReportElementCategoryFromReportElementCategoryDto(ReportElementCategoryDto cat);
         ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(Core.Domain.ReportElementCategory cat);
 
