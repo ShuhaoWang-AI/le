@@ -3521,6 +3521,442 @@ BEGIN
         )
 END
 
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tMonitoringPoint)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tMonitoringPoint'
+    PRINT '-------------------------------'
+    
+    INSERT INTO dbo.tMonitoringPoint (Name, Description, OrganizationRegulatoryProgramId)
+		SELECT CTSMonPointAbbrv
+            , CTSMonPointDesc
+            , LEOrganizationRegulatoryProgramID
+        FROM dbo.ts_LE_CTSMonitoringPoints
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tCtsEventType)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tCtsEventType'
+    PRINT '----------------------------'
+    
+    INSERT INTO dbo.tCtsEventType (Name, CtsEventCategoryName, OrganizationRegulatoryProgramId)
+		SELECT CTSEventTypeAbbrv
+            , CTSEventCatCode
+            , LEOrganizationRegulatoryProgramID
+        FROM dbo.ts_LE_CTSEventTypes
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tCollectionMethod)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tCollectionMethod'
+    PRINT '--------------------------------'
+    
+    INSERT INTO dbo.tCollectionMethod (Name, OrganizationId)
+		SELECT CTSCollectMethCode
+            , @OrganizationId_GRESD
+        FROM dbo.ts_LE_CTSCollectionMethods
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tUnit)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tUnit'
+    PRINT '--------------------'
+    
+    INSERT INTO dbo.tUnit (Name, IsFlowUnit, OrganizationId)
+		SELECT CTSUnitCode
+            , CTSIsFlowUnit
+            , @OrganizationId_GRESD
+        FROM dbo.ts_LE_CTSUnits
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tParameter)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tParameter'
+    PRINT '-------------------------'
+    
+    INSERT INTO dbo.tParameter (Name, DefaultUnitId, TrcFactor, OrganizationRegulatoryProgramId)
+		SELECT CTSParamName
+            , (SELECT UnitId FROM dbo.tUnit WHERE Name = CTSDefaultUnitsCode)
+            , CTSTRCFactor
+            , LEOrganizationRegulatoryProgramID
+        FROM dbo.ts_LE_CTSParameters
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tParameterGroup)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tParameterGroup'
+    PRINT '------------------------------'
+    
+    INSERT INTO dbo.tParameterGroup (Name, Description, OrganizationRegulatoryProgramId, IsActive)
+		VALUES
+        (
+            'TotalMetals'
+            , 'All Metals'
+            , @OrganizationRegulatoryProgramId_GRESD
+            , 1
+        )
+        ,
+        (
+            'TTO'
+            , 'Total Toxic Organics'
+            , @OrganizationRegulatoryProgramId_GRESD
+            , 1
+        )
+        ,
+        (
+            'Surcharge'
+            , 'Surcharge Parameters'
+            , @OrganizationRegulatoryProgramId_GRESD
+            , 1
+        )
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tParameterGroupParameter)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tParameterGroupParameter'
+    PRINT '---------------------------------------'
+    
+    INSERT INTO dbo.tParameterGroupParameter (ParameterGroupId, ParameterId)
+		VALUES
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TotalMetals')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = 'Arsenic, total')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TotalMetals')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = 'Boron, total')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TotalMetals')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = 'Cadmium, total')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TotalMetals')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = 'Chromium, total')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TotalMetals')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = 'Lead, total')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TotalMetals')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = 'Nickel, total')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TotalMetals')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = 'Zinc, total')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,1,1,2-Tetrachloroethane')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,1,1-Trichloroethane')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,1,1-Trichloroethene')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,1,2,2-Tetrachloroethane')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,1,2-Trichloroethane')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,1,2-Trichloroethene')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,1-Dichloroethane')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,1-Dichloroethene')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,1-Dichlorpropene')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,2,3-Trichlorobenzene')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,2,3-Trichlorpropane')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,2,4-Trichlorobenzene')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,2,4-Trimethylbenzene')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'TTO')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = '1,2-Dibromoethane')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'Surcharge')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = 'Biochemical Oxygen Demand')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'Surcharge')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = 'Total Suspended Solids')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'Surcharge')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = 'Ammonia')
+        )
+        ,
+        (
+            (SELECT ParameterGroupId FROM dbo.tParameterGroup WHERE Name = 'Surcharge')
+            , (SELECT ParameterId FROM dbo.tParameter WHERE Name = 'Chemical Oxygen Demand')
+        )
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tReportElementType WHERE Name <> 'Samples and Results')
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tReportElementType'
+    PRINT '---------------------------------'
+    
+    INSERT INTO dbo.tReportElementType (Name, Description, Content, IsContentProvided, CtsEventTypeId, ReportElementCategoryId, OrganizationRegulatoryProgramId)
+		VALUES
+        (
+            'Lab Analysis Report'
+            , 'Lab Analysis Report'
+            , NULL
+            , 0
+            , (SELECT CtsEventTypeId FROM dbo.tCtsEventType WHERE Name = 'P2 Certification')
+            , (SELECT ReportElementCategoryId FROM dbo.tReportElementCategory WHERE Name = 'Attachments')
+            , @OrganizationRegulatoryProgramId_GRESD
+        )
+        ,
+        (
+            'TTO Certification'
+            , 'TTO Certification'
+            , 'Based on my inquiry of the person or persons directly responsible for managing compliance with the pretreatment standard for total toxic organics (T.T.O.), I certify that to the best of my knowledge and belief, no dumping of concentrated toxic organics into the wastewater has occurred since the filing of the last analysis report.  I further certify that this company is implementing the solvent management plan submitted to the Control Authority.'
+            , 1
+            , NULL
+            , (SELECT ReportElementCategoryId FROM dbo.tReportElementCategory WHERE Name = 'Certifications')
+            , @OrganizationRegulatoryProgramId_GRESD
+        )
+        ,
+        (
+            'Signature Certification'
+            , 'Signature Certification'
+            , 'I certify under penalty of law that this document and all attachments were prepared under my direction or supervision in accordance with a system designed to assure that qualified personnel properly gathered and evaluated the information submitted. Based on my inquiry of the person or persons who managed the system, or those persons directly responsible for gathering information, the information submitted is, to the best of my knowledge and belief, true, accurate and complete. I am aware that there are significant penalties for submitting false information, including the possibility of fines and imprisonment for a knowing violation.'
+            , 1
+            , NULL
+            , (SELECT ReportElementCategoryId FROM dbo.tReportElementCategory WHERE Name = 'Certifications')
+            , @OrganizationRegulatoryProgramId_GRESD
+        )
+        ,
+        (
+            'Violation Response Letter'
+            , 'Violation Response Letter'
+            , NULL
+            , 0
+            , (SELECT CtsEventTypeId FROM dbo.tCtsEventType WHERE Name = 'IURESP')
+            , (SELECT ReportElementCategoryId FROM dbo.tReportElementCategory WHERE Name = 'Attachments')
+            , @OrganizationRegulatoryProgramId_GRESD
+        )
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tReportPackageTemplate)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tReportPackageTemplate'
+    PRINT '-------------------------------------'
+    
+    INSERT INTO dbo.tReportPackageTemplate (Name, Description, EffectiveDateTimeUtc, IsSubmissionBySignatoryRequired, CtsEventTypeId, OrganizationRegulatoryProgramId, IsActive)
+		VALUES
+        (
+            '1st Quarter PCR'
+            , 'Submit 1st Quarter PCR including resubmission of a repudiated report'
+            , '2017-01-01 00:00:00 -07:00'
+            , 1
+            , (SELECT CtsEventTypeId FROM dbo.tCtsEventType WHERE Name = '1st quarter report')
+            , @OrganizationRegulatoryProgramId_GRESD
+            , 1
+        )
+        ,
+        (
+            '1st Quarter PCR'
+            , 'Submit 1st Quarter PCR including resubmission of a repudiated report'
+            , '2017-04-13 00:00:00 -07:00'
+            , 1
+            , (SELECT CtsEventTypeId FROM dbo.tCtsEventType WHERE Name = '1st quarter report')
+            , @OrganizationRegulatoryProgramId_GRESD
+            , 1
+        )
+        ,
+        (
+            '1st Quarter PCR'
+            , 'Submit 1st Quarter PCR including resubmission of a repudiated report'
+            , '2017-08-01 00:00:00 -07:00'
+            , 1
+            , (SELECT CtsEventTypeId FROM dbo.tCtsEventType WHERE Name = '1st quarter report')
+            , @OrganizationRegulatoryProgramId_GRESD
+            , 1
+        )
+        ,
+        (
+            'Semi Annual Flow'
+            , 'Submit Monthly Daily Maximum Flow and Average Daily Flow'
+            , '2017-01-01 00:00:00 -07:00'
+            , 1
+            , (SELECT CtsEventTypeId FROM dbo.tCtsEventType WHERE Name = 'Flow Report')
+            , @OrganizationRegulatoryProgramId_GRESD
+            , 1
+        )
+        ,
+        (
+            'Resample'
+            , 'Submit the results of a resampling event'
+            , '2017-01-01 00:00:00 -07:00'
+            , 1
+            , (SELECT CtsEventTypeId FROM dbo.tCtsEventType WHERE Name = 'Resample' AND CtsEventCategoryName = 'GENERIC')
+            , @OrganizationRegulatoryProgramId_GRESD
+            , 1
+        )
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tReportPackageTemplateAssignment)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tReportPackageTemplateAssignment'
+    PRINT '-----------------------------------------------'
+    
+    -- Assign Report Package Template 5 to all Industries
+    INSERT INTO dbo.tReportPackageTemplateAssignment (ReportPackageTemplateId, OrganizationRegulatoryProgramId)
+		SELECT 5, OrganizationRegulatoryProgramId
+        FROM dbo.tOrganizationRegulatoryProgram
+        WHERE RegulatorOrganizationId = @OrganizationId_GRESD
+
+    -- Assign Report Package Template 4 to all Industries except Di-Anodic
+    INSERT INTO dbo.tReportPackageTemplateAssignment (ReportPackageTemplateId, OrganizationRegulatoryProgramId)
+		SELECT 4, orp.OrganizationRegulatoryProgramId
+        FROM dbo.tOrganizationRegulatoryProgram orp
+            INNER JOIN dbo.tOrganization o ON o.OrganizationId = orp.OrganizationId
+        WHERE orp.RegulatorOrganizationId = @OrganizationId_GRESD 
+            AND o.Name <> 'Di-Anodic Finishing'
+
+    INSERT INTO dbo.tReportPackageTemplateAssignment (ReportPackageTemplateId, OrganizationRegulatoryProgramId)
+		SELECT 1, orp.OrganizationRegulatoryProgramId 
+        FROM dbo.tOrganizationRegulatoryProgram orp 
+            INNER JOIN dbo.tOrganization o ON o.OrganizationId = orp.OrganizationId
+        WHERE o.PermitNumber IN ('0006', '0040', '0002', '0022', '0032', '0469', '0711', '0764', '0770')
+
+    INSERT INTO dbo.tReportPackageTemplateAssignment (ReportPackageTemplateId, OrganizationRegulatoryProgramId)
+		SELECT 2, orp.OrganizationRegulatoryProgramId 
+        FROM dbo.tOrganizationRegulatoryProgram orp 
+            INNER JOIN dbo.tOrganization o ON o.OrganizationId = orp.OrganizationId
+        WHERE o.PermitNumber = '0006'
+    
+    INSERT INTO dbo.tReportPackageTemplateAssignment (ReportPackageTemplateId, OrganizationRegulatoryProgramId)
+		SELECT 3, orp.OrganizationRegulatoryProgramId 
+        FROM dbo.tOrganizationRegulatoryProgram orp 
+            INNER JOIN dbo.tOrganization o ON o.OrganizationId = orp.OrganizationId
+        WHERE o.PermitNumber = '0002'       
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tReportPackageTemplateElementCategory)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tReportPackageTemplateElementCategory'
+    PRINT '----------------------------------------------------'
+    
+    INSERT INTO dbo.tReportPackageTemplateElementCategory (ReportPackageTemplateId, ReportElementCategoryId, SortOrder)
+		VALUES (1, 1, 1)
+            , (1, 2, 2)
+            , (1, 3, 3)
+            , (2, 1, 1)
+            , (2, 2, 2)
+            , (2, 3, 3)
+            , (3, 1, 1)
+            , (3, 2, 2)
+            , (3, 3, 3)
+            , (4, 1, 1)
+            , (4, 3, 2)
+            , (5, 1, 1)
+            , (5, 2, 2)
+            , (5, 3, 3)
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tReportPackageTemplateElementType)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tReportPackageTemplateElementType'
+    PRINT '------------------------------------------------'
+    
+    INSERT INTO dbo.tReportPackageTemplateElementType (ReportPackageTemplateElementCategoryId, ReportElementTypeId, IsRequired, SortOrder)
+		VALUES (1, 1, 1, 1)
+            , (2, 2, 1, 1)
+            , (3, 3, 1, 1)
+            , (3, 4, 1, 2)
+            , (4, 1, 1, 1)
+            , (5, 2, 1, 1)
+            , (6, 3, 1, 1)
+            , (6, 4, 1, 2)
+            , (7, 1, 1, 1)
+            , (8, 2, 1, 1)
+            , (9, 4, 1, 1)
+            , (10, 1, 1, 1)
+            , (11, 4, 1, 1)
+            , (12, 1, 1, 1)
+            , (13, 2, 1, 1)
+            , (13, 5, 1, 2)
+            , (14, 4, 1, 1)            
+END
 
 PRINT CHAR(13)
 PRINT '-------------------------------------'

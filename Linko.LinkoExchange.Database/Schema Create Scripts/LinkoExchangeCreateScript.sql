@@ -1551,6 +1551,51 @@ BEGIN
 END
 GO
 
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tMonitoringPoint') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tMonitoringPoint'
+    PRINT '-----------------------'
+    
+    CREATE TABLE dbo.tMonitoringPoint 
+    (
+        MonitoringPointId                   int IDENTITY(1,1) NOT NULL  
+        , Name                              varchar(100) NOT NULL  
+        , Description                       varchar(500) NULL  
+        , OrganizationRegulatoryProgramId   int NOT NULL
+        , IsEnabled                         bit NOT NULL
+        , IsRemoved                         bit NOT NULL
+        , CreationDateTimeUtc               datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc       datetimeoffset(0) NULL  
+        , LastModifierUserId                int  NULL  
+        
+        CONSTRAINT PK_tMonitoringPoint PRIMARY KEY CLUSTERED 
+        (
+	        MonitoringPointId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        --, CONSTRAINT AK_tMonitoringPoint_Name_OrganizationRegulatoryProgramId UNIQUE 
+        --(
+        --    Name ASC
+        --    , OrganizationRegulatoryProgramId ASC
+        --) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT FK_tMonitoringPoint_tOrganizationRegulatoryProgram FOREIGN KEY 
+		(
+			OrganizationRegulatoryProgramId
+		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
+    ) ON [LinkoExchange_FG1_Data]
+    
+    ALTER TABLE dbo.tMonitoringPoint ADD CONSTRAINT DF_tMonitoringPoint_IsEnabled DEFAULT 1 FOR IsEnabled
+    ALTER TABLE dbo.tMonitoringPoint ADD CONSTRAINT DF_tMonitoringPoint_IsRemoved DEFAULT 0 FOR IsRemoved
+    ALTER TABLE dbo.tMonitoringPoint ADD CONSTRAINT DF_tMonitoringPoint_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
+
+    CREATE NONCLUSTERED INDEX IX_tMonitoringPoint_OrganizationRegulatoryProgramId ON dbo.tMonitoringPoint
+	(
+		OrganizationRegulatoryProgramId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+END
+GO
+
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tCtsEventType') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
 BEGIN
 	PRINT CHAR(13)
@@ -1587,13 +1632,58 @@ BEGIN
 		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
     ) ON [LinkoExchange_FG1_Data]
     
-    ALTER TABLE dbo.tCtsEventType ADD CONSTRAINT DF_tCtsEventType_IsEnabled DEFAULT 0 FOR IsEnabled
+    ALTER TABLE dbo.tCtsEventType ADD CONSTRAINT DF_tCtsEventType_IsEnabled DEFAULT 1 FOR IsEnabled
     ALTER TABLE dbo.tCtsEventType ADD CONSTRAINT DF_tCtsEventType_IsRemoved DEFAULT 0 FOR IsRemoved
     ALTER TABLE dbo.tCtsEventType ADD CONSTRAINT DF_tCtsEventType_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
     
 	CREATE NONCLUSTERED INDEX IX_tCtsEventType_OrganizationRegulatoryProgramId ON dbo.tCtsEventType
 	(
 		OrganizationRegulatoryProgramId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tCollectionMethod') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tCollectionMethod'
+    PRINT '------------------------'
+    
+    CREATE TABLE dbo.tCollectionMethod 
+    (
+        CollectionMethodId              int IDENTITY(1,1) NOT NULL  
+        , Name                          varchar(100) NOT NULL  
+        , Description                   varchar(500) NULL  
+        , OrganizationId                int NOT NULL
+        , IsEnabled                     bit NOT NULL
+        , IsRemoved                     bit NOT NULL
+        , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
+        , LastModifierUserId            int  NULL  
+        
+        CONSTRAINT PK_tCollectionMethod PRIMARY KEY CLUSTERED 
+        (
+	        CollectionMethodId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT AK_tCollectionMethod_Name_OrganizationId UNIQUE 
+        (
+            Name ASC
+            , OrganizationId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT FK_tCollectionMethod_tOrganization FOREIGN KEY 
+		(
+			OrganizationId
+		) REFERENCES dbo.tOrganization(OrganizationId)
+    ) ON [LinkoExchange_FG1_Data]
+    
+    ALTER TABLE dbo.tCollectionMethod ADD CONSTRAINT DF_tCollectionMethod_IsEnabled DEFAULT 1 FOR IsEnabled
+    ALTER TABLE dbo.tCollectionMethod ADD CONSTRAINT DF_tCollectionMethod_IsRemoved DEFAULT 0 FOR IsRemoved
+    ALTER TABLE dbo.tCollectionMethod ADD CONSTRAINT DF_tCollectionMethod_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
+
+    CREATE NONCLUSTERED INDEX IX_tCollectionMethod_OrganizationId ON dbo.tCollectionMethod
+	(
+		OrganizationId ASC
 	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
 END
 GO
@@ -1611,7 +1701,6 @@ BEGIN
         , Name                          varchar(100) NOT NULL  
         , Description                   varchar(500) NULL  
         , IsFlowUnit                    bit NOT NULL
-        , IsFlowUnitVisible             bit NOT NULL
         , OrganizationId                int NOT NULL
         , IsRemoved                     bit NOT NULL
         , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
@@ -1627,12 +1716,20 @@ BEGIN
             Name ASC
             , OrganizationId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT FK_tUnit_tOrganization FOREIGN KEY 
+		(
+			OrganizationId
+		) REFERENCES dbo.tOrganization(OrganizationId)
     ) ON [LinkoExchange_FG1_Data]
     
     ALTER TABLE dbo.tUnit ADD CONSTRAINT DF_tUnit_IsFlowUnit DEFAULT 0 FOR IsFlowUnit
-    ALTER TABLE dbo.tUnit ADD CONSTRAINT DF_tUnit_IsFlowUnitVisible DEFAULT 0 FOR IsFlowUnitVisible
     ALTER TABLE dbo.tUnit ADD CONSTRAINT DF_tUnit_IsRemoved DEFAULT 0 FOR IsRemoved
     ALTER TABLE dbo.tUnit ADD CONSTRAINT DF_tUnit_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
+
+    CREATE NONCLUSTERED INDEX IX_tUnit_OrganizationId ON dbo.tUnit
+	(
+		OrganizationId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
 END
 GO
 
@@ -2588,6 +2685,33 @@ BEGIN
 		    'UserPerIndustryMaxCount'
 		    , 'Maximum number of users per Industry. This is how many users can be added to an Industry for the current Regulatory Program. We are using one flat number for all Industries right now. When invitations are being sent to Industry users by anyone, system cannot invite more than what is set here.'
             , '5' 
+		    , @OrganizationTypeId_Authority
+		    , @RegulatoryProgramId_IPP
+		)
+    INSERT INTO dbo.tSettingTemplate (Name, Description, DefaultValue, OrganizationTypeId, RegulatoryProgramId)
+		VALUES 
+		(
+		    'ResultQualifierValidValues'
+		    , 'Result qualifier values that Industries can use in the samples and results data screen.'
+            , '>,<,ND,NF' 
+		    , @OrganizationTypeId_Authority
+		    , @RegulatoryProgramId_IPP
+		)
+    INSERT INTO dbo.tSettingTemplate (Name, Description, DefaultValue, OrganizationTypeId, RegulatoryProgramId)
+		VALUES 
+		(
+		    'FlowUnitValidValues'
+		    , 'Flow units that Industries can use in the samples and results data screen.'
+            , 'gpd,mgd' 
+		    , @OrganizationTypeId_Authority
+		    , @RegulatoryProgramId_IPP
+		)
+    INSERT INTO dbo.tSettingTemplate (Name, Description, DefaultValue, OrganizationTypeId, RegulatoryProgramId)
+		VALUES 
+		(
+		    'SampleNameCreationRule'
+		    , 'Sample names sent to CTS.'
+            , ''
 		    , @OrganizationTypeId_Authority
 		    , @RegulatoryProgramId_IPP
 		)
@@ -4384,6 +4508,23 @@ BEGIN
 		VALUES ('Attachments', 'File attachments')
     INSERT INTO dbo.tReportElementCategory (Name, Description)
 		VALUES ('Certifications', 'Certification statements')
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tReportElementType)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tReportElementType'
+    PRINT '---------------------------------'
+    
+    INSERT INTO dbo.tReportElementType (Name, Description, ReportElementCategoryId, OrganizationRegulatoryProgramId)
+		VALUES 
+        (
+            'Samples and Results'
+            , 'Sample results'
+            , 1
+            , (SELECT OrganizationRegulatoryProgramId FROM dbo.tOrganizationRegulatoryProgram WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP AND OrganizationId = @OrganizationId_GRESD)
+        )
 END
 
 PRINT CHAR(13)
