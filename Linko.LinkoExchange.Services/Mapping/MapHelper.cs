@@ -1,34 +1,23 @@
 ﻿using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Dto;
-using Linko.LinkoExchange.Services.Parameter;
-using Linko.LinkoExchange.Services.Report;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.Entity;
 
 namespace Linko.LinkoExchange.Services.Mapping
 {
     public class MapHelper : IMapHelper
     {
-        public MapHelper()
-        {
-
-        }
-
         public OrganizationDto GetOrganizationDtoFromOrganization(Core.Domain.Organization organization, OrganizationDto dto = null)
         {
             if (dto == null)
             {
                 dto = new OrganizationDto();
-                dto.OrganizationType = this.GetOrganizationTypeDtoFromOrganizationType(organization.OrganizationType);
+                dto.OrganizationType = GetOrganizationTypeDtoFromOrganizationType(organization.OrganizationType);
             }
             else
             {
-                dto.OrganizationType = this.GetOrganizationTypeDtoFromOrganizationType(organization.OrganizationType, dto.OrganizationType);
+                dto.OrganizationType = GetOrganizationTypeDtoFromOrganizationType(organization.OrganizationType, dto.OrganizationType);
             }
 
             dto.AddressLine1 = organization.AddressLine1;
@@ -56,7 +45,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             if (dto == null)
             {
                 dto = new AuthorityDto();
-                dto.OrganizationType = new Dto.OrganizationTypeDto();
+                dto.OrganizationType = new OrganizationTypeDto();
             }
             dto.AddressLine1 = organization.AddressLine1;
             dto.AddressLine2 = organization.AddressLine2;
@@ -180,10 +169,10 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             //Map OrganizationRegulatoryProgramDto
-            userDto.OrganizationRegulatoryProgramDto = this.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(user.OrganizationRegulatoryProgram);
+            userDto.OrganizationRegulatoryProgramDto = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(user.OrganizationRegulatoryProgram);
 
             //Map InviterOrganizationRegulatoryProgramDto
-            userDto.InviterOrganizationRegulatoryProgramDto = this.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(user.InviterOrganizationRegulatoryProgram);
+            userDto.InviterOrganizationRegulatoryProgramDto = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(user.InviterOrganizationRegulatoryProgram);
 
             return userDto;
 
@@ -198,9 +187,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
             dto.OrganizationRegulatoryProgramId = org.OrganizationRegulatoryProgramId;
             dto.RegulatoryProgramId = org.RegulatoryProgramId;
-
             dto.RegulatoryProgramDto = GetProgramDtoFromOrganizationRegulatoryProgram(org.RegulatoryProgram);
-
             dto.OrganizationId = org.OrganizationId;
             dto.RegulatorOrganizationId = org.RegulatorOrganizationId;
 
@@ -208,7 +195,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             if (org.RegulatorOrganization != null)
             {
-                dto.RegulatorOrganization = this.GetOrganizationDtoFromOrganization(org.RegulatorOrganization);
+                dto.RegulatorOrganization = GetOrganizationDtoFromOrganization(org.RegulatorOrganization);
             }
 
             dto.IsEnabled = org.IsEnabled;
@@ -495,17 +482,27 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         private CtsEventTypeDto GetCtsEventTypeDtoFromCtsEventType(CtsEventType ctsEventType)
         {
-            var mappedDto = new CtsEventTypeDto();
-            mappedDto.CtsEventTypeId = ctsEventType.CtsEventTypeId;
-            mappedDto.Name = ctsEventType.Name;
-            mappedDto.Description = ctsEventType.Description;
+            if (ctsEventType == null)
+            {
+                return null;
+            }
+
+            var mappedDto = new CtsEventTypeDto
+            {
+                CtsEventTypeId = ctsEventType.CtsEventTypeId,
+                Name = ctsEventType.Name,
+                Description = ctsEventType.Description
+            };
             return mappedDto;
         }
 
-
-
-        public ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(Core.Domain.ReportElementCategory cat)
+        public ReportElementCategoryDto GetReportElementCategoryDtoFromReportElementCategory(ReportElementCategory cat)
         {
+            if (cat == null)
+            {
+                return null;
+            }
+
             var reportElementCategory = new ReportElementCategoryDto();
             reportElementCategory.ReportElementCategoryId = cat.ReportElementCategoryId;
             reportElementCategory.Name = cat.Name;
@@ -519,18 +516,22 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public ReportPackageTemplateElementCategoryDto GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(ReportPackageTemplateElementCategory cat)
         {
+            if (cat == null)
+            {
+                return null;
+            }
+
             var reportPackageTemplateElementCategory = new ReportPackageTemplateElementCategoryDto();
             reportPackageTemplateElementCategory.ReportPackageTemplateElementCategoryId = cat.ReportPackageTemplateElementCategoryId;
 
             reportPackageTemplateElementCategory.ReportPackageTemplateId = cat.ReportPackageTemplateId;
 
             reportPackageTemplateElementCategory.ReportElementCategoryId = cat.ReportElementCategoryId;
-            reportPackageTemplateElementCategory.ReportElementCategory = this.GetReportElementCategoryDtoFromReportElementCategory(cat.ReportElementCategory);
+            reportPackageTemplateElementCategory.ReportElementCategory = GetReportElementCategoryDtoFromReportElementCategory(cat.ReportElementCategory);
 
             reportPackageTemplateElementCategory.SortOrder = cat.SortOrder;
 
-            //// deep naviagation cause error 
-            /// 
+            //// deep naviagation cause error  
             //var dtos = new List<ReportPackageTemplateElementTypeDto>();
             //foreach (var c in cat.ReportPackageTemplateElementTypes)
             //{
@@ -542,12 +543,17 @@ namespace Linko.LinkoExchange.Services.Mapping
         }
         public ReportPackageTemplateElementTypeDto GetReportPackageTemplateElememtTypeDtoFromReportPackageTemplateElementType(ReportPackageTemplateElementType rptet)
         {
+            if (rptet == null)
+            {
+                return null;
+            }
+
             var rptetDto = new ReportPackageTemplateElementTypeDto();
             rptetDto.ReportPackageTemplateElementTypeId = rptet.ReportPackageTemplateElementTypeId;
             rptetDto.ReportPackageTemplateElementCategoryId = rptet.ReportPackageTemplateElementCategoryId;
-            rptetDto.ReportPackageTemplateElementCategory = this.GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(rptet.ReportPackageTemplateElementCategory);
+            rptetDto.ReportPackageTemplateElementCategory = GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(rptet.ReportPackageTemplateElementCategory);
             rptetDto.ReportElementTypeId = rptet.ReportElementTypeId;
-            rptetDto.ReportElementType = this.GetReportElementTypeDtoFromReportElementType(rptet.ReportElementType);
+            rptetDto.ReportElementType = GetReportElementTypeDtoFromReportElementType(rptet.ReportElementType);
             rptetDto.IsRequired = rptet.IsRequired;
             rptetDto.SortOrder = rptet.SortOrder;
             return rptetDto;
@@ -555,12 +561,17 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public ReportPackageTemplateElementType GetReportPackageTemplateElememtTypeFromReportPackageTemplateElementTypeDto(ReportPackageTemplateElementTypeDto rptetDto)
         {
+            if (rptetDto == null)
+            {
+                return null;
+            }
+
             var rptet = new ReportPackageTemplateElementType();
             rptet.ReportPackageTemplateElementTypeId = rptetDto.ReportPackageTemplateElementTypeId;
             rptet.ReportPackageTemplateElementCategoryId = rptetDto.ReportPackageTemplateElementCategoryId;
-            rptet.ReportPackageTemplateElementCategory = this.GetReportPackageTemplateElementCategoryFromReportPackageTemplateElementCategoryDto(rptetDto.ReportPackageTemplateElementCategory);
+            rptet.ReportPackageTemplateElementCategory = GetReportPackageTemplateElementCategoryFromReportPackageTemplateElementCategoryDto(rptetDto.ReportPackageTemplateElementCategory);
             rptet.ReportElementTypeId = rptetDto.ReportElementTypeId;
-            rptet.ReportElementType = this.GetReportElementTypeFromReportElementTypeDto(rptetDto.ReportElementType);
+            rptet.ReportElementType = GetReportElementTypeFromReportElementTypeDto(rptetDto.ReportElementType);
             rptet.IsRequired = rptetDto.IsRequired;
             rptet.SortOrder = rptetDto.SortOrder;
             return rptet;
@@ -568,15 +579,20 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public ReportPackageTemplateElementCategory GetReportPackageTemplateElementCategoryFromReportPackageTemplateElementCategoryDto(ReportPackageTemplateElementCategoryDto cat)
         {
+            if (cat == null)
+            {
+                return null;
+            }
+
             var reportPackageTemplateElementCategory = new ReportPackageTemplateElementCategory
             {
                 ReportPackageTemplateElementCategoryId = cat.ReportPackageTemplateElementCategoryId,
                 ReportPackageTemplateId = cat.ReportPackageTemplateId,
                 ReportPackageTemplate =
-                    this.GetReportPackageTemplateFromReportPackageTemplateDto(cat.ReportPackageTemplate),
+                    GetReportPackageTemplateFromReportPackageTemplateDto(cat.ReportPackageTemplate),
                 ReportElementCategoryId = cat.ReportElementCategoryId,
                 ReportElementCategory =
-                    this.GetReportElementCategoryFromReportElementCategoryDto(cat.ReportElementCategory),
+                    GetReportElementCategoryFromReportElementCategoryDto(cat.ReportElementCategory),
                 SortOrder = cat.SortOrder
             };
 
@@ -591,9 +607,14 @@ namespace Linko.LinkoExchange.Services.Mapping
             return reportPackageTemplateElementCategory;
         }
 
-        public Core.Domain.ReportElementCategory GetReportElementCategoryFromReportElementCategoryDto(ReportElementCategoryDto cat)
+        public ReportElementCategory GetReportElementCategoryFromReportElementCategoryDto(ReportElementCategoryDto cat)
         {
-            var reportElementCategory = new Core.Domain.ReportElementCategory
+            if (cat == null)
+            {
+                return null;
+            }
+
+            var reportElementCategory = new ReportElementCategory
             {
                 ReportElementCategoryId = cat.ReportElementCategoryId,
                 Name = cat.Name,
@@ -666,14 +687,14 @@ namespace Linko.LinkoExchange.Services.Mapping
             // This will include attachment, TTO, comments etc categories
             foreach (var cat in reportPackageTemplate.ReportPackageTemplateElementCategories)
             {
-                rpt.ReportPackageTemplateElementCategories.Add(this.GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(cat));
+                rpt.ReportPackageTemplateElementCategories.Add(GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(cat));
             }
 
             // For ReportPackageTemplateAssignments fields  
             rpt.ReportPackageTemplateAssignments = new List<ReportPackageTemplateAssignmentDto>();
             foreach (var rpta in reportPackageTemplate.ReportPackageTemplateAssignments)
             {
-                rpt.ReportPackageTemplateAssignments.Add(this.GetReportPackageTemplateAssignmentDtoFromReportPackageTemplateAssignment(rpta));
+                rpt.ReportPackageTemplateAssignments.Add(GetReportPackageTemplateAssignmentDtoFromReportPackageTemplateAssignment(rpta));
             }
 
             return rpt;
@@ -721,6 +742,11 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public ReportPackageTemplateElementTypeDto GetReportPackageTemplateElmentTypeDtoFromReportPackageTemplateType(ReportPackageTemplateElementType rptet)
         {
+            if (rptet == null)
+            {
+                return null;
+            }
+
             var dto = new ReportPackageTemplateElementTypeDto();
             dto.ReportPackageTemplateElementTypeId = rptet.ReportPackageTemplateElementTypeId;
             dto.ReportPackageTemplateElementCategoryId = rptet.ReportPackageTemplateElementCategoryId;
@@ -733,6 +759,11 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public ReportElementTypeDto GetReportElementTypeDtoFromReportElementType(ReportElementType reportElementType)
         {
+            if (reportElementType == null)
+            {
+                return null;
+            }
+
             var mappedReportElementType = new ReportElementTypeDto();
             mappedReportElementType.ReportElementCategoryId = reportElementType.ReportElementCategoryId;
             if (reportElementType.ReportElementCategory != null)
@@ -780,13 +811,18 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public ReportPackageTemplateAssignmentDto GetReportPackageTemplateAssignmentDtoFromReportPackageTemplateAssignment(ReportPackageTemplateAssignment rpt)
         {
+            if (rpt == null)
+            {
+                return null;
+            }
+
             var rptaDto = new ReportPackageTemplateAssignmentDto
             {
                 ReportPackageTemplateAssignmentId = rpt.ReportPackageTemplateAssignmentId,
                 ReportPackageTemplateId = rpt.ReportPackageTemplateId,
                 OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId,
                 OrganizationRegulatoryProgram =
-                    this.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(
+                    GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(
                         rpt.OrganizationRegulatoryProgram)
             };
             return rptaDto;
@@ -794,12 +830,17 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public ReportPackageTemplateAssignment GetReportPackageTemplateAssignmentFromReportPackageTemplateAssignmentDto(ReportPackageTemplateAssignmentDto rptDto)
         {
+            if (rptDto == null)
+            {
+                return null;
+            }
+
             var rpta = new ReportPackageTemplateAssignment
             {
                 ReportPackageTemplateAssignmentId = rptDto.ReportPackageTemplateAssignmentId,
                 ReportPackageTemplateId = rptDto.ReportPackageTemplateId,
                 ReportPackageTemplate =
-                    this.GetReportPackageTemplateFromReportPackageTemplateDto(rptDto.ReportPackageTemplate),
+                    GetReportPackageTemplateFromReportPackageTemplateDto(rptDto.ReportPackageTemplate),
                 OrganizationRegulatoryProgramId = rptDto.OrganizationRegulatoryProgramId
             };
             return rpta;
