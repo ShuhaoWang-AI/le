@@ -135,8 +135,10 @@ namespace Linko.LinkoExchange.Services.Report
         //      2.2 Create records in table tReportPackageTemplateElementType
         /// </summary>
         /// <param name="rpt">The ReportPackageTemplateDto Object</param> 
-        public void SaveReportPackageTemplate(ReportPackageTemplateDto rpt)
+        public int SaveReportPackageTemplate(ReportPackageTemplateDto rpt)
         {
+            var rptId = rpt.ReportPackageTemplateId.HasValue ? rpt.ReportPackageTemplateId.Value : -1;
+
             using (var transaction = _dbContext.BeginTransaction())
             {
                 List<RuleViolation> validationIssues = new List<RuleViolation>();
@@ -226,6 +228,8 @@ namespace Linko.LinkoExchange.Services.Report
 
                         // First time creation recorder DO NOT need to provide creation datetime.
                         reportPackageTemplate = _dbContext.ReportPackageTempates.Add(reportPackageTemplate);
+                        _dbContext.SaveChanges();
+                        rptId = reportPackageTemplate.ReportPackageTemplateId;
                     }
 
                     // Create records in tReportTemplateAssignment table
@@ -262,6 +266,8 @@ namespace Linko.LinkoExchange.Services.Report
 
                     _dbContext.SaveChanges();
                     transaction.Commit();
+
+                    return rptId;
                 }
                 catch (Exception ex)
                 {
@@ -316,7 +322,7 @@ namespace Linko.LinkoExchange.Services.Report
             foreach (var rpt in reportElementTypes)
             {
                 var reportElementTypeDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(rpt);
-                if (rpt.LastModifierUserId.HasValue)
+                if (rpt.LastModificationDateTimeUtc.HasValue)
                 {
                     reportElementTypeDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(rpt.LastModificationDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
                     var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
@@ -409,7 +415,7 @@ namespace Linko.LinkoExchange.Services.Report
                 foreach (var ret in rets)
                 {
                     var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(ret);
-                    if (ret.LastModifierUserId.HasValue)
+                    if (ret.LastModificationDateTimeUtc.HasValue)
                     {
                         retDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(ret.LastModificationDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
                         var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);

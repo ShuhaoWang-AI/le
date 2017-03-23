@@ -8,7 +8,7 @@ namespace Linko.LinkoExchange.Services.Report
         void DeleteReportPackageTemplate(int reportPackageTemplateId);
         ReportPackageTemplateDto GetReportPackageTemplate(int reportPackageTemplateId);
         IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates();
-        void SaveReportPackageTemplate(ReportPackageTemplateDto rpt);
+        int SaveReportPackageTemplate(ReportPackageTemplateDto rpt);
 
         IEnumerable<CtsEventTypeDto> GetCtsEventTypes();
         IEnumerable<ReportElementTypeDto> GetCertificationTypes();
