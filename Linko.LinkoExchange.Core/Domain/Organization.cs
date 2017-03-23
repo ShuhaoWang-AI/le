@@ -63,5 +63,9 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual ICollection<OrganizationRegulatoryProgram> RegulatorOrganizationRegulatoryPrograms { get; set; }
 
         public virtual ICollection<OrganizationSetting> OrganizationSettings { get; set; }
+
+        public virtual ICollection<CollectionMethod> CollectionMethods { get; set; }
+
+        public virtual ICollection<Unit> Units { get; set; }
     }
 }

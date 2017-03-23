@@ -23,20 +23,4 @@ namespace Linko.LinkoExchange.Core.Domain
         public string IUSampleFrequency { get; set; }
         public bool IsRemoved { get; set; }
     }
-
-    public class CollectionMethod
-    {
-        public int CollectionMethodId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public bool IsRemoved { get; set; }
-    }
-
-    public class MonitoringPoint
-    {
-        public int MonitoringPointId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public bool IsRemoved { get; set; }
-    }
 }

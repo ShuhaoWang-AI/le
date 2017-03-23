@@ -3,24 +3,24 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public class UnitMap : EntityTypeConfiguration<Unit>
+    public class MonitoringPointMap : EntityTypeConfiguration<MonitoringPoint>
     {
-        public UnitMap()
+        public MonitoringPointMap()
         {
-            ToTable("tUnit");
+            ToTable("tMonitoringPoint");
 
-            HasKey(x => x.UnitId);
+            HasKey(x => x.MonitoringPointId);
 
             Property(x => x.Name).IsRequired().HasMaxLength(100);
 
             Property(x => x.Description).IsOptional().HasMaxLength(500);
 
-            Property(x => x.IsFlowUnit).IsRequired();
-
-            HasRequired(a => a.Organization)
-                .WithMany(b => b.Units)
-                .HasForeignKey(c => c.OrganizationId)
+            HasRequired(a => a.OrganizationRegulatoryProgram)
+                .WithMany(b => b.MonitoringPoints)
+                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(false);
+
+            Property(x => x.IsEnabled).IsRequired();
 
             Property(x => x.IsRemoved).IsRequired();
 

@@ -56,6 +56,8 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public virtual ICollection<OrganizationRegulatoryProgramUser> InviterOrganizationRegulatoryProgramUsers { get; set; }
 
+        public virtual ICollection<MonitoringPoint> MonitoringPoints { get; set; }
+
         public virtual ICollection<PermissionGroup> PermissionGroups { get; set; }
 
         public virtual ICollection<Parameter> Parameters { get; set; }

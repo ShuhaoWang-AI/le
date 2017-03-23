@@ -73,12 +73,14 @@
     <Compile Include="Common\LinkoExchangeException.cs" />
     <Compile Include="Common\ValueParser.cs" />
     <Compile Include="Domain\AuditLogTemplate.cs" />
+    <Compile Include="Domain\CollectionMethod.cs" />
     <Compile Include="Domain\CromerrAuditLog.cs" />
     <Compile Include="Domain\CtsEventType.cs" />
     <Compile Include="Domain\EmailAuditLog.cs" />
     <Compile Include="Domain\Invitation.cs" />
     <Compile Include="Domain\Jurisdiction.cs" />
     <Compile Include="Domain\Module.cs" />
+    <Compile Include="Domain\MonitoringPoint.cs" />
     <Compile Include="Domain\MonitoringPointParameterLimit.cs" />
     <Compile Include="Domain\Organization.cs" />
     <Compile Include="Domain\OrganizationRegulatoryProgram.cs" />

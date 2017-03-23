@@ -79,11 +79,13 @@
   <ItemGroup>
     <Compile Include="LinkoExchangeContext.cs" />
     <Compile Include="Mapping\AuditLogTemplateMap.cs" />
+    <Compile Include="Mapping\CollectionMethodMap.cs" />
     <Compile Include="Mapping\CromerrAuditLogMap.cs" />
     <Compile Include="Mapping\CtsEventTypeMap.cs" />
     <Compile Include="Mapping\EmailAuditLogMap.cs" />
     <Compile Include="Mapping\InvitationMap.cs" />
     <Compile Include="Mapping\JurisdictionMap.cs" />
+    <Compile Include="Mapping\MonitoringPointMap.cs" />
     <Compile Include="Mapping\OrganizationRegulatoryProgramModuleMap.cs" />
     <Compile Include="Mapping\OrganizationTypeRegulatoryProgramMap.cs" />
     <Compile Include="Mapping\ParameterGroupMap.cs" />

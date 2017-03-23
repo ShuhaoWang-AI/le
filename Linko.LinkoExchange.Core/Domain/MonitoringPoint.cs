@@ -3,32 +3,29 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a Unit.
+    /// Represents a Monitoring Point.
     /// </summary>
-    public partial class Unit
+    public partial class MonitoringPoint
     {
         /// <summary>
         /// Primary key.
         /// </summary>
-        public int UnitId { get; set; }
+        public int MonitoringPointId { get; set; }
 
-        /// <summary>
-        /// Unique within a particular OrganizationRegulatoryProgramId.
-        /// </summary>
         public string Name { get; set; }
 
         public string Description { get; set; }
 
         /// <summary>
-        /// True: the current unit is for flow. False, otherwise.
+        /// Typical value: Authority Regulatory Program id.
         /// </summary>
-        public bool IsFlowUnit { get; set; }
+        public int OrganizationRegulatoryProgramId { get; set; }
+        public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 
         /// <summary>
-        /// Typical value: Authority id.
+        /// True: the current monitoring point is visible to the Industry. False, otherwise.
         /// </summary>
-        public int OrganizationId { get; set; }
-        public virtual Organization Organization { get; set; }
+        public bool IsEnabled { get; set; }
 
         public bool IsRemoved { get; set; }
 

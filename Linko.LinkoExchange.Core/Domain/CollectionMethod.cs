@@ -3,32 +3,32 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a Unit.
+    /// Represents a Collection Method for a particular organization.
     /// </summary>
-    public partial class Unit
+    public partial class CollectionMethod
     {
         /// <summary>
         /// Primary key.
         /// </summary>
-        public int UnitId { get; set; }
+        public int CollectionMethodId { get; set; }
 
         /// <summary>
-        /// Unique within a particular OrganizationRegulatoryProgramId.
+        /// Unique within a particular OrganizationId.
         /// </summary>
         public string Name { get; set; }
 
         public string Description { get; set; }
 
         /// <summary>
-        /// True: the current unit is for flow. False, otherwise.
-        /// </summary>
-        public bool IsFlowUnit { get; set; }
-
-        /// <summary>
         /// Typical value: Authority id.
         /// </summary>
         public int OrganizationId { get; set; }
         public virtual Organization Organization { get; set; }
+
+        /// <summary>
+        /// True: the current collection method is visible to the Industry. False, otherwise.
+        /// </summary>
+        public bool IsEnabled { get; set; }
 
         public bool IsRemoved { get; set; }
 

@@ -3,24 +3,24 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public class UnitMap : EntityTypeConfiguration<Unit>
+    public class CollectionMethodMap : EntityTypeConfiguration<CollectionMethod>
     {
-        public UnitMap()
+        public CollectionMethodMap()
         {
-            ToTable("tUnit");
+            ToTable("tCollectionMethod");
 
-            HasKey(x => x.UnitId);
+            HasKey(x => x.CollectionMethodId);
 
             Property(x => x.Name).IsRequired().HasMaxLength(100);
 
             Property(x => x.Description).IsOptional().HasMaxLength(500);
 
-            Property(x => x.IsFlowUnit).IsRequired();
-
             HasRequired(a => a.Organization)
-                .WithMany(b => b.Units)
+                .WithMany(b => b.CollectionMethods)
                 .HasForeignKey(c => c.OrganizationId)
                 .WillCascadeOnDelete(false);
+
+            Property(x => x.IsEnabled).IsRequired();
 
             Property(x => x.IsRemoved).IsRequired();
 
