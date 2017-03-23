@@ -63,8 +63,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 rpt.Name += "_";
                 rpt.Description += "_";
+                rpt.ShowSampleResults = true;
+
+                _reportTemplateService.SaveReportPackageTemplate(rpt);
             }
-            _reportTemplateService.SaveReportPackageTemplate(templatesList[0]);
 
             templatesList = _reportTemplateService.GetReportPackageTemplates().ToList();
 

@@ -217,7 +217,7 @@ namespace Linko.LinkoExchange.Services.Report
                     }
                     else
                     {
-                        // 1 Create new in tReportPackageTempate table
+                        // Create new in tReportPackageTempate table
                         reportPackageTemplate.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
                         reportPackageTemplate.IsActive = rpt.IsActive;
                         reportPackageTemplate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
@@ -228,7 +228,7 @@ namespace Linko.LinkoExchange.Services.Report
                         reportPackageTemplate = _dbContext.ReportPackageTempates.Add(reportPackageTemplate);
                     }
 
-                    // 2 Create records in tReportTemplateAssignment table
+                    // Create records in tReportTemplateAssignment table
                     foreach (var assignment in reportPackageTemplate.ReportPackageTemplateAssignments)
                     {
                         _dbContext.ReportPackageTemplateAssignments.Add(assignment);
@@ -239,29 +239,21 @@ namespace Linko.LinkoExchange.Services.Report
                     // Determine show sample result section or not
                     if (rpt.ShowSampleResults)
                     {
-                        // TODO replace below code to create sample result type in ReportPackageTemplateElementTypes table;  
-                        var sampleCategory =
-                            _dbContext.ReportElementCategories.Single(
-                                i => i.Name == ReportElementCategoryName.SamplesAndResults.ToString());
-
-                        var rptec = new ReportPackageTemplateElementCategory
+                        if (rpt.SamplesAndResultsTypes != null && rpt.SamplesAndResultsTypes.Count > 0)
                         {
-                            ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId,
-                            ReportElementCategoryId = sampleCategory.ReportElementCategoryId,
-                            SortOrder = 0
-                        };
-
-                        _dbContext.ReportPackageTemplateElementCategories.Add(rptec);
+                            var samplesAndResultsTypes = rpt.SamplesAndResultsTypes.ToArray();
+                            CreateReportPackageElementCatergoryType(samplesAndResultsTypes, reportPackageTemplate, 1);
+                        }
                     }
 
-                    // 3 AttachmentType   
+                    // AttachmentType   
                     if (rpt.AttachmentTypes != null && rpt.AttachmentTypes.Count > 0)
                     {
                         var attachmentTypes = rpt.AttachmentTypes.ToArray();
                         CreateReportPackageElementCatergoryType(attachmentTypes, reportPackageTemplate, 1);
                     }
 
-                    // 4 CertificationType  
+                    // CertificationType  
                     if (rpt.CertificationTypes != null && rpt.CertificationTypes.Count > 0)
                     {
                         var certificationTypes = rpt.CertificationTypes.ToArray();
@@ -440,7 +432,7 @@ namespace Linko.LinkoExchange.Services.Report
                 .OrderBy(i => i.SortOrder)
                 .ToList();
 
-            var rets = rptets.Select(i => i.ReportElementType).Distinct();
+            var rets = rptets.Select(i => i.ReportElementType).Distinct().ToList();
             foreach (var ret in rets)
             {
                 ret.CtsEventType =
