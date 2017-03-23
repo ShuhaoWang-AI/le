@@ -2130,7 +2130,7 @@ BEGIN
         ReportPackageTemplateElementTypeId          int IDENTITY(1,1) NOT NULL  
         , ReportPackageTemplateElementCategoryId    int NOT NULL  
         , ReportElementTypeId                       int NOT NULL
-        , IsRequired                                int NOT NULL
+        , IsRequired                                bit NOT NULL
         , SortOrder                                 int NOT NULL  
     
         CONSTRAINT PK_tReportPackageTemplateElementType PRIMARY KEY CLUSTERED 
