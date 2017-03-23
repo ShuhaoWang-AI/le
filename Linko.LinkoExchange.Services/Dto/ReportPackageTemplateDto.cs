@@ -21,7 +21,7 @@ namespace Linko.LinkoExchange.Services.Dto
 
         public int? LastModifierUserId { get; set; }
         public string LastModifierFullName { get; set; }
-
+        public List<ReportElementTypeDto> SamplesAndResultsTypes { get; set; }
         public List<ReportElementTypeDto> AttachmentTypes { get; set; }
         public List<ReportElementTypeDto> CertificationTypes { get; set; }
         public List<ReportPackageTemplateAssignmentDto> ReportPackageTemplateAssignments { get; set; }

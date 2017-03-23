@@ -390,51 +390,12 @@ namespace Linko.LinkoExchange.Services.Report
                 rptDto.RetirementDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(rpt.RetirementDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
             }
 
-            //1. set AttachmentTypes  
-            var cat = rpt.ReportPackageTemplateElementCategories
-                .FirstOrDefault(i => i.ReportElementCategory.Name == ReportElementCategoryName.Attachments.ToString());
+            // set SamplesAndResultsTypes, AttachmentTypes, and CertificationTypes
+            rptDto.SamplesAndResultsTypes = GetReportElementTypes(ReportElementCategoryName.SamplesAndResults, rpt, currentOrgRegProgramId);
+            rptDto.AttachmentTypes = GetReportElementTypes(ReportElementCategoryName.Attachments, rpt, currentOrgRegProgramId);
+            rptDto.CertificationTypes = GetReportElementTypes(ReportElementCategoryName.Certifications, rpt, currentOrgRegProgramId);
 
-            rptDto.AttachmentTypes = new List<ReportElementTypeDto>();
-            if (cat != null)
-            {
-                var rets = GetReportElementType(cat);
-                foreach (var ret in rets)
-                {
-                    var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(ret);
-                    if (ret.LastModifierUserId.HasValue)
-                    {
-                        retDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(ret.LastModificationDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
-                        var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
-                        retDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
-                    }
-                    rptDto.AttachmentTypes.Add(retDto);
-                }
-            }
-
-            //2. set certifications   
-            cat = rpt.ReportPackageTemplateElementCategories
-                .FirstOrDefault(
-                    i => i.ReportElementCategory.Name == ReportElementCategoryName.Certifications.ToString());
-
-            rptDto.CertificationTypes = new List<ReportElementTypeDto>();
-            if (cat != null)
-            {
-                var rets = GetReportElementType(cat);
-                foreach (var ret in rets)
-                {
-                    var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(ret);
-                    if (ret.LastModifierUserId.HasValue)
-                    {
-                        retDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(ret.LastModificationDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
-                        var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
-                        retDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
-                    }
-
-                    rptDto.CertificationTypes.Add(retDto);
-                }
-            }
-
-            //3. set assingedIndustries  
+            // set assingedIndustries  
             rptDto.ReportPackageTemplateAssignments = rptDto.ReportPackageTemplateAssignments;
             if (rpt.LastModifierUserId.HasValue)
             {
@@ -442,6 +403,31 @@ namespace Linko.LinkoExchange.Services.Report
                 rptDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
             }
             return rptDto;
+        }
+
+        private List<ReportElementTypeDto> GetReportElementTypes(ReportElementCategoryName categoryName, ReportPackageTemplate rpt, int currentOrgRegProgramId)
+        {
+            var cat = rpt.ReportPackageTemplateElementCategories
+                .FirstOrDefault(i => i.ReportElementCategory.Name == categoryName.ToString());
+
+            var amplesAndResultsTypes = new List<ReportElementTypeDto>();
+            if (cat != null)
+            {
+                var rets = GetReportElementType(cat);
+                foreach (var ret in rets)
+                {
+                    var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(ret);
+                    if (ret.LastModifierUserId.HasValue)
+                    {
+                        retDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(ret.LastModificationDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
+                        var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
+                        retDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+                    }
+                    amplesAndResultsTypes.Add(retDto);
+                }
+            }
+
+            return amplesAndResultsTypes;
         }
 
         private IEnumerable<ReportElementType> GetReportElementType(ReportPackageTemplateElementCategory cat)
