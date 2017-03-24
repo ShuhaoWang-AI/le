@@ -155,6 +155,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         {
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId; 
+            var parameterGroupIdToReturn = -1;
             var currentUserProfileId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
             List<RuleViolation> validationIssues = new List<RuleViolation>();
             using (var transaction = _dbContext.BeginTransaction())
@@ -218,6 +219,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                         paramGroupToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
                         paramGroupToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                         paramGroupToPersist.LastModifierUserId = currentUserProfileId;
+                        
                     }
                     else
                     {
@@ -239,10 +241,11 @@ namespace Linko.LinkoExchange.Services.Parameter
                     }
 
                     _dbContext.SaveChanges();
-                    var parameterGroupId = paramGroupToPersist.ParameterGroupId;
+
+                    parameterGroupIdToReturn = paramGroupToPersist.ParameterGroupId;
 
                     transaction.Commit();
-                    return parameterGroupId;
+                    
                 }
                 catch (RuleViolationException ex)
                 {
@@ -266,10 +269,10 @@ namespace Linko.LinkoExchange.Services.Parameter
                     throw;
                 }
 
+
             }
            
-            
-            
+            return parameterGroupIdToReturn;
 
         }
 
@@ -358,11 +361,20 @@ namespace Linko.LinkoExchange.Services.Parameter
                                             && p.IsRemoved == false
                                             && p.CollectionMethod.IsRemoved == false);
 
-                    foreach (var mpParamLimit in freqCollectParams)
+                    foreach (var mpParamLimit in freqCollectParams.ToList())
                     {
                         var param = _mapHelper.GetParameterDtoFromParameter(mpParamLimit.Parameter);
 
-                        //TO-DO: Set concentration, mass loading, default units
+                        ////TO-DO: Set concentration, mass loading, default units
+                        //if (mpParamLimit.DailyLimit.HasValue)
+                        //{
+                        //    param.ConcentrationUnit = _mapHelper.GetUnitDtoFromUnit(mpParamLimit.DailyLimitUnit);
+                        //}
+                        //if (mpParamLimit.MassLoadingDailyLimit.HasValue)
+                        //{
+                        //    param.IsCalcMassLoading = true;
+                        //}
+
 
                         dynamicFreqAndCollectMethodParamGroup.Parameters.Add(param);
                     }
@@ -390,7 +402,15 @@ namespace Linko.LinkoExchange.Services.Parameter
                 {
                     var param = _mapHelper.GetParameterDtoFromParameter(mpParamLimit.Parameter);
 
-                    //TO-DO: Set concentration, mass loading, default units
+                    ////TO-DO: Set concentration, mass loading, default units
+                    //if (mpParamLimit.DailyLimit.HasValue)
+                    //{
+                    //    param.ConcentrationUnit = _mapHelper.GetUnitDtoFromUnit(mpParamLimit.DailyLimitUnit);
+                    //}
+                    //if (mpParamLimit.MassLoadingDailyLimit.HasValue)
+                    //{
+                    //    param.IsCalcMassLoading = true;
+                    //}
 
                     dynamicAllCollectMethodParamGroup.Parameters.Add(param);
                 }
