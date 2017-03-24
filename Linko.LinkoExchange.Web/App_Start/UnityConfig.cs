@@ -93,6 +93,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IEncryptionService, EncryptionService>();
             container.RegisterType<IJurisdictionService, JurisdictionService>();
             container.RegisterType<IParameterService, ParameterService>();
+            container.RegisterType<IReportElementService, ReportElementService>();
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();

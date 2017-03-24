@@ -18,6 +18,7 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Parameter;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.User;
@@ -46,10 +47,12 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly ILogger _logger;
         private readonly ICromerrAuditLogService _cromerrLogService;
         private readonly IParameterService _parameterService;
+        private readonly IReportElementService _reportElementService;
 
         public AuthorityController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService,
                                    ISettingService settingService, IQuestionAnswerService questionAnswerService, ITimeZoneService timeZoneService, IPermissionService permissionService,
-                                   ISessionCache sessionCache, ILogger logger, ICromerrAuditLogService cromerrLogService, IHttpContextService httpContextService, IParameterService parameterService)
+                                   ISessionCache sessionCache, ILogger logger, ICromerrAuditLogService cromerrLogService, IHttpContextService httpContextService, IParameterService parameterService,
+                                   IReportElementService reportElementService)
         {
             _organizationService = organizationService;
             _userService = userService;
@@ -63,6 +66,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _cromerrLogService = cromerrLogService;
             _httpContextService = httpContextService;
             _parameterService = parameterService;
+            _reportElementService = reportElementService;
         }
 
         #endregion
@@ -1853,6 +1857,104 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                IsRemoved = p.IsRemoved
                                                                                            }).ToList();
             return viewModel;
+        }
+
+        #endregion
+
+        #region Show Report Element Type List
+        
+        // GET: /Authority/ReportElementTypes
+        public ActionResult ReportElementTypes()
+        {
+            return View();
+        }
+
+        public ActionResult ReportElementTypes_Attachment_Read([DataSourceRequest] DataSourceRequest request)
+        {
+            var reportElementTypes = _reportElementService.GetReportElementTypes(ReportElementCategoryName.Attachments);
+
+            var viewModels = reportElementTypes.Select(vm => new ReportElementTypeViewModel
+                                                          {
+                                                              Id = vm.ReportElementTypeId,
+                                                              Name = vm.Name,
+                                                              Description = vm.Description,
+                                                              LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal,
+                                                              LastModifierUserName = vm.LastModifierFullName
+                                                          });
+
+            var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
+                                                                                       {
+                                                                                           vm.Id,
+                                                                                           vm.Name,
+                                                                                           vm.Description,
+                                                                                           vm.LastModificationDateTimeLocal,
+                                                                                           vm.LastModifierUserName
+                                                                                       });
+
+            return Json(data:result);
+        }
+        public ActionResult ReportElementTypes_Certification_Read([DataSourceRequest] DataSourceRequest request)
+        {
+            var reportElementTypes = _reportElementService.GetReportElementTypes(ReportElementCategoryName.Certifications);
+
+            var viewModels = reportElementTypes.Select(vm => new ReportElementTypeViewModel
+                                                          {
+                                                              Id = vm.ReportElementTypeId,
+                                                              Name = vm.Name,
+                                                              Description = vm.Description,
+                                                              LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal,
+                                                              LastModifierUserName = vm.LastModifierFullName
+                                                          });
+
+            var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
+                                                                                       {
+                                                                                           vm.Id,
+                                                                                           vm.Name,
+                                                                                           vm.Description,
+                                                                                           vm.LastModificationDateTimeLocal,
+                                                                                           vm.LastModifierUserName
+                                                                                       });
+
+            return Json(data:result);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        public ActionResult ReportElementTypes_Select(IEnumerable<ReportElementTypeViewModel> items)
+        {
+            try
+            {
+                if (items != null)
+                {
+                    var item = items.First();
+                    return Json(data:new
+                                     {
+                                         redirect = true,
+                                         newurl = Url.Action(actionName:"ReportElementTypeDetails", controllerName:"Authority", routeValues:new { id = item.Id })
+                                     });
+                }
+                return Json(data:new
+                                 {
+                                     redirect = false,
+                                     message = "Please select a parameter group."
+                                 });
+            }
+            catch (RuleViolationException rve)
+            {
+                return Json(data:new
+                                 {
+                                     redirect = false,
+                                     message = MvcValidationExtensions.GetViolationMessages(ruleViolationException:rve)
+                                 });
+            }
+        }
+        
+
+        #endregion
+
+        #region Show Report Element Type Details
+        public ActionResult ReportElementTypeDetails()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

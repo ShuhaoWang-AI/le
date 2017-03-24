@@ -408,6 +408,7 @@
     <Content Include="Views\ReprotPackage\index.cshtml" />
     <Content Include="Views\Authority\ParameterGroups.cshtml" />
     <Content Include="Views\Authority\ParameterGroupDetails.cshtml" />
+    <Content Include="Views\Authority\ReportElementTypes.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -452,6 +453,7 @@
     <Compile Include="ViewModels\Authority\AuthorityUserViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
+    <Compile Include="ViewModels\Shared\ReportElementTypeViewModel.cs" />
     <Compile Include="ViewModels\Shared\ParameterGroupViewModel.cs" />
     <Compile Include="ViewModels\Shared\ParameterViewModel.cs" />
     <Compile Include="ViewModels\Shared\PendingInvitationViewModel.cs" />

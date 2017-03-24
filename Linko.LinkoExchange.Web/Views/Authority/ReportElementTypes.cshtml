@@ -1,0 +1,181 @@
+﻿@using Linko.LinkoExchange.Web.ViewModels.Shared
+@{
+    ViewBag.Title = "Report Package Elements";
+}
+
+<section>
+    <ol class="breadcrumb">
+        <li>
+            <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Authority")'"><i class=""></i> Home </a>
+        </li>
+        <li class="active">Report Package Elements</li>
+    </ol>
+</section>
+
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title">Attachments</h3>
+        <div class="box-tools pull-right">
+            <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"ReportElementTypeDetails", controllerName:"Authority")'">Create New Type</button>
+            <button class="btn btn-box-tool" data-widget="collapse">
+                <i class="fa fa-minus"></i>
+            </button>
+        </div>
+    </div>
+
+    <section class="box-body form-horizontal">
+        <div class="form-group">
+            <div class="col-md-12">
+                @* grid name should be start with grid for centralized error handling *@
+                @(Html.Kendo().Grid<ReportElementTypeViewModel>()
+                      .Name(componentName: "gridAttachment")
+                      .Columns(columns =>
+                      {
+                          columns.Bound(c => c.Name)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
+                          columns.Bound(c => c.Description)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
+                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm:ss}")
+                                 .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+                          columns.Bound(c => c.LastModifierUserName)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
+                          columns.Template(m =>
+                          {
+                          })
+                                 .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
+                                 .Width(pixelWidth: 60);
+                      })
+                      .Pageable(pageable => pageable
+                                                .PageSizes(pageSizes: new List<object> { "all", 15, 25, 50, 75 })
+                                                .Refresh(enabled: true)
+                                                .Input(enabled: true)
+                                                .Numeric(enabled: false)
+                      )
+                      .Selectable(selectable =>
+                      {
+                          selectable.Mode(mode: GridSelectionMode.Single);
+                          selectable.Type(type: GridSelectionType.Row);
+                      })
+                      .Sortable(sortable =>
+                      {
+                          sortable.SortMode(value: GridSortMode.MultipleColumn);
+                      })
+                      //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                      .Resizable(resizable => resizable.Columns(value: true))
+                      .Scrollable(s => s.Height(value: "auto"))
+                      .NoRecords(text: "No attachment element type exists.")
+                      .Events(events =>
+                      {
+                          events.Change(handler: "gotoNextPageAttachment");
+                      })
+                      .DataSource(dataSource => dataSource
+                                                    .Ajax()
+                                                    .ServerOperation(enabled: false)
+                                                    .Batch(enabled: true)
+                                                    .Read(read => read.Action(actionName: "ReportElementTypes_Attachment_Read", controllerName: "Authority"))
+                                                    .PageSize(pageSize: 15)
+                                                    .Events(events => events.Error(handler: "error_handler"))
+                      )
+                )
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title">Certifications</h3>
+        <div class="box-tools pull-right">
+            <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"ReportElementTypeDetails", controllerName:"Authority")'">Create New Type</button>
+            <button class="btn btn-box-tool" data-widget="collapse">
+                <i class="fa fa-minus"></i>
+            </button>
+        </div>
+    </div>
+
+    <section class="box-body form-horizontal">
+        <div class="form-group">
+            <div class="col-md-12">
+                @* grid name should be start with grid for centralized error handling *@
+                @(Html.Kendo().Grid<ReportElementTypeViewModel>()
+                      .Name(componentName: "gridCertification")
+                      .Columns(columns =>
+                      {
+                          columns.Bound(c => c.Name)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
+                          columns.Bound(c => c.Description)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
+                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm:ss}")
+                                 .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+                          columns.Bound(c => c.LastModifierUserName)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
+                          columns.Template(m =>
+                          {
+                          })
+                                 .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
+                                 .Width(pixelWidth: 60);
+                      })
+                      .Pageable(pageable => pageable
+                                                .PageSizes(pageSizes: new List<object> { "all", 15, 25, 50, 75 })
+                                                .Refresh(enabled: true)
+                                                .Input(enabled: true)
+                                                .Numeric(enabled: false)
+                      )
+                      .Selectable(selectable =>
+                      {
+                          selectable.Mode(mode: GridSelectionMode.Single);
+                          selectable.Type(type: GridSelectionType.Row);
+                      })
+                      .Sortable(sortable =>
+                      {
+                          sortable.SortMode(value: GridSortMode.MultipleColumn);
+                      })
+                      //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                      .Resizable(resizable => resizable.Columns(value: true))
+                      .Scrollable(s => s.Height(value: "auto"))
+                      .NoRecords(text: "No attachment element type exists.")
+                      .Events(events =>
+                      {
+                          events.Change(handler: "gotoNextPageCertification");
+                      })
+                      .DataSource(dataSource => dataSource
+                                                    .Ajax()
+                                                    .ServerOperation(enabled: false)
+                                                    .Batch(enabled: true)
+                                                    .Read(read => read.Action(actionName: "ReportElementTypes_Certification_Read", controllerName: "Authority"))
+                                                    .PageSize(pageSize: 15)
+                                                    .Events(events => events.Error(handler: "error_handler"))
+                      )
+                )
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        gotoNextPageAttachment = function()
+        {
+            var grid = $("#gridAttachment").data("kendoGrid");
+            var postUrl = "@Url.Action(actionName: "ReportElementTypes_Select", controllerName:"Authority")";
+
+            doAjaxAction(grid, postUrl, "", "Select an attachment type");
+        }
+
+        gotoNextPageCertification = function()
+        {
+            var grid = $("#gridAttachment").data("kendoGrid");
+            var postUrl = "@Url.Action(actionName: "ReportElementTypes_Select", controllerName:"Authority")";
+
+            doAjaxAction(grid, postUrl, "", "Select a certification type");
+        }
+
+    </script>
+}
+
