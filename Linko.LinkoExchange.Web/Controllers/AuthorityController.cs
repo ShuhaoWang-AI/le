@@ -1692,7 +1692,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             try
             {
-                if (items != null && ModelState.IsValid)
+                if (items != null)
                 {
                     var item = items.First();
                     return Json(data:new

@@ -102,7 +102,7 @@
                                                                    {
                                                                        @class = "control-label col-md-2 required"
                                                                    })
-                <div class="col-md-4">
+                <div class="col-md-8">
                     @Html.EditorFor(model => model.Name, additionalViewData:new
                                                                             {
                                                                                 htmlAttributes = new
@@ -118,9 +118,9 @@
 
                 @Html.LabelFor(model => model.IsActive, htmlAttributes:new
                                                                        {
-                                                                           @class = "control-label col-md-2"
+                                                                           @class = "control-label col-md-1"
                                                                        })
-                <div class="col-md-4">
+                <div class="col-md-1">
                     <div class="checkbox">
                         @Html.EditorFor(model => model.IsActive)
                     </div>
@@ -132,7 +132,7 @@
                                                                           {
                                                                               @class = "control-label col-md-2"
                                                                           })
-                <div class="col-md-10">
+                <div class="col-md-8">
                     @Html.EditorFor(model => model.Description, additionalViewData:new
                                                                                    {
                                                                                        htmlAttributes = new
