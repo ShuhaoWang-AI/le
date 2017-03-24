@@ -921,7 +921,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(HttpVerbs.Post)]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ResetExpiredPassword(ResetPasswordViewModel model)
+        public ActionResult ResetExpiredPassword(ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
             {

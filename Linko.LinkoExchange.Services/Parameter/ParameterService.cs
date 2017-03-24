@@ -129,7 +129,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         {
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var foundParamGroup = _dbContext.ParameterGroups
-                .Include(param => param.ParameterGroupParameters)
+                .Include(param => param.ParameterGroupParameters.Select(i=>i.Parameter))
                 .Single(param => param.ParameterGroupId == parameterGroupId);
 
             var parameterGroupDto = _mapHelper.GetParameterGroupDtoFromParameterGroup(foundParamGroup);
@@ -151,9 +151,10 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// OR creates new object to persist.
         /// </summary>
         /// <param name="parameterGroup"></param>
-        public void SaveParameterGroup(ParameterGroupDto parameterGroup)
+        public int SaveParameterGroup(ParameterGroupDto parameterGroup)
         {
-            var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId; 
+            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId; 
             var currentUserProfileId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
             List<RuleViolation> validationIssues = new List<RuleViolation>();
             using (var transaction = _dbContext.BeginTransaction())
@@ -201,7 +202,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                         {
                             if (paramGroupWithMatchingName.ParameterGroupId != parameterGroup.ParameterGroupId.Value)
                             {
-                                string message = "A Parameter Group with that name already exists.  Please select another name.";
+                                string message = "A Parameter Group with that name already exists. Please select another name.";
                                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                             }
@@ -214,6 +215,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                         _dbContext.ParameterGroupParameters.RemoveRange(paramGroupToPersist.ParameterGroupParameters);
 
                         paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup, paramGroupToPersist);
+                        paramGroupToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
                         paramGroupToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                         paramGroupToPersist.LastModifierUserId = currentUserProfileId;
                     }
@@ -229,6 +231,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 
                         //Get new
                         paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup);
+                        paramGroupToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
                         paramGroupToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
                         paramGroupToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                         paramGroupToPersist.LastModifierUserId = currentUserProfileId;
@@ -236,8 +239,10 @@ namespace Linko.LinkoExchange.Services.Parameter
                     }
 
                     _dbContext.SaveChanges();
+                    var parameterGroupId = paramGroupToPersist.ParameterGroupId;
 
                     transaction.Commit();
+                    return parameterGroupId;
                 }
                 catch (RuleViolationException ex)
                 {

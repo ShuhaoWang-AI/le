@@ -453,7 +453,6 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             parameterGroup.Name = parameterGroupDto.Name;
             parameterGroup.Description = parameterGroupDto.Description;
-            parameterGroup.OrganizationRegulatoryProgramId = parameterGroupDto.OrganizationRegulatoryProgramId;
             parameterGroup.IsActive = parameterGroupDto.IsActive;
             foreach (var param in parameterGroupDto.Parameters)
             {

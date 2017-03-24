@@ -12,7 +12,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null);
         IEnumerable<ParameterGroupDto> GetStaticParameterGroups();
         ParameterGroupDto GetParameterGroup(int parameterGroupId);
-        void SaveParameterGroup(ParameterGroupDto parameterGroup);
+        int SaveParameterGroup(ParameterGroupDto parameterGroup);
         void DeleteParameterGroup(int parameterGroupId);
 
         //

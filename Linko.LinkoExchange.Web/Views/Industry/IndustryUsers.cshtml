@@ -58,7 +58,7 @@
                     //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                     .Resizable(resizable => resizable.Columns(value: true))
                     .Scrollable(s => s.Height(value: "auto"))
-                    .NoRecords(text: "No users exist.")
+                    .NoRecords(text: "No user exists.")
                     .Events(events =>
                     {
                         events.Change(handler: "gotoNextPage");
@@ -122,7 +122,7 @@
                     //.Filterable(filterable => filterable.Enabled(value: false))
                     .Resizable(resizable => resizable.Columns(value: true))
                     .Scrollable(s => s.Height(value: "auto"))
-                    .NoRecords(text: "No pending invitations exist.")
+                    .NoRecords(text: "No pending invitation exists.")
                     .DataSource(dataSource => dataSource
                         .Ajax()
                         .ServerOperation(enabled: false)

@@ -1,0 +1,401 @@
+﻿@using Linko.LinkoExchange.Web.ViewModels.Shared
+@model ParameterGroupViewModel
+
+@{
+    ViewBag.Title = "Parameter Group Details";
+    ViewBag.AvailableParameter = ((List<ParameterViewModel>) ViewBag.GlobalParameters).Where(p => Model.Parameters.ToList().All(s => p.Id != s.Id));
+}
+
+
+@using (Html.BeginForm(actionName:"ParameterGroupDetails",
+    controllerName:"Authority",
+    routeValues:new
+                {
+                    parameterGroupId = Model.Id
+                },
+    method:FormMethod.Post,
+    htmlAttributes:new
+                   {
+                       @class = "form-horizontal",
+                       role = "form"
+                   }))
+{
+    @Html.AntiForgeryToken()
+
+    <section>
+        <ol class="breadcrumb">
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Authority")'"><i class=""></i> Home </a>
+            </li>
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"ParameterGroups", controllerName:"Authority")'"><i class=""></i> Parameter Groups </a>
+            </li>
+            <li class="active">Details</li>
+        </ol>
+    </section>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Parameter Group Information</h3>
+            <div class="box-tools pull-right">
+                @if (!ViewBag.Satus.Equals("ViewOnly"))
+                {
+                    <input class="btn btn-primary btn-sm" type="button" id="btnSave" value="Save" />
+
+                    if (!ViewBag.Satus.Equals("New"))
+                    {
+                        <input class="btn btn-primary btn-sm" data-target="#DeleteParameterGroupModal" data-toggle="modal" type="button" value="Delete" />
+                    }
+                }
+
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+
+        <section class="box-body form-horizontal">
+            @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
+                                                                                                                            {
+                                                                                                                                @class = "alert alert-danger"
+                                                                                                                            })
+            @Html.HiddenFor(model => model.Id)
+
+            @if (ViewBag.ShowSuccessMessage != null && ViewBag.ShowSuccessMessage)
+            {
+                <div class="alert alert-dismissible alert-success">
+                    <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
+                    <h5>
+                        <i class="fa fa-check icon"></i>
+                        @ViewBag.SuccessMessage
+                    </h5>
+                </div>
+            }
+
+            <div aria-labelledby="DeleteParameterGroupModalLabel" class="col-md-12 fade modal modal-info" id="DeleteParameterGroupModal" role="dialog" tabindex="-1">
+                <div class="modal-dialog" role="document">
+                    <div class="alert alert-dismissible alert-info modal-content">
+                        <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
+                        <h4 class="box-title">Delete Parameter Group</h4>
+
+                        <div>
+                            <p>
+                                Do you want to delete the parameter group?<br />
+                                You can not undo this deletion.
+                            </p>
+                            <div class="form-group">
+                                <div class="pull-right">
+                                    <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"DeleteParameterGroup", controllerName:"Authority", routeValues:new {id = Model.Id})" formmethod="post">
+                                        Yes
+                                    </button>
+                                    <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.HiddenFor(model => model.Id)
+                @Html.LabelFor(model => model.Name, htmlAttributes:new
+                                                                   {
+                                                                       @class = "control-label col-md-2 required"
+                                                                   })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.Name, additionalViewData:new
+                                                                            {
+                                                                                htmlAttributes = new
+                                                                                                 {
+                                                                                                     @class = "form-control"
+                                                                                                 }
+                                                                            })
+                    @Html.ValidationMessageFor(model => model.Name, validationMessage:"", htmlAttributes:new
+                                                                                                         {
+                                                                                                             @class = "text-danger"
+                                                                                                         })
+                </div>
+
+                @Html.LabelFor(model => model.IsActive, htmlAttributes:new
+                                                                       {
+                                                                           @class = "control-label col-md-2"
+                                                                       })
+                <div class="col-md-4">
+                    <div class="checkbox">
+                        @Html.EditorFor(model => model.IsActive)
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Description, htmlAttributes:new
+                                                                          {
+                                                                              @class = "control-label col-md-2"
+                                                                          })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Description, additionalViewData:new
+                                                                                   {
+                                                                                       htmlAttributes = new
+                                                                                                        {
+                                                                                                            @class = "form-control",
+                                                                                                            rows = "3"
+                                                                                                        }
+                                                                                   })
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Parameters</h3>
+            <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body box-collapse collapse in">
+
+            <div class="col-md-6">
+                <h4 class="box-title">Available Parameters</h4>
+                <table class="hover table table-condensed table-bordered table-responsive table-striped" id="availableParameterTable">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Parameter</th>
+                            <th class="text-center" style="width: 60px">Add</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (ParameterViewModel parameter in ViewBag.AvailableParameter)
+                        {
+                            <tr>
+                                <td>@parameter.Id</td>
+                                <td>@parameter.Name</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" id="btnAddParameter">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-6">
+                <h4 class="box-title">Selected Parameters</h4>
+
+                <table class="table table-condensed table-bordered table-hover table-responsive table-striped" id="selectedParameterTable">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Parameter</th>
+                            <th class="text-center" style="width: 60px">Remove</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var parameter in Model.Parameters)
+                        {
+                            <tr>
+                                <td>@parameter.Id</td>
+                                <td>@parameter.Name</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" id="btnRemoveParameter">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <link href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script>
+
+    <script>
+        $(document)
+            .ready(function()
+            {
+                $('#availableParameterTable')
+                    .DataTable(
+                        {
+                            "columnDefs": [
+                                { "searchable": true, "targets": 1 }
+                                , { "targets": [0], "visible": false, "searchable": false }
+                                , {
+                                    "defaultContent":
+                                        "<button class='btn btn-primary btn-sm' id='btnAddParameter'><i class='fa fa-plus'></i></button>"
+                                    , "targets": 2
+                                }
+                            ]
+                            , "ordering": true
+                            , "order": [[1, 'asc']]
+                            , "scrollY": "35vh"
+                            , "scrollCollapse": true
+                            , "paging": false
+                            , "info": false
+                            , "processing": true
+                            , "stateSave": false
+                            , "language": {
+                                "search": ""
+                                , "searchPlaceholder": "Search Parameter..."
+                                , "zeroRecords": "No parameter available for selection."
+                            }
+                        }
+                    );
+
+                $('#selectedParameterTable')
+                    .DataTable(
+                        {
+                            "columnDefs": [
+                                { "searchable": true, "targets": 1 }
+                                , { "targets": [0], "visible": false, "searchable": false }
+                                , {
+                                    "defaultContent":
+                                        "<button class='btn btn-danger btn-sm' id='btnRemoveParameter'><i class='fa fa-minus'></i></button>"
+                                    , "targets": 2
+                                }
+                            ]
+                            , "ordering": true
+                            , "order": [[1, 'asc']]
+                            , "scrollY": "35vh"
+                            , "scrollCollapse": true
+                            , "paging": false
+                            , "info": false
+                            , "processing": true
+                            , "stateSave": false
+                            , "language": {
+                                "search": ""
+                                , "searchPlaceholder": "Search Parameter..."
+                                , "zeroRecords": "No parameter selected."
+                            }
+                        }
+                    );
+            });
+
+        $(document)
+            .on('click'
+                , "button[id^='btnAddParameter']"
+                , function()
+                {
+                    var availableParameterTable = $('#availableParameterTable').DataTable();
+
+                    var data = availableParameterTable.row($(this).parents('tr')).data();
+                    var paramId = data[0];
+                    var paramName = data[1];
+
+                    availableParameterTable
+                        .row($(this).parents('tr'))
+                        .remove()
+                        .draw();
+
+                    var selectedParameterTable = $('#selectedParameterTable').DataTable();
+                    var rowNode = selectedParameterTable
+                        .row.add([paramId, paramName])
+                        .draw()
+                        .node();
+
+                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+                });
+
+        $(document)
+            .on('click'
+                , "button[id^='btnRemoveParameter']"
+                , function()
+                {
+                    var selectedParameterTable = $('#selectedParameterTable').DataTable();
+
+                    var data = selectedParameterTable.row($(this).parents('tr')).data();
+                    var paramId = data[0];
+                    var paramName = data[1];
+
+                    selectedParameterTable
+                        .row($(this).parents('tr'))
+                        .remove()
+                        .draw();
+
+                    var availableParameterTable = $('#availableParameterTable').DataTable();
+                    var rowNode = availableParameterTable
+                        .row.add([paramId, paramName])
+                        .draw()
+                        .node();
+
+                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+                });
+
+
+        $(function()
+        {
+            $("#btnSave")
+                .on("click"
+                    , function()
+                    {
+                        var selectedParameters = [];
+                        $('#selectedParameterTable')
+                            .DataTable()
+                            .rows()
+                            .data()
+                            .each(function(d)
+                            {
+                                var parameterViewModel = {};
+                                parameterViewModel.Id = d[0];
+                                parameterViewModel.Name = d[1];
+                                selectedParameters.push(parameterViewModel);
+                            });
+                        console.log(selectedParameters.length);
+
+                        var parameterGroupViewModel = {};
+                        parameterGroupViewModel.Id = $('#Id').val();
+                        parameterGroupViewModel.Name = $('#Name').val();
+                        parameterGroupViewModel.Description = $('#Description').val();
+                        parameterGroupViewModel.IsActive = $('#IsActive').is(":checked");
+                        parameterGroupViewModel.Parameters = selectedParameters;
+
+                        console.log('----', parameterGroupViewModel);
+
+                        var postUrl = "@Url.Action(actionName:"ParameterGroupDetails", controllerName:"Authority")";
+                        $.ajax({
+                            type: "POST"
+                            , url: postUrl
+                            , data: parameterGroupViewModel
+                            //, dataType: "JSON"
+                            //, contentType: "application/json; charset=utf-8"
+                            , success: function(response)
+                            {
+                                //test for a property in the JSON response
+                                if (response.ErrorCount && response.ErrorCount == 0)
+                                {
+                                    //success! do whatever else you want with the response
+                                    
+                                    var newDoc = document.open("text/html", "replace");
+                                    newDoc.write(response);
+                                    newDoc.close();
+                                }
+                                else
+                                {
+                                    //fail - replace the HTML with the returned response HTML.
+                                    var newDoc = document.open("text/html", "replace");
+                                    newDoc.write(response);
+                                    newDoc.close();
+                                }
+                            }
+                            //, error: function()
+                            //    {}
+                        });
+                    });
+        });
+    </script>
+}

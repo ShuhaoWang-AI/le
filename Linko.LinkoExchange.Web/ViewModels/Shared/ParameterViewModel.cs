@@ -1,35 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
     public class ParameterViewModel
     {
-        public int Id
-        {
-            get; set;
-        }
-        public string Name
-        {
-            get; set;
-        }
-        public string Description
-        {
-            get; set;
-        }
-        public int DefaultUnitId
-        {
-            get; set;
-        }
-        public string DefaultUnitName
-        {
-            get; set;
-        }
-        public bool IsRemoved
-        {
-            get; set;
-        }
+        [ScaffoldColumn(scaffold: false)]
+        public int Id { get; set; }
+
+        [Display(Name = "Name")]
+        public string Name { get; set; }
+
+        [Display(Name = "Description")]
+        [DataType(dataType: DataType.MultilineText)]
+        public string Description { get; set; }
+
+        public int DefaultUnitId { get; set; }
+
+        [Display(Name = "Unit")]
+        public string DefaultUnitName { get; set; }
+
+        public bool IsRemoved { get; set; }
     }
 }
