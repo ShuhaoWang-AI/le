@@ -23,6 +23,8 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly ILogger _logger;
         private readonly UserService _userService;
         private readonly ITimeZoneService _timeZoneService;
+        private List<ReportPackageTemplateElementCategory> _reportPackageTemplateElementCategories;
+        private List<ReportPackageTemplateElementType> _reportPackageTemplateElementTypes;
 
         public ReportTemplateService(
             LinkoExchangeContext dbContext,
@@ -112,6 +114,9 @@ namespace Linko.LinkoExchange.Services.Report
                     .Include(a => a.ReportPackageTemplateElementCategories.Select(b => b.ReportPackageTemplateElementTypes.Select(d => d.ReportElementType)))
                     .Distinct()
                     .ToArray();
+
+            _reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories.ToList();
+            _reportPackageTemplateElementTypes = _dbContext.ReportPackageTemplateElementTypes.ToList();
 
             return rpts.Select(GetReportOneReportPackageTemplate).ToList();
         }
@@ -405,8 +410,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         private List<ReportElementTypeDto> GetReportElementTypes(ReportElementCategoryName categoryName, ReportPackageTemplate rpt, int currentOrgRegProgramId)
         {
-            var cat = rpt.ReportPackageTemplateElementCategories
-                .FirstOrDefault(i => i.ReportElementCategory.Name == categoryName.ToString());
+            var cat = _reportPackageTemplateElementCategories.FirstOrDefault(i => i.ReportElementCategory.Name == categoryName.ToString());
 
             var amplesAndResultsTypes = new List<ReportElementTypeDto>();
             if (cat != null)
@@ -417,7 +421,9 @@ namespace Linko.LinkoExchange.Services.Report
                     var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(ret);
                     if (ret.LastModificationDateTimeUtc.HasValue)
                     {
-                        retDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(ret.LastModificationDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
+                        retDto.LastModificationDateTimeLocal =
+                            _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(
+                                ret.LastModificationDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
                         var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
                         retDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
                     }
@@ -430,7 +436,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         private IEnumerable<ReportElementType> GetReportElementType(ReportPackageTemplateElementCategory cat)
         {
-            var rptets = _dbContext.ReportPackageTemplateElementTypes.Where(
+            var rptets = _reportPackageTemplateElementTypes.Where(
                     i =>
                         i.ReportPackageTemplateElementCategoryId ==
                         cat.ReportPackageTemplateElementCategoryId)
