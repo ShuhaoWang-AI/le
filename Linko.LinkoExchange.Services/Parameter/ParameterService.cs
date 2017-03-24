@@ -72,8 +72,15 @@ namespace Linko.LinkoExchange.Services.Parameter
                                         .GetLocalizedDateTimeUsingThisTimeZoneId((parameter.LastModificationDateTimeUtc.HasValue ? parameter.LastModificationDateTimeUtc.Value.DateTime
                                          : parameter.CreationDateTimeUtc.DateTime), timeZoneId);
 
-                var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == parameter.LastModifierUserId);
-                dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+                if (parameter.LastModifierUserId.HasValue)
+                {
+                    var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == parameter.LastModifierUserId.Value);
+                    dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+                }
+                else
+                {
+                    dto.LastModifierFullName = "N/A";
+                }
                 parameterDtos.Add(dto);
             }
             return parameterDtos;
