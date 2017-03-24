@@ -60,8 +60,16 @@ namespace Linko.LinkoExchange.Services.Report
                 dto.LastModificationDateTimeLocal = _timeZoneService
                     .GetLocalizedDateTimeUsingSettingForThisOrg((reportElementType.LastModificationDateTimeUtc.HasValue ? reportElementType.LastModificationDateTimeUtc.Value.DateTime 
                                                                     : reportElementType.CreationDateTimeUtc.DateTime), currentOrgRegProgramId);
-                var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == reportElementType.LastModifierUserId);
-                dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+
+                if (reportElementType.LastModifierUserId.HasValue)
+                {
+                    var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == reportElementType.LastModifierUserId.Value);
+                    dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+                }
+                else
+                {
+                    dto.LastModifierFullName = "N/A";
+                }
 
                 reportElementTypes.Add(dto);
             }
