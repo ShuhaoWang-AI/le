@@ -399,7 +399,6 @@
     <Content Include="Scripts\linkoExchange.js" />
     <Content Include="Scripts\invite.js" />
     <Content Include="Scripts\Profile.js" />
-    <Content Include="Scripts\Registration.js" />
     <Content Include="Views\Account\ChangeAccountSucceed.cshtml" />
     <Content Include="Views\Account\ChangeEmail.cshtml" />
     <Content Include="Web.config">
@@ -409,6 +408,7 @@
     <Content Include="Views\Authority\ParameterGroups.cshtml" />
     <Content Include="Views\Authority\ParameterGroupDetails.cshtml" />
     <Content Include="Views\Authority\ReportElementTypes.cshtml" />
+    <Content Include="Views\Authority\ReportElementTypeDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />

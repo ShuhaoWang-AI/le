@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 using FluentValidation;
 using FluentValidation.Attributes;
 using Linko.LinkoExchange.Core.Enum;
@@ -23,6 +25,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public ReportElementCategoryName CategoryName { get; set; }
 
         [Display(Name = "Certification Text")]
+        [DataType(dataType:DataType.MultilineText)]
         public string Content { get; set; }
 
         public bool IsContentProvided { get; set; }
@@ -30,7 +33,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public int CtsEventTypeId { get; set; }
 
         [Display(Name = "CTS Event Type")]
-        public int CtsEventTypeName { get; set; }
+        public string CtsEventTypeName { get; set; }
+        public IList<SelectListItem> AvailableCtsEventTypes { get; set; }
 
         [Display(Name = "Created/Modified Date")]
         public DateTime LastModificationDateTimeLocal { get; set; }
@@ -38,13 +42,14 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Last Modified By")]
         public string LastModifierUserName { get; set; }
 
-        public class ReportElementTypeViewModelValidator:AbstractValidator<ReportElementTypeViewModel>
+    }
+
+    public partial class ReportElementTypeViewModelValidator:AbstractValidator<ReportElementTypeViewModel>
+    {
+        public ReportElementTypeViewModelValidator()
         {
-            public ReportElementTypeViewModelValidator()
-            {
-                //Name
-                RuleFor(x => x.Name).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
-            }
+            //Name
+            RuleFor(x => x.Name).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
         }
     }
 }

@@ -48,11 +48,12 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly ICromerrAuditLogService _cromerrLogService;
         private readonly IParameterService _parameterService;
         private readonly IReportElementService _reportElementService;
+        private readonly IReportTemplateService _reportTemplateService;
 
         public AuthorityController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService,
                                    ISettingService settingService, IQuestionAnswerService questionAnswerService, ITimeZoneService timeZoneService, IPermissionService permissionService,
                                    ISessionCache sessionCache, ILogger logger, ICromerrAuditLogService cromerrLogService, IHttpContextService httpContextService, IParameterService parameterService,
-                                   IReportElementService reportElementService)
+                                   IReportElementService reportElementService, IReportTemplateService reportTemplateService)
         {
             _organizationService = organizationService;
             _userService = userService;
@@ -67,6 +68,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _httpContextService = httpContextService;
             _parameterService = parameterService;
             _reportElementService = reportElementService;
+            _reportTemplateService = reportTemplateService;
         }
 
         #endregion
@@ -1935,7 +1937,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return Json(data:new
                                  {
                                      redirect = false,
-                                     message = "Please select a parameter group."
+                                     message = "Please select a report element type."
                                  });
             }
             catch (RuleViolationException rve)
@@ -1952,11 +1954,83 @@ namespace Linko.LinkoExchange.Web.Controllers
         #endregion
 
         #region Show Report Element Type Details
-        public ActionResult ReportElementTypeDetails()
+        public ActionResult ReportElementTypeDetails(int? id)
         {
-            throw new NotImplementedException();
+            var viewModel = new ReportElementTypeViewModel();
+            try
+            {
+                viewModel = PrepareReportElementTypeDetails(id);
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+            return View(model:viewModel);
+        }
+
+        public ActionResult DeleteReportElementType(int id)
+        {
+            try
+            {
+                _reportElementService.DeleteReportElementType(reportElementTypeId:id);
+                
+                return View(viewName:"Confirmation", model:new ConfirmationViewModel
+                                                           {
+                                                               Title = "Report Element Type Deleted",
+                                                               Message = "Report Element Type Deleted Successfully."
+                                                           });
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            return View(viewName:"ReportElementTypeDetails", model:PrepareReportElementTypeDetails(id:id));
+        }
+
+        private ReportElementTypeViewModel PrepareReportElementTypeDetails(int? id)
+        {
+            var viewModel = new ReportElementTypeViewModel();
+
+            if (id.HasValue)
+            {
+                ViewBag.Satus = "Edit";
+                var reportElementType = _reportElementService.GetReportElementTypes(ReportElementCategoryName.Attachments).FirstOrDefault(); // TODO: Need to call proper function
+                viewModel = new ReportElementTypeViewModel
+                {
+                    Id = reportElementType.ReportElementTypeId,
+                    Name = reportElementType.Name,
+                    Description = reportElementType.Description,
+                    CategoryName = (ReportElementCategoryName) Enum.Parse(enumType: typeof(ReportElementCategoryName), value: reportElementType.ReportElementCategory.Name),
+                    Content = reportElementType.Content,
+                    IsContentProvided = reportElementType.IsContentProvided,
+                    CtsEventTypeId = reportElementType.CtsEventType?.CtsEventTypeId ?? 0,
+                    CtsEventTypeName = reportElementType.CtsEventType?.Name ?? "",
+                    LastModificationDateTimeLocal = reportElementType.LastModificationDateTimeLocal,
+                    LastModifierUserName = reportElementType.LastModifierFullName
+                };
+
+                ViewBag.IsReportElementTypeInUsed = false;
+            }
+            else
+            {
+                ViewBag.Satus = "New";
+            }
+
+            // Waste Types
+            viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
+            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes().Select(c => new SelectListItem
+            {
+                Text = c.Name,
+                Value = c.CtsEventTypeId.ToString(),
+                Selected = (c.CtsEventTypeId.Equals(viewModel.CtsEventTypeId))
+            }).ToList();
+
+            viewModel.AvailableCtsEventTypes.Insert(0, new SelectListItem { Text = "Select Cts Event Type", Value = "0" });
+            return viewModel;
         }
 
         #endregion
+
     }
 }

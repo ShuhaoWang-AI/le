@@ -1,0 +1,210 @@
+﻿@using Linko.LinkoExchange.Core.Enum
+@model Linko.LinkoExchange.Web.ViewModels.Shared.ReportElementTypeViewModel
+
+@{
+    ViewBag.Title = "Report Package Element Details";
+}
+
+
+@using (Html.BeginForm(actionName:"ReportElementTypeDetails",
+    controllerName:"Authority",
+    routeValues:new
+                {
+                    id = Model.Id
+                },
+    method:FormMethod.Post,
+    htmlAttributes:new
+                   {
+                       @class = "form-horizontal",
+                       role = "form"
+                   }))
+{
+    @Html.AntiForgeryToken()
+
+    <section>
+        <ol class="breadcrumb">
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Authority")'"><i class=""></i> Home </a>
+            </li>
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportElementTypes", controllerName:"Authority")'"><i class=""></i> Report Package Elements </a>
+            </li>
+            <li class="active">Details</li>
+        </ol>
+    </section>
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+
+            @if (Model.CategoryName == ReportElementCategoryName.Certifications)
+            {
+                <h3 class="box-title">
+                    Certification Type Details
+                </h3>
+            }
+            else if (Model.CategoryName == ReportElementCategoryName.Attachments)
+            {
+                <h3 class="box-title">
+                    Attachment Type Details
+                </h3>
+            }
+
+            <div class="box-tools pull-right">
+                @if (!ViewBag.Satus.Equals("ViewOnly"))
+                {
+                    <input class="btn btn-primary btn-sm" id="btnSave" type="button" value="Save" />
+
+                    if (!ViewBag.Satus.Equals("New"))
+                    {
+                        <input class="btn btn-primary btn-sm" data-target="#DeleteReportPackageElementModal" data-toggle="modal" type="button" value="Delete" />
+                    }
+                }
+
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+
+        <section class="box-body form-horizontal">
+            @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
+                                                                                                                            {
+                                                                                                                                @class = "alert alert-danger"
+                                                                                                                            })
+            @Html.HiddenFor(model => model.Id)
+
+            @if (ViewBag.ShowSuccessMessage != null && ViewBag.ShowSuccessMessage)
+            {
+                <div class="alert alert-dismissible alert-success">
+                    <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
+                    <h5>
+                        <i class="fa fa-check icon"></i>
+                        @ViewBag.SuccessMessage
+                    </h5>
+                </div>
+            }
+
+            <div aria-labelledby="DeleteReportPackageElementModalLabel" class="col-md-12 fade modal modal-info" id="DeleteReportPackageElementModal" role="dialog" tabindex="-1">
+                <div class="modal-dialog" role="document">
+                    <div class="alert alert-dismissible alert-info modal-content">
+                        <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
+                        <h4 class="box-title">Delete Report Package Element</h4>
+
+                        <div>
+                            @if (ViewBag.IsReportElementTypeInUsed)
+                            {
+                                <p>
+                                    This Report Package Element is in use in a Report Package Template and cannot be deleted.
+                                </p>
+                            }
+                            else
+                            {
+                                <p>
+                                    Do you want to delete this Report Package Element?<br />
+                                    You can not undo this deletion.
+                                </p>
+                            }
+                            <div class="form-group">
+                                <div class="pull-right">
+                                    @if (!ViewBag.IsReportElementTypeInUsed)
+                                    {
+                                        <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"DeleteReportElementType", controllerName:"Authority", routeValues:new {id = Model.Id})" formmethod="post">
+                                            Yes
+                                        </button>
+                                    }
+                                    <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.HiddenFor(model => model.Id)
+                @Html.LabelFor(model => model.Name, htmlAttributes:new
+                                                                   {
+                                                                       @class = "control-label col-md-2 required"
+                                                                   })
+                <div class="col-md-8">
+                    @Html.EditorFor(model => model.Name, additionalViewData:new
+                                                                            {
+                                                                                htmlAttributes = new
+                                                                                                 {
+                                                                                                     @class = "form-control"
+                                                                                                 }
+                                                                            })
+                    @Html.ValidationMessageFor(model => model.Name, validationMessage:"", htmlAttributes:new
+                                                                                                         {
+                                                                                                             @class = "text-danger"
+                                                                                                         })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Description, htmlAttributes:new
+                                                                          {
+                                                                              @class = "control-label col-md-2"
+                                                                          })
+                <div class="col-md-8">
+                    @Html.EditorFor(model => model.Description, additionalViewData:new
+                                                                                   {
+                                                                                       htmlAttributes = new
+                                                                                                        {
+                                                                                                            @class = "form-control",
+                                                                                                            rows = "3"
+                                                                                                        }
+                                                                                   })
+                </div>
+            </div>
+
+            <hr />
+
+            <h5>
+                If you want the details of this specific report element to show up in LinkoCTS as an event, choose the Event Type.
+            </h5>
+
+            <div class="form-group">
+
+                @Html.LabelFor(model => model.CtsEventTypeName, htmlAttributes:new
+                                                                               {
+                                                                                   @class = "control-label col-md-2"
+                                                                               })
+                <div class="col-md-4">
+                    @Html.DropDownList(name:"CtsEventTypeName", selectList:Model.AvailableCtsEventTypes, htmlAttributes:new
+                                                                                                                        {
+                                                                                                                            @class = "form-control"
+                                                                                                                        })
+                    @Html.ValidationMessageFor(model => model.CtsEventTypeName, validationMessage:"", htmlAttributes:new
+                                                                                                                     {
+                                                                                                                         @class = "text-danger"
+                                                                                                                     })
+                </div>
+            </div>
+
+            @if (Model.CategoryName == ReportElementCategoryName.Certifications)
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Content, htmlAttributes:new
+                                                                          {
+                                                                              @class = "control-label col-md-2"
+                                                                          })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Content, additionalViewData:new
+                                                                                   {
+                                                                                       htmlAttributes = new
+                                                                                                        {
+                                                                                                            @class = "form-control",
+                                                                                                            rows = "10"
+                                                                                                        }
+                                                                                   })
+                        @Html.ValidationMessageFor(model => model.Content, validationMessage:"", htmlAttributes:new
+                                                                                                                {
+                                                                                                                    @class = "text-danger"
+                                                                                                                })
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+}

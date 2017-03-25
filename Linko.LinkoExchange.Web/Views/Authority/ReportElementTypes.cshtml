@@ -139,7 +139,7 @@
                       //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value: true))
                       .Scrollable(s => s.Height(value: "auto"))
-                      .NoRecords(text: "No attachment element type exists.")
+                      .NoRecords(text: "No certification element type exists.")
                       .Events(events =>
                       {
                           events.Change(handler: "gotoNextPageCertification");
@@ -170,7 +170,7 @@
 
         gotoNextPageCertification = function()
         {
-            var grid = $("#gridAttachment").data("kendoGrid");
+            var grid = $("#gridCertification").data("kendoGrid");
             var postUrl = "@Url.Action(actionName: "ReportElementTypes_Select", controllerName:"Authority")";
 
             doAjaxAction(grid, postUrl, "", "Select a certification type");

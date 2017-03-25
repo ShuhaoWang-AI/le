@@ -195,13 +195,15 @@ namespace Linko.LinkoExchange.Services.Report
                     if (rpTemplatesUsingThis.Count() > 0)
                     {
                         string warningMessage = "This Report Package Element is in use in the following Report Package Templates and cannot be deleted:";
-                        foreach (var rpTemplate in rpTemplatesUsingThis)
-                        {
-                            warningMessage += $"{Environment.NewLine} - \"{rpTemplate.Name}\"";
-                        }
-
                         List<RuleViolation> validationIssues = new List<RuleViolation>();
                         validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: warningMessage));
+
+                        foreach (var rpTemplate in rpTemplatesUsingThis)
+                        {
+                            warningMessage = $" - \"{rpTemplate.Name}\"";
+                            validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage:  warningMessage));
+                        }
+
                         throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                     }
 
