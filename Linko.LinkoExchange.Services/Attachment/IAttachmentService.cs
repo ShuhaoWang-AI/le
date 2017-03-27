@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Services.Attachment
 {
@@ -13,5 +14,7 @@ namespace Linko.LinkoExchange.Services.Attachment
         /// </summary>
         /// <returns></returns>
         IList<string> GetUserAttachmentFiles();
+
+        void SaveAttachmentFile(AttachmentFileDto fileDto);
     }
 }

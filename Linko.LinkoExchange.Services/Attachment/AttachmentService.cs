@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 
 namespace Linko.LinkoExchange.Services.Attachment
@@ -10,6 +12,7 @@ namespace Linko.LinkoExchange.Services.Attachment
     {
         private readonly DbContext _dbContext;
         private readonly IMapHelper _mapHelper;
+        private readonly IHttpContextService _httpContextService;
 
         private readonly string[] _validExtensions =
         {
@@ -19,10 +22,27 @@ namespace Linko.LinkoExchange.Services.Attachment
 
         public AttachmentService(
             DbContext dbContext,
-            IMapHelper mapHelper)
+            IMapHelper mapHelper,
+            IHttpContextService httpContextService)
         {
+            if (dbContext == null)
+            {
+                throw new ArgumentNullException(nameof(dbContext));
+            }
+
+            if (mapHelper == null)
+            {
+                throw new ArgumentNullException(nameof(mapHelper));
+            }
+
+            if (httpContextService == null)
+            {
+                throw new ArgumentNullException(nameof(httpContextService));
+            }
+
             _dbContext = dbContext;
             _mapHelper = mapHelper;
+            _httpContextService = httpContextService;
         }
 
         public List<string> GetValidAttachmentFileExtensions()
@@ -47,6 +67,21 @@ namespace Linko.LinkoExchange.Services.Attachment
 
         public IList<string> GetUserAttachmentFiles()
         {
+            var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+            var currentRegulatoryProgramId =
+                int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+            return new List<string>();
+
+        }
+
+        public void SaveAttachmentFile(AttachmentFileDto fileDto)
+        {
+            var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+            var currentRegulatoryProgramId =
+                int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+
             throw new NotImplementedException();
         }
     }

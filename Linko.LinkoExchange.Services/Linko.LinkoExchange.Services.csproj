@@ -111,7 +111,7 @@
   <ItemGroup>
     <Compile Include="Attachment\AttachmentService.cs" />
     <Compile Include="Attachment\IAttachmentService.cs" />
-    <Compile Include="Dto\AttachmentDto.cs" />
+    <Compile Include="Dto\AttachmentFileDto.cs" />
     <Compile Include="AuditLog\CromerrAuditLogService.cs" />
     <Compile Include="AuditLog\EmailAuditLogService.cs" />
     <Compile Include="AuditLog\IAuditLogService.cs" />
