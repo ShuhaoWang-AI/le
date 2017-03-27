@@ -13,15 +13,17 @@ namespace Linko.LinkoExchange.Services
         /// The result doesn't include file data;
         /// </summary>
         /// <returns></returns>
-        List<FileStoreDto> GetUserAttachmentFiles();
+        List<FileStoreDto> GetFileStores();
 
         /// <summary>
         /// The result includes file byte data
         /// </summary>
-        /// <param name="attachenmentFileId">The file Id of the </param>
+        /// <param name="fileStoreId">The file Id of the </param>
         /// <returns>One FileStoreDto object</returns>
-        FileStoreDto GetFileStoreById(int attachenmentFileId);
+        FileStoreDto GetFileStoreById(int fileStoreId);
+        void CreateFileStore(FileStoreDto fileStoreDto);
 
-        void SaveFileStores(FileStoreDto fileStoreDto);
+        void UpdateFileStore(FileStoreDto fileStoreDto);
+        void DeleteFileStore(int fileStoreId);
     }
 }

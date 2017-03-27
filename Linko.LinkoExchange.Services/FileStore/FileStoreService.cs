@@ -75,9 +75,9 @@ namespace Linko.LinkoExchange.Services
             return _validExtensions.Contains(ext);
         }
 
-        public List<FileStoreDto> GetUserAttachmentFiles()
+        public List<FileStoreDto> GetFileStores()
         {
-            _logger.Info("Enter FileStoreService.GetUserAttachmentFiles.");
+            _logger.Info("Enter FileStoreService.GetFileStores.");
 
             var currentRegulatoryProgramId =
                 int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
@@ -85,34 +85,48 @@ namespace Linko.LinkoExchange.Services
             var fileStores = _dbContext.FileStores.Where(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
             var fileStoreDtos = fileStores.Select(i => _mapHelper.GetFileStoreDtoFromFileStore(i)).ToList();
 
-            _logger.Info("Leave FileStoreService.GetUserAttachmentFiles.");
+            _logger.Info("Leave FileStoreService.GetFileStores.");
             return fileStoreDtos;
         }
 
-        public void SaveFileStores(FileStoreDto fileStoreDto)
+        public void CreateFileStore(FileStoreDto fileStoreDto)
         {
-            _logger.Info("Enter FileStoreService.SaveFileStores.");
-            var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
-            //var currentRegulatoryProgramId =
-            //    int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            _logger.Info("Enter FileStoreService.CreateFileStore.");
+            using (_dbContext.BeginTransaction())
+            {
+                try
+                {
+                    var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+                    //var currentRegulatoryProgramId =
+                    //    int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
+                    var fileStore = _mapHelper.GetFileStoreFromFileStoreDto(fileStoreDto);
 
-            _logger.Info("Leave FileStoreService.SaveFileStores.");
-            throw new NotImplementedException();
+                    _dbContext.FileStores.Add(fileStore);
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+
+            _logger.Info("Leave FileStoreService.CreateFileStore.");
         }
 
-        public FileStoreDto GetFileStoreById(int attachenmentFileId)
+        public FileStoreDto GetFileStoreById(int fileStoreId)
         {
-            _logger.Info("Enter FileStoreService.GetFileStoreById, attachmentFileId={0}.", attachenmentFileId);
+            _logger.Info("Enter FileStoreService.GetFileStoreById, attachmentFileId={0}.", fileStoreId);
 
             var currentRegulatoryProgramId =
                 int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
-            var fileStore = _dbContext.FileStores.Single(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
+            var fileStore =
+                _dbContext.FileStores.Single(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
+
             var fileStoreDto = _mapHelper.GetFileStoreDtoFromFileStore(fileStore);
             fileStoreDto.Data = _dbContext.FileStoreDatas.Single(i => i.FileStoreId == fileStoreDto.FileStoreId.Value).Data;
 
-            _logger.Info("Leave FileStoreService.GetFileStoreById, attachmentFileId={0}.", attachenmentFileId);
+            _logger.Info("Leave FileStoreService.GetFileStoreById, attachmentFileId={0}.", fileStoreId);
 
             return fileStoreDto;
         }
