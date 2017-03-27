@@ -110,7 +110,7 @@ namespace Linko.LinkoExchange.Services
 
             var fileStore = _dbContext.FileStores.Single(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
             var fileStoreDto = _mapHelper.GetFileStoreDtoFromFileStore(fileStore);
-            fileStoreDto.Data = _dbContext.FileStoreDatas.Single(i => i.FileStoreDataId == fileStoreDto.FileStoreId.Value).Data;
+            fileStoreDto.Data = _dbContext.FileStoreDatas.Single(i => i.FileStoreId == fileStoreDto.FileStoreId.Value).Data;
 
             _logger.Info("Leave FileStoreService.GetFileStoreById, attachmentFileId={0}.", attachenmentFileId);
 
