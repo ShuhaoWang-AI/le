@@ -53,22 +53,37 @@ namespace Linko.LinkoExchange.Data
         public DbSet<UserPasswordHistory> UserPasswordHistories { get; set; }
         public DbSet<UserQuestionAnswer> UserQuestionAnswers { get; set; }
 
+        public DbSet<CtsEventType> CtsEventTypes { get; set; }
+        public DbSet<Parameter> Parameters { get; set; }
+        public DbSet<MonitoringPoint> MonitoringPoints { get; set; }
+        public DbSet<MonitoringPointParameterLimit> MonitoringPointParameterLimits { get; set; }
+
         public DbSet<ParameterGroup> ParameterGroups { get; set; }
         public DbSet<ParameterGroupParameter> ParameterGroupParameters { get; set; }
-        public DbSet<Parameter> Parameters { get; set; }
+
+        public DbSet<FileStore> FileStores { get; set; }
+        public DbSet<FileStoreData> FileStoreDatas { get; set; }
+        public DbSet<CopyOfRecord> CopyOfRecords { get; set; }
+
+        public DbSet<SampleStatus> SampleStatuses { get; set; }
+        public DbSet<Sample> Samples { get; set; }
+        public DbSet<SampleResult> SampleResults { get; set; }
 
         public DbSet<ReportElementType> ReportElementTypes { get; set; }
         public DbSet<ReportElementCategory> ReportElementCategories { get; set; }
 
-        public DbSet<CtsEventType> CtsEventTypes { get; set; }
+        public DbSet<ReportPackageTemplateAssignment> ReportPackageTemplateAssignments { get; set; }
+        public DbSet<ReportPackageTemplate> ReportPackageTempates { get; set; }
+        public DbSet<ReportPackageTemplateElementType> ReportPackageTemplateElementTypes { get; set; }
+        public DbSet<ReportPackageTemplateElementCategory> ReportPackageTemplateElementCategories { get; set; }
 
-        public virtual DbSet<ReportPackageTemplateAssignment> ReportPackageTemplateAssignments { get; set; }
-        public virtual DbSet<ReportPackageTemplate> ReportPackageTempates { get; set; }
-        public virtual DbSet<ReportPackageTemplateElementType> ReportPackageTemplateElementTypes { get; set; }
-        public virtual DbSet<ReportPackageTemplateElementCategory> ReportPackageTemplateElementCategories { get; set; }
-
-        public virtual DbSet<MonitoringPointParameterLimit> MonitoringPointParameterLimits { get; set; }
-        public virtual DbSet<MonitoringPoint> MonitoringPoints { get; set; }
+        public DbSet<RepudiationReason> RepudiationReasons { get; set; }
+        public DbSet<ReportStatus> ReportStatuses { get; set; }
+        public DbSet<ReportPackage> ReportPackages { get; set; }
+        public DbSet<ReportPackageElementCategory> ReportPackageElementCategories { get; set; }
+        public DbSet<ReportPackageElementType> ReportPackageElementTypes { get; set; }
+        public DbSet<ReportFile> ReportFiles { get; set; }
+        public DbSet<ReportSample> ReportSamples { get; set; }
 
         #endregion
 
