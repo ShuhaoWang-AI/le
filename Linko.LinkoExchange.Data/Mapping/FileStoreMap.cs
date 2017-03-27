@@ -15,7 +15,7 @@ namespace Linko.LinkoExchange.Data.Mapping
         {
             ToTable("tFileStore");
 
-            Property(t => t.FileStoreId).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            HasKey(t => t.FileStoreId);
             Property(t => t.Name).IsRequired();
             Property(t => t.Description);
             Property(t => t.OriginalName).IsRequired();
