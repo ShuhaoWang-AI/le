@@ -109,9 +109,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attachment\AttachmentService.cs" />
-    <Compile Include="Attachment\IAttachmentService.cs" />
-    <Compile Include="Dto\AttachmentFileDto.cs" />
+    <Compile Include="FileStore\FileStoreService.cs" />
+    <Compile Include="FileStore\IFileStoreService.cs" />
+    <Compile Include="Dto\FileStoreDto.cs" />
     <Compile Include="AuditLog\CromerrAuditLogService.cs" />
     <Compile Include="AuditLog\EmailAuditLogService.cs" />
     <Compile Include="AuditLog\IAuditLogService.cs" />

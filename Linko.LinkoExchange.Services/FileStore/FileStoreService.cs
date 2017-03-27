@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
+using NLog;
 
-namespace Linko.LinkoExchange.Services.Attachment
+namespace Linko.LinkoExchange.Services
 {
-    public class AttachmentService : IAttachmentService
+    public class FileStoreService : IFileStoreService
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly IMapHelper _mapHelper;
+        private readonly ILogger _logger;
         private readonly IHttpContextService _httpContextService;
 
         private readonly string[] _validExtensions =
@@ -21,9 +22,10 @@ namespace Linko.LinkoExchange.Services.Attachment
             "jpg", "jpeg", "bmp", "png", "txt", "csv"
         };
 
-        public AttachmentService(
+        public FileStoreService(
             LinkoExchangeContext dbContext,
             IMapHelper mapHelper,
+            ILogger logger,
             IHttpContextService httpContextService)
         {
             if (dbContext == null)
@@ -36,13 +38,20 @@ namespace Linko.LinkoExchange.Services.Attachment
                 throw new ArgumentNullException(nameof(mapHelper));
             }
 
+            if (logger == null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+
             if (httpContextService == null)
             {
                 throw new ArgumentNullException(nameof(httpContextService));
             }
 
+
             _dbContext = dbContext;
             _mapHelper = mapHelper;
+            _logger = logger;
             _httpContextService = httpContextService;
         }
 
@@ -66,31 +75,46 @@ namespace Linko.LinkoExchange.Services.Attachment
             return _validExtensions.Contains(ext);
         }
 
-        public List<AttachmentFileDto> GetUserAttachmentFiles()
+        public List<FileStoreDto> GetUserAttachmentFiles()
         {
-            var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+            _logger.Info("Enter FileStoreService.GetUserAttachmentFiles.");
+
             var currentRegulatoryProgramId =
                 int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
-            var fileStore = _dbContext.FileStores.Where(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
+            var fileStores = _dbContext.FileStores.Where(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
+            var fileStoreDtos = fileStores.Select(i => _mapHelper.GetFileStoreDtoFromFileStore(i)).ToList();
 
-            return new List<AttachmentFileDto>();
-
+            _logger.Info("Leave FileStoreService.GetUserAttachmentFiles.");
+            return fileStoreDtos;
         }
 
-        public void SaveAttachmentFile(AttachmentFileDto fileDto)
+        public void SaveFileStores(FileStoreDto fileStoreDto)
         {
+            _logger.Info("Enter FileStoreService.SaveFileStores.");
             var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+            //var currentRegulatoryProgramId =
+            //    int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+
+            _logger.Info("Leave FileStoreService.SaveFileStores.");
+            throw new NotImplementedException();
+        }
+
+        public FileStoreDto GetFileStoreById(int attachenmentFileId)
+        {
+            _logger.Info("Enter FileStoreService.GetFileStoreById, attachmentFileId={0}.", attachenmentFileId);
+
             var currentRegulatoryProgramId =
                 int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
+            var fileStore = _dbContext.FileStores.Single(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
+            var fileStoreDto = _mapHelper.GetFileStoreDtoFromFileStore(fileStore);
+            fileStoreDto.Data = _dbContext.FileStoreDatas.Single(i => i.FileStoreDataId == fileStoreDto.FileStoreId.Value).Data;
 
-            throw new NotImplementedException();
-        }
+            _logger.Info("Leave FileStoreService.GetFileStoreById, attachmentFileId={0}.", attachenmentFileId);
 
-        public List<AttachmentFileDto> GetAttachmentFile(int attachenmentFileId)
-        {
-            throw new NotImplementedException();
+            return fileStoreDto;
         }
     }
 }

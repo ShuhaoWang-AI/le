@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
 
-namespace Linko.LinkoExchange.Services.Attachment
+namespace Linko.LinkoExchange.Services
 {
-    public interface IAttachmentService
+    public interface IFileStoreService
     {
         List<string> GetValidAttachmentFileExtensions();
         bool IsValidFileExtension(string ext);
@@ -13,15 +13,15 @@ namespace Linko.LinkoExchange.Services.Attachment
         /// The result doesn't include file data;
         /// </summary>
         /// <returns></returns>
-        List<AttachmentFileDto> GetUserAttachmentFiles();
+        List<FileStoreDto> GetUserAttachmentFiles();
 
         /// <summary>
         /// The result includes file byte data
         /// </summary>
         /// <param name="attachenmentFileId">The file Id of the </param>
-        /// <returns></returns>
-        List<AttachmentFileDto> GetAttachmentFile(int attachenmentFileId);
+        /// <returns>One FileStoreDto object</returns>
+        FileStoreDto GetFileStoreById(int attachenmentFileId);
 
-        void SaveAttachmentFile(AttachmentFileDto fileDto);
+        void SaveFileStores(FileStoreDto fileStoreDto);
     }
 }

@@ -845,5 +845,58 @@ namespace Linko.LinkoExchange.Services.Mapping
             return rpta;
 
         }
+
+        public FileStoreDto GetFileStoreDtoFromFileStore(FileStore fileStore)
+        {
+            if (fileStore == null)
+            {
+                return null;
+            }
+
+            return new FileStoreDto
+            {
+                FileStoreId = fileStore.FileStoreId,
+                Name = fileStore.Name,
+                Description = fileStore.Description,
+                OriginalName = fileStore.OriginalName,
+                SizeByte = fileStore.SizeByte,
+                ReportElementTypeId = fileStore.ReportElementTypeId,
+                OrganizationRegulatoryProgramId = fileStore.OrganizationRegulatoryProgramId,
+                OrganizationRegulatoryProgram =
+                    GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(
+                        fileStore.OrganizationRegulatoryProgram),
+                IsReported = fileStore.IsReported,
+                UploaDateTimeUtc = fileStore.UploadDateTimeUtc,
+                UploaderUserId = fileStore.UploaderUserId
+            };
+        }
+
+        public FileStore GetFileStoreFromFileStoreDto(FileStoreDto fileStoreDto)
+        {
+            if (fileStoreDto == null)
+            {
+                return null;
+            }
+
+            var fileStore = new FileStore
+            {
+                Name = fileStoreDto.Name,
+                Description = fileStoreDto.Description,
+                OriginalName = fileStoreDto.OriginalName,
+                SizeByte = fileStoreDto.SizeByte,
+                ReportElementTypeId = fileStoreDto.ReportElementTypeId,
+                OrganizationRegulatoryProgramId = fileStoreDto.OrganizationRegulatoryProgramId,
+                IsReported = fileStoreDto.IsReported,
+                UploadDateTimeUtc = fileStoreDto.UploaDateTimeUtc.DateTime,
+                UploaderUserId = fileStoreDto.UploaderUserId
+            };
+
+            if (fileStoreDto.FileStoreId.HasValue)
+            {
+                fileStore.FileStoreId = fileStoreDto.FileStoreId.Value;
+            }
+
+            return fileStore;
+        }
     }
 }
