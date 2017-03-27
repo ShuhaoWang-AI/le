@@ -66,7 +66,7 @@ namespace Linko.LinkoExchange.Services.Attachment
             return _validExtensions.Contains(ext);
         }
 
-        public IList<string> GetUserAttachmentFiles()
+        public List<AttachmentFileDto> GetUserAttachmentFiles()
         {
             var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
             var currentRegulatoryProgramId =
@@ -74,7 +74,7 @@ namespace Linko.LinkoExchange.Services.Attachment
 
             var fileStore = _dbContext.FileStores.Where(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
 
-            return new List<string>();
+            return new List<AttachmentFileDto>();
 
         }
 
@@ -85,6 +85,11 @@ namespace Linko.LinkoExchange.Services.Attachment
                 int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
 
+            throw new NotImplementedException();
+        }
+
+        public List<AttachmentFileDto> GetAttachmentFile(int attachenmentFileId)
+        {
             throw new NotImplementedException();
         }
     }

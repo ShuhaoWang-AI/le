@@ -27,12 +27,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasRequired(a => a.OrganizationRegulatoryProgram)
                 .WithMany()
-                .HasForeignKey(c => c.OrganizationRegulatoryProgram)
-                .WillCascadeOnDelete(false);
-
-            HasRequired(a => a.FileStoreData)
-                .WithMany()
-                .HasForeignKey(c => c.FileStoreData)
+                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(false);
         }
     }

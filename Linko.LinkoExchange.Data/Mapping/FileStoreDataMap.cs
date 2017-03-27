@@ -8,9 +8,9 @@ namespace Linko.LinkoExchange.Data.Mapping
     {
         public FileStoreDataMap()
         {
-            ToTable("tFileStore");
+            ToTable("tFileStoreData");
 
-            Property(t => t.FileStoreId).IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            Property(t => t.FileStoreDataId).IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(t => t.Data).IsRequired();
         }
     }

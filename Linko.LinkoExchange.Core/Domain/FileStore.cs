@@ -48,7 +48,7 @@ namespace Linko.LinkoExchange.Core.Domain
 
 
         // Reverse navigation
-        public virtual ICollection<FileStoreData> FileStoreData { get; set; }
+        //public virtual ICollection<FileStoreData> FileStoreData { get; set; }
     }
 }
 
