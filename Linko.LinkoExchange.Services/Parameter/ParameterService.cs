@@ -146,9 +146,15 @@ namespace Linko.LinkoExchange.Services.Parameter
                     .GetLocalizedDateTimeUsingSettingForThisOrg((foundParamGroup.LastModificationDateTimeUtc.HasValue ? foundParamGroup.LastModificationDateTimeUtc.Value.DateTime
                         : foundParamGroup.CreationDateTimeUtc.DateTime), currentOrgRegProgramId);
 
-            var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == foundParamGroup.LastModifierUserId);
-            parameterGroupDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
-
+            if (foundParamGroup.LastModifierUserId.HasValue)
+            {
+                var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == foundParamGroup.LastModifierUserId.Value);
+                parameterGroupDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+            }
+            else
+            {
+                parameterGroupDto.LastModifierFullName = "N/A";
+            }
 
             return parameterGroupDto;
         }

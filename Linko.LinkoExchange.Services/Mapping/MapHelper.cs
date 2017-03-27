@@ -767,7 +767,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             mappedReportElementType.ReportElementCategoryId = reportElementType.ReportElementCategoryId;
             if (reportElementType.ReportElementCategory != null)
             {
-                mappedReportElementType.ReportElementCategory = GetReportElementCategoryDtoFromReportElementCategory(reportElementType.ReportElementCategory);
+                mappedReportElementType.ReportElementCategory = (ReportElementCategoryName)(Enum.Parse(typeof(ReportElementCategoryName), reportElementType.ReportElementCategory.Name));
             }
             mappedReportElementType.ReportElementTypeId = reportElementType.ReportElementTypeId;
             mappedReportElementType.Name = reportElementType.Name;

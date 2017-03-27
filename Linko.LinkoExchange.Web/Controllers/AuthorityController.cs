@@ -2001,7 +2001,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     Id = reportElementType.ReportElementTypeId,
                     Name = reportElementType.Name,
                     Description = reportElementType.Description,
-                    CategoryName = (ReportElementCategoryName) Enum.Parse(enumType: typeof(ReportElementCategoryName), value: reportElementType.ReportElementCategory.Name),
+                    CategoryName = reportElementType.ReportElementCategory,
                     Content = reportElementType.Content,
                     IsContentProvided = reportElementType.IsContentProvided,
                     CtsEventTypeId = reportElementType.CtsEventType?.CtsEventTypeId ?? 0,

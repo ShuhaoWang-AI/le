@@ -1,4 +1,5 @@
 ﻿using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Core.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool IsContentProvided { get; set; }
         public CtsEventTypeDto CtsEventType { get; set; }
         public int ReportElementCategoryId { get; set; }
-        public ReportElementCategoryDto ReportElementCategory { get; set; }
+        public ReportElementCategoryName ReportElementCategory { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
         public DateTime LastModificationDateTimeLocal { get; set; }
         public string LastModifierFullName { get; set; }

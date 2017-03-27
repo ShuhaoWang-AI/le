@@ -76,6 +76,32 @@ namespace Linko.LinkoExchange.Services.Report
             return reportElementTypes;
         }
 
+        public ReportElementTypeDto GetReportElementType(int reportElementTypeId)
+        {
+            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var foundREType = _dbContext.ReportElementTypes
+                .Single(re => re.ReportElementTypeId == reportElementTypeId);
+
+            var dto = _mapHelper.GetReportElementTypeDtoFromReportElementType(foundREType);
+
+            //Set LastModificationDateTimeLocal
+            dto.LastModificationDateTimeLocal = _timeZoneService
+                    .GetLocalizedDateTimeUsingSettingForThisOrg((foundREType.LastModificationDateTimeUtc.HasValue ? foundREType.LastModificationDateTimeUtc.Value.DateTime
+                        : foundREType.CreationDateTimeUtc.DateTime), currentOrgRegProgramId);
+
+            if (foundREType.LastModifierUserId.HasValue)
+            {
+                var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == foundREType.LastModifierUserId.Value);
+                dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+            }
+            else
+            {
+                dto.LastModifierFullName = "N/A";
+            }
+
+            return dto;
+        }
+
         public void SaveReportElementType(ReportElementTypeDto reportElementType)
         {
             var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
