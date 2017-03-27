@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
@@ -10,7 +11,7 @@ namespace Linko.LinkoExchange.Services.Attachment
 {
     public class AttachmentService : IAttachmentService
     {
-        private readonly DbContext _dbContext;
+        private readonly LinkoExchangeContext _dbContext;
         private readonly IMapHelper _mapHelper;
         private readonly IHttpContextService _httpContextService;
 
@@ -21,7 +22,7 @@ namespace Linko.LinkoExchange.Services.Attachment
         };
 
         public AttachmentService(
-            DbContext dbContext,
+            LinkoExchangeContext dbContext,
             IMapHelper mapHelper,
             IHttpContextService httpContextService)
         {
@@ -70,6 +71,8 @@ namespace Linko.LinkoExchange.Services.Attachment
             var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
             var currentRegulatoryProgramId =
                 int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+            var fileStore = _dbContext.FileStores.Where(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
 
             return new List<string>();
 

@@ -83,8 +83,10 @@
     <Compile Include="Mapping\CromerrAuditLogMap.cs" />
     <Compile Include="Mapping\CtsEventTypeMap.cs" />
     <Compile Include="Mapping\EmailAuditLogMap.cs" />
+    <Compile Include="Mapping\FileStoreDataMap.cs" />
     <Compile Include="Mapping\InvitationMap.cs" />
     <Compile Include="Mapping\JurisdictionMap.cs" />
+    <Compile Include="Mapping\FileStoreMap.cs" />
     <Compile Include="Mapping\MonitoringPointMap.cs" />
     <Compile Include="Mapping\OrganizationRegulatoryProgramModuleMap.cs" />
     <Compile Include="Mapping\OrganizationTypeRegulatoryProgramMap.cs" />
