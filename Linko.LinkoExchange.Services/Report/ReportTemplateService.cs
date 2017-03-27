@@ -54,6 +54,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         public void DeleteReportPackageTemplate(int reportPackageTemplateId)
         {
+            _logger.Info("Enter ReportTemplateService.DeleteReportPackageTemplate. reportPackageTemplateId={0}", reportPackageTemplateId);
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try
@@ -71,8 +72,8 @@ namespace Linko.LinkoExchange.Services.Report
 
                     // Step 3
                     _dbContext.ReportPackageTempates.Remove(rpt);
-
                     _dbContext.SaveChanges();
+                    _logger.Info("Leave ReportTemplateService.DeleteReportPackageTemplate. reportPackageTemplateId={0}", reportPackageTemplateId);
                 }
                 catch (Exception ex)
                 {
@@ -93,15 +94,21 @@ namespace Linko.LinkoExchange.Services.Report
 
         public ReportPackageTemplateDto GetReportPackageTemplate(int reportPackageTemplateId)
         {
+            _logger.Info("Enter ReportTemplateService.ReportPackageTemplateDto. reportPackageTemplateId={0}", reportPackageTemplateId);
             var rpt =
                 _dbContext.ReportPackageTempates.SingleOrDefault(
                     i => i.ReportPackageTemplateId == reportPackageTemplateId);
 
-            return GetReportOneReportPackageTemplate(rpt);
+            var rptDto = GetReportOneReportPackageTemplate(rpt);
+
+            _logger.Info("Enter ReportTemplateService.ReportPackageTemplateDto.");
+            return rptDto;
         }
 
         public IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates()
         {
+            _logger.Info("Enter ReportTemplateService.GetReportPackageTemplates.");
+
             var currentRegulatoryProgramId =
                        int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
@@ -118,7 +125,9 @@ namespace Linko.LinkoExchange.Services.Report
             _reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories.ToList();
             _reportPackageTemplateElementTypes = _dbContext.ReportPackageTemplateElementTypes.ToList();
 
-            return rpts.Select(GetReportOneReportPackageTemplate).ToList();
+            var rptDtos = rpts.Select(GetReportOneReportPackageTemplate).ToList();
+            _logger.Info("Enter ReportTemplateService.ReportPackageTemplateDto. Return count={0}", rptDtos.Count);
+            return rptDtos;
         }
 
         /// <summary>
@@ -142,6 +151,8 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="rpt">The ReportPackageTemplateDto Object</param> 
         public int SaveReportPackageTemplate(ReportPackageTemplateDto rpt)
         {
+            _logger.Info("Enter ReportTemplateService.SaveReportPackageTemplate.");
+
             var rptId = rpt.ReportPackageTemplateId.HasValue ? rpt.ReportPackageTemplateId.Value : -1;
 
             using (var transaction = _dbContext.BeginTransaction())
@@ -272,6 +283,8 @@ namespace Linko.LinkoExchange.Services.Report
                     _dbContext.SaveChanges();
                     transaction.Commit();
 
+                    _logger.Info("Leave ReportTemplateService.SaveReportPackageTemplate. rptId={0}", rptId);
+
                     return rptId;
                 }
                 catch (Exception ex)
@@ -380,6 +393,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         private ReportPackageTemplateDto GetReportOneReportPackageTemplate(ReportPackageTemplate rpt)
         {
+            _logger.Info("Enter ReportTemplateService.ReportPackageTemplateDto.");
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var rptDto = _mapHelper.GetReportPackageTemplateDtoFromReportPackageTemplate(rpt);
 
@@ -405,6 +419,8 @@ namespace Linko.LinkoExchange.Services.Report
                 var lastModifierUser = _userService.GetUserProfileById(rpt.LastModifierUserId.Value);
                 rptDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
             }
+
+            _logger.Info("Leave ReportTemplateService.GetReportOneReportPackageTemplate.");
             return rptDto;
         }
 
