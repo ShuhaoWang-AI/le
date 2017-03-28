@@ -320,6 +320,11 @@ namespace Linko.LinkoExchange.Services.Report
             return ReportElementTypeDtos(ReportElementCategoryName.Attachments.ToString());
         }
 
+        public IEnumerable<ReportElementTypeDto> GetSampleAndResultTypes()
+        {
+            return ReportElementTypeDtos(ReportElementCategoryName.SamplesAndResults.ToString());
+        }
+
         #region private section
 
         private IEnumerable<ReportElementTypeDto> ReportElementTypeDtos(string categoryName)
@@ -536,6 +541,12 @@ namespace Linko.LinkoExchange.Services.Report
 
             return dto;
 
+        }
+
+        public IEnumerable<ReportElementCategoryDto> GetReportElementCategories()
+        {
+            var recats = _dbContext.ReportElementCategories.ToList();
+            return recats.Select(i => _mapHelper.GetReportElementCategoryDtoFromReportElementCategory(i)).ToList();
         }
 
         #endregion

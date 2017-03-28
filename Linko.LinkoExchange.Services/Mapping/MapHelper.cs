@@ -690,10 +690,10 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             // For ReportPackageTemplateAssignments fields  
-            rpt.ReportPackageTemplateAssignments = new List<ReportPackageTemplateAssignmentDto>();
+            rpt.ReportPackageTemplateAssignments = new List<OrganizationRegulatoryProgramDto>();
             foreach (var rpta in reportPackageTemplate.ReportPackageTemplateAssignments)
             {
-                rpt.ReportPackageTemplateAssignments.Add(GetReportPackageTemplateAssignmentDtoFromReportPackageTemplateAssignment(rpta));
+                rpt.ReportPackageTemplateAssignments.Add(GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(rpta.OrganizationRegulatoryProgram));
             }
 
             return rpt;
@@ -723,7 +723,16 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             foreach (var asDto in reportPackageTemplateDto.ReportPackageTemplateAssignments)
             {
-                rpt.ReportPackageTemplateAssignments.Add(GetReportPackageTemplateAssignmentFromReportPackageTemplateAssignmentDto(asDto));
+                var assignment = new ReportPackageTemplateAssignment
+                {
+                    OrganizationRegulatoryProgramId = asDto.OrganizationRegulatoryProgramId
+                };
+                if (reportPackageTemplateDto.ReportPackageTemplateId.HasValue)
+                {
+                    assignment.ReportPackageTemplateId = reportPackageTemplateDto.ReportPackageTemplateId.Value;
+                }
+
+                rpt.ReportPackageTemplateAssignments.Add(assignment);
             }
 
             foreach (var rptec in reportPackageTemplateDto.ReportPackageTemplateElementCategories)
@@ -806,41 +815,41 @@ namespace Linko.LinkoExchange.Services.Mapping
             throw new NotImplementedException();
         }
 
-        public ReportPackageTemplateAssignmentDto GetReportPackageTemplateAssignmentDtoFromReportPackageTemplateAssignment(ReportPackageTemplateAssignment rpt)
-        {
-            if (rpt == null)
-            {
-                return null;
-            }
+        //public ReportPackageTemplateAssignmentDto GetReportPackageTemplateAssignmentDtoFromReportPackageTemplateAssignment(ReportPackageTemplateAssignment rpt)
+        //{
+        //    if (rpt == null)
+        //    {
+        //        return null;
+        //    }
 
-            var rptaDto = new ReportPackageTemplateAssignmentDto
-            {
-                ReportPackageTemplateAssignmentId = rpt.ReportPackageTemplateAssignmentId,
-                ReportPackageTemplateId = rpt.ReportPackageTemplateId,
-                OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId,
-                OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(rpt.OrganizationRegulatoryProgram)
-            };
-            return rptaDto;
-        }
+        //    var rptaDto = new ReportPackageTemplateAssignmentDto
+        //    {
+        //        ReportPackageTemplateAssignmentId = rpt.ReportPackageTemplateAssignmentId,
+        //        ReportPackageTemplateId = rpt.ReportPackageTemplateId,
+        //        OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId,
+        //        OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(rpt.OrganizationRegulatoryProgram)
+        //    };
+        //    return rptaDto;
+        //}
 
-        public ReportPackageTemplateAssignment GetReportPackageTemplateAssignmentFromReportPackageTemplateAssignmentDto(ReportPackageTemplateAssignmentDto rptDto)
-        {
-            if (rptDto == null)
-            {
-                return null;
-            }
+        //public ReportPackageTemplateAssignment GetReportPackageTemplateAssignmentFromReportPackageTemplateAssignmentDto(ReportPackageTemplateAssignmentDto rptDto)
+        //{
+        //    if (rptDto == null)
+        //    {
+        //        return null;
+        //    }
 
-            var rpta = new ReportPackageTemplateAssignment
-            {
-                ReportPackageTemplateAssignmentId = rptDto.ReportPackageTemplateAssignmentId,
-                ReportPackageTemplateId = rptDto.ReportPackageTemplateId,
-                ReportPackageTemplate =
-                    GetReportPackageTemplateFromReportPackageTemplateDto(rptDto.ReportPackageTemplate),
-                OrganizationRegulatoryProgramId = rptDto.OrganizationRegulatoryProgramId
-            };
-            return rpta;
+        //    var rpta = new ReportPackageTemplateAssignment
+        //    {
+        //        ReportPackageTemplateAssignmentId = rptDto.ReportPackageTemplateAssignmentId,
+        //        ReportPackageTemplateId = rptDto.ReportPackageTemplateId,
+        //        ReportPackageTemplate =
+        //            GetReportPackageTemplateFromReportPackageTemplateDto(rptDto.ReportPackageTemplate),
+        //        OrganizationRegulatoryProgramId = rptDto.OrganizationRegulatoryProgramId
+        //    };
+        //    return rpta;
 
-        }
+        //}
 
         public FileStoreDto GetFileStoreDtoFromFileStore(FileStore fileStore)
         {

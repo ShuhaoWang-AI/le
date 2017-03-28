@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Services.Report
@@ -14,5 +15,7 @@ namespace Linko.LinkoExchange.Services.Report
         CtsEventTypeDto GetCtsEventType(int ctsEventTypeId);
         IEnumerable<ReportElementTypeDto> GetCertificationTypes();
         IEnumerable<ReportElementTypeDto> GetAttachmentTypes();
+        IEnumerable<ReportElementTypeDto> GetSampleAndResultTypes();
+        IEnumerable<ReportElementCategoryDto> GetReportElementCategories();
     }
 }
