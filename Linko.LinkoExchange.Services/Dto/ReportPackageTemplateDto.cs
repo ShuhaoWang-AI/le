@@ -1,6 +1,7 @@
 using Linko.LinkoExchange.Core.Domain;
 using System;
 using System.Collections.Generic;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
@@ -25,7 +26,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public List<ReportElementTypeDto> AttachmentTypes { get; set; }
         public List<ReportElementTypeDto> CertificationTypes { get; set; }
         public List<OrganizationRegulatoryProgramDto> ReportPackageTemplateAssignments { get; set; }
-        public List<ReportPackageTemplateElementCategoryDto> ReportPackageTemplateElementCategories { get; set; }
+        public List<ReportElementCategoryName> ReportPackageTemplateElementCategories { get; set; }
         public bool ShowSampleResults { get; set; }
     }
 }

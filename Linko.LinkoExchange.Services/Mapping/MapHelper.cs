@@ -680,13 +680,14 @@ namespace Linko.LinkoExchange.Services.Mapping
                 IsActive = reportPackageTemplate.IsActive,
                 LastModifierUserId = reportPackageTemplate.LastModifierUserId,
 
-                ReportPackageTemplateElementCategories = new List<ReportPackageTemplateElementCategoryDto>()
+                ReportPackageTemplateElementCategories = new List<ReportElementCategoryName>()
             };
 
             // This will include attachment, TTO, comments etc categories
             foreach (var cat in reportPackageTemplate.ReportPackageTemplateElementCategories)
             {
-                rpt.ReportPackageTemplateElementCategories.Add(GetReportPackageTemplateElementCategoryDtoFromReportPackageTemplateElementCategory(cat));
+                var reportElementCategoryName = (ReportElementCategoryName)Enum.Parse(typeof(ReportElementCategoryName), cat.ReportElementCategory.Name);
+                rpt.ReportPackageTemplateElementCategories.Add(reportElementCategoryName);
             }
 
             // For ReportPackageTemplateAssignments fields  
@@ -733,11 +734,6 @@ namespace Linko.LinkoExchange.Services.Mapping
                 }
 
                 rpt.ReportPackageTemplateAssignments.Add(assignment);
-            }
-
-            foreach (var rptec in reportPackageTemplateDto.ReportPackageTemplateElementCategories)
-            {
-                rpt.ReportPackageTemplateElementCategories.Add(GetReportPackageTemplateElementCategoryFromReportPackageTemplateElementCategoryDto(rptec));
             }
 
             if (reportPackageTemplateDto.ReportPackageTemplateId.HasValue)

@@ -231,7 +231,7 @@ namespace Linko.LinkoExchange.Services.Report
                         //  1 Delete from tReprotPackageTemplateAssignment table,
                         //  2 Delete from tReportPackageTemplateElementType table,
                         //  3 Delete from tReportPackageTemplateElementCategory table 
-                        DeleteReportPackageChildrenObjects(reportPackageTemplate);
+                        DeleteReportPackageChildrenObjects(currentReportPackageTempalte);
                     }
                     else
                     {
@@ -362,8 +362,8 @@ namespace Linko.LinkoExchange.Services.Report
             ReportPackageTemplate reportPackageTemplate, int setOrder)
         {
             // Step 1, Save to tReportPackageTemplateElementCategory table
-            var reportElementCategoryId = _dbContext.ReportElementCategories
-                                                .Single(cat => cat.Name == reportElementTypeDtos[0].ReportElementCategory.ToString()).ReportElementCategoryId;
+            var catName = reportElementTypeDtos[0].ReportElementCategory.ToString();
+            var reportElementCategoryId = _dbContext.ReportElementCategories.Single(cat => cat.Name == catName).ReportElementCategoryId;
             var rptec = new ReportPackageTemplateElementCategory
             {
                 ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId,
@@ -475,26 +475,23 @@ namespace Linko.LinkoExchange.Services.Report
             return rets;
         }
 
-        private void DeleteReportPackageTemplateAssignments(
-            IEnumerable<ReportPackageTemplateAssignment> reportPackageTemplateAssignments)
+        private void DeleteReportPackageTemplateAssignments(int reportTemplateId)
         {
-            foreach (var assignment in reportPackageTemplateAssignments)
-            {
-                var temp = _dbContext.ReportPackageTemplateAssignments.Single(
-                        i => i.ReportPackageTemplateAssignmentId == assignment.ReportPackageTemplateAssignmentId);
+            var assignments =
+                _dbContext.ReportPackageTemplateAssignments.Where(i => i.ReportPackageTemplateId == reportTemplateId).ToList();
 
-                if (temp != null)
-                {
-                    _dbContext.ReportPackageTemplateAssignments.Remove(temp);
-                }
+            foreach (var assignment in assignments)
+            {
+                _dbContext.ReportPackageTemplateAssignments.Remove(assignment);
             }
         }
 
         private void DeleteReportPackageChildrenObjects(ReportPackageTemplate rpt)
         {
-            DeleteReportPackageTemplateAssignments(rpt.ReportPackageTemplateAssignments);
+            DeleteReportPackageTemplateAssignments(rpt.ReportPackageTemplateId);
 
-            foreach (var rptec in rpt.ReportPackageTemplateElementCategories)
+            var currentCategories = rpt.ReportPackageTemplateElementCategories.ToList();
+            foreach (var rptec in currentCategories)
             {
                 var rptetId = rptec.ReportPackageTemplateElementCategoryId;
                 var rptets =
@@ -543,7 +540,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         }
 
-        public IEnumerable<ReportElementCategoryDto> GetReportElementCategories()
+        private List<ReportElementCategoryDto> GetReportElementCategories()
         {
             var recats = _dbContext.ReportElementCategories.ToList();
             return recats.Select(i => _mapHelper.GetReportElementCategoryDtoFromReportElementCategory(i)).ToList();
