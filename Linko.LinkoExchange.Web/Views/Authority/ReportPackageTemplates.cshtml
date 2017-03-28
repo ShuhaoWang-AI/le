@@ -1,6 +1,6 @@
 ﻿@using Linko.LinkoExchange.Web.ViewModels.Shared
 @{
-    ViewBag.Title = "Parameter Groups";
+    ViewBag.Title = "Report Package Templates";
 }
 
 <section>
@@ -8,15 +8,15 @@
         <li>
             <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Authority")'"><i class=""></i> Home </a>
         </li>
-        <li class="active">Parameter Groups</li>
+        <li class="active">Report Package Templates</li>
     </ol>
 </section>
 
 <div class="box box-primary">
     <div class="box-header with-border">
-        <h3 class="box-title">Parameter Groups</h3>
+        <h3 class="box-title">Report Package Templates</h3>
         <div class="box-tools pull-right">
-            <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"ParameterGroupDetails", controllerName:"Authority")'">Create New</button>
+            <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewReportPackageTemplateDetails", controllerName:"Authority")'">Create New</button>
             <button class="btn btn-box-tool" data-widget="collapse">
                 <i class="fa fa-minus"></i>
             </button>
@@ -31,27 +31,34 @@
         <div class="form-group">
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@
-                @(Html.Kendo().Grid<ParameterGroupViewModel>()
-                      .Name(componentName:"gridParameterGroup")
+                @(Html.Kendo().Grid<ReportPackageTemplateViewModel>()
+                      .Name(componentName:"gridReportPackageTemplate")
                       .Columns(columns =>
                       {
                           columns.Bound(c => c.Name)
                                  .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
+                                                                         .SuggestionOperator(filterType:FilterType.Contains)))
+                                 .Width(pixelWidth: 250);
                           columns.Bound(c => c.Description)
                                  .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
                                                                          .SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.EffectiveDateTimeLocal).Format(value: "{0:MM/dd/yyyy}")
+                                 .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true))
+                                 .Width(pixelWidth: 100);
                           columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm:ss}")
-                                 .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                                 .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true))
+                                 .Width(pixelWidth: 140);
                           columns.Bound(c => c.LastModifierUserName)
                                  .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
+                                                                         .SuggestionOperator(filterType:FilterType.Contains)))
+                                 .Width(pixelWidth: 150);
                           columns.Bound(c => c.Status)
                                  .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
+                                                                         .SuggestionOperator(filterType:FilterType.Contains)))
+                                 .Width(pixelWidth: 70);
                           columns.Template(m => { })
                                  .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
-                                 .Width(pixelWidth:60);
+                                 .Width(pixelWidth:40);
                       })
                       .Pageable(pageable => pageable
                                                 .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
@@ -68,13 +75,13 @@
                       //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value:true))
                       .Scrollable(s => s.Height(value:"auto"))
-                      .NoRecords(text:"No parameter group exists.")
+                      .NoRecords(text: "No report package template exists.")
                       .Events(events => { events.Change(handler:"gotoNextPage"); })
                       .DataSource(dataSource => dataSource
                                                     .Ajax()
                                                     .ServerOperation(enabled:false)
                                                     .Batch(enabled:true)
-                                                    .Read(read => read.Action(actionName:"ParameterGroups_Read", controllerName:"Authority"))
+                                                    .Read(read => read.Action(actionName:"ReportPackageTemplates_Read", controllerName:"Authority"))
                                                     .PageSize(pageSize:15)
                                                     .Events(events => events.Error(handler:"error_handler"))
                       )
@@ -88,10 +95,10 @@
     <script type="text/javascript">
         gotoNextPage = function()
         {
-            var grid = $("#gridParameterGroup").data("kendoGrid");
-            var postUrl = "@Url.Action(actionName: "ParameterGroups_Select", controllerName:"Authority")";
+            var grid = $("#gridReportPackageTemplate").data("kendoGrid");
+            var postUrl = "@Url.Action(actionName: "ReportPackageTemplates_Select", controllerName:"Authority")";
 
-            doAjaxAction(grid, postUrl, "", "Select a parameter group");
+            doAjaxAction(grid, postUrl, "", "Select a report package template.");
         }
 
     </script>

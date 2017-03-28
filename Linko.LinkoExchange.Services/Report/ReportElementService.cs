@@ -144,7 +144,7 @@ namespace Linko.LinkoExchange.Services.Report
                         {
                             if (elementTypeWithMatchingName.ReportElementTypeId != reportElementType.ReportElementTypeId.Value)
                             {
-                                string message = "A Report Element Type with that name already exists.  Please select another name.";
+                                string message = "A Report Element Type with that name already exists. Please select another name.";
                                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                             }
@@ -165,7 +165,7 @@ namespace Linko.LinkoExchange.Services.Report
                         //Ensure there are no other element types with same name
                         if (elementTypesWithMatchingName.Count() > 0)
                         {
-                            string message = "A Report Element Type with that name already exists.  Please select another name.";
+                            string message = "A Report Element Type with that name already exists. Please select another name.";
                             validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                             throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                         }

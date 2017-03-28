@@ -409,6 +409,7 @@
     <Content Include="Views\Authority\ParameterGroupDetails.cshtml" />
     <Content Include="Views\Authority\ReportElementTypes.cshtml" />
     <Content Include="Views\Authority\ReportElementTypeDetails.cshtml" />
+    <Content Include="Views\Authority\ReportPackageTemplates.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -453,6 +454,7 @@
     <Compile Include="ViewModels\Authority\AuthorityUserViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
+    <Compile Include="ViewModels\Shared\ReportPackageTemplateViewModel.cs" />
     <Compile Include="ViewModels\Shared\ReportElementTypeViewModel.cs" />
     <Compile Include="ViewModels\Shared\ParameterGroupViewModel.cs" />
     <Compile Include="ViewModels\Shared\ParameterViewModel.cs" />

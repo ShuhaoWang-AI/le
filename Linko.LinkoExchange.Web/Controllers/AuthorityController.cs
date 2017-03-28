@@ -2084,5 +2084,88 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         #endregion
+        
+        #region Show Report Package Template List
+
+        // GET: /Authority/ReportPackageTemplates
+        public ActionResult ReportPackageTemplates()
+        {
+            return View();
+        }
+
+        public ActionResult ReportPackageTemplates_Read([DataSourceRequest] DataSourceRequest request)
+        {
+            var reportPackageTemplates = _reportTemplateService.GetReportPackageTemplates().ToList();
+
+            var viewModels = reportPackageTemplates.Select(vm => new ReportPackageTemplateViewModel
+                                                          {
+                                                              Id = vm.ReportPackageTemplateId,
+                                                              Name = vm.Name,
+                                                              Description = vm.Description,
+                                                              IsActive = vm.IsActive,
+                                                              EffectiveDateTimeLocal = vm.EffectiveDateTimeLocal,
+                                                              LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal,
+                                                              LastModifierUserName = vm.LastModifierFullName
+                                                          });
+
+            var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
+                                                                                       {
+                                                                                           vm.Id,
+                                                                                           vm.Name,
+                                                                                           vm.Description,
+                                                                                           vm.Status,
+                                                                                           vm.EffectiveDateTimeLocal,
+                                                                                           vm.LastModificationDateTimeLocal,
+                                                                                           vm.LastModifierUserName
+                                                                                       });
+
+            return Json(data:result);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        public ActionResult ReportPackageTemplates_Select(IEnumerable<ReportPackageTemplateViewModel> items)
+        {
+            try
+            {
+                if (items != null)
+                {
+                    var item = items.First();
+                    return Json(data:new
+                                     {
+                                         redirect = true,
+                                         newurl = Url.Action(actionName:"ReportPackageTemplateDetails", controllerName:"Authority", routeValues:new {id = item.Id})
+                                     });
+                }
+                return Json(data:new
+                                 {
+                                     redirect = false,
+                                     message = "Please select a report package template."
+                                 });
+            }
+            catch (RuleViolationException rve)
+            {
+                return Json(data:new
+                                 {
+                                     redirect = false,
+                                     message = MvcValidationExtensions.GetViolationMessages(ruleViolationException:rve)
+                                 });
+            }
+        }
+
+        #endregion
+
+        #region Show Report Package Template Details
+
+        public ActionResult NewReportPackageTemplateDetails()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ActionResult ReportPackageTemplateDetails(int? id)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
     }
 }
