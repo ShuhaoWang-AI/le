@@ -862,7 +862,6 @@ namespace Linko.LinkoExchange.Services.Mapping
                 OrganizationRegulatoryProgram =
                     GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(
                         fileStore.OrganizationRegulatoryProgram),
-                IsReported = fileStore.IsReported,
                 UploadDateTimeUtc = fileStore.UploadDateTimeUtc,
                 UploaderUserId = fileStore.UploaderUserId
             };
@@ -884,7 +883,6 @@ namespace Linko.LinkoExchange.Services.Mapping
                 ReportElementTypeId = fileStoreDto.ReportElementTypeId,
                 ReportElementTypeName = fileStoreDto.ReportElementTypeName,
                 OrganizationRegulatoryProgramId = fileStoreDto.OrganizationRegulatoryProgramId,
-                IsReported = fileStoreDto.IsReported,
                 UploadDateTimeUtc = fileStoreDto.UploadDateTimeUtc.DateTime,
                 UploaderUserId = fileStoreDto.UploaderUserId
             };

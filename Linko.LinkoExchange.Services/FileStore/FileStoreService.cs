@@ -112,6 +112,8 @@ namespace Linko.LinkoExchange.Services
                     var currentRegulatoryProgramId =
                         int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
+                    //TODO:  try to reduce the file size;
+
                     fileStoreDto.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
                     fileStoreDto.UploaderUserId = currentUserId;
                     fileStoreDto.UploadDateTimeUtc = DateTimeOffset.UtcNow;
@@ -172,14 +174,13 @@ namespace Linko.LinkoExchange.Services
         public void UpdateFileStore(FileStoreDto fileStoreDto)
         {
             _logger.Info("Enter FileStoreService.UpdateFileStore.");
-
-            List<RuleViolation> validationIssues = new List<RuleViolation>();
-
             //Check if the file is already set to be 'reproted' or not 
             var testFileStore = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreDto.FileStoreId);
-            if (testFileStore.IsReported)
+            // Check the fileStoreId is in tReportFile table or not, if it, means that file is included in a reprot  
+            if (_dbContext.ReportFiles.Any(t => t.FileStoreId == fileStoreDto.FileStoreId))
             {
                 string message = "The attachment is used in a Report Package, and cannot be changed.";
+                List<RuleViolation> validationIssues = new List<RuleViolation>();
                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
             }
@@ -188,8 +189,9 @@ namespace Linko.LinkoExchange.Services
             {
                 try
                 {
-                    testFileStore.Name = fileStoreDto.Name;
+                    //testFileStore.Name = fileStoreDto.Name;
                     testFileStore.Description = fileStoreDto.Description;
+                    testFileStore.ReportElementTypeName = fileStoreDto.ReportElementTypeName;
 
                     _dbContext.SaveChanges();
                     _dbContext.Commit(transaction);
@@ -216,8 +218,7 @@ namespace Linko.LinkoExchange.Services
             _logger.Info("Enter FileStoreService.DeleteFileStore.");
 
             //Check if the file is already set to be 'reproted' or not 
-            var testFileStore = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreId);
-            if (testFileStore.IsReported)
+            if (_dbContext.ReportFiles.Any(t => t.FileStoreId == fileStoreId))
             {
                 List<RuleViolation> validationIssues = new List<RuleViolation>();
                 string message = "The attachment is used in a Report Package, and cannot be changed.";
@@ -229,6 +230,7 @@ namespace Linko.LinkoExchange.Services
             {
                 try
                 {
+                    var testFileStore = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreId);
                     var fileStoreDate = _dbContext.FileStoreDatas.Single(i => i.FileStoreId == fileStoreId);
                     _dbContext.FileStoreDatas.Remove(fileStoreDate);
                     _dbContext.FileStores.Remove(testFileStore);
