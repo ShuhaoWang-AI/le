@@ -102,10 +102,12 @@ namespace Linko.LinkoExchange.Services.Report
             return dto;
         }
 
-        public void SaveReportElementType(ReportElementTypeDto reportElementType)
+        public int SaveReportElementType(ReportElementTypeDto reportElementType)
         {
-            var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
+            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
+            var reportElementTypeIdToReturn = -1;
             List<RuleViolation> validationIssues = new List<RuleViolation>();
 
             //Check required fields (Name and Certification Text as per UC-53.3 4.b.)
@@ -115,10 +117,8 @@ namespace Linko.LinkoExchange.Services.Report
                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
             }
-
-            int certificationElementCategoryId = _dbContext.ReportElementCategories
-                                                .Single(cat => cat.Name == ReportElementCategoryName.Certifications.ToString()).ReportElementCategoryId;
-            if (reportElementType.ReportElementCategoryId == certificationElementCategoryId
+            
+            if (reportElementType.ReportElementCategory == ReportElementCategoryName.Certifications
                 && string.IsNullOrEmpty(reportElementType.Content))
             {
                 string message = "Certification Text is required.";
@@ -136,6 +136,7 @@ namespace Linko.LinkoExchange.Services.Report
                                 && ret.OrganizationRegulatoryProgramId == authOrgRegProgramId);
 
                     ReportElementType reportElementTypeToPersist = null;
+
                     if (reportElementType.ReportElementTypeId.HasValue && reportElementType.ReportElementTypeId.Value > 0)
                     {
                         //Ensure there are no other element types with same name
@@ -152,6 +153,9 @@ namespace Linko.LinkoExchange.Services.Report
                         //Update existing
                         reportElementTypeToPersist = _dbContext.ReportElementTypes.Single(c => c.ReportElementTypeId == reportElementType.ReportElementTypeId);
                         reportElementTypeToPersist = _mapHelper.GetReportElementTypeFromReportElementTypeDto(reportElementType, reportElementTypeToPersist);
+                        reportElementTypeToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
+                        reportElementTypeToPersist.ReportElementCategoryId = _dbContext.ReportElementCategories
+                                                .Single(cat => cat.Name == reportElementType.ReportElementCategory.ToString()).ReportElementCategoryId;
                         reportElementTypeToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                         reportElementTypeToPersist.LastModifierUserId = currentUserId;
 
@@ -168,12 +172,17 @@ namespace Linko.LinkoExchange.Services.Report
 
                         //Get new
                         reportElementTypeToPersist = _mapHelper.GetReportElementTypeFromReportElementTypeDto(reportElementType);
+                        reportElementTypeToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
+                        reportElementTypeToPersist.ReportElementCategoryId = _dbContext.ReportElementCategories
+                                                .Single(cat => cat.Name == reportElementType.ReportElementCategory.ToString()).ReportElementCategoryId;
                         reportElementTypeToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
                         reportElementTypeToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                         reportElementTypeToPersist.LastModifierUserId = currentUserId;
                         _dbContext.ReportElementTypes.Add(reportElementTypeToPersist);
                     }
                     _dbContext.SaveChanges();
+
+                    reportElementTypeIdToReturn = reportElementTypeToPersist.ReportElementTypeId;
 
                     transaction.Commit();
                 }
@@ -200,7 +209,7 @@ namespace Linko.LinkoExchange.Services.Report
                 }
 
             }
-
+            return reportElementTypeIdToReturn;
         }
 
     

@@ -16,7 +16,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public string Content { get; set; }
         public bool IsContentProvided { get; set; }
         public CtsEventTypeDto CtsEventType { get; set; }
-        public int ReportElementCategoryId { get; set; }
         public ReportElementCategoryName ReportElementCategory { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
         public DateTime LastModificationDateTimeLocal { get; set; }

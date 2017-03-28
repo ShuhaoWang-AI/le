@@ -72,7 +72,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         #endregion
-
+        
         #region default action
 
         // GET: Authority
@@ -1045,7 +1045,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     model = PrepareIndustryDetails(id:id);
 
                     var validationIssues = new List<RuleViolation>();
-                    var message = "Enable Industry not allowed. No more Industry Licenses are available.  Disable another Industry and try again.";
+                    var message = "Enable Industry not allowed. No more Industry Licenses are available. Disable another Industry and try again.";
                     validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
                     throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
                 }
@@ -1704,7 +1704,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     return Json(data:new
                                      {
                                          redirect = true,
-                                         newurl = Url.Action(actionName:"ParameterGroupDetails", controllerName:"Authority", routeValues:new { id = item.Id })
+                                         newurl = Url.Action(actionName:"ParameterGroupDetails", controllerName:"Authority", routeValues:new {id = item.Id})
                                      });
                 }
                 return Json(data:new
@@ -1726,7 +1726,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         #endregion
 
         #region Show Static Parameter Group Details
-        
+
         [Route(template:"ParameterGroup/Details")]
         public ActionResult ParameterGroupDetails(int? id)
         {
@@ -1741,7 +1741,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             return View(model:viewModel);
         }
-        
+
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         //[ValidateAntiForgeryToken]
         [Route(template:"ParameterGroup/Details")]
@@ -1749,7 +1749,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             return SaveParameterGroupDetails(model:model);
         }
-        
+
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         public ActionResult DeleteParameterGroup(int id)
         {
@@ -1760,7 +1760,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return View(viewName:"Confirmation", model:new ConfirmationViewModel
                                                            {
                                                                Title = "Parameter Group Deleted",
-                                                               Message = "Parameter Group Deleted Successfully."
+                                                               Message = "Parameter group deleted successfully."
                                                            });
             }
             catch (RuleViolationException rve)
@@ -1775,11 +1775,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model = PrepareParameterGroupDetails(model.Id);
+                model = PrepareParameterGroupDetails(id:model.Id);
 
-                foreach (var issue in ModelState["."].Errors)
+                foreach (var issue in ModelState[key:"."].Errors)
                 {
-                    ModelState.AddModelError(string.Empty, issue.ErrorMessage);
+                    ModelState.AddModelError(key:string.Empty, errorMessage:issue.ErrorMessage);
                 }
 
                 return View(viewName:"ParameterGroupDetails", model:model);
@@ -1800,13 +1800,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                 parameterGroupDto.Parameters = model.Parameters.Select(p => new ParameterDto {ParameterId = p.Id}).ToList();
 
                 var id = _parameterService.SaveParameterGroup(parameterGroup:parameterGroupDto);
-                
+
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = $"Parameter Group {(model.Id.HasValue ? "updated" : "created")} successfully!";
                 ModelState.Clear();
                 model = PrepareParameterGroupDetails(id:id);
                 return View(viewName:"ParameterGroupDetails", model:model);
-
             }
             catch (RuleViolationException rve)
             {
@@ -1864,49 +1863,25 @@ namespace Linko.LinkoExchange.Web.Controllers
         #endregion
 
         #region Show Report Element Type List
-        
+
         // GET: /Authority/ReportElementTypes
         public ActionResult ReportElementTypes()
         {
             return View();
         }
 
-        public ActionResult ReportElementTypes_Attachment_Read([DataSourceRequest] DataSourceRequest request)
+        public ActionResult ReportElementTypes_Read([DataSourceRequest] DataSourceRequest request, ReportElementCategoryName categoryName)
         {
-            var reportElementTypes = _reportElementService.GetReportElementTypes(ReportElementCategoryName.Attachments);
+            var reportElementTypes = _reportElementService.GetReportElementTypes(categoryName:categoryName);
 
             var viewModels = reportElementTypes.Select(vm => new ReportElementTypeViewModel
-                                                          {
-                                                              Id = vm.ReportElementTypeId,
-                                                              Name = vm.Name,
-                                                              Description = vm.Description,
-                                                              LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal,
-                                                              LastModifierUserName = vm.LastModifierFullName
-                                                          });
-
-            var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
-                                                                                       {
-                                                                                           vm.Id,
-                                                                                           vm.Name,
-                                                                                           vm.Description,
-                                                                                           vm.LastModificationDateTimeLocal,
-                                                                                           vm.LastModifierUserName
-                                                                                       });
-
-            return Json(data:result);
-        }
-        public ActionResult ReportElementTypes_Certification_Read([DataSourceRequest] DataSourceRequest request)
-        {
-            var reportElementTypes = _reportElementService.GetReportElementTypes(ReportElementCategoryName.Certifications);
-
-            var viewModels = reportElementTypes.Select(vm => new ReportElementTypeViewModel
-                                                          {
-                                                              Id = vm.ReportElementTypeId,
-                                                              Name = vm.Name,
-                                                              Description = vm.Description,
-                                                              LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal,
-                                                              LastModifierUserName = vm.LastModifierFullName
-                                                          });
+                                                             {
+                                                                 Id = vm.ReportElementTypeId,
+                                                                 Name = vm.Name,
+                                                                 Description = vm.Description,
+                                                                 LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal,
+                                                                 LastModifierUserName = vm.LastModifierFullName
+                                                             });
 
             var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
                                                                                        {
@@ -1931,7 +1906,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     return Json(data:new
                                      {
                                          redirect = true,
-                                         newurl = Url.Action(actionName:"ReportElementTypeDetails", controllerName:"Authority", routeValues:new { id = item.Id })
+                                         newurl = Url.Action(actionName:"ReportElementTypeDetails", controllerName:"Authority", routeValues:new {id = item.Id})
                                      });
                 }
                 return Json(data:new
@@ -1949,23 +1924,62 @@ namespace Linko.LinkoExchange.Web.Controllers
                                  });
             }
         }
-        
 
         #endregion
 
         #region Show Report Element Type Details
-        public ActionResult ReportElementTypeDetails(int? id)
+
+        [Route(template:"ReportElementType/New")]
+        public ActionResult NewReportElementTypeDetails(ReportElementCategoryName categoryName)
         {
             var viewModel = new ReportElementTypeViewModel();
+
             try
             {
-                viewModel = PrepareReportElementTypeDetails(id);
+                viewModel = PrepareReportElementTypeDetails();
+                viewModel.CategoryName = categoryName;
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
+            return View(viewName:"ReportElementTypeDetails", model:viewModel);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"ReportElementType/New")]
+        public ActionResult NewReportElementTypeDetails(ReportElementCategoryName categoryName, ReportElementTypeViewModel model)
+        {
+            return SaveReportElementTypeDetails(model:model);
+        }
+
+        [Route(template:"ReportElementType/{id:int}/Details")]
+        public ActionResult ReportElementTypeDetails(int id)
+        {
+            var viewModel = new ReportElementTypeViewModel();
+
+            try
+            {
+                viewModel = PrepareReportElementTypeDetails(id:id);
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            ViewBag.ShowSuccessMessage = TempData[key:"ShowSuccessMessage"] ?? false;
+            ViewBag.SuccessMessage = TempData[key:"SuccessMessage"] ?? "";
+
             return View(model:viewModel);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"ReportElementType/{id:int}/Details")]
+        public ActionResult ReportElementTypeDetails(int id, ReportElementTypeViewModel model)
+        {
+            return SaveReportElementTypeDetails(model:model);
         }
 
         public ActionResult DeleteReportElementType(int id)
@@ -1973,11 +1987,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             try
             {
                 _reportElementService.DeleteReportElementType(reportElementTypeId:id);
-                
+
                 return View(viewName:"Confirmation", model:new ConfirmationViewModel
                                                            {
                                                                Title = "Report Element Type Deleted",
-                                                               Message = "Report Element Type Deleted Successfully."
+                                                               Message = "Report element type deleted successfully."
                                                            });
             }
             catch (RuleViolationException rve)
@@ -1988,29 +2002,27 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"ReportElementTypeDetails", model:PrepareReportElementTypeDetails(id:id));
         }
 
-        private ReportElementTypeViewModel PrepareReportElementTypeDetails(int? id)
+        private ReportElementTypeViewModel PrepareReportElementTypeDetails(int? id = null)
         {
             var viewModel = new ReportElementTypeViewModel();
 
             if (id.HasValue)
             {
                 ViewBag.Satus = "Edit";
-                var reportElementType = _reportElementService.GetReportElementTypes(ReportElementCategoryName.Attachments).FirstOrDefault(); // TODO: Need to call proper function
+                var reportElementType = _reportElementService.GetReportElementType(reportElementTypeId:id.Value);
                 viewModel = new ReportElementTypeViewModel
-                {
-                    Id = reportElementType.ReportElementTypeId,
-                    Name = reportElementType.Name,
-                    Description = reportElementType.Description,
-                    CategoryName = reportElementType.ReportElementCategory,
-                    Content = reportElementType.Content,
-                    IsContentProvided = reportElementType.IsContentProvided,
-                    CtsEventTypeId = reportElementType.CtsEventType?.CtsEventTypeId ?? 0,
-                    CtsEventTypeName = reportElementType.CtsEventType?.Name ?? "",
-                    LastModificationDateTimeLocal = reportElementType.LastModificationDateTimeLocal,
-                    LastModifierUserName = reportElementType.LastModifierFullName
-                };
-
-                ViewBag.IsReportElementTypeInUsed = false;
+                            {
+                                Id = reportElementType.ReportElementTypeId,
+                                Name = reportElementType.Name,
+                                Description = reportElementType.Description,
+                                CategoryName = reportElementType.ReportElementCategory,
+                                Content = reportElementType.Content,
+                                IsContentProvided = reportElementType.IsContentProvided,
+                                CtsEventTypeId = reportElementType.CtsEventType?.CtsEventTypeId ?? 0,
+                                CtsEventTypeName = reportElementType.CtsEventType?.Name ?? "",
+                                LastModificationDateTimeLocal = reportElementType.LastModificationDateTimeLocal,
+                                LastModifierUserName = reportElementType.LastModifierFullName
+                            };
             }
             else
             {
@@ -2020,17 +2032,57 @@ namespace Linko.LinkoExchange.Web.Controllers
             // Waste Types
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
             viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes().Select(c => new SelectListItem
-            {
-                Text = c.Name,
-                Value = c.CtsEventTypeId.ToString(),
-                Selected = (c.CtsEventTypeId.Equals(viewModel.CtsEventTypeId))
-            }).ToList();
+                                                                                                     {
+                                                                                                         Text = c.Name,
+                                                                                                         Value = c.CtsEventTypeId.ToString(),
+                                                                                                         Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
+                                                                                                     }).ToList();
 
-            viewModel.AvailableCtsEventTypes.Insert(0, new SelectListItem { Text = "Select Cts Event Type", Value = "0" });
+            viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select Cts Event Type", Value = "0"});
             return viewModel;
         }
 
-        #endregion
+        private ActionResult SaveReportElementTypeDetails(ReportElementTypeViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var reportElementTypeDto = new ReportElementTypeDto();
 
+                    if (model.Id.HasValue)
+                    {
+                        reportElementTypeDto = _reportElementService.GetReportElementType(reportElementTypeId:model.Id.Value);
+                    }
+
+                    reportElementTypeDto.ReportElementTypeId = model.Id;
+                    reportElementTypeDto.Name = model.Name;
+                    reportElementTypeDto.Description = model.Description;
+                    reportElementTypeDto.CtsEventType = model.CtsEventTypeId == 0 ? null : _reportTemplateService.GetCtsEventType(ctsEventTypeId:model.CtsEventTypeId);
+                    reportElementTypeDto.Content = model.Content;
+                    reportElementTypeDto.ReportElementCategory = model.CategoryName;
+                    reportElementTypeDto.IsContentProvided = model.CategoryName == ReportElementCategoryName.Certifications;
+
+                    var id = _reportElementService.SaveReportElementType(reportElementType:reportElementTypeDto);
+
+                    TempData[key:"ShowSuccessMessage"] = true;
+                    TempData[key:"SuccessMessage"] = $"Report element type {(model.Id.HasValue ? "updated" : "created")} successfully!";
+
+                    ModelState.Clear();
+                    return RedirectToAction(actionName:"ReportElementTypeDetails", controllerName:"Authority", routeValues:new {id});
+                }
+                catch (RuleViolationException rve)
+                {
+                    MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+                }
+            }
+
+            var viewModel = PrepareReportElementTypeDetails(id:model.Id);
+            viewModel.CategoryName = model.CategoryName;
+
+            return View(viewName:"ReportElementTypeDetails", model:viewModel);
+        }
+
+        #endregion
     }
 }

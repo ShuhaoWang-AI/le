@@ -68,7 +68,7 @@ namespace Linko.LinkoExchange.Test
         {
             var reportElementTypeDto = new ReportElementTypeDto();
             reportElementTypeDto.Name = "Has Required Name";
-            reportElementTypeDto.ReportElementCategoryId = 3; //Certifications;
+            reportElementTypeDto.ReportElementCategory = ReportElementCategoryName.Certifications; //Certifications;
             //reportElementTypeDto.Content = NOT SET!
             _reportElementService.SaveReportElementType(reportElementTypeDto);
         }
@@ -83,7 +83,7 @@ namespace Linko.LinkoExchange.Test
             //reportElementTypeDto.Content = MISSING
             reportElementTypeDto.IsContentProvided = false;
             reportElementTypeDto.CtsEventType = new CtsEventTypeDto() { CtsEventTypeId = 1 };
-            reportElementTypeDto.ReportElementCategoryId = 2; //Attachment;
+            reportElementTypeDto.ReportElementCategory = ReportElementCategoryName.Attachments; //Attachment;
             reportElementTypeDto.OrganizationRegulatoryProgramId = 1;
 
             _reportElementService.SaveReportElementType(reportElementTypeDto);
@@ -99,7 +99,7 @@ namespace Linko.LinkoExchange.Test
             reportElementTypeDto.Content = "This is sample certification text";
             reportElementTypeDto.IsContentProvided = true;
             reportElementTypeDto.CtsEventType = new CtsEventTypeDto() { CtsEventTypeId = 1 };
-            reportElementTypeDto.ReportElementCategoryId = 3; //Certifications;
+            reportElementTypeDto.ReportElementCategory = ReportElementCategoryName.Certifications;; //Certifications;
             reportElementTypeDto.OrganizationRegulatoryProgramId = 1;
 
             _reportElementService.SaveReportElementType(reportElementTypeDto);
@@ -116,7 +116,7 @@ namespace Linko.LinkoExchange.Test
             reportElementTypeDto.Content = "This is sample certification text";
             reportElementTypeDto.IsContentProvided = true;
             reportElementTypeDto.CtsEventType = new CtsEventTypeDto() { CtsEventTypeId = 1 };
-            reportElementTypeDto.ReportElementCategoryId = 3; //Certifications;
+            reportElementTypeDto.ReportElementCategory = ReportElementCategoryName.Certifications;; //Certifications;
             reportElementTypeDto.OrganizationRegulatoryProgramId = 1;
 
             _reportElementService.SaveReportElementType(reportElementTypeDto);
@@ -133,7 +133,7 @@ namespace Linko.LinkoExchange.Test
             reportElementTypeDto.Content = "This is different sample certification text";
             reportElementTypeDto.IsContentProvided = true;
             reportElementTypeDto.CtsEventType = new CtsEventTypeDto() { CtsEventTypeId = 1 };
-            reportElementTypeDto.ReportElementCategoryId = 3; //Certifications;
+            reportElementTypeDto.ReportElementCategory = ReportElementCategoryName.Certifications; //Certifications;
             reportElementTypeDto.OrganizationRegulatoryProgramId = 1;
 
             _reportElementService.SaveReportElementType(reportElementTypeDto);

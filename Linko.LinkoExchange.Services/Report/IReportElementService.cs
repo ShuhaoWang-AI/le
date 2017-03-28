@@ -12,7 +12,7 @@ namespace Linko.LinkoExchange.Services.Report
     {
         IEnumerable<ReportElementTypeDto> GetReportElementTypes(ReportElementCategoryName categoryName);
         ReportElementTypeDto GetReportElementType(int reportElementTypeId);
-        void SaveReportElementType(ReportElementTypeDto reportElementType);
+        int SaveReportElementType(ReportElementTypeDto reportElementType);
         void DeleteReportElementType(int reportElementTypeId);
         bool IsReportElementTypeInUse(int reportElementTypeId);
     }

@@ -764,7 +764,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             var mappedReportElementType = new ReportElementTypeDto();
-            mappedReportElementType.ReportElementCategoryId = reportElementType.ReportElementCategoryId;
             if (reportElementType.ReportElementCategory != null)
             {
                 mappedReportElementType.ReportElementCategory = (ReportElementCategoryName)(Enum.Parse(typeof(ReportElementCategoryName), reportElementType.ReportElementCategory.Name));
@@ -790,11 +789,10 @@ namespace Linko.LinkoExchange.Services.Mapping
             reportElementType.Description = reportElementTypeDto.Description;
             reportElementType.Content = reportElementTypeDto.Content;
             reportElementType.IsContentProvided = reportElementTypeDto.IsContentProvided;
-            reportElementType.CtsEventTypeId = reportElementTypeDto.CtsEventType.CtsEventTypeId;
+            reportElementType.CtsEventTypeId = reportElementTypeDto.CtsEventType?.CtsEventTypeId;
             //IGNORE reportElementType.CtsEventType
-            reportElementType.ReportElementCategoryId = reportElementTypeDto.ReportElementCategoryId;
+            //reportElementType.ReportElementCategoryId = reportElementTypeDto.ReportElementCategoryId;
             //IGNORE reportElementType.ReportElementCategory
-            reportElementType.OrganizationRegulatoryProgramId = reportElementTypeDto.OrganizationRegulatoryProgramId;
             //IGNORE reportElementType.OrganizationRegulatoryProgram
             //IGNORE reportElementType.CreationDateTimeUtc
             //IGNORE reportElementType.LastModificationDateTimeUtc
@@ -820,9 +818,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 ReportPackageTemplateAssignmentId = rpt.ReportPackageTemplateAssignmentId,
                 ReportPackageTemplateId = rpt.ReportPackageTemplateId,
                 OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId,
-                OrganizationRegulatoryProgram =
-                    GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(
-                        rpt.OrganizationRegulatoryProgram)
+                OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(rpt.OrganizationRegulatoryProgram)
             };
             return rptaDto;
         }

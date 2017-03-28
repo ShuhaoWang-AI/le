@@ -1,4 +1,5 @@
-﻿@using Linko.LinkoExchange.Web.ViewModels.Shared
+﻿@using Linko.LinkoExchange.Core.Enum
+@using Linko.LinkoExchange.Web.ViewModels.Shared
 @{
     ViewBag.Title = "Report Package Elements";
 }
@@ -16,7 +17,12 @@
     <div class="box-header with-border">
         <h3 class="box-title">Attachments</h3>
         <div class="box-tools pull-right">
-            <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"ReportElementTypeDetails", controllerName:"Authority")'">Create New Type</button>
+            <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewReportElementTypeDetails", controllerName:"Authority", routeValues: new
+                                                    {
+                                                        categoryName = ReportElementCategoryName.Attachments
+                                                    })'">
+                Create New Type
+            </button>
             <button class="btn btn-box-tool" data-widget="collapse">
                 <i class="fa fa-minus"></i>
             </button>
@@ -75,7 +81,9 @@
                                                     .Ajax()
                                                     .ServerOperation(enabled: false)
                                                     .Batch(enabled: true)
-                                                    .Read(read => read.Action(actionName: "ReportElementTypes_Attachment_Read", controllerName: "Authority"))
+                                                    .Read(read => read.Action(actionName: "ReportElementTypes_Read", controllerName: "Authority", routeValues: new {
+                                                        categoryName = ReportElementCategoryName.Attachments
+                                                    }))
                                                     .PageSize(pageSize: 15)
                                                     .Events(events => events.Error(handler: "error_handler"))
                       )
@@ -89,7 +97,12 @@
     <div class="box-header with-border">
         <h3 class="box-title">Certifications</h3>
         <div class="box-tools pull-right">
-            <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"ReportElementTypeDetails", controllerName:"Authority")'">Create New Type</button>
+            <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewReportElementTypeDetails", controllerName:"Authority", routeValues: new
+                                                                                                                                                                            {
+                                                                                                                                                                                categoryName = ReportElementCategoryName.Certifications
+                                                                                                                                                                            })'">
+                Create New Type
+            </button>
             <button class="btn btn-box-tool" data-widget="collapse">
                 <i class="fa fa-minus"></i>
             </button>
@@ -148,7 +161,10 @@
                                                     .Ajax()
                                                     .ServerOperation(enabled: false)
                                                     .Batch(enabled: true)
-                                                    .Read(read => read.Action(actionName: "ReportElementTypes_Certification_Read", controllerName: "Authority"))
+                                                    .Read(read => read.Action(actionName: "ReportElementTypes_Read", controllerName: "Authority", routeValues: new
+                                                    {
+                                                        categoryName = ReportElementCategoryName.Certifications
+                                                    }))
                                                     .PageSize(pageSize: 15)
                                                     .Events(events => events.Error(handler: "error_handler"))
                       )

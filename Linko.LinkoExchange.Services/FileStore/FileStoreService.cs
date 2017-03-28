@@ -130,5 +130,15 @@ namespace Linko.LinkoExchange.Services
 
             return fileStoreDto;
         }
+
+        public void UpdateFileStore(FileStoreDto fileStoreDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteFileStore(int fileStoreId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -6,18 +6,7 @@
 }
 
 
-@using (Html.BeginForm(actionName:"ReportElementTypeDetails",
-    controllerName:"Authority",
-    routeValues:new
-                {
-                    id = Model.Id
-                },
-    method:FormMethod.Post,
-    htmlAttributes:new
-                   {
-                       @class = "form-horizontal",
-                       role = "form"
-                   }))
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
 
@@ -52,11 +41,15 @@
             <div class="box-tools pull-right">
                 @if (!ViewBag.Satus.Equals("ViewOnly"))
                 {
-                    <input class="btn btn-primary btn-sm" id="btnSave" type="button" value="Save" />
-
                     if (!ViewBag.Satus.Equals("New"))
                     {
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ReportElementTypeDetails", controllerName:"Authority")" formmethod="post" />
+
                         <input class="btn btn-primary btn-sm" data-target="#DeleteReportPackageElementModal" data-toggle="modal" type="button" value="Delete" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"NewReportElementTypeDetails", controllerName:"Authority")" formmethod="post" />
                     }
                 }
 
@@ -72,6 +65,7 @@
                                                                                                                                 @class = "alert alert-danger"
                                                                                                                             })
             @Html.HiddenFor(model => model.Id)
+            @Html.HiddenFor(model => model.CategoryName)
 
             @if (ViewBag.ShowSuccessMessage != null && ViewBag.ShowSuccessMessage)
             {
@@ -91,27 +85,15 @@
                         <h4 class="box-title">Delete Report Package Element</h4>
 
                         <div>
-                            @if (ViewBag.IsReportElementTypeInUsed)
-                            {
-                                <p>
-                                    This Report Package Element is in use in a Report Package Template and cannot be deleted.
-                                </p>
-                            }
-                            else
-                            {
-                                <p>
-                                    Do you want to delete this Report Package Element?<br />
-                                    You can not undo this deletion.
-                                </p>
-                            }
+                            <p>
+                                Do you want to delete this Report Package Element?<br />
+                                You can not undo this deletion.
+                            </p>
                             <div class="form-group">
                                 <div class="pull-right">
-                                    @if (!ViewBag.IsReportElementTypeInUsed)
-                                    {
-                                        <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"DeleteReportElementType", controllerName:"Authority", routeValues:new {id = Model.Id})" formmethod="post">
-                                            Yes
-                                        </button>
-                                    }
+                                    <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"DeleteReportElementType", controllerName:"Authority", routeValues:new {id = Model.Id})" formmethod="post">
+                                        Yes
+                                    </button>
                                     <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
                                 </div>
                             </div>

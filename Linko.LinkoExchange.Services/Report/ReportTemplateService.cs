@@ -357,7 +357,8 @@ namespace Linko.LinkoExchange.Services.Report
             ReportPackageTemplate reportPackageTemplate, int setOrder)
         {
             // Step 1, Save to tReportPackageTemplateElementCategory table
-            var reportElementCategoryId = reportElementTypeDtos[0].ReportElementCategoryId;
+            var reportElementCategoryId = _dbContext.ReportElementCategories
+                                                .Single(cat => cat.Name == reportElementTypeDtos[0].ReportElementCategory.ToString()).ReportElementCategoryId;
             var rptec = new ReportPackageTemplateElementCategory
             {
                 ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId,
@@ -508,6 +509,11 @@ namespace Linko.LinkoExchange.Services.Report
 
                 _dbContext.ReportPackageTemplateElementCategories.Remove(temp);
             }
+        }
+
+        public CtsEventTypeDto GetCtsEventType(int ctsEventTypeId)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
