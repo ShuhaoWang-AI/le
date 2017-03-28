@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
@@ -127,6 +128,7 @@ namespace Linko.LinkoExchange.Services
                     };
 
                     _dbContext.FileStoreDatas.Add(fileStoreData);
+                    _dbContext.SaveChanges();
                     _dbContext.Commit(transaction);
                     _logger.Info("Leave FileStoreService.CreateFileStore.");
 
@@ -171,30 +173,25 @@ namespace Linko.LinkoExchange.Services
         {
             _logger.Info("Enter FileStoreService.UpdateFileStore.");
 
-            //TODO: To determine if the attachment has been used in a Report Package (status ="Reported")
+            List<RuleViolation> validationIssues = new List<RuleViolation>();
+
+            //Check if the file is already set to be 'reproted' or not 
+            var testFileStore = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreDto.FileStoreId);
+            if (testFileStore.IsReported)
+            {
+                string message = "The attachment is used in a Report Package, and cannot be changed.";
+                validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+            }
+
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try
                 {
-                    var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
-                    var currentRegulatoryProgramId =
-                        int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+                    testFileStore.Name = fileStoreDto.Name;
+                    testFileStore.Description = fileStoreDto.Description;
 
-                    fileStoreDto.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
-                    fileStoreDto.UploaderUserId = currentUserId;
-                    fileStoreDto.UploadDateTimeUtc = DateTimeOffset.UtcNow;
-                    fileStoreDto.SizeByte = fileStoreDto.Data.Length;
-
-                    var fileStore = _mapHelper.GetFileStoreFromFileStoreDto(fileStoreDto);
-                    _dbContext.FileStores.Add(fileStore);
-
-                    var fileStoreData = new FileStoreData
-                    {
-                        Data = fileStoreDto.Data,
-                        FileStoreId = fileStore.FileStoreId
-                    };
-
-                    _dbContext.FileStoreDatas.Add(fileStoreData);
+                    _dbContext.SaveChanges();
                     _dbContext.Commit(transaction);
                     _logger.Info("Leave FileStoreService.UpdateFileStore.");
                 }
@@ -216,9 +213,44 @@ namespace Linko.LinkoExchange.Services
 
         public void DeleteFileStore(int fileStoreId)
         {
-            throw new NotImplementedException();
-        }
+            _logger.Info("Enter FileStoreService.DeleteFileStore.");
 
+            //Check if the file is already set to be 'reproted' or not 
+            var testFileStore = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreId);
+            if (testFileStore.IsReported)
+            {
+                List<RuleViolation> validationIssues = new List<RuleViolation>();
+                string message = "The attachment is used in a Report Package, and cannot be changed.";
+                validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+            }
+
+            using (var transaction = _dbContext.BeginTransaction())
+            {
+                try
+                {
+                    var fileStoreDate = _dbContext.FileStoreDatas.Single(i => i.FileStoreId == fileStoreId);
+                    _dbContext.FileStoreDatas.Remove(fileStoreDate);
+                    _dbContext.FileStores.Remove(testFileStore);
+                    _dbContext.SaveChanges();
+                    _dbContext.Commit(transaction);
+                    _logger.Info("Leave FileStoreService.DeleteFileStore.");
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    var errors = new List<string>() { ex.Message };
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error happens {0} ", string.Join("," + Environment.NewLine, errors));
+                    throw;
+                }
+            }
+        }
         private FileStoreDto LocalizeFileStoreDtoUploadDateTime(FileStoreDto fileStoreDto, int currentOrgRegProgramId)
         {
             fileStoreDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.UploadDateTimeUtc.DateTime, currentOrgRegProgramId);
