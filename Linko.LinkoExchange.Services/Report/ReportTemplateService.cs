@@ -513,7 +513,29 @@ namespace Linko.LinkoExchange.Services.Report
 
         public CtsEventTypeDto GetCtsEventType(int ctsEventTypeId)
         {
-            throw new NotImplementedException();
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var ctsEventType = _dbContext.CtsEventTypes
+                .Single(cts => cts.CtsEventTypeId == ctsEventTypeId);
+
+            var dto = _mapHelper.GetCtsEventTypeDtoFromEventType(ctsEventType);
+
+            //Set LastModificationDateTimeLocal
+            dto.LastModificationDateTimeLocal = _timeZoneService
+                    .GetLocalizedDateTimeUsingSettingForThisOrg((ctsEventType.LastModificationDateTimeUtc.HasValue ? ctsEventType.LastModificationDateTimeUtc.Value.DateTime
+                        : ctsEventType.CreationDateTimeUtc.DateTime), currentOrgRegProgramId);
+
+            if (ctsEventType.LastModifierUserId.HasValue)
+            {
+                var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == ctsEventType.LastModifierUserId.Value);
+                dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+            }
+            else
+            {
+                dto.LastModifierFullName = "N/A";
+            }
+
+            return dto;
+
         }
 
         #endregion
