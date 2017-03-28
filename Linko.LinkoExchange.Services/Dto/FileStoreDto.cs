@@ -14,8 +14,9 @@ namespace Linko.LinkoExchange.Services.Dto
         public int OrganizationRegulatoryProgramId { get; set; }
         public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgram { get; set; }
         public bool IsReported { get; set; }
-        public DateTimeOffset UploaDateTimeUtc { get; set; }
+        public DateTimeOffset UploadDateTimeUtc { get; set; }
         public int? UploaderUserId { get; set; }
         public byte[] Data { get; set; }
+        public DateTime LastModificationDateTimeLocal { get; set; }
     }
 }

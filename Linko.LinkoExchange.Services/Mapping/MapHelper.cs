@@ -857,12 +857,13 @@ namespace Linko.LinkoExchange.Services.Mapping
                 OriginalName = fileStore.OriginalName,
                 SizeByte = fileStore.SizeByte,
                 ReportElementTypeId = fileStore.ReportElementTypeId,
+                ReportElementTypeName = fileStore.ReportElementTypeName,
                 OrganizationRegulatoryProgramId = fileStore.OrganizationRegulatoryProgramId,
                 OrganizationRegulatoryProgram =
                     GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(
                         fileStore.OrganizationRegulatoryProgram),
                 IsReported = fileStore.IsReported,
-                UploaDateTimeUtc = fileStore.UploadDateTimeUtc,
+                UploadDateTimeUtc = fileStore.UploadDateTimeUtc,
                 UploaderUserId = fileStore.UploaderUserId
             };
         }
@@ -881,9 +882,10 @@ namespace Linko.LinkoExchange.Services.Mapping
                 OriginalName = fileStoreDto.OriginalName,
                 SizeByte = fileStoreDto.SizeByte,
                 ReportElementTypeId = fileStoreDto.ReportElementTypeId,
+                ReportElementTypeName = fileStoreDto.ReportElementTypeName,
                 OrganizationRegulatoryProgramId = fileStoreDto.OrganizationRegulatoryProgramId,
                 IsReported = fileStoreDto.IsReported,
-                UploadDateTimeUtc = fileStoreDto.UploaDateTimeUtc.DateTime,
+                UploadDateTimeUtc = fileStoreDto.UploadDateTimeUtc.DateTime,
                 UploaderUserId = fileStoreDto.UploaderUserId
             };
 

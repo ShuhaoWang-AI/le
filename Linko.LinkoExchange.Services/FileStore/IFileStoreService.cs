@@ -21,7 +21,7 @@ namespace Linko.LinkoExchange.Services
         /// <param name="fileStoreId">The file Id of the </param>
         /// <returns>One FileStoreDto object</returns>
         FileStoreDto GetFileStoreById(int fileStoreId);
-        void CreateFileStore(FileStoreDto fileStoreDto);
+        int CreateFileStore(FileStoreDto fileStoreDto);
 
         void UpdateFileStore(FileStoreDto fileStoreDto);
         void DeleteFileStore(int fileStoreId);
