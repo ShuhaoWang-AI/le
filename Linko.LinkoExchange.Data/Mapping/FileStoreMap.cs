@@ -21,7 +21,6 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(t => t.OriginalName).IsRequired();
             Property(t => t.SizeByte).IsRequired();
             Property(t => t.OrganizationRegulatoryProgramId).IsRequired();
-            Property(t => t.IsReported).IsRequired();
             Property(t => t.UploadDateTimeUtc);
             Property(t => t.UploaderUserId).IsRequired();
 

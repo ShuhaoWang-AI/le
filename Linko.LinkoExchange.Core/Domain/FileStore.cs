@@ -40,8 +40,6 @@ namespace Linko.LinkoExchange.Core.Domain
         public int OrganizationRegulatoryProgramId { get; set; }
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
 
-        public bool IsReported { get; set; }
-
         public DateTimeOffset UploadDateTimeUtc { get; set; }
 
         public int? UploaderUserId { get; set; }
