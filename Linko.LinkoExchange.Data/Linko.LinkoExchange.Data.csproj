@@ -88,6 +88,8 @@
     <Compile Include="Mapping\JurisdictionMap.cs" />
     <Compile Include="Mapping\FileStoreMap.cs" />
     <Compile Include="Mapping\MonitoringPointMap.cs" />
+    <Compile Include="Mapping\MonitoringPointParameterLimitMap.cs" />
+    <Compile Include="Mapping\MonitoringPointParameterMap.cs" />
     <Compile Include="Mapping\OrganizationRegulatoryProgramModuleMap.cs" />
     <Compile Include="Mapping\OrganizationTypeRegulatoryProgramMap.cs" />
     <Compile Include="Mapping\ParameterGroupMap.cs" />
@@ -105,6 +107,7 @@
     <Compile Include="Mapping\ReportPackageTemplateElementCategoryMap.cs" />
     <Compile Include="Mapping\ReportPackageTemplateElementTypeMap.cs" />
     <Compile Include="Mapping\ReportPackageTemplateMap.cs" />
+    <Compile Include="Mapping\SampleScheduleMap.cs" />
     <Compile Include="Mapping\SignatoryRequestMap.cs" />
     <Compile Include="Mapping\SignatoryRequestStatusMap.cs" />
     <Compile Include="Mapping\SystemSettingMap.cs" />
