@@ -84,6 +84,9 @@ namespace Linko.LinkoExchange.Data
         public DbSet<ReportPackageElementType> ReportPackageElementTypes { get; set; }
         public DbSet<ReportFile> ReportFiles { get; set; }
         public DbSet<ReportSample> ReportSamples { get; set; }
+        public DbSet<SampleSchedule> SampleSchedules { get; set; }
+        public DbSet<MonitoringPointParameter> MonitoringPointParameters { get; set; }
+        public DbSet<CollectionMethod> CollectionMethods { get; set; }
 
         #endregion
 

@@ -126,6 +126,7 @@
     <Compile Include="Dto\EnableOrganizationResultDto.cs" />
     <Compile Include="Dto\InvitationCheckEmailResultDto.cs" />
     <Compile Include="Dto\JurisdictionDto.cs" />
+    <Compile Include="Dto\MonitoringPointDto.cs" />
     <Compile Include="Dto\ReportElementCategoryDto.cs" />
     <Compile Include="Dto\ParameterDto.cs" />
     <Compile Include="Dto\ParameterGroupDto.cs" />
@@ -149,6 +150,8 @@
     <Compile Include="Dto\ProgramSettingDto.cs" />
     <Compile Include="Dto\QuestionAnswerDtos.cs" />
     <Compile Include="Dto\RegistrationResultDto.cs" />
+    <Compile Include="Dto\SampleDto.cs" />
+    <Compile Include="Dto\SampleResultDto.cs" />
     <Compile Include="Dto\SettingDto.cs" />
     <Compile Include="Dto\TimeZoneDto.cs" />
     <Compile Include="Dto\UnitDto.cs" />
@@ -165,6 +168,8 @@
     <Compile Include="Invitation\InvitationService.cs" />
     <Compile Include="Dto\CtsEventTypeDto.cs" />
     <Compile Include="Dto\ReportPackageTemplateElementCategoryDto.cs" />
+    <Compile Include="MonitoringPoint\IMonitoringPointService.cs" />
+    <Compile Include="MonitoringPoint\MonitoringPointService.cs" />
     <Compile Include="Report\IReportTemplateService.cs" />
     <Compile Include="Dto\ReportPackageTemplateDto.cs" />
     <Compile Include="Report\ReportElementService.cs" />
@@ -186,6 +191,8 @@
     <Compile Include="QuestionAnswer\StringCipher.cs" />
     <Compile Include="Report\IReportElementService.cs" />
     <Compile Include="Report\ReportTemplateService.cs" />
+    <Compile Include="Sample\ISampleService.cs" />
+    <Compile Include="Sample\SampleService.cs" />
     <Compile Include="Settings\ISettingService.cs" />
     <Compile Include="Settings\SettingService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

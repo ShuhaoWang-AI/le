@@ -99,13 +99,14 @@ namespace Linko.LinkoExchange.Test
         public void SaveParameterGroup_Test_Valid_CreateNew()
         {
             var paramGroupDto = new ParameterGroupDto();
-            paramGroupDto.Name = "Some Name";
-            paramGroupDto.Description = "Different description";
+            paramGroupDto.Name = "Parameter Group ABC";
+            paramGroupDto.Description = "Some description";
             paramGroupDto.IsActive = true;
             paramGroupDto.Parameters = new List<ParameterDto>();
             paramGroupDto.Parameters.Add(new ParameterDto() { ParameterId = 1 });
+            paramGroupDto.Parameters.Add(new ParameterDto() { ParameterId = 2 });
             paramGroupDto.OrganizationRegulatoryProgramId = 1;
-            _paramService.SaveParameterGroup(paramGroupDto);
+            var newId = _paramService.SaveParameterGroup(paramGroupDto);
         }
 
         [TestMethod]
@@ -123,13 +124,13 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void SaveParameterGroup_Test_Valid_Update()
         {
-            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 7 };
-            paramGroupDto.Name = "Some Name Changed Again";
+            var paramGroupDto = new ParameterGroupDto() { ParameterGroupId = 4 };
+            paramGroupDto.Name = "Parameter Group A+";
             paramGroupDto.Description = "Sample desc";
             paramGroupDto.Parameters = new List<ParameterDto>();
             paramGroupDto.Parameters.Add(new ParameterDto() { ParameterId = 1 });
             paramGroupDto.OrganizationRegulatoryProgramId = 1;
-            _paramService.SaveParameterGroup(paramGroupDto);
+            var existingId = _paramService.SaveParameterGroup(paramGroupDto);
         }
 
         [TestMethod]
@@ -174,7 +175,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetParameterGroup_Test()
         {
-            var paramGroupDto = _paramService.GetParameterGroup(7);
+            var paramGroupDto = _paramService.GetParameterGroup(4);
         }
 
         [TestMethod]
@@ -225,6 +226,12 @@ namespace Linko.LinkoExchange.Test
         public void GetGlobalParameters_StartsWith_All_Alphanumeric_Test()
         {
             var resultDtos = _paramService.GetGlobalParameters("1,2");
+        }
+
+        [TestMethod]
+        public void GetAllParameterGroups_Test()
+        {
+            var resultDtos = _paramService.GetAllParameterGroups(1);
         }
 
 

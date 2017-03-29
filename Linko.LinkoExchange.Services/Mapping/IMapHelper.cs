@@ -52,5 +52,10 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         FileStoreDto GetFileStoreDtoFromFileStore(Core.Domain.FileStore fileStore);
         Core.Domain.FileStore GetFileStoreFromFileStoreDto(FileStoreDto fileStoreDto);
+
+        MonitoringPointDto GetMonitoringPointDtoFromMonitoringPoint(Core.Domain.MonitoringPoint mp);
+
+        SampleDto GetSampleDtoFromSample(Core.Domain.Sample sample);
+        SampleResultDto GetSampleResultDtoFromSampleResult(SampleResult sampleResult);
     }
 }

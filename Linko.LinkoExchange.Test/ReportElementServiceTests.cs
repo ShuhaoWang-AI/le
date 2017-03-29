@@ -179,5 +179,11 @@ namespace Linko.LinkoExchange.Test
         {
             _reportElementService.DeleteReportElementType(1);
         }
+
+        [TestMethod]
+        public void GetReportElementType_Test_Valid()
+        {
+            var dto = _reportElementService.GetReportElementType(3);
+        }
     }
 }

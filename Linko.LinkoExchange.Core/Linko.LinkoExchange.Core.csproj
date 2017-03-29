@@ -82,8 +82,11 @@
     <Compile Include="Domain\FileStoreData.cs" />
     <Compile Include="Domain\Invitation.cs" />
     <Compile Include="Domain\Jurisdiction.cs" />
+    <Compile Include="Domain\LimitBasis.cs" />
+    <Compile Include="Domain\LimitType.cs" />
     <Compile Include="Domain\Module.cs" />
     <Compile Include="Domain\MonitoringPoint.cs" />
+    <Compile Include="Domain\MonitoringPointParameter.cs" />
     <Compile Include="Domain\MonitoringPointParameterLimit.cs" />
     <Compile Include="Domain\Organization.cs" />
     <Compile Include="Domain\OrganizationRegulatoryProgram.cs" />
@@ -119,6 +122,7 @@
     <Compile Include="Domain\RepudiationReason.cs" />
     <Compile Include="Domain\Sample.cs" />
     <Compile Include="Domain\SampleResult.cs" />
+    <Compile Include="Domain\SampleSchedule.cs" />
     <Compile Include="Domain\SampleStatus.cs" />
     <Compile Include="Domain\SettingTemplate.cs" />
     <Compile Include="Domain\SignatoryRequest.cs" />
@@ -144,6 +148,7 @@
     <Compile Include="Enum\RegistrationType.cs" />
     <Compile Include="Enum\ReportElementCategory.cs" />
     <Compile Include="Enum\ReportPackageTemplateStatus.cs" />
+    <Compile Include="Enum\SampleStatusName.cs" />
     <Compile Include="Enum\SettingType.cs" />
     <Compile Include="Enum\SystemSettingType.cs" />
     <Compile Include="Enum\UserRole.cs" />

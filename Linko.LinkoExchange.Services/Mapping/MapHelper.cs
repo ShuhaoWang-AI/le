@@ -899,5 +899,84 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             return fileStore;
         }
+
+        public MonitoringPointDto GetMonitoringPointDtoFromMonitoringPoint(Core.Domain.MonitoringPoint mp)
+        {
+            if (mp == null)
+            {
+                return null;
+            }
+
+            var dto = new MonitoringPointDto();
+            dto.MonitoringPointId = mp.MonitoringPointId;
+            dto.Name = mp.Name;
+            dto.Description = mp.Description;
+            dto.OrganizationRegulatoryProgramId = mp.OrganizationRegulatoryProgramId;
+            dto.IsEnabled = mp.IsEnabled;
+            dto.IsRemoved = mp.IsRemoved;
+            return dto;
+        }
+
+        public SampleDto GetSampleDtoFromSample(Core.Domain.Sample sample)
+        {
+            if (sample == null)
+            {
+                return null;
+            }
+
+            var dto = new SampleDto();
+            dto.SampleId = sample.SampleId;
+            dto.Name = sample.Name;
+            dto.MonitoringPointId = sample.MonitoringPointId;
+            dto.MonitoringPointName = sample.MonitoringPointName;
+            dto.CtsEventTypeId = sample.CtsEventTypeId;
+            dto.CtsEventTypeName = sample.CtsEventTypeName;
+            dto.CtsEventCategoryName = sample.CtsEventCategoryName;
+
+            dto.CollectionMethodId = sample.CollectionMethodId;
+            dto.CollectionMethodName = sample.CollectionMethodName;
+            dto.SampleStatusId = sample.SampleStatusId;
+            dto.LabSampleId = sample.LabSampleIdentifier;
+            dto.MassLoadingConversionFactor = sample.MassLoadingConversionFactor;
+
+            //Handle this in calling code
+            //var resultDtos = new List<SampleResultDto>();
+            //foreach (var sampleResult in sample.SampleResults)
+            //{
+            //    resultDtos.Add(this.GetSampleResultDtoFromSampleResult(sampleResult));
+            //}
+            //dto.SampleResults = resultDtos;
+
+            return dto;
+        }
+
+        public SampleResultDto GetSampleResultDtoFromSampleResult(SampleResult sampleResult)
+        {
+            if (sampleResult == null)
+                return null;
+
+            var dto = new SampleResultDto();
+            dto.SampleResultId = sampleResult.SampleResultId;
+            dto.SampleId = sampleResult.SampleId;
+            dto.ParameterId = sampleResult.ParameterId;
+            dto.ParameterName = sampleResult.ParameterName;
+            dto.Qualifier = sampleResult.Qualifier;
+            dto.Value = sampleResult.Value;
+            dto.UnitId = sampleResult.UnitId;
+            dto.UnitName = sampleResult.UnitName;
+            dto.MethodDetectionLimit = sampleResult.MethodDetectionLimit;
+            dto.AnalysisMethod = sampleResult.AnalysisMethod;
+            //dto.AnalysisDateTimeLocal = set outside MapHelper
+            dto.IsApprovedEPAMethod = sampleResult.IsApprovedEPAMethod;
+            dto.IsMassLoadingCalculationRequired = sampleResult.IsMassLoadingCalculationRequired;
+            dto.IsFlowForMassLoadingCalculation = sampleResult.IsFlowForMassLoadingCalculation;
+            dto.IsCalculated = sampleResult.IsCalculated;
+            dto.LimitTypeId = sampleResult.LimitTypeId;
+            dto.LimitBasisId = sampleResult.LimitBasisId;
+            //dto.LastModificationDateTimeLocal = set outside MapHelper
+            //dto.LastModifierUserFullName = set outside MapHelper
+
+            return dto;
+        }
     }
 }

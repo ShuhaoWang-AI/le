@@ -345,38 +345,51 @@ namespace Linko.LinkoExchange.Services.Parameter
             parameterGroupDtos = this.GetStaticParameterGroups().ToList();
 
             //Add Dyanamic Groups
-            var uniqueNonNullFrequencies = _dbContext.MonitoringPointParameterLimits
-                .Where(x => !string.IsNullOrEmpty(x.IUSampleFrequency) && x.IsRemoved == false)
+            var uniqueNonNullFrequencies = _dbContext.SampleSchedules
+                .Include(ss => ss.MonitoringPointParameter)
+                .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
+                    && !string.IsNullOrEmpty(ss.IUSampleFrequency))
                 .Select(x => x.IUSampleFrequency)
-                .Distinct();
+                .Distinct()
+                .ToList();
 
-            var uniqueCollectionMethods = _dbContext.MonitoringPointParameterLimits
-                .Include(x => x.CollectionMethod)
-                .Where(x => x.IsRemoved == false && x.CollectionMethod.IsRemoved == false)
-                .Select(x => x.CollectionMethod.Name)
-                .Distinct();
+            var uniqueCollectionMethodIds = _dbContext.SampleSchedules
+                .Include(ss => ss.MonitoringPointParameter)
+                .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId)
+                .Select(x => x.CollectionMethodId)
+                .Distinct()
+                .ToList();
 
-            foreach (var collectMethod in uniqueCollectionMethods.ToList())
+            foreach (var collectMethodId in uniqueCollectionMethodIds)
             {
-                foreach (var freq in uniqueNonNullFrequencies.ToList())
+                var collectionMethodName = _dbContext.CollectionMethods
+                    .Single(cm => cm.CollectionMethodId == collectMethodId).Name;
+
+                foreach (var freq in uniqueNonNullFrequencies)
                 {
                     //Add "<Frequency> + <Collection Method>" Groups
                     var dynamicFreqAndCollectMethodParamGroup = new ParameterGroupDto();
-                    dynamicFreqAndCollectMethodParamGroup.Name = $"{freq} {collectMethod}";
-                    dynamicFreqAndCollectMethodParamGroup.Description = $"All {freq} {collectMethod} parameters for Monitoring Point {monitoringPointAbbrv}";
+                    dynamicFreqAndCollectMethodParamGroup.Name = $"{freq} {collectionMethodName}";
+                    dynamicFreqAndCollectMethodParamGroup.Description = $"All {freq} {collectionMethodName} parameters for Monitoring Point {monitoringPointAbbrv}";
                     dynamicFreqAndCollectMethodParamGroup.Parameters = new List<ParameterDto>();
 
                     //Add Parameters
-                    var freqCollectParams = _dbContext.MonitoringPointParameterLimits
-                                        .Include(p => p.Parameter)
-                                        .Where(p => p.IUSampleFrequency == freq 
-                                            && p.CollectionMethod.Name == collectMethod
-                                            && p.IsRemoved == false
-                                            && p.CollectionMethod.IsRemoved == false);
+                    var freqCollectParams = _dbContext.SampleSchedules
+                                        .Include(ss => ss.MonitoringPointParameter)
+                                        .Include(ss => ss.CollectionMethod)
+                                        .Include(ss => ss.MonitoringPointParameter.Parameter)
+                                        .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
+                                            && ss.IUSampleFrequency == freq
+                                            && ss.CollectionMethodId == collectMethodId
+                                            && ss.CollectionMethod.IsRemoved == false
+                                            && ss.CollectionMethod.IsEnabled == true)
+                                        .Select(ss => ss.MonitoringPointParameter.Parameter)
+                                        .Distinct()
+                                        .ToList();
 
-                    foreach (var mpParamLimit in freqCollectParams.ToList())
+                    foreach (var parameter in freqCollectParams.ToList())
                     {
-                        var param = _mapHelper.GetParameterDtoFromParameter(mpParamLimit.Parameter);
+                        var paramDto = _mapHelper.GetParameterDtoFromParameter(parameter);
 
                         ////TO-DO: Set concentration, mass loading, default units
                         //if (mpParamLimit.DailyLimit.HasValue)
@@ -389,7 +402,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                         //}
 
 
-                        dynamicFreqAndCollectMethodParamGroup.Parameters.Add(param);
+                        dynamicFreqAndCollectMethodParamGroup.Parameters.Add(paramDto);
                     }
 
                     if (dynamicFreqAndCollectMethodParamGroup.Parameters.Count() > 0)
@@ -400,20 +413,26 @@ namespace Linko.LinkoExchange.Services.Parameter
 
                 //Add All "<Collection Method>" Groups
                 var dynamicAllCollectMethodParamGroup = new ParameterGroupDto();
-                dynamicAllCollectMethodParamGroup.Name = $"All {collectMethod}'s";
-                dynamicAllCollectMethodParamGroup.Description = $"All {collectMethod} parameters for Monitoring Point {monitoringPointAbbrv}";
+                dynamicAllCollectMethodParamGroup.Name = $"All {collectionMethodName}'s";
+                dynamicAllCollectMethodParamGroup.Description = $"All {collectionMethodName} parameters for Monitoring Point {monitoringPointAbbrv}";
                 dynamicAllCollectMethodParamGroup.Parameters = new List<ParameterDto>();
 
                 //Add Parameters
-                var collectParams = _dbContext.MonitoringPointParameterLimits
-                                       .Include(p => p.Parameter)
-                                       .Where(p => p.CollectionMethod.Name == collectMethod 
-                                            && p.IsRemoved == false 
-                                            && p.CollectionMethod.IsRemoved == false);
+                var collectParams = _dbContext.SampleSchedules
+                                        .Include(ss => ss.MonitoringPointParameter)
+                                        .Include(ss => ss.CollectionMethod)
+                                        .Include(ss => ss.MonitoringPointParameter.Parameter)
+                                        .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
+                                            && ss.CollectionMethodId == collectMethodId
+                                            && ss.CollectionMethod.IsRemoved == false
+                                            && ss.CollectionMethod.IsEnabled == true)
+                                        .Select(ss => ss.MonitoringPointParameter.Parameter)
+                                        .Distinct()
+                                        .ToList();
 
-                foreach (var mpParamLimit in collectParams)
+                foreach (var parameter in collectParams)
                 {
-                    var param = _mapHelper.GetParameterDtoFromParameter(mpParamLimit.Parameter);
+                    var paramDto = _mapHelper.GetParameterDtoFromParameter(parameter);
 
                     ////TO-DO: Set concentration, mass loading, default units
                     //if (mpParamLimit.DailyLimit.HasValue)
@@ -425,11 +444,56 @@ namespace Linko.LinkoExchange.Services.Parameter
                     //    param.IsCalcMassLoading = true;
                     //}
 
-                    dynamicAllCollectMethodParamGroup.Parameters.Add(param);
+                    dynamicAllCollectMethodParamGroup.Parameters.Add(paramDto);
                 }
 
                 //No need to check if Group.Count > 0 because this is guaranteed
                 parameterGroupDtos.Add(dynamicAllCollectMethodParamGroup);
+
+            }
+
+
+
+            //Add "<Frequency>" Groups
+            foreach (var freq in uniqueNonNullFrequencies)
+            {
+                var dynamicAllFreqParamGroup = new ParameterGroupDto();
+                dynamicAllFreqParamGroup.Name = $"All {freq}'s";
+                dynamicAllFreqParamGroup.Description = $"All {freq} parameters for Monitoring Point {monitoringPointAbbrv}";
+                dynamicAllFreqParamGroup.Parameters = new List<ParameterDto>();
+
+                //Add Parameters
+                var freqCollectParams = _dbContext.SampleSchedules
+                                    .Include(ss => ss.MonitoringPointParameter)
+                                    .Include(ss => ss.CollectionMethod)
+                                    .Include(ss => ss.MonitoringPointParameter.Parameter)
+                                    .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
+                                        && ss.IUSampleFrequency == freq
+                                        && ss.CollectionMethod.IsRemoved == false
+                                        && ss.CollectionMethod.IsEnabled == true)
+                                    .Select(ss => ss.MonitoringPointParameter.Parameter)
+                                    .Distinct()
+                                    .ToList();
+
+                foreach (var parameter in freqCollectParams.ToList())
+                {
+                    var paramDto = _mapHelper.GetParameterDtoFromParameter(parameter);
+
+                    ////TO-DO: Set concentration, mass loading, default units
+                    //if (mpParamLimit.DailyLimit.HasValue)
+                    //{
+                    //    param.ConcentrationUnit = _mapHelper.GetUnitDtoFromUnit(mpParamLimit.DailyLimitUnit);
+                    //}
+                    //if (mpParamLimit.MassLoadingDailyLimit.HasValue)
+                    //{
+                    //    param.IsCalcMassLoading = true;
+                    //}
+
+
+                    dynamicAllFreqParamGroup.Parameters.Add(paramDto);
+                }
+
+                parameterGroupDtos.Add(dynamicAllFreqParamGroup);
 
             }
 
