@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -100,7 +101,10 @@ namespace Linko.LinkoExchange.Services.FileStore
             var currentRegulatoryProgramId =
                 int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
-            var fileStores = _dbContext.FileStores.Where(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
+            var fileStores =
+                _dbContext.FileStores.Where(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId)
+                    .Include(t => t.OrganizationRegulatoryProgram).ToList();
+
             var fileStoreDtos = fileStores.Select(i => _mapHelper.GetFileStoreDtoFromFileStore(i)).ToList();
 
             fileStoreDtos = fileStoreDtos.Select(i => LocalizeFileStoreDtoUploadDateTime(i, currentRegulatoryProgramId)).ToList();
@@ -194,7 +198,7 @@ namespace Linko.LinkoExchange.Services.FileStore
                 int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
             var fileStore =
-                _dbContext.FileStores.Single(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
+                _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreId);
 
             var fileStoreDto = _mapHelper.GetFileStoreDtoFromFileStore(fileStore);
             fileStoreDto.Data = _dbContext.FileStoreDatas.Single(i => i.FileStoreId == fileStoreDto.FileStoreId.Value).Data;
@@ -310,6 +314,7 @@ namespace Linko.LinkoExchange.Services.FileStore
                 var newImageData = ImageToByte(newImage, format);
                 if (newImageData.Length < fileStoreDto.Data.Length)
                 {
+                    fileStoreDto.Data = new byte[newImageData.Length];
                     Array.Copy(newImageData, 0, fileStoreDto.Data, 0, newImageData.Length);
                 }
             }
