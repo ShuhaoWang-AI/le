@@ -11,7 +11,11 @@ namespace Linko.LinkoExchange.Services.Dto
         public int ParameterId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+
+        //Either DefaultUnit at the Parameter level OR overriden by the 
+        //DefaultUnit at the MonitoringPoint
         public UnitDto DefaultUnit { get; set; }
+
         public double? TrcFactor { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
         public bool IsRemoved { get; set; }
@@ -19,7 +23,8 @@ namespace Linko.LinkoExchange.Services.Dto
         public string LastModifierFullName { get; set; }
 
         //UC-15-3.1.2: If the parameter has a concentration limit at the Monitoring Point it also adds unit
-        public UnitDto ConcentrationUnit { get; set; }
+        // OVERRIDE THE DefaultUnit above
+        //public UnitDto ConcentrationUnit { get; set; }
 
         //UC-15-3.1.3: If the parameter has a mass limit at the Monitoring Point it also checks the "Calc Mass Loadings" box
         public bool IsCalcMassLoading { get; set; }

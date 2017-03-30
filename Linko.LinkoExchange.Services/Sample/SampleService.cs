@@ -229,11 +229,12 @@ namespace Linko.LinkoExchange.Services.Sample
                 dto.LastModifierFullName = "N/A";
             }
 
-            //Need to set localized time stamps for SampleResults
             var resultDtoList = new List<SampleResultDto>();
             foreach (var sampleResult in sample.SampleResults)
             {
-                var resultDto = new SampleResultDto();
+                var resultDto = _mapHelper.GetSampleResultDtoFromSampleResult(sampleResult);
+                
+                //Need to set localized time stamps for SampleResults
                 if (sampleResult.AnalysisDateTimeUtc.HasValue)
                 {
                     resultDto.AnalysisDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(sampleResult.AnalysisDateTimeUtc.Value.DateTime, timeZoneId);
@@ -264,6 +265,8 @@ namespace Linko.LinkoExchange.Services.Sample
         public SampleDto GetSampleDetails(int sampleId)
         {
             var sample = _dbContext.Samples
+                .Include(s => s.SampleStatus)
+                .Include(s => s.SampleResults)
                 .Single(s => s.SampleId == sampleId);
 
             var dto = this.GetSampleDetails(sample);

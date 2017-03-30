@@ -22,6 +22,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTime LastModificationDateTimeLocal { get; set; }
         public string LastModifierFullName { get; set; }
         public int SampleStatusId { get; set; }
+        public string SampleStatusName { get; set; }
         public string LabSampleId { get; set; }
 		public double? MassLoadingConversionFactor { get; set; }
         public int MassLoadingUnitId { get; set; }

@@ -936,6 +936,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.CollectionMethodId = sample.CollectionMethodId;
             dto.CollectionMethodName = sample.CollectionMethodName;
             dto.SampleStatusId = sample.SampleStatusId;
+            dto.SampleStatusName = sample.SampleStatus.Name;
             dto.LabSampleId = sample.LabSampleIdentifier;
             dto.MassLoadingConversionFactor = sample.MassLoadingConversionFactor;
 

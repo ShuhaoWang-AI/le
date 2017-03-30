@@ -452,51 +452,6 @@ namespace Linko.LinkoExchange.Services.Parameter
 
             }
 
-
-
-            //Add "<Frequency>" Groups
-            foreach (var freq in uniqueNonNullFrequencies)
-            {
-                var dynamicAllFreqParamGroup = new ParameterGroupDto();
-                dynamicAllFreqParamGroup.Name = $"All {freq}'s";
-                dynamicAllFreqParamGroup.Description = $"All {freq} parameters for Monitoring Point {monitoringPointAbbrv}";
-                dynamicAllFreqParamGroup.Parameters = new List<ParameterDto>();
-
-                //Add Parameters
-                var freqCollectParams = _dbContext.SampleSchedules
-                                    .Include(ss => ss.MonitoringPointParameter)
-                                    .Include(ss => ss.CollectionMethod)
-                                    .Include(ss => ss.MonitoringPointParameter.Parameter)
-                                    .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
-                                        && ss.IUSampleFrequency == freq
-                                        && ss.CollectionMethod.IsRemoved == false
-                                        && ss.CollectionMethod.IsEnabled == true)
-                                    .Select(ss => ss.MonitoringPointParameter.Parameter)
-                                    .Distinct()
-                                    .ToList();
-
-                foreach (var parameter in freqCollectParams.ToList())
-                {
-                    var paramDto = _mapHelper.GetParameterDtoFromParameter(parameter);
-
-                    ////TO-DO: Set concentration, mass loading, default units
-                    //if (mpParamLimit.DailyLimit.HasValue)
-                    //{
-                    //    param.ConcentrationUnit = _mapHelper.GetUnitDtoFromUnit(mpParamLimit.DailyLimitUnit);
-                    //}
-                    //if (mpParamLimit.MassLoadingDailyLimit.HasValue)
-                    //{
-                    //    param.IsCalcMassLoading = true;
-                    //}
-
-
-                    dynamicAllFreqParamGroup.Parameters.Add(paramDto);
-                }
-
-                parameterGroupDtos.Add(dynamicAllFreqParamGroup);
-
-            }
-
             return parameterGroupDtos;
         }
 
