@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -21,19 +22,34 @@ namespace Linko.LinkoExchange.Web.Controllers
         // GET: Attachment
         public ActionResult Index()
         {
+
             return View();
         }
 
-
-        [AcceptVerbs(HttpVerbs.Post)]
-        public ActionResult Upload()
+        public ActionResult FileStores()
         {
-            return View();
+            var fileStores = _fileStoreService.GetFileStores();
+            return View(fileStores);
+        }
+
+        [Route(template: "Attachment/Download/{fileStoreId:int}")]
+        public FileResult Download(int fileStoreId)
+        {
+            var fileStore = _fileStoreService.GetFileStoreById(fileStoreId);
+            var fileDownloadName = fileStore.OriginalFileName;
+            var extension = fileDownloadName.Substring(fileDownloadName.IndexOf(".") + 1);
+            var contentType = $"application/${extension}";
+
+            var fileStream = new MemoryStream(fileStore.Data);
+            fileStream.Position = 0;
+            return File(fileStream, contentType, fileDownloadName);
         }
 
         [HttpPost]
         public ActionResult Create(AttachmentModel model, HttpPostedFileBase upload)
         {
+            int fileStoreId = -1;
+
             if (upload != null && upload.ContentLength > 0)
             {
                 using (var reader = new System.IO.BinaryReader(upload.InputStream))
@@ -47,11 +63,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                     fileStoreDto.Data = content;
                     fileStoreDto.FileStoreId = null;
 
-                    var id = _fileStoreService.CreateFileStore(fileStoreDto);
+                    fileStoreId = _fileStoreService.CreateFileStore(fileStoreDto);
                 }
             }
 
-            return View();
+            return RedirectToAction("FileStores");
         }
     }
 }
