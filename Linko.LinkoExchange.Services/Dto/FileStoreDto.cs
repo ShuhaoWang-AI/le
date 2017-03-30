@@ -7,7 +7,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public int? FileStoreId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string OriginalName { get; set; }
+        public string OriginalFileName { get; set; }
         public double SizeByte { get; set; }
         public int ReportElementTypeId { get; set; }
         public string ReportElementTypeName { get; set; }

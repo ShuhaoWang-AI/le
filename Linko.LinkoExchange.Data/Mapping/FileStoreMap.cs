@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data.Entity.ModelConfiguration;
 using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
@@ -28,6 +22,9 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .WithMany()
                 .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(false);
+
+            HasRequired(t => t.FileStoreData)
+                .WithRequiredPrincipal(fd => fd.FileStore);
         }
     }
 }

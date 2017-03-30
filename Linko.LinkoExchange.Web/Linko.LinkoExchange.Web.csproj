@@ -410,6 +410,7 @@
     <Content Include="Views\Authority\ReportElementTypes.cshtml" />
     <Content Include="Views\Authority\ReportElementTypeDetails.cshtml" />
     <Content Include="Views\Authority\ReportPackageTemplates.cshtml" />
+    <Content Include="Views\Attachment\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -419,6 +420,8 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AttachmentController.cs" />
+    <Compile Include="ViewModels\Attachment\AttachmentModel.cs" />
     <Compile Include="Controllers\AuthorityController.cs" />
     <Compile Include="Controllers\IndustryController.cs" />
     <Compile Include="Controllers\InviteController.cs" />

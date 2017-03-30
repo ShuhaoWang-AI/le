@@ -10,6 +10,7 @@ using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
+using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Permission;
@@ -119,6 +120,7 @@ namespace Linko.LinkoExchange.Web
 
             container.RegisterType<ICromerrAuditLogService, CromerrAuditLogService>();
             container.RegisterType<IReportTemplateService, ReportTemplateService>();
+            container.RegisterType<IFileStoreService, FileStoreService>();
         }
     }
 }

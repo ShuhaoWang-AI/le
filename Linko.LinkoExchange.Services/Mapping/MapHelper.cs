@@ -847,7 +847,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         //}
 
-        public FileStoreDto GetFileStoreDtoFromFileStore(FileStore fileStore)
+        public FileStoreDto GetFileStoreDtoFromFileStore(Core.Domain.FileStore fileStore)
         {
             if (fileStore == null)
             {
@@ -859,7 +859,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 FileStoreId = fileStore.FileStoreId,
                 Name = fileStore.Name,
                 Description = fileStore.Description,
-                OriginalName = fileStore.OriginalName,
+                OriginalFileName = fileStore.OriginalName,
                 SizeByte = fileStore.SizeByte,
                 ReportElementTypeId = fileStore.ReportElementTypeId,
                 ReportElementTypeName = fileStore.ReportElementTypeName,
@@ -872,18 +872,18 @@ namespace Linko.LinkoExchange.Services.Mapping
             };
         }
 
-        public FileStore GetFileStoreFromFileStoreDto(FileStoreDto fileStoreDto)
+        public Core.Domain.FileStore GetFileStoreFromFileStoreDto(FileStoreDto fileStoreDto)
         {
             if (fileStoreDto == null)
             {
                 return null;
             }
 
-            var fileStore = new FileStore
+            var fileStore = new Core.Domain.FileStore
             {
                 Name = fileStoreDto.Name,
                 Description = fileStoreDto.Description,
-                OriginalName = fileStoreDto.OriginalName,
+                OriginalName = fileStoreDto.OriginalFileName,
                 SizeByte = fileStoreDto.SizeByte,
                 ReportElementTypeId = fileStoreDto.ReportElementTypeId,
                 ReportElementTypeName = fileStoreDto.ReportElementTypeName,
