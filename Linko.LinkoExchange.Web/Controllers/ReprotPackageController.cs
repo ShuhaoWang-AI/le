@@ -48,6 +48,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 rpt.Description += "_";
             }
 
+            var tempate = _reportTemplateService.GetReportPackageTemplate(1);
+
             return Json(templatesList, JsonRequestBehavior.AllowGet);
         }
 

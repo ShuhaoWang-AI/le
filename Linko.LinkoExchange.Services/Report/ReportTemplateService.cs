@@ -97,11 +97,18 @@ namespace Linko.LinkoExchange.Services.Report
         public ReportPackageTemplateDto GetReportPackageTemplate(int reportPackageTemplateId)
         {
             _logger.Info("Enter ReportTemplateService.ReportPackageTemplateDto. reportPackageTemplateId={0}", reportPackageTemplateId);
+
             var rpt =
                 _dbContext.ReportPackageTempates.SingleOrDefault(
                     i => i.ReportPackageTemplateId == reportPackageTemplateId);
 
-            var rptDto = GetReportOneReportPackageTemplate(rpt);
+            _reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories
+                    .Where(a => a.ReportPackageTemplateId == reportPackageTemplateId).ToList();
+
+            _reportPackageTemplateElementTypes = _dbContext.ReportPackageTemplateElementTypes.Include(a => a.ReportPackageTemplateElementCategory)
+                .Where(b => b.ReportPackageTemplateElementCategory.ReportPackageTemplateId == reportPackageTemplateId).ToList();
+
+            var rptDto = GetReportPackageTemplateInner(rpt);
 
             _logger.Info("Enter ReportTemplateService.ReportPackageTemplateDto.");
             return rptDto;
@@ -124,10 +131,13 @@ namespace Linko.LinkoExchange.Services.Report
                     .Distinct()
                     .ToArray();
 
-            _reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories.ToList();
-            _reportPackageTemplateElementTypes = _dbContext.ReportPackageTemplateElementTypes.ToList();
+            _reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories.Include(i => i.ReportPackageTemplate)
+                            .Where(a => a.ReportPackageTemplate.OrganizationRegulatoryProgramId == currentRegulatoryProgramId).ToList();
 
-            var rptDtos = rpts.Select(rpt => GetReportOneReportPackageTemplate(rpt:rpt, includeChildObjects:includeChildObjects)).ToList();
+            _reportPackageTemplateElementTypes = _dbContext.ReportPackageTemplateElementTypes.Include(a => a.ReportPackageTemplateElementCategory.ReportPackageTemplate)
+                .Where(b => b.ReportPackageTemplateElementCategory.ReportPackageTemplate.OrganizationRegulatoryProgramId == currentRegulatoryProgramId).ToList();
+
+            var rptDtos = rpts.Select(rpt => GetReportPackageTemplateInner(rpt: rpt, includeChildObjects: includeChildObjects)).ToList();
 
             _logger.Info("Enter ReportTemplateService.ReportPackageTemplateDto. Return count={0}", rptDtos.Count);
             return rptDtos;
@@ -328,6 +338,12 @@ namespace Linko.LinkoExchange.Services.Report
             return ReportElementTypeDtos(ReportElementCategoryName.SamplesAndResults.ToString());
         }
 
+        public IEnumerable<ReportElementCategoryDto> GetReportElementCategories()
+        {
+            var recats = _dbContext.ReportElementCategories.ToList();
+            return recats.Select(i => _mapHelper.GetReportElementCategoryDtoFromReportElementCategory(i)).ToList();
+        }
+
         #region private section
 
         private IEnumerable<ReportElementTypeDto> ReportElementTypeDtos(string categoryName)
@@ -400,7 +416,7 @@ namespace Linko.LinkoExchange.Services.Report
             }
         }
 
-        private ReportPackageTemplateDto GetReportOneReportPackageTemplate(ReportPackageTemplate rpt, bool includeChildObjects = true)
+        private ReportPackageTemplateDto GetReportPackageTemplateInner(ReportPackageTemplate rpt, bool includeChildObjects = true)
         {
             _logger.Info("Enter ReportTemplateService.ReportPackageTemplateDto.");
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
@@ -419,9 +435,9 @@ namespace Linko.LinkoExchange.Services.Report
             if (includeChildObjects)
             {
                 // set SamplesAndResultsTypes, AttachmentTypes, and CertificationTypes
-                rptDto.SamplesAndResultsTypes = GetReportElementTypes(ReportElementCategoryName.SamplesAndResults, rpt, currentOrgRegProgramId);
-                rptDto.AttachmentTypes = GetReportElementTypes(ReportElementCategoryName.Attachments, rpt, currentOrgRegProgramId);
-                rptDto.CertificationTypes = GetReportElementTypes(ReportElementCategoryName.Certifications, rpt, currentOrgRegProgramId);
+                rptDto.SamplesAndResultsTypes = GetReportElementCategoryReportElementTypes(ReportElementCategoryName.SamplesAndResults, rpt, currentOrgRegProgramId);
+                rptDto.AttachmentTypes = GetReportElementCategoryReportElementTypes(ReportElementCategoryName.Attachments, rpt, currentOrgRegProgramId);
+                rptDto.CertificationTypes = GetReportElementCategoryReportElementTypes(ReportElementCategoryName.Certifications, rpt, currentOrgRegProgramId);
 
                 // set assingedIndustries  
                 rptDto.ReportPackageTemplateAssignments = rptDto.ReportPackageTemplateAssignments;
@@ -440,35 +456,31 @@ namespace Linko.LinkoExchange.Services.Report
                 rptDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
             }
 
-            _logger.Info("Leave ReportTemplateService.GetReportOneReportPackageTemplate.");
+            _logger.Info("Leave ReportTemplateService.GetReportPackageTemplateInner.");
             return rptDto;
         }
 
-        private List<ReportElementTypeDto> GetReportElementTypes(ReportElementCategoryName categoryName, ReportPackageTemplate rpt, int currentOrgRegProgramId)
+        private List<ReportElementTypeDto> GetReportElementCategoryReportElementTypes(ReportElementCategoryName categoryName, ReportPackageTemplate rpt, int currentOrgRegProgramId)
         {
-            if (_reportPackageTemplateElementCategories == null)
-            {
-                _reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories.Where(r => r.ReportPackageTemplateId == rpt.ReportPackageTemplateId).ToList();
-            }
 
-            var cat = _reportPackageTemplateElementCategories.FirstOrDefault(i => i.ReportElementCategory.Name == categoryName.ToString() &&
+            var category = _reportPackageTemplateElementCategories.FirstOrDefault(i => i.ReportElementCategory.Name == categoryName.ToString() &&
                                                                                   i.ReportPackageTemplateId == rpt.ReportPackageTemplateId);
 
-            var amplesAndResultsTypes = new List<ReportElementTypeDto>();
+            var reportElementTypeDtos = new List<ReportElementTypeDto>();
 
-            if (cat != null)
+            if (category != null)
             {
-                var rets = GetReportElementType(cat);
-                foreach (var ret in rets)
+                var reportElementTypes = GetReportElementCategoryReportElementTypesHelper(category);
+                foreach (var reportElementType in reportElementTypes)
                 {
-                    var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(ret);
+                    var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(reportElementType);
                     //Set LastModificationDateTimeLocal
                     retDto.LastModificationDateTimeLocal = _timeZoneService
-                        .GetLocalizedDateTimeUsingSettingForThisOrg(ret.LastModificationDateTimeUtc?.DateTime ?? ret.CreationDateTimeUtc.DateTime, currentOrgRegProgramId);
-                    
-                    if (ret.LastModifierUserId.HasValue)
+                        .GetLocalizedDateTimeUsingSettingForThisOrg(reportElementType.LastModificationDateTimeUtc?.DateTime ?? reportElementType.CreationDateTimeUtc.DateTime, currentOrgRegProgramId);
+
+                    if (reportElementType.LastModifierUserId.HasValue)
                     {
-                        var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == ret.LastModifierUserId.Value);
+                        var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == reportElementType.LastModifierUserId.Value);
                         retDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
                     }
                     else
@@ -476,21 +488,16 @@ namespace Linko.LinkoExchange.Services.Report
                         retDto.LastModifierFullName = "N/A";
                     }
 
-                    amplesAndResultsTypes.Add(retDto);
+                    reportElementTypeDtos.Add(retDto);
                 }
             }
 
-            return amplesAndResultsTypes;
+            return reportElementTypeDtos;
         }
 
-        private IEnumerable<ReportElementType> GetReportElementType(ReportPackageTemplateElementCategory cat)
+        private IEnumerable<ReportElementType> GetReportElementCategoryReportElementTypesHelper(ReportPackageTemplateElementCategory cat)
         {
-            if (_reportPackageTemplateElementTypes == null)
-            {
-                _reportPackageTemplateElementTypes = _dbContext.ReportPackageTemplateElementTypes
-                                                               .Where(i => i.ReportPackageTemplateElementCategoryId == cat.ReportPackageTemplateElementCategoryId).ToList();
-            }
-            var rptets = _reportPackageTemplateElementTypes.Where(
+            var reportPackageTemplateElementTypes = _reportPackageTemplateElementTypes.Where(
                     i =>
                         i.ReportPackageTemplateElementCategoryId ==
                         cat.ReportPackageTemplateElementCategoryId)
@@ -498,13 +505,13 @@ namespace Linko.LinkoExchange.Services.Report
                 .OrderBy(i => i.SortOrder)
                 .ToList();
 
-            var rets = rptets.Select(i => i.ReportElementType).Distinct().ToList();
-            foreach (var ret in rets)
+            var reportElementTypes = reportPackageTemplateElementTypes.Select(i => i.ReportElementType).Distinct().ToList();
+            foreach (var ret in reportElementTypes)
             {
                 ret.CtsEventType =
                     _dbContext.CtsEventTypes.FirstOrDefault(i => i.CtsEventTypeId == ret.CtsEventTypeId);
             }
-            return rets;
+            return reportElementTypes;
         }
 
         private void DeleteReportPackageTemplateAssignments(int reportTemplateId)
@@ -569,13 +576,6 @@ namespace Linko.LinkoExchange.Services.Report
             }
 
             return dto;
-
-        }
-
-        private List<ReportElementCategoryDto> GetReportElementCategories()
-        {
-            var recats = _dbContext.ReportElementCategories.ToList();
-            return recats.Select(i => _mapHelper.GetReportElementCategoryDtoFromReportElementCategory(i)).ToList();
         }
 
         #endregion

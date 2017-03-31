@@ -16,5 +16,6 @@ namespace Linko.LinkoExchange.Services.Report
         IEnumerable<ReportElementTypeDto> GetCertificationTypes();
         IEnumerable<ReportElementTypeDto> GetAttachmentTypes();
         IEnumerable<ReportElementTypeDto> GetSampleAndResultTypes();
+        IEnumerable<ReportElementCategoryDto> GetReportElementCategories();
     }
 }
