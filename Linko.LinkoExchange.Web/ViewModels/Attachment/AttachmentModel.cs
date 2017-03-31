@@ -3,6 +3,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Attachment
 {
     public class AttachmentModel
     {
+        public int FileStoreId
+        {
+            get; set;
+        }
         public string FileName
         {
             get; set;

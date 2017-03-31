@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Web;
 using System.Web.Mvc;
-using Linko.LinkoExchange.Services;
+using System.Web.Routing;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Web.ViewModels.Attachment;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
+    //Demo controller for attachment upload and download
     public partial class AttachmentController : Controller
     {
         private IFileStoreService _fileStoreService;
@@ -22,7 +21,6 @@ namespace Linko.LinkoExchange.Web.Controllers
         // GET: Attachment
         public ActionResult Index()
         {
-
             return View();
         }
 
@@ -32,16 +30,48 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(fileStores);
         }
 
+        [Route(template: "Attachment/FileStoreInfo/{fileStoreId:int}")]
+        public ActionResult FileStoreInfo(int fileStoreId)
+        {
+            var fileStore = _fileStoreService.GetFileStoreById(fileStoreId);
+            var model = new AttachmentModel
+            {
+                FileName = fileStore.Name,
+                OriginFileName = fileStore.OriginalName,
+                AttachmentTypeName = fileStore.ReportElementTypeName,
+                Description = fileStore.Description,
+                FileStoreId = fileStore.FileStoreId.Value
+            };
+
+
+            return View(model);
+        }
+
+        [AcceptVerbs(HttpVerbs.Post)]
+        [Route(template: "Attachment/{fileStoreId}/Update")]
+        public ActionResult Update(AttachmentModel model, int fileStoreId)
+        {
+            var fileStoreDto = _fileStoreService.GetFileStoreById(fileStoreId);
+
+            fileStoreDto.ReportElementTypeName = model.AttachmentTypeName;
+            fileStoreDto.Description = model.Description;
+
+            _fileStoreService.UpdateFileStore(fileStoreDto);
+
+            var param = new RouteValueDictionary();
+            param.Add("fileStoreId", fileStoreId);
+            return RedirectToAction("FileStoreInfo", param);
+        }
+
         [Route(template: "Attachment/Download/{fileStoreId:int}")]
         public FileResult Download(int fileStoreId)
         {
-            var fileStore = _fileStoreService.GetFileStoreById(fileStoreId);
-            var fileDownloadName = fileStore.OriginalFileName;
+            var fileStore = _fileStoreService.GetFileStoreById(fileStoreId, includingFileData: true);
+            var fileDownloadName = fileStore.OriginalName;
             var extension = fileDownloadName.Substring(fileDownloadName.IndexOf(".") + 1);
             var contentType = $"application/${extension}";
 
-            var fileStream = new MemoryStream(fileStore.Data);
-            fileStream.Position = 0;
+            var fileStream = new MemoryStream(fileStore.Data) { Position = 0 };
             return File(fileStream, contentType, fileDownloadName);
         }
 
@@ -57,7 +87,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     var content = reader.ReadBytes(upload.ContentLength);
 
                     var fileStoreDto = new FileStoreDto();
-                    fileStoreDto.OriginalFileName = model.OriginFileName;
+                    fileStoreDto.OriginalName = model.OriginFileName;
                     fileStoreDto.ReportElementTypeName = model.AttachmentTypeName;
                     fileStoreDto.Description = model.Description;
                     fileStoreDto.Data = content;
