@@ -37,7 +37,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var model = new AttachmentModel
             {
                 FileName = fileStore.Name,
-                OriginFileName = fileStore.OriginalName,
+                OriginFileName = fileStore.OriginalFileName,
                 AttachmentTypeName = fileStore.ReportElementTypeName,
                 Description = fileStore.Description,
                 FileStoreId = fileStore.FileStoreId.Value
@@ -67,7 +67,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public FileResult Download(int fileStoreId)
         {
             var fileStore = _fileStoreService.GetFileStoreById(fileStoreId, includingFileData: true);
-            var fileDownloadName = fileStore.OriginalName;
+            var fileDownloadName = fileStore.OriginalFileName;
             var extension = fileDownloadName.Substring(fileDownloadName.IndexOf(".") + 1);
             var contentType = $"application/${extension}";
 
@@ -87,7 +87,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     var content = reader.ReadBytes(upload.ContentLength);
 
                     var fileStoreDto = new FileStoreDto();
-                    fileStoreDto.OriginalName = model.OriginFileName;
+                    fileStoreDto.OriginalFileName = model.OriginFileName;
                     fileStoreDto.ReportElementTypeName = model.AttachmentTypeName;
                     fileStoreDto.Description = model.Description;
                     fileStoreDto.Data = content;
