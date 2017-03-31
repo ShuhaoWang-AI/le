@@ -29,6 +29,7 @@ namespace Linko.LinkoExchange.Services.FileStore
         private const int MaxFileSize = 1024 * 1024 * 10;
         private const int SizeToReduce = 1024 * 1024 * 2;
 
+        // TODO to get from table tFileType
         private readonly string[] _validExtensions =
         {
             ".docx", ".doc", ".xls", ".xlsx", ".pdf", ".tif",
@@ -79,6 +80,8 @@ namespace Linko.LinkoExchange.Services.FileStore
             return new List<string>(_validExtensions);
         }
 
+        // TODO to get from table tFileType
+        // Here should validate data from tFileType table
         public bool IsValidFileExtension(string ext)
         {
             if (string.IsNullOrWhiteSpace(ext))
@@ -220,7 +223,7 @@ namespace Linko.LinkoExchange.Services.FileStore
         {
             _logger.Info("Enter FileStoreService.UpdateFileStore.");
             //Check if the file is already set to be 'reproted' or not 
-            var testFileStore = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreDto.FileStoreId);
+            var fileStoreToUpdate = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreDto.FileStoreId);
             // Check the fileStoreId is in tReportFile table or not, if it, means that file is included in a reprot  
             if (IsFileInReports(fileStoreDto.FileStoreId.Value))
             {
@@ -234,8 +237,13 @@ namespace Linko.LinkoExchange.Services.FileStore
             {
                 try
                 {
-                    testFileStore.Description = fileStoreDto.Description;
-                    testFileStore.ReportElementTypeName = fileStoreDto.ReportElementTypeName;
+                    //TOOD add to reflect the new table changes
+                    //var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+                    //fileStoreToUpdate.LastModiferUserId = currentUserId;
+                    //fileStoreToUpdate.LastModiciationDateTimeUtc = DateTimeOffset.UtcNow;
+
+                    fileStoreToUpdate.Description = fileStoreDto.Description;
+                    fileStoreToUpdate.ReportElementTypeName = fileStoreDto.ReportElementTypeName;
 
                     _dbContext.SaveChanges();
                     _dbContext.Commit(transaction);
