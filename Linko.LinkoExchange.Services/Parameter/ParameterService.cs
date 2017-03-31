@@ -88,10 +88,15 @@ namespace Linko.LinkoExchange.Services.Parameter
 
         /// <summary>
         /// Returns all Parameter Groups associated with this Organization Regulatory Program
-        /// including children parameters
+        /// including children parameters.
+        ///
+        /// OPTIONAL PARAMETERS: if these are passed in, we update the Default unit and set the Is Mass Calc flag
+        /// for each parameter based on it's potential association with the monitoring point and effective/retire date range.
         /// </summary>
+        /// <param name="monitoringPointId"></param>
+        /// <param name="sampleEndDateTimeLocal">If provided, must fall between the MonitoringPointParameter's effective/retire date range</param>
         /// <returns></returns>
-        public IEnumerable<ParameterGroupDto> GetStaticParameterGroups()
+        public IEnumerable<ParameterGroupDto> GetStaticParameterGroups(int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null)
         {
             var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
@@ -104,26 +109,70 @@ namespace Linko.LinkoExchange.Services.Parameter
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
             foreach (var paramGroup in foundParamGroups)
             {
-                var dto = _mapHelper.GetParameterGroupDtoFromParameterGroup(paramGroup);
+                var paramGroupDto = _mapHelper.GetParameterGroupDtoFromParameterGroup(paramGroup);
+
+                //If monitoring point and sample end datetime is passed in,
+                //get Unit and Calc mass data if this parameter is associated with the monitoring point
+                //and effective date range.
+                if (monitoringPointId.HasValue && sampleEndDateTimeUtc.HasValue)
+                {
+                    for (int paramIndex = 0; paramIndex < paramGroupDto.Parameters.Count; paramIndex++)
+                    {
+                        var paramDto = paramGroupDto.Parameters.ElementAt(paramIndex);
+                        UpdateParameterForMonitoringPoint(ref paramDto, monitoringPointId.Value, sampleEndDateTimeUtc.Value);
+                    }
+                }
 
                 //Set LastModificationDateTimeLocal
-                dto.LastModificationDateTimeLocal = _timeZoneService
+                paramGroupDto.LastModificationDateTimeLocal = _timeZoneService
                         .GetLocalizedDateTimeUsingThisTimeZoneId((paramGroup.LastModificationDateTimeUtc.HasValue ? paramGroup.LastModificationDateTimeUtc.Value.DateTime
                          : paramGroup.CreationDateTimeUtc.DateTime), timeZoneId);
 
                 if (paramGroup.LastModifierUserId.HasValue)
                 {
                     var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == paramGroup.LastModifierUserId.Value);
-                    dto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+                    paramGroupDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
                 }
                 else
                 {
-                    dto.LastModifierFullName = "N/A";
+                    paramGroupDto.LastModifierFullName = "N/A";
                 }
 
-                parameterGroupDtos.Add(dto);
+                parameterGroupDtos.Add(paramGroupDto);
             }
             return parameterGroupDtos;
+        }
+
+        /// <summary>
+        /// Overrides the given parameter's default unit with one found for the parameter at a given monitoring point
+        /// and effective date range. Also updates the default setting for IsCalcMassLoading based on "Mass Daily" limit(s) found
+        /// </summary>
+        /// <param name="paramDto"></param>
+        /// <param name="monitoringPointId"></param>
+        /// <param name="sampleEndDateTimeUtc"></param>
+        private void UpdateParameterForMonitoringPoint(ref ParameterDto paramDto, int monitoringPointId, DateTimeOffset sampleEndDateTimeUtc)
+        {
+            var orgRegProgramId = paramDto.OrganizationRegulatoryProgramId;
+
+            var foundMonitoringPointParameterLimit = _dbContext.MonitoringPointParameterLimits
+                .Include(mppl => mppl.MonitoringPointParameter)
+                .Include(mppl => mppl.MonitoringPointParameter.DefaultUnit)
+                .Include(mppl => mppl.LimitBasis)
+                .Include(mppl => mppl.LimitType)
+                .FirstOrDefault(mppl => mppl.MonitoringPointParameter.OrganizationRegulatoryProgramId == orgRegProgramId
+                    && mppl.MonitoringPointParameter.MonitoringPointId == monitoringPointId
+                    && mppl.MonitoringPointParameter.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
+                    && mppl.MonitoringPointParameter.RetireDateTimeUtc >= sampleEndDateTimeUtc);
+
+            if (foundMonitoringPointParameterLimit != null)
+            {
+                paramDto.DefaultUnit = _mapHelper.GetUnitDtoFromUnit(foundMonitoringPointParameterLimit.MonitoringPointParameter.DefaultUnit);
+                paramDto.IsCalcMassLoading = _dbContext.MonitoringPointParameterLimits
+                    .Include(mppl => mppl.LimitBasis)
+                    .Include(mppl => mppl.LimitType)
+                    .Any(mppl => mppl.MonitoringPointParameterId == foundMonitoringPointParameterLimit.MonitoringPointParameterId
+                        && mppl.LimitBasis.Name == "Mass" && mppl.LimitType.Name == "Daily");
+            }
         }
 
         /// <summary>
@@ -336,18 +385,23 @@ namespace Linko.LinkoExchange.Services.Parameter
 
         }
 
-        public IEnumerable<ParameterGroupDto> GetAllParameterGroups(int monitoringPointId)
+        public IEnumerable<ParameterGroupDto> GetAllParameterGroups(int monitoringPointId, DateTime sampleEndDateTimeLocal)
         {
+            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
+            var sampleEndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleEndDateTimeLocal, timeZoneId);
             string monitoringPointAbbrv = _dbContext.MonitoringPoints
                                         .Single(mp => mp.MonitoringPointId == monitoringPointId).Name; //TO-DO: Is this the same as Abbreviation? Or do we take Id?
             //Static Groups
             var parameterGroupDtos = new List<ParameterGroupDto>();
-            parameterGroupDtos = this.GetStaticParameterGroups().ToList();
+            parameterGroupDtos = this.GetStaticParameterGroups(monitoringPointId, sampleEndDateTimeLocal).ToList();
 
             //Add Dyanamic Groups
             var uniqueNonNullFrequencies = _dbContext.SampleFrequencies
                 .Include(ss => ss.MonitoringPointParameter)
                 .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
+                    && ss.MonitoringPointParameter.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
+                    && ss.MonitoringPointParameter.RetireDateTimeUtc >= sampleEndDateTimeUtc
                     && !string.IsNullOrEmpty(ss.IUSampleFrequency))
                 .Select(x => x.IUSampleFrequency)
                 .Distinct()
@@ -355,7 +409,9 @@ namespace Linko.LinkoExchange.Services.Parameter
 
             var uniqueCollectionMethodIds = _dbContext.SampleFrequencies
                 .Include(ss => ss.MonitoringPointParameter)
-                .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId)
+                .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
+                    && ss.MonitoringPointParameter.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
+                    && ss.MonitoringPointParameter.RetireDateTimeUtc >= sampleEndDateTimeUtc)
                 .Select(x => x.CollectionMethodId)
                 .Distinct()
                 .ToList();
@@ -379,6 +435,8 @@ namespace Linko.LinkoExchange.Services.Parameter
                                         .Include(ss => ss.CollectionMethod)
                                         .Include(ss => ss.MonitoringPointParameter.Parameter)
                                         .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
+                                            && ss.MonitoringPointParameter.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
+                                            && ss.MonitoringPointParameter.RetireDateTimeUtc >= sampleEndDateTimeUtc
                                             && ss.IUSampleFrequency == freq
                                             && ss.CollectionMethodId == collectMethodId
                                             && ss.CollectionMethod.IsRemoved == false
@@ -390,17 +448,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                     foreach (var parameter in freqCollectParams.ToList())
                     {
                         var paramDto = _mapHelper.GetParameterDtoFromParameter(parameter);
-
-                        ////TO-DO: Set concentration, mass loading, default units
-                        //if (mpParamLimit.DailyLimit.HasValue)
-                        //{
-                        //    param.ConcentrationUnit = _mapHelper.GetUnitDtoFromUnit(mpParamLimit.DailyLimitUnit);
-                        //}
-                        //if (mpParamLimit.MassLoadingDailyLimit.HasValue)
-                        //{
-                        //    param.IsCalcMassLoading = true;
-                        //}
-
+                        UpdateParameterForMonitoringPoint(ref paramDto, monitoringPointId, sampleEndDateTimeUtc);
 
                         dynamicFreqAndCollectMethodParamGroup.Parameters.Add(paramDto);
                     }
@@ -423,6 +471,8 @@ namespace Linko.LinkoExchange.Services.Parameter
                                         .Include(ss => ss.CollectionMethod)
                                         .Include(ss => ss.MonitoringPointParameter.Parameter)
                                         .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
+                                            && ss.MonitoringPointParameter.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
+                                            && ss.MonitoringPointParameter.RetireDateTimeUtc >= sampleEndDateTimeUtc
                                             && ss.CollectionMethodId == collectMethodId
                                             && ss.CollectionMethod.IsRemoved == false
                                             && ss.CollectionMethod.IsEnabled == true)
@@ -433,16 +483,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                 foreach (var parameter in collectParams)
                 {
                     var paramDto = _mapHelper.GetParameterDtoFromParameter(parameter);
-
-                    ////TO-DO: Set concentration, mass loading, default units
-                    //if (mpParamLimit.DailyLimit.HasValue)
-                    //{
-                    //    param.ConcentrationUnit = _mapHelper.GetUnitDtoFromUnit(mpParamLimit.DailyLimitUnit);
-                    //}
-                    //if (mpParamLimit.MassLoadingDailyLimit.HasValue)
-                    //{
-                    //    param.IsCalcMassLoading = true;
-                    //}
+                    UpdateParameterForMonitoringPoint(ref paramDto, monitoringPointId, sampleEndDateTimeUtc);
 
                     dynamicAllCollectMethodParamGroup.Parameters.Add(paramDto);
                 }

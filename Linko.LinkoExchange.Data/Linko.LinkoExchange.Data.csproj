@@ -87,6 +87,8 @@
     <Compile Include="Mapping\InvitationMap.cs" />
     <Compile Include="Mapping\JurisdictionMap.cs" />
     <Compile Include="Mapping\FileStoreMap.cs" />
+    <Compile Include="Mapping\LimitBasisMap.cs" />
+    <Compile Include="Mapping\LimitTypeMap.cs" />
     <Compile Include="Mapping\MonitoringPointMap.cs" />
     <Compile Include="Mapping\MonitoringPointParameterLimitMap.cs" />
     <Compile Include="Mapping\MonitoringPointParameterMap.cs" />
