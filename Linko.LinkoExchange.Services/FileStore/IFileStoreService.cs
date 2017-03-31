@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
 
-namespace Linko.LinkoExchange.Services
+namespace Linko.LinkoExchange.Services.FileStore
 {
     public interface IFileStoreService
     {
@@ -19,11 +19,12 @@ namespace Linko.LinkoExchange.Services
         /// The result includes file byte data
         /// </summary>
         /// <param name="fileStoreId">The file Id of the </param>
+        /// <param name="includingFileData">Indicates including file data or not</param>
         /// <returns>One FileStoreDto object</returns>
-        FileStoreDto GetFileStoreById(int fileStoreId);
+        FileStoreDto GetFileStoreById(int fileStoreId, bool includingFileData = false);
         int CreateFileStore(FileStoreDto fileStoreDto);
-
         void UpdateFileStore(FileStoreDto fileStoreDto);
         void DeleteFileStore(int fileStoreId);
+        bool IsFileInReports(int fileStore);
     }
 }

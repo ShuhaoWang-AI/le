@@ -148,13 +148,16 @@ namespace Linko.LinkoExchange.Services.FileStore
 
                     fileStoreDto.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
                     fileStoreDto.UploaderUserId = currentUserId;
-                    fileStoreDto.UploadDateTimeUtc = DateTimeOffset.UtcNow;
+
                     fileStoreDto.SizeByte = fileStoreDto.Data.Length;
 
                     var fileName = Path.GetFileNameWithoutExtension(fileStoreDto.OriginalFileName);
                     fileStoreDto.Name = $"{fileName}_0{extension}";
 
                     var fileStore = _mapHelper.GetFileStoreFromFileStoreDto(fileStoreDto);
+
+                    fileStore.UploadDateTimeUtc = DateTimeOffset.UtcNow;
+
                     fileStore = _dbContext.FileStores.Add(fileStore);
                     _dbContext.SaveChanges();
 
@@ -190,7 +193,7 @@ namespace Linko.LinkoExchange.Services.FileStore
             }
         }
 
-        public FileStoreDto GetFileStoreById(int fileStoreId)
+        public FileStoreDto GetFileStoreById(int fileStoreId, bool includingFileData = false)
         {
             _logger.Info("Enter FileStoreService.GetFileStoreById, attachmentFileId={0}.", fileStoreId);
 
@@ -201,7 +204,11 @@ namespace Linko.LinkoExchange.Services.FileStore
                 _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreId);
 
             var fileStoreDto = _mapHelper.GetFileStoreDtoFromFileStore(fileStore);
-            fileStoreDto.Data = _dbContext.FileStoreDatas.Single(i => i.FileStoreId == fileStoreDto.FileStoreId.Value).Data;
+            if (includingFileData)
+            {
+                fileStoreDto.Data = _dbContext.FileStoreDatas.Single(i => i.FileStoreId == fileStoreDto.FileStoreId.Value).Data;
+            }
+
 
             LocalizeFileStoreDtoUploadDateTime(fileStoreDto, currentRegulatoryProgramId);
             _logger.Info("Leave FileStoreService.GetFileStoreById, attachmentFileId={0}.", fileStoreId);
@@ -215,7 +222,7 @@ namespace Linko.LinkoExchange.Services.FileStore
             //Check if the file is already set to be 'reproted' or not 
             var testFileStore = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreDto.FileStoreId);
             // Check the fileStoreId is in tReportFile table or not, if it, means that file is included in a reprot  
-            if (_dbContext.ReportFiles.Any(t => t.FileStoreId == fileStoreDto.FileStoreId))
+            if (IsFileInReports(fileStoreDto.FileStoreId.Value))
             {
                 string message = "The attachment is used in a Report Package, and cannot be changed.";
                 List<RuleViolation> validationIssues = new List<RuleViolation>();
@@ -255,7 +262,7 @@ namespace Linko.LinkoExchange.Services.FileStore
             _logger.Info("Enter FileStoreService.DeleteFileStore.");
 
             //Check if the file is already set to be 'reproted' or not 
-            if (_dbContext.ReportFiles.Any(t => t.FileStoreId == fileStoreId))
+            if (IsFileInReports(fileStoreId))
             {
                 List<RuleViolation> validationIssues = new List<RuleViolation>();
                 string message = "The attachment is used in a Report Package, and cannot be changed.";
@@ -290,9 +297,21 @@ namespace Linko.LinkoExchange.Services.FileStore
                 }
             }
         }
+
+        public bool IsFileInReports(int fileStoreId)
+        {
+            _logger.Info("Enter FileStoreService.IsFileInReports.");
+
+            var isFileInReports = _dbContext.ReportFiles.Any(i => i.FileStoreId == fileStoreId);
+
+            _logger.Info("Leave FileStoreService.IsFileInReports.");
+
+            return isFileInReports;
+        }
+
         private FileStoreDto LocalizeFileStoreDtoUploadDateTime(FileStoreDto fileStoreDto, int currentOrgRegProgramId)
         {
-            fileStoreDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.UploadDateTimeUtc.DateTime, currentOrgRegProgramId);
+            fileStoreDto.LocalizaedUploaDateTime = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.LocalizaedUploaDateTime.DateTime, currentOrgRegProgramId);
             return fileStoreDto;
         }
 
