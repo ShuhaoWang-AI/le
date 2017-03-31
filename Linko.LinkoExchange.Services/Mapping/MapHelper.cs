@@ -867,8 +867,13 @@ namespace Linko.LinkoExchange.Services.Mapping
                 OrganizationRegulatoryProgram =
                     GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(
                         fileStore.OrganizationRegulatoryProgram),
-                LocalizaedUploaDateTime = fileStore.UploadDateTimeUtc,
-                UploaderUserId = fileStore.UploaderUserId
+                UploalDateTimeLocal = fileStore.UploadDateTimeUtc,
+                UploaderUserId = fileStore.UploaderUserId,
+
+                //TODO: wating for poco is finished
+                //LastModifierUserId = fileStore.LastModifierUserId; 
+                //LastModificationDateTimeLocal = fileStore.LastModificationDateTimeUtc;
+
             };
         }
 
@@ -889,6 +894,9 @@ namespace Linko.LinkoExchange.Services.Mapping
                 ReportElementTypeName = fileStoreDto.ReportElementTypeName,
                 OrganizationRegulatoryProgramId = fileStoreDto.OrganizationRegulatoryProgramId,
                 UploaderUserId = fileStoreDto.UploaderUserId
+
+                //TODO: wating for poco is finished
+                //LastModifierUserId = fileStoreDto.LastModifierUserId;  
             };
 
             if (fileStoreDto.FileStoreId.HasValue)

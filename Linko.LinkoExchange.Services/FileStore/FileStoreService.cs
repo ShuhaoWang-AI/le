@@ -107,7 +107,7 @@ namespace Linko.LinkoExchange.Services.FileStore
 
             var fileStoreDtos = fileStores.Select(i => _mapHelper.GetFileStoreDtoFromFileStore(i)).ToList();
 
-            fileStoreDtos = fileStoreDtos.Select(i => LocalizeFileStoreDtoUploadDateTime(i, currentRegulatoryProgramId)).ToList();
+            fileStoreDtos = fileStoreDtos.Select(i => FileStoreDtoHelper(i, currentRegulatoryProgramId)).ToList();
 
             _logger.Info("Leave FileStoreService.GetFileStores.");
             return fileStoreDtos;
@@ -210,7 +210,7 @@ namespace Linko.LinkoExchange.Services.FileStore
             }
 
 
-            LocalizeFileStoreDtoUploadDateTime(fileStoreDto, currentRegulatoryProgramId);
+            FileStoreDtoHelper(fileStoreDto, currentRegulatoryProgramId);
             _logger.Info("Leave FileStoreService.GetFileStoreById, attachmentFileId={0}.", fileStoreId);
 
             return fileStoreDto;
@@ -309,10 +309,26 @@ namespace Linko.LinkoExchange.Services.FileStore
             return isFileInReports;
         }
 
-        private FileStoreDto LocalizeFileStoreDtoUploadDateTime(FileStoreDto fileStoreDto, int currentOrgRegProgramId)
+        private FileStoreDto FileStoreDtoHelper(FileStoreDto fileStoreDto, int currentOrgRegProgramId)
         {
-            fileStoreDto.LocalizaedUploaDateTime = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.LocalizaedUploaDateTime.DateTime, currentOrgRegProgramId);
+            fileStoreDto.UploalDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.UploalDateTimeLocal.DateTime, currentOrgRegProgramId);
+
+            fileStoreDto.UploaderUserFullName = GetUserFullName(fileStoreDto.UploaderUserId);
+            //fileStoreDto.LastModifierUserFullName = GetUserFullName(fileStoreDto.LastModifierUserId);
+            fileStoreDto.LastModificationDateTimeLocal = _timeZoneService.
+                GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.LastModificationDateTimeLocal?.DateTime ?? fileStoreDto.UploalDateTimeLocal.DateTime, currentOrgRegProgramId);
             return fileStoreDto;
+        }
+
+        private string GetUserFullName(int? userId)
+        {
+            if (userId.HasValue)
+            {
+                var uploaderUser = _dbContext.Users.Single(user => user.UserProfileId == userId.Value);
+                return $"{uploaderUser.FirstName} {uploaderUser.LastName}";
+            }
+
+            return "N/A";
         }
 
         private void TryToReduceFileDataSize(FileStoreDto fileStoreDto)
