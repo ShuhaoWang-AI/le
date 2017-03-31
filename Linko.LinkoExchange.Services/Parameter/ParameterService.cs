@@ -345,7 +345,7 @@ namespace Linko.LinkoExchange.Services.Parameter
             parameterGroupDtos = this.GetStaticParameterGroups().ToList();
 
             //Add Dyanamic Groups
-            var uniqueNonNullFrequencies = _dbContext.SampleSchedules
+            var uniqueNonNullFrequencies = _dbContext.SampleFrequencies
                 .Include(ss => ss.MonitoringPointParameter)
                 .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
                     && !string.IsNullOrEmpty(ss.IUSampleFrequency))
@@ -353,7 +353,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                 .Distinct()
                 .ToList();
 
-            var uniqueCollectionMethodIds = _dbContext.SampleSchedules
+            var uniqueCollectionMethodIds = _dbContext.SampleFrequencies
                 .Include(ss => ss.MonitoringPointParameter)
                 .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId)
                 .Select(x => x.CollectionMethodId)
@@ -374,7 +374,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                     dynamicFreqAndCollectMethodParamGroup.Parameters = new List<ParameterDto>();
 
                     //Add Parameters
-                    var freqCollectParams = _dbContext.SampleSchedules
+                    var freqCollectParams = _dbContext.SampleFrequencies
                                         .Include(ss => ss.MonitoringPointParameter)
                                         .Include(ss => ss.CollectionMethod)
                                         .Include(ss => ss.MonitoringPointParameter.Parameter)
@@ -418,7 +418,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                 dynamicAllCollectMethodParamGroup.Parameters = new List<ParameterDto>();
 
                 //Add Parameters
-                var collectParams = _dbContext.SampleSchedules
+                var collectParams = _dbContext.SampleFrequencies
                                         .Include(ss => ss.MonitoringPointParameter)
                                         .Include(ss => ss.CollectionMethod)
                                         .Include(ss => ss.MonitoringPointParameter.Parameter)

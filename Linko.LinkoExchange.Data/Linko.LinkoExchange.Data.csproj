@@ -107,7 +107,7 @@
     <Compile Include="Mapping\ReportPackageTemplateElementCategoryMap.cs" />
     <Compile Include="Mapping\ReportPackageTemplateElementTypeMap.cs" />
     <Compile Include="Mapping\ReportPackageTemplateMap.cs" />
-    <Compile Include="Mapping\SampleScheduleMap.cs" />
+    <Compile Include="Mapping\SampleFrequencyMap.cs" />
     <Compile Include="Mapping\SignatoryRequestMap.cs" />
     <Compile Include="Mapping\SignatoryRequestStatusMap.cs" />
     <Compile Include="Mapping\SystemSettingMap.cs" />

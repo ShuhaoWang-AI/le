@@ -122,7 +122,7 @@
     <Compile Include="Domain\RepudiationReason.cs" />
     <Compile Include="Domain\Sample.cs" />
     <Compile Include="Domain\SampleResult.cs" />
-    <Compile Include="Domain\SampleSchedule.cs" />
+    <Compile Include="Domain\SampleFrequency.cs" />
     <Compile Include="Domain\SampleStatus.cs" />
     <Compile Include="Domain\SettingTemplate.cs" />
     <Compile Include="Domain\SignatoryRequest.cs" />

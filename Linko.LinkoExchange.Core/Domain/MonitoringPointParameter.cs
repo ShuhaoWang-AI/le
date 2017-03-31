@@ -26,6 +26,6 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
         public int? LastModifierUserId { get; set; }
         public virtual ICollection<MonitoringPointParameterLimit> MonitoringPointParameterLimits { get; set; }
-        public virtual ICollection<SampleSchedule> SampleSchedules { get; set; }
+        public virtual ICollection<SampleFrequency> SampleFrequencies { get; set; }
     }
 }

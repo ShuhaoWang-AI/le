@@ -41,7 +41,7 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public virtual ICollection<MonitoringPointParameterLimit> MonitoringPointParameterLimits { get; set; }
 
-        public virtual ICollection<SampleSchedule> SampleSchedules { get; set; }
+        public virtual ICollection<SampleFrequency> SampleFrequencies { get; set; }
     }
 }
 

@@ -8,21 +8,21 @@ using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public class SampleScheduleMap : EntityTypeConfiguration<SampleSchedule>
+    public class SampleFrequencyMap : EntityTypeConfiguration<SampleFrequency>
     {
-        public SampleScheduleMap()
+        public SampleFrequencyMap()
         {
-            ToTable("tSampleSchedule");
+            ToTable("tSampleFrequency");
 
-            HasKey(x => x.SampleScheduleId);
+            HasKey(x => x.SampleFrequencyId);
 
             HasRequired(a => a.MonitoringPointParameter)
-                 .WithMany(b => b.SampleSchedules)
+                 .WithMany(b => b.SampleFrequencies)
                  .HasForeignKey(c => c.MonitoringPointParameterId)
                  .WillCascadeOnDelete(false);
 
             HasRequired(a => a.CollectionMethod)
-                 .WithMany(b => b.SampleSchedules)
+                 .WithMany(b => b.SampleFrequencies)
                  .HasForeignKey(c => c.CollectionMethodId)
                  .WillCascadeOnDelete(false);
 

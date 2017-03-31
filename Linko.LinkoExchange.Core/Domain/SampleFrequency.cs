@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Core.Domain
 {
-    public class SampleSchedule
+    public class SampleFrequency
     {
-        public int SampleScheduleId { get; set; }
+        public int SampleFrequencyId { get; set; }
         public int MonitoringPointParameterId { get; set; }
         public virtual MonitoringPointParameter MonitoringPointParameter { get; set; }
         public int CollectionMethodId { get; set; }
