@@ -36,13 +36,10 @@
             @Html.DisplayNameFor(model => model.OrganizationRegulatoryProgramId)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.UploadDateTimeUtc)
+            @Html.DisplayNameFor(model => model.LocalizaedUploaDateTime)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.UploaderUserId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LastModificationDateTimeLocal)
         </th>
         <th></th>
     </tr>
@@ -75,13 +72,10 @@
                 @Html.DisplayFor(modelItem => item.OrganizationRegulatoryProgramId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UploadDateTimeUtc)
+                @Html.DisplayFor(modelItem => item.LocalizaedUploaDateTime)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.UploaderUserId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastModificationDateTimeLocal)
             </td>
         </tr>
     }
