@@ -39,6 +39,9 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
+        public virtual ICollection<MonitoringPointParameterLimit> MonitoringPointParameterLimits { get; set; }
+        
+
     }
 }
 

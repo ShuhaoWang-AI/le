@@ -26,7 +26,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual LimitType LimitType { get; set; }
         public int LimitBasisId { get; set; }
         public virtual LimitBasis LimitBasis { get; set; }
-        public bool IsAlertOnly { get; set; }
+        public bool IsAlertsOnly { get; set; }
     }
 
 }

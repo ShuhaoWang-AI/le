@@ -9,7 +9,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 {
     public interface IParameterService
     {
-        IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null);
+        IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null, int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null);
         IEnumerable<ParameterGroupDto> GetStaticParameterGroups(int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null);
         ParameterGroupDto GetParameterGroup(int parameterGroupId);
         int SaveParameterGroup(ParameterGroupDto parameterGroup);

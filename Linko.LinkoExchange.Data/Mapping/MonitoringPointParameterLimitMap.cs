@@ -21,13 +21,18 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .HasForeignKey(c => c.MonitoringPointParameterId)
                 .WillCascadeOnDelete(false);
 
-            Property(x => x.Name).IsRequired();
+            Property(x => x.Name).IsRequired().HasMaxLength(254);
 
-            Property(x => x.Description).IsRequired();
+            Property(x => x.Description).IsOptional().HasMaxLength(500);
 
             Property(x => x.MinimumValue).IsOptional();
 
             Property(x => x.MaximumValue).IsOptional();
+
+            HasRequired(a => a.BaseUnit)
+                .WithMany(b => b.MonitoringPointParameterLimits)
+                .HasForeignKey(c => c.BaseUnitId)
+                .WillCascadeOnDelete(false);
 
             HasRequired(a => a.CollectionMethod)
                 .WithMany(b => b.MonitoringPointParameterLimits)
@@ -44,7 +49,7 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .HasForeignKey(c => c.LimitBasisId)
                 .WillCascadeOnDelete(false);
 
-            Property(x => x.IsAlertOnly).IsOptional();
+            Property(x => x.IsAlertsOnly).IsOptional();
 
         }
     }

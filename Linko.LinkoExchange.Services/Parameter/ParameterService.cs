@@ -49,7 +49,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// Returns a complete list of parameters associated with this Organization Regulatory Program
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null)
+        public IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null, int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null)
         {
             var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
@@ -68,6 +68,15 @@ namespace Linko.LinkoExchange.Services.Parameter
             foreach (var parameter in foundParams.ToList())
             {
                 var dto = _mapHelper.GetParameterDtoFromParameter(parameter);
+
+                //If monitoring point and sample end datetime is passed in,
+                //get Unit and Calc mass data if this parameter is associated with the monitoring point
+                //and effective date range.
+                if (monitoringPointId.HasValue && sampleEndDateTimeUtc.HasValue)
+                {
+                    UpdateParameterForMonitoringPoint(ref dto, monitoringPointId.Value, sampleEndDateTimeUtc.Value);
+                }
+
                 dto.LastModificationDateTimeLocal = _timeZoneService
                                         .GetLocalizedDateTimeUsingThisTimeZoneId((parameter.LastModificationDateTimeUtc.HasValue ? parameter.LastModificationDateTimeUtc.Value.DateTime
                                          : parameter.CreationDateTimeUtc.DateTime), timeZoneId);
@@ -153,6 +162,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         private void UpdateParameterForMonitoringPoint(ref ParameterDto paramDto, int monitoringPointId, DateTimeOffset sampleEndDateTimeUtc)
         {
             var orgRegProgramId = paramDto.OrganizationRegulatoryProgramId;
+            var parameterId = paramDto.ParameterId;
 
             var foundMonitoringPointParameterLimit = _dbContext.MonitoringPointParameterLimits
                 .Include(mppl => mppl.MonitoringPointParameter)
@@ -161,6 +171,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                 .Include(mppl => mppl.LimitType)
                 .FirstOrDefault(mppl => mppl.MonitoringPointParameter.OrganizationRegulatoryProgramId == orgRegProgramId
                     && mppl.MonitoringPointParameter.MonitoringPointId == monitoringPointId
+                    && mppl.MonitoringPointParameter.ParameterId == parameterId
                     && mppl.MonitoringPointParameter.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
                     && mppl.MonitoringPointParameter.RetireDateTimeUtc >= sampleEndDateTimeUtc);
 
