@@ -1759,7 +1759,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 return View(viewName:"Confirmation", model:new ConfirmationViewModel
                                                            {
-                                                               Title = "Parameter Group Deleted",
+                                                               Title = "Delete Confirmation",
                                                                Message = "Parameter group deleted successfully."
                                                            });
             }
@@ -1990,7 +1990,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 return View(viewName:"Confirmation", model:new ConfirmationViewModel
                                                            {
-                                                               Title = "Report Element Type Deleted",
+                                                               Title = "Delete Confirmation",
                                                                Message = "Report element type deleted successfully."
                                                            });
             }
@@ -2029,7 +2029,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 ViewBag.Satus = "New";
             }
 
-            // Waste Types
+            // CtsEventTypes
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
             viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes().Select(c => new SelectListItem
                                                                                                      {
@@ -2038,7 +2038,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                          Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
                                                                                                      }).ToList();
 
-            viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select Cts Event Type", Value = "0"});
+            viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select CTS Event Type", Value = "0"});
+
             return viewModel;
         }
 
@@ -2095,7 +2096,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public ActionResult ReportPackageTemplates_Read([DataSourceRequest] DataSourceRequest request)
         {
-            var reportPackageTemplates = _reportTemplateService.GetReportPackageTemplates().ToList();
+            var reportPackageTemplates = _reportTemplateService.GetReportPackageTemplates(includeChildObjects:false).ToList();
 
             var viewModels = reportPackageTemplates.Select(vm => new ReportPackageTemplateViewModel
                                                           {
@@ -2158,14 +2159,102 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public ActionResult NewReportPackageTemplateDetails()
         {
-            throw new NotImplementedException();
+           
+            var viewModel = new ReportPackageTemplateViewModel();
+
+            try
+            {
+                viewModel = PrepareReportPackageTemplateDetails();
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+            return View(viewName:"ReportPackageTemplateDetails", model:viewModel);
         }
 
         public ActionResult ReportPackageTemplateDetails(int? id)
         {
-            throw new NotImplementedException();
+           
+            var viewModel = new ReportPackageTemplateViewModel();
+
+            try
+            {
+                viewModel = PrepareReportPackageTemplateDetails(id:id);
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            ViewBag.ShowSuccessMessage = TempData[key:"ShowSuccessMessage"] ?? false;
+            ViewBag.SuccessMessage = TempData[key:"SuccessMessage"] ?? "";
+
+            return View(model:viewModel);
+        }
+        public ActionResult DeleteReportPackageTemplate(int id)
+        {
+            try
+            {
+                _reportTemplateService.DeleteReportPackageTemplate(reportPackageTemplateId:id);
+
+                return View(viewName:"Confirmation", model:new ConfirmationViewModel
+                                                           {
+                                                               Title = "Delete Confirmation",
+                                                               Message = "Report package template has been deleted successfully."
+                                                           });
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            return View(viewName:"ReportPackageTemplateDetails", model:PrepareReportPackageTemplateDetails(id:id));
+        }
+
+        private ReportPackageTemplateViewModel PrepareReportPackageTemplateDetails(int? id = null)
+        {
+            var viewModel = new ReportPackageTemplateViewModel();
+
+            if (id.HasValue)
+            {
+                ViewBag.Satus = "Edit";
+
+                var reportPackageTemplate = _reportTemplateService.GetReportPackageTemplate(reportPackageTemplateId:id.Value);
+
+                viewModel = new ReportPackageTemplateViewModel
+                            {
+                                Id = reportPackageTemplate.ReportPackageTemplateId,
+                                Name = reportPackageTemplate.Name,
+                                Description = reportPackageTemplate.Description,
+                                IsActive = reportPackageTemplate.IsActive,
+                                EffectiveDateTimeLocal = reportPackageTemplate.EffectiveDateTimeLocal,
+                                LastModificationDateTimeLocal = reportPackageTemplate.LastModificationDateTimeLocal,
+                                LastModifierUserName = reportPackageTemplate.LastModifierFullName
+                            };
+            }
+            else
+            {
+                ViewBag.Satus = "New";
+            }
+
+            
+            // CtsEventTypes
+            viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
+            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes().Select(c => new SelectListItem
+                                                                                                     {
+                                                                                                         Text = c.Name,
+                                                                                                         Value = c.CtsEventTypeId.ToString(),
+                                                                                                         Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
+                                                                                                     }).ToList();
+
+            viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select CTS Event Type", Value = "0"});
+
+
+            return viewModel;
         }
 
         #endregion
+
     }
 }
