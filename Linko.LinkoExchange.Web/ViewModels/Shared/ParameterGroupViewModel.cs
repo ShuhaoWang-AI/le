@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using FluentValidation;
 using FluentValidation.Attributes;
 
@@ -32,6 +33,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string LastModifierUserName { get; set; }
 
         public ICollection<ParameterViewModel> Parameters { get; set; }
+        public List<ParameterViewModel> AllParameters { private get; set; }
+        public List<ParameterViewModel> AvailableParameters => AllParameters.Where(a => Parameters.All(b => a.Id != b.Id)).ToList();
     }
 
     public partial class ParameterGroupViewModelValidator:AbstractValidator<ParameterGroupViewModel>

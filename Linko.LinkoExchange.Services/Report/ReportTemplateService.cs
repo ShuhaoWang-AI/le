@@ -130,13 +130,15 @@ namespace Linko.LinkoExchange.Services.Report
                     .Include(a => a.ReportPackageTemplateElementCategories.Select(b => b.ReportPackageTemplateElementTypes.Select(d => d.ReportElementType)))
                     .Distinct()
                     .ToArray();
+            if (includeChildObjects)
+            {
+                _reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories.Include(i => i.ReportPackageTemplate)
+                                                                    .Where(a => a.ReportPackageTemplate.OrganizationRegulatoryProgramId == currentRegulatoryProgramId).ToList();
 
-            _reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories.Include(i => i.ReportPackageTemplate)
-                            .Where(a => a.ReportPackageTemplate.OrganizationRegulatoryProgramId == currentRegulatoryProgramId).ToList();
-
-            _reportPackageTemplateElementTypes = _dbContext.ReportPackageTemplateElementTypes.Include(a => a.ReportPackageTemplateElementCategory.ReportPackageTemplate)
-                .Where(b => b.ReportPackageTemplateElementCategory.ReportPackageTemplate.OrganizationRegulatoryProgramId == currentRegulatoryProgramId).ToList();
-
+                _reportPackageTemplateElementTypes = _dbContext.ReportPackageTemplateElementTypes.Include(a => a.ReportPackageTemplateElementCategory.ReportPackageTemplate)
+                                                               .Where(b => b.ReportPackageTemplateElementCategory.ReportPackageTemplate.OrganizationRegulatoryProgramId == currentRegulatoryProgramId)
+                                                               .ToList();
+            }
             var rptDtos = rpts.Select(rpt => GetReportPackageTemplateInner(rpt: rpt, includeChildObjects: includeChildObjects)).ToList();
 
             _logger.Info("Enter ReportTemplateService.ReportPackageTemplateDto. Return count={0}", rptDtos.Count);
@@ -342,6 +344,12 @@ namespace Linko.LinkoExchange.Services.Report
         {
             var recats = _dbContext.ReportElementCategories.ToList();
             return recats.Select(i => _mapHelper.GetReportElementCategoryDtoFromReportElementCategory(i)).ToList();
+        }
+        
+        public IEnumerable<ReportElementCategoryName> GetReportElementCategoryNames()
+        {
+            var recats = _dbContext.ReportElementCategories.ToList();
+            return recats.Select(i => (ReportElementCategoryName) Enum.Parse(typeof(ReportElementCategoryName), i.Name)).ToList();
         }
 
         #region private section

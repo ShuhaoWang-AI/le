@@ -942,7 +942,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                      {
                                                          Id = vm.OrganizationRegulatoryProgramId,
                                                          IndustryNo = vm.OrganizationDto.OrganizationId,
-                                                         IndustryNoText = vm.OrganizationDto.OrganizationId.ToString(),
                                                          IndustryName = vm.OrganizationDto.OrganizationName,
                                                          AddressLine1 = vm.OrganizationDto.AddressLine1,
                                                          AddressLine2 = vm.OrganizationDto.AddressLine2,
@@ -1848,7 +1847,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 viewModel.Parameters = new List<ParameterViewModel>();
             }
 
-            ViewBag.GlobalParameters = _parameterService.GetGlobalParameters().Select(p => new ParameterViewModel
+            viewModel.AllParameters = _parameterService.GetGlobalParameters().Select(p => new ParameterViewModel
                                                                                            {
                                                                                                Id = p.ParameterId,
                                                                                                Name = p.Name,
@@ -2156,7 +2155,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         #endregion
 
         #region Show Report Package Template Details
-
+        
+        [Route(template:"ReportPackageTemplate/New")]
         public ActionResult NewReportPackageTemplateDetails()
         {
            
@@ -2173,6 +2173,15 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"ReportPackageTemplateDetails", model:viewModel);
         }
 
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"ReportPackageTemplate/New")]
+        public ActionResult NewReportPackageTemplateDetails(ReportPackageTemplateViewModel model)
+        {
+            throw new NotImplementedException();
+        }
+        
+        [Route(template:"ReportPackageTemplate/Details")]
         public ActionResult ReportPackageTemplateDetails(int? id)
         {
            
@@ -2192,6 +2201,15 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return View(model:viewModel);
         }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"ReportPackageTemplate/Details")]
+        public ActionResult ReportPackageTemplateDetails(int? id, ReportPackageTemplateViewModel model)
+        {
+            throw new NotImplementedException();
+        }
+
         public ActionResult DeleteReportPackageTemplate(int id)
         {
             try
@@ -2230,14 +2248,80 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 IsActive = reportPackageTemplate.IsActive,
                                 EffectiveDateTimeLocal = reportPackageTemplate.EffectiveDateTimeLocal,
                                 LastModificationDateTimeLocal = reportPackageTemplate.LastModificationDateTimeLocal,
-                                LastModifierUserName = reportPackageTemplate.LastModifierFullName
+                                LastModifierUserName = reportPackageTemplate.LastModifierFullName,
+                                SamplesAndResultsTypes = reportPackageTemplate.SamplesAndResultsTypes.Select(t => new ReportElementTypeViewModel
+                                                                                                                  {
+                                                                                                                      Id = t.ReportElementTypeId,
+                                                                                                                      Name = t.Name,
+                                                                                                                      Description = t.Description
+                                                                                                                  }).ToList(),
+                                AttachmentTypes = reportPackageTemplate.AttachmentTypes.Select(t => new ReportElementTypeViewModel
+                                                                                                    {
+                                                                                                        Id = t.ReportElementTypeId,
+                                                                                                        Name = t.Name,
+                                                                                                        Description = t.Description
+                                                                                                    }).ToList(),
+                                CertificationTypes = reportPackageTemplate.CertificationTypes.Select(t => new ReportElementTypeViewModel
+                                                                                                          {
+                                                                                                              Id = t.ReportElementTypeId,
+                                                                                                              Name = t.Name,
+                                                                                                              Description = t.Description
+                                                                                                          }).ToList(),
+                                ReportPackageTemplateAssignments = reportPackageTemplate.ReportPackageTemplateAssignments.Select(vm => new IndustryViewModel
+                                                                                                                                       {
+                                                                                                                                           Id = vm.OrganizationRegulatoryProgramId,
+                                                                                                                                           IndustryNo = vm.OrganizationDto.OrganizationId,
+                                                                                                                                           IndustryName = vm.OrganizationDto.OrganizationName,
+                                                                                                                                           AddressLine1 = vm.OrganizationDto.AddressLine1,
+                                                                                                                                           AddressLine2 = vm.OrganizationDto.AddressLine2,
+                                                                                                                                           CityName = vm.OrganizationDto.CityName,
+                                                                                                                                           State = vm.OrganizationDto.State,
+                                                                                                                                           ZipCode = vm.OrganizationDto.ZipCode,
+                                                                                                                                           Classification = vm.OrganizationDto.Classification
+                                                                                                                                       }).ToList(),
+                                ReportPackageTemplateElementCategories = reportPackageTemplate.ReportPackageTemplateElementCategories
                             };
             }
             else
             {
-                ViewBag.Satus = "New";
+                ViewBag.Satus                                    = "New";
+
+                viewModel.SamplesAndResultsTypes                 = new List<ReportElementTypeViewModel>();
+                viewModel.AttachmentTypes                        = new List<ReportElementTypeViewModel>();
+                viewModel.CertificationTypes                     = new List<ReportElementTypeViewModel>();
+                viewModel.ReportPackageTemplateAssignments       = new List<IndustryViewModel>();
+                viewModel.ReportPackageTemplateElementCategories = _reportTemplateService.GetReportElementCategoryNames().ToList();
             }
 
+            viewModel.AllAttachmentTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments).Select(vm => new ReportElementTypeViewModel
+                                                             {
+                                                                 Id = vm.ReportElementTypeId,
+                                                                 Name = vm.Name,
+                                                                 Description = vm.Description
+                                                             }).ToList();
+
+            viewModel.AllCertificationTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Certifications).Select(vm => new ReportElementTypeViewModel
+                                                             {
+                                                                 Id = vm.ReportElementTypeId,
+                                                                 Name = vm.Name,
+                                                                 Description = vm.Description
+                                                             }).ToList();
+            
+            var currentOrganizationRegulatoryProgramId = int.Parse(s:GetClaimValue(key:CacheKey.OrganizationRegulatoryProgramId));
+            var industries = _organizationService.GetChildOrganizationRegulatoryPrograms(orgRegProgId:currentOrganizationRegulatoryProgramId);
+
+            viewModel.AllReportPackageTemplateAssignments = industries.Select(vm => new IndustryViewModel
+                                                                                    {
+                                                                                        Id = vm.OrganizationRegulatoryProgramId,
+                                                                                        IndustryNo = vm.OrganizationDto.OrganizationId,
+                                                                                        IndustryName = vm.OrganizationDto.OrganizationName,
+                                                                                        AddressLine1 = vm.OrganizationDto.AddressLine1,
+                                                                                        AddressLine2 = vm.OrganizationDto.AddressLine2,
+                                                                                        CityName = vm.OrganizationDto.CityName,
+                                                                                        State = vm.OrganizationDto.State,
+                                                                                        ZipCode = vm.OrganizationDto.ZipCode,
+                                                                                        Classification = vm.OrganizationDto.Classification
+                                                                                    }).ToList();
             
             // CtsEventTypes
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();

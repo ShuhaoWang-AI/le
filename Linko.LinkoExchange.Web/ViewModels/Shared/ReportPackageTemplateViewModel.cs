@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Web.Mvc;
 using FluentValidation;
 using FluentValidation.Attributes;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Web.ViewModels.Authority;
+using Linko.LinkoExchange.Web.ViewModels.Shared;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
@@ -54,12 +56,18 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         
         [Display(Name = "Attachments")]
         public List<ReportElementTypeViewModel> AttachmentTypes { get; set; }
-        
+        public List<ReportElementTypeViewModel> AllAttachmentTypes { private get; set; }
+        public List<ReportElementTypeViewModel> AvailableAttachmentTypes => AllAttachmentTypes.Where(a => AttachmentTypes.All(b => a.Id != b.Id)).ToList();
+
         [Display(Name = "Certifications")]
         public List<ReportElementTypeViewModel> CertificationTypes { get; set; }
+        public List<ReportElementTypeViewModel> AllCertificationTypes { private get; set; }
+        public List<ReportElementTypeViewModel> AvailableCertificationTypes => AllCertificationTypes.Where(a => CertificationTypes.All(b => a.Id != b.Id)).ToList();
         
         [Display(Name = "Industries")]
         public List<IndustryViewModel> ReportPackageTemplateAssignments { get; set; }
+        public List<IndustryViewModel> AllReportPackageTemplateAssignments { private get; set; }
+        public List<IndustryViewModel> AvailableReportPackageTemplateAssignments => AllReportPackageTemplateAssignments.Where(a => ReportPackageTemplateAssignments.All(b => a.Id != b.Id)).ToList();
         
         [Display(Name = "Categories")]
         public List<ReportElementCategoryName> ReportPackageTemplateElementCategories { get; set; }

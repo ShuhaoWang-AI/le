@@ -21,10 +21,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 
         [Editable(false)]
         [Display(Name = "Industry No.")]
-        public string IndustryNoText
-        {
-            get; set;
-        }
+        public string IndustryNoText => IndustryNo.ToString();
 
         [Editable(false)]
         [Display(Name = "Industry Name")]

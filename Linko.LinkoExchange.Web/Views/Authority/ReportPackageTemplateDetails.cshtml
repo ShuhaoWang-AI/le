@@ -180,6 +180,451 @@
                 </div>
             </div>
         </section>
-
     </div>
+
+    /////////////////////////////////////    Attachment Types   ////////////////////////////////////////////
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Attachments</h3>
+            <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body box-collapse collapse in">
+
+            <div class="col-md-6">
+                <h4 class="box-title">Available Attachment Types</h4>
+                <table class="hover table table-bordered table-condensed table-responsive table-striped" id="availableAttachmentTable">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th class="text-center" style="width: 60px">Add</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var attachment in Model.AvailableAttachmentTypes)
+                        {
+                            <tr>
+                                <td>@attachment.Id</td>
+                                <td>@attachment.Name</td>
+                                <td>@attachment.Description</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" id="btnAddAttachment" type="button">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-6">
+                <h4 class="box-title">Selected Attachment Types</h4>
+
+                <table class="table table-bordered table-condensed table-hover table-responsive table-striped" id="selectedAttachmentTable">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th class="text-center" style="width: 60px">Remove</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var attachment in Model.AttachmentTypes)
+                        {
+                            <tr>
+                                <td>@attachment.Id</td>
+                                <td>@attachment.Name</td>
+                                <td>@attachment.Description</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" id="btnRemoveAttachment" type="button">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @(Html.Kendo().Sortable()
+                  .For(selector:"#selectedAttachmentTable")
+                  .Filter(selector:"tbody > tr")
+                  .Cursor(cursor:"move")
+                  .HintHandler(handler:"noHint")
+                  .PlaceholderHandler(handler:"placeholder")
+                  .ContainerSelector(selector:"#selectedAttachmentTable tbody")
+                  )
+        </div>
+    </div>
+
+    /////////////////////////////////////    Certification Types   ////////////////////////////////////////////
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Certifications</h3>
+            <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body box-collapse collapse in">
+
+            <div class="col-md-6">
+                <h4 class="box-title">Available Certification Types</h4>
+                <table class="hover table table-bordered table-condensed table-responsive table-striped" id="availableCertificationTable">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th class="text-center" style="width: 60px">Add</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var certification in Model.AvailableCertificationTypes)
+                        {
+                            <tr>
+                                <td>@certification.Id</td>
+                                <td>@certification.Name</td>
+                                <td>@certification.Description</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" id="btnAddCertification" type="button">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-6">
+                <h4 class="box-title">Selected Certification Types</h4>
+
+                <table class="table table-bordered table-condensed table-hover table-responsive table-striped" id="selectedCertificationTable">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th class="text-center" style="width: 60px">Remove</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var certification in Model.CertificationTypes)
+                        {
+                            <tr>
+                                <td>@certification.Id</td>
+                                <td>@certification.Name</td>
+                                <td>@certification.Description</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" id="btnRemoveCertification" type="button">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @(Html.Kendo().Sortable()
+                  .For(selector:"#selectedCertificationTable")
+                  .Filter(selector:"tbody > tr")
+                  .Cursor(cursor:"move")
+                  .HintHandler(handler:"noHint")
+                  .PlaceholderHandler(handler:"placeholder")
+                  .ContainerSelector(selector:"#selectedCertificationTable tbody")
+                  )
+
+        </div>
+    </div>
+
+    /////////////////////////////////////    Assign Industries   ////////////////////////////////////////////
+
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Assign Industries</h3>
+            <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-body box-collapse collapse in">
+
+            <div class="col-md-6">
+                <h4 class="box-title">Available Industries</h4>
+                <table class="hover table table-bordered table-condensed table-responsive table-striped" id="availableIndustryTable">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>No</th>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Classification</th>
+                            <th class="text-center" style="width: 60px">Add</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var industry in Model.AvailableReportPackageTemplateAssignments)
+                        {
+                            <tr>
+                                <td>@industry.Id</td>
+                                <td>@industry.IndustryNoText</td>
+                                <td>@industry.IndustryName</td>
+                                <td>@industry.Address</td>
+                                <td>@industry.Classification</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" id="btnAddIndustry" type="button">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-6">
+                <h4 class="box-title">Selected Industries</h4>
+
+                <table class="table table-bordered table-condensed table-hover table-responsive table-striped" id="selectedIndustryTable">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>No</th>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Classification</th>
+                            <th class="text-center" style="width: 60px">Remove</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var industry in Model.ReportPackageTemplateAssignments)
+                        {
+                            <tr>
+                                <td>@industry.Id</td>
+                                <td>@industry.IndustryNoText</td>
+                                <td>@industry.IndustryName</td>
+                                <td>@industry.Address</td>
+                                <td>@industry.Classification</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" id="btnRemoveIndustry" type="button">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <link href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script>
+
+    <script>
+
+        var noHint = $.noop;
+
+        function placeholder(element)
+        {
+            return element.clone().addClass("k-state-hover").css("opacity", 0.65);
+        }
+
+        $(document)
+            .ready(function()
+            {
+                $('#availableAttachmentTable')
+                    .DataTable(
+                        {
+                            "columnDefs": [
+                                { "searchable": true, "targets": [1, 2] }
+                                , { "targets": [0], "visible": false, "searchable": false }
+                                , {
+                                    "defaultContent":
+                                        "<button class='btn btn-primary btn-sm' id='btnAddAttachment'><i class='fa fa-plus'></i></button>"
+                                    , "targets": 2
+                                }
+                            ]
+                            , "ordering": true
+                            , "order": [[1, 'asc']]
+                            , "scrollY": "35vh"
+                            , "scrollCollapse": true
+                            , "paging": false
+                            , "info": false
+                            , "processing": true
+                            , "stateSave": false
+                            , "language": {
+                                "search": ""
+                                , "searchPlaceholder": "Search Attachment..."
+                                , "zeroRecords": "No attachment available for selection."
+                            }
+                        }
+                    );
+
+                $('#selectedAttachmentTable')
+                    .DataTable(
+                        {
+                            "columnDefs": [
+                                { "searchable": true, "targets": [1, 2] }
+                                , { "targets": [0], "visible": false, "searchable": false }
+                                , {
+                                    "defaultContent":
+                                        "<button class='btn btn-danger btn-sm' id='btnRemoveAttachment'><i class='fa fa-minus'></i></button>"
+                                    , "targets": 2
+                                }
+                            ]
+                            , "ordering": true
+                            , "order": [[1, 'asc']]
+                            , "scrollY": "35vh"
+                            , "scrollCollapse": true
+                            , "paging": false
+                            , "info": false
+                            , "processing": true
+                            , "stateSave": false
+                            , "language": {
+                                "search": ""
+                                , "searchPlaceholder": "Search Attachment..."
+                                , "zeroRecords": "No attachment selected."
+                            }
+                        }
+                    );
+
+                $('#availableCertificationTable')
+                    .DataTable(
+                        {
+                            "columnDefs": [
+                                { "searchable": true, "targets": [1, 2] }
+                                , { "targets": [0], "visible": false, "searchable": false }
+                                , {
+                                    "defaultContent":
+                                        "<button class='btn btn-primary btn-sm' id='btnAddCertification'><i class='fa fa-plus'></i></button>"
+                                    , "targets": 2
+                                }
+                            ]
+                            , "ordering": true
+                            , "order": [[1, 'asc']]
+                            , "scrollY": "35vh"
+                            , "scrollCollapse": true
+                            , "paging": false
+                            , "info": false
+                            , "processing": true
+                            , "stateSave": false
+                            , "language": {
+                                "search": ""
+                                , "searchPlaceholder": "Search Certification..."
+                                , "zeroRecords": "No certification available for selection."
+                            }
+                        }
+                    );
+
+                $('#selectedCertificationTable')
+                    .DataTable(
+                        {
+                            "columnDefs": [
+                                { "searchable": true, "targets": [1, 2] }
+                                , { "targets": [0], "visible": false, "searchable": false }
+                                , {
+                                    "defaultContent":
+                                        "<button class='btn btn-danger btn-sm' id='btnRemoveCertification'><i class='fa fa-minus'></i></button>"
+                                    , "targets": 2
+                                }
+                            ]
+                            , "ordering": true
+                            , "order": [[1, 'asc']]
+                            , "scrollY": "35vh"
+                            , "scrollCollapse": true
+                            , "paging": false
+                            , "info": false
+                            , "processing": true
+                            , "stateSave": false
+                            , "language": {
+                                "search": ""
+                                , "searchPlaceholder": "Search Certification..."
+                                , "zeroRecords": "No certification selected."
+                            }
+                        }
+                    );
+
+                $('#availableIndustryTable')
+                    .DataTable(
+                        {
+                            "columnDefs": [
+                                { "searchable": true, "targets": [1, 2, 3, 4] }
+                                , { "targets": [0], "visible": false, "searchable": false }
+                                , {
+                                    "defaultContent":
+                                        "<button class='btn btn-primary btn-sm' id='btnAddIndustry'><i class='fa fa-plus'></i></button>"
+                                    , "targets": 2
+                                }
+                            ]
+                            , "ordering": true
+                            , "order": [[1, 'asc']]
+                            , "scrollY": "35vh"
+                            , "scrollCollapse": true
+                            , "paging": false
+                            , "info": false
+                            , "processing": true
+                            , "stateSave": false
+                            , "language": {
+                                "search": ""
+                                , "searchPlaceholder": "Search Industry..."
+                                , "zeroRecords": "No industry available for selection."
+                            }
+                        }
+                    );
+
+                $('#selectedIndustryTable')
+                    .DataTable(
+                        {
+                            "columnDefs": [
+                                { "searchable": true, "targets": [1, 2, 3, 4] }
+                                , { "targets": [0], "visible": false, "searchable": false }
+                                , {
+                                    "defaultContent":
+                                        "<button class='btn btn-danger btn-sm' id='btnRemoveIndustry'><i class='fa fa-minus'></i></button>"
+                                    , "targets": 2
+                                }
+                            ]
+                            , "ordering": true
+                            , "order": [[1, 'asc']]
+                            , "scrollY": "35vh"
+                            , "scrollCollapse": true
+                            , "paging": false
+                            , "info": false
+                            , "processing": true
+                            , "stateSave": false
+                            , "language": {
+                                "search": ""
+                                , "searchPlaceholder": "Search Industry..."
+                                , "zeroRecords": "No industry selected."
+                            }
+                        }
+                    );
+            });
+
+    </script>
 }

@@ -3,22 +3,10 @@
 
 @{
     ViewBag.Title = "Parameter Group Details";
-    ViewBag.AvailableParameter = ((List<ParameterViewModel>) ViewBag.GlobalParameters).Where(p => Model.Parameters.ToList().All(s => p.Id != s.Id));
 }
 
 
-@using (Html.BeginForm(actionName:"ParameterGroupDetails",
-    controllerName:"Authority",
-    routeValues:new
-                {
-                    id = Model.Id
-                },
-    method:FormMethod.Post,
-    htmlAttributes:new
-                   {
-                       @class = "form-horizontal",
-                       role = "form"
-                   }))
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
 
@@ -169,7 +157,7 @@
                     </thead>
 
                     <tbody>
-                        @foreach (ParameterViewModel parameter in ViewBag.AvailableParameter)
+                        @foreach (ParameterViewModel parameter in Model.AvailableParameters)
                         {
                             <tr>
                                 <td>@parameter.Id</td>
