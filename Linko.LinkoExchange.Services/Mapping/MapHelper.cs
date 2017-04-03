@@ -490,6 +490,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             {
                 CtsEventTypeId = ctsEventType.CtsEventTypeId,
                 Name = ctsEventType.Name,
+                CtsEventCategoryName = ctsEventType.CtsEventCategoryName,
                 Description = ctsEventType.Description
             };
             return mappedDto;
@@ -637,6 +638,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             {
                 CtsEventTypeId = ctsEventType.CtsEventTypeId,
                 Name = ctsEventType.Name,
+                CtsEventCategoryName = ctsEventType.CtsEventCategoryName,
                 Description = ctsEventType.Description
             };
 
@@ -654,6 +656,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             {
                 CtsEventTypeId = ctsEventTypeDto.CtsEventTypeId,
                 Name = ctsEventTypeDto.Name,
+                CtsEventCategoryName = ctsEventTypeDto.CtsEventCategoryName,
                 Description = ctsEventTypeDto.Description
             };
 

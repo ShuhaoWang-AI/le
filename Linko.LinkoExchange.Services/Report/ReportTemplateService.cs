@@ -321,7 +321,13 @@ namespace Linko.LinkoExchange.Services.Report
 
         public IEnumerable<CtsEventTypeDto> GetCtsEventTypes()
         {
-            var ctsEventTypes = _dbContext.CtsEventTypes.Where(i => i.IsEnabled && i.IsRemoved == false).ToList();
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var ctsEventTypes =
+                _dbContext.CtsEventTypes.Where(
+                    i =>
+                        i.IsEnabled && i.IsRemoved == false &&
+                        i.OrganizationRegulatoryProgramId == currentOrgRegProgramId).ToList();
+
             return ctsEventTypes.Select(i => _mapHelper.GetCtsEventTypeDtoFromEventType(i));
         }
 
@@ -345,11 +351,11 @@ namespace Linko.LinkoExchange.Services.Report
             var recats = _dbContext.ReportElementCategories.ToList();
             return recats.Select(i => _mapHelper.GetReportElementCategoryDtoFromReportElementCategory(i)).ToList();
         }
-        
+
         public IEnumerable<ReportElementCategoryName> GetReportElementCategoryNames()
         {
             var recats = _dbContext.ReportElementCategories.ToList();
-            return recats.Select(i => (ReportElementCategoryName) Enum.Parse(typeof(ReportElementCategoryName), i.Name)).ToList();
+            return recats.Select(i => (ReportElementCategoryName)Enum.Parse(typeof(ReportElementCategoryName), i.Name)).ToList();
         }
 
         #region private section
