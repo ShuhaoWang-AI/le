@@ -24,8 +24,9 @@ namespace Linko.LinkoExchange.Core.Enum
         AuthorityUserLicenseTotalCount,
         IndustryLicenseTotalCount,
         UserPerIndustryMaxCount,
-        ResultQualifiersIndustryCanUse,
-        CreateSampleNamesRule
+        ResultQualifierValidValues,
+        FlowUnitValidValues,
+        SampleNameCreationRule
     }
 
 }

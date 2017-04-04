@@ -92,7 +92,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var currentRegulatoryProgramId =
                       int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
-            var settings = _settingService.GetSettingTemplateValue(SettingType.ResultQualifiersIndustryCanUse);
+            var settings = _settingService.GetSettingTemplateValue(SettingType.ResultQualifierValidValues);
 
             return Json(settings, JsonRequestBehavior.AllowGet);
         }
@@ -103,7 +103,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                       int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
             var settingDto = new SettingDto();
-            settingDto.TemplateName = SettingType.ResultQualifiersIndustryCanUse;
+            settingDto.TemplateName = SettingType.ResultQualifierValidValues;
             settingDto.Value = "GreaterThan,LessThan";
             settingDto.OrgTypeName = OrganizationTypeName.Authority;
 
@@ -117,7 +117,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var currentRegulatoryProgramId =
                       int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
-            var settings = _settingService.GetSettingTemplateValue(SettingType.CreateSampleNamesRule);
+            var settings = _settingService.GetSettingTemplateValue(SettingType.SampleNameCreationRule);
 
             return Json(settings, JsonRequestBehavior.AllowGet);
         }
