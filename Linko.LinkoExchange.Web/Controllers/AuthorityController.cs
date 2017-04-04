@@ -2286,12 +2286,20 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 ViewBag.Satus                                    = "New";
 
-                viewModel.SamplesAndResultsTypes                 = new List<ReportElementTypeViewModel>();
+                viewModel.SamplesAndResultsTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.SamplesAndResults).Select(vm => new ReportElementTypeViewModel
+                                                                                                                                                                      {
+                                                                                                                                                                          Id = vm.ReportElementTypeId,
+                                                                                                                                                                          Name = vm.Name,
+                                                                                                                                                                          Description = vm.Description
+                                                                                                                                                                      }).ToList();
                 viewModel.AttachmentTypes                        = new List<ReportElementTypeViewModel>();
                 viewModel.CertificationTypes                     = new List<ReportElementTypeViewModel>();
                 viewModel.ReportPackageTemplateAssignments       = new List<IndustryViewModel>();
                 viewModel.ReportPackageTemplateElementCategories = _reportTemplateService.GetReportElementCategoryNames().ToList();
+                viewModel.EffectiveDateTimeLocal                 = DateTime.Today;
             }
+
+            viewModel.AllSamplesAndResultsTypes = new List<ReportElementTypeViewModel>();
 
             viewModel.AllAttachmentTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments).Select(vm => new ReportElementTypeViewModel
                                                              {
@@ -2325,12 +2333,13 @@ namespace Linko.LinkoExchange.Web.Controllers
             
             // CtsEventTypes
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
-            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes().Select(c => new SelectListItem
-                                                                                                     {
-                                                                                                         Text = c.Name,
-                                                                                                         Value = c.CtsEventTypeId.ToString(),
-                                                                                                         Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
-                                                                                                     }).ToList();
+            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes().OrderBy(c => c.CtsEventCategoryName).Select(c => new SelectListItem
+                                                                                                                                          {
+                                                                                                                                              Text = $"({c.CtsEventCategoryName}) {c.Name}",
+                                                                                                                                              Value = c.CtsEventTypeId.ToString(),
+                                                                                                                                              Selected =
+                                                                                                                                                  c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
+                                                                                                                                          }).ToList();
 
             viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select CTS Event Type", Value = "0"});
 

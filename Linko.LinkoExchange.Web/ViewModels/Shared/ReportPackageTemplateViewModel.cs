@@ -53,6 +53,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = "Samples And Results")]
         public List<ReportElementTypeViewModel> SamplesAndResultsTypes { get; set; }
+        public List<ReportElementTypeViewModel> AllSamplesAndResultsTypes { private get; set; }
+        public List<ReportElementTypeViewModel> AvailableSamplesAndResultsTypes => AllSamplesAndResultsTypes.Where(a => SamplesAndResultsTypes.All(b => a.Id != b.Id)).ToList();
         
         [Display(Name = "Attachments")]
         public List<ReportElementTypeViewModel> AttachmentTypes { get; set; }

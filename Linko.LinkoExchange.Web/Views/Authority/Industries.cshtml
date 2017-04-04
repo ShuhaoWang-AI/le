@@ -50,8 +50,8 @@
                                     .HeaderHtmlAttributes(new { @class = "col-sm-4" })
                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
                             columns.Bound(c => c.Classification)
-                                    .HtmlAttributes(new { @class = "col-sm-1" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-1" })
+                                    .HtmlAttributes(attributes:new {style = "width:80px;"})
+                                    .HeaderHtmlAttributes(attributes:new {style = "width:80px;"})
                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
                             columns.Bound(c => c.IsEnabledText)
                                     .HtmlAttributes(new { @class = "col-sm-1" })

@@ -329,6 +329,7 @@
     <Content Include="Content\iCheck\square\yellow.css" />
     <Content Include="Content\iCheck\square\yellow.png" />
     <Content Include="Content\iCheck\square\_all.css" />
+    <Content Include="Content\Images\handle.png" />
     <Content Include="Content\Images\logo-min.png" />
     <Content Include="Content\Images\logo.png" />
     <Content Include="Content\site.css" />
