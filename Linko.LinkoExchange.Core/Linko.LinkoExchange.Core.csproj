@@ -141,6 +141,8 @@
     <Compile Include="Enum\CromerrEvent.cs" />
     <Compile Include="Enum\EmailType.cs" />
     <Compile Include="Enum\InvitationError.cs" />
+    <Compile Include="Enum\LimitBasisName.cs" />
+    <Compile Include="Enum\LimitTypeName.cs" />
     <Compile Include="Enum\LinkoExchangeError.cs" />
     <Compile Include="Enum\InvitationType.cs" />
     <Compile Include="Enum\RegistrationResult.cs" />

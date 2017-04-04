@@ -15,17 +15,23 @@ namespace Linko.LinkoExchange.Services.Dto
         public int CtsEventTypeId { get; set; }
         public string CtsEventTypeName { get; set; }
         public string CtsEventCategoryName { get; set; }
-        public DateTime SampleStartDateLocal { get; set; }
-        public DateTime SampleEndDateLocal { get; set; }
         public int CollectionMethodId { get; set; }
         public string CollectionMethodName { get; set; }
-        public DateTime LastModificationDateTimeLocal { get; set; }
-        public string LastModifierFullName { get; set; }
+        public string LabSampleIdentifier { get; set; }
+        public DateTime StartDateLocal { get; set; }
+        public DateTime EndDateLocal { get; set; }
+        public bool IsCalculated { get; set; }
         public int SampleStatusId { get; set; }
         public string SampleStatusName { get; set; }
-        public string LabSampleId { get; set; }
-		public double? MassLoadingConversionFactor { get; set; }
-        public int MassLoadingUnitId { get; set; }
+        public int OrganizationTypeId { get; set; }
+        public int OrganizationRegulatoryProgramId { get; set; }
+        public DateTime LastModificationDateTimeLocal { get; set; }
+        public string LastModifierFullName { get; set; }
+        
+        public double FlowValue { get; set; }
+        public int FlowValueDecimalPlaces { get; set; }
+        public int FlowUnitId { get; set; }
+        public string FlowUnitName { get; set; }
         public IEnumerable<SampleResultDto> SampleResults { get; set; }
     }
 }

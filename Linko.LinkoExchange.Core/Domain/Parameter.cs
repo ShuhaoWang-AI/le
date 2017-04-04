@@ -25,6 +25,8 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public double? TrcFactor { get; set; }
 
+        public bool IsFlowForMassLoadingCalculation { get; set; }
+
         /// <summary>
         /// Typical value: Authority Organization Regulatory Program id.
         /// </summary>

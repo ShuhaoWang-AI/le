@@ -26,6 +26,6 @@ namespace Linko.LinkoExchange.Services.Dto
         
         //UC-15-3.1.3: If the parameter has a mass limit at the Monitoring Point it also checks the "Calc Mass Loadings" box
         public bool IsCalcMassLoading { get; set; }
-        
+
     }
 }

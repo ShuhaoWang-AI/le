@@ -26,6 +26,8 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public double? Value { get; set; }
 
+        public int DecimalPlaces { get; set; }
+
         public int UnitId { get; set; }
 
         /// <summary>

@@ -14,6 +14,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using Linko.LinkoExchange.Services.Cache;
+using System.Collections.ObjectModel;
+using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Services.Sample
 {
@@ -43,16 +45,17 @@ namespace Linko.LinkoExchange.Services.Sample
             _settings = settings;
         }
 
-        public int SaveSample(SampleDto sample)
+        public int SaveSample(SampleDto sampleDto)
         {
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
+            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
             var sampleIdToReturn = -1;
             List<RuleViolation> validationIssues = new List<RuleViolation>();
 
             //Check required fields
-            if (string.IsNullOrEmpty(sample.Name))
+            if (string.IsNullOrEmpty(sampleDto.Name))
             {
                 string message = "Name is required.";
                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
@@ -65,33 +68,37 @@ namespace Linko.LinkoExchange.Services.Sample
                 try
                 {
                     //Find existing Sample with same Name
-                    string proposedSampleName = sample.Name.Trim().ToLower();
+                    string proposedSampleName = sampleDto.Name.Trim().ToLower();
                     var samplesWithMatchingName = _dbContext.Samples
                         .Where(s => s.Name.Trim().ToLower() == proposedSampleName
                                 && s.OrganizationRegulatoryProgramId == authOrgRegProgramId);
 
                     Core.Domain.Sample sampleToPersist = null;
 
-                    if (sample.SampleId.HasValue && sample.SampleId.Value > 0)
+                    if (sampleDto.SampleId.HasValue && sampleDto.SampleId.Value > 0)
                     {
                         //Ensure there are no other samples with same name
                         foreach (var sampleWithMatchingName in samplesWithMatchingName)
                         {
-                            if (sampleWithMatchingName.SampleId != sample.SampleId.Value)
+                            if (sampleWithMatchingName.SampleId != sampleDto.SampleId.Value)
                             {
-                                string message = "A Sample with that name already exists.  Please select another name.";
+                                string message = "A Sample with that name already exists. Please select another name.";
                                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                             }
                         }
 
                         //Update existing
-                        sampleToPersist = _dbContext.Samples.Single(c => c.SampleId == sample.SampleId);
-                        //sampleToPersist = _mapHelper.GetSampleFromSampleDto(sample, sampleToPersist);
+                        sampleToPersist = _dbContext.Samples.Single(c => c.SampleId == sampleDto.SampleId);
+                        sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto, sampleToPersist);
                         sampleToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
                         sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                         sampleToPersist.LastModifierUserId = currentUserId;
 
+                        //Delete existing results
+                        var existingSampleResults = _dbContext.SampleResults
+                            .Where(sr => sr.SampleId == sampleDto.SampleId);
+                        _dbContext.SampleResults.RemoveRange(existingSampleResults);
                     }
                     else
                     {
@@ -104,16 +111,77 @@ namespace Linko.LinkoExchange.Services.Sample
                         }
 
                         //Get new
-                        //sampleToPersist = _mapHelper.GetSampleFromSampleDto(sample);
+                        sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto);
                         sampleToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
+                        sampleToPersist.StartDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.StartDateLocal, timeZoneId);
+                        sampleToPersist.EndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.EndDateLocal, timeZoneId);
                         sampleToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
                         sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                         sampleToPersist.LastModifierUserId = currentUserId;
                         _dbContext.Samples.Add(sampleToPersist);
                     }
-                    _dbContext.SaveChanges();
+
+
+                    _dbContext.SaveChanges(); //Needed here?
 
                     sampleIdToReturn = sampleToPersist.SampleId;
+
+                    //Add results
+                    sampleToPersist.SampleResults = new Collection<SampleResult>();
+                    //
+                    //Add flow result first
+                    var ppdUnitId = _dbContext.Units.Single(u => u.Name == sampleDto.FlowUnitName).UnitId;
+                    var flowParameter = _dbContext.Parameters
+                        .First(p => p.IsFlowForMassLoadingCalculation == true); //Chris: "Should be one but just get first".
+
+                    var flowResult = new SampleResult() {
+                        SampleId = sampleIdToReturn
+                        ,ParameterId = flowParameter.ParameterId
+                        ,ParameterName = flowParameter.Name
+                        ,Qualifier = ""
+                        ,Value = sampleDto.FlowValue
+                        ,DecimalPlaces = sampleDto.FlowValueDecimalPlaces
+                        ,UnitId = ppdUnitId
+                        ,UnitName = sampleDto.FlowUnitName
+                        ,IsFlowForMassLoadingCalculation = true
+                        ,LimitTypeId = null
+                        ,LimitBasisId = null
+                        ,IsCalculated = false
+                    };
+                    sampleToPersist.SampleResults.Add(flowResult);
+
+                    //Add "regular" sample results
+                    var massLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Mass.ToString()).LimitBasisId;
+                    var concentrationLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Mass.ToString()).LimitBasisId;
+                    var dailyLimitTypeId = _dbContext.LimitTypes.Single(lt => lt.Name == LimitTypeName.DailyLimit.ToString()).LimitTypeId;
+                    foreach (var resultDto in sampleDto.SampleResults)
+                    {
+                        //Concentration result
+                        var sampleResult = _mapHelper.GetConcentrationSampleResultFromSampleResultDto(resultDto);
+                        sampleResult.AnalysisDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                        sampleResult.LimitBasisId = concentrationLimitBasisId;
+                        sampleResult.LimitTypeId = dailyLimitTypeId;
+                        sampleResult.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+                        sampleResult.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                        sampleResult.LastModifierUserId = currentUserId;
+
+                        sampleToPersist.SampleResults.Add(sampleResult);
+
+                        //Mass result (if calculated)
+                        if (resultDto.IsCalcMassLoading)
+                        {
+                            var sampleMassResult = _mapHelper.GetMassSampleResultFromSampleResultDto(resultDto);
+                            sampleMassResult.LimitBasisId = massLimitBasisId;
+                            sampleMassResult.LimitTypeId = dailyLimitTypeId;
+                            sampleMassResult.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+                            sampleMassResult.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                            sampleMassResult.LastModifierUserId = currentUserId;
+
+                            sampleToPersist.SampleResults.Add(sampleMassResult);
+                        }
+                    }
+
+                    _dbContext.SaveChanges();
 
                     transaction.Commit();
                 }
@@ -207,11 +275,11 @@ namespace Linko.LinkoExchange.Services.Sample
             var dto = _mapHelper.GetSampleDtoFromSample(sample);
 
             //Set Sample Start Local Timestamp
-            dto.SampleStartDateLocal = _timeZoneService
+            dto.StartDateLocal = _timeZoneService
                     .GetLocalizedDateTimeUsingThisTimeZoneId(sample.StartDateTimeUtc.DateTime, timeZoneId);
 
             //Set Sample End Local Timestamp
-            dto.SampleStartDateLocal = _timeZoneService
+            dto.StartDateLocal = _timeZoneService
                     .GetLocalizedDateTimeUsingThisTimeZoneId(sample.EndDateTimeUtc.DateTime, timeZoneId);
 
             //Set LastModificationDateTimeLocal

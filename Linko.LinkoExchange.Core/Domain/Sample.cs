@@ -47,17 +47,13 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public DateTimeOffset EndDateTimeUtc { get; set; }
 
-        public double? MassLoadingConversionFactor { get; set; }
-
-        public int? MassLoadingDecimalPlaces { get; set; }
-
         public bool IsCalculated { get; set; }
 
         public int SampleStatusId { get; set; }
         public virtual SampleStatus SampleStatus { get; set; }
 
-        public int OrgTypeId { get; set; }
-        public virtual OrganizationType OrgType { get; set; }
+        public int OrganizationTypeId { get; set; }
+        public virtual OrganizationType OrganizationType { get; set; }
 
         /// <summary>
         /// Typical value: Industry Regulatory Program id.

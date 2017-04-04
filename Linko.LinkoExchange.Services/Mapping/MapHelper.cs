@@ -947,8 +947,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.CollectionMethodName = sample.CollectionMethodName;
             dto.SampleStatusId = sample.SampleStatusId;
             dto.SampleStatusName = sample.SampleStatus.Name;
-            dto.LabSampleId = sample.LabSampleIdentifier;
-            dto.MassLoadingConversionFactor = sample.MassLoadingConversionFactor;
+            dto.LabSampleIdentifier = sample.LabSampleIdentifier;
 
             //Handle this in calling code
             //var resultDtos = new List<SampleResultDto>();
@@ -959,6 +958,31 @@ namespace Linko.LinkoExchange.Services.Mapping
             //dto.SampleResults = resultDtos;
 
             return dto;
+        }
+        public Core.Domain.Sample GetSampleFromSampleDto(SampleDto sampleDto, Core.Domain.Sample existingSample = null)
+        {
+            if (existingSample == null)
+            {
+                existingSample = new Core.Domain.Sample();
+            }
+
+            existingSample.Name = sampleDto.Name;
+            existingSample.MonitoringPointId = sampleDto.MonitoringPointId;
+            existingSample.MonitoringPointName = sampleDto.MonitoringPointName;
+            existingSample.CtsEventTypeId = sampleDto.CtsEventTypeId;
+            existingSample.CtsEventTypeName = sampleDto.CtsEventTypeName;
+            existingSample.CtsEventCategoryName = sampleDto.CtsEventCategoryName;
+            existingSample.CollectionMethodId = sampleDto.CollectionMethodId;
+            existingSample.CollectionMethodName = sampleDto.CollectionMethodName;
+            existingSample.LabSampleIdentifier = sampleDto.LabSampleIdentifier;
+            //existingSample.StartDateTimeUtc = sampleDto.StartDateTimeUtc;
+            //existingSample.EndDateTimeUtc = sampleDto.EndDateTimeUtc;
+            existingSample.IsCalculated = sampleDto.IsCalculated;
+            existingSample.SampleStatusId = sampleDto.SampleStatusId;
+            existingSample.OrganizationTypeId = sampleDto.OrganizationTypeId;
+            existingSample.OrganizationRegulatoryProgramId = sampleDto.OrganizationRegulatoryProgramId;
+
+            return existingSample;
         }
 
         public SampleResultDto GetSampleResultDtoFromSampleResult(SampleResult sampleResult)
@@ -979,8 +1003,6 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.AnalysisMethod = sampleResult.AnalysisMethod;
             //dto.AnalysisDateTimeLocal = set outside MapHelper
             dto.IsApprovedEPAMethod = sampleResult.IsApprovedEPAMethod;
-            dto.IsMassLoadingCalculationRequired = sampleResult.IsMassLoadingCalculationRequired;
-            dto.IsFlowForMassLoadingCalculation = sampleResult.IsFlowForMassLoadingCalculation;
             dto.IsCalculated = sampleResult.IsCalculated;
             dto.LimitTypeId = sampleResult.LimitTypeId;
             dto.LimitBasisId = sampleResult.LimitBasisId;
@@ -989,5 +1011,65 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             return dto;
         }
+
+        public SampleResult GetConcentrationSampleResultFromSampleResultDto(SampleResultDto dto)
+        {
+             var concentrationResult = new SampleResult()
+            {
+                SampleId = dto.SampleId
+                ,ParameterId = dto.ParameterId
+                ,ParameterName = dto.ParameterName
+                ,Qualifier = dto.Qualifier
+                ,Value = dto.Value
+                ,DecimalPlaces = dto.DecimalPlaces
+                ,UnitId = dto.UnitId
+                ,UnitName = dto.UnitName
+                ,MethodDetectionLimit = dto.MethodDetectionLimit
+                //,AnalysisDateTimeUtc = set outside after calling line
+                ,IsApprovedEPAMethod = dto.IsApprovedEPAMethod
+                ,IsMassLoadingCalculationRequired = false
+                ,IsFlowForMassLoadingCalculation = false
+                ,IsCalculated = false
+                 //,LimitTypeId = set outside after calling line
+                 //,LimitBasisId = set outside after calling line
+                 //,CreationDateTimeUtc = set outside after calling line
+                 //,LastModificationDateTimeUtc = set outside after calling line
+                 //,LastModifierUserId = set outside after calling line
+
+             };
+
+            return concentrationResult;
+        }
+
+        public SampleResult GetMassSampleResultFromSampleResultDto(SampleResultDto dto)
+        {
+            var massResult = new SampleResult()
+            {
+                SampleId = dto.SampleId
+                ,ParameterId = dto.ParameterId
+                ,ParameterName = dto.ParameterName
+                ,Qualifier = dto.MassLoadingQualifier
+                ,Value = dto.MassLoadingValue
+                ,DecimalPlaces = dto.MassLoadingDecimalPlaces
+                ,UnitId = dto.MassLoadingUnitId
+                ,UnitName = dto.MassLoadingUnitName
+                ,MethodDetectionLimit = dto.MethodDetectionLimit
+                //,AnalysisDateTimeUtc = set outside after calling line
+                ,IsApprovedEPAMethod = dto.IsApprovedEPAMethod
+                ,IsMassLoadingCalculationRequired = true
+                ,IsFlowForMassLoadingCalculation = false
+                ,IsCalculated = false
+                 //,LimitTypeId = set outside after calling line
+                 //,LimitBasisId = set outside after calling line
+                 //,CreationDateTimeUtc = set outside after calling line
+                 //,LastModificationDateTimeUtc = set outside after calling line
+                 //,LastModifierUserId = set outside after calling line
+            };
+
+            
+
+            return massResult;
+        }
+
     }
 }

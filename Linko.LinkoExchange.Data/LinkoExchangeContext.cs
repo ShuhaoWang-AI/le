@@ -87,7 +87,9 @@ namespace Linko.LinkoExchange.Data
         public DbSet<SampleFrequency> SampleFrequencies { get; set; }
         public DbSet<MonitoringPointParameter> MonitoringPointParameters { get; set; }
         public DbSet<CollectionMethod> CollectionMethods { get; set; }
-
+        public DbSet<Unit> Units { get; set; }
+        public DbSet<LimitBasis> LimitBases { get; set; }
+        public DbSet<LimitType> LimitTypes { get; set; }
         #endregion
 
 

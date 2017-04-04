@@ -164,26 +164,26 @@ namespace Linko.LinkoExchange.Services.Parameter
             var orgRegProgramId = paramDto.OrganizationRegulatoryProgramId;
             var parameterId = paramDto.ParameterId;
 
-            var foundMonitoringPointParameterLimit = _dbContext.MonitoringPointParameterLimits
-                .Include(mppl => mppl.MonitoringPointParameter)
-                .Include(mppl => mppl.MonitoringPointParameter.DefaultUnit)
-                .Include(mppl => mppl.LimitBasis)
-                .Include(mppl => mppl.LimitType)
-                .FirstOrDefault(mppl => mppl.MonitoringPointParameter.OrganizationRegulatoryProgramId == orgRegProgramId
-                    && mppl.MonitoringPointParameter.MonitoringPointId == monitoringPointId
-                    && mppl.MonitoringPointParameter.ParameterId == parameterId
-                    && mppl.MonitoringPointParameter.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
-                    && mppl.MonitoringPointParameter.RetireDateTimeUtc >= sampleEndDateTimeUtc);
+            //Check MonitoringPointParameter table
+            var foundMonitoringPointParameter = _dbContext.MonitoringPointParameters
+                .Include(mppl => mppl.DefaultUnit)
+                .FirstOrDefault(mppl => mppl.OrganizationRegulatoryProgramId == orgRegProgramId
+                    && mppl.MonitoringPointId == monitoringPointId
+                    && mppl.ParameterId == parameterId
+                    && mppl.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
+                    && mppl.RetireDateTimeUtc >= sampleEndDateTimeUtc);
 
-            if (foundMonitoringPointParameterLimit != null)
+            if (foundMonitoringPointParameter != null)
             {
-                paramDto.DefaultUnit = _mapHelper.GetUnitDtoFromUnit(foundMonitoringPointParameterLimit.MonitoringPointParameter.DefaultUnit);
+                paramDto.DefaultUnit = _mapHelper.GetUnitDtoFromUnit(foundMonitoringPointParameter.DefaultUnit);
                 paramDto.IsCalcMassLoading = _dbContext.MonitoringPointParameterLimits
                     .Include(mppl => mppl.LimitBasis)
                     .Include(mppl => mppl.LimitType)
-                    .Any(mppl => mppl.MonitoringPointParameterId == foundMonitoringPointParameterLimit.MonitoringPointParameterId
-                        && mppl.LimitBasis.Name == "Mass" && mppl.LimitType.Name == "Daily");
+                    .Any(mppl => mppl.MonitoringPointParameterId == foundMonitoringPointParameter.MonitoringPointParameterId
+                        && mppl.LimitBasis.Name == LimitBasisName.Mass.ToString() && mppl.LimitType.Name == LimitTypeName.DailyLimit.ToString());
+
             }
+
         }
 
         /// <summary>

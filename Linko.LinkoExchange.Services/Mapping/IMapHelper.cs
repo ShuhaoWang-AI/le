@@ -56,6 +56,9 @@ namespace Linko.LinkoExchange.Services.Mapping
         MonitoringPointDto GetMonitoringPointDtoFromMonitoringPoint(Core.Domain.MonitoringPoint mp);
 
         SampleDto GetSampleDtoFromSample(Core.Domain.Sample sample);
+        Core.Domain.Sample GetSampleFromSampleDto(SampleDto sampleDto, Core.Domain.Sample existingSample = null);
         SampleResultDto GetSampleResultDtoFromSampleResult(SampleResult sampleResult);
+        SampleResult GetConcentrationSampleResultFromSampleResultDto(SampleResultDto dto);
+        SampleResult GetMassSampleResultFromSampleResultDto(SampleResultDto dto);
     }
 }
