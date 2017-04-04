@@ -91,8 +91,6 @@ namespace Linko.LinkoExchange.Data
         public DbSet<LimitBasis> LimitBases { get; set; }
         public DbSet<LimitType> LimitTypes { get; set; }
 
-        public DbSet<Unit> Units { get; set; }
-
         #endregion
 
 
