@@ -130,7 +130,6 @@ namespace Linko.LinkoExchange.Services.Sample
                     sampleToPersist.SampleResults = new Collection<SampleResult>();
                     //
                     //Add flow result first
-                    var ppdUnitId = _dbContext.Units.Single(u => u.Name == sampleDto.FlowUnitName).UnitId;
                     var flowParameter = _dbContext.Parameters
                         .First(p => p.IsFlowForMassLoadingCalculation == true); //Chris: "Should be one but just get first".
 
@@ -141,7 +140,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         ,Qualifier = ""
                         ,Value = sampleDto.FlowValue
                         ,DecimalPlaces = sampleDto.FlowValueDecimalPlaces
-                        ,UnitId = ppdUnitId
+                        ,UnitId = sampleDto.FlowUnitId
                         ,UnitName = sampleDto.FlowUnitName
                         ,IsFlowForMassLoadingCalculation = true
                         ,LimitTypeId = null
