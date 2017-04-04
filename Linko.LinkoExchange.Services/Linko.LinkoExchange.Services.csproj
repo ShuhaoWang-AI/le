@@ -117,7 +117,6 @@
     <Compile Include="Dto\CorFileDtoBase.cs" />
     <Compile Include="Dto\CorManifestFileDato.cs" />
     <Compile Include="Dto\CorPreviewFileDto.cs" />
-    <Compile Include="Dto\IReportPackageService.cs" />
     <Compile Include="Dto\ReportPackageELementTypeDto.cs" />
     <Compile Include="FileStore\FileStoreService.cs" />
     <Compile Include="FileStore\IFileStoreService.cs" />
@@ -180,6 +179,7 @@
     <Compile Include="Dto\ReportPackageTemplateElementCategoryDto.cs" />
     <Compile Include="MonitoringPoint\IMonitoringPointService.cs" />
     <Compile Include="MonitoringPoint\MonitoringPointService.cs" />
+    <Compile Include="Report\IReportPackageService.cs" />
     <Compile Include="Report\IReportTemplateService.cs" />
     <Compile Include="Dto\ReportPackageTemplateDto.cs" />
     <Compile Include="Report\ReportElementService.cs" />
@@ -200,6 +200,7 @@
     <Compile Include="QuestionAnswer\IEncryptionService.cs" />
     <Compile Include="QuestionAnswer\StringCipher.cs" />
     <Compile Include="Report\IReportElementService.cs" />
+    <Compile Include="Report\ReportPackageServiceMock.cs" />
     <Compile Include="Report\ReportTemplateService.cs" />
     <Compile Include="Sample\ISampleService.cs" />
     <Compile Include="Sample\SampleService.cs" />
@@ -209,6 +210,8 @@
     <Compile Include="QuestionAnswer\IQuestionAnswerService.cs" />
     <Compile Include="TimeZone\ITimeZoneService.cs" />
     <Compile Include="TimeZone\TimeZoneService.cs" />
+    <Compile Include="Unit\IUnitService.cs" />
+    <Compile Include="Unit\UnitService.cs" />
     <Compile Include="User\IUserService.cs" />
     <Compile Include="QuestionAnswer\QuestionAnswerService.cs" />
     <Compile Include="User\UserService.cs" />

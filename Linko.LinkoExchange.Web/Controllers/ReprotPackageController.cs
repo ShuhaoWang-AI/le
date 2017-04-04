@@ -10,6 +10,7 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.Unit;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -22,11 +23,13 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IReportTemplateService _reportTemplateService;
         private readonly ISettingService _settingService;
         private readonly IHttpContextService _httpContextService;
+        private readonly IUnitService _unitService;
 
         public ReprotPackageController(
             IReportTemplateService reportTemplateService,
             ISettingService settingService,
-            IHttpContextService httpContextService)
+            IHttpContextService httpContextService,
+            IUnitService unitService)
         {
             if (reportTemplateService == null)
             {
@@ -36,6 +39,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _reportTemplateService = reportTemplateService;
             _settingService = settingService;
             _httpContextService = httpContextService;
+            _unitService = unitService;
         }
         // GET: ReprotPackage 
         public JsonResult Index()
@@ -120,6 +124,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             var settings = _settingService.GetSettingTemplateValue(SettingType.SampleNameCreationRule);
 
             return Json(settings, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetUnits()
+        {
+            var units = _unitService.GetFlowUnits();
+            return Json(units, JsonRequestBehavior.AllowGet);
         }
 
     }

@@ -462,7 +462,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             return parameterGroup;
         }
 
-        public UnitDto GetUnitDtoFromUnit(Unit unit)
+        public UnitDto GetUnitDtoFromUnit(Core.Domain.Unit unit)
         {
             var unitDto = new UnitDto();
             unitDto.UnitId = unit.UnitId;

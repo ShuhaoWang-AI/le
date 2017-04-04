@@ -29,6 +29,7 @@ using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Web.ViewModels.User;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Parameter;
+using Linko.LinkoExchange.Services.Unit;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -121,6 +122,8 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<ICromerrAuditLogService, CromerrAuditLogService>();
             container.RegisterType<IReportTemplateService, ReportTemplateService>();
             container.RegisterType<IFileStoreService, FileStoreService>();
+            container.RegisterType<IUnitService, UnitService>();
+            container.RegisterType<IReportPackageService, ReportPackageServiceMock>();
         }
     }
 }
