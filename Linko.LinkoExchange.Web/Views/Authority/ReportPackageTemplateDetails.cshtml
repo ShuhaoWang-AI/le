@@ -578,7 +578,7 @@
                                 , { "targets": [0], "visible": false, "searchable": false }
                                 , {
                                     "defaultContent":
-                                        "<button class='btn btn-primary btn-sm' id='btnSamplesAndResults' disabled='disabled'><i class='fa fa-plus'></i></button>"
+                                        "<button class='btn btn-primary btn-sm' id='btnAddSamplesAndResults' disabled='disabled'><i class='fa fa-plus'></i></button>"
                                     , "targets": 3
                                 }
                             ]
@@ -813,5 +813,188 @@
                     );
             });
 
+        $(document)
+            .on('click'
+                , "button[id^='btnAddSamplesAndResults']"
+                , function()
+                {
+                    var tableMoveFrom = $('#availableSamplesAndResultsTable').DataTable();
+
+                    var data = tableMoveFrom.row($(this).parents('tr')).data();
+
+                    var tableMoveTo = $('#selectedSamplesAndResultsTable').DataTable();
+                    var rowNode = tableMoveTo
+                        .row.add([null, data[0], data[1], data[2]])
+                        .draw()
+                        .node();
+
+                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+
+                    tableMoveFrom
+                        .row($(this).parents('tr'))
+                        .remove()
+                        .draw();
+                });
+
+        $(document)
+            .on('click'
+                , "button[id^='btnRemoveSamplesAndResults']"
+                , function()
+                {
+                    var tableMoveFrom = $('#selectedSamplesAndResultsTable').DataTable();
+
+                    var data = tableMoveFrom.row($(this).parents('tr')).data();
+
+                    var tableMoveTo = $('#availableSamplesAndResultsTable').DataTable();
+                    var rowNode = tableMoveTo
+                        .row.add([data[1], data[2], data[3]])
+                        .draw()
+                        .node();
+
+                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+
+                    tableMoveFrom
+                        .row($(this).parents('tr'))
+                        .remove()
+                        .draw();
+                });
+
+        $(document)
+            .on('click'
+                , "button[id^='btnAddAttachment']"
+                , function()
+                {
+                    var tableMoveFrom = $('#availableAttachmentTable').DataTable();
+
+                    var data = tableMoveFrom.row($(this).parents('tr')).data();
+
+                    var tableMoveTo = $('#selectedAttachmentTable').DataTable();
+                    var rowNode = tableMoveTo
+                        .row.add([null, data[0], data[1], data[2]])
+                        .draw()
+                        .node();
+
+                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+
+                    tableMoveFrom
+                        .row($(this).parents('tr'))
+                        .remove()
+                        .draw();
+                });
+
+        $(document)
+            .on('click'
+                , "button[id^='btnRemoveAttachment']"
+                , function()
+                {
+                    var tableMoveFrom = $('#selectedAttachmentTable').DataTable();
+
+                    var data = tableMoveFrom.row($(this).parents('tr')).data();
+
+                    var tableMoveTo = $('#availableAttachmentTable').DataTable();
+                    var rowNode = tableMoveTo
+                        .row.add([data[1], data[2], data[3]])
+                        .draw()
+                        .node();
+
+                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+
+                    tableMoveFrom
+                        .row($(this).parents('tr'))
+                        .remove()
+                        .draw();
+                });
+
+        $(document)
+            .on('click'
+                , "button[id^='btnAddCertification']"
+                , function()
+                {
+                    var tableMoveFrom = $('#availableCertificationTable').DataTable();
+
+                    var data = tableMoveFrom.row($(this).parents('tr')).data();
+
+                    var tableMoveTo = $('#selectedCertificationTable').DataTable();
+                    var rowNode = tableMoveTo
+                        .row.add([null, data[0], data[1], data[2]])
+                        .draw()
+                        .node();
+
+                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+
+                    tableMoveFrom
+                        .row($(this).parents('tr'))
+                        .remove()
+                        .draw();
+                });
+
+        $(document)
+            .on('click'
+                , "button[id^='btnRemoveCertification']"
+                , function()
+                {
+                    var tableMoveFrom = $('#selectedCertificationTable').DataTable();
+
+                    var data = tableMoveFrom.row($(this).parents('tr')).data();
+
+                    var tableMoveTo = $('#availableCertificationTable').DataTable();
+                    var rowNode = tableMoveTo
+                        .row.add([data[1], data[2], data[3]])
+                        .draw()
+                        .node();
+
+                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+
+                    tableMoveFrom
+                        .row($(this).parents('tr'))
+                        .remove()
+                        .draw();
+                });
+
+        $(document)
+            .on('click'
+                , "button[id^='btnAddIndustry']"
+                , function()
+                {
+                    var tableMoveFrom = $('#availableIndustryTable').DataTable();
+
+                    var data = tableMoveFrom.row($(this).parents('tr')).data();
+
+                    var tableMoveTo = $('#selectedIndustryTable').DataTable();
+                    var rowNode = tableMoveTo
+                        .row.add([data[0], data[1], data[2], data[3], data[4]])
+                        .draw()
+                        .node();
+
+                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+
+                    tableMoveFrom
+                        .row($(this).parents('tr'))
+                        .remove()
+                        .draw();
+                });
+
+        $(document)
+            .on('click'
+                , "button[id^='btnRemoveIndustry']"
+                , function()
+                {
+                    var tableMoveFrom = $('#selectedIndustryTable').DataTable();
+
+                    var data = tableMoveFrom.row($(this).parents('tr')).data();
+
+                    var tableMoveTo = $('#availableIndustryTable').DataTable();
+                    var rowNode = tableMoveTo
+                        .row.add([data[0], data[1], data[2], data[3], data[4]])
+                        .draw()
+                        .node();
+
+                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+
+                    tableMoveFrom
+                        .row($(this).parents('tr'))
+                        .remove()
+                        .draw();
+                });
     </script>
 }

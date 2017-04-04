@@ -279,22 +279,20 @@
                 , "button[id^='btnAddParameter']"
                 , function()
                 {
-                    var availableParameterTable = $('#availableParameterTable').DataTable();
+                    var tableMoveFrom = $('#availableParameterTable').DataTable();
 
-                    var data = availableParameterTable.row($(this).parents('tr')).data();
-                    var paramId = data[0];
-                    var paramName = data[1];
+                    var data = tableMoveFrom.row($(this).parents('tr')).data();
 
-                    availableParameterTable
+                    var tableMoveTo = $('#selectedParameterTable').DataTable();
+                    var rowNode = tableMoveTo
+                        .row.add([data[0], data[1]])
+                        .draw()
+                        .node();
+
+                    tableMoveFrom
                         .row($(this).parents('tr'))
                         .remove()
                         .draw();
-
-                    var selectedParameterTable = $('#selectedParameterTable').DataTable();
-                    var rowNode = selectedParameterTable
-                        .row.add([paramId, paramName])
-                        .draw()
-                        .node();
 
                     $(rowNode).css('color', 'green').animate({ color: 'black' });
                 });
@@ -304,22 +302,20 @@
                 , "button[id^='btnRemoveParameter']"
                 , function()
                 {
-                    var selectedParameterTable = $('#selectedParameterTable').DataTable();
+                    var tableMoveFrom = $('#selectedParameterTable').DataTable();
 
-                    var data = selectedParameterTable.row($(this).parents('tr')).data();
-                    var paramId = data[0];
-                    var paramName = data[1];
+                    var data = tableMoveFrom.row($(this).parents('tr')).data();
 
-                    selectedParameterTable
+                    var tableMoveTo = $('#availableParameterTable').DataTable();
+                    var rowNode = tableMoveTo
+                        .row.add([data[0], data[1]])
+                        .draw()
+                        .node();
+
+                    tableMoveFrom
                         .row($(this).parents('tr'))
                         .remove()
                         .draw();
-
-                    var availableParameterTable = $('#availableParameterTable').DataTable();
-                    var rowNode = availableParameterTable
-                        .row.add([paramId, paramName])
-                        .draw()
-                        .node();
 
                     $(rowNode).css('color', 'green').animate({ color: 'black' });
                 });
