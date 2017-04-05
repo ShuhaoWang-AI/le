@@ -566,11 +566,6 @@ namespace Linko.LinkoExchange.Services.Report
 
                 _dbContext.ReportPackageTemplateElementCategories.Remove(temp);
             }
-
-
-            var t =
-                rpt.ReportPackageTemplateElementCategories.Where(
-                    i => i.ReportPackageTemplateId == rpt.ReportPackageTemplateId).ToList();
         }
 
         public CtsEventTypeDto GetCtsEventType(int ctsEventTypeId)
