@@ -12,6 +12,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Attachment
             get; set;
         }
 
+        public string MediaType { get; set; }
+
         public string OriginFileName { get; set; }
 
         public string AttachmentTypeName

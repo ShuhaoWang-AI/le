@@ -29,13 +29,6 @@ namespace Linko.LinkoExchange.Services.FileStore
         private const int MaxFileSize = 1024 * 1024 * 10;
         private const int SizeToReduce = 1024 * 1024 * 2;
 
-        // TODO to get from table tFileType
-        private readonly string[] _validExtensions =
-        {
-            ".docx", ".doc", ".xls", ".xlsx", ".pdf", ".tif",
-            ".jpg", ".jpeg", ".bmp", ".png", ".txt", ".csv"
-        };
-
         public FileStoreService(
             LinkoExchangeContext dbContext,
             IMapHelper mapHelper,
@@ -77,7 +70,12 @@ namespace Linko.LinkoExchange.Services.FileStore
 
         public List<string> GetValidAttachmentFileExtensions()
         {
-            return new List<string>(_validExtensions);
+            _logger.Info("Enter FileStoreService.GetValidAttachmentFileExtensions.");
+
+            var fileTypes = _dbContext.FileTypes.Select(i => i.Extension);
+
+            _logger.Info("Leave FileStoreService.GetValidAttachmentFileExtensions.");
+            return new List<string>(fileTypes);
         }
 
         // TODO to get from table tFileType
@@ -89,12 +87,12 @@ namespace Linko.LinkoExchange.Services.FileStore
                 return false;
             }
 
-            if (ext.StartsWith("."))
+            if (!ext.StartsWith("."))
             {
-                ext = ext.Substring(1);
+                ext = $".{ext}";
             }
-
-            return _validExtensions.Contains(ext);
+            var fileTypes = _dbContext.FileTypes.Select(i => i.Extension);
+            return fileTypes.Contains(ext);
         }
 
         public List<FileStoreDto> GetFileStores()
@@ -120,11 +118,32 @@ namespace Linko.LinkoExchange.Services.FileStore
         {
             _logger.Info("Enter FileStoreService.CreateFileStore.");
 
+            if (fileStoreDto.Data == null || fileStoreDto.Data.Length < 1)
+            {
+                List<RuleViolation> validationIssues = new List<RuleViolation>();
+                string message = "Empty file.";
+                validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+            }
+
             if (fileStoreDto.Data.Length > MaxFileSize)
             {
                 List<RuleViolation> validationIssues = new List<RuleViolation>();
 
                 string message = "The file size exceeds that 10 MB limit.";
+                validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+            }
+
+            var extension = Path.GetExtension(fileStoreDto.OriginalFileName);
+            var validFileTypes = _dbContext.FileTypes.ToList();
+            var validFileExtensions = validFileTypes.Select(i => i.Extension);
+
+            if (!validFileExtensions.Contains(extension))
+            {
+                List<RuleViolation> validationIssues = new List<RuleViolation>();
+
+                string message = "Not Supported File Format.";
                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
             }
@@ -137,8 +156,7 @@ namespace Linko.LinkoExchange.Services.FileStore
                     var currentRegulatoryProgramId =
                         int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
-                    // Try to reduce the image file size
-                    var extension = Path.GetExtension(fileStoreDto.OriginalFileName);
+                    // Try to reduce the image file size  
                     if (IsImageFile(extension) && fileStoreDto.Data.Length > SizeToReduce)
                     {
                         TryToReduceFileDataSize(fileStoreDto);
@@ -151,9 +169,8 @@ namespace Linko.LinkoExchange.Services.FileStore
 
                     fileStoreDto.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
                     fileStoreDto.UploaderUserId = currentUserId;
-
                     fileStoreDto.SizeByte = fileStoreDto.Data.Length;
-
+                    fileStoreDto.FileTypeId = validFileTypes.Single(i => i.Extension.ToLower().Equals(extension)).FileTypeId;
                     var fileName = Path.GetFileNameWithoutExtension(fileStoreDto.OriginalFileName);
                     fileStoreDto.Name = $"{fileName}_0{extension}";
 
@@ -322,7 +339,7 @@ namespace Linko.LinkoExchange.Services.FileStore
             fileStoreDto.UploalDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.UploalDateTimeLocal.DateTime, currentOrgRegProgramId);
 
             fileStoreDto.UploaderUserFullName = GetUserFullName(fileStoreDto.UploaderUserId);
-            //fileStoreDto.LastModifierUserFullName = GetUserFullName(fileStoreDto.LastModifierUserId);
+            fileStoreDto.LastModifierUserFullName = GetUserFullName(fileStoreDto.LastModifierUserId);
             fileStoreDto.LastModificationDateTimeLocal = _timeZoneService.
                 GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.LastModificationDateTimeLocal?.DateTime ?? fileStoreDto.UploalDateTimeLocal.DateTime, currentOrgRegProgramId);
             return fileStoreDto;

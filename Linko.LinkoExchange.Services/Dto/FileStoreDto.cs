@@ -9,6 +9,8 @@ namespace Linko.LinkoExchange.Services.Dto
         public string Description { get; set; }
         public string OriginalFileName { get; set; }
         public double SizeByte { get; set; }
+        public int FileTypeId { get; set; }
+        public string FileType { get; set; }
         public int ReportElementTypeId { get; set; }
         public string ReportElementTypeName { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
@@ -16,12 +18,10 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTimeOffset UploalDateTimeLocal { get; set; }
         public int? UploaderUserId { get; set; }
         public string UploaderUserFullName { get; set; }
-
-
-        //TODO:  Not in moakup, but in tables  
         public DateTimeOffset? LastModificationDateTimeLocal { get; set; }
         public int? LastModifierUserId { get; set; }
         public string LastModifierUserFullName { get; set; }
         public byte[] Data { get; set; }
+        public string MediaType { get; set; }
     }
 }

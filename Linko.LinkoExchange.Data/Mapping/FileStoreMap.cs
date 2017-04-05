@@ -25,6 +25,10 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasRequired(t => t.FileStoreData)
                 .WithRequiredPrincipal(fd => fd.FileStore);
+
+            HasRequired(t => t.FileType)
+                .WithMany()
+                .HasForeignKey(i => i.FileTypeId);
         }
     }
 }

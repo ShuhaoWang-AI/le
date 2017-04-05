@@ -84,6 +84,7 @@
     <Compile Include="Mapping\CtsEventTypeMap.cs" />
     <Compile Include="Mapping\EmailAuditLogMap.cs" />
     <Compile Include="Mapping\FileStoreDataMap.cs" />
+    <Compile Include="Mapping\FileTypeMap.cs" />
     <Compile Include="Mapping\InvitationMap.cs" />
     <Compile Include="Mapping\JurisdictionMap.cs" />
     <Compile Include="Mapping\FileStoreMap.cs" />

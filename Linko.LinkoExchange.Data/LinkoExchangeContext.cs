@@ -62,6 +62,7 @@ namespace Linko.LinkoExchange.Data
         public DbSet<ParameterGroupParameter> ParameterGroupParameters { get; set; }
 
         public DbSet<FileStore> FileStores { get; set; }
+        public DbSet<FileType> FileTypes { get; set; }
         public DbSet<FileStoreData> FileStoreDatas { get; set; }
         public DbSet<CopyOfRecord> CopyOfRecords { get; set; }
 

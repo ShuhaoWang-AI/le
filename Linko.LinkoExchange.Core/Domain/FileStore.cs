@@ -27,6 +27,10 @@ namespace Linko.LinkoExchange.Core.Domain
         /// </summary>
         public double SizeByte { get; set; }
 
+        public string MediaType { get; set; }
+        public int FileTypeId { get; set; }
+        public virtual FileType FileType { get; set; }
+
         public int ReportElementTypeId { get; set; }
 
         /// <summary>

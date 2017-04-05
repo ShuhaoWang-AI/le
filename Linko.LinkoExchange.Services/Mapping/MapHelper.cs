@@ -848,7 +848,9 @@ namespace Linko.LinkoExchange.Services.Mapping
                 FileStoreId = fileStore.FileStoreId,
                 Name = fileStore.Name,
                 Description = fileStore.Description,
+                MediaType = fileStore.MediaType,
                 OriginalFileName = fileStore.OriginalName,
+                FileTypeId = fileStore.FileTypeId,
                 SizeByte = fileStore.SizeByte,
                 ReportElementTypeId = fileStore.ReportElementTypeId,
                 ReportElementTypeName = fileStore.ReportElementTypeName,
@@ -857,12 +859,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                     GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(
                         fileStore.OrganizationRegulatoryProgram),
                 UploalDateTimeLocal = fileStore.UploadDateTimeUtc,
-                UploaderUserId = fileStore.UploaderUserId,
-
-                //TODO: wating for poco is finished
-                //LastModifierUserId = fileStore.LastModifierUserId; 
-                //LastModificationDateTimeLocal = fileStore.LastModificationDateTimeUtc;
-
+                UploaderUserId = fileStore.UploaderUserId
             };
         }
 
@@ -878,14 +875,13 @@ namespace Linko.LinkoExchange.Services.Mapping
                 Name = fileStoreDto.Name,
                 Description = fileStoreDto.Description,
                 OriginalName = fileStoreDto.OriginalFileName,
+                MediaType = fileStoreDto.MediaType,
                 SizeByte = fileStoreDto.SizeByte,
+                FileTypeId = fileStoreDto.FileTypeId,
                 ReportElementTypeId = fileStoreDto.ReportElementTypeId,
                 ReportElementTypeName = fileStoreDto.ReportElementTypeName,
                 OrganizationRegulatoryProgramId = fileStoreDto.OrganizationRegulatoryProgramId,
                 UploaderUserId = fileStoreDto.UploaderUserId
-
-                //TODO: wating for poco is finished
-                //LastModifierUserId = fileStoreDto.LastModifierUserId;  
             };
 
             if (fileStoreDto.FileStoreId.HasValue)
@@ -1000,29 +996,29 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public SampleResult GetConcentrationSampleResultFromSampleResultDto(SampleResultDto dto)
         {
-             var concentrationResult = new SampleResult()
+            var concentrationResult = new SampleResult()
             {
-                SampleId = dto.SampleId
-                ,ParameterId = dto.ParameterId
-                ,ParameterName = dto.ParameterName
-                ,Qualifier = dto.Qualifier
-                ,Value = dto.Value
-                ,DecimalPlaces = dto.DecimalPlaces
-                ,UnitId = dto.UnitId
-                ,UnitName = dto.UnitName
-                ,MethodDetectionLimit = dto.MethodDetectionLimit
+                SampleId = dto.SampleId,
+                ParameterId = dto.ParameterId,
+                ParameterName = dto.ParameterName,
+                Qualifier = dto.Qualifier,
+                Value = dto.Value,
+                DecimalPlaces = dto.DecimalPlaces,
+                UnitId = dto.UnitId,
+                UnitName = dto.UnitName,
+                MethodDetectionLimit = dto.MethodDetectionLimit,
                 //,AnalysisDateTimeUtc = set outside after calling line
-                ,IsApprovedEPAMethod = dto.IsApprovedEPAMethod
-                ,IsMassLoadingCalculationRequired = false
-                ,IsFlowForMassLoadingCalculation = false
-                ,IsCalculated = false
-                 //,LimitTypeId = set outside after calling line
-                 //,LimitBasisId = set outside after calling line
-                 //,CreationDateTimeUtc = set outside after calling line
-                 //,LastModificationDateTimeUtc = set outside after calling line
-                 //,LastModifierUserId = set outside after calling line
+                IsApprovedEPAMethod = dto.IsApprovedEPAMethod,
+                IsMassLoadingCalculationRequired = false,
+                IsFlowForMassLoadingCalculation = false,
+                IsCalculated = false
+                //,LimitTypeId = set outside after calling line
+                //,LimitBasisId = set outside after calling line
+                //,CreationDateTimeUtc = set outside after calling line
+                //,LastModificationDateTimeUtc = set outside after calling line
+                //,LastModifierUserId = set outside after calling line
 
-             };
+            };
 
             return concentrationResult;
         }
@@ -1031,28 +1027,28 @@ namespace Linko.LinkoExchange.Services.Mapping
         {
             var massResult = new SampleResult()
             {
-                SampleId = dto.SampleId
-                ,ParameterId = dto.ParameterId
-                ,ParameterName = dto.ParameterName
-                ,Qualifier = dto.MassLoadingQualifier
-                ,Value = dto.MassLoadingValue
-                ,DecimalPlaces = dto.MassLoadingDecimalPlaces
-                ,UnitId = dto.MassLoadingUnitId
-                ,UnitName = dto.MassLoadingUnitName
-                ,MethodDetectionLimit = dto.MethodDetectionLimit
-                //,AnalysisDateTimeUtc = set outside after calling line
-                ,IsApprovedEPAMethod = dto.IsApprovedEPAMethod
-                ,IsMassLoadingCalculationRequired = true
-                ,IsFlowForMassLoadingCalculation = false
-                ,IsCalculated = false
-                 //,LimitTypeId = set outside after calling line
-                 //,LimitBasisId = set outside after calling line
-                 //,CreationDateTimeUtc = set outside after calling line
-                 //,LastModificationDateTimeUtc = set outside after calling line
-                 //,LastModifierUserId = set outside after calling line
+                SampleId = dto.SampleId,
+                ParameterId = dto.ParameterId,
+                ParameterName = dto.ParameterName,
+                Qualifier = dto.MassLoadingQualifier,
+                Value = dto.MassLoadingValue,
+                DecimalPlaces = dto.MassLoadingDecimalPlaces,
+                UnitId = dto.MassLoadingUnitId,
+                UnitName = dto.MassLoadingUnitName,
+                MethodDetectionLimit = dto.MethodDetectionLimit,
+                //,AnalysisDateTimeUtc = set outside after calling line 
+                IsApprovedEPAMethod = dto.IsApprovedEPAMethod,
+                IsMassLoadingCalculationRequired = true,
+                IsFlowForMassLoadingCalculation = false,
+                IsCalculated = false
+                //,LimitTypeId = set outside after calling line
+                //,LimitBasisId = set outside after calling line
+                //,CreationDateTimeUtc = set outside after calling line
+                //,LastModificationDateTimeUtc = set outside after calling line
+                //,LastModifierUserId = set outside after calling line
             };
 
-            
+
 
             return massResult;
         }

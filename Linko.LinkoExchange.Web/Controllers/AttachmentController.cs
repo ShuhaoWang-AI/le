@@ -24,6 +24,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
+        public ActionResult GetFileTypes()
+        {
+            var units = _fileStoreService.GetValidAttachmentFileExtensions();
+            return Json(units, JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult FileStores()
         {
             var fileStores = _fileStoreService.GetFileStores();
@@ -40,6 +46,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 OriginFileName = fileStore.OriginalFileName,
                 AttachmentTypeName = fileStore.ReportElementTypeName,
                 Description = fileStore.Description,
+                MediaType = fileStore.MediaType,
                 FileStoreId = fileStore.FileStoreId.Value
             };
 
@@ -69,7 +76,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var fileStore = _fileStoreService.GetFileStoreById(fileStoreId, includingFileData: true);
             var fileDownloadName = fileStore.OriginalFileName;
             var extension = fileDownloadName.Substring(fileDownloadName.IndexOf(".") + 1);
-            var contentType = $"application/${extension}";
+            var contentType = $"application/${fileStore.MediaType}";
 
             var fileStream = new MemoryStream(fileStore.Data) { Position = 0 };
             return File(fileStream, contentType, fileDownloadName);
@@ -82,7 +89,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             if (upload != null && upload.ContentLength > 0)
             {
-                using (var reader = new System.IO.BinaryReader(upload.InputStream))
+                using (var reader = new BinaryReader(upload.InputStream))
                 {
                     var content = reader.ReadBytes(upload.ContentLength);
 
@@ -92,7 +99,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     fileStoreDto.Description = model.Description;
                     fileStoreDto.Data = content;
                     fileStoreDto.FileStoreId = null;
-
+                    fileStoreDto.MediaType = upload.ContentType;
                     fileStoreId = _fileStoreService.CreateFileStore(fileStoreDto);
                 }
             }

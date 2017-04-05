@@ -5,7 +5,6 @@ using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
-using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.TimeZone;
 using NLog;
 
