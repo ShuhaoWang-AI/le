@@ -30,10 +30,13 @@
             <div class="box-tools pull-right">
                 @if (!ViewBag.Satus.Equals("ViewOnly"))
                 {
+                    ViewBag.PostURL = @Url.Action(actionName: "NewReportPackageTemplateDetails", controllerName:"Authority");
+
                     <input type="button" value="Save" id="btnSave" class="btn btn-primary btn-sm"/>
 
                     if (!ViewBag.Satus.Equals("New"))
                     {
+                        ViewBag.PostURL = @Url.Action(actionName: "ReportPackageTemplateDetails", controllerName: "Authority");
 
                         <input class="btn btn-primary btn-sm" data-target="#DeleteReportPackageTemplateModal" data-toggle="modal" type="button" value="Delete" />
                     }
@@ -567,7 +570,7 @@
         }
 
         $(document)
-            .ready(function()
+            .ready(function ()
             {
                 $('#availableSamplesAndResultsTable')
                     .DataTable(
@@ -815,7 +818,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnAddSamplesAndResults']"
-                , function()
+                , function ()
                 {
                     var tableMoveFrom = $('#availableSamplesAndResultsTable').DataTable();
 
@@ -838,7 +841,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnRemoveSamplesAndResults']"
-                , function()
+                , function ()
                 {
                     var tableMoveFrom = $('#selectedSamplesAndResultsTable').DataTable();
 
@@ -861,7 +864,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnAddAttachment']"
-                , function()
+                , function ()
                 {
                     var tableMoveFrom = $('#availableAttachmentTable').DataTable();
 
@@ -884,7 +887,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnRemoveAttachment']"
-                , function()
+                , function ()
                 {
                     var tableMoveFrom = $('#selectedAttachmentTable').DataTable();
 
@@ -907,7 +910,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnAddCertification']"
-                , function()
+                , function ()
                 {
                     var tableMoveFrom = $('#availableCertificationTable').DataTable();
 
@@ -930,7 +933,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnRemoveCertification']"
-                , function()
+                , function ()
                 {
                     var tableMoveFrom = $('#selectedCertificationTable').DataTable();
 
@@ -953,7 +956,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnAddIndustry']"
-                , function()
+                , function ()
                 {
                     var tableMoveFrom = $('#availableIndustryTable').DataTable();
 
@@ -976,7 +979,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnRemoveIndustry']"
-                , function()
+                , function ()
                 {
                     var tableMoveFrom = $('#selectedIndustryTable').DataTable();
 
@@ -998,14 +1001,14 @@
 
         $("#btnSave")
             .on("click"
-                , function()
+                , function ()
                 {
                     var selectedSamplesAndResults = [];
                     $('#selectedSamplesAndResultsTable')
                         .DataTable()
                         .rows()
                         .data()
-                        .each(function(d)
+                        .each(function (d)
                         {
                             var reportElementTypeViewModel = {};
                             reportElementTypeViewModel.Id = d[1];
@@ -1018,7 +1021,7 @@
                         .DataTable()
                         .rows()
                         .data()
-                        .each(function(d)
+                        .each(function (d)
                         {
                             var reportElementTypeViewModel = {};
                             reportElementTypeViewModel.Id = d[1];
@@ -1031,7 +1034,7 @@
                         .DataTable()
                         .rows()
                         .data()
-                        .each(function(d)
+                        .each(function (d)
                         {
                             var reportElementTypeViewModel = {};
                             reportElementTypeViewModel.Id = d[1];
@@ -1044,7 +1047,7 @@
                         .DataTable()
                         .rows()
                         .data()
-                        .each(function(d)
+                        .each(function (d)
                         {
                             var industryViewModel = {};
                             industryViewModel.Id = d[0];
@@ -1069,14 +1072,13 @@
 
                     console.log('----', viewModel);
 
-                    var postUrl =
-                        "@Url.Action(actionName: "ReportPackageTemplateDetails", controllerName:"Authority")";
+                    var postUrl = "@ViewBag.PostURL";
 
                     $.ajax({
                         type: "POST"
                         , url: postUrl
                         , data: viewModel
-                        , success: function(response)
+                        , success: function (response)
                         {
                             if (response.redirect != null && response.redirect)
                             {

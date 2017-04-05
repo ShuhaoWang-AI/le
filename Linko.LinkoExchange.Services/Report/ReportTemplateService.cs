@@ -263,6 +263,17 @@ namespace Linko.LinkoExchange.Services.Report
                         rptId = reportPackageTemplate.ReportPackageTemplateId;
                     }
 
+                    foreach (var asDto in rpt.ReportPackageTemplateAssignments)
+                    {
+                        var assignment = new ReportPackageTemplateAssignment
+                                         {
+                                             OrganizationRegulatoryProgramId = asDto.OrganizationRegulatoryProgramId,
+                                             ReportPackageTemplateId = rptId
+                                         };
+
+                        reportPackageTemplate.ReportPackageTemplateAssignments.Add(assignment);
+                    }
+
                     // Create records in tReportTemplateAssignment table
                     foreach (var assignment in reportPackageTemplate.ReportPackageTemplateAssignments)
                     {
@@ -395,8 +406,8 @@ namespace Linko.LinkoExchange.Services.Report
             ReportPackageTemplate reportPackageTemplate, int setOrder)
         {
             // Step 1, Save to tReportPackageTemplateElementCategory table
-            var catName = reportElementTypeDtos[0].ReportElementCategory.ToString();
-            var reportElementCategoryId = _dbContext.ReportElementCategories.Single(cat => cat.Name == catName).ReportElementCategoryId;
+            var reportElementTypeId = reportElementTypeDtos[0].ReportElementTypeId;
+            var reportElementCategoryId = _dbContext.ReportElementTypes.Single(cat => cat.ReportElementTypeId == reportElementTypeId).ReportElementCategoryId;
             var rptec = new ReportPackageTemplateElementCategory
             {
                 ReportPackageTemplateId = reportPackageTemplate.ReportPackageTemplateId,

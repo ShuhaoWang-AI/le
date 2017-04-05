@@ -717,27 +717,13 @@ namespace Linko.LinkoExchange.Services.Mapping
                 RetirementDateTimeUtc = reportPackageTemplateDto.RetirementDateTimeUtc,
                 IsSubmissionBySignatoryRequired = reportPackageTemplateDto.IsSubmissionBySignatoryRequired,
                 CtsEventTypeId = reportPackageTemplateDto.CtsEventTypeId,
-                OrganizationRegulatoryProgramId = reportPackageTemplateDto.OrganizationRegulatoryProgramId,
+                //OrganizationRegulatoryProgramId = reportPackageTemplateDto.OrganizationRegulatoryProgramId,
                 IsActive = reportPackageTemplateDto.IsActive,
                 LastModifierUserId = reportPackageTemplateDto.LastModifierUserId,
                 CtsEventType = GetCtsEventTypeFromEventTypeDto(reportPackageTemplateDto.CtsEventType),
                 ReportPackageTemplateAssignments = new List<ReportPackageTemplateAssignment>(),
                 ReportPackageTemplateElementCategories = new List<ReportPackageTemplateElementCategory>()
             };
-
-            foreach (var asDto in reportPackageTemplateDto.ReportPackageTemplateAssignments)
-            {
-                var assignment = new ReportPackageTemplateAssignment
-                {
-                    OrganizationRegulatoryProgramId = asDto.OrganizationRegulatoryProgramId
-                };
-                if (reportPackageTemplateDto.ReportPackageTemplateId.HasValue)
-                {
-                    assignment.ReportPackageTemplateId = reportPackageTemplateDto.ReportPackageTemplateId.Value;
-                }
-
-                rpt.ReportPackageTemplateAssignments.Add(assignment);
-            }
 
             if (reportPackageTemplateDto.ReportPackageTemplateId.HasValue)
             {
