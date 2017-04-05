@@ -1730,6 +1730,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult ParameterGroupDetails(int? id)
         {
             var viewModel = new ParameterGroupViewModel();
+
             try
             {
                 viewModel = PrepareParameterGroupDetails(id:id);
@@ -1738,6 +1739,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
+
+            ViewBag.ShowSuccessMessage = TempData[key:"ShowSuccessMessage"] ?? false;
+            ViewBag.SuccessMessage = TempData[key:"SuccessMessage"] ?? "";
+
             return View(model:viewModel);
         }
 
@@ -1800,11 +1805,11 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 var id = _parameterService.SaveParameterGroup(parameterGroup:parameterGroupDto);
 
-                ViewBag.ShowSuccessMessage = true;
-                ViewBag.SuccessMessage = $"Parameter Group {(model.Id.HasValue ? "updated" : "created")} successfully!";
+                TempData[key:"ShowSuccessMessage"] = true;
+                TempData[key:"SuccessMessage"] = $"Parameter Group {(model.Id.HasValue ? "updated" : "created")} successfully!";
+
                 ModelState.Clear();
-                model = PrepareParameterGroupDetails(id:id);
-                return View(viewName:"ParameterGroupDetails", model:model);
+                return Json(data:new { redirect = true, newurl = Url.Action(actionName:"ParameterGroupDetails", controllerName:"Authority", routeValues:new {id}) });
             }
             catch (RuleViolationException rve)
             {
@@ -2174,11 +2179,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        [ValidateAntiForgeryToken]
+       // [ValidateAntiForgeryToken]
         [Route(template:"ReportPackageTemplate/New")]
         public ActionResult NewReportPackageTemplateDetails(ReportPackageTemplateViewModel model)
         {
-            throw new NotImplementedException();
+            return SaveReportPackageTemplateDetails(model:model);
         }
         
         [Route(template:"ReportPackageTemplate/Details")]
@@ -2203,11 +2208,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        [ValidateAntiForgeryToken]
+       // [ValidateAntiForgeryToken]
         [Route(template:"ReportPackageTemplate/Details")]
         public ActionResult ReportPackageTemplateDetails(int? id, ReportPackageTemplateViewModel model)
         {
-            throw new NotImplementedException();
+            return SaveReportPackageTemplateDetails(model:model);
         }
 
         public ActionResult DeleteReportPackageTemplate(int id)
@@ -2249,6 +2254,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 EffectiveDateTimeLocal = reportPackageTemplate.EffectiveDateTimeLocal,
                                 LastModificationDateTimeLocal = reportPackageTemplate.LastModificationDateTimeLocal,
                                 LastModifierUserName = reportPackageTemplate.LastModifierFullName,
+                                CtsEventTypeId = reportPackageTemplate.CtsEventType?.CtsEventTypeId ?? 0,
+                                CtsEventTypeName = reportPackageTemplate.CtsEventType?.Name ?? "",
                                 SamplesAndResultsTypes = reportPackageTemplate.SamplesAndResultsTypes.Select(t => new ReportElementTypeViewModel
                                                                                                                   {
                                                                                                                       Id = t.ReportElementTypeId,
@@ -2345,6 +2352,61 @@ namespace Linko.LinkoExchange.Web.Controllers
 
 
             return viewModel;
+        }
+
+        private ActionResult SaveReportPackageTemplateDetails(ReportPackageTemplateViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model = PrepareReportPackageTemplateDetails();
+
+                //foreach (var issue in ModelState[key:"."].Errors)
+                //{
+                //    ModelState.AddModelError(key:string.Empty, errorMessage:issue.ErrorMessage);
+                //}
+                
+                return View(viewName:"ReportPackageTemplateDetails", model:model);
+            }
+            try
+            {
+                var reportPackageTemplateDto = new ReportPackageTemplateDto();
+
+                if (model.Id.HasValue)
+                {
+                    reportPackageTemplateDto = _reportTemplateService.GetReportPackageTemplate(reportPackageTemplateId:model.Id.Value);
+                }
+
+                reportPackageTemplateDto.ReportPackageTemplateId = model.Id;
+                reportPackageTemplateDto.Name = model.Name;
+                reportPackageTemplateDto.Description = model.Description;
+                reportPackageTemplateDto.IsActive = model.IsActive;
+                reportPackageTemplateDto.EffectiveDateTimeLocal = model.EffectiveDateTimeLocal;
+                reportPackageTemplateDto.CtsEventTypeId = model.CtsEventTypeId;
+                reportPackageTemplateDto.CtsEventType = model.CtsEventTypeId == 0 ? null : _reportTemplateService.GetCtsEventType(ctsEventTypeId:model.CtsEventTypeId);
+                reportPackageTemplateDto.SamplesAndResultsTypes = model.SamplesAndResultsTypes.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
+                reportPackageTemplateDto.AttachmentTypes = model.AttachmentTypes.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
+                reportPackageTemplateDto.CertificationTypes = model.CertificationTypes.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
+                reportPackageTemplateDto.ReportPackageTemplateAssignments = model.ReportPackageTemplateAssignments.Select(p => new OrganizationRegulatoryProgramDto() {OrganizationRegulatoryProgramId = p.Id}).ToList();
+                reportPackageTemplateDto.ReportPackageTemplateElementCategories = _reportTemplateService.GetReportElementCategoryNames().ToList();
+                reportPackageTemplateDto.IsSubmissionBySignatoryRequired = model.IsSubmissionBySignatoryRequired;
+                reportPackageTemplateDto.ShowSampleResults = model.ShowSampleResults;
+
+
+                var id = _reportTemplateService.SaveReportPackageTemplate(rpt:reportPackageTemplateDto);
+                
+                TempData[key:"ShowSuccessMessage"] = true;
+                TempData[key:"SuccessMessage"] = $"Report package template {(model.Id.HasValue ? "updated" : "created")} successfully!";
+
+                ModelState.Clear();
+                return Json(data:new { redirect = true, newurl = Url.Action(actionName:"ReportPackageTemplateDetails", controllerName:"Authority", routeValues:new {id}) });
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+                model = PrepareReportPackageTemplateDetails(id:model.Id);
+            }
+
+            return View(viewName:"ReportPackageTemplateDetails", model:model);
         }
 
         #endregion

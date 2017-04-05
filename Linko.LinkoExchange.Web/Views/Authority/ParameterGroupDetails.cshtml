@@ -320,66 +320,53 @@
                     $(rowNode).css('color', 'green').animate({ color: 'black' });
                 });
 
-
-        $(function()
-        {
-            $("#btnSave")
-                .on("click"
-                    , function()
-                    {
-                        var selectedParameters = [];
-                        $('#selectedParameterTable')
-                            .DataTable()
-                            .rows()
-                            .data()
-                            .each(function(d)
-                            {
-                                var parameterViewModel = {};
-                                parameterViewModel.Id = d[0];
-                                parameterViewModel.Name = d[1];
-                                selectedParameters.push(parameterViewModel);
-                            });
-                        console.log(selectedParameters.length);
-
-                        var parameterGroupViewModel = {};
-                        parameterGroupViewModel.Id = $('#Id').val();
-                        parameterGroupViewModel.Name = $('#Name').val();
-                        parameterGroupViewModel.Description = $('#Description').val();
-                        parameterGroupViewModel.IsActive = $('#IsActive').is(":checked");
-                        parameterGroupViewModel.Parameters = selectedParameters;
-
-                        console.log('----', parameterGroupViewModel);
-
-                        var postUrl = "@Url.Action(actionName:"ParameterGroupDetails", controllerName:"Authority")";
-                        $.ajax({
-                            type: "POST"
-                            , url: postUrl
-                            , data: parameterGroupViewModel
-                            //, dataType: "JSON"
-                            //, contentType: "application/json; charset=utf-8"
-                            , success: function(response)
-                            {
-                                //test for a property in the JSON response
-                                if (response.ErrorCount && response.ErrorCount == 0)
-                                {
-                                    //success! do whatever else you want with the response
-                                    
-                                    var newDoc = document.open("text/html", "replace");
-                                    newDoc.write(response);
-                                    newDoc.close();
-                                }
-                                else
-                                {
-                                    //fail - replace the HTML with the returned response HTML.
-                                    var newDoc = document.open("text/html", "replace");
-                                    newDoc.write(response);
-                                    newDoc.close();
-                                }
-                            }
-                            //, error: function()
-                            //    {}
+        $("#btnSave")
+            .on("click"
+                , function()
+                {
+                    var selectedParameters = [];
+                    $('#selectedParameterTable')
+                        .DataTable()
+                        .rows()
+                        .data()
+                        .each(function(d)
+                        {
+                            var parameterViewModel = {};
+                            parameterViewModel.Id = d[0];
+                            parameterViewModel.Name = d[1];
+                            selectedParameters.push(parameterViewModel);
                         });
+                    console.log(selectedParameters.length);
+
+                    var viewModel = {};
+                    viewModel.Id = $('#Id').val();
+                    viewModel.Name = $('#Name').val();
+                    viewModel.Description = $('#Description').val();
+                    viewModel.IsActive = $('#IsActive').is(":checked");
+                    viewModel.Parameters = selectedParameters;
+
+                    var postUrl = "@Url.Action(actionName:"ParameterGroupDetails", controllerName:"Authority")";
+
+                    $.ajax({
+                        type: "POST"
+                        , url: postUrl
+                        , data: viewModel
+                        , success: function(response)
+                        {
+                            if (response.redirect != null && response.redirect)
+                            {
+                                window.location.replace(response.newurl);
+                            }
+                            else
+                            {
+                                var newDoc = document.open("text/html", "replace");
+                                newDoc.write(response);
+                                newDoc.close();
+                            }
+                        }
+                        //, error: function()
+                        //    {}
                     });
-        });
+                });
     </script>
 }

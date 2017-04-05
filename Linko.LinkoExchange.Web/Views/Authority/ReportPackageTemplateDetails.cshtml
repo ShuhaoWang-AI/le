@@ -30,15 +30,12 @@
             <div class="box-tools pull-right">
                 @if (!ViewBag.Satus.Equals("ViewOnly"))
                 {
+                    <input type="button" value="Save" id="btnSave" class="btn btn-primary btn-sm"/>
+
                     if (!ViewBag.Satus.Equals("New"))
                     {
-                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ReportPackageTemplateDetails", controllerName:"Authority")" formmethod="post" />
 
                         <input class="btn btn-primary btn-sm" data-target="#DeleteReportPackageTemplateModal" data-toggle="modal" type="button" value="Delete" />
-                    }
-                    else
-                    {
-                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"NewReportPackageTemplateDetails", controllerName:"Authority")" formmethod="post" />
                     }
                 }
 
@@ -90,6 +87,8 @@
 
             <div class="form-group">
                 @Html.HiddenFor(model => model.Id)
+                @Html.HiddenFor(model => model.ShowSampleResults)
+                @Html.HiddenFor(model => model.IsSubmissionBySignatoryRequired)
                 @Html.LabelFor(model => model.Name, htmlAttributes:new
                                                                    {
                                                                        @class = "control-label col-md-2 required"
@@ -995,6 +994,104 @@
                         .row($(this).parents('tr'))
                         .remove()
                         .draw();
+                });
+
+        $("#btnSave")
+            .on("click"
+                , function()
+                {
+                    var selectedSamplesAndResults = [];
+                    $('#selectedSamplesAndResultsTable')
+                        .DataTable()
+                        .rows()
+                        .data()
+                        .each(function(d)
+                        {
+                            var reportElementTypeViewModel = {};
+                            reportElementTypeViewModel.Id = d[1];
+                            reportElementTypeViewModel.Name = d[2];
+                            selectedSamplesAndResults.push(reportElementTypeViewModel);
+                        });
+
+                    var selectedAttachments = [];
+                    $('#selectedAttachmentTable')
+                        .DataTable()
+                        .rows()
+                        .data()
+                        .each(function(d)
+                        {
+                            var reportElementTypeViewModel = {};
+                            reportElementTypeViewModel.Id = d[1];
+                            reportElementTypeViewModel.Name = d[2];
+                            selectedAttachments.push(reportElementTypeViewModel);
+                        });
+
+                    var selectedCertifications = [];
+                    $('#selectedCertificationTable')
+                        .DataTable()
+                        .rows()
+                        .data()
+                        .each(function(d)
+                        {
+                            var reportElementTypeViewModel = {};
+                            reportElementTypeViewModel.Id = d[1];
+                            reportElementTypeViewModel.Name = d[2];
+                            selectedCertifications.push(reportElementTypeViewModel);
+                        });
+
+                    var selectedIndustries = [];
+                    $('#selectedIndustryTable')
+                        .DataTable()
+                        .rows()
+                        .data()
+                        .each(function(d)
+                        {
+                            var industryViewModel = {};
+                            industryViewModel.Id = d[0];
+                            industryViewModel.Name = d[2];
+                            selectedIndustries.push(industryViewModel);
+                        });
+
+
+                    var viewModel = {};
+                    viewModel.Id = $('#Id').val();
+                    viewModel.Name = $('#Name').val();
+                    viewModel.Description = $('#Description').val();
+                    viewModel.IsActive = $('#IsActive').is(":checked");
+                    viewModel.EffectiveDateTimeLocal = $('#dEffectiveDateTimeLocal').val();
+                    viewModel.IsSubmissionBySignatoryRequired = $('#IsSubmissionBySignatoryRequired').val();
+                    viewModel.ShowSampleResults = $('#ShowSampleResults').val();
+                    viewModel.CtsEventTypeId = $('#CtsEventTypeId').val();
+                    viewModel.SamplesAndResultsTypes = selectedSamplesAndResults;
+                    viewModel.AttachmentTypes = selectedAttachments;
+                    viewModel.CertificationTypes = selectedCertifications;
+                    viewModel.ReportPackageTemplateAssignments = selectedIndustries;
+
+                    console.log('----', viewModel);
+
+                    var postUrl =
+                        "@Url.Action(actionName: "ReportPackageTemplateDetails", controllerName:"Authority")";
+
+                    $.ajax({
+                        type: "POST"
+                        , url: postUrl
+                        , data: viewModel
+                        , success: function(response)
+                        {
+                            if (response.redirect != null && response.redirect)
+                            {
+                                window.location.replace(response.newurl);
+                            }
+                            else
+                            {
+                                var newDoc = document.open("text/html", "replace");
+                                newDoc.write(response);
+                                newDoc.close();
+                            }
+                        }
+                        //, error: function()
+                        //    {}
+                    });
                 });
     </script>
 }
