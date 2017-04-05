@@ -217,7 +217,7 @@ namespace Linko.LinkoExchange.Services.Report
                         if (rpt.ReportPackageTemplateId.HasValue == false || testRpt.ReportPackageTemplateId != rpt.ReportPackageTemplateId.Value)
                         {
                             string message =
-                                "A Template with that Name already exists for this Effective Date.  Select another name or effective date";
+                                "A Template with that Name already exists for this Effective Date. Select another name or effective date";
                             validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null,
                                 errorMessage: message));
                             throw new RuleViolationException(message: "Validation errors",
@@ -263,15 +263,18 @@ namespace Linko.LinkoExchange.Services.Report
                         rptId = reportPackageTemplate.ReportPackageTemplateId;
                     }
 
-                    foreach (var asDto in rpt.ReportPackageTemplateAssignments)
+                    if (rpt.ReportPackageTemplateAssignments != null && rpt.ReportPackageTemplateAssignments.Count > 0)
                     {
-                        var assignment = new ReportPackageTemplateAssignment
-                                         {
-                                             OrganizationRegulatoryProgramId = asDto.OrganizationRegulatoryProgramId,
-                                             ReportPackageTemplateId = rptId
-                                         };
+                        foreach (var asDto in rpt.ReportPackageTemplateAssignments)
+                        {
+                            var assignment = new ReportPackageTemplateAssignment
+                                             {
+                                                 OrganizationRegulatoryProgramId = asDto.OrganizationRegulatoryProgramId,
+                                                 ReportPackageTemplateId = rptId
+                                             };
 
-                        reportPackageTemplate.ReportPackageTemplateAssignments.Add(assignment);
+                            reportPackageTemplate.ReportPackageTemplateAssignments.Add(assignment);
+                        }
                     }
 
                     // Create records in tReportTemplateAssignment table

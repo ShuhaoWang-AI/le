@@ -84,9 +84,6 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         {
             //Name
             RuleFor(x => x.Name).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
-
-            //Parameters
-            //RuleFor(x => x).Must(x => (x.Parameters != null) && (x.Parameters.Count > 0)).WithName(".").WithMessage("At least 1 parameter must be added to the group");
         }
     }
 }

@@ -2360,11 +2360,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 model = PrepareReportPackageTemplateDetails();
 
-                //foreach (var issue in ModelState[key:"."].Errors)
+                //foreach (var issue in ModelState[key: "."].Errors)
                 //{
-                //    ModelState.AddModelError(key:string.Empty, errorMessage:issue.ErrorMessage);
+                //    ModelState.AddModelError(key: string.Empty, errorMessage: issue.ErrorMessage);
                 //}
-                
+
                 return View(viewName:"ReportPackageTemplateDetails", model:model);
             }
             try
@@ -2383,10 +2383,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                 reportPackageTemplateDto.EffectiveDateTimeLocal = model.EffectiveDateTimeLocal;
                 reportPackageTemplateDto.CtsEventTypeId = (int?) (model.CtsEventTypeId == 0 ? (ValueType) null : model.CtsEventTypeId);
                 reportPackageTemplateDto.CtsEventType = model.CtsEventTypeId == 0 ? null : _reportTemplateService.GetCtsEventType(ctsEventTypeId:model.CtsEventTypeId);
-                reportPackageTemplateDto.SamplesAndResultsTypes = model.SamplesAndResultsTypes.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
-                reportPackageTemplateDto.AttachmentTypes = model.AttachmentTypes.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
-                reportPackageTemplateDto.CertificationTypes = model.CertificationTypes.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
-                reportPackageTemplateDto.ReportPackageTemplateAssignments = model.ReportPackageTemplateAssignments.Select(p => new OrganizationRegulatoryProgramDto() {OrganizationRegulatoryProgramId = p.Id}).ToList();
+                reportPackageTemplateDto.SamplesAndResultsTypes = model.SamplesAndResultsTypes?.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
+                reportPackageTemplateDto.AttachmentTypes = model.AttachmentTypes?.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
+                reportPackageTemplateDto.CertificationTypes = model.CertificationTypes?.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
+                reportPackageTemplateDto.ReportPackageTemplateAssignments = model.ReportPackageTemplateAssignments?.Select(p => new OrganizationRegulatoryProgramDto() {OrganizationRegulatoryProgramId = p.Id}).ToList();
                 reportPackageTemplateDto.ReportPackageTemplateElementCategories = _reportTemplateService.GetReportElementCategoryNames().ToList();
                 reportPackageTemplateDto.IsSubmissionBySignatoryRequired = model.IsSubmissionBySignatoryRequired;
                 reportPackageTemplateDto.ShowSampleResults = model.ShowSampleResults;
