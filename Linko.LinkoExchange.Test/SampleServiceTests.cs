@@ -71,10 +71,22 @@ namespace Linko.LinkoExchange.Test
         {
             var sampleDto = new SampleDto();
             sampleDto.Name = "Sample XYZ";
+            sampleDto.MonitoringPointId = 1;
+            sampleDto.MonitoringPointName = "0002-Retired";
+            sampleDto.CollectionMethodId = 1;
+            sampleDto.CollectionMethodName = "24";
+            sampleDto.CtsEventTypeId = 1;
+            sampleDto.CtsEventTypeName = "SNC-P";
+            sampleDto.CtsEventCategoryName = "Sample Category 1";
+            sampleDto.OrganizationTypeId = 1;
             sampleDto.OrganizationRegulatoryProgramId = 1;
             sampleDto.FlowUnitId = 10;
             sampleDto.FlowUnitName = "ppd";
             sampleDto.FlowValue = 808.1;
+            sampleDto.StartDateTimeLocal = DateTime.Now;
+            sampleDto.EndDateTimeLocal = DateTime.Now;
+            sampleDto.SampleStatusId = 1;
+            sampleDto.IsCalculated = false;
             var resultDtos = new List<SampleResultDto>();
 
             var resultDto = new SampleResultDto()

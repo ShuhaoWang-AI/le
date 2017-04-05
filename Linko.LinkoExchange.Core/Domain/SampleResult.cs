@@ -50,10 +50,10 @@ namespace Linko.LinkoExchange.Core.Domain
         public bool IsCalculated { get; set; }
 
         public int? LimitTypeId { get; set; }
-        //public virtual LimitType LimitType { get; set; }
+        public virtual LimitType LimitType { get; set; }
 
         public int? LimitBasisId { get; set; }
-        //public virtual LimitBasis LimitBasis { get; set; }
+        public virtual LimitBasis LimitBasis { get; set; }
 
         public DateTimeOffset CreationDateTimeUtc { get; set; }
 

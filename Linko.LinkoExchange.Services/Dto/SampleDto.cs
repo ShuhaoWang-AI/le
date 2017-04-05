@@ -18,8 +18,8 @@ namespace Linko.LinkoExchange.Services.Dto
         public int CollectionMethodId { get; set; }
         public string CollectionMethodName { get; set; }
         public string LabSampleIdentifier { get; set; }
-        public DateTime StartDateLocal { get; set; }
-        public DateTime EndDateLocal { get; set; }
+        public DateTime StartDateTimeLocal { get; set; }
+        public DateTime EndDateTimeLocal { get; set; }
         public bool IsCalculated { get; set; }
         public int SampleStatusId { get; set; }
         public string SampleStatusName { get; set; }

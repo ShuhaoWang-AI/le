@@ -69,6 +69,7 @@ namespace Linko.LinkoExchange.Services.TimeZone
 
         public DateTimeOffset GetUTCDateTimeUsingThisTimeZoneId(DateTime localDateTime, int timeZoneId)
         {
+            localDateTime = DateTime.SpecifyKind(localDateTime, DateTimeKind.Unspecified);
             TimeZoneInfo orgRegProgramLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
             return (TimeZoneInfo.ConvertTimeToUtc(localDateTime, orgRegProgramLocalZone));
         }

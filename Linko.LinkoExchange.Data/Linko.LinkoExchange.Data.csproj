@@ -96,6 +96,7 @@
     <Compile Include="Mapping\OrganizationTypeRegulatoryProgramMap.cs" />
     <Compile Include="Mapping\ParameterGroupMap.cs" />
     <Compile Include="Mapping\ParameterGroupParameterMap.cs" />
+    <Compile Include="Mapping\SampleResultMap.cs" />
     <Compile Include="Mapping\SampleMap.cs" />
     <Compile Include="Mapping\ParameterMap.cs" />
     <Compile Include="Mapping\PermissionGroupMap.cs" />

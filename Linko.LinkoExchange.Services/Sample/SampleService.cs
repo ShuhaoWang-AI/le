@@ -115,8 +115,8 @@ namespace Linko.LinkoExchange.Services.Sample
                         //Get new
                         sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto);
                         sampleToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
-                        sampleToPersist.StartDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.StartDateLocal, timeZoneId);
-                        sampleToPersist.EndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.EndDateLocal, timeZoneId);
+                        sampleToPersist.StartDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId);
+                        sampleToPersist.EndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId);
                         sampleToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
                         sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                         sampleToPersist.LastModifierUserId = currentUserId;
@@ -276,11 +276,11 @@ namespace Linko.LinkoExchange.Services.Sample
             var dto = _mapHelper.GetSampleDtoFromSample(sample);
 
             //Set Sample Start Local Timestamp
-            dto.StartDateLocal = _timeZoneService
+            dto.StartDateTimeLocal = _timeZoneService
                     .GetLocalizedDateTimeUsingThisTimeZoneId(sample.StartDateTimeUtc.DateTime, timeZoneId);
 
             //Set Sample End Local Timestamp
-            dto.StartDateLocal = _timeZoneService
+            dto.StartDateTimeLocal = _timeZoneService
                     .GetLocalizedDateTimeUsingThisTimeZoneId(sample.EndDateTimeUtc.DateTime, timeZoneId);
 
             //Set LastModificationDateTimeLocal
