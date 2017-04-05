@@ -91,6 +91,8 @@ namespace Linko.LinkoExchange.Test
 
             var resultDto = new SampleResultDto()
             {
+                ParameterId = 14,
+                ParameterName = "1,2-Dibromo-3-chloropropane",
                 Qualifier = ">",
                 UnitId = 7,
                 UnitName = "mg/L",
@@ -110,6 +112,8 @@ namespace Linko.LinkoExchange.Test
             resultDtos.Add(resultDto);
             resultDto = new SampleResultDto()
             {
+                ParameterId = 263,
+                ParameterName = "Trichloroethane",
                 Qualifier = "<",
                 UnitId = 11,
                 UnitName = "su",

@@ -30,11 +30,11 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.UnitName).IsRequired();
 
-            Property(x => x.MethodDetectionLimit).IsRequired();
+            Property(x => x.MethodDetectionLimit).IsOptional();
 
-            Property(x => x.AnalysisMethod).IsRequired();
+            Property(x => x.AnalysisMethod).IsOptional();
 
-            Property(x => x.AnalysisDateTimeUtc).IsRequired();
+            Property(x => x.AnalysisDateTimeUtc).IsOptional();
 
             Property(x => x.IsApprovedEPAMethod).IsRequired();
 

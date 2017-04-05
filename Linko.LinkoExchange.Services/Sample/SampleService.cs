@@ -144,6 +144,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         ,DecimalPlaces = sampleDto.FlowValueDecimalPlaces
                         ,UnitId = sampleDto.FlowUnitId
                         ,UnitName = sampleDto.FlowUnitName
+                        ,MethodDetectionLimit = ""
                         ,IsFlowForMassLoadingCalculation = true
                         ,LimitTypeId = null
                         ,LimitBasisId = null
@@ -153,13 +154,14 @@ namespace Linko.LinkoExchange.Services.Sample
 
                     //Add "regular" sample results
                     var massLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Mass.ToString()).LimitBasisId;
-                    var concentrationLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Mass.ToString()).LimitBasisId;
+                    var concentrationLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Concentration.ToString()).LimitBasisId;
                     var dailyLimitTypeId = _dbContext.LimitTypes.Single(lt => lt.Name == LimitTypeName.DailyLimit.ToString()).LimitTypeId;
                     foreach (var resultDto in sampleDto.SampleResults)
                     {
                         //Concentration result
                         var sampleResult = _mapHelper.GetConcentrationSampleResultFromSampleResultDto(resultDto);
-                        sampleResult.AnalysisDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                        sampleResult.AnalysisDateTimeUtc = _timeZoneService
+                            .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
                         sampleResult.LimitBasisId = concentrationLimitBasisId;
                         sampleResult.LimitTypeId = dailyLimitTypeId;
                         sampleResult.CreationDateTimeUtc = DateTimeOffset.UtcNow;
@@ -172,6 +174,8 @@ namespace Linko.LinkoExchange.Services.Sample
                         if (resultDto.IsCalcMassLoading)
                         {
                             var sampleMassResult = _mapHelper.GetMassSampleResultFromSampleResultDto(resultDto);
+                            sampleMassResult.AnalysisDateTimeUtc = _timeZoneService
+                                .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
                             sampleMassResult.LimitBasisId = massLimitBasisId;
                             sampleMassResult.LimitTypeId = dailyLimitTypeId;
                             sampleMassResult.CreationDateTimeUtc = DateTimeOffset.UtcNow;
