@@ -543,7 +543,9 @@ namespace Linko.LinkoExchange.Services.Report
         {
             DeleteReportPackageTemplateAssignments(rpt.ReportPackageTemplateId);
 
-            var currentCategories = rpt.ReportPackageTemplateElementCategories.ToList();
+            var currentCategories =
+                rpt.ReportPackageTemplateElementCategories.Where(
+                    i => i.ReportPackageTemplateId == rpt.ReportPackageTemplateId).ToList();
             foreach (var rptec in currentCategories)
             {
                 var rptetId = rptec.ReportPackageTemplateElementCategoryId;
@@ -564,6 +566,11 @@ namespace Linko.LinkoExchange.Services.Report
 
                 _dbContext.ReportPackageTemplateElementCategories.Remove(temp);
             }
+
+
+            var t =
+                rpt.ReportPackageTemplateElementCategories.Where(
+                    i => i.ReportPackageTemplateId == rpt.ReportPackageTemplateId).ToList();
         }
 
         public CtsEventTypeDto GetCtsEventType(int ctsEventTypeId)
