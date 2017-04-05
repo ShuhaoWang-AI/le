@@ -393,10 +393,10 @@ BEGIN
         (
 	        OrganizationRegulatoryProgramId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tOrganizationRegulatoryProgram_RegulatoryProgramId_OrganizationId UNIQUE 
+        , CONSTRAINT AK_tOrganizationRegulatoryProgram_OrganizationId_RegulatoryProgramId UNIQUE 
         (
-            RegulatoryProgramId ASC
-            , OrganizationId ASC
+            OrganizationId ASC
+            , RegulatoryProgramId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tOrganizationRegulatoryProgram_tRegulatoryProgram FOREIGN KEY 
 		(
@@ -883,10 +883,10 @@ BEGIN
         (
 	        UserQuestionAnswerId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tUserQuestionAnswer_QuestionId_UserProfileId UNIQUE 
+        , CONSTRAINT AK_tUserQuestionAnswer_UserProfileId_QuestionId UNIQUE 
         (
-            QuestionId ASC
-            , UserProfileId ASC
+            UserProfileId ASC
+            , QuestionId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data] 
         , CONSTRAINT FK_tUserQuestionAnswer_tQuestion FOREIGN KEY 
 		(
@@ -1101,10 +1101,10 @@ BEGIN
         (
 	        ModuleId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tModule_Name_OrganizationTypeRegulatoryProgramId UNIQUE 
+        , CONSTRAINT AK_tModule_OrganizationTypeRegulatoryProgramId_Name UNIQUE 
         (
-            Name ASC
-            , OrganizationTypeRegulatoryProgramId ASC
+            OrganizationTypeRegulatoryProgramId ASC
+            , Name ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tModule_tOrganizationTypeRegulatoryProgram FOREIGN KEY 
 		(
@@ -1239,8 +1239,8 @@ BEGIN
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT AK_tPermissionGroupTemplate_Name_OrganizationTypeRegulatoryProgramId UNIQUE 
         (
-            Name ASC
-            , OrganizationTypeRegulatoryProgramId ASC
+            OrganizationTypeRegulatoryProgramId ASC
+            , Name ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tPermissionGroupTemplate_tOrganizationTypeRegulatoryProgram FOREIGN KEY 
 		(
@@ -1331,8 +1331,8 @@ BEGIN
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT AK_tPermissionGroup_Name_OrganizationRegulatoryProgramId UNIQUE 
         (
-            Name ASC
-            , OrganizationRegulatoryProgramId ASC
+            OrganizationRegulatoryProgramId ASC
+            , Name ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tPermissionGroup_tOrganizationRegulatoryProgram FOREIGN KEY 
 		(
@@ -1426,10 +1426,10 @@ BEGIN
         (
 	        OrganizationRegulatoryProgramUserId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tOrganizationRegulatoryProgramUser_UserProfileId_OrganizationRegulatoryProgramId UNIQUE 
+        , CONSTRAINT AK_tOrganizationRegulatoryProgramUser_OrganizationRegulatoryProgramId_UserProfileId UNIQUE 
         (
-            UserProfileId ASC
-            , OrganizationRegulatoryProgramId ASC
+            OrganizationRegulatoryProgramId ASC
+            , UserProfileId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tOrganizationRegulatoryProgramUser_tUserProfile FOREIGN KEY 
 		(
@@ -1620,11 +1620,11 @@ BEGIN
         (
 	        CtsEventTypeId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tCtsEventType_Name_CtsEventCategoryName_OrganizationRegulatoryProgramId UNIQUE 
+        , CONSTRAINT AK_tCtsEventType_OrganizationRegulatoryProgramId_CtsEventCategoryName_Name UNIQUE 
         (
-            Name ASC
+            OrganizationRegulatoryProgramId ASC
             , CtsEventCategoryName ASC
-            , OrganizationRegulatoryProgramId ASC
+            , Name ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
 		, CONSTRAINT FK_tCtsEventType_tOrganizationRegulatoryProgram FOREIGN KEY 
 		(
@@ -1643,6 +1643,36 @@ BEGIN
 END
 GO
 
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tCollectionMethodType') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tCollectionMethodType'
+    PRINT '----------------------------'
+    
+    CREATE TABLE dbo.tCollectionMethodType 
+    (
+        CollectionMethodTypeId          int IDENTITY(1,1) NOT NULL  
+        , Name                          varchar(100) NOT NULL  
+        , Description                   varchar(500) NULL  
+        , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
+        , LastModifierUserId            int  NULL  
+        
+        CONSTRAINT PK_tCollectionMethodType PRIMARY KEY CLUSTERED 
+        (
+	        CollectionMethodTypeId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT AK_tCollectionMethodType_Name UNIQUE 
+        (
+            Name ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+    ) ON [LinkoExchange_FG1_Data]
+    
+    ALTER TABLE dbo.tCollectionMethodType ADD CONSTRAINT DF_tCollectionMethodType_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
+END
+GO
+
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tCollectionMethod') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
 BEGIN
 	PRINT CHAR(13)
@@ -1656,6 +1686,7 @@ BEGIN
         , Name                          varchar(100) NOT NULL  
         , Description                   varchar(500) NULL  
         , OrganizationId                int NOT NULL
+        , CollectionMethodTypeId        int NOT NULL
         , IsEnabled                     bit NOT NULL
         , IsRemoved                     bit NOT NULL
         , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
@@ -1666,15 +1697,19 @@ BEGIN
         (
 	        CollectionMethodId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tCollectionMethod_Name_OrganizationId UNIQUE 
+        , CONSTRAINT AK_tCollectionMethod_OrganizationId_Name UNIQUE 
         (
-            Name ASC
-            , OrganizationId ASC
+            OrganizationId ASC
+            , Name ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tCollectionMethod_tOrganization FOREIGN KEY 
 		(
 			OrganizationId
 		) REFERENCES dbo.tOrganization(OrganizationId)
+        , CONSTRAINT FK_tCollectionMethod_tCollectionMethodType FOREIGN KEY 
+		(
+			CollectionMethodTypeId
+		) REFERENCES dbo.tCollectionMethodType(CollectionMethodTypeId)
     ) ON [LinkoExchange_FG1_Data]
     
     ALTER TABLE dbo.tCollectionMethod ADD CONSTRAINT DF_tCollectionMethod_IsEnabled DEFAULT 1 FOR IsEnabled
@@ -1684,6 +1719,11 @@ BEGIN
     CREATE NONCLUSTERED INDEX IX_tCollectionMethod_OrganizationId ON dbo.tCollectionMethod
 	(
 		OrganizationId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tCollectionMethod_CollectionMethodTypeId ON dbo.tCollectionMethod
+	(
+		CollectionMethodTypeId ASC
 	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
 END
 GO
@@ -1711,10 +1751,10 @@ BEGIN
         (
 	        UnitId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tUnit_Name_OrganizationId UNIQUE 
+        , CONSTRAINT AK_tUnit_OrganizationId_Name UNIQUE 
         (
-            Name ASC
-            , OrganizationId ASC
+            OrganizationId ASC
+            , Name ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tUnit_tOrganization FOREIGN KEY 
 		(
@@ -1747,6 +1787,7 @@ BEGIN
         , Description                       varchar(500) NULL
         , DefaultUnitId                     int NULL
         , TrcFactor                         float NULL
+        , IsFlowForMassLoadingCalculation   bit NOT NULL
         , OrganizationRegulatoryProgramId   int NOT NULL  
         , IsRemoved                         bit NOT NULL  
         , CreationDateTimeUtc               datetimeoffset(0) NOT NULL  
@@ -1757,10 +1798,10 @@ BEGIN
         (
 	        ParameterId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tParameter_Name_OrganizationRegulatoryProgramId UNIQUE 
+        , CONSTRAINT AK_tParameter_OrganizationRegulatoryProgramId_Name UNIQUE 
         (
-            Name ASC
-            , OrganizationRegulatoryProgramId ASC
+            OrganizationRegulatoryProgramId ASC
+            , Name ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tParameter_tUnit FOREIGN KEY 
 		(
@@ -1772,6 +1813,7 @@ BEGIN
 		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
     ) ON [LinkoExchange_FG1_Data]
     
+    ALTER TABLE dbo.tParameter ADD CONSTRAINT DF_tParameter_IsFlowForMassLoadingCalculation DEFAULT 0 FOR IsFlowForMassLoadingCalculation
     ALTER TABLE dbo.tParameter ADD CONSTRAINT DF_tParameter_IsRemoved DEFAULT 0 FOR IsRemoved
     ALTER TABLE dbo.tParameter ADD CONSTRAINT DF_tParameter_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
     
@@ -1809,10 +1851,10 @@ BEGIN
         (
 	        ParameterGroupId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tParameterGroup_Name_OrganizationRegulatoryProgramId UNIQUE 
+        , CONSTRAINT AK_tParameterGroup_OrganizationRegulatoryProgramId_Name UNIQUE 
         (
-            Name ASC
-            , OrganizationRegulatoryProgramId ASC
+            OrganizationRegulatoryProgramId ASC
+            , Name ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
 		, CONSTRAINT FK_tParameterGroup_tOrganizationRegulatoryProgram FOREIGN KEY 
 		(
@@ -1874,6 +1916,306 @@ BEGIN
 END
 GO
 
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tLimitType') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tLimitType'
+    PRINT '-----------------'
+    
+    CREATE TABLE dbo.tLimitType 
+    (
+        LimitTypeId                     int IDENTITY(1,1) NOT NULL
+        , Name                          varchar(100) NOT NULL
+        , Description                   varchar(500) NULL
+        , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
+        , LastModifierUserId            int NULL  
+    
+        CONSTRAINT PK_tLimitType PRIMARY KEY CLUSTERED 
+        (
+	        LimitTypeId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT AK_tLimitType_Name UNIQUE 
+        (
+            Name ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+    ) ON [LinkoExchange_FG1_Data]
+    
+    ALTER TABLE dbo.tLimitType ADD CONSTRAINT DF_tLimitType_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tLimitBasis') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tLimitBasis'
+    PRINT '------------------'
+    
+    CREATE TABLE dbo.tLimitBasis 
+    (
+        LimitBasisId                    int IDENTITY(1,1) NOT NULL
+        , Name                          varchar(100) NOT NULL
+        , Description                   varchar(500) NULL
+        , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
+        , LastModifierUserId            int NULL  
+    
+        CONSTRAINT PK_tLimitBasis PRIMARY KEY CLUSTERED 
+        (
+	        LimitBasisId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT AK_tLimitBasis_Name UNIQUE 
+        (
+            Name ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+    ) ON [LinkoExchange_FG1_Data]
+    
+    ALTER TABLE dbo.tLimitBasis ADD CONSTRAINT DF_tLimitBasis_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tMonitoringPointParameter') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tMonitoringPointParameter'
+    PRINT '--------------------------------'
+    
+    CREATE TABLE dbo.tMonitoringPointParameter 
+    (
+        MonitoringPointParameterId          int IDENTITY(1,1) NOT NULL
+        , OrganizationRegulatoryProgramId   int NOT NULL
+        , MonitoringPointId                 int NOT NULL
+        , ParameterId                       int NOT NULL
+        , DefaultUnitId                     int NULL
+        , EffectiveDateTimeUtc              datetimeoffset(0) NOT NULL
+        , RetirementDateTimeUtc             datetimeoffset(0) NOT NULL   
+    
+        CONSTRAINT PK_tMonitoringPointParameter PRIMARY KEY CLUSTERED 
+        (
+	        MonitoringPointParameterId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT AK_tMonitoringPointParameter_OrganizationRegulatoryProgramId_MonitoringPointId_ParameterId_EffectiveDateTimeUtc UNIQUE 
+        (
+            OrganizationRegulatoryProgramId ASC
+            , MonitoringPointId ASC
+            , ParameterId ASC
+            , EffectiveDateTimeUtc ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+		, CONSTRAINT FK_tMonitoringPointParameter_tOrganizationRegulatoryProgram FOREIGN KEY 
+		(
+			OrganizationRegulatoryProgramId
+		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
+        , CONSTRAINT FK_tMonitoringPointParameter_tMonitoringPoint FOREIGN KEY 
+		(
+			MonitoringPointId
+		) REFERENCES dbo.tMonitoringPoint(MonitoringPointId)
+        , CONSTRAINT FK_tMonitoringPointParameter_tParameter FOREIGN KEY 
+		(
+			ParameterId
+		) REFERENCES dbo.tParameter(ParameterId)
+        , CONSTRAINT FK_tMonitoringPointParameter_tUnit FOREIGN KEY 
+		(
+			DefaultUnitId
+		) REFERENCES dbo.tUnit(UnitId)
+    ) ON [LinkoExchange_FG1_Data]
+    
+	CREATE NONCLUSTERED INDEX IX_tMonitoringPointParameter_OrganizationRegulatoryProgramId ON dbo.tMonitoringPointParameter
+	(
+		OrganizationRegulatoryProgramId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tMonitoringPointParameter_MonitoringPointId ON dbo.tMonitoringPointParameter
+	(
+		MonitoringPointId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tMonitoringPointParameter_ParameterId ON dbo.tMonitoringPointParameter
+	(
+		ParameterId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tMonitoringPointParameter_DefaultUnitId ON dbo.tMonitoringPointParameter
+	(
+		DefaultUnitId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tMonitoringPointParameterLimit') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tMonitoringPointParameterLimit'
+    PRINT '-------------------------------------'
+    
+    CREATE TABLE dbo.tMonitoringPointParameterLimit 
+    (
+        MonitoringPointParameterLimitId     int IDENTITY(1,1) NOT NULL
+        , MonitoringPointParameterId        int NOT NULL
+        , Name                              varchar(100) NOT NULL
+        , Description                       varchar(500) NULL
+        , MinimumValue                      float NULL
+        , MaximumValue                      float NOT NULL
+        , BaseUnitId                        int NOT NULL
+        , CollectionMethodTypeId            int NULL
+        , LimitTypeId                       int NOT NULL
+        , LimitBasisId                      int NOT NULL
+        , IsAlertOnly                       bit NOT NULL
+    
+        CONSTRAINT PK_tMonitoringPointParameterLimit PRIMARY KEY CLUSTERED 
+        (
+	        MonitoringPointParameterLimitId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT AK_tMonitoringPointParameterLimit_MonitoringPointParameterId_LimitTypeId_LimitBasisId UNIQUE 
+        (
+            MonitoringPointParameterId ASC
+            , LimitTypeId ASC
+            , LimitBasisId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+		, CONSTRAINT FK_tMonitoringPointParameterLimit_tMonitoringPointParameter FOREIGN KEY 
+		(
+			MonitoringPointParameterId
+		) REFERENCES dbo.tMonitoringPointParameter(MonitoringPointParameterId)
+        , CONSTRAINT FK_tMonitoringPointParameterLimit_tUnit FOREIGN KEY 
+		(
+			BaseUnitId
+		) REFERENCES dbo.tUnit(UnitId)
+        , CONSTRAINT FK_tMonitoringPointParameterLimit_tCollectionMethodType FOREIGN KEY 
+		(
+			CollectionMethodTypeId
+		) REFERENCES dbo.tCollectionMethodType(CollectionMethodTypeId)
+        , CONSTRAINT FK_tMonitoringPointParameterLimit_tLimitType FOREIGN KEY 
+		(
+			LimitTypeId
+		) REFERENCES dbo.tLimitType(LimitTypeId)
+        , CONSTRAINT FK_tMonitoringPointParameterLimit_tLimitBasis FOREIGN KEY 
+		(
+			LimitBasisId
+		) REFERENCES dbo.tLimitBasis(LimitBasisId)
+    ) ON [LinkoExchange_FG1_Data]
+    
+    ALTER TABLE dbo.tMonitoringPointParameterLimit ADD CONSTRAINT DF_tMonitoringPointParameterLimit_IsAlertOnly DEFAULT 0 FOR IsAlertOnly
+
+	CREATE NONCLUSTERED INDEX IX_tMonitoringPointParameterLimit_MonitoringPointParameterId ON dbo.tMonitoringPointParameterLimit
+	(
+		MonitoringPointParameterId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tMonitoringPointParameterLimit_BaseUnitId ON dbo.tMonitoringPointParameterLimit
+	(
+		BaseUnitId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tMonitoringPointParameterLimit_CollectionMethodTypeId ON dbo.tMonitoringPointParameterLimit
+	(
+		CollectionMethodTypeId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tMonitoringPointParameterLimit_LimitTypeId ON dbo.tMonitoringPointParameterLimit
+	(
+		LimitTypeId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tMonitoringPointParameterLimit_LimitBasisId ON dbo.tMonitoringPointParameterLimit
+	(
+		LimitBasisId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tSampleRequirement') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tSampleRequirement'
+    PRINT '-------------------------'
+    
+    CREATE TABLE dbo.tSampleRequirement 
+    (
+        SampleRequirementId             int IDENTITY(1,1) NOT NULL
+        , MonitoringPointParameterId    int NOT NULL
+        , PeriodStartDateTimeUtc        datetimeoffset(0) NOT NULL  
+        , PeriodEndDateTimeUtc          datetimeoffset(0) NOT NULL
+        , SamplesRequired               int NOT NULL
+        , LimitEffectiveDateTimeUtc     datetimeoffset(0) NOT NULL
+        , LimitRetirementDateTimeUtc    datetimeoffset(0) NULL
+        , OrganizationTypeId            int NOT NULL
+    
+        CONSTRAINT PK_tSampleRequirement PRIMARY KEY CLUSTERED 
+        (
+	        SampleRequirementId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT FK_tSampleRequirement_tMonitoringPointParameter FOREIGN KEY 
+		(
+			MonitoringPointParameterId
+		) REFERENCES dbo.tMonitoringPointParameter(MonitoringPointParameterId)
+        , CONSTRAINT FK_tSampleRequirement_tOrganizationType FOREIGN KEY 
+		(
+			OrganizationTypeId
+		) REFERENCES dbo.tOrganizationType(OrganizationTypeId)
+    ) ON [LinkoExchange_FG1_Data]
+    
+    CREATE NONCLUSTERED INDEX IX_tSampleRequirement_MonitoringPointParameterId ON dbo.tSampleRequirement
+	(
+		MonitoringPointParameterId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tSampleRequirement_OrganizationTypeId ON dbo.tSampleRequirement
+	(
+		OrganizationTypeId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tSampleFrequency') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tSampleFrequency'
+    PRINT '-----------------------'
+    
+    CREATE TABLE dbo.tSampleFrequency 
+    (
+        SampleFrequencyId               int IDENTITY(1,1) NOT NULL
+        , MonitoringPointParameterId    int NOT NULL
+        , CollectionMethodId            int NOT NULL
+        , IUSampleFrequency             varchar(50) NULL
+        , AuthoritySampleFrequency      varchar(50) NULL
+    
+        CONSTRAINT PK_tSampleFrequency PRIMARY KEY CLUSTERED 
+        (
+	        SampleFrequencyId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT AK_tSampleFrequency_MonitoringPointParameterId_CollectionMethodId UNIQUE 
+        (
+            MonitoringPointParameterId ASC
+            , CollectionMethodId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT FK_tSampleFrequency_tMonitoringPointParameter FOREIGN KEY 
+		(
+			MonitoringPointParameterId
+		) REFERENCES dbo.tMonitoringPointParameter(MonitoringPointParameterId)
+        , CONSTRAINT FK_tSampleFrequency_tCollectionMethod FOREIGN KEY 
+		(
+			CollectionMethodId
+		) REFERENCES dbo.tCollectionMethod(CollectionMethodId)
+    ) ON [LinkoExchange_FG1_Data]
+    
+    CREATE NONCLUSTERED INDEX IX_tSampleFrequency_MonitoringPointParameterId ON dbo.tSampleFrequency
+	(
+		MonitoringPointParameterId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tSampleFrequency_CollectionMethodId ON dbo.tSampleFrequency
+	(
+		CollectionMethodId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+END
+GO
+
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tSampleStatus') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
 BEGIN
 	PRINT CHAR(13)
@@ -1925,8 +2267,6 @@ BEGIN
         , LabSampleIdentifier               varchar(50) NULL
         , StartDateTimeUtc                  datetimeoffset(0) NOT NULL
         , EndDateTimeUtc                    datetimeoffset(0) NOT NULL
-        , MassLoadingConversionFactor       float NULL
-        , MassLoadingDecimalPlaces          int NULL
         , IsCalculated                      bit NOT NULL
         , SampleStatusId                    int NOT NULL
         , OrganizationTypeId                int NOT NULL
@@ -1988,13 +2328,13 @@ BEGIN
         , ParameterName                     varchar(254) NOT NULL
         , Qualifier                         varchar(2) NULL
         , Value                             float NULL
+        , DecimalPlaces                     int NULL
         , UnitId                            int NOT NULL
         , UnitName                          varchar(100) NOT NULL
         , MethodDetectionLimit              varchar(50) NULL
         , AnalysisMethod                    varchar(50) NULL
         , AnalysisDateTimeUtc               datetimeoffset(0) NULL
         , IsApprovedEPAMethod               bit NOT NULL
-        , IsMassLoadingCalculationRequired  bit NOT NULL
         , IsFlowForMassLoadingCalculation   bit NOT NULL
         , IsCalculated                      bit NOT NULL
         , LimitTypeId                       int NULL
@@ -2016,10 +2356,17 @@ BEGIN
 		(
 			SampleId
 		) REFERENCES dbo.tSample(SampleId)
+        , CONSTRAINT FK_tSampleResult_tLimitType FOREIGN KEY 
+		(
+			LimitTypeId
+		) REFERENCES dbo.tLimitType(LimitTypeId)
+        , CONSTRAINT FK_tSampleResult_tLimitBasis FOREIGN KEY 
+		(
+			LimitBasisId
+		) REFERENCES dbo.tLimitBasis(LimitBasisId)
     ) ON [LinkoExchange_FG1_Data]
     
     ALTER TABLE dbo.tSampleResult ADD CONSTRAINT DF_tSampleResult_IsApprovedEPAMethod DEFAULT 0 FOR IsApprovedEPAMethod
-    ALTER TABLE dbo.tSampleResult ADD CONSTRAINT DF_tSampleResult_IsMassLoadingCalculationRequired DEFAULT 0 FOR IsMassLoadingCalculationRequired
     ALTER TABLE dbo.tSampleResult ADD CONSTRAINT DF_tSampleResult_IsFlowForMassLoadingCalculation DEFAULT 0 FOR IsFlowForMassLoadingCalculation
     ALTER TABLE dbo.tSampleResult ADD CONSTRAINT DF_tSampleResult_IsCalculated DEFAULT 0 FOR IsCalculated
     ALTER TABLE dbo.tSampleResult ADD CONSTRAINT DF_tSampleResult_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
@@ -2028,6 +2375,136 @@ BEGIN
 	(
 		SampleId ASC
 	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tSampleResult_LimitTypeId ON dbo.tSampleResult
+	(
+		LimitTypeId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tSampleResult_LimitBasisId ON dbo.tSampleResult
+	(
+		LimitBasisId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tFileType') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tFileType'
+    PRINT '----------------'
+    
+    CREATE TABLE dbo.tFileType 
+    (
+        FileTypeId                          int IDENTITY(1,1) NOT NULL
+        , Extension                         varchar(5) NOT NULL
+        , Description                       varchar(500) NULL
+        , CreationDateTimeUtc               datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc       datetimeoffset(0) NULL  
+        , LastModifierUserId                int NULL  
+    
+        CONSTRAINT PK_tFileType PRIMARY KEY CLUSTERED 
+        (
+	        FileTypeId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT AK_tFileType_Extension UNIQUE 
+        (
+            Extension ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+    ) ON [LinkoExchange_FG1_Data]
+    
+    ALTER TABLE dbo.tFileType ADD CONSTRAINT DF_tFileType_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tFileStore') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tFileStore'
+    PRINT '-----------------'
+    
+    CREATE TABLE dbo.tFileStore
+    (
+        FileStoreId                         int IDENTITY(1,1) NOT NULL
+        , Name                              varchar(256) NOT NULL
+        , Description                       varchar(500) NULL
+        , OriginalName                      varchar(256) NOT NULL
+        , SizeByte                          float NOT NULL
+        , MediaType                         varchar(100) NULL
+        , FileTypeId                        int NOT NULL
+        , ReportElementTypeId               int NOT NULL
+        , ReportElementTypeName             varchar(100) NOT NULL
+        , OrganizationRegulatoryProgramId   int NOT NULL
+        , UploadDateTimeUtc                 datetimeoffset(0) NOT NULL  
+        , UploaderUserId                    int NOT NULL  
+        , LastModificationDateTimeUtc       datetimeoffset(0) NULL  
+        , LastModifierUserId                int NULL  
+    
+        CONSTRAINT PK_tFileStore PRIMARY KEY CLUSTERED 
+        (
+	        FileStoreId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT AK_tReportElementCategory_OrganizationRegulatoryProgramId_Name UNIQUE 
+        (
+            OrganizationRegulatoryProgramId ASC
+            , Name ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT FK_tFileStore_tFileType FOREIGN KEY 
+		(
+			FileTypeId
+		) REFERENCES dbo.tFileType(FileTypeId)
+        , CONSTRAINT FK_tFileStore_tOrganizationRegulatoryProgram FOREIGN KEY 
+		(
+			OrganizationRegulatoryProgramId
+		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
+        , CONSTRAINT FK_tFileStore_tUserProfile FOREIGN KEY 
+		(
+			UploaderUserId
+		) REFERENCES dbo.tUserProfile(UserProfileId)
+    ) ON [LinkoExchange_FG1_Data]
+    
+    ALTER TABLE dbo.tFileStore ADD CONSTRAINT DF_tFileStore_UploadDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR UploadDateTimeUtc
+
+    CREATE NONCLUSTERED INDEX IX_tFileStore_FileTypeId ON dbo.tFileStore
+	(
+		FileTypeId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tFileStore_OrganizationRegulatoryProgramId ON dbo.tFileStore
+	(
+		OrganizationRegulatoryProgramId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tFileStore_UploaderUserId ON dbo.tFileStore
+	(
+		UploaderUserId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tFileStoreData') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tFileStoreData'
+    PRINT '---------------------'
+    
+    CREATE TABLE dbo.tFileStoreData 
+    (
+        FileStoreId int NOT NULL
+        , Data      varbinary(max) NOT NULL    
+    
+        CONSTRAINT PK_tFileStoreData PRIMARY KEY CLUSTERED 
+        (
+	        FileStoreId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG3_LOB]
+        , CONSTRAINT FK_tFileStoreData_tFileStore FOREIGN KEY 
+		(
+			FileStoreId
+		) REFERENCES dbo.tFileStore(FileStoreId)
+    ) ON [LinkoExchange_FG3_LOB]
 END
 GO
 
@@ -2088,8 +2565,8 @@ BEGIN
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT AK_tReportElementType_Name_OrganizationRegulatoryProgramId UNIQUE 
         (
-            Name ASC
-            , OrganizationRegulatoryProgramId ASC
+            OrganizationRegulatoryProgramId ASC
+            , Name ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tReportElementType_tCtsEventType FOREIGN KEY 
 		(
@@ -2153,9 +2630,9 @@ BEGIN
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT AK_tReportPackageTemplate_Name_EffectiveDateTimeUtc_OrganizationRegulatoryProgramId UNIQUE 
         (
-            Name ASC
+            OrganizationRegulatoryProgramId ASC
+            , Name ASC
             , EffectiveDateTimeUtc ASC
-            , OrganizationRegulatoryProgramId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tReportPackageTemplate_tCtsEventType FOREIGN KEY 
 		(
@@ -2203,8 +2680,8 @@ BEGIN
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT AK_tReportPackageTemplateAssignment_ReportPackageTemplateId_OrganizationRegulatoryProgramId UNIQUE 
         (
-            ReportPackageTemplateId ASC
-            , OrganizationRegulatoryProgramId ASC
+            OrganizationRegulatoryProgramId ASC
+            , ReportPackageTemplateId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tReportPackageTemplateAssignment_tReportPackageTemplate FOREIGN KEY 
 		(
@@ -2321,6 +2798,435 @@ BEGIN
 	(
 		ReportElementTypeId ASC
 	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tReportStatus') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tReportStatus'
+    PRINT '--------------------'
+    
+    CREATE TABLE dbo.tReportStatus 
+    (
+        ReportStatusId                  int IDENTITY(1,1) NOT NULL
+        , Name                          varchar(100) NOT NULL
+        , Description                   varchar(500) NULL
+        , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
+        , LastModifierUserId            int NULL  
+    
+        CONSTRAINT PK_tReportStatus PRIMARY KEY CLUSTERED 
+        (
+	        ReportStatusId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT AK_tReportStatus_Name UNIQUE 
+        (
+            Name ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+    ) ON [LinkoExchange_FG1_Data]
+    
+    ALTER TABLE dbo.tReportStatus ADD CONSTRAINT DF_tReportStatus_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tRepudiationReason') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tRepudiationReason'
+    PRINT '-------------------------'
+    
+    CREATE TABLE dbo.tRepudiationReason 
+    (
+        RepudiationReasonId                 int IDENTITY(1,1) NOT NULL
+        , Name                              varchar(100) NOT NULL
+        , Description                       varchar(500) NULL
+        , OrganizationRegulatoryProgramId   int NOT NULL
+        , CreationDateTimeUtc               datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc       datetimeoffset(0) NULL  
+        , LastModifierUserId                int NULL  
+    
+        CONSTRAINT PK_tRepudiationReason PRIMARY KEY CLUSTERED 
+        (
+	        RepudiationReasonId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT AK_tRepudiationReason_OrganizationRegulatoryProgramId_Name UNIQUE 
+        (
+            OrganizationRegulatoryProgramId ASC
+            , Name ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT FK_tRepudiationReason_tOrganizationRegulatoryProgram FOREIGN KEY 
+		(
+			OrganizationRegulatoryProgramId
+		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
+    ) ON [LinkoExchange_FG1_Data]
+    
+    ALTER TABLE dbo.tRepudiationReason ADD CONSTRAINT DF_tRepudiationReason_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
+
+    CREATE NONCLUSTERED INDEX IX_tRepudiationReason_OrganizationRegulatoryProgramId ON dbo.tRepudiationReason
+	(
+		OrganizationRegulatoryProgramId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tReportPackage') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tReportPackage'
+    PRINT '---------------------'
+    
+    CREATE TABLE dbo.tReportPackage 
+    (
+        ReportPackageId                         int IDENTITY(1,1) NOT NULL
+        , Name                                  varchar(100) NOT NULL
+        , Description                           varchar(500) NULL
+        , PeriodStartDateTimeUtc                datetimeoffset(0) NOT NULL
+        , PeriodEndDateTimeUtc                  datetimeoffset(0) NOT NULL
+        , CtsEventTypeId                        int NULL
+        , CtsEventTypeName                      varchar(100) NULL
+        , CtsEventCategoryName                  varchar(100) NULL
+        , Comments                              varchar(500) NULL
+        , IsSubmissionBySignatoryRequired       bit NOT NULL
+        , ReportPackageTemplateId               int NOT NULL
+        , ReportStatusId                        int NOT NULL
+        
+        , OrganizationRegulatoryProgramId       int NOT NULL
+        , OrganizationName                      varchar(254) NOT NULL
+        , OrganizationAddressLine1              varchar(100) NOT NULL
+        , OrganizationAddressLine2              varchar(100) NOT NULL
+        , OrganizationCityName                  varchar(100) NOT NULL
+        , OrganizationJurisdictionName          varchar(100) NOT NULL
+        , OrganizationZipCode                   varchar(50) NOT NULL
+        , RecipientOrganizationName             varchar(254) NOT NULL
+        , RecipientOrganizationAddressLine1     varchar(100) NOT NULL
+        , RecipientOrganizationAddressLine2     varchar(100) NOT NULL
+        , RecipientOrganizationCityName         varchar(100) NOT NULL
+        , RecipientOrganizationJurisdictionName varchar(100) NOT NULL
+        , RecipientOrganizationZipCode          varchar(50) NOT NULL
+        
+        , SubmissionDateTimeUtc                 datetimeoffset(0) NULL
+        , SubmitterUserId                       int NULL
+        , SubmitterFirstName                    varchar(50) NULL
+        , SubmitterLastName                     varchar(50) NULL
+        , SubmitterTitleRole                    varchar(250) NULL
+        , SubmitterIPAddress                    varchar(50) NULL
+        , SubmitterUserName                     varchar(256) NULL
+
+        , SubmissionReviewDateTimeUtc           datetimeoffset(0) NULL
+        , SubmissionReviewerUserId              int NULL
+        , SubmissionReviewerFirstName           varchar(50) NULL
+        , SubmissionReviewerLastName            varchar(50) NULL
+        , SubmissionReviewerTitleRole           varchar(250) NULL
+        , SubmissionReviewComments              varchar(500) NULL
+
+        , RepudationDateTimeUtc                 datetimeoffset(0) NULL
+        , RepudiatorUserId                      int NULL
+        , RepudiatorFirstName                   varchar(50) NULL
+        , RepudiatorLastName                    varchar(50) NULL
+        , RepudiatorTitleRole                   varchar(250) NULL
+        , RepudiationReasonId                   int NULL
+        , RepudiationReasonName                 varchar(100) NULL
+        , RepudiationComments                   varchar(500) NULL
+
+        , RepudiationReviewDateTimeUtc          datetimeoffset(0) NULL
+        , RepudiationReviewerUserId             int NULL
+        , RepudiationReviewerFirstName          varchar(50) NULL
+        , RepudiationReviewerLastName           varchar(50) NULL
+        , RepudiationReviewerTitleRole          varchar(250) NULL
+        , RepudiationReviewComments             varchar(500) NULL
+
+        , LastSentDateTimeUtc                   datetimeoffset(0) NULL
+        , LastSenderUserId                      int NULL
+        , LastSenderFirstName                   varchar(50) NULL
+        , LastSenderLastName                    varchar(50) NULL
+
+        , CreationDateTimeUtc                   datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc           datetimeoffset(0) NULL  
+        , LastModifierUserId                    int NULL  
+    
+        CONSTRAINT PK_tReportPackage PRIMARY KEY CLUSTERED 
+        (
+	        ReportPackageId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+        , CONSTRAINT FK_tReportPackage_tReportStatus FOREIGN KEY 
+		(
+			ReportStatusId
+		) REFERENCES dbo.tReportStatus(ReportStatusId)
+		, CONSTRAINT FK_tReportPackage_tOrganizationRegulatoryProgram FOREIGN KEY 
+		(
+			OrganizationRegulatoryProgramId
+		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
+    ) ON [LinkoExchange_FG2_Data]
+    
+    ALTER TABLE dbo.tReportPackage ADD CONSTRAINT DF_tReportPackage_IsSubmissionBySignatoryRequired DEFAULT 1 FOR IsSubmissionBySignatoryRequired
+    ALTER TABLE dbo.tReportPackage ADD CONSTRAINT DF_tReportPackage_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
+    
+    CREATE NONCLUSTERED INDEX IX_tReportPackage_ReportStatusId ON dbo.tReportPackage
+	(
+		ReportStatusId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+
+	CREATE NONCLUSTERED INDEX IX_tReportPackage_OrganizationRegulatoryProgramId ON dbo.tReportPackage
+	(
+		OrganizationRegulatoryProgramId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tReportPackageElementCategory') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tReportPackageElementCategory'
+    PRINT '------------------------------------'
+
+    CREATE TABLE dbo.tReportPackageElementCategory
+    (
+        ReportPackageElementCategoryId  int IDENTITY(1,1) NOT NULL  
+        , ReportPackageId               int NOT NULL  
+        , ReportElementCategoryId       int NOT NULL
+        , SortOrder                     int NOT NULL  
+    
+        CONSTRAINT PK_tReportPackageElementCategory PRIMARY KEY CLUSTERED 
+        (
+	        ReportPackageElementCategoryId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+        , CONSTRAINT AK_tReportPackageElementCategory_ReportPackageId_ReportElementCategoryId UNIQUE 
+        (
+            ReportPackageId ASC
+            , ReportElementCategoryId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+        , CONSTRAINT FK_tReportPackageElementCategory_tReportPackage FOREIGN KEY 
+		(
+			ReportPackageId
+		) REFERENCES dbo.tReportPackage(ReportPackageId)
+		, CONSTRAINT FK_tReportPackageElementCategory_tReportElementCategory FOREIGN KEY 
+		(
+			ReportElementCategoryId
+		) REFERENCES dbo.tReportElementCategory(ReportElementCategoryId)
+    ) ON [LinkoExchange_FG2_Data]
+    
+    ALTER TABLE dbo.tReportPackageElementCategory ADD CONSTRAINT DF_tReportPackageElementCategory_SortOrder DEFAULT 0 FOR SortOrder
+
+    CREATE NONCLUSTERED INDEX IX_tReportPackageElementCategory_ReportPackageId ON dbo.tReportPackageElementCategory
+	(
+		ReportPackageId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+	
+	CREATE NONCLUSTERED INDEX IX_tReportPackageElementCategory_ReportElementCategoryId ON dbo.tReportPackageElementCategory
+	(
+		ReportElementCategoryId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tReportPackageElementType') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tReportPackageElementType'
+    PRINT '--------------------------------'
+
+    CREATE TABLE dbo.tReportPackageElementType
+    (
+        ReportPackageElementTypeId              int IDENTITY(1,1) NOT NULL  
+        , ReportPackageElementCategoryId        int NOT NULL  
+        , ReportElementTypeId                   int NOT NULL
+        , ReportElementTypeName                 varchar(100) NOT NULL
+        , ReportElementTypeContent              varchar(2000) NULL
+        , ReportElementTypeIsContentProvided    bit NOT NULL
+        , CtsEventTypeId                        int NULL
+        , CtsEventTypeName                      varchar(100) NULL
+        , CtsEventCategoryName                  varchar(100) NULL
+        , IsRequired                            bit NOT NULL
+        , SortOrder                             int NOT NULL  
+    
+        CONSTRAINT PK_tReportPackageElementType PRIMARY KEY CLUSTERED 
+        (
+	        ReportPackageElementTypeId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+        , CONSTRAINT AK_tReportPackageElementType_ReportPackageElementCategoryId_ReportElementTypeName UNIQUE 
+        (
+            ReportPackageElementCategoryId ASC
+            , ReportElementTypeName ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+        , CONSTRAINT FK_tReportPackageElementType_tReportPackageElementCategory FOREIGN KEY 
+		(
+			ReportPackageElementCategoryId
+		) REFERENCES dbo.tReportPackageElementCategory(ReportPackageElementCategoryId)
+    ) ON [LinkoExchange_FG2_Data]
+    
+    ALTER TABLE dbo.tReportPackageElementType ADD CONSTRAINT DF_tReportPackageElementType_IsRequired DEFAULT 0 FOR IsRequired
+    ALTER TABLE dbo.tReportPackageElementType ADD CONSTRAINT DF_tReportPackageElementType_SortOrder DEFAULT 0 FOR SortOrder
+
+    CREATE NONCLUSTERED INDEX IX_tReportPackageElementType_ReportPackageElementCategoryId ON dbo.tReportPackageElementType
+	(
+		ReportPackageElementCategoryId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tReportSample') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tReportSample'
+    PRINT '--------------------'
+
+    CREATE TABLE dbo.tReportSample
+    (
+        ReportSampleId                  int IDENTITY(1,1) NOT NULL  
+        , ReportPackageElementTypeId    int NOT NULL  
+        , SampleId                      int NOT NULL  
+    
+        CONSTRAINT PK_tReportSample PRIMARY KEY CLUSTERED 
+        (
+	        ReportSampleId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+        , CONSTRAINT AK_tReportSample_ReportPackageElementTypeId_SampleId UNIQUE 
+        (
+            ReportPackageElementTypeId ASC
+            , SampleId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+        , CONSTRAINT FK_tReportSample_tReportPackageElementType FOREIGN KEY 
+		(
+			ReportPackageElementTypeId
+		) REFERENCES dbo.tReportPackageElementType(ReportPackageElementTypeId)
+		, CONSTRAINT FK_tReportSample_tSample FOREIGN KEY 
+		(
+			SampleId
+		) REFERENCES dbo.tSample(SampleId)
+    ) ON [LinkoExchange_FG2_Data]
+    
+    CREATE NONCLUSTERED INDEX IX_tReportSample_ReportPackageElementTypeId ON dbo.tReportSample
+	(
+		ReportPackageElementTypeId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+	
+	CREATE NONCLUSTERED INDEX IX_tReportSample_SampleId ON dbo.tReportSample
+	(
+		SampleId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tReportFile') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tReportFile'
+    PRINT '------------------'
+
+    CREATE TABLE dbo.tReportFile
+    (
+        ReportFileId                    int IDENTITY(1,1) NOT NULL  
+        , ReportPackageElementTypeId    int NOT NULL  
+        , FileStoreId                   int NOT NULL  
+    
+        CONSTRAINT PK_tReportFile PRIMARY KEY CLUSTERED 
+        (
+	        ReportFileId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+        , CONSTRAINT AK_tReportFile_ReportPackageElementTypeId_FileStoreId UNIQUE 
+        (
+            ReportPackageElementTypeId ASC
+            , FileStoreId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+        , CONSTRAINT FK_tReportFile_tReportPackageElementType FOREIGN KEY 
+		(
+			ReportPackageElementTypeId
+		) REFERENCES dbo.tReportPackageElementType(ReportPackageElementTypeId)
+		, CONSTRAINT FK_tReportFile_tFileStore FOREIGN KEY 
+		(
+			FileStoreId
+		) REFERENCES dbo.tFileStore(FileStoreId)
+    ) ON [LinkoExchange_FG2_Data]
+    
+    CREATE NONCLUSTERED INDEX IX_tReportFile_ReportPackageElementTypeId ON dbo.tReportFile
+	(
+		ReportPackageElementTypeId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+	
+	CREATE NONCLUSTERED INDEX IX_tReportFile_FileStoreId ON dbo.tReportFile
+	(
+		FileStoreId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG2_Data]
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tCopyOfRecordCertificate') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tCopyOfRecordCertificate'
+    PRINT '-------------------------------'
+    
+    CREATE TABLE dbo.tCopyOfRecordCertificate 
+    (
+        CopyOfRecordCertificateId           int IDENTITY(1,1) NOT NULL
+        , PhysicalPath                      varchar(256) NOT NULL
+        , FileName                          varchar(256) NOT NULL
+        , Password                          varchar(50) NOT NULL
+        , CreationDateTimeUtc               datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc       datetimeoffset(0) NULL  
+        , LastModifierUserId                int NULL  
+    
+        CONSTRAINT PK_tCopyOfRecordCertificate PRIMARY KEY CLUSTERED 
+        (
+	        CopyOfRecordCertificateId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+    ) ON [LinkoExchange_FG1_Data]
+    
+    ALTER TABLE dbo.tCopyOfRecordCertificate ADD CONSTRAINT DF_tCopyOfRecordCertificate_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
+END
+GO
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tCopyOfRecord') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tCopyOfRecord'
+    PRINT '--------------------'
+    
+    CREATE TABLE dbo.tCopyOfRecord 
+    (
+        CopyOfRecordId                      int IDENTITY(1,1) NOT NULL
+        , OrganizationRegulatoryProgramId   int NOT NULL
+        , ReportPackageId                   int NOT NULL
+        , Signature                         varchar(350) NOT NULL
+        , SignatureAlgorithm                varchar(10) NOT NULL
+        , Hash                              varchar(100) NOT NULL
+        , HashAlgorithm                     varchar(10) NOT NULL
+        , Data                              varbinary(max) NOT NULL
+        , CopyOfRecordCertificateId         int NOT NULL
+    
+        CONSTRAINT PK_tCopyOfRecord PRIMARY KEY CLUSTERED 
+        (
+	        CopyOfRecordId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG3_LOB]
+        , CONSTRAINT FK_tCopyOfRecord_tOrganizationRegulatoryProgram FOREIGN KEY 
+		(
+			OrganizationRegulatoryProgramId
+		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
+        , CONSTRAINT FK_tCopyOfRecord_tCopyOfRecordCertificate FOREIGN KEY 
+		(
+			CopyOfRecordCertificateId
+		) REFERENCES dbo.tCopyOfRecordCertificate(CopyOfRecordCertificateId)
+    ) ON [LinkoExchange_FG3_LOB]
+    
+    CREATE NONCLUSTERED INDEX IX_tCopyOfRecord_OrganizationRegulatoryProgramId ON dbo.tCopyOfRecord
+	(
+		OrganizationRegulatoryProgramId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG3_LOB]
+
+    CREATE NONCLUSTERED INDEX IX_tCopyOfRecord_CopyOfRecordCertificateId ON dbo.tCopyOfRecord
+	(
+		CopyOfRecordCertificateId ASC
+	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG3_LOB]
 END
 GO
 
@@ -4653,6 +5559,78 @@ BEGIN
 		VALUES ('Revoked', 'Signatory rights request revoked')
 END
 
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tCollectionMethodType)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tCollectionMethodType'
+    PRINT '------------------------------------'
+    
+    INSERT INTO dbo.tCollectionMethodType (Name, Description)
+		VALUES ('Grab', 'Grab')
+    INSERT INTO dbo.tCollectionMethodType (Name, Description)
+		VALUES ('Composite', 'Composite')
+    INSERT INTO dbo.tCollectionMethodType (Name, Description)
+		VALUES ('Flow', 'Flow')
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tLimitType)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tLimitType'
+    PRINT '-------------------------'
+    
+    INSERT INTO dbo.tLimitType (Name, Description)
+		VALUES ('Daily', 'Daily')
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tLimitBasis)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tLimitBasis'
+    PRINT '--------------------------'
+    
+    INSERT INTO dbo.tLimitBasis (Name, Description)
+		VALUES ('Concentration', 'Concentration')
+    INSERT INTO dbo.tLimitBasis (Name, Description)
+		VALUES ('MassLoading', 'MassLoading')
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tFileType)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tFileType'
+    PRINT '------------------------'
+    
+    INSERT INTO dbo.tFileType (Extension, Description)
+		VALUES ('.docx', 'application/msword')
+    INSERT INTO dbo.tFileType (Extension, Description)
+		VALUES ('.doc', 'application/msword')
+    INSERT INTO dbo.tFileType (Extension, Description)
+		VALUES ('.xls', 'application/excel')
+    INSERT INTO dbo.tFileType (Extension, Description)
+		VALUES ('.xlsx', 'application/excel')
+    INSERT INTO dbo.tFileType (Extension, Description)
+		VALUES ('.pdf', 'application/pdf')
+    INSERT INTO dbo.tFileType (Extension, Description)
+		VALUES ('.tif', 'image/tiff')
+    INSERT INTO dbo.tFileType (Extension, Description)
+		VALUES ('.jpg', 'image/jpeg')
+    INSERT INTO dbo.tFileType (Extension, Description)
+		VALUES ('.jpeg', 'image/pjpeg')
+    INSERT INTO dbo.tFileType (Extension, Description)
+		VALUES ('.bmp', 'image/bmp')
+    INSERT INTO dbo.tFileType (Extension, Description)
+		VALUES ('.png', 'image/png')
+    INSERT INTO dbo.tFileType (Extension, Description)
+		VALUES ('.txt', 'text/plain')
+    INSERT INTO dbo.tFileType (Extension, Description)
+		VALUES ('.csv', 'text/csv')
+END
+
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tSampleStatus)
 BEGIN
     PRINT CHAR(13)
@@ -4696,6 +5674,74 @@ BEGIN
             'Samples and Results'
             , 'Sample results'
             , 1
+            , (SELECT OrganizationRegulatoryProgramId FROM dbo.tOrganizationRegulatoryProgram WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP AND OrganizationId = @OrganizationId_GRESD)
+        )
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tReportStatus)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tReportStatus'
+    PRINT '----------------------------'
+    
+    INSERT INTO dbo.tReportStatus (Name, Description)
+		VALUES ('Draft', 'Draft')
+    INSERT INTO dbo.tReportStatus (Name, Description)
+		VALUES ('ReadyToSubmit', 'Ready To Submit')
+    INSERT INTO dbo.tReportStatus (Name, Description)
+		VALUES ('Submitted', 'Submitted')
+    INSERT INTO dbo.tReportStatus (Name, Description)
+		VALUES ('Repudiated', 'Repudiated')
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tRepudiationReason)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tRepudiationReason'
+    PRINT '---------------------------------'
+    
+    INSERT INTO dbo.tRepudiationReason (Name, Description, OrganizationRegulatoryProgramId)
+		VALUES 
+        (
+            'I did not submit this report'
+            , 'I did not submit this report'
+            , (SELECT OrganizationRegulatoryProgramId FROM dbo.tOrganizationRegulatoryProgram WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP AND OrganizationId = @OrganizationId_GRESD)
+        )
+    INSERT INTO dbo.tRepudiationReason (Name, Description, OrganizationRegulatoryProgramId)
+		VALUES 
+        (
+            'Report is missing a sample'
+            , 'Report is missing a sample'
+            , (SELECT OrganizationRegulatoryProgramId FROM dbo.tOrganizationRegulatoryProgram WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP AND OrganizationId = @OrganizationId_GRESD)
+        )
+    INSERT INTO dbo.tRepudiationReason (Name, Description, OrganizationRegulatoryProgramId)
+		VALUES 
+        (
+            'Report is missing a parameter'
+            , 'Report is missing a parameter'
+            , (SELECT OrganizationRegulatoryProgramId FROM dbo.tOrganizationRegulatoryProgram WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP AND OrganizationId = @OrganizationId_GRESD)
+        )
+    INSERT INTO dbo.tRepudiationReason (Name, Description, OrganizationRegulatoryProgramId)
+		VALUES 
+        (
+            'Report has errors'
+            , 'Report has errors'
+            , (SELECT OrganizationRegulatoryProgramId FROM dbo.tOrganizationRegulatoryProgram WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP AND OrganizationId = @OrganizationId_GRESD)
+        )
+    INSERT INTO dbo.tRepudiationReason (Name, Description, OrganizationRegulatoryProgramId)
+		VALUES 
+        (
+            'A hold time was exceeded'
+            , 'A hold time was exceeded'
+            , (SELECT OrganizationRegulatoryProgramId FROM dbo.tOrganizationRegulatoryProgram WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP AND OrganizationId = @OrganizationId_GRESD)
+        )
+    INSERT INTO dbo.tRepudiationReason (Name, Description, OrganizationRegulatoryProgramId)
+		VALUES 
+        (
+            'Other (please comment)'
+            , 'Other (please comment)'
             , (SELECT OrganizationRegulatoryProgramId FROM dbo.tOrganizationRegulatoryProgram WHERE RegulatoryProgramId = @RegulatoryProgramId_IPP AND OrganizationId = @OrganizationId_GRESD)
         )
 END
