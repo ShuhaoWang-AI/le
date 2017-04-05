@@ -26,5 +26,7 @@ namespace Linko.LinkoExchange.Core.Domain
 
         // Reverse navigation
         public virtual ICollection<OrganizationTypeRegulatoryProgram> OrganizationTypeRegulatoryPrograms { get; set; }
+
+        public virtual ICollection<Sample> Samples { get; set; }
     }
 }

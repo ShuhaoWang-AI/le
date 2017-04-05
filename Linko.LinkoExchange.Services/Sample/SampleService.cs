@@ -39,6 +39,7 @@ namespace Linko.LinkoExchange.Services.Sample
         {
             _dbContext = dbContext;
             _httpContext = httpContext;
+            _orgService = orgService;
             _mapHelper = mapHelper;
             _logger = logger;
             _timeZoneService = timeZoneService;
@@ -61,7 +62,8 @@ namespace Linko.LinkoExchange.Services.Sample
                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
             }
-            //...
+            //Check for any mass results exist, if so check for flow value provided?
+            // OR HANDLED AT UI LAYER
 
             using (var transaction = _dbContext.BeginTransaction())
             {

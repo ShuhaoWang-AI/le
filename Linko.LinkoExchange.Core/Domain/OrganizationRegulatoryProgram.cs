@@ -68,5 +68,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public virtual ICollection<ReportElementType> ReportElementTypes { get; set; }
 
         public virtual ICollection<ReportPackageTemplate> ReportPackageTemplates { get; set; }
+
+        public virtual ICollection<Sample> Samples { get; set; }
     }
 }
