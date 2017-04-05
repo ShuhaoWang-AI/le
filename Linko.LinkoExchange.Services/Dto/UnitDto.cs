@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
@@ -15,9 +11,9 @@ namespace Linko.LinkoExchange.Services.Dto
         public int OrganizationId { get; set; }
         public bool IsRemoved { get; set; }
         public DateTimeOffset CreationDateTimeUtc { get; set; }
-        public DateTimeOffset CreationDateTimeLocal { get; set; }
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
         public DateTimeOffset? LastModificationDateTimeLocal { get; set; }
         public int? LastModifierUserId { get; set; }
+        public string LastModifierFullName { get; set; }
     }
 }

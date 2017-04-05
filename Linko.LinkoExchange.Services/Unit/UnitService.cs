@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Report;
@@ -17,15 +18,13 @@ namespace Linko.LinkoExchange.Services.Unit
         private readonly ILogger _logger;
         private readonly IHttpContextService _httpContextService;
         private readonly ITimeZoneService _timeZoneService;
-        private readonly IReportPackageService _reportPackageService;
 
         public UnitService(
             LinkoExchangeContext dbContext,
             IMapHelper mapHelper,
             ILogger logger,
             IHttpContextService httpContextService,
-            ITimeZoneService timeZoneService,
-            IReportPackageService reportPackageService)
+            ITimeZoneService timeZoneService)
         {
             if (dbContext == null)
             {
@@ -52,34 +51,54 @@ namespace Linko.LinkoExchange.Services.Unit
                 throw new ArgumentNullException(nameof(timeZoneService));
             }
 
-            if (reportPackageService == null)
-            {
-                throw new ArgumentNullException(nameof(reportPackageService));
-            }
-
             _dbContext = dbContext;
             _mapHelper = mapHelper;
             _logger = logger;
             _httpContextService = httpContextService;
             _timeZoneService = timeZoneService;
-            _reportPackageService = reportPackageService;
         }
 
         public List<UnitDto> GetFlowUnits()
         {
             _logger.Info("Enter UnitService.GetFlowUnits.");
+
             var units = _dbContext.Units.Where(i => i.IsFlowUnit == true).ToList();
 
-            var unitsDtos = units.Select(i => _mapHelper.GetUnitDtoFromUnit(i)).ToList();
+            var unitDtos = UnitDtosHelper(units);
 
-            //TODO: to upodate teh last modification time and last modifier   
-            //foreach (var unit in unitsDtos)
-            //{ 
-            //    unit.LastModificationDateTimeUtc =
-            //}
             _logger.Info("Leave UnitService.GetFlowUnits.");
 
-            return unitsDtos;
+            return unitDtos;
+        }
+
+        private List<UnitDto> UnitDtosHelper(List<Core.Domain.Unit> units)
+        {
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+            var unitDtos = new List<UnitDto>();
+            foreach (var unit in units)
+            {
+                var unitDto = _mapHelper.GetUnitDtoFromUnit(unit);
+
+                unitDto.LastModificationDateTimeLocal = _timeZoneService
+                    .GetLocalizedDateTimeUsingSettingForThisOrg(
+                    (unit.LastModificationDateTimeUtc.HasValue
+                        ? unit.LastModificationDateTimeUtc.Value.DateTime
+                        : unit.CreationDateTimeUtc.DateTime), currentOrgRegProgramId);
+
+                if (unit.LastModifierUserId.HasValue)
+                {
+                    var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == unit.LastModifierUserId.Value);
+                    unitDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+                }
+                else
+                {
+                    unitDto.LastModifierFullName = "N/A";
+                }
+
+                unitDtos.Add(unitDto);
+            }
+            return unitDtos;
         }
     }
 }
