@@ -1799,7 +1799,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         [Route(template:"ParameterGroup/Details")]
         public ActionResult ParameterGroupDetails(ParameterGroupViewModel model)
         {
@@ -2231,7 +2231,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-       // [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         [Route(template:"ReportPackageTemplate/New")]
         public ActionResult NewReportPackageTemplateDetails(ReportPackageTemplateViewModel model)
         {
@@ -2260,7 +2260,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-       // [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         [Route(template:"ReportPackageTemplate/Details")]
         public ActionResult ReportPackageTemplateDetails(int? id, ReportPackageTemplateViewModel model)
         {

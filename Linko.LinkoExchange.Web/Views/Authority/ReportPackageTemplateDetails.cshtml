@@ -30,13 +30,13 @@
             <div class="box-tools pull-right">
                 @if (!ViewBag.Satus.Equals("ViewOnly"))
                 {
-                    ViewBag.PostURL = @Url.Action(actionName: "NewReportPackageTemplateDetails", controllerName:"Authority");
+                    ViewBag.PostURL = Url.Action(actionName: "NewReportPackageTemplateDetails", controllerName:"Authority");
 
                     <input type="button" value="Save" id="btnSave" class="btn btn-primary btn-sm"/>
 
                     if (!ViewBag.Satus.Equals("New"))
                     {
-                        ViewBag.PostURL = @Url.Action(actionName: "ReportPackageTemplateDetails", controllerName: "Authority");
+                        ViewBag.PostURL = Url.Action(actionName: "ReportPackageTemplateDetails", controllerName: "Authority");
 
                         <input class="btn btn-primary btn-sm" data-target="#DeleteReportPackageTemplateModal" data-toggle="modal" type="button" value="Delete" />
                     }
@@ -1073,6 +1073,8 @@
                     console.log('----', viewModel);
 
                     var postUrl = "@ViewBag.PostURL";
+                    var token = $("[name='__RequestVerificationToken']").val();
+                    viewModel.__RequestVerificationToken = token;
 
                     $.ajax({
                         type: "POST"

@@ -346,6 +346,8 @@
                     viewModel.Parameters = selectedParameters;
 
                     var postUrl = "@Url.Action(actionName:"ParameterGroupDetails", controllerName:"Authority")";
+                    var token = $("[name='__RequestVerificationToken']").val();
+                    viewModel.__RequestVerificationToken = token;
 
                     $.ajax({
                         type: "POST"
