@@ -317,6 +317,10 @@ namespace Linko.LinkoExchange.Services.Sample
                 if (sampleResult.IsFlowForMassLoadingCalculation &&
                     (sampleResult.LimitBasisId == null && sampleResult.LimitTypeId == null))
                 {
+                    dto.FlowValue = sampleResult.Value;
+                    dto.FlowUnitId = sampleResult.UnitId;
+                    dto.FlowUnitName = sampleResult.UnitName;
+                    dto.FlowValueDecimalPlaces = sampleResult.DecimalPlaces;
 
                 }
                 else if (sampleResult.IsFlowForMassLoadingCalculation == false &&
@@ -325,19 +329,19 @@ namespace Linko.LinkoExchange.Services.Sample
                     || sampleResult.LimitBasis.Name == LimitBasisName.Concentration.ToString()))
                 {
 
-                    if (resultDtoList.ContainsKey(resultDto.ParameterId))
+                    if (resultDtoList.ContainsKey(sampleResult.ParameterId))
                     {
                         //There was already a result dto added for this parameter
                         //and we are now handling the corresponding concentration (or mass) result
                         //and must attach these fields to that dto
-                        resultDto = resultDtoList[resultDto.ParameterId];
+                        resultDto = resultDtoList[sampleResult.ParameterId];
                     }
                     else
                     {
                         //There may be a corresponding concentation (or mass) result
                         //later in the collection that needs to be attached to this result dto
                         //so we need to save this for looking up later. 
-                        resultDtoList.Add(resultDto.ParameterId, resultDto);
+                        resultDtoList.Add(sampleResult.ParameterId, resultDto);
                     }
 
                     if (sampleResult.LimitBasis.Name == LimitBasisName.Concentration.ToString())

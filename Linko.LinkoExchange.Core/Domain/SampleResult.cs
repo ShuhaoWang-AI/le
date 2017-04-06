@@ -24,7 +24,7 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public string Qualifier { get; set; }
 
-        public double? Value { get; set; }
+        public double Value { get; set; }
 
         public int? DecimalPlaces { get; set; }
 

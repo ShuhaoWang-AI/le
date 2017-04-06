@@ -1002,7 +1002,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 ,ParameterId = dto.ParameterId
                 ,ParameterName = dto.ParameterName
                 ,Qualifier = dto.Qualifier
-                ,Value = dto.Value
+                ,Value = dto.Value.Value
                 ,DecimalPlaces = dto.DecimalPlaces
                 ,UnitId = dto.UnitId
                 ,UnitName = dto.UnitName
@@ -1031,7 +1031,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 ,ParameterId = dto.ParameterId
                 ,ParameterName = dto.ParameterName
                 ,Qualifier = dto.MassLoadingQualifier
-                ,Value = dto.MassLoadingValue
+                ,Value = dto.MassLoadingValue.Value
                 ,DecimalPlaces = dto.MassLoadingDecimalPlaces
                 ,UnitId = dto.MassLoadingUnitId
                 ,UnitName = dto.MassLoadingUnitName
