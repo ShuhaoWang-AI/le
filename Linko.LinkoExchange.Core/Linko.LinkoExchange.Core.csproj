@@ -139,6 +139,8 @@
     <Compile Include="Domain\UserQuestionAnswer.cs" />
     <Compile Include="Enum\AccountAutoLockEvent.cs" />
     <Compile Include="Enum\AuthenticationResult.cs" />
+    <Compile Include="Enum\DigitalSignAlgorithm.cs" />
+    <Compile Include="Enum\HashAlgorithm.cs" />
     <Compile Include="Enum\Country.cs" />
     <Compile Include="Enum\CreateOrUpdateAnswersResult.cs" />
     <Compile Include="Enum\CurrentUserInfo.cs" />

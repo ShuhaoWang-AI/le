@@ -112,7 +112,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CopyOrRecord\CopyOfRecordService.cs" />
+    <Compile Include="CopyOrRecord\HashHelper.cs" />
     <Compile Include="CopyOrRecord\ICopyOrRecordService.cs" />
+    <Compile Include="CopyOrRecord\IDigitalSignManager.cs" />
     <Compile Include="Dto\CopyOfRecordDto.cs" />
     <Compile Include="Dto\CorFileDtoBase.cs" />
     <Compile Include="Dto\CorManifestFileDato.cs" />
