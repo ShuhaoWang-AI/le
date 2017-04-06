@@ -134,41 +134,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         [Display(Name = "Select the Result Qualifiers the Industry Can Use")]
         public string ResultQualifierValidValues { get; set; }
 
-        public IList<SelectListItem> AvailableResultQualifierValidValues
-        {
-            get
-            {
-                var selectedValues = ResultQualifierValidValues?.Split(',').ToList() ?? new List<string> {""};
-                var options = new List<SelectListItem>
-                              {
-                                  new SelectListItem
-                                  {
-                                      Text = @"<",
-                                      Value = "<",
-                                      Selected = selectedValues.Contains(item:"<")
-                                  },
-                                  new SelectListItem
-                                  {
-                                      Text = @">",
-                                      Value = ">",
-                                      Selected = selectedValues.Contains(item:">")
-                                  },
-                                  new SelectListItem
-                                  {
-                                      Text = @"ND",
-                                      Value = "ND",
-                                      Selected = selectedValues.Contains(item:"ND")
-                                  },
-                                  new SelectListItem
-                                  {
-                                      Text = @"NF",
-                                      Value = "NF",
-                                      Selected = selectedValues.Contains(item:"<")
-                                  }
-                              };
-                return options;
-            }
-        }
+        public IList<SelectListItem> AvailableResultQualifierValidValues { get; set; }
 
         [Display(Name = "Select the Sample Flow Units the Industry Can Use")]
         public string FlowUnitValidValues { get; set; }

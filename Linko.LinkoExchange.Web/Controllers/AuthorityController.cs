@@ -301,6 +301,21 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                          .Select(s => s.Value).First()
                             };
 
+            // Result Qualifier Valid Values
+
+            var selectedResultQualifierValidValues = viewModel.ResultQualifierValidValues.Split(',').ToList();
+            viewModel.AvailableResultQualifierValidValues = new List<SelectListItem>();
+            var resultQualifierValidValues = new List<string> {"<", ">", "ND", "NF"};
+            if (resultQualifierValidValues.Count > 0)
+            {
+                viewModel.AvailableResultQualifierValidValues = resultQualifierValidValues.Select(x => new SelectListItem
+                                                                     {
+                                                                         Text = x,
+                                                                         Value = x,
+                                                                         Selected = selectedResultQualifierValidValues.Contains(item:x)
+                                                                     }).ToList();
+            }
+
             // Flow Units
 
             var selectedFlowUnits = viewModel.FlowUnitValidValues.Split(',').ToList();
