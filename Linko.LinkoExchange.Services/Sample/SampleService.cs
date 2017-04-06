@@ -302,37 +302,126 @@ namespace Linko.LinkoExchange.Services.Sample
                 dto.LastModifierFullName = "N/A";
             }
 
-            var resultDtoList = new List<SampleResultDto>();
+            var resultDtoList = new Dictionary<int, SampleResultDto>();
             foreach (var sampleResult in sample.SampleResults)
             {
-                var resultDto = _mapHelper.GetSampleResultDtoFromSampleResult(sampleResult);
+                //Handle "special case" Sample Results. These do not get mapped to their own
+                //SampleResult dtos.
+                //1. Flow - gets mapped to properties of the parent Sample Dto
+                //2. Mass - gets mapped to corresponding Concentration result Dto
+                //
+                //Remember that the items in this collection are unordered.
+
+                var resultDto = new SampleResultDto();
                 
-                //Need to set localized time stamps for SampleResults
-                if (sampleResult.AnalysisDateTimeUtc.HasValue)
+                if (sampleResult.IsFlowForMassLoadingCalculation &&
+                    (sampleResult.LimitBasisId == null && sampleResult.LimitTypeId == null))
                 {
-                    resultDto.AnalysisDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(sampleResult.AnalysisDateTimeUtc.Value.DateTime, timeZoneId);
+
                 }
-
-                //Set LastModificationDateTimeLocal
-                resultDto.LastModificationDateTimeLocal = _timeZoneService
-                        .GetLocalizedDateTimeUsingThisTimeZoneId((sampleResult.LastModificationDateTimeUtc.HasValue ? sampleResult.LastModificationDateTimeUtc.Value.DateTime
-                            : sampleResult.CreationDateTimeUtc.DateTime), timeZoneId);
-
-                if (sampleResult.LastModifierUserId.HasValue)
+                else if (sampleResult.IsFlowForMassLoadingCalculation == false &&
+                    sampleResult.LimitType.Name == LimitTypeName.DailyLimit.ToString() &&
+                    (sampleResult.LimitBasis.Name == LimitBasisName.Mass.ToString() 
+                    || sampleResult.LimitBasis.Name == LimitBasisName.Concentration.ToString()))
                 {
-                    var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == sampleResult.LastModifierUserId.Value);
-                    resultDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+
+                    if (resultDtoList.ContainsKey(resultDto.ParameterId))
+                    {
+                        //There was already a result dto added for this parameter
+                        //and we are now handling the corresponding concentration (or mass) result
+                        //and must attach these fields to that dto
+                        resultDto = resultDtoList[resultDto.ParameterId];
+                    }
+                    else
+                    {
+                        //There may be a corresponding concentation (or mass) result
+                        //later in the collection that needs to be attached to this result dto
+                        //so we need to save this for looking up later. 
+                        resultDtoList.Add(resultDto.ParameterId, resultDto);
+                    }
+
+                    if (sampleResult.LimitBasis.Name == LimitBasisName.Concentration.ToString())
+                    {
+                        resultDto.SampleId = sampleResult.SampleId;
+                        resultDto.ParameterId = sampleResult.ParameterId;
+                        resultDto.ParameterName = sampleResult.ParameterName;
+                        resultDto.MethodDetectionLimit = sampleResult.MethodDetectionLimit;
+                        resultDto.AnalysisMethod = sampleResult.AnalysisMethod;
+                        resultDto.IsApprovedEPAMethod = sampleResult.IsApprovedEPAMethod;
+                        resultDto.ParameterId = sampleResult.ParameterId;
+                        resultDto.IsCalcMassLoading = sampleResult.IsMassLoadingCalculationRequired;
+                        resultDto.Qualifier = sampleResult.Qualifier;
+                        resultDto.Value = sampleResult.Value;
+                        resultDto.DecimalPlaces = sampleResult.DecimalPlaces;
+                        resultDto.UnitId = sampleResult.UnitId;
+                        resultDto.UnitName = sampleResult.UnitName;
+
+                        SetSampleResultDatesAndLastModified(sampleResult, ref resultDto, timeZoneId);
+
+                    }
+                    else {
+                        //Mass Result
+                        resultDto.MassLoadingQualifier = sampleResult.Qualifier;
+                        resultDto.MassLoadingValue = sampleResult.Value;
+                        resultDto.MassLoadingDecimalPlaces = sampleResult.DecimalPlaces;
+                        resultDto.MassLoadingUnitId = sampleResult.UnitId;
+                        resultDto.MassLoadingUnitName = sampleResult.UnitName;
+                    }
+
+
                 }
                 else
                 {
-                    resultDto.LastModifierFullName = "N/A";
+                    //  "Any introduction of a new Limit Type or new Limit Basis at the data level 
+                    //  will be ignored until we change the code..." - mj
+                    var errorString = $"Encountered Sample Result with SampleResultId={sampleResult.SampleResultId} with unknown " + 
+                        $"IsFlowForMassLoadingCalculation / Limit Type / Limit Basis combination";
+                    throw new Exception(errorString);
                 }
 
-                resultDtoList.Add(resultDto);
+              
             }
-            dto.SampleResults = resultDtoList;
+
+            //Check that all results have at least concentration fields.
+            foreach (var resultDtoValue in resultDtoList.Values)
+            {
+                if (string.IsNullOrEmpty(resultDtoValue.Qualifier) ||
+                    resultDtoValue.Value == null || resultDtoValue.DecimalPlaces < 1 ||
+                    resultDtoValue.UnitId < 1 || string.IsNullOrEmpty(resultDtoValue.UnitName))
+                {
+                    var errorString = $"Sample Result DTO for Sample Id = {resultDtoValue.SampleId}, " +
+                        $"Parameter Id = {resultDtoValue.ParameterId} could not be correctly constructed due to missing concentration fields";
+                    throw new Exception(errorString);
+                }
+            }
+
+            dto.SampleResults = resultDtoList.Values.ToList();
 
             return dto;
+        }
+
+        private void SetSampleResultDatesAndLastModified(SampleResult sampleResult, ref SampleResultDto resultDto, int timeZoneId)
+        {
+            //Need to set localized time stamps for SampleResults
+            if (sampleResult.AnalysisDateTimeUtc.HasValue)
+            {
+                resultDto.AnalysisDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(sampleResult.AnalysisDateTimeUtc.Value.DateTime, timeZoneId);
+            }
+
+            //Set LastModificationDateTimeLocal
+            resultDto.LastModificationDateTimeLocal = _timeZoneService
+                    .GetLocalizedDateTimeUsingThisTimeZoneId((sampleResult.LastModificationDateTimeUtc.HasValue ? sampleResult.LastModificationDateTimeUtc.Value.DateTime
+                        : sampleResult.CreationDateTimeUtc.DateTime), timeZoneId);
+
+            if (sampleResult.LastModifierUserId.HasValue)
+            {
+                var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == sampleResult.LastModifierUserId.Value);
+                resultDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
+            }
+            else
+            {
+                resultDto.LastModifierFullName = "N/A";
+            }
         }
 
         public SampleDto GetSampleDetails(int sampleId)
