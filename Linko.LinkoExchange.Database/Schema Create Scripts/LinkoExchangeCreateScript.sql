@@ -3775,7 +3775,7 @@ BEGIN
 		(
 		    'SampleNameCreationRule'
 		    , 'Sample names sent to CTS.'
-            , ''
+            , 'SampleEventType'
 		    , @OrganizationTypeId_Authority
 		    , @RegulatoryProgramId_IPP
 		)
