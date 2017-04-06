@@ -61,7 +61,9 @@ namespace Linko.LinkoExchange.Services.Unit
         {
             _logger.Info("Enter UnitService.GetFlowUnits.");
 
-            var units = _dbContext.Units.Where(i => i.IsFlowUnit == true).ToList();
+            var currentOrganizationId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationId));
+
+            var units = _dbContext.Units.Where(i => i.IsFlowUnit && i.OrganizationId == currentOrganizationId).ToList();
 
             var unitDtos = UnitDtosHelper(units);
 
