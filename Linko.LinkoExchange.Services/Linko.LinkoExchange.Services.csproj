@@ -111,6 +111,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CopyOrRecord\CertificateDigitalSignManager.cs" />
     <Compile Include="CopyOrRecord\CopyOfRecordService.cs" />
     <Compile Include="CopyOrRecord\HashHelper.cs" />
     <Compile Include="CopyOrRecord\ICopyOrRecordService.cs" />
