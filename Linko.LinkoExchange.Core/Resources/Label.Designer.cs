@@ -250,6 +250,24 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sample Event Type.
+        /// </summary>
+        public static string SampleEventType {
+            get {
+                return ResourceManager.GetString("SampleEventType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sample Event Type + Collection Method.
+        /// </summary>
+        public static string SampleEventTypeCollectionMethod {
+            get {
+                return ResourceManager.GetString("SampleEventTypeCollectionMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Forgot Password.
         /// </summary>
         public static string TitleForgotPassword {

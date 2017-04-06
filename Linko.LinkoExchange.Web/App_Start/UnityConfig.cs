@@ -97,6 +97,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IParameterService, ParameterService>();
             container.RegisterType<IReportElementService, ReportElementService>();
             container.RegisterType<IReportTemplateService, ReportTemplateService>();
+            container.RegisterType<IUnitService, UnitService>();
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();

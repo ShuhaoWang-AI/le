@@ -434,6 +434,54 @@
             </div>
 
             <div class="form-group">
+                @Html.LabelFor(model => model.ResultQualifierValidValues, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @for (int i = 0; i < Model.AvailableResultQualifierValidValues.Count; i++)
+                    {
+                        <div class="checkbox-inline">
+                            @Html.CheckBoxFor(m => m.AvailableResultQualifierValidValues[i].Selected)
+                            @Html.HiddenFor(m => m.AvailableResultQualifierValidValues[i].Value)
+                            @Html.LabelFor(m => m.AvailableResultQualifierValidValues[i].Selected, Model.AvailableResultQualifierValidValues[i].Text)
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.FlowUnitValidValues, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @for (int i = 0; i < Model.AvailableFlowUnitValidValues.Count; i++)
+                    {
+                        <div class="checkbox-inline">
+                            @Html.CheckBoxFor(m => m.AvailableFlowUnitValidValues[i].Selected)
+                            @Html.HiddenFor(m => m.AvailableFlowUnitValidValues[i].Value)
+                            @Html.LabelFor(m => m.AvailableFlowUnitValidValues[i].Selected, Model.AvailableFlowUnitValidValues[i].Text)
+                        </div>
+                    }
+                </div>
+            </div>
+    
+            <div class="form-group">
+                @Html.LabelFor(model => model.SampleNameCreationRule, htmlAttributes: new
+                {
+                    @class = "control-label col-md-7 col-lg-6"
+                })
+
+                <div class="col-md-5 col-lg-4">
+                    @Html.DropDownList("SampleNameCreationRule", Model.AvailableSampleNameCreationRule, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.SampleNameCreationRule, "", new { @class = "text-red" })
+                </div>
+            </div>
+
+            <div class="form-group">
                 @Html.LabelFor(model => model.MassLoadingConversionFactorPounds, htmlAttributes: new
                 {
                     @class = "control-label col-md-7 col-lg-6"

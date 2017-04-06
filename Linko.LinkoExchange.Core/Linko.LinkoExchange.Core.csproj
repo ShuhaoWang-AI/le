@@ -151,6 +151,7 @@
     <Compile Include="Enum\RegistrationType.cs" />
     <Compile Include="Enum\ReportElementCategory.cs" />
     <Compile Include="Enum\ReportPackageTemplateStatus.cs" />
+    <Compile Include="Enum\SampleNameCreationRuleOption.cs" />
     <Compile Include="Enum\SampleStatusName.cs" />
     <Compile Include="Enum\SettingType.cs" />
     <Compile Include="Enum\SystemSettingType.cs" />

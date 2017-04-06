@@ -21,6 +21,7 @@ using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
+using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mvc;
@@ -49,11 +50,12 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IParameterService _parameterService;
         private readonly IReportElementService _reportElementService;
         private readonly IReportTemplateService _reportTemplateService;
+        private readonly IUnitService _unitService;
 
         public AuthorityController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService,
                                    ISettingService settingService, IQuestionAnswerService questionAnswerService, ITimeZoneService timeZoneService, IPermissionService permissionService,
                                    ISessionCache sessionCache, ILogger logger, ICromerrAuditLogService cromerrLogService, IHttpContextService httpContextService, IParameterService parameterService,
-                                   IReportElementService reportElementService, IReportTemplateService reportTemplateService)
+                                   IReportElementService reportElementService, IReportTemplateService reportTemplateService, IUnitService unitService)
         {
             _organizationService = organizationService;
             _userService = userService;
@@ -69,6 +71,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _parameterService = parameterService;
             _reportElementService = reportElementService;
             _reportTemplateService = reportTemplateService;
+            _unitService = unitService;
         }
 
         #endregion
@@ -166,6 +169,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                 //EmailContactInfoEmailAddress
                 programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.EmailContactInfoEmailAddress)).ToList()
                                .ForEach(s => s.Value = "" + model.EmailContactInfoEmailAddress);
+                //ResultQualifierValidValues
+                programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues)).ToList()
+                               .ForEach(s => s.Value = string.Join(",", model.AvailableResultQualifierValidValues.Where(x => x.Selected).Select(x => x.Value).ToList()));
+                //FlowUnitValidValues
+                programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.FlowUnitValidValues)).ToList()
+                               .ForEach(s => s.Value = string.Join(",", model.AvailableFlowUnitValidValues.Where(x => x.Selected).Select(x => x.Value).ToList()));
+                //SampleNameCreationRule
+                programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.SampleNameCreationRule)).ToList().ForEach(s => s.Value = model.SampleNameCreationRule);
 
                 _settingService.CreateOrUpdateProgramSettings(orgRegProgId:id, settingDtos:programSettings);
 
@@ -245,6 +256,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 ReportRepudiatedDays = programSettings.Settings
                                                                       .Where(s => s.TemplateName.Equals(obj:SettingType.ReportRepudiatedDays))
                                                                       .Select(s => s.Value).First(),
+                                ResultQualifierValidValues = programSettings.Settings
+                                                                      .Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues))
+                                                                      .Select(s => s.Value).First(),
+                                FlowUnitValidValues = programSettings.Settings
+                                                                      .Where(s => s.TemplateName.Equals(obj:SettingType.FlowUnitValidValues))
+                                                                      .Select(s => s.Value).First(),
+                                SampleNameCreationRule = programSettings.Settings
+                                                                      .Where(s => s.TemplateName.Equals(obj:SettingType.SampleNameCreationRule))
+                                                                      .Select(s => s.Value).First(),
                                 ReportRepudiatedDaysDefault = programSettings.Settings
                                                                              .Where(s => s.TemplateName.Equals(obj:SettingType.ReportRepudiatedDays))
                                                                              .Select(s => s.DefaultValue).First(),
@@ -280,6 +300,23 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                          .Where(s => s.TemplateName.Equals(obj:SettingType.UserPerIndustryMaxCount))
                                                                          .Select(s => s.Value).First()
                             };
+
+            // Flow Units
+
+            var selectedFlowUnits = viewModel.FlowUnitValidValues.Split(',').ToList();
+            viewModel.AvailableFlowUnitValidValues = new List<SelectListItem>();
+            var flowUnits = _unitService.GetFlowUnits();
+            if (flowUnits.Count > 0)
+            {
+                viewModel.AvailableFlowUnitValidValues = flowUnits.Select(x => new SelectListItem
+                                                                     {
+                                                                         Text = x.Name,
+                                                                         Value = x.Name,
+                                                                         Selected = selectedFlowUnits.Contains(item:x.Name)
+                                                                     }).ToList();
+            }
+
+
 
             // Time Zones
             viewModel.AvailableTimeZones = new List<SelectListItem>();

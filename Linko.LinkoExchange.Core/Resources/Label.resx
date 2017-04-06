@@ -180,6 +180,12 @@
   <data name="RememberMe" xml:space="preserve">
     <value>Remember Me</value>
   </data>
+  <data name="SampleEventType" xml:space="preserve">
+    <value>Sample Event Type</value>
+  </data>
+  <data name="SampleEventTypeCollectionMethod" xml:space="preserve">
+    <value>Sample Event Type + Collection Method</value>
+  </data>
   <data name="TitleForgotPassword" xml:space="preserve">
     <value>Forgot Password</value>
   </data>
