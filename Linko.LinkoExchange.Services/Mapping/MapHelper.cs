@@ -720,7 +720,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 //OrganizationRegulatoryProgramId = reportPackageTemplateDto.OrganizationRegulatoryProgramId,
                 IsActive = reportPackageTemplateDto.IsActive,
                 LastModifierUserId = reportPackageTemplateDto.LastModifierUserId,
-                CtsEventType = GetCtsEventTypeFromEventTypeDto(reportPackageTemplateDto.CtsEventType),
+                //CtsEventType = GetCtsEventTypeFromEventTypeDto(reportPackageTemplateDto.CtsEventType),
                 ReportPackageTemplateAssignments = new List<ReportPackageTemplateAssignment>(),
                 ReportPackageTemplateElementCategories = new List<ReportPackageTemplateElementCategory>()
             };

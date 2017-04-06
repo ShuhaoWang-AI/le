@@ -2434,7 +2434,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                 reportPackageTemplateDto.IsActive = model.IsActive;
                 reportPackageTemplateDto.EffectiveDateTimeLocal = model.EffectiveDateTimeLocal;
                 reportPackageTemplateDto.CtsEventTypeId = (int?) (model.CtsEventTypeId == 0 ? (ValueType) null : model.CtsEventTypeId);
-                reportPackageTemplateDto.CtsEventType = model.CtsEventTypeId == 0 ? null : _reportTemplateService.GetCtsEventType(ctsEventTypeId:model.CtsEventTypeId);
                 reportPackageTemplateDto.SamplesAndResultsTypes = model.SamplesAndResultsTypes?.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
                 reportPackageTemplateDto.AttachmentTypes = model.AttachmentTypes?.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
                 reportPackageTemplateDto.CertificationTypes = model.CertificationTypes?.Select(p => new ReportElementTypeDto {ReportElementTypeId = p.Id}).ToList();
