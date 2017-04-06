@@ -65,7 +65,7 @@ namespace Linko.LinkoExchange.Data
         public DbSet<FileType> FileTypes { get; set; }
         public DbSet<FileStoreData> FileStoreDatas { get; set; }
         public DbSet<CopyOfRecord> CopyOfRecords { get; set; }
-
+        public DbSet<CopyOfRecordCertificate> CopyOfRecordCertificates { get; set; }
         public DbSet<SampleStatus> SampleStatuses { get; set; }
         public DbSet<Sample> Samples { get; set; }
         public DbSet<SampleResult> SampleResults { get; set; }

@@ -75,6 +75,7 @@
     <Compile Include="Domain\AuditLogTemplate.cs" />
     <Compile Include="Domain\CollectionMethod.cs" />
     <Compile Include="Domain\CopyOfRecord.cs" />
+    <Compile Include="Domain\CopyOfRecordCertificate.cs" />
     <Compile Include="Domain\CromerrAuditLog.cs" />
     <Compile Include="Domain\CtsEventType.cs" />
     <Compile Include="Domain\EmailAuditLog.cs" />

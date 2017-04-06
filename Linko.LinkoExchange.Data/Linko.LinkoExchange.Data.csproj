@@ -80,6 +80,8 @@
     <Compile Include="LinkoExchangeContext.cs" />
     <Compile Include="Mapping\AuditLogTemplateMap.cs" />
     <Compile Include="Mapping\CollectionMethodMap.cs" />
+    <Compile Include="Mapping\CopyOfRecordCertificateMap.cs" />
+    <Compile Include="Mapping\CopyOfRecordMap.cs" />
     <Compile Include="Mapping\CromerrAuditLogMap.cs" />
     <Compile Include="Mapping\CtsEventTypeMap.cs" />
     <Compile Include="Mapping\EmailAuditLogMap.cs" />
