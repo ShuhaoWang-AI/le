@@ -1,26 +1,40 @@
+﻿using Linko.LinkoExchange.Core.Domain;
 using System.Data.Entity.ModelConfiguration;
-using Linko.LinkoExchange.Core.Domain;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public class CopyOfRecordMap : EntityTypeConfiguration<CopyOfRecord>
+    public partial class CopyOfRecordMap : EntityTypeConfiguration<CopyOfRecord>
     {
         public CopyOfRecordMap()
         {
             ToTable("tCopyOfRecord");
 
-            HasKey(t => t.CopyOfRecordId);
-            Property(t => t.OrganizationRegulatoryProgramId).IsRequired();
-            Property(t => t.ReportPackageId).IsRequired();
-            Property(t => t.Signature).IsRequired();
-            Property(t => t.SignatureAlgorithm).IsRequired();
-            Property(t => t.Hash).IsRequired();
-            Property(t => t.HashAlgorithm).IsRequired();
-            Property(t => t.Data).IsRequired();
+            HasKey(x => x.CopyOfRecordId);
 
-            HasRequired(t => t.CopyOfRecordCertificate)
+            HasRequired(a => a.OrganizationRegulatoryProgram)
+                .WithMany(b => b.CopyOfRecords)
+                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
+                .WillCascadeOnDelete(false);
+
+            HasRequired(a => a.ReportPackage)
+                .WithMany(b => b.CopyOfRecords)
+                .HasForeignKey(c => c.ReportPackageId)
+                .WillCascadeOnDelete(false);
+
+            Property(x => x.Signature).IsRequired().HasMaxLength(350);
+
+            Property(x => x.SignatureAlgorithm).IsRequired().HasMaxLength(10);
+
+            Property(x => x.Hash).IsRequired().HasMaxLength(100);
+
+            Property(x => x.HashAlgorithm).IsRequired().HasMaxLength(10);
+
+            Property(x => x.Data).IsRequired();
+
+            HasRequired(a => a.CopyOfRecordCertificate)
                 .WithMany()
-                .HasForeignKey(i => i.CopyOfRecordCertificateId);
+                .HasForeignKey(c => c.CopyOfRecordCertificateId)
+                .WillCascadeOnDelete(false);
         }
     }
 }

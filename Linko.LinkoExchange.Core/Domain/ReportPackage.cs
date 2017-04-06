@@ -38,7 +38,7 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public bool IsSubmissionBySignatoryRequired { get; set; }
 
-        public int? ReportPackageTemplateId { get; set; }
+        public int ReportPackageTemplateId { get; set; }
 
         public int ReportStatusId { get; set; }
         public virtual ReportStatus ReportStatus { get; set; }
@@ -109,7 +109,7 @@ namespace Linko.LinkoExchange.Core.Domain
         /// </summary>
         public string RecipientOrganizationZipCode { get; set; }
 
-        public DateTimeOffset SubmissionDateTimeUtc { get; set; }
+        public DateTimeOffset? SubmissionDateTimeUtc { get; set; }
 
         public int? SubmitterUserId { get; set; }
 
@@ -176,7 +176,11 @@ namespace Linko.LinkoExchange.Core.Domain
         public string RepudiatorTitleRole { get; set; }
 
         public int? RepudiationReasonId { get; set; }
-        public virtual RepudiationReason RepudiationReason { get; set; }
+
+        /// <summary>
+        /// Denormalized data.
+        /// </summary>
+        public string RepudiationReasonName { get; set; }
 
         public string RepudiationComments { get; set; }
 
@@ -223,7 +227,9 @@ namespace Linko.LinkoExchange.Core.Domain
 
 
         // Reverse navigation
-        public virtual ICollection<CopyOfRecord> CopyOfRecord { get; set; }
+        public virtual ICollection<ReportPackageElementCategory> ReportPackageElementCategories { get; set; }
+
+        public virtual ICollection<CopyOfRecord> CopyOfRecords { get; set; }
     }
 }
 

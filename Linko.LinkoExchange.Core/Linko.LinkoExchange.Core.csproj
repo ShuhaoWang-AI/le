@@ -74,6 +74,7 @@
     <Compile Include="Common\ValueParser.cs" />
     <Compile Include="Domain\AuditLogTemplate.cs" />
     <Compile Include="Domain\CollectionMethod.cs" />
+    <Compile Include="Domain\CollectionMethodType.cs" />
     <Compile Include="Domain\CopyOfRecord.cs" />
     <Compile Include="Domain\CopyOfRecordCertificate.cs" />
     <Compile Include="Domain\CromerrAuditLog.cs" />
@@ -123,6 +124,7 @@
     <Compile Include="Domain\ReportStatus.cs" />
     <Compile Include="Domain\RepudiationReason.cs" />
     <Compile Include="Domain\Sample.cs" />
+    <Compile Include="Domain\SampleRequirement.cs" />
     <Compile Include="Domain\SampleResult.cs" />
     <Compile Include="Domain\SampleFrequency.cs" />
     <Compile Include="Domain\SampleStatus.cs" />

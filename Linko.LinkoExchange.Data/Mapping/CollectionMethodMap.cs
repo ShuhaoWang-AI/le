@@ -20,6 +20,11 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .HasForeignKey(c => c.OrganizationId)
                 .WillCascadeOnDelete(false);
 
+            HasRequired(a => a.CollectionMethodType)
+                .WithMany()
+                .HasForeignKey(c => c.CollectionMethodTypeId)
+                .WillCascadeOnDelete(false);
+
             Property(x => x.IsEnabled).IsRequired();
 
             Property(x => x.IsRemoved).IsRequired();

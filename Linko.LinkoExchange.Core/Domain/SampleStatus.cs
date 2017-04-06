@@ -25,7 +25,6 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
-        public virtual ICollection<Sample> Samples { get; set; }
     }
 }
 

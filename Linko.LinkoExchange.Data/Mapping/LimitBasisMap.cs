@@ -1,10 +1,5 @@
 ﻿using Linko.LinkoExchange.Core.Domain;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
@@ -16,7 +11,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasKey(x => x.LimitBasisId);
 
-            Property(x => x.Name).IsRequired().HasMaxLength(254);
+            Property(x => x.Name).IsRequired().HasMaxLength(100);
 
             Property(x => x.Description).IsOptional().HasMaxLength(500);
 

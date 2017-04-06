@@ -13,6 +13,9 @@
         public int ReportPackageTemplateElementCategoryId { get; set; }
         public virtual ReportPackageTemplateElementCategory ReportPackageTemplateElementCategory { get; set; }
 
+        /// <summary>
+        /// Unique within a particular ReportPackageTemplateElementCategoryId. 
+        /// </summary>
         public int ReportElementTypeId { get; set; }
         public virtual ReportElementType ReportElementType { get; set; }
 

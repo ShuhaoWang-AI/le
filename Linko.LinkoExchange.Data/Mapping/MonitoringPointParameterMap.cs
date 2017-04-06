@@ -38,13 +38,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.EffectiveDateTimeUtc).IsOptional();
 
-            Property(x => x.RetireDateTimeUtc).IsOptional();
-
-            Property(x => x.CreationDateTimeUtc).IsRequired();
-
-            Property(x => x.LastModificationDateTimeUtc).IsOptional();
-
-            Property(x => x.LastModifierUserId).IsOptional();
+            Property(x => x.RetirementDateTimeUtc).IsOptional();
         }
     }
 }

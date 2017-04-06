@@ -14,7 +14,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public int ReportPackageTemplateId { get; set; }
 
         /// <summary>
-        /// Unique within a particular OrganizationRegulatoryProgramId and effective date.
+        /// Unique within a particular OrganizationRegulatoryProgramId and effective date period.
         /// </summary>
         public string Name { get; set; }
 

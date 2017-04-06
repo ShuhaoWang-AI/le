@@ -1,4 +1,6 @@
-﻿namespace Linko.LinkoExchange.Core.Domain
+﻿using System.Collections.Generic;
+
+namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
     /// Represents a specific Report Element Type for a Report Element Category within a Report Package.
@@ -48,5 +50,11 @@
         public bool IsRequired { get; set; }
 
         public int SortOrder { get; set; }
+
+
+        // Reverse navigation
+        public virtual ICollection<ReportSample> ReportSamples { get; set; }
+
+        public virtual ICollection<ReportFile> ReportFiles { get; set; }
     }
 }

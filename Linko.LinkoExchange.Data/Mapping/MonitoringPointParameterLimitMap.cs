@@ -1,10 +1,5 @@
 ﻿using Linko.LinkoExchange.Core.Domain;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
@@ -21,31 +16,31 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .HasForeignKey(c => c.MonitoringPointParameterId)
                 .WillCascadeOnDelete(false);
 
-            Property(x => x.Name).IsRequired().HasMaxLength(254);
+            Property(x => x.Name).IsRequired().HasMaxLength(100);
 
             Property(x => x.Description).IsOptional().HasMaxLength(500);
 
             Property(x => x.MinimumValue).IsOptional();
 
-            Property(x => x.MaximumValue).IsOptional();
+            Property(x => x.MaximumValue).IsRequired();
 
             HasRequired(a => a.BaseUnit)
-                .WithMany(b => b.MonitoringPointParameterLimits)
+                .WithMany()
                 .HasForeignKey(c => c.BaseUnitId)
                 .WillCascadeOnDelete(false);
 
-            HasRequired(a => a.CollectionMethod)
-                .WithMany(b => b.MonitoringPointParameterLimits)
-                .HasForeignKey(c => c.CollectionMethodId)
+            HasOptional(a => a.CollectionMethodType)
+                .WithMany()
+                .HasForeignKey(c => c.CollectionMethodTypeId)
                 .WillCascadeOnDelete(false);
 
             HasRequired(a => a.LimitType)
-                .WithMany(b => b.MonitoringPointParameterLimits_LimitType)
+                .WithMany()
                 .HasForeignKey(c => c.LimitTypeId)
                 .WillCascadeOnDelete(false);
 
             HasRequired(a => a.LimitBasis)
-                .WithMany(b => b.MonitoringPointParameterLimits_LimitBasis)
+                .WithMany()
                 .HasForeignKey(c => c.LimitBasisId)
                 .WillCascadeOnDelete(false);
 

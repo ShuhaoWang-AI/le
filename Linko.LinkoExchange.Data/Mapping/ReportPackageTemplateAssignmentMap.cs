@@ -17,7 +17,7 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .WillCascadeOnDelete(false);
 
             HasRequired(a => a.OrganizationRegulatoryProgram)
-                .WithMany()
+                .WithMany(b => b.ReportPackageTemplateAssignments)
                 .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(false);
         }

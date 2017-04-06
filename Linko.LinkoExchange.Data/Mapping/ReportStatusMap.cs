@@ -3,13 +3,13 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public class LimitTypeMap : EntityTypeConfiguration<LimitType>
+    public partial class ReportStatusMap : EntityTypeConfiguration<ReportStatus>
     {
-        public LimitTypeMap()
+        public ReportStatusMap()
         {
-            ToTable("tLimitType");
+            ToTable("tReportStatus");
 
-            HasKey(x => x.LimitTypeId);
+            HasKey(x => x.ReportStatusId);
 
             Property(x => x.Name).IsRequired().HasMaxLength(100);
 

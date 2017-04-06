@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
@@ -20,6 +21,9 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public string Description { get; set; }
 
+        /// <summary>
+        /// Original name as given by the uploader.
+        /// </summary>
         public string OriginalName { get; set; }
 
         /// <summary>
@@ -27,7 +31,11 @@ namespace Linko.LinkoExchange.Core.Domain
         /// </summary>
         public double SizeByte { get; set; }
 
+        /// <summary>
+        /// MIME Type/Internet Meda Type.
+        /// </summary>
         public string MediaType { get; set; }
+
         public int FileTypeId { get; set; }
         public virtual FileType FileType { get; set; }
 
@@ -46,11 +54,17 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public DateTimeOffset UploadDateTimeUtc { get; set; }
 
-        public int? UploaderUserId { get; set; }
+        public int UploaderUserId { get; set; }
+
+        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
+
+        public int? LastModifierUserId { get; set; }
 
 
         // Reverse navigation
         public virtual FileStoreData FileStoreData { get; set; }
+
+        public virtual ICollection<ReportFile> ReportFiles { get; set; }
     }
 }
 

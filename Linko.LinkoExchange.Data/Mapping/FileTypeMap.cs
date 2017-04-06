@@ -8,12 +8,18 @@ namespace Linko.LinkoExchange.Data.Mapping
         public FileTypeMap()
         {
             ToTable("tFileType");
+
             HasKey(t => t.FileTypeId);
-            Property(t => t.Extension);
-            Property(t => t.Description);
-            Property(t => t.CreationDateTimeUtc);
-            Property(t => t.LastModifierUserId);
-            Property(t => t.LastModificationDateTimeUtc);
+
+            Property(t => t.Extension).IsRequired().HasMaxLength(5);
+
+            Property(t => t.Description).IsOptional().HasMaxLength(500);
+
+            Property(t => t.CreationDateTimeUtc).IsRequired();
+
+            Property(t => t.LastModifierUserId).IsOptional();
+
+            Property(t => t.LastModificationDateTimeUtc).IsOptional();
         }
     }
 }

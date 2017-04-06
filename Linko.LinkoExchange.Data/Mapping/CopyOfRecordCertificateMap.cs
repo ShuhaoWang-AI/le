@@ -1,22 +1,27 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using Linko.LinkoExchange.Core.Domain;
+﻿using Linko.LinkoExchange.Core.Domain;
+using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public class CopyOfRecordCertificateMap : EntityTypeConfiguration<CopyOfRecordCertificate>
+    public partial class CopyOfRecordCertificateMap : EntityTypeConfiguration<CopyOfRecordCertificate>
     {
         public CopyOfRecordCertificateMap()
         {
-            ToTable("tCopyOfRecordCertificateMap");
+            ToTable("tCopyOfRecordCertificate");
 
-            HasKey(t => t.CopyOfRecordCertificateId);
-            Property(t => t.PhysicalPath).IsRequired();
-            Property(t => t.FileName).IsRequired();
-            Property(t => t.Password).IsRequired();
+            HasKey(x => x.CopyOfRecordCertificateId);
 
-            Property(t => t.CreationDateTimeUtc).IsRequired();
-            Property(t => t.LastModificationDateTimeUtc);
-            Property(t => t.LastModifierUserId);
+            Property(x => x.PhysicalPath).IsRequired().HasMaxLength(256);
+
+            Property(x => x.FileName).IsRequired().HasMaxLength(256);
+
+            Property(x => x.Password).IsRequired().HasMaxLength(50);
+
+            Property(x => x.CreationDateTimeUtc).IsRequired();
+
+            Property(x => x.LastModificationDateTimeUtc).IsOptional();
+
+            Property(x => x.LastModifierUserId).IsOptional();
         }
     }
 }

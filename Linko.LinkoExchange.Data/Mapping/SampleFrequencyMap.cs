@@ -1,10 +1,5 @@
 ﻿using Linko.LinkoExchange.Core.Domain;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity.ModelConfiguration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
@@ -22,13 +17,13 @@ namespace Linko.LinkoExchange.Data.Mapping
                  .WillCascadeOnDelete(false);
 
             HasRequired(a => a.CollectionMethod)
-                 .WithMany(b => b.SampleFrequencies)
+                 .WithMany()
                  .HasForeignKey(c => c.CollectionMethodId)
                  .WillCascadeOnDelete(false);
 
-            Property(x => x.IUSampleFrequency).IsOptional();
+            Property(x => x.IUSampleFrequency).IsOptional().HasMaxLength(50);
 
-            Property(x => x.AuthoritySampleFrequency).IsOptional();
+            Property(x => x.AuthoritySampleFrequency).IsOptional().HasMaxLength(50);
 
         }
     }

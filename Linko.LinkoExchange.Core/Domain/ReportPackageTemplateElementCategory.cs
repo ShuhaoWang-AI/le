@@ -15,6 +15,9 @@ namespace Linko.LinkoExchange.Core.Domain
         public int ReportPackageTemplateId { get; set; }
         public virtual ReportPackageTemplate ReportPackageTemplate { get; set; }
 
+        /// <summary>
+        /// Unique within a particular ReportPackageTemplateId.
+        /// </summary>
         public int ReportElementCategoryId { get; set; }
         public virtual ReportElementCategory ReportElementCategory { get; set; }
 

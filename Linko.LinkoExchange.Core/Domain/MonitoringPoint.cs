@@ -13,6 +13,9 @@ namespace Linko.LinkoExchange.Core.Domain
         /// </summary>
         public int MonitoringPointId { get; set; }
 
+        /// <summary>
+        /// Unique within a particular OrganizationRegulatoryProgramId.
+        /// </summary>
         public string Name { get; set; }
 
         public string Description { get; set; }
@@ -36,6 +39,8 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
+
+        // Reverse navigation
         public virtual ICollection<MonitoringPointParameter> MonitoringPointParameters { get; set; }
     }
 }

@@ -171,7 +171,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                     && mppl.MonitoringPointId == monitoringPointId
                     && mppl.ParameterId == parameterId
                     && mppl.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
-                    && mppl.RetireDateTimeUtc >= sampleEndDateTimeUtc);
+                    && mppl.RetirementDateTimeUtc >= sampleEndDateTimeUtc);
 
             if (foundMonitoringPointParameter != null)
             {
@@ -412,7 +412,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                 .Include(ss => ss.MonitoringPointParameter)
                 .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
                     && ss.MonitoringPointParameter.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
-                    && ss.MonitoringPointParameter.RetireDateTimeUtc >= sampleEndDateTimeUtc
+                    && ss.MonitoringPointParameter.RetirementDateTimeUtc >= sampleEndDateTimeUtc
                     && !string.IsNullOrEmpty(ss.IUSampleFrequency))
                 .Select(x => x.IUSampleFrequency)
                 .Distinct()
@@ -422,7 +422,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                 .Include(ss => ss.MonitoringPointParameter)
                 .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
                     && ss.MonitoringPointParameter.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
-                    && ss.MonitoringPointParameter.RetireDateTimeUtc >= sampleEndDateTimeUtc)
+                    && ss.MonitoringPointParameter.RetirementDateTimeUtc >= sampleEndDateTimeUtc)
                 .Select(x => x.CollectionMethodId)
                 .Distinct()
                 .ToList();
@@ -447,7 +447,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                                         .Include(ss => ss.MonitoringPointParameter.Parameter)
                                         .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
                                             && ss.MonitoringPointParameter.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
-                                            && ss.MonitoringPointParameter.RetireDateTimeUtc >= sampleEndDateTimeUtc
+                                            && ss.MonitoringPointParameter.RetirementDateTimeUtc >= sampleEndDateTimeUtc
                                             && ss.IUSampleFrequency == freq
                                             && ss.CollectionMethodId == collectMethodId
                                             && ss.CollectionMethod.IsRemoved == false
@@ -483,7 +483,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                                         .Include(ss => ss.MonitoringPointParameter.Parameter)
                                         .Where(ss => ss.MonitoringPointParameter.MonitoringPointId == monitoringPointId
                                             && ss.MonitoringPointParameter.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
-                                            && ss.MonitoringPointParameter.RetireDateTimeUtc >= sampleEndDateTimeUtc
+                                            && ss.MonitoringPointParameter.RetirementDateTimeUtc >= sampleEndDateTimeUtc
                                             && ss.CollectionMethodId == collectMethodId
                                             && ss.CollectionMethod.IsRemoved == false
                                             && ss.CollectionMethod.IsEnabled == true)

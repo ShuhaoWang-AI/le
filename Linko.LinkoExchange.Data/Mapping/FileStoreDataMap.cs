@@ -10,6 +10,7 @@ namespace Linko.LinkoExchange.Data.Mapping
             ToTable("tFileStoreData");
 
             HasKey(t => t.FileStoreId);
+
             Property(t => t.Data).IsRequired();
 
         }

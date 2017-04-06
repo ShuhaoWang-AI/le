@@ -22,6 +22,8 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.TrcFactor).IsOptional();
 
+            Property(x => x.IsFlowForMassLoadingCalculation).IsRequired();
+
             HasRequired(a => a.OrganizationRegulatoryProgram)
                 .WithMany(b => b.Parameters)
                 .HasForeignKey(c => c.OrganizationRegulatoryProgramId)

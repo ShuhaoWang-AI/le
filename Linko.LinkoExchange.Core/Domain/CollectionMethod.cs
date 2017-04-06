@@ -26,6 +26,9 @@ namespace Linko.LinkoExchange.Core.Domain
         public int OrganizationId { get; set; }
         public virtual Organization Organization { get; set; }
 
+        public int CollectionMethodTypeId { get; set; }
+        public virtual CollectionMethodType CollectionMethodType { get; set; }
+
         /// <summary>
         /// True: the current collection method is visible to the Industry. False, otherwise.
         /// </summary>
@@ -38,10 +41,6 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
 
         public int? LastModifierUserId { get; set; }
-
-        public virtual ICollection<MonitoringPointParameterLimit> MonitoringPointParameterLimits { get; set; }
-
-        public virtual ICollection<SampleFrequency> SampleFrequencies { get; set; }
     }
 }
 

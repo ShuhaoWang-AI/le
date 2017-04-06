@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a sample.
+    /// Represents a Sample.
     /// </summary>
     public partial class Sample
     {
@@ -69,6 +69,8 @@ namespace Linko.LinkoExchange.Core.Domain
 
         // Reverse navigation
         public virtual ICollection<SampleResult> SampleResults { get; set; }
+
+        public virtual ICollection<ReportSample> ReportSamples { get; set; }
     }
 }
 

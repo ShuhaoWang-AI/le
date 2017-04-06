@@ -3,15 +3,19 @@
 namespace Linko.LinkoExchange.Core.Domain
 {
     /// <summary>
-    /// Represents a type of a limit.
+    /// Represents a Collection Method Type.
+    /// The collection methods the users define must be identified as belonging to one of these types.
     /// </summary>
-    public class LimitType
+    public partial class CollectionMethodType
     {
         /// <summary>
         /// Primary key.
         /// </summary>
-        public int LimitTypeId { get; set; }
+        public int CollectionMethodTypeId { get; set; }
 
+        /// <summary>
+        /// Unique.
+        /// </summary>
         public string Name { get; set; }
 
         public string Description { get; set; }
@@ -23,3 +27,4 @@ namespace Linko.LinkoExchange.Core.Domain
         public int? LastModifierUserId { get; set; }
     }
 }
+

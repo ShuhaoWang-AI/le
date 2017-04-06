@@ -10,25 +10,41 @@ namespace Linko.LinkoExchange.Data.Mapping
             ToTable("tFileStore");
 
             HasKey(t => t.FileStoreId);
-            Property(t => t.Name).IsRequired();
-            Property(t => t.Description);
-            Property(t => t.OriginalName).IsRequired();
+
+            Property(t => t.Name).IsRequired().HasMaxLength(256);
+
+            Property(t => t.Description).IsOptional().HasMaxLength(500);
+
+            Property(t => t.OriginalName).IsRequired().HasMaxLength(256);
+
             Property(t => t.SizeByte).IsRequired();
-            Property(t => t.OrganizationRegulatoryProgramId).IsRequired();
-            Property(t => t.UploadDateTimeUtc);
-            Property(t => t.UploaderUserId).IsRequired();
+
+            Property(t => t.MediaType).IsOptional().HasMaxLength(100);
+
+            HasRequired(a => a.FileType)
+                .WithMany()
+                .HasForeignKey(c => c.FileTypeId)
+                .WillCascadeOnDelete(false);
+
+            Property(t => t.ReportElementTypeId).IsRequired();
+
+            Property(t => t.ReportElementTypeName).IsRequired().HasMaxLength(100);
 
             HasRequired(a => a.OrganizationRegulatoryProgram)
-                .WithMany()
+                .WithMany(b => b.FileStores)
                 .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(false);
 
+            Property(t => t.UploadDateTimeUtc).IsRequired();
+
+            Property(t => t.UploaderUserId).IsRequired();
+
+            Property(t => t.LastModificationDateTimeUtc).IsOptional();
+
+            Property(t => t.LastModifierUserId).IsOptional();
+
             HasRequired(t => t.FileStoreData)
                 .WithRequiredPrincipal(fd => fd.FileStore);
-
-            HasRequired(t => t.FileType)
-                .WithMany()
-                .HasForeignKey(i => i.FileTypeId);
         }
     }
 }

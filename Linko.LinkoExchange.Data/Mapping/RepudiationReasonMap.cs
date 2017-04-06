@@ -1,30 +1,24 @@
-using Linko.LinkoExchange.Core.Domain;
+﻿using Linko.LinkoExchange.Core.Domain;
 using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public partial class CtsEventTypeMap : EntityTypeConfiguration<CtsEventType>
+    public partial class RepudiationReasonMap : EntityTypeConfiguration<RepudiationReason>
     {
-        public CtsEventTypeMap()
+        public RepudiationReasonMap()
         {
-            ToTable("tCtsEventType");
+            ToTable("tRepudiationReason");
 
-            HasKey(x => x.CtsEventTypeId);
+            HasKey(x => x.RepudiationReasonId);
 
             Property(x => x.Name).IsRequired().HasMaxLength(100);
 
             Property(x => x.Description).IsOptional().HasMaxLength(500);
 
-            Property(x => x.CtsEventCategoryName).IsRequired().HasMaxLength(100);
-
             HasRequired(a => a.OrganizationRegulatoryProgram)
-                .WithMany(b => b.CtsEventTypes)
+                .WithMany(b => b.RepudiationReasons)
                 .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(false);
-
-            Property(x => x.IsEnabled).IsRequired();
-
-            Property(x => x.IsRemoved).IsRequired();
 
             Property(x => x.CreationDateTimeUtc).IsRequired();
 

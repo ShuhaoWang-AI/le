@@ -11,23 +11,23 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasKey(x => x.SampleId);
 
-            Property(x => x.Name).IsRequired().HasMaxLength(254);
+            Property(x => x.Name).IsRequired().HasMaxLength(100);
 
             Property(x => x.MonitoringPointId).IsRequired();
 
-            Property(x => x.MonitoringPointName).IsRequired();
+            Property(x => x.MonitoringPointName).IsRequired().HasMaxLength(100);
 
             Property(x => x.CtsEventTypeId).IsRequired();
 
-            Property(x => x.CtsEventTypeName).IsRequired();
+            Property(x => x.CtsEventTypeName).IsRequired().HasMaxLength(100);
 
-            Property(x => x.CtsEventCategoryName).IsRequired();
+            Property(x => x.CtsEventCategoryName).IsRequired().HasMaxLength(100);
 
             Property(x => x.CollectionMethodId).IsRequired();
 
-            Property(x => x.CollectionMethodName).IsRequired();
+            Property(x => x.CollectionMethodName).IsRequired().HasMaxLength(100);
 
-            Property(x => x.LabSampleIdentifier).IsOptional();
+            Property(x => x.LabSampleIdentifier).IsOptional().HasMaxLength(50);
 
             Property(x => x.StartDateTimeUtc).IsRequired();
 
@@ -36,12 +36,12 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(x => x.IsCalculated).IsRequired();
 
             HasRequired(a => a.SampleStatus)
-                .WithMany(b => b.Samples)
+                .WithMany()
                 .HasForeignKey(c => c.SampleStatusId)
                 .WillCascadeOnDelete(false);
 
             HasRequired(a => a.OrganizationType)
-                .WithMany(b => b.Samples)
+                .WithMany()
                 .HasForeignKey(c => c.OrganizationTypeId)
                 .WillCascadeOnDelete(false);
 

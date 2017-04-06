@@ -80,6 +80,7 @@
     <Compile Include="LinkoExchangeContext.cs" />
     <Compile Include="Mapping\AuditLogTemplateMap.cs" />
     <Compile Include="Mapping\CollectionMethodMap.cs" />
+    <Compile Include="Mapping\CollectionMethodTypeMap.cs" />
     <Compile Include="Mapping\CopyOfRecordCertificateMap.cs" />
     <Compile Include="Mapping\CopyOfRecordMap.cs" />
     <Compile Include="Mapping\CromerrAuditLogMap.cs" />
@@ -99,6 +100,14 @@
     <Compile Include="Mapping\OrganizationTypeRegulatoryProgramMap.cs" />
     <Compile Include="Mapping\ParameterGroupMap.cs" />
     <Compile Include="Mapping\ParameterGroupParameterMap.cs" />
+    <Compile Include="Mapping\ReportFileMap.cs" />
+    <Compile Include="Mapping\ReportPackageElementCategoryMap.cs" />
+    <Compile Include="Mapping\ReportPackageElementTypeMap.cs" />
+    <Compile Include="Mapping\ReportPackageMap.cs" />
+    <Compile Include="Mapping\ReportSampleMap.cs" />
+    <Compile Include="Mapping\ReportStatusMap.cs" />
+    <Compile Include="Mapping\RepudiationReasonMap.cs" />
+    <Compile Include="Mapping\SampleRequirementMap.cs" />
     <Compile Include="Mapping\SampleStatusMap.cs" />
     <Compile Include="Mapping\SampleResultMap.cs" />
     <Compile Include="Mapping\SampleMap.cs" />

@@ -3,13 +3,13 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace Linko.LinkoExchange.Data.Mapping
 {
-    public class LimitTypeMap : EntityTypeConfiguration<LimitType>
+    public class CollectionMethodTypeMap : EntityTypeConfiguration<CollectionMethodType>
     {
-        public LimitTypeMap()
+        public CollectionMethodTypeMap()
         {
-            ToTable("tLimitType");
+            ToTable("tCollectionMethodType");
 
-            HasKey(x => x.LimitTypeId);
+            HasKey(x => x.CollectionMethodTypeId);
 
             Property(x => x.Name).IsRequired().HasMaxLength(100);
 

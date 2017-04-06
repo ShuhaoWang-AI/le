@@ -56,19 +56,32 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public virtual ICollection<OrganizationRegulatoryProgramUser> InviterOrganizationRegulatoryProgramUsers { get; set; }
 
-        public virtual ICollection<MonitoringPoint> MonitoringPoints { get; set; }
-        public virtual ICollection<MonitoringPointParameter> MonitoringPointParameters { get; set; }
-
         public virtual ICollection<PermissionGroup> PermissionGroups { get; set; }
+
+        public virtual ICollection<MonitoringPoint> MonitoringPoints { get; set; }
+
+        public virtual ICollection<MonitoringPointParameter> MonitoringPointParameters { get; set; }
 
         public virtual ICollection<Parameter> Parameters { get; set; }
 
         public virtual ICollection<ParameterGroup> ParameterGroups { get; set; }
 
+        public virtual ICollection<Sample> Samples { get; set; }
+
+        public virtual ICollection<FileStore> FileStores { get; set; }
+
+        public virtual ICollection<CtsEventType> CtsEventTypes { get; set; }
+
         public virtual ICollection<ReportElementType> ReportElementTypes { get; set; }
 
         public virtual ICollection<ReportPackageTemplate> ReportPackageTemplates { get; set; }
 
-        public virtual ICollection<Sample> Samples { get; set; }
+        public virtual ICollection<ReportPackageTemplateAssignment> ReportPackageTemplateAssignments { get; set; }
+
+        public virtual ICollection<RepudiationReason> RepudiationReasons { get; set; }
+
+        public virtual ICollection<CopyOfRecord> CopyOfRecords { get; set; }
+
+        public virtual ICollection<ReportPackage> ReportPackages { get; set; }
     }
 }

@@ -41,6 +41,8 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public int? LastModifierUserId { get; set; }
 
+
+        // Reverse navigation
         public virtual ICollection<MonitoringPointParameter> MonitoringPointParameters { get; set; }
     }
 }

@@ -57,15 +57,26 @@ namespace Linko.LinkoExchange.Data
         public DbSet<Parameter> Parameters { get; set; }
         public DbSet<MonitoringPoint> MonitoringPoints { get; set; }
         public DbSet<MonitoringPointParameterLimit> MonitoringPointParameterLimits { get; set; }
+        public DbSet<SampleFrequency> SampleFrequencies { get; set; }
+        public DbSet<SampleRequirement> SampleRequirements { get; set; }
+        public DbSet<MonitoringPointParameter> MonitoringPointParameters { get; set; }
+        public DbSet<CollectionMethod> CollectionMethods { get; set; }
+        public DbSet<Unit> Units { get; set; }
+
+        public DbSet<CollectionMethodType> CollectionMethodTypes { get; set; }
+        public DbSet<LimitBasis> LimitBases { get; set; }
+        public DbSet<LimitType> LimitTypes { get; set; }
 
         public DbSet<ParameterGroup> ParameterGroups { get; set; }
         public DbSet<ParameterGroupParameter> ParameterGroupParameters { get; set; }
 
-        public DbSet<FileStore> FileStores { get; set; }
         public DbSet<FileType> FileTypes { get; set; }
+        public DbSet<FileStore> FileStores { get; set; }
         public DbSet<FileStoreData> FileStoreDatas { get; set; }
-        public DbSet<CopyOfRecord> CopyOfRecords { get; set; }
+
         public DbSet<CopyOfRecordCertificate> CopyOfRecordCertificates { get; set; }
+        public DbSet<CopyOfRecord> CopyOfRecords { get; set; }
+
         public DbSet<SampleStatus> SampleStatuses { get; set; }
         public DbSet<Sample> Samples { get; set; }
         public DbSet<SampleResult> SampleResults { get; set; }
@@ -85,12 +96,6 @@ namespace Linko.LinkoExchange.Data
         public DbSet<ReportPackageElementType> ReportPackageElementTypes { get; set; }
         public DbSet<ReportFile> ReportFiles { get; set; }
         public DbSet<ReportSample> ReportSamples { get; set; }
-        public DbSet<SampleFrequency> SampleFrequencies { get; set; }
-        public DbSet<MonitoringPointParameter> MonitoringPointParameters { get; set; }
-        public DbSet<CollectionMethod> CollectionMethods { get; set; }
-        public DbSet<Unit> Units { get; set; }
-        public DbSet<LimitBasis> LimitBases { get; set; }
-        public DbSet<LimitType> LimitTypes { get; set; }
 
         #endregion
 

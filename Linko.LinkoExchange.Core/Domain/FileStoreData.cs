@@ -13,9 +13,9 @@
         /// Primary key.
         /// </summary> 
         public int FileStoreId { get; set; }
-        public byte[] Data { get; set; }
-
         public virtual FileStore FileStore { get; set; }
+
+        public byte[] Data { get; set; }
     }
 }
 
