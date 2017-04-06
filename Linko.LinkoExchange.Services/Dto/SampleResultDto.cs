@@ -14,7 +14,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string ParameterName { get; set; }
         public string Qualifier { get; set; }
         public double? Value { get; set; }
-        public int DecimalPlaces { get; set; }
+        public int? DecimalPlaces { get; set; }
         public int UnitId { get; set; }
         public string UnitName { get; set; }
         public string MethodDetectionLimit { get; set; }
@@ -33,7 +33,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool IsCalcMassLoading { get; set; }
         public string MassLoadingQualifier { get; set; }
         public double? MassLoadingValue { get; set; }
-        public int MassLoadingDecimalPlaces { get; set; }
+        public int? MassLoadingDecimalPlaces { get; set; }
         public int MassLoadingUnitId { get; set; }
         public string MassLoadingUnitName { get; set; }
 

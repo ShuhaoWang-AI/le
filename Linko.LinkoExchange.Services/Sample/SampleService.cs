@@ -349,7 +349,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         resultDto.AnalysisMethod = sampleResult.AnalysisMethod;
                         resultDto.IsApprovedEPAMethod = sampleResult.IsApprovedEPAMethod;
                         resultDto.ParameterId = sampleResult.ParameterId;
-                        resultDto.IsCalcMassLoading = sampleResult.IsMassLoadingCalculationRequired;
+                        //resultDto.IsCalcMassLoading = sampleResult.IsMassLoadingCalculationRequired;
                         resultDto.Qualifier = sampleResult.Qualifier;
                         resultDto.Value = sampleResult.Value;
                         resultDto.DecimalPlaces = sampleResult.DecimalPlaces;
