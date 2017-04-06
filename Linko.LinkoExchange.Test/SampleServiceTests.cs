@@ -131,6 +131,20 @@ namespace Linko.LinkoExchange.Test
             _sampleService.SaveSample(sampleDto);
         }
 
+        [TestMethod]
+        public void GetSampleDetails_With_Results_Valid()
+        {
+            var sampleId = -1;
+            var sampleDtos = _sampleService.GetSamples(SampleStatusName.All);
+            foreach (var sampleDto in sampleDtos)
+            {
+                sampleId = sampleDto.SampleId.Value;
+                break;
+            }
+
+            var firstSampleDto = _sampleService.GetSampleDetails(sampleId);
+        }
+
 
     }
 }
