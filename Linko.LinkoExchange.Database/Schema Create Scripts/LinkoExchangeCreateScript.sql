@@ -3194,35 +3194,24 @@ BEGIN
     
     CREATE TABLE dbo.tCopyOfRecord 
     (
-        CopyOfRecordId                      int IDENTITY(1,1) NOT NULL
-        , OrganizationRegulatoryProgramId   int NOT NULL
-        , ReportPackageId                   int NOT NULL
-        , Signature                         varchar(350) NOT NULL
-        , SignatureAlgorithm                varchar(10) NOT NULL
-        , Hash                              varchar(100) NOT NULL
-        , HashAlgorithm                     varchar(10) NOT NULL
-        , Data                              varbinary(max) NOT NULL
-        , CopyOfRecordCertificateId         int NOT NULL
+        ReportPackageId             int NOT NULL
+        , Signature                 varchar(350) NOT NULL
+        , SignatureAlgorithm        varchar(10) NOT NULL
+        , Hash                      varchar(100) NOT NULL
+        , HashAlgorithm             varchar(10) NOT NULL
+        , Data                      varbinary(max) NOT NULL
+        , CopyOfRecordCertificateId int NOT NULL
     
         CONSTRAINT PK_tCopyOfRecord PRIMARY KEY CLUSTERED 
         (
-	        CopyOfRecordId ASC
+	        ReportPackageId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG3_LOB]
-        , CONSTRAINT FK_tCopyOfRecord_tOrganizationRegulatoryProgram FOREIGN KEY 
-		(
-			OrganizationRegulatoryProgramId
-		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
         , CONSTRAINT FK_tCopyOfRecord_tCopyOfRecordCertificate FOREIGN KEY 
 		(
 			CopyOfRecordCertificateId
 		) REFERENCES dbo.tCopyOfRecordCertificate(CopyOfRecordCertificateId)
     ) ON [LinkoExchange_FG3_LOB]
     
-    CREATE NONCLUSTERED INDEX IX_tCopyOfRecord_OrganizationRegulatoryProgramId ON dbo.tCopyOfRecord
-	(
-		OrganizationRegulatoryProgramId ASC
-	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG3_LOB]
-
     CREATE NONCLUSTERED INDEX IX_tCopyOfRecord_CopyOfRecordCertificateId ON dbo.tCopyOfRecord
 	(
 		CopyOfRecordCertificateId ASC
