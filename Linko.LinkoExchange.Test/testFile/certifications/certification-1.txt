@@ -1,0 +1,3 @@
+i.	the raw ‘text’ data including samples and results data, certification name and text, comments, list of files included in the .zip (manifest) and copy of record receipt details (below).  See example of Copy of Record Data.xml in Appendix A
+ii.	Copy of Record Receipt - this includes UserProfile Details (who submitted), Organization Details (on behalf of what Organization (Industry) it was submitted and to what Authority), and Report Details (what report package it was for)
+1.	All Date/Times converted to local timezone and including the local timezone designation such as PST or PDT (2016-12-31T13:15:15 PDT)
