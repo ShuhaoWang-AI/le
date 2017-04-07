@@ -15,6 +15,6 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageId"></param>
         /// <returns></returns>
         CorPreviewFileDto GetReportPackageSampleFormData(int reportPackageId);
-        CorManifestFileDato GetReportPackageManefestData(int reportPackageId);
+        CorManifestFileDato GetReportPackageManifestData(int reportPackageId);
     }
 }

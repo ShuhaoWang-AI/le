@@ -74,7 +74,7 @@ namespace Linko.LinkoExchange.Test
             _reprotPackageService.Setup(i => i.GetReportPackageCertifications(It.IsAny<int>()))
                                  .Returns(certifications);
 
-            _reprotPackageService.Setup(i => i.GetReportPackageManefestData(It.IsAny<int>()))
+            _reprotPackageService.Setup(i => i.GetReportPackageManifestData(It.IsAny<int>()))
                                  .Returns(manifest);
             _reprotPackageService.Setup(i => i.GetReportPackageSampleFormData(It.IsAny<int>()))
                                  .Returns(sampleResults);

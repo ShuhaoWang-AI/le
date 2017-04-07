@@ -27,7 +27,7 @@ namespace Linko.LinkoExchange.Services.Report
             throw new System.NotImplementedException();
         }
 
-        public CorManifestFileDato GetReportPackageManefestData(int reportPackageId)
+        public CorManifestFileDato GetReportPackageManifestData(int reportPackageId)
         {
             throw new System.NotImplementedException();
         }

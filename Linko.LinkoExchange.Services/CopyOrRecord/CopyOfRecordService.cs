@@ -162,7 +162,7 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
             var attachmentFiles = _reportPackageService.GetReportPackageAttachments(reportPackageId: reportPackageId);
             var certifications = _reportPackageService.GetReportPackageCertifications(reportPackageId: reportPackageId);
             var corPreviewFileDto = _reportPackageService.GetReportPackageSampleFormData(reportPackageId: reportPackageId);
-            var manifestDto = _reportPackageService.GetReportPackageManefestData(reportPackageId: reportPackageId);
+            var manifestDto = _reportPackageService.GetReportPackageManifestData(reportPackageId: reportPackageId);
 
             byte[] coreBytes;
             using (var stream = new MemoryStream())
