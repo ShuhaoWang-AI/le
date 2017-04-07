@@ -229,7 +229,7 @@ namespace Linko.LinkoExchange.Core.Domain
         // Reverse navigation
         public virtual ICollection<ReportPackageElementCategory> ReportPackageElementCategories { get; set; }
 
-        public virtual ICollection<CopyOfRecord> CopyOfRecords { get; set; }
+        public virtual CopyOfRecord CopyOfRecord { get; set; }
     }
 }
 

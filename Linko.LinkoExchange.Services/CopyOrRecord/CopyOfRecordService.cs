@@ -76,7 +76,7 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
             _digitalSignManager = digitalSignManager;
         }
 
-        public int CreateCopyOfRecordForReportPackage(int reportPackageId)
+        public void CreateCopyOfRecordForReportPackage(int reportPackageId)
         {
             _logger.Info($"Enter CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}");
             //TODO:
@@ -105,10 +105,8 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
                     _dbContext.SaveChanges();
                     _dbContext.Commit(transaction: tansaction);
 
-                    var message = $"Enter CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}. CopyOfRecord Id:{copyOfRecord.CopyOfRecordId}";
+                    var message = $"Leave CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}.";
                     _logger.Info(message: message);
-
-                    return copyOfRecord.CopyOfRecordId;
                 }
                 catch (Exception ex)
                 {

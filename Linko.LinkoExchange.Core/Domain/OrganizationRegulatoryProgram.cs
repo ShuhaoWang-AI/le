@@ -80,8 +80,6 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public virtual ICollection<RepudiationReason> RepudiationReasons { get; set; }
 
-        public virtual ICollection<CopyOfRecord> CopyOfRecords { get; set; }
-
         public virtual ICollection<ReportPackage> ReportPackages { get; set; }
     }
 }

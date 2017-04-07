@@ -9,17 +9,7 @@ namespace Linko.LinkoExchange.Data.Mapping
         {
             ToTable("tCopyOfRecord");
 
-            HasKey(x => x.CopyOfRecordId);
-
-            HasRequired(a => a.OrganizationRegulatoryProgram)
-                .WithMany(b => b.CopyOfRecords)
-                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
-                .WillCascadeOnDelete(false);
-
-            HasRequired(a => a.ReportPackage)
-                .WithMany(b => b.CopyOfRecords)
-                .HasForeignKey(c => c.ReportPackageId)
-                .WillCascadeOnDelete(false);
+            HasKey(x => x.ReportPackageId);
 
             Property(x => x.Signature).IsRequired().HasMaxLength(350);
 
