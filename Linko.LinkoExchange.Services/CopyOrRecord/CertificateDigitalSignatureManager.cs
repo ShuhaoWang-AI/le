@@ -10,7 +10,7 @@ using NLog;
 
 namespace Linko.LinkoExchange.Services.CopyOrRecord
 {
-    public class CertificateDigitalSignManager : IDigitalSignManager
+    public class CertificateDigitalSignatureManager : IDigitalSignatureManager
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly IMapHelper _mapHelper;
@@ -22,7 +22,7 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
 
         private readonly int _currentCertificateId;
 
-        public CertificateDigitalSignManager(
+        public CertificateDigitalSignatureManager(
             LinkoExchangeContext dbContext,
             IMapHelper mapHelper,
             ILogger logger,
@@ -70,20 +70,26 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
 
         public string SignData(string base64Data)
         {
-            _logger.Info("Enter CertificateDigitalSignManager.GetDataSignature.");
+            _logger.Info("Enter CertificateDigitalSignatureManager.GetDataSignature.");
             var dataBytes = Convert.FromBase64String(base64Data);
             var signature = GetDataSignature(dataBytes);
-            _logger.Info("Leave CertificateDigitalSignManager.GetDataSignature.");
+            _logger.Info("Leave CertificateDigitalSignatureManager.GetDataSignature.");
 
             return signature;
         }
 
-        public virtual CopyOfRecordCertificate GetLatestCertificate()
+        public int LatestCertificateId()
+        {
+            return _currentCertificateId;
+        }
+
+
+        #region private section
+        private CopyOfRecordCertificate GetLatestCertificate()
         {
             return _dbContext.CopyOfRecordCertificates.OrderByDescending(t => t.CreationDateTimeUtc).First();
         }
 
-        #region private section
         private string GetDataSignature(byte[] data)
         {
             return Convert.ToBase64String(this.SignData(data));

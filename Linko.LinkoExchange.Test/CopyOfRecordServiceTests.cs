@@ -31,7 +31,6 @@ namespace Linko.LinkoExchange.Test
         [TestInitialize]
         public void Init()
         {
-
             var connectionString = //ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
                   "data source=wtxodev05;initial catalog=LinkoExchange;Integrated Security=True";
             var dbContext = new LinkoExchangeContext(connectionString);
@@ -41,7 +40,7 @@ namespace Linko.LinkoExchange.Test
             var actualTimeZoneService = new TimeZoneService(dbContext, _settService, new MapHelper());
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
 
-            IDigitalSignManager certificateDigitalSignManager = new CertificateDigitalSignManagerMock(dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+            IDigitalSignatureManager certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
 
             _copyOrRecordService = new CopyOfRecordService
                 (dbContext,
@@ -50,7 +49,7 @@ namespace Linko.LinkoExchange.Test
                  _httpContext.Object,
                  actualTimeZoneService,
                  _reprotPackageService.Object,
-                 certificateDigitalSignManager
+                 certificateDigitalSignatureManager
                 );
         }
 
@@ -156,29 +155,13 @@ namespace Linko.LinkoExchange.Test
             return reportPackageELementTypeDtos;
         }
 
-        public class CertificateDigitalSignManagerMock : CertificateDigitalSignManager
+        public class CertificateDigitalSignatureManagerMock : CertificateDigitalSignatureManager
         {
-            public CertificateDigitalSignManagerMock(LinkoExchangeContext dbContext, IMapHelper mapHelper, ILogger logger, IHttpContextService httpContextService)
+            public CertificateDigitalSignatureManagerMock(LinkoExchangeContext dbContext, IMapHelper mapHelper, ILogger logger, IHttpContextService httpContextService)
                 : base(dbContext, mapHelper, logger, httpContextService)
             {
-            }
-
-            public override CopyOfRecordCertificate GetLatestCertificate()
-            {
-                return new CopyOfRecordCertificate
-                {
-                    CopyOfRecordCertificateId = 1,
-                    PhysicalPath = @"C:\work\LinkoApplications\Development\LinkoExchange\Linko.LinkoExchange.Web\Certificate",
-                    FileName = "fd-export-from-import.pfx",
-                    Password = "watertrax"
-                };
             }
         }
 
     }
-
-
-
-
-
 }

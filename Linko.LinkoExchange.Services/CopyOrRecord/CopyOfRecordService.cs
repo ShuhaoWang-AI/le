@@ -22,7 +22,7 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
         private readonly IHttpContextService _httpContextService;
         private readonly ITimeZoneService _timeZoneService;
         private readonly IReportPackageService _reportPackageService;
-        private readonly IDigitalSignManager _digitalSignManager;
+        private readonly IDigitalSignatureManager _digitalSignatureManager;
 
         public CopyOfRecordService(
             LinkoExchangeContext dbContext,
@@ -31,7 +31,7 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
             IHttpContextService httpContextService,
             ITimeZoneService timeZoneService,
             IReportPackageService reportPackageService,
-            IDigitalSignManager digitalSignManager)
+            IDigitalSignatureManager digitalSignatureManager)
         {
             if (dbContext == null)
             {
@@ -63,9 +63,9 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
                 throw new ArgumentNullException(nameof(reportPackageService));
             }
 
-            if (digitalSignManager == null)
+            if (digitalSignatureManager == null)
             {
-                throw new ArgumentNullException(nameof(digitalSignManager));
+                throw new ArgumentNullException(nameof(digitalSignatureManager));
             }
 
             _dbContext = dbContext;
@@ -74,18 +74,13 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
             _httpContextService = httpContextService;
             _timeZoneService = timeZoneService;
             _reportPackageService = reportPackageService;
-            _digitalSignManager = digitalSignManager;
+            _digitalSignatureManager = digitalSignatureManager;
         }
 
         public void CreateCopyOfRecordForReportPackage(int reportPackageId)
         {
             _logger.Info($"Enter CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}");
 
-            //TODO:
-            //1. get attachment files
-            //2. get pdf generated from form data
-            //3. get cor proview pdf file
-            //4. get manifestDto xml file  
             try
             {
                 var coreBytes = CreateZipFileData(reportPackageId);
@@ -100,7 +95,7 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
 
                 Array.Copy(sourceArray: coreBytes, destinationArray: copyOfRecord.Data, length: coreBytes.Length);
                 copyOfRecord.Signature = SignaData(hash: copyOfRecord.Hash);
-                copyOfRecord.CopyOfRecordCertificateId = _digitalSignManager.GetLatestCertificate().CopyOfRecordCertificateId;
+                copyOfRecord.CopyOfRecordCertificateId = _digitalSignatureManager.LatestCertificateId();
                 copyOfRecord.ReportPackageId = reportPackageId;
 
                 copyOfRecord = _dbContext.CopyOfRecords.Add(entity: copyOfRecord);
@@ -145,7 +140,7 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
             var hashBytes = Encoding.UTF8.GetBytes(s: hash);
             var hashBase64 = Convert.ToBase64String(inArray: hashBytes);
 
-            return _digitalSignManager.SignData(base64Data: hashBase64);
+            return _digitalSignatureManager.SignData(base64Data: hashBase64);
         }
         private static void AddFileIntoZipArchive(ZipArchive archive, string fileName, byte[] fileData)
         {
@@ -159,6 +154,11 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
 
         private byte[] CreateZipFileData(int reportPackageId)
         {
+            //TODO:
+            //1. get attachment files
+            //2. get pdf generated from form data
+            //3. get cor proview pdf file
+            //4. get manifestDto xml file  
             var attachmentFiles = _reportPackageService.GetReportPackageAttachments(reportPackageId: reportPackageId);
             var certifications = _reportPackageService.GetReportPackageCertifications(reportPackageId: reportPackageId);
             var corPreviewFileDto = _reportPackageService.GetReportPackageSampleFormData(reportPackageId: reportPackageId);

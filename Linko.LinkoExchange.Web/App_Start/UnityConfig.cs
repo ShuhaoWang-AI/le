@@ -126,7 +126,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IFileStoreService, FileStoreService>();
             container.RegisterType<IUnitService, UnitService>();
             container.RegisterType<IReportPackageService, ReportPackageServiceMock>();
-            container.RegisterType<IDigitalSignManager, CertificateDigitalSignManager>();
+            container.RegisterType<IDigitalSignatureManager, CertificateDigitalSignatureManager>();
             container.RegisterType<ICopyOrRecordService, CopyOfRecordService>();
         }
     }
