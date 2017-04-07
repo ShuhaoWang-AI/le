@@ -24,7 +24,7 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public string Qualifier { get; set; }
 
-        public double Value { get; set; }
+        public double? Value { get; set; }
 
         public int? DecimalPlaces { get; set; }
 
@@ -42,6 +42,8 @@ namespace Linko.LinkoExchange.Core.Domain
         public DateTimeOffset? AnalysisDateTimeUtc { get; set; }
 
         public bool IsApprovedEPAMethod { get; set; }
+
+        public bool IsMassLoadingCalculationRequired { get; set; }
 
         public bool IsFlowForMassLoadingCalculation { get; set; }
 

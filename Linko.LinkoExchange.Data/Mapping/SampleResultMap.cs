@@ -20,7 +20,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.ParameterName).IsRequired().HasMaxLength(256);
 
-            Property(x => x.Qualifier).IsRequired().HasMaxLength(2);
+            Property(x => x.Qualifier).IsOptional().HasMaxLength(2);
 
             Property(x => x.Value).IsOptional();
 
@@ -37,6 +37,8 @@ namespace Linko.LinkoExchange.Data.Mapping
             Property(x => x.AnalysisDateTimeUtc).IsOptional();
 
             Property(x => x.IsApprovedEPAMethod).IsRequired();
+
+            Property(x => x.IsMassLoadingCalculationRequired).IsRequired();
 
             Property(x => x.IsFlowForMassLoadingCalculation).IsRequired();
 
