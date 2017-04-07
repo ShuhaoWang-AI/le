@@ -6,6 +6,7 @@ using System.Text;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.TimeZone;
@@ -79,47 +80,46 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
         public void CreateCopyOfRecordForReportPackage(int reportPackageId)
         {
             _logger.Info($"Enter CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}");
+
             //TODO:
             //1. get attachment files
             //2. get pdf generated from form data
             //3. get cor proview pdf file
-            //4. get anifestDto xml file
-            using (var tansaction = _dbContext.BeginTransaction())
+            //4. get manifestDto xml file  
+            try
             {
-                try
+                var coreBytes = CreateZipFileData(reportPackageId);
+
+                var copyOfRecord = new CopyOfRecord
                 {
-                    var coreBytes = CreateZipFileData(reportPackageId);
+                    Hash = HashHelper.ComputeSha256Hash(data: coreBytes),
+                    HashAlgorithm = HashAlgorithm.Sha256.ToString(),
+                    SignatureAlgorithm = DigitalSignAlgorithm.Sha1.ToString(),
+                    Data = new byte[coreBytes.Length]
+                };
 
-                    var copyOfRecord = new CopyOfRecord
-                    {
-                        Hash = HashHelper.ComputeSha256Hash(data: coreBytes),
-                        HashAlgorithm = HashAlgorithm.Sha256.ToString(),
-                        SignatureAlgorithm = DigitalSignAlgorithm.Sha1.ToString(),
-                        Data = new byte[coreBytes.Length]
-                    };
+                Array.Copy(sourceArray: coreBytes, destinationArray: copyOfRecord.Data, length: coreBytes.Length);
+                copyOfRecord.Signature = SignaData(hash: copyOfRecord.Hash);
+                copyOfRecord.CopyOfRecordCertificateId = _digitalSignManager.GetLatestCertificate().CopyOfRecordCertificateId;
+                copyOfRecord.ReportPackageId = reportPackageId;
 
-                    Array.Copy(sourceArray: coreBytes, destinationArray: copyOfRecord.Data, length: coreBytes.Length);
-                    copyOfRecord.Signature = GenerateCorSignature(hash: copyOfRecord.Hash);
+                copyOfRecord = _dbContext.CopyOfRecords.Add(entity: copyOfRecord);
 
-                    copyOfRecord = _dbContext.CopyOfRecords.Add(entity: copyOfRecord);
-                    _dbContext.SaveChanges();
-                    _dbContext.Commit(transaction: tansaction);
+                _dbContext.SaveChanges();
 
-                    var message = $"Leave CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}.";
-                    _logger.Info(message: message);
-                }
-                catch (Exception ex)
+                var message = $"Leave CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}.";
+                _logger.Info(message: message);
+            }
+            catch (Exception ex)
+            {
+                var errors = new List<string>() { ex.Message };
+                while (ex.InnerException != null)
                 {
-                    tansaction.Rollback();
-                    var errors = new List<string>() { ex.Message };
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(ex.Message);
-                    }
-                    _logger.Error("Error happens {0} ", string.Join("," + Environment.NewLine, errors));
-                    throw;
+                    ex = ex.InnerException;
+                    errors.Add(ex.Message);
                 }
+                _logger.Error("Error happens {0} ", string.Join("," + Environment.NewLine, errors));
+                throw;
             }
         }
 
@@ -140,12 +140,12 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
 
         #region Private functions
 
-        private string GenerateCorSignature(string hash)
+        private string SignaData(string hash)
         {
             var hashBytes = Encoding.UTF8.GetBytes(s: hash);
             var hashBase64 = Convert.ToBase64String(inArray: hashBytes);
 
-            return _digitalSignManager.GetDataSignature(base64Data: hashBase64);
+            return _digitalSignManager.SignData(base64Data: hashBase64);
         }
         private static void AddFileIntoZipArchive(ZipArchive archive, string fileName, byte[] fileData)
         {

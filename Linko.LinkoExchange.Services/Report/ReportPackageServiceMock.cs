@@ -5,6 +5,13 @@ namespace Linko.LinkoExchange.Services.Report
 {
     public class ReportPackageServiceMock : IReportPackageService
     {
+        /// <summary>
+        ///  Prepare Mock data;
+        /// </summary>
+        /// <param name="reportPackageId"></param>
+        /// <returns></returns>
+
+
         public IList<FileStoreDto> GetReportPackageAttachments(int reportPackageId)
         {
             throw new System.NotImplementedException();

@@ -1,13 +1,13 @@
-namespace Linko.LinkoExchange.Services
+namespace Linko.LinkoExchange.Services.Dto
 {
     public class CopyOfRecordDto
     {
-        public int CopyOfRecordId { get; set; }
-        public int OrganizationRegulatoryProgramId { get; set; }
+        public int ReportPackageId { get; set; }
         public string Signature { get; set; }
         public string SignatureAlgorithm { get; set; }
         public string Hash { get; set; }
         public string HashAlgorithm { get; set; }
         public byte[] Data { get; set; }
+        public int CopyOfRecordCertificateId { get; set; }
     }
 }

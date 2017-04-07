@@ -1,4 +1,6 @@
 ﻿
+using Linko.LinkoExchange.Services.Dto;
+
 namespace Linko.LinkoExchange.Services.CopyOrRecord
 {
     public interface ICopyOrRecordService
