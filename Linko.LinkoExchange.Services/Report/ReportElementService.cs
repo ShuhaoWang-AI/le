@@ -82,6 +82,11 @@ namespace Linko.LinkoExchange.Services.Report
             var foundREType = _dbContext.ReportElementTypes
                 .Single(re => re.ReportElementTypeId == reportElementTypeId);
 
+            if (foundREType.OrganizationRegulatoryProgramId != currentOrgRegProgramId)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             var dto = _mapHelper.GetReportElementTypeDtoFromReportElementType(foundREType);
 
             //Set LastModificationDateTimeLocal
