@@ -2348,11 +2348,11 @@ BEGIN
         (
 	        SampleResultId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tSampleResult_SampleId_ParameterName UNIQUE 
-        (
-            SampleId ASC
-            , ParameterName ASC
-        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        --, CONSTRAINT AK_tSampleResult_SampleId_ParameterName UNIQUE 
+        --(
+        --    SampleId ASC
+        --    , ParameterName ASC
+        --) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tSampleResult_tSample FOREIGN KEY 
 		(
 			SampleId
@@ -3208,12 +3208,21 @@ BEGIN
         (
 	        ReportPackageId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG3_LOB]
+        , CONSTRAINT FK_tCopyOfRecord_tReportPackage FOREIGN KEY 
+		(
+			ReportPackageId
+		) REFERENCES dbo.tReportPackage(ReportPackageId)
         , CONSTRAINT FK_tCopyOfRecord_tCopyOfRecordCertificate FOREIGN KEY 
 		(
 			CopyOfRecordCertificateId
 		) REFERENCES dbo.tCopyOfRecordCertificate(CopyOfRecordCertificateId)
     ) ON [LinkoExchange_FG3_LOB]
     
+    CREATE NONCLUSTERED INDEX IX_tCopyOfRecord_ReportPackageId ON dbo.tCopyOfRecord
+	(
+		ReportPackageId ASC
+    ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG3_LOB]
+
     CREATE NONCLUSTERED INDEX IX_tCopyOfRecord_CopyOfRecordCertificateId ON dbo.tCopyOfRecord
 	(
 		CopyOfRecordCertificateId ASC
