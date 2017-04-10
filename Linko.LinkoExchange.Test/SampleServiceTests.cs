@@ -66,8 +66,7 @@ namespace Linko.LinkoExchange.Test
             _sampleService.SaveSample(sampleDto);
         }
 
-        [TestMethod]
-        public void SaveSample_Details__Concentration_And_Mass_Results__Valid()
+        private SampleDto GetTestSampleDto()
         {
             var sampleDto = new SampleDto();
             sampleDto.Name = "Sample XYZ";
@@ -128,7 +127,22 @@ namespace Linko.LinkoExchange.Test
             resultDtos.Add(resultDto);
 
             sampleDto.SampleResults = resultDtos;
+
+            return sampleDto;
+        }
+
+        [TestMethod]
+        public void SaveSample_Details_Concentration_And_Mass_Results_Valid_NotSavingAsReadyToSubmit()
+        {
+            var sampleDto = GetTestSampleDto();
             _sampleService.SaveSample(sampleDto);
+        }
+
+        [TestMethod]
+        public void SaveSample_Details_Concentration_And_Mass_Results_Valid_SavingAsReadyToSubmit()
+        {
+            var sampleDto = GetTestSampleDto();
+            _sampleService.SaveSample(sampleDto, true);
         }
 
         [TestMethod]
@@ -143,6 +157,20 @@ namespace Linko.LinkoExchange.Test
             }
 
             var firstSampleDto = _sampleService.GetSampleDetails(sampleId);
+        }
+
+        [TestMethod]
+        public void Delete_Sample_With_Results_Valid()
+        {
+            var sampleId = -1;
+            var sampleDtos = _sampleService.GetSamples(SampleStatusName.All);
+            foreach (var sampleDto in sampleDtos)
+            {
+                sampleId = sampleDto.SampleId.Value;
+                break;
+            }
+
+            _sampleService.DeleteSample(sampleId);
         }
 
 

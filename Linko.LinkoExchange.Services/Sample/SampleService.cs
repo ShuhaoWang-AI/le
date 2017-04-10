@@ -175,9 +175,9 @@ namespace Linko.LinkoExchange.Services.Sample
                     }
 
                     //Add "regular" sample results
-                    var massLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Mass.ToString()).LimitBasisId;
+                    var massLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.MassLoading.ToString()).LimitBasisId;
                     var concentrationLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Concentration.ToString()).LimitBasisId;
-                    var dailyLimitTypeId = _dbContext.LimitTypes.Single(lt => lt.Name == LimitTypeName.DailyLimit.ToString()).LimitTypeId;
+                    var dailyLimitTypeId = _dbContext.LimitTypes.Single(lt => lt.Name == LimitTypeName.Daily.ToString()).LimitTypeId;
                     foreach (var resultDto in sampleDto.SampleResults)
                     {
 
@@ -370,7 +370,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         sampleResultDtos.Add(result.ParameterId, thisSampleResult);
                     }
 
-                    if (result.LimitType.Name == LimitTypeName.DailyLimit.ToString()
+                    if (result.LimitType.Name == LimitTypeName.Daily.ToString()
                         && result.LimitBasis.Name == LimitBasisName.Concentration.ToString())
                     {
                         thisSampleResult.IsCalcMassLoading = result.IsMassLoadingCalculationRequired;
@@ -381,8 +381,8 @@ namespace Linko.LinkoExchange.Services.Sample
                         thisSampleResult.DecimalPlaces = result.DecimalPlaces;
 
                     }
-                    else if (result.LimitType.Name == LimitTypeName.DailyLimit.ToString()
-                        && result.LimitBasis.Name == LimitBasisName.Mass.ToString())
+                    else if (result.LimitType.Name == LimitTypeName.Daily.ToString()
+                        && result.LimitBasis.Name == LimitBasisName.MassLoading.ToString())
                     {
                         thisSampleResult.MassLoadingQualifier = result.Qualifier;
                         thisSampleResult.MassLoadingValue = result.Value;
@@ -560,8 +560,8 @@ namespace Linko.LinkoExchange.Services.Sample
 
                 }
                 else if (sampleResult.IsFlowForMassLoadingCalculation == false &&
-                    sampleResult.LimitType.Name == LimitTypeName.DailyLimit.ToString() &&
-                    (sampleResult.LimitBasis.Name == LimitBasisName.Mass.ToString() 
+                    sampleResult.LimitType.Name == LimitTypeName.Daily.ToString() &&
+                    (sampleResult.LimitBasis.Name == LimitBasisName.MassLoading.ToString() 
                     || sampleResult.LimitBasis.Name == LimitBasisName.Concentration.ToString()))
                 {
 

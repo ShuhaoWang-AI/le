@@ -180,7 +180,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                     .Include(mppl => mppl.LimitBasis)
                     .Include(mppl => mppl.LimitType)
                     .Any(mppl => mppl.MonitoringPointParameterId == foundMonitoringPointParameter.MonitoringPointParameterId
-                        && mppl.LimitBasis.Name == LimitBasisName.Mass.ToString() && mppl.LimitType.Name == LimitTypeName.DailyLimit.ToString());
+                        && mppl.LimitBasis.Name == LimitBasisName.MassLoading.ToString() && mppl.LimitType.Name == LimitTypeName.Daily.ToString());
 
             }
 

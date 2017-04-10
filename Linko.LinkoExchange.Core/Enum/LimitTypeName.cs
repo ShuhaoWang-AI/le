@@ -8,6 +8,6 @@ namespace Linko.LinkoExchange.Core.Enum
 {
     public enum LimitTypeName
     {
-        DailyLimit
+        Daily
     }
 }
