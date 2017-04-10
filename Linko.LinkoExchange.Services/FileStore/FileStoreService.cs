@@ -162,17 +162,13 @@ namespace Linko.LinkoExchange.Services.FileStore
                         TryToReduceFileDataSize(fileStoreDto);
                     }
 
-                    // Set [ReportElementTypeId] fied, search db by ReprotElementTypeName   
-                    fileStoreDto.ReportElementTypeId =
-                        _dbContext.ReportElementTypes.Single(
-                            i => i.Name == fileStoreDto.ReportElementTypeName).ReportElementTypeId;
-
                     fileStoreDto.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
                     fileStoreDto.UploaderUserId = currentUserId;
                     fileStoreDto.SizeByte = fileStoreDto.Data.Length;
                     fileStoreDto.FileTypeId = validFileTypes.Single(i => i.Extension.ToLower().Equals(extension)).FileTypeId;
                     var fileName = Path.GetFileNameWithoutExtension(fileStoreDto.OriginalFileName);
-                    fileStoreDto.Name = $"{fileName}_0{extension}";
+                    var timeTick = DateTimeOffset.UtcNow.Ticks.ToString();
+                    fileStoreDto.Name = $"{fileName}_{timeTick}_{extension}";
 
                     var fileStore = _mapHelper.GetFileStoreFromFileStoreDto(fileStoreDto);
 
@@ -254,13 +250,13 @@ namespace Linko.LinkoExchange.Services.FileStore
             {
                 try
                 {
-                    //TOOD add to reflect the new table changes
-                    //var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
-                    //fileStoreToUpdate.LastModiferUserId = currentUserId;
-                    //fileStoreToUpdate.LastModiciationDateTimeUtc = DateTimeOffset.UtcNow;
+                    var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+                    fileStoreToUpdate.LastModifierUserId = currentUserId;
+                    fileStoreToUpdate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
 
                     fileStoreToUpdate.Description = fileStoreDto.Description;
                     fileStoreToUpdate.ReportElementTypeName = fileStoreDto.ReportElementTypeName;
+                    fileStoreToUpdate.ReportElementTypeId = fileStoreDto.ReportElementTypeId;
 
                     _dbContext.SaveChanges();
                     _dbContext.Commit(transaction);
