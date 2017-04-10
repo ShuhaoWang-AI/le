@@ -6,6 +6,7 @@ using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.CopyOrRecord;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;

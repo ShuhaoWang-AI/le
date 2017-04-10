@@ -5,10 +5,11 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.CopyOrRecord;
 using Linko.LinkoExchange.Services.Mapping;
 using NLog;
 
-namespace Linko.LinkoExchange.Services.CopyOrRecord
+namespace Linko.LinkoExchange.Services.CopyOfRecord
 {
     public class CertificateDigitalSignatureManager : IDigitalSignatureManager
     {
@@ -82,7 +83,6 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
         {
             return _currentCertificateId;
         }
-
 
         #region private section
         private CopyOfRecordCertificate GetLatestCertificate()

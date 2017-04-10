@@ -8,6 +8,7 @@ using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.CopyOrRecord;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
@@ -127,7 +128,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IUnitService, UnitService>();
             container.RegisterType<IReportPackageService, ReportPackageServiceMock>();
             container.RegisterType<IDigitalSignatureManager, CertificateDigitalSignatureManager>();
-            container.RegisterType<ICopyOrRecordService, CopyOfRecordService>();
+            container.RegisterType<ICopyOfRecordService, CopyOfRecordService>();
         }
     }
 }

@@ -3,7 +3,7 @@ using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Services.CopyOrRecord
 {
-    public interface ICopyOrRecordService
+    public interface ICopyOfRecordService
     {
         void CreateCopyOfRecordForReportPackage(int reportPackageId);
         bool ValidCoreData(int copyOfRecordId);

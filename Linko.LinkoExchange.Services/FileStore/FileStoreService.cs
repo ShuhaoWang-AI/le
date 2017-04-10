@@ -6,7 +6,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Net.Sockets;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
@@ -322,11 +321,11 @@ namespace Linko.LinkoExchange.Services.FileStore
 
         public bool IsFileInReports(int fileStoreId)
         {
-            _logger.Info("Enter FileStoreService.IsFileInReports.");
+            _logger.Info(message: "Enter FileStoreService.IsFileInReports.");
 
             var isFileInReports = _dbContext.ReportFiles.Any(i => i.FileStoreId == fileStoreId);
 
-            _logger.Info("Leave FileStoreService.IsFileInReports.");
+            _logger.Info(message: "Leave FileStoreService.IsFileInReports.");
 
             return isFileInReports;
         }

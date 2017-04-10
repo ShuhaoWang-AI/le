@@ -2,19 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
-using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.CopyOrRecord;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.TimeZone;
 using NLog;
 
-namespace Linko.LinkoExchange.Services.CopyOrRecord
+namespace Linko.LinkoExchange.Services.CopyOfRecord
 {
-    public class CopyOfRecordService : ICopyOrRecordService
+    public class CopyOfRecordService : ICopyOfRecordService
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly IMapHelper _mapHelper;
@@ -85,7 +86,7 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
             {
                 var coreBytes = CreateZipFileData(reportPackageId);
 
-                var copyOfRecord = new CopyOfRecord
+                var copyOfRecord = new Core.Domain.CopyOfRecord
                 {
                     Hash = HashHelper.ComputeSha256Hash(data: coreBytes),
                     HashAlgorithm = HashAlgorithm.Sha256.ToString(),
@@ -125,7 +126,23 @@ namespace Linko.LinkoExchange.Services.CopyOrRecord
 
         public CopyOfRecordDto GetCopyOfRecordByReportPackageId(int reportPackageId)
         {
-            throw new System.NotImplementedException();
+            var copyOfRecord = _dbContext.CopyOfRecords.Single(i => i.ReportPackageId == reportPackageId);
+
+            // unzip copyOfRecord data into:
+            // 1. Attachment files
+            // 2. Certification files
+            // 3. Cor preview pdf file
+            // 4. Manifest xml file   
+            return new CopyOfRecordDto
+            {
+                ReportPackageId = reportPackageId,
+                Signature = copyOfRecord.Signature,
+                SignatureAlgorithm = copyOfRecord.SignatureAlgorithm,
+                Hash = copyOfRecord.Hash,
+                HashAlgorithm = copyOfRecord.HashAlgorithm,
+                Data = copyOfRecord.Data,
+                CopyOfRecordCertificateId = copyOfRecord.CopyOfRecordCertificateId
+            };
         }
 
         public CopyOfRecordDto GetCopyOfRecordById(int copyOfRecordId)

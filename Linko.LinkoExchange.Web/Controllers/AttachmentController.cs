@@ -2,12 +2,24 @@
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Linko.LinkoExchange.Services.CopyOrRecord;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Web.ViewModels.Attachment;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
+
+    public class CorController : Controller
+    {
+        private ICopyOfRecordService _copyOfRecordService;
+
+        public CorController(ICopyOfRecordService copyOfRecordService)
+        {
+            _copyOfRecordService = copyOfRecordService;
+        }
+    }
+
     //Demo controller for attachment upload and download
     public partial class AttachmentController : Controller
     {
