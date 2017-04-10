@@ -46,56 +46,77 @@ namespace Linko.LinkoExchange.Services.Sample
             _settings = settings;
         }
 
-        public int SaveSample(SampleDto sampleDto)
+        public int SaveSample(SampleDto sampleDto, bool isSavingAsReadyToSubmit = false)
         {
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
             var sampleIdToReturn = -1;
+            bool isFlowValuesExist = false;
             List<RuleViolation> validationIssues = new List<RuleViolation>();
 
-            //Check required fields
-            if (string.IsNullOrEmpty(sampleDto.Name))
+            //Check required field (UC-15-1.2.1): "Sample Type"
+            if (sampleDto.CtsEventTypeId < 1)
             {
-                string message = "Name is required.";
-                validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
-                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                ThrowSimpleException("Sample Type is required.");
             }
-            //Check for any mass results exist, if so check for flow value provided?
-            // OR HANDLED AT UI LAYER
+            //Check required field (UC-15-1.2.1): "Collection Method"
+            if (sampleDto.CollectionMethodId < 1)
+            {
+                ThrowSimpleException("Collection Method is required.");
+            }
+            //Check required field (UC-15-1.2.1): "Start Date/Time"
+            if (sampleDto.StartDateTimeLocal == null)
+            {
+                ThrowSimpleException("Start Date/Time is required.");
+            }
+            //Check required field (UC-15-1.2.1): "End Date/Time"
+            if (sampleDto.EndDateTimeLocal == null)
+            {
+                ThrowSimpleException("End Date/Time is required.");
+            }
+            
+            //Check sample start/end dates are not in the future (UC-15-1.2.9.1.b)
+
+            var sampleStartDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId);
+            var sampleEndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId);
+
+            if (sampleStartDateTimeUtc > DateTime.UtcNow || sampleEndDateTimeUtc > DateTime.UtcNow)
+            {
+                ThrowSimpleException("Sample dates cannot be future dates.");
+            }
+
+            if (sampleDto.FlowUnitId != null || sampleDto.FlowValue != null)
+            {
+                //All flow values must exist!
+                if (sampleDto.FlowUnitId == null || sampleDto.FlowValue == null)
+                {
+                    ThrowSimpleException("A flow value must be accompanied by a flow unit.");
+                }
+
+                isFlowValuesExist = true;
+            }
 
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try
                 {
-                    //Find existing Sample with same Name
-                    string proposedSampleName = sampleDto.Name.Trim().ToLower();
-                    var samplesWithMatchingName = _dbContext.Samples
-                        .Where(s => s.Name.Trim().ToLower() == proposedSampleName
-                                && s.OrganizationRegulatoryProgramId == authOrgRegProgramId);
-
                     Core.Domain.Sample sampleToPersist = null;
 
                     if (sampleDto.SampleId.HasValue && sampleDto.SampleId.Value > 0)
                     {
-                        //Ensure there are no other samples with same name
-                        foreach (var sampleWithMatchingName in samplesWithMatchingName)
+
+                        if (IsSampleIncludedInReportPackage(sampleDto.SampleId.Value))
                         {
-                            if (sampleWithMatchingName.SampleId != sampleDto.SampleId.Value)
-                            {
-                                string message = "A Sample with that name already exists. Please select another name.";
-                                validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
-                                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
-                            }
+                            //Sample is in use in a Report Package (draft or otherwise)...  
+                            //Actor can not perform any actions of any kind except view all details.
+                            return sampleDto.SampleId.Value;
                         }
 
                         //Update existing
                         sampleToPersist = _dbContext.Samples.Single(c => c.SampleId == sampleDto.SampleId);
                         sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto, sampleToPersist);
-                        sampleToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
-                        sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
-                        sampleToPersist.LastModifierUserId = currentUserId;
 
                         //Delete existing results
                         var existingSampleResults = _dbContext.SampleResults
@@ -104,24 +125,18 @@ namespace Linko.LinkoExchange.Services.Sample
                     }
                     else
                     {
-                        //Ensure there are no other element types with same name
-                        if (samplesWithMatchingName.Count() > 0)
-                        {
-                            string message = "A Sample with that name already exists.  Please select another name.";
-                            validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
-                            throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
-                        }
-
                         //Get new
                         sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto);
-                        sampleToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
-                        sampleToPersist.StartDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId);
-                        sampleToPersist.EndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId);
                         sampleToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
-                        sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
-                        sampleToPersist.LastModifierUserId = currentUserId;
                         _dbContext.Samples.Add(sampleToPersist);
                     }
+
+                    sampleToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
+                    sampleToPersist.StartDateTimeUtc = sampleStartDateTimeUtc;
+                    sampleToPersist.EndDateTimeUtc = sampleEndDateTimeUtc;
+                    sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                    sampleToPersist.LastModifierUserId = currentUserId;
+
 
 
                     _dbContext.SaveChanges(); //Needed here?
@@ -131,26 +146,33 @@ namespace Linko.LinkoExchange.Services.Sample
                     //Add results
                     sampleToPersist.SampleResults = new Collection<SampleResult>();
                     //
-                    //Add flow result first
-                    var flowParameter = _dbContext.Parameters
-                        .First(p => p.IsFlowForMassLoadingCalculation == true); //Chris: "Should be one but just get first".
+                    //Add flow result first (if exists)
+                    //  - this is only required if there is at least 1 mass loading result
 
-                    var flowResult = new SampleResult() {
-                        SampleId = sampleIdToReturn
-                        ,ParameterId = flowParameter.ParameterId
-                        ,ParameterName = flowParameter.Name
-                        ,Qualifier = ""
-                        ,Value = sampleDto.FlowValue
-                        ,DecimalPlaces = sampleDto.FlowValueDecimalPlaces
-                        ,UnitId = sampleDto.FlowUnitId
-                        ,UnitName = sampleDto.FlowUnitName
-                        ,MethodDetectionLimit = ""
-                        ,IsFlowForMassLoadingCalculation = true
-                        ,LimitTypeId = null
-                        ,LimitBasisId = null
-                        ,IsCalculated = false
-                    };
-                    sampleToPersist.SampleResults.Add(flowResult);
+                    if (isFlowValuesExist)
+                    {
+                        var flowParameter = _dbContext.Parameters
+                            .First(p => p.IsFlowForMassLoadingCalculation == true); //Chris: "Should be one but just get first".
+
+                        var flowResult = new SampleResult()
+                        {
+                            SampleId = sampleIdToReturn,
+                            ParameterId = flowParameter.ParameterId,
+                            ParameterName = flowParameter.Name,
+                            Qualifier = "",
+                            Value = sampleDto.FlowValue,
+                            DecimalPlaces = sampleDto.FlowValueDecimalPlaces,
+                            UnitId = sampleDto.FlowUnitId.Value,
+                            UnitName = sampleDto.FlowUnitName,
+                            MethodDetectionLimit = "",
+                            IsFlowForMassLoadingCalculation = true,
+                            LimitTypeId = null,
+                            LimitBasisId = null,
+                            IsCalculated = false
+                        };
+                        sampleToPersist.SampleResults.Add(flowResult);
+
+                    }
 
                     //Add "regular" sample results
                     var massLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Mass.ToString()).LimitBasisId;
@@ -158,6 +180,31 @@ namespace Linko.LinkoExchange.Services.Sample
                     var dailyLimitTypeId = _dbContext.LimitTypes.Single(lt => lt.Name == LimitTypeName.DailyLimit.ToString()).LimitTypeId;
                     foreach (var resultDto in sampleDto.SampleResults)
                     {
+
+                        if (isSavingAsReadyToSubmit)
+                        {
+                            if ((resultDto.Qualifier == ">" || resultDto.Qualifier == "<" || string.IsNullOrEmpty(resultDto.Qualifier))
+                                && resultDto.Value == null)
+                            {
+                                ThrowSimpleException("Every numeric qualifier must be accompanied by a numeric value.");
+                            }
+
+                            if (resultDto.Qualifier == "ND" || resultDto.Qualifier == "NF" && resultDto.Value != null)
+                            {
+                                ThrowSimpleException("Values cannot be associated with non-numeric qualifiers");
+                            }
+
+                            if (resultDto.IsCalcMassLoading && !isFlowValuesExist)
+                            {
+                                ThrowSimpleException("Flow values must be provided if including mass loading results.");
+                            }
+
+                            if (resultDto.IsCalcMassLoading && (resultDto.MassLoadingUnitId < 0 || resultDto.MassLoadingValue == null))
+                            {
+                                ThrowSimpleException("Missing mass loading values.");
+                            }
+                        }
+
                         //Concentration result
                         var sampleResult = _mapHelper.GetConcentrationSampleResultFromSampleResultDto(resultDto);
                         sampleResult.AnalysisDateTimeUtc = _timeZoneService
@@ -173,6 +220,8 @@ namespace Linko.LinkoExchange.Services.Sample
                         //Mass result (if calculated)
                         if (resultDto.IsCalcMassLoading)
                         {
+                            sampleResult.IsMassLoadingCalculationRequired = true;
+
                             var sampleMassResult = _mapHelper.GetMassSampleResultFromSampleResultDto(resultDto);
                             sampleMassResult.AnalysisDateTimeUtc = _timeZoneService
                                 .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
@@ -214,6 +263,193 @@ namespace Linko.LinkoExchange.Services.Sample
 
             }
             return sampleIdToReturn;
+        }
+
+        private void ThrowSimpleException(string message)
+        {
+            List<RuleViolation> validationIssues = new List<RuleViolation>();
+            validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+            throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+        }
+
+        public bool IsReadyToSubmit(int sampleId, bool isSuppressExceptions = false)
+        {
+            bool isReadyToSubmit = true;
+            List<RuleViolation> validationIssues = new List<RuleViolation>();
+
+            var sample = _dbContext.Samples
+                .Include(s => s.SampleResults)
+                .Include(s => s.SampleResults.Select(r => r.LimitBasis))
+                .Include(s => s.SampleResults.Select(r => r.LimitType))
+                .Single(s => s.SampleId == sampleId);
+
+            //Check required field (UC-15-1.2.1): "Sample Type"
+            if (sample.CtsEventTypeId < 1)
+            {
+                isReadyToSubmit = false;
+                if (!isSuppressExceptions)
+                {
+                    string message = "Sample Type is required.";
+                    validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                    throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                }
+            }
+            //Check required field (UC-15-1.2.1): "Collection Method"
+            if (sample.CollectionMethodId < 1)
+            {
+                isReadyToSubmit = false;
+                if (!isSuppressExceptions)
+                {
+                    string message = "Collection Method is required.";
+                    validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                    throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                }
+            }
+            //Check required field (UC-15-1.2.1): "Start Date/Time"
+            if (sample.StartDateTimeUtc == null)
+            {
+                isReadyToSubmit = false;
+                if (!isSuppressExceptions)
+                {
+                    string message = "Start Date/Time is required.";
+                    validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                    throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                }
+            }
+            //Check required field (UC-15-1.2.1): "End Date/Time"
+            if (sample.EndDateTimeUtc == null)
+            {
+                isReadyToSubmit = false;
+                if (!isSuppressExceptions)
+                {
+                    string message = "End Date/Time is required.";
+                    validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                    throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                }
+            }
+
+            //Check sample start/end dates are not in the future (UC-15-1.2.9.1.b)
+            if (sample.StartDateTimeUtc > DateTime.UtcNow || sample.EndDateTimeUtc > DateTime.UtcNow)
+            {
+                isReadyToSubmit = false;
+                if (!isSuppressExceptions)
+                {
+                    string message = "Sample dates cannot be future dates.";
+                    validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                    throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                }
+            }
+
+            //Check results
+            //
+
+            //Step 1: load all results into dtos
+            //Step 2: iterate through all the dtos to make sure
+            //          - qualifier exists and if required, concentration values and units exist
+            //          - if calc mass loading, we have flow value(s)
+            //          - if calc mass loading, we have mass value(s)
+            var flowResult = sample.SampleResults
+                .SingleOrDefault(sr => sr.IsFlowForMassLoadingCalculation && sr.LimitBasisId == null && sr.LimitTypeId == null);
+            var sampleResultDtos = new Dictionary<int, SampleResultDto>();
+            foreach (var result in sample.SampleResults)
+            {
+                if (result.LimitBasisId == null && result.LimitTypeId == null)
+                {
+                    //ignore
+                }
+                else
+                {
+                    SampleResultDto thisSampleResult;
+                    if (sampleResultDtos.ContainsKey(result.ParameterId))
+                    {
+                        thisSampleResult = sampleResultDtos[result.ParameterId];
+                    }
+                    else
+                    {
+                        thisSampleResult = new SampleResultDto();
+                        sampleResultDtos.Add(result.ParameterId, thisSampleResult);
+                    }
+
+                    if (result.LimitType.Name == LimitTypeName.DailyLimit.ToString()
+                        && result.LimitBasis.Name == LimitBasisName.Concentration.ToString())
+                    {
+                        thisSampleResult.IsCalcMassLoading = result.IsMassLoadingCalculationRequired;
+                        thisSampleResult.Qualifier = result.Qualifier;
+                        thisSampleResult.Value = result.Value;
+                        thisSampleResult.UnitId = result.UnitId;
+                        thisSampleResult.UnitName = result.UnitName;
+                        thisSampleResult.DecimalPlaces = result.DecimalPlaces;
+
+                    }
+                    else if (result.LimitType.Name == LimitTypeName.DailyLimit.ToString()
+                        && result.LimitBasis.Name == LimitBasisName.Mass.ToString())
+                    {
+                        thisSampleResult.MassLoadingQualifier = result.Qualifier;
+                        thisSampleResult.MassLoadingValue = result.Value;
+                        thisSampleResult.MassLoadingUnitId = result.UnitId;
+                        thisSampleResult.MassLoadingUnitName = result.UnitName;
+                        thisSampleResult.MassLoadingDecimalPlaces = result.DecimalPlaces;
+
+                    }
+                    else
+                    {
+                        throw new Exception($"Unknown sample result type encountered. SampleResultId={result.SampleResultId}");
+                    }
+
+                }
+
+
+            }
+
+            //Step 2: iterate through all the dtos
+            foreach (var resultDto in sampleResultDtos.Values)
+            {
+                if ((resultDto.Qualifier == ">" || resultDto.Qualifier == "<" || string.IsNullOrEmpty(resultDto.Qualifier))
+                    && resultDto.Value == null)
+                {
+                    isReadyToSubmit = false;
+                    if (!isSuppressExceptions)
+                    {
+                        string message = "All numeric values must be accompanied by a numeric qualifier.";
+                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    }
+                }
+                if (resultDto.Qualifier == "ND" || resultDto.Qualifier == "NF" && resultDto.Value != null)
+                {
+                    isReadyToSubmit = false;
+                    if (!isSuppressExceptions)
+                    {
+                        string message = "Only null values can be associated with non-numeric qualifiers.";
+                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    }
+                }
+
+                if (resultDto.IsCalcMassLoading && (flowResult == null || flowResult.UnitId < 0 || flowResult.Value == null))
+                {
+                    isReadyToSubmit = false;
+                    if (!isSuppressExceptions)
+                    {
+                        string message = "You must provide valid a flow value to calculate mass loading results";
+                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    }
+                }
+
+                if (resultDto.IsCalcMassLoading && (resultDto.MassLoadingUnitId < 0 || resultDto.MassLoadingValue == null))
+                {
+                    isReadyToSubmit = false;
+                    if (!isSuppressExceptions)
+                    {
+                        string message = "You must provide valid mass loading unit/value if electing to calculate mass loading results";
+                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    }
+                }
+            }
+
+            return isReadyToSubmit;
         }
 
         public void DeleteSample(int sampleId)

@@ -11,7 +11,7 @@ namespace Linko.LinkoExchange.Services.Sample
     public interface ISampleService
     {
         IEnumerable<SampleDto> GetSamples(SampleStatusName status, DateTime? startDate = null, DateTime? endDate = null);
-        int SaveSample(SampleDto sample);
+        int SaveSample(SampleDto sample, bool isSavingAsReadyToSubmit = false);
         void DeleteSample(int sampleId);
         SampleDto GetSampleDetails(int sampleId);
         bool IsSampleIncludedInReportPackage(int sampleId);
