@@ -6,6 +6,7 @@ namespace Linko.LinkoExchange.Services.Report
     public interface IReportPackageService
     {
         // TODO: Get sample result....  
+        ReportPackageDto GetReportPackage(int reportPackageId);
         IList<FileStoreDto> GetReportPackageAttachments(int reportPackageId);
         IList<ReportPackageELementTypeDto> GetReportPackageCertifications(int reportPackageId);
 

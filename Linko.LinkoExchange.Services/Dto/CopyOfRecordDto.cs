@@ -9,5 +9,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public string HashAlgorithm { get; set; }
         public byte[] Data { get; set; }
         public int CopyOfRecordCertificateId { get; set; }
+        public string DownloadFileName { get; set; }
     }
 }

@@ -126,14 +126,10 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         public CopyOfRecordDto GetCopyOfRecordByReportPackageId(int reportPackageId)
         {
+            //TODO to verify user permissions?  
+            var reportPackage = _reportPackageService.GetReportPackage(reportPackageId);
             var copyOfRecord = _dbContext.CopyOfRecords.Single(i => i.ReportPackageId == reportPackageId);
-
-            // unzip copyOfRecord data into:
-            // 1. Attachment files
-            // 2. Certification files
-            // 3. Cor preview pdf file
-            // 4. Manifest xml file   
-            return new CopyOfRecordDto
+            var copyOfRecordDto = new CopyOfRecordDto
             {
                 ReportPackageId = reportPackageId,
                 Signature = copyOfRecord.Signature,
@@ -143,6 +139,11 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 Data = copyOfRecord.Data,
                 CopyOfRecordCertificateId = copyOfRecord.CopyOfRecordCertificateId
             };
+
+            var datetimePart = reportPackage.SubMissionDateTime.ToString(format: "yyyyMMdd");
+            copyOfRecordDto.DownloadFileName = $"{reportPackage.OrganizationRegulatoryProgramId} {reportPackage.Name} {datetimePart}.zip";
+
+            return copyOfRecordDto;
         }
 
         public CopyOfRecordDto GetCopyOfRecordById(int copyOfRecordId)

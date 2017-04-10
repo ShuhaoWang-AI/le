@@ -120,6 +120,7 @@
     <Compile Include="Dto\CorFileDtoBase.cs" />
     <Compile Include="Dto\CorManifestFileDato.cs" />
     <Compile Include="Dto\CorPreviewFileDto.cs" />
+    <Compile Include="Dto\ReportPackageDto.cs" />
     <Compile Include="Dto\ReportPackageELementTypeDto.cs" />
     <Compile Include="FileStore\FileStoreService.cs" />
     <Compile Include="FileStore\IFileStoreService.cs" />
