@@ -6,6 +6,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
@@ -332,12 +333,26 @@ namespace Linko.LinkoExchange.Services.FileStore
 
         private FileStoreDto FileStoreDtoHelper(FileStoreDto fileStoreDto, int currentOrgRegProgramId)
         {
-            fileStoreDto.UploalDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.UploalDateTimeLocal.DateTime, currentOrgRegProgramId);
+            fileStoreDto.UploalDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.UploalDateTimeLocal, currentOrgRegProgramId);
 
             fileStoreDto.UploaderUserFullName = GetUserFullName(fileStoreDto.UploaderUserId);
             fileStoreDto.LastModifierUserFullName = GetUserFullName(fileStoreDto.LastModifierUserId);
-            fileStoreDto.LastModificationDateTimeLocal = _timeZoneService.
-                GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.LastModificationDateTimeLocal?.DateTime ?? fileStoreDto.UploalDateTimeLocal.DateTime, currentOrgRegProgramId);
+
+            fileStoreDto.LastModificationDateTimeLocal = fileStoreDto.UploalDateTimeLocal;
+            if (fileStoreDto.LastModificationDateTimeLocal.HasValue)
+            {
+                fileStoreDto.LastModificationDateTimeLocal = _timeZoneService.
+                    GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.LastModificationDateTimeLocal.Value, currentOrgRegProgramId);
+            }
+
+            if (fileStoreDto.FileStoreId.HasValue && IsFileInReports(fileStoreDto.FileStoreId.Value))
+            {
+                if (_dbContext.ReportFiles.Any(i => i.FileStoreId == fileStoreDto.FileStoreId))
+                {
+                    fileStoreDto.UsedByReports = true;
+                }
+            }
+
             return fileStoreDto;
         }
 

@@ -15,13 +15,14 @@ namespace Linko.LinkoExchange.Services.Dto
         public string ReportElementTypeName { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
         public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgram { get; set; }
-        public DateTimeOffset UploalDateTimeLocal { get; set; }
+        public DateTime UploalDateTimeLocal { get; set; }
         public int UploaderUserId { get; set; }
         public string UploaderUserFullName { get; set; }
-        public DateTimeOffset? LastModificationDateTimeLocal { get; set; }
+        public DateTime? LastModificationDateTimeLocal { get; set; }
         public int? LastModifierUserId { get; set; }
         public string LastModifierUserFullName { get; set; }
         public byte[] Data { get; set; }
         public string MediaType { get; set; }
+        public bool UsedByReports { get; set; }
     }
 }
