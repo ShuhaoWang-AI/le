@@ -22,7 +22,6 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         private readonly ILogger _logger;
         private readonly IHttpContextService _httpContextService;
         private readonly ITimeZoneService _timeZoneService;
-        private readonly IReportPackageService _reportPackageService;
         private readonly IDigitalSignatureManager _digitalSignatureManager;
 
         public CopyOfRecordService(
@@ -31,7 +30,6 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             ILogger logger,
             IHttpContextService httpContextService,
             ITimeZoneService timeZoneService,
-            IReportPackageService reportPackageService,
             IDigitalSignatureManager digitalSignatureManager)
         {
             if (dbContext == null)
@@ -59,11 +57,6 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 throw new ArgumentNullException(nameof(timeZoneService));
             }
 
-            if (reportPackageService == null)
-            {
-                throw new ArgumentNullException(nameof(reportPackageService));
-            }
-
             if (digitalSignatureManager == null)
             {
                 throw new ArgumentNullException(nameof(digitalSignatureManager));
@@ -74,17 +67,16 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             _logger = logger;
             _httpContextService = httpContextService;
             _timeZoneService = timeZoneService;
-            _reportPackageService = reportPackageService;
             _digitalSignatureManager = digitalSignatureManager;
         }
 
-        public void CreateCopyOfRecordForReportPackage(int reportPackageId)
+        public int CreateCopyOfRecordForReportPackage(ReportPackageDto reportPackageDto)
         {
-            _logger.Info($"Enter CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}");
+            _logger.Info($"Enter CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageDto.ReportPackageId}");
 
             try
             {
-                var coreBytes = CreateZipFileData(reportPackageId);
+                var coreBytes = CreateZipFileData(reportPackageDto);
 
                 var copyOfRecord = new Core.Domain.CopyOfRecord
                 {
@@ -97,14 +89,16 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 Array.Copy(sourceArray: coreBytes, destinationArray: copyOfRecord.Data, length: coreBytes.Length);
                 copyOfRecord.Signature = SignaData(hash: copyOfRecord.Hash);
                 copyOfRecord.CopyOfRecordCertificateId = _digitalSignatureManager.LatestCertificateId();
-                copyOfRecord.ReportPackageId = reportPackageId;
+                copyOfRecord.ReportPackageId = reportPackageDto.ReportPackageId;
 
                 copyOfRecord = _dbContext.CopyOfRecords.Add(entity: copyOfRecord);
 
                 _dbContext.SaveChanges();
 
-                var message = $"Leave CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}.";
+                var message = $"Leave CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageDto.ReportPackageId}.";
                 _logger.Info(message: message);
+
+                return copyOfRecord.ReportPackageId;
             }
             catch (Exception ex)
             {
@@ -124,14 +118,13 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             throw new System.NotImplementedException();
         }
 
-        public CopyOfRecordDto GetCopyOfRecordByReportPackageId(int reportPackageId)
+        public CopyOfRecordDto GetCopyOfRecordByReportPackage(ReportPackageDto reportPackage)
         {
-            //TODO to verify user permissions?  
-            var reportPackage = _reportPackageService.GetReportPackage(reportPackageId);
-            var copyOfRecord = _dbContext.CopyOfRecords.Single(i => i.ReportPackageId == reportPackageId);
+            //TODO to verify user permissions?   
+            var copyOfRecord = _dbContext.CopyOfRecords.Single(i => i.ReportPackageId == reportPackage.ReportPackageId);
             var copyOfRecordDto = new CopyOfRecordDto
             {
-                ReportPackageId = reportPackageId,
+                ReportPackageId = reportPackage.ReportPackageId,
                 Signature = copyOfRecord.Signature,
                 SignatureAlgorithm = copyOfRecord.SignatureAlgorithm,
                 Hash = copyOfRecord.Hash,
@@ -170,32 +163,29 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             }
         }
 
-        private byte[] CreateZipFileData(int reportPackageId)
-        {
-            //TODO:
-            //1. get attachment files
-            //2. get Copy Of Record.pdf
-            //3. get Copy Of Record Data.xml
-            var attachmentFiles = _reportPackageService.GetReportPackageAttachments(reportPackageId: reportPackageId);
-            var copyOfRecordPdfInfo = _reportPackageService.GetReportPackageCopyOfRecordPdfFile(reportPackageId: reportPackageId);
-            var copyOfRecordDataXmlFileInfo = _reportPackageService.GetReportPackageCopyOfRecordDataXmlFile(reportPackageId: reportPackageId);
 
+        //TODO:
+        //1. get attachment files
+        //2. get Copy Of Record.pdf
+        //3. get Copy Of Record Data.xml 
+        private byte[] CreateZipFileData(ReportPackageDto reportPackageDto)
+        {
             byte[] coreBytes;
             using (var stream = new MemoryStream())
             {
                 using (var zipArchive = new ZipArchive(stream: stream, mode: ZipArchiveMode.Create))
                 {
                     // Attachment files
-                    foreach (var attachment in attachmentFiles)
+                    foreach (var attachment in reportPackageDto.AttachmentFiles)
                     {
                         AddFileIntoZipArchive(archive: zipArchive, fileName: attachment.Name, fileData: attachment.Data);
                     }
 
                     // Copy Of Record.pdf  
-                    AddFileIntoZipArchive(archive: zipArchive, fileName: copyOfRecordPdfInfo.FileName, fileData: copyOfRecordPdfInfo.FileData);
+                    AddFileIntoZipArchive(archive: zipArchive, fileName: reportPackageDto.CopyOfRecordPdfInfo.FileName, fileData: reportPackageDto.CopyOfRecordPdfInfo.FileData);
 
                     // Copy Of Record Data.xml
-                    AddFileIntoZipArchive(archive: zipArchive, fileName: copyOfRecordDataXmlFileInfo.FileName, fileData: copyOfRecordDataXmlFileInfo.FileData);
+                    AddFileIntoZipArchive(archive: zipArchive, fileName: reportPackageDto.CopyOfRecordDataXmlFileInfo.FileName, fileData: reportPackageDto.CopyOfRecordDataXmlFileInfo.FileData);
                 }
 
                 coreBytes = stream.ToArray();

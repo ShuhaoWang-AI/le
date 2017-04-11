@@ -46,7 +46,6 @@ namespace Linko.LinkoExchange.Test
                  _logger.Object,
                  _httpContext.Object,
                  actualTimeZoneService,
-                 _reprotPackageService.Object,
                  certificateDigitalSignatureManager
                 );
         }
@@ -61,6 +60,9 @@ namespace Linko.LinkoExchange.Test
 
             fileDtos.AddRange(collection: new[] { ft1, ft2 });
 
+            var rnd = new Random();
+            int rptId = rnd.Next(int.MaxValue);
+
             var attachments = GetMockAttachmentFiles();
             var copyOfRecordPdfFile = GetCopyOfRecordPdfFile();
             var reportPackageCopyOfRecordDataXml = GetReportPackageCopyOfRecordDataXml();
@@ -73,10 +75,23 @@ namespace Linko.LinkoExchange.Test
             _reprotPackageService.Setup(i => i.GetReportPackageCopyOfRecordPdfFile(It.IsAny<int>()))
                                  .Returns(copyOfRecordPdfFile);
 
-            var rnd = new Random();
-            int rptId = rnd.Next(int.MaxValue);
+            var rpt = GetReportPackage(rptId);
 
-            _copyOrRecordService.CreateCopyOfRecordForReportPackage(rptId);
+            _copyOrRecordService.CreateCopyOfRecordForReportPackage(rpt);
+        }
+
+        private ReportPackageDto GetReportPackage(int reportPackageId)
+        {
+            return new ReportPackageDto
+            {
+                ReportPackageId = reportPackageId,
+                Name = " 1st Quarter PCR",
+                OrganizationRegulatoryProgramId = 3,
+                SubMissionDateTime = DateTime.UtcNow,
+                AttachmentFiles = _reprotPackageService.Object.GetReportPackageAttachments(reportPackageId),
+                CopyOfRecordDataXmlFileInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordDataXmlFile(reportPackageId),
+                CopyOfRecordPdfInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordPdfFile(reportPackageId)
+            };
         }
 
         private CopyOfRecordPdfFileDto GetCopyOfRecordPdfFile()

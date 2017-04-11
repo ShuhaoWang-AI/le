@@ -101,7 +101,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IProgramService, ProgramService>();
             container.RegisterType<IQuestionAnswerService, QuestionAnswerService>();
             container.RegisterType<IReportElementService, ReportElementService>();
-            container.RegisterType<IReportPackageService, ReportPackageServiceMock>();
+            container.RegisterType<IReportPackageService, ReportPackageService>();
             container.RegisterType<IReportTemplateService, ReportTemplateService>();
             container.RegisterType<IRequestCache, RequestCache>();
             container.RegisterType<ISessionCache, SessionCache>();

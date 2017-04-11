@@ -1,13 +1,13 @@
 ﻿
 using Linko.LinkoExchange.Services.Dto;
 
-namespace Linko.LinkoExchange.Services.CopyOrRecord
+namespace Linko.LinkoExchange.Services.CopyOfRecord
 {
     public interface ICopyOfRecordService
     {
-        void CreateCopyOfRecordForReportPackage(int reportPackageId);
+        int CreateCopyOfRecordForReportPackage(ReportPackageDto reportPackageDto);
         bool ValidCoreData(int copyOfRecordId);
-        CopyOfRecordDto GetCopyOfRecordByReportPackageId(int reportPackageId);
+        CopyOfRecordDto GetCopyOfRecordByReportPackage(ReportPackageDto reportPackage);
         CopyOfRecordDto GetCopyOfRecordById(int copyOfRecordId);
     }
 }
