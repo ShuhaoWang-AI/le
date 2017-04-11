@@ -173,6 +173,25 @@ namespace Linko.LinkoExchange.Test
             _sampleService.DeleteSample(sampleId);
         }
 
+        [TestMethod]
+        public void Get_Samples_And_Test_Validity_DRAFT()
+        {
+            var sampleDtos = _sampleService.GetSamples(SampleStatusName.All);
+            foreach (var sampleDto in sampleDtos)
+            {
+                var isValid = _sampleService.IsValidSample(sampleDto, false, false);
+            }
+        }
+
+        [TestMethod]
+        public void Get_Samples_And_Test_Validity_READYTOSUBMIT()
+        {
+            var sampleDtos = _sampleService.GetSamples(SampleStatusName.All);
+            foreach (var sampleDto in sampleDtos)
+            {
+                var isValid = _sampleService.IsValidSample(sampleDto, true, false);
+            }
+        }
 
     }
 }

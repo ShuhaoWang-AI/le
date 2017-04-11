@@ -15,5 +15,6 @@ namespace Linko.LinkoExchange.Services.Sample
         void DeleteSample(int sampleId);
         SampleDto GetSampleDetails(int sampleId);
         bool IsSampleIncludedInReportPackage(int sampleId);
+        bool IsValidSample(SampleDto sampleDto, bool isReadyToSubmit, bool isSuppressExceptions = false);
     }
 }
