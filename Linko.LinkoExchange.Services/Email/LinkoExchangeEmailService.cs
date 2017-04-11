@@ -232,7 +232,7 @@ namespace Linko.LinkoExchange.Services.Email
                     break;
 
                 // Below type needs to log for all programs 
-                case EmailType.UserAccess_AccountLockOut:
+                case EmailType.UserAccess_AccountLockout:
                     if (perRegulatoryPrrogram)
                     {
                         emailAuditLogs.AddRange(PopulateRecipientLogDataForAllPrograms(receipientEmail));
@@ -242,9 +242,9 @@ namespace Linko.LinkoExchange.Services.Email
                         emailAuditLogs.AddRange(PopulateSingleRecipientProgramData(receipientEmail));
                     }
                     break;
-                case EmailType.UserAccess_LockOutToSysAdmins:
+                case EmailType.UserAccess_LockoutToSysAdmins:
                 case EmailType.Registration_ResetRequired:
-                case EmailType.Profile_KBQFailedLockOut:
+                case EmailType.Profile_KBQFailedLockout:
                 case EmailType.Profile_KBQChanged:
                 case EmailType.Profile_EmailChanged:
                 case EmailType.Profile_ProfileChanged:

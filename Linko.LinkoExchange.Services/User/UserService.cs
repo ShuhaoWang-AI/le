@@ -561,7 +561,7 @@ namespace Linko.LinkoExchange.Services.User
                         contentReplacements.Add("lastName", user.LastName);
                         contentReplacements.Add("userName", user.UserName);
                         contentReplacements.Add("email", user.Email);
-                        _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockOutToSysAdmins, contentReplacements, perProgram);
+                        _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements, perProgram);
                         adminEmailList.Add(adminEmail);
                     }
                     
@@ -596,7 +596,7 @@ namespace Linko.LinkoExchange.Services.User
                         contentReplacements.Add("lastName", user.LastName);
                         contentReplacements.Add("userName", user.UserName);
                         contentReplacements.Add("email", user.Email);
-                        _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockOutToSysAdmins, contentReplacements);
+                        _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements);
                         adminEmailList.Add(adminEmail);
                     }
                 }
@@ -613,7 +613,7 @@ namespace Linko.LinkoExchange.Services.User
                     contentReplacements.Add("authorityOrganizationName", authority.Organization.Name);
                     contentReplacements.Add("authoritySupportEmail", authorityEmail);
                     contentReplacements.Add("authoritySupportPhoneNumber", authorityPhone);
-                    _emailService.SendEmail(new[] { user.Email }, EmailType.UserAccess_AccountLockOut, contentReplacements);
+                    _emailService.SendEmail(new[] { user.Email }, EmailType.UserAccess_AccountLockout, contentReplacements);
 
                 }
 
@@ -630,7 +630,7 @@ namespace Linko.LinkoExchange.Services.User
                 contentReplacements.Add("authorityList", authorityListString);
                 contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
                 contentReplacements.Add("supportEmail", supportEmail);
-                _emailService.SendEmail(new[] { user.Email }, EmailType.Profile_KBQFailedLockOut, contentReplacements);
+                _emailService.SendEmail(new[] { user.Email }, EmailType.Profile_KBQFailedLockout, contentReplacements);
 
             }
         }

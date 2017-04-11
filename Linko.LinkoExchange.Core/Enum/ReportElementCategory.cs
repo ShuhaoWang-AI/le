@@ -2,8 +2,8 @@
 {
     public enum ReportElementCategoryName
     {
+        SamplesAndResults,
         Attachments,
-        Certifications,
-        SamplesAndResults
+        Certifications
     }
 }

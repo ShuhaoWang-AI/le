@@ -203,7 +203,7 @@ namespace Linko.LinkoExchange.Test
                 {"authoritySupportPhoneNumber","616-456-3260" }
             };
 
-            _emailService.SendEmail(receivers, EmailType.UserAccess_AccountLockOut, contentReplacements); 
+            _emailService.SendEmail(receivers, EmailType.UserAccess_AccountLockout, contentReplacements); 
         }
 
         [TestMethod]
@@ -222,7 +222,7 @@ namespace Linko.LinkoExchange.Test
                 {"supportPhoneNumber","616-456-3260" }
             };
 
-            _emailService.SendEmail(receivers, EmailType.UserAccess_LockOutToSysAdmins, contentReplacements); 
+            _emailService.SendEmail(receivers, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements); 
         }
 
         [TestMethod]
@@ -312,7 +312,7 @@ namespace Linko.LinkoExchange.Test
                 {"supportPhoneNumber","616-456-3260" }
             };
 
-            _emailService.SendEmail(receivers, EmailType.Profile_KBQFailedLockOut, contentReplacements); 
+            _emailService.SendEmail(receivers, EmailType.Profile_KBQFailedLockout, contentReplacements); 
         } 
 
         [TestMethod]

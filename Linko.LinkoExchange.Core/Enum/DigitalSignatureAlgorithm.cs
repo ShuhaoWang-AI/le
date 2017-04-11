@@ -1,6 +1,6 @@
 ﻿namespace Linko.LinkoExchange.Core.Enum
 {
-    public enum DigitalSignAlgorithm
+    public enum DigitalSignatureAlgorithm
     {
         Sha1
     }

@@ -90,7 +90,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 {
                     Hash = HashHelper.ComputeSha256Hash(data: coreBytes),
                     HashAlgorithm = HashAlgorithm.Sha256.ToString(),
-                    SignatureAlgorithm = DigitalSignAlgorithm.Sha1.ToString(),
+                    SignatureAlgorithm = DigitalSignatureAlgorithm.Sha1.ToString(),
                     Data = new byte[coreBytes.Length]
                 };
 

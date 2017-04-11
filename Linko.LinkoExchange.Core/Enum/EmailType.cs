@@ -19,10 +19,10 @@
         Registration_AuthorityRegistrationApproved,
 
         // UC-5.5 Lock/UnLock  (for authority user account / and IU User Account)
-        UserAccess_AccountLockOut,
+        UserAccess_AccountLockout,
 
         // UC-5.5 Lock/UnLock (for Authority Sys Admin / IU Authority sys Admin
-        UserAccess_LockOutToSysAdmins,
+        UserAccess_LockoutToSysAdmins,
 
         // UC-5.6 UC-7.6 Reset Authority User Account/Reset IU User Account
         Registration_ResetRequired,
@@ -41,8 +41,8 @@
         Signature_SignatoryRevoked,
         Signature_SignatoryRevokedToAdmin, //for 7.8 (sub item 2.3) 
 
-        // UC-30 Manage My Profile-Profile LockOut
-        Profile_KBQFailedLockOut,
+        // UC-30 Manage My Profile-Profile Lockout
+        Profile_KBQFailedLockout,
 
         // UC-30 Manage My Profile-Profile Changed
         Profile_ProfileChanged,
