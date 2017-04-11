@@ -174,39 +174,28 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         {
             //TODO:
             //1. get attachment files
-            //2. get pdf generated from form data
-            //3. get cor proview pdf file
-            //4. get manifestDto xml file  
+            //2. get Copy Of Record.pdf
+            //3. get Copy Of Record Data.xml
             var attachmentFiles = _reportPackageService.GetReportPackageAttachments(reportPackageId: reportPackageId);
-            var certifications = _reportPackageService.GetReportPackageCertifications(reportPackageId: reportPackageId);
-            var corPreviewFileDto = _reportPackageService.GetReportPackageSampleFormData(reportPackageId: reportPackageId);
-            var manifestDto = _reportPackageService.GetReportPackageManifestData(reportPackageId: reportPackageId);
+            var copyOfRecordPdfInfo = _reportPackageService.GetReportPackageCopyOfRecordPdfFile(reportPackageId: reportPackageId);
+            var copyOfRecordDataXmlFileInfo = _reportPackageService.GetReportPackageCopyOfRecordDataXmlFile(reportPackageId: reportPackageId);
 
             byte[] coreBytes;
             using (var stream = new MemoryStream())
             {
                 using (var zipArchive = new ZipArchive(stream: stream, mode: ZipArchiveMode.Create))
                 {
+                    // Attachment files
                     foreach (var attachment in attachmentFiles)
                     {
                         AddFileIntoZipArchive(archive: zipArchive, fileName: attachment.Name, fileData: attachment.Data);
                     }
 
-                    // for certifications 
-                    foreach (var certification in certifications)
-                    {
-                        var certificationData = Encoding.UTF8.GetBytes(certification.ReportElementTypeContent);
-                        //TODO:  need a certification file name here 
-                        var fileName = certification.ReportElementTypeName;
+                    // Copy Of Record.pdf  
+                    AddFileIntoZipArchive(archive: zipArchive, fileName: copyOfRecordPdfInfo.FileName, fileData: copyOfRecordPdfInfo.FileData);
 
-                        AddFileIntoZipArchive(archive: zipArchive, fileName: fileName, fileData: certificationData);
-                    }
-
-                    // for cor preview file data  
-                    AddFileIntoZipArchive(archive: zipArchive, fileName: corPreviewFileDto.FileName, fileData: corPreviewFileDto.FileData);
-
-                    // for manifest file  
-                    AddFileIntoZipArchive(archive: zipArchive, fileName: manifestDto.FileName, fileData: manifestDto.FileData);
+                    // Copy Of Record Data.xml
+                    AddFileIntoZipArchive(archive: zipArchive, fileName: copyOfRecordDataXmlFileInfo.FileName, fileData: copyOfRecordDataXmlFileInfo.FileData);
                 }
 
                 coreBytes = stream.ToArray();

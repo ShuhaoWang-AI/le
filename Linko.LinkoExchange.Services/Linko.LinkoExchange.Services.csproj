@@ -118,8 +118,8 @@
     <Compile Include="CopyOfRecord\IDigitalSignatureManager.cs" />
     <Compile Include="Dto\CopyOfRecordDto.cs" />
     <Compile Include="Dto\CorFileDtoBase.cs" />
-    <Compile Include="Dto\CorManifestFileDato.cs" />
-    <Compile Include="Dto\CorPreviewFileDto.cs" />
+    <Compile Include="Dto\CopyOfRecordDataXmlFileDto.cs" />
+    <Compile Include="Dto\CopyOfRecordPdfFileDto.cs" />
     <Compile Include="Dto\ReportPackageDto.cs" />
     <Compile Include="Dto\ReportPackageELementTypeDto.cs" />
     <Compile Include="FileStore\FileStoreService.cs" />

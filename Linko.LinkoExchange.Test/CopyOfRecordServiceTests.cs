@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
-using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.CopyOrRecord;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
-using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
@@ -65,20 +62,16 @@ namespace Linko.LinkoExchange.Test
             fileDtos.AddRange(collection: new[] { ft1, ft2 });
 
             var attachments = GetMockAttachmentFiles();
-            var certifications = GetMockCertifications();
-            var sampleResults = GetCorPreviewFile();
-            var manifest = GetReportPackageManefestData();
+            var copyOfRecordPdfFile = GetCopyOfRecordPdfFile();
+            var reportPackageCopyOfRecordDataXml = GetReportPackageCopyOfRecordDataXml();
 
             _reprotPackageService.Setup(i => i.GetReportPackageAttachments(It.IsAny<int>()))
                                  .Returns(attachments);
 
-            _reprotPackageService.Setup(i => i.GetReportPackageCertifications(It.IsAny<int>()))
-                                 .Returns(certifications);
-
-            _reprotPackageService.Setup(i => i.GetReportPackageManifestData(It.IsAny<int>()))
-                                 .Returns(manifest);
-            _reprotPackageService.Setup(i => i.GetReportPackageSampleFormData(It.IsAny<int>()))
-                                 .Returns(sampleResults);
+            _reprotPackageService.Setup(i => i.GetReportPackageCopyOfRecordDataXmlFile(It.IsAny<int>()))
+                                 .Returns(reportPackageCopyOfRecordDataXml);
+            _reprotPackageService.Setup(i => i.GetReportPackageCopyOfRecordPdfFile(It.IsAny<int>()))
+                                 .Returns(copyOfRecordPdfFile);
 
             var rnd = new Random();
             int rptId = rnd.Next(int.MaxValue);
@@ -86,11 +79,10 @@ namespace Linko.LinkoExchange.Test
             _copyOrRecordService.CreateCopyOfRecordForReportPackage(rptId);
         }
 
-
-        private CorPreviewFileDto GetCorPreviewFile()
+        private CopyOfRecordPdfFileDto GetCopyOfRecordPdfFile()
         {
-            var filepath = $"./testFile/preview/linko-cor-preview.pdf";
-            var fileDto = new CorPreviewFileDto
+            var filepath = $"./testFile/CopyOfRecordPdf/CopyOfRecordPdf.pdf";
+            var fileDto = new CopyOfRecordPdfFileDto
             {
                 FileData = File.ReadAllBytes(filepath),
                 FileName = Path.GetFileName(filepath)
@@ -99,10 +91,10 @@ namespace Linko.LinkoExchange.Test
             return fileDto;
         }
 
-        private CorManifestFileDato GetReportPackageManefestData()
+        private CopyOfRecordDataXmlFileDto GetReportPackageCopyOfRecordDataXml()
         {
-            var filepath = $"./testFile/manifest/manifest.xml";
-            var fileDto = new CorManifestFileDato
+            var filepath = $"./testFile/CopyOfRecordData/CopyOfRecordData.xml";
+            var fileDto = new CopyOfRecordDataXmlFileDto
             {
                 FileData = File.ReadAllBytes(filepath),
                 FileName = Path.GetFileName(filepath)
@@ -110,7 +102,6 @@ namespace Linko.LinkoExchange.Test
 
             return fileDto;
         }
-
 
         private List<FileStoreDto> GetMockAttachmentFiles()
         {
@@ -155,14 +146,5 @@ namespace Linko.LinkoExchange.Test
 
             return reportPackageELementTypeDtos;
         }
-
-        public class CertificateDigitalSignatureManagerMock : CertificateDigitalSignatureManager
-        {
-            public CertificateDigitalSignatureManagerMock(LinkoExchangeContext dbContext, IMapHelper mapHelper, ILogger logger, IHttpContextService httpContextService)
-                : base(dbContext, mapHelper, logger, httpContextService)
-            {
-            }
-        }
-
     }
 }

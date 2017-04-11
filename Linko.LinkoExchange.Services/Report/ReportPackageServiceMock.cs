@@ -30,12 +30,12 @@ namespace Linko.LinkoExchange.Services.Report
             throw new System.NotImplementedException();
         }
 
-        public CorPreviewFileDto GetReportPackageSampleFormData(int reportPackageId)
+        public CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(int reportPackageId)
         {
             throw new System.NotImplementedException();
         }
 
-        public CorManifestFileDato GetReportPackageManifestData(int reportPackageId)
+        public CopyOfRecordDataXmlFileDto GetReportPackageCopyOfRecordDataXmlFile(int reportPackageId)
         {
             throw new System.NotImplementedException();
         }
