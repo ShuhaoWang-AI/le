@@ -1,19 +1,19 @@
-﻿@if (Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.PortalName.ToLower().Equals(value: "authority"))
+﻿@if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.PortalName.ToLower().Equals(value:"authority"))
 {
     <aside class="main-sidebar">
         <section class="sidebar">
             @* BEGIN Menu *@
             <ul class="sidebar-menu">
-                <li class="@(ViewContext.RouteData.Values["Action"].ToString().ToLower() == "industries" ? "active" : "")">
-                    <a href="#" onclick="location.href = '@Url.Action(actionName: "Industries", controllerName: "Authority")'">
-                        <i class="fa fa-industry fa-fw"></i>
+                <li class="@Html.IsActive(actions:"Industries,IndustryDetails,IndustryUsers,IndustryUserDetails,IndustryUserUpdateSignatoryStatus,IndustryUserLockUnLock,IndustryUserReset", controllers:"Authority")">
+                    <a href="#" onclick="location.href = '@Url.Action(actionName:"Industries", controllerName:"Authority")'">
+                        <i class="fa fa-fw fa-industry"></i>
                         <span>Industries</span>
                     </a>
                 </li>
 
                 <li class="treeview">
                     <a href="#">
-                        <i class="fa glyphicon glyphicon-duplicate fa-fw"></i>
+                        <i class="fa fa-fw glyphicon glyphicon-duplicate"></i>
                         <span>Report Packages</span>
                     </a>
                     <ul class="treeview-menu">
@@ -44,34 +44,34 @@
                     </ul>
                 </li>
 
-                <li class="@(ViewContext.RouteData.Values["Action"].ToString().ToLower() == "pendinguserapprovals" ? "active" : "")">
-                    <a href="#" onclick="location.href = '@Url.Action(actionName: "PendingUserApprovals", controllerName: "Authority")'">
-                        <i class="fa fa-user-plus fa-fw"></i>
+                <li class="@Html.IsActive(actions:"PendingUserApprovals,PendingUserApprovalDetails", controllers:"Authority")">
+                    <a href="#" onclick="location.href = '@Url.Action(actionName:"PendingUserApprovals", controllerName:"Authority")'">
+                        <i class="fa fa-fw fa-user-plus"></i>
                         <span>Pending Registrations</span>
                     </a>
                 </li>
 
-                <li class="@(ViewContext.RouteData.Values["Action"].ToString().ToLower() == "auditlogs" ? "active" : "")">
-                    <a href="#" onclick="location.href = '@Url.Action(actionName: "AuditLogs", controllerName: "Authority")'">
+                <li class="@Html.IsActive(actions:"AuditLogs", controllers:"Authority")">
+                    <a href="#" onclick="location.href = '@Url.Action(actionName:"AuditLogs", controllerName:"Authority")'">
                         <i class="fa fa-file-text fa-fw"></i>
-                        <span>Audit Logs </span>
+                        <span>Audit Logs</span>
                     </a>
                 </li>
 
-                <li class="treeview">
+                <li class="treeview @Html.IsActive(actions:"ReportPackageTemplates,NewReportPackageTemplateDetails,ReportPackageTemplateDetails,ReportElementTypes,NewReportElementTypeDetails,ReportElementTypeDetails,ParameterGroups,ParameterGroupDetails", controllers:"Authority")">
                     <a href="#">
-                        <i class="fa glyphicon glyphicon-duplicate fa-fw"></i>
+                        <i class="fa fa-fw glyphicon glyphicon-duplicate"></i>
                         <span>Report Settings</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>
-                            <a href="#" onclick="location.href = '@Url.Action(actionName: "ReportPackageTemplates", controllerName: "Authority")'">
+                        <li class="@Html.IsActive(actions:"ReportPackageTemplates,NewReportPackageTemplateDetails,ReportPackageTemplateDetails", controllers:"Authority")">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackageTemplates", controllerName:"Authority")'">
                                 <i class="fa fa-fw"></i>
                                 <span>Templates</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="#" onclick="location.href = '@Url.Action(actionName: "ReportElementTypes", controllerName: "Authority")'">
+                        <li class="@Html.IsActive(actions:"ReportElementTypes,NewReportElementTypeDetails,ReportElementTypeDetails", controllers:"Authority")">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportElementTypes", controllerName:"Authority")'">
                                 <i class="fa fa-fw"></i>
                                 <span>Report Elements</span>
                             </a>
@@ -90,8 +90,8 @@
                                 </li>
                             </ul>*@
                         </li>
-                        <li>
-                            <a href="#" onclick="location.href = '@Url.Action(actionName: "ParameterGroups", controllerName: "Authority")'">
+                        <li class="@Html.IsActive(actions:"ParameterGroups,ParameterGroupDetails", controllers:"Authority")">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"ParameterGroups", controllerName:"Authority")'">
                                 <i class="fa fa-fw"></i>
                                 <span>Parameter Groups</span>
                             </a>
@@ -99,20 +99,20 @@
                     </ul>
                 </li>
 
-                <li class="treeview">
+                <li class="treeview @Html.IsActive(actions:"AuthorityUsers,AuthorityUserDetails,AuthorityUserLockUnLock,AuthorityUserChangeStatus,AuthorityUserRemove,AuthorityUserReset,Settings", controllers:"Authority")">
                     <a href="#">
                         <i class="fa fa-bank fa-fw"></i>
                         <span>Authority Account</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>
-                            <a href="#" onclick="location.href = '@Url.Action(actionName: "AuthorityUsers", controllerName: "Authority")'">
-                                <i class="fa fa-users fa-fw"></i>
+                        <li class="@Html.IsActive(actions:"AuthorityUsers,AuthorityUserDetails,AuthorityUserLockUnLock,AuthorityUserChangeStatus,AuthorityUserRemove,AuthorityUserReset", controllers:"Authority")">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"AuthorityUsers", controllerName:"Authority")'">
+                                <i class="fa fa-fw fa-users"></i>
                                 <span>Users</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="#" onclick="location.href = '@Url.Action(actionName: "Settings", controllerName: "Authority")'">
+                        <li class="@Html.IsActive(actions:"Settings", controllers:"Authority")">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"Settings", controllerName:"Authority")'">
                                 <i class="fa fa-cog fa-fw"></i>
                                 <span>Settings</span>
                             </a>
@@ -126,7 +126,7 @@
     <!-- The sidebar's background -->
 }
 
-else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.PortalName.ToLower().Equals(value: "industry"))
+else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.PortalName.ToLower().Equals(value:"industry"))
 {
     <aside class="main-sidebar">
         <section class="sidebar">
@@ -134,8 +134,8 @@ else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.Porta
             <ul class="sidebar-menu">
                 <li class="treeview">
                     <a href="#">
-                        <i class="fa fa-th-list fa-fw"></i>
-                        <span>Data Entry Forms</span>
+                        <i class="fa fa-fw fa-th-list"></i>
+                        <span>Samples</span>
                         @*<span class="pull-right-container">
                             <span class="label bg-orange pull-right">2</span>
                         </span>*@
@@ -153,7 +153,7 @@ else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.Porta
                         <li>
                             <a href="#">
                                 <i class="fa fa-fw"></i>
-                                <span>Submitted</span>
+                                <span>Reported</span>
                             </a>
                         </li>
                     </ul>
@@ -161,7 +161,7 @@ else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.Porta
 
                 <li class="treeview">
                     <a href="#">
-                        <i class="fa glyphicon glyphicon-duplicate fa-fw"></i>
+                        <i class="fa fa-fw glyphicon glyphicon-duplicate"></i>
                         <span>Report Packages</span>
                         @*<span class="pull-right-container">
                             <span class="label bg-orange pull-right">2</span>
@@ -193,30 +193,43 @@ else if(Request.IsAuthenticated && (ViewBag.PortalName != null) && ViewBag.Porta
                                 <span>Submitted</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="#">
+                                <i class="fa fa-fw"></i>
+                                <span>Repudiated</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
 
-                <li class="treeview">
+                <li class="@Html.IsActive(actions:"Attachments,AttachmentDetails", controllers:"Industry")">
+                    <a href="#" onclick="location.href = '@Url.Action(actionName:"Attachments", controllerName:"Industry")'">
+                        <i class="fa fa-file-text fa-fw"></i>
+                        <span>Attachments</span>
+                    </a>
+                </li>
+
+                <li class="treeview @Html.IsActive(actions:"IndustryUsers,IndustryUserDetails,IndustryUserRemove,IndustryUserChangeStatus,Settings,PendingUserApprovals,PendingUserApprovalDetails", controllers: "Industry")">
                     <a href="#">
                         <i class="fa fa-bank fa-fw"></i>
                         <span>Industry Account</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>
-                            <a href="#" onclick="location.href = '@Url.Action(actionName: "IndustryUsers", controllerName: "Industry")'">
-                                <i class="fa fa-users fa-fw"></i>
+                        <li class="@Html.IsActive(actions:"IndustryUsers,IndustryUserDetails,IndustryUserRemove,IndustryUserChangeStatus", controllers:"Industry")">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"IndustryUsers", controllerName:"Industry")'">
+                                <i class="fa fa-fw fa-users"></i>
                                 <span>Users</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="#" onclick="location.href = '@Url.Action(actionName: "Settings", controllerName: "Industry")'">
+                        <li class="@Html.IsActive(actions:"Settings", controllers:"Industry")">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"Settings", controllerName:"Industry")'">
                                 <i class="fa fa-cog fa-fw"></i>
                                 <span>Settings</span>
                             </a>
                         </li>
-                        <li class="treeview">
-                            <a href="#" onclick="location.href = '@Url.Action(actionName: "PendingUserApprovals", controllerName: "Industry")'">
-                                <i class="fa fa-user-plus fa-fw"></i>
+                        <li class="@Html.IsActive(actions:"PendingUserApprovals,PendingUserApprovalDetails", controllers:"Industry")">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"PendingUserApprovals", controllerName:"Industry")'">
+                                <i class="fa fa-fw fa-user-plus"></i>
                                 <span>Pending Registrations</span>
                                 @*<span class="pull-right-container">
                                     <span class="label bg-primary pull-right">1</span>

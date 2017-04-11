@@ -1008,12 +1008,13 @@
                         .DataTable()
                         .rows()
                         .data()
-                        .each(function (d)
+                        .each(function (value, index)
                         {
                             var reportElementTypeViewModel = {};
-                            reportElementTypeViewModel.Id = d[1];
-                            reportElementTypeViewModel.Name = d[2];
+                            reportElementTypeViewModel.Id = value[1];
+                            reportElementTypeViewModel.Name = value[2];
                             selectedSamplesAndResults.push(reportElementTypeViewModel);
+                            console.log( 'Data in index: '+index+' is: '+value );
                         });
 
                     var selectedAttachments = [];
@@ -1021,12 +1022,13 @@
                         .DataTable()
                         .rows()
                         .data()
-                        .each(function (d)
+                        .each(function (value, index)
                         {
                             var reportElementTypeViewModel = {};
-                            reportElementTypeViewModel.Id = d[1];
-                            reportElementTypeViewModel.Name = d[2];
+                            reportElementTypeViewModel.Id = value[1];
+                            reportElementTypeViewModel.Name = value[2];
                             selectedAttachments.push(reportElementTypeViewModel);
+                            console.log( 'Data in index: '+index+' is: '+value );
                         });
 
                     var selectedCertifications = [];
@@ -1034,12 +1036,13 @@
                         .DataTable()
                         .rows()
                         .data()
-                        .each(function (d)
+                        .each(function (value, index)
                         {
                             var reportElementTypeViewModel = {};
-                            reportElementTypeViewModel.Id = d[1];
-                            reportElementTypeViewModel.Name = d[2];
+                            reportElementTypeViewModel.Id = value[1];
+                            reportElementTypeViewModel.Name = value[2];
                             selectedCertifications.push(reportElementTypeViewModel);
+                            console.log( 'Data in index: '+index+' is: '+value );
                         });
 
                     var selectedIndustries = [];
@@ -1047,11 +1050,11 @@
                         .DataTable()
                         .rows()
                         .data()
-                        .each(function (d)
+                        .each(function (value, index)
                         {
                             var industryViewModel = {};
-                            industryViewModel.Id = d[0];
-                            industryViewModel.Name = d[2];
+                            industryViewModel.Id = value[0];
+                            industryViewModel.Name = value[2];
                             selectedIndustries.push(industryViewModel);
                         });
 

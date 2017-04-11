@@ -855,10 +855,8 @@ namespace Linko.LinkoExchange.Services.Mapping
                 ReportElementTypeId = fileStore.ReportElementTypeId,
                 ReportElementTypeName = fileStore.ReportElementTypeName,
                 OrganizationRegulatoryProgramId = fileStore.OrganizationRegulatoryProgramId,
-                OrganizationRegulatoryProgram =
-                    GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(
-                        fileStore.OrganizationRegulatoryProgram),
-                UploalDateTimeLocal = fileStore.UploadDateTimeUtc.DateTime,
+                OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(fileStore.OrganizationRegulatoryProgram),
+                UploadDateTimeLocal = fileStore.UploadDateTimeUtc.DateTime,
                 UploaderUserId = fileStore.UploaderUserId
             };
         }
@@ -1048,10 +1046,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 //LastModifierUserId = set outside after calling line
             };
 
-
-
             return massResult;
         }
-
     }
 }

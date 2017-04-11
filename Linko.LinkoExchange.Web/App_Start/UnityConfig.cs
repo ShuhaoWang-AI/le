@@ -14,12 +14,16 @@ using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Parameter;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
+using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -27,11 +31,6 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using Microsoft.Practices.Unity;
 using NLog;
-using Linko.LinkoExchange.Services.Jurisdiction;
-using Linko.LinkoExchange.Web.ViewModels.User;
-using Linko.LinkoExchange.Services.Report;
-using Linko.LinkoExchange.Services.Parameter;
-using Linko.LinkoExchange.Services.Unit;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -77,58 +76,50 @@ namespace Linko.LinkoExchange.Web
             container.AddNewExtension<NLogExtension>();
 
             // Custom filter
-            container.RegisterType<CustomHandleErrorAttribute>(new InjectionConstructor(typeof(ILogger)));
             container.RegisterType<CommonInfoAttribute>();
+            container.RegisterType<CustomHandleErrorAttribute>(new InjectionConstructor(typeof(ILogger)));
 
             // Services
-            container.RegisterType<IAuthenticationManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));
             //container.RegisterType<ApplicationSignInManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Get<ApplicationSignInManager>()));
+            container.RegisterType<IAuditLogEntry, EmailAuditLogEntryDto>();
+            container.RegisterType<IAuditLogService, EmailAuditLogService>();
+            container.RegisterType<IAuthenticationManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));
             container.RegisterType<IAuthenticationService, AuthenticationService>();
-            container.RegisterType<ISettingService, SettingService>();
-            container.RegisterType<IOrganizationService, OrganizationService>();
-            container.RegisterType<IInvitationService, InvitationService>();
-            container.RegisterType<IProgramService, ProgramService>();
-            container.RegisterType<IUserService, UserService>();
+            container.RegisterType<ICopyOfRecordService, CopyOfRecordService>();
+            container.RegisterType<ICromerrAuditLogService, CromerrAuditLogService>();
+            container.RegisterType<IDigitalSignatureManager, CertificateDigitalSignatureManager>();
+            container.RegisterType<IEmailService, LinkoExchangeEmailService>(new InjectionConstructor(typeof(LinkoExchangeContext), typeof(EmailAuditLogService), typeof(IProgramService), typeof(ISettingService), typeof(IRequestCache)));
+            container.RegisterType<IEncryptionService, EncryptionService>();
+            container.RegisterType<IFileStoreService, FileStoreService>();
             container.RegisterType<IHttpContextService, HttpContextService>();
+            container.RegisterType<IInvitationService, InvitationService>();
+            container.RegisterType<IJurisdictionService, JurisdictionService>();
+            container.RegisterType<IOrganizationService, OrganizationService>();
+            container.RegisterType<IParameterService, ParameterService>();
+            container.RegisterType<IPasswordHasher, PasswordHasher>();
+            container.RegisterType<IPermissionService, PermissionService>();
+            container.RegisterType<IProgramService, ProgramService>();
+            container.RegisterType<IQuestionAnswerService, QuestionAnswerService>();
+            container.RegisterType<IReportElementService, ReportElementService>();
+            container.RegisterType<IReportPackageService, ReportPackageServiceMock>();
+            container.RegisterType<IReportTemplateService, ReportTemplateService>();
             container.RegisterType<IRequestCache, RequestCache>();
             container.RegisterType<ISessionCache, SessionCache>();
-            container.RegisterType<IQuestionAnswerService, QuestionAnswerService>();
+            container.RegisterType<ISettingService, SettingService>();
             container.RegisterType<ITimeZoneService, TimeZoneService>();
-            container.RegisterType<IEncryptionService, EncryptionService>();
-            container.RegisterType<IJurisdictionService, JurisdictionService>();
-            container.RegisterType<IParameterService, ParameterService>();
-            container.RegisterType<IReportElementService, ReportElementService>();
-            container.RegisterType<IReportTemplateService, ReportTemplateService>();
             container.RegisterType<IUnitService, UnitService>();
+            container.RegisterType<IUserService, UserService>();
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
             container.RegisterType<ApplicationUserManager>();
             container.RegisterType<IUserStore<UserProfile>, UserStore<UserProfile>>(new InjectionConstructor(typeof(LinkoExchangeContext)));
-            container.RegisterType<IPermissionService, PermissionService>();
-            container.RegisterType<IAuditLogEntry, EmailAuditLogEntryDto>();
-            container.RegisterType<IPasswordHasher, PasswordHasher>();
-            container.RegisterType<IRequestCache, RequestCache>();
-            container.RegisterType<IAuditLogService, EmailAuditLogService>();
-            container.RegisterType<IEmailService, LinkoExchangeEmailService>(new InjectionConstructor(typeof(LinkoExchangeContext),
-                typeof(EmailAuditLogService),
-                typeof(IProgramService),
-                typeof(ISettingService),
-                typeof(IRequestCache)));
 
             //Map POCO <-> DTO
             container.RegisterType<Services.Mapping.IMapHelper, Services.Mapping.MapHelper>();
 
             //Map DTO <-> ViewModel
             container.RegisterType<Web.Mapping.IMapHelper, Web.Mapping.MapHelper>();
-
-            container.RegisterType<ICromerrAuditLogService, CromerrAuditLogService>();
-            container.RegisterType<IReportTemplateService, ReportTemplateService>();
-            container.RegisterType<IFileStoreService, FileStoreService>();
-            container.RegisterType<IUnitService, UnitService>();
-            container.RegisterType<IReportPackageService, ReportPackageServiceMock>();
-            container.RegisterType<IDigitalSignatureManager, CertificateDigitalSignatureManager>();
-            container.RegisterType<ICopyOfRecordService, CopyOfRecordService>();
         }
     }
 }

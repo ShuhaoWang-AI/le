@@ -235,9 +235,9 @@ namespace Linko.LinkoExchange.Services.FileStore
         public void UpdateFileStore(FileStoreDto fileStoreDto)
         {
             _logger.Info("Enter FileStoreService.UpdateFileStore.");
-            //Check if the file is already set to be 'reproted' or not 
+            //Check if the file is already set to be 'reported' or not 
             var fileStoreToUpdate = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreDto.FileStoreId);
-            // Check the fileStoreId is in tReportFile table or not, if it, means that file is included in a reprot  
+            // Check the fileStoreId is in tReportFile table or not, if it, means that file is included in a report  
             if (IsFileInReports(fileStoreDto.FileStoreId.Value))
             {
                 string message = "The attachment is used in a Report Package, and cannot be changed.";
@@ -282,7 +282,7 @@ namespace Linko.LinkoExchange.Services.FileStore
         {
             _logger.Info("Enter FileStoreService.DeleteFileStore.");
 
-            //Check if the file is already set to be 'reproted' or not 
+            //Check if the file is already set to be 'reported' or not 
             if (IsFileInReports(fileStoreId))
             {
                 List<RuleViolation> validationIssues = new List<RuleViolation>();
@@ -296,8 +296,8 @@ namespace Linko.LinkoExchange.Services.FileStore
                 try
                 {
                     var testFileStore = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreId);
-                    var fileStoreDate = _dbContext.FileStoreDatas.Single(i => i.FileStoreId == fileStoreId);
-                    _dbContext.FileStoreDatas.Remove(fileStoreDate);
+                    var fileStoreData = _dbContext.FileStoreDatas.Single(i => i.FileStoreId == fileStoreId);
+                    _dbContext.FileStoreDatas.Remove(fileStoreData);
                     _dbContext.FileStores.Remove(testFileStore);
                     _dbContext.SaveChanges();
                     _dbContext.Commit(transaction);
@@ -332,12 +332,12 @@ namespace Linko.LinkoExchange.Services.FileStore
 
         private FileStoreDto FileStoreDtoHelper(FileStoreDto fileStoreDto, int currentOrgRegProgramId)
         {
-            fileStoreDto.UploalDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.UploalDateTimeLocal, currentOrgRegProgramId);
+            fileStoreDto.UploadDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.UploadDateTimeLocal, currentOrgRegProgramId);
 
             fileStoreDto.UploaderUserFullName = GetUserFullName(fileStoreDto.UploaderUserId);
             fileStoreDto.LastModifierUserFullName = GetUserFullName(fileStoreDto.LastModifierUserId);
 
-            fileStoreDto.LastModificationDateTimeLocal = fileStoreDto.UploalDateTimeLocal;
+            fileStoreDto.LastModificationDateTimeLocal = fileStoreDto.UploadDateTimeLocal;
             if (fileStoreDto.LastModificationDateTimeLocal.HasValue)
             {
                 fileStoreDto.LastModificationDateTimeLocal = _timeZoneService.

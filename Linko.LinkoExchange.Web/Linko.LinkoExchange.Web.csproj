@@ -416,6 +416,7 @@
     <Content Include="Views\Attachment\FileStores.cshtml" />
     <Content Include="Views\Authority\ReportPackageTemplateDetails.cshtml" />
     <Content Include="Views\Attachment\FileStoreInfo.cshtml" />
+    <Content Include="Views\Industry\Attachments.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -427,6 +428,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AttachmentController.cs" />
     <Compile Include="Controllers\CorController.cs" />
+    <Compile Include="Extensions\HtmlExtensions.cs" />
     <Compile Include="ViewModels\Attachment\AttachmentModel.cs" />
     <Compile Include="Controllers\AuthorityController.cs" />
     <Compile Include="Controllers\IndustryController.cs" />
@@ -463,6 +465,7 @@
     <Compile Include="ViewModels\Authority\AuthorityUserViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
+    <Compile Include="ViewModels\Shared\AttachmentViewModel.cs" />
     <Compile Include="ViewModels\Shared\ReportPackageTemplateViewModel.cs" />
     <Compile Include="ViewModels\Shared\ReportElementTypeViewModel.cs" />
     <Compile Include="ViewModels\Shared\ParameterGroupViewModel.cs" />
