@@ -5,7 +5,6 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services.CopyOrRecord;
 using Linko.LinkoExchange.Services.Mapping;
 using NLog;
 

@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Web.Mvc;
-using Linko.LinkoExchange.Services.CopyOrRecord;
 using Linko.LinkoExchange.Services.Report;
 
 namespace Linko.LinkoExchange.Web.Controllers

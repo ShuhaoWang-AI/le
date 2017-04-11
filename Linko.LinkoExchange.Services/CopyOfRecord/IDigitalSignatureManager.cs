@@ -1,4 +1,4 @@
-﻿namespace Linko.LinkoExchange.Services.CopyOrRecord
+﻿namespace Linko.LinkoExchange.Services.CopyOfRecord
 {
     public interface IDigitalSignatureManager
     {

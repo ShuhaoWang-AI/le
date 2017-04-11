@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
@@ -13,8 +12,5 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTime SubMissionDateTime { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
         public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgramDto { get; set; }
-        //public IEnumerable<FileStoreDto> AttachmentFiles { get; set; }
-        //public CopyOfRecordPdfFileDto CopyOfRecordPdfInfo { get; set; }
-        //public CopyOfRecordDataXmlFileDto CopyOfRecordDataXmlFileInfo { get; set; }
     }
 }

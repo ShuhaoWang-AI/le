@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Linko.LinkoExchange.Services.CopyOfRecord;
-using Linko.LinkoExchange.Services.CopyOrRecord;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Program;
 
@@ -46,7 +45,6 @@ namespace Linko.LinkoExchange.Services.Report
         {
             throw new System.NotImplementedException();
         }
-
 
         //TODO: to implement this!
         public ReportPackageDto GetReportPackage(int reportPackageId)
