@@ -75,9 +75,11 @@ namespace Linko.LinkoExchange.Test
             _reprotPackageService.Setup(i => i.GetReportPackageCopyOfRecordPdfFile(It.IsAny<int>()))
                                  .Returns(copyOfRecordPdfFile);
 
-            var rpt = GetReportPackage(rptId);
+            var attachmentFiles = _reprotPackageService.Object.GetReportPackageAttachments(rptId);
+            var copyOfRecordDataXmlFileInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordDataXmlFile(rptId);
+            var copyOfRecordPdfInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordPdfFile(rptId);
 
-            _copyOrRecordService.CreateCopyOfRecordForReportPackage(rpt);
+            _copyOrRecordService.CreateCopyOfRecordForReportPackage(rptId, attachmentFiles, copyOfRecordPdfInfo, copyOfRecordDataXmlFileInfo);
         }
 
         private ReportPackageDto GetReportPackage(int reportPackageId)
@@ -87,10 +89,7 @@ namespace Linko.LinkoExchange.Test
                 ReportPackageId = reportPackageId,
                 Name = " 1st Quarter PCR",
                 OrganizationRegulatoryProgramId = 3,
-                SubMissionDateTime = DateTime.UtcNow,
-                AttachmentFiles = _reprotPackageService.Object.GetReportPackageAttachments(reportPackageId),
-                CopyOfRecordDataXmlFileInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordDataXmlFile(reportPackageId),
-                CopyOfRecordPdfInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordPdfFile(reportPackageId)
+                SubMissionDateTime = DateTime.UtcNow
             };
         }
 

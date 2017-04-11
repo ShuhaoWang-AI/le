@@ -70,13 +70,13 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             _digitalSignatureManager = digitalSignatureManager;
         }
 
-        public int CreateCopyOfRecordForReportPackage(ReportPackageDto reportPackageDto)
+        public void CreateCopyOfRecordForReportPackage(int reportPackageId, IEnumerable<FileStoreDto> attachments, CopyOfRecordPdfFileDto copyOfRecordPdfFileDto, CopyOfRecordDataXmlFileDto copyOfRecordDataXmlFileDto)
         {
-            _logger.Info($"Enter CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageDto.ReportPackageId}");
+            _logger.Info($"Enter CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}");
 
             try
             {
-                var coreBytes = CreateZipFileData(reportPackageDto);
+                var coreBytes = CreateZipFileData(attachments, copyOfRecordPdfFileDto, copyOfRecordDataXmlFileDto);
 
                 var copyOfRecord = new Core.Domain.CopyOfRecord
                 {
@@ -89,16 +89,12 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 Array.Copy(sourceArray: coreBytes, destinationArray: copyOfRecord.Data, length: coreBytes.Length);
                 copyOfRecord.Signature = SignaData(hash: copyOfRecord.Hash);
                 copyOfRecord.CopyOfRecordCertificateId = _digitalSignatureManager.LatestCertificateId();
-                copyOfRecord.ReportPackageId = reportPackageDto.ReportPackageId;
-
-                copyOfRecord = _dbContext.CopyOfRecords.Add(entity: copyOfRecord);
-
+                copyOfRecord.ReportPackageId = reportPackageId;
+                _dbContext.CopyOfRecords.Add(entity: copyOfRecord);
                 _dbContext.SaveChanges();
 
-                var message = $"Leave CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageDto.ReportPackageId}.";
+                var message = $"Leave CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}.";
                 _logger.Info(message: message);
-
-                return copyOfRecord.ReportPackageId;
             }
             catch (Exception ex)
             {
@@ -168,7 +164,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         //1. get attachment files
         //2. get Copy Of Record.pdf
         //3. get Copy Of Record Data.xml 
-        private byte[] CreateZipFileData(ReportPackageDto reportPackageDto)
+        private byte[] CreateZipFileData(IEnumerable<FileStoreDto> attachments, CopyOfRecordPdfFileDto copyOfRecordPdfFileDto, CopyOfRecordDataXmlFileDto copyOfRecordDataXmlFileDto)
         {
             byte[] coreBytes;
             using (var stream = new MemoryStream())
@@ -176,16 +172,16 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 using (var zipArchive = new ZipArchive(stream: stream, mode: ZipArchiveMode.Create))
                 {
                     // Attachment files
-                    foreach (var attachment in reportPackageDto.AttachmentFiles)
+                    foreach (var attachment in attachments)
                     {
                         AddFileIntoZipArchive(archive: zipArchive, fileName: attachment.Name, fileData: attachment.Data);
                     }
 
                     // Copy Of Record.pdf  
-                    AddFileIntoZipArchive(archive: zipArchive, fileName: reportPackageDto.CopyOfRecordPdfInfo.FileName, fileData: reportPackageDto.CopyOfRecordPdfInfo.FileData);
+                    AddFileIntoZipArchive(archive: zipArchive, fileName: copyOfRecordPdfFileDto.FileName, fileData: copyOfRecordPdfFileDto.FileData);
 
                     // Copy Of Record Data.xml
-                    AddFileIntoZipArchive(archive: zipArchive, fileName: reportPackageDto.CopyOfRecordDataXmlFileInfo.FileName, fileData: reportPackageDto.CopyOfRecordDataXmlFileInfo.FileData);
+                    AddFileIntoZipArchive(archive: zipArchive, fileName: copyOfRecordDataXmlFileDto.FileName, fileData: copyOfRecordDataXmlFileDto.FileData);
                 }
 
                 coreBytes = stream.ToArray();

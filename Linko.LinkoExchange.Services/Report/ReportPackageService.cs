@@ -57,24 +57,12 @@ namespace Linko.LinkoExchange.Services.Report
                 Name = " 1st Quarter PCR",
                 OrganizationRegulatoryProgramId = 3,
                 SubMissionDateTime = DateTime.UtcNow,
-
-                //TODO
-                //AttachmentFiles = GetReportPackageAttachments(reportPackageId),
-                //CopyOfRecordDataXmlFileInfo = GetReportPackageCopyOfRecordDataXmlFile(reportPackageId),
-                //CopyOfRecordPdfInfo = GetReportPackageCopyOfRecordPdfFile(reportPackageId)
             };
 
             rptDto.OrganizationRegulatoryProgramDto =
                     _programService.GetOrganizationRegulatoryProgram(rptDto.OrganizationRegulatoryProgramId);
 
             return rptDto;
-        }
-
-        public void temp(int reportPackageId)
-        {
-            var attachmentFiles = this.GetReportPackageAttachments(reportPackageId: reportPackageId);
-            var copyOfRecordPdfInfo = GetReportPackageCopyOfRecordPdfFile(reportPackageId: reportPackageId);
-            var copyOfRecordDataXmlFileInfo = GetReportPackageCopyOfRecordDataXmlFile(reportPackageId: reportPackageId);
         }
 
         public CopyOfRecordDto GetCopyOfRecordByReportPackageId(int reportPackageId)
@@ -86,7 +74,11 @@ namespace Linko.LinkoExchange.Services.Report
         public CopyOfRecordDto CreateCopyOfRecordForReportPackage(int reportPackageId)
         {
             var reportPackageDto = GetReportPackage(reportPackageId);
-            var copyOfRecordId = _copyOfRecordService.CreateCopyOfRecordForReportPackage(reportPackageDto);
+            var attachments = GetReportPackageAttachments(reportPackageId);
+            var copyOfRecordPdfFile = GetReportPackageCopyOfRecordPdfFile(reportPackageId);
+            var copyOfRecordDataXmlFile = GetReportPackageCopyOfRecordDataXmlFile(reportPackageId);
+            _copyOfRecordService.CreateCopyOfRecordForReportPackage(reportPackageId, attachments, copyOfRecordPdfFile, copyOfRecordDataXmlFile);
+
             return _copyOfRecordService.GetCopyOfRecordByReportPackage(reportPackageDto);
         }
     }
