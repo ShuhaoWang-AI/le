@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
@@ -14,6 +16,7 @@ using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mvc;
@@ -47,10 +50,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly ILogger _logger;
         private readonly IHttpContextService _httpContextService;
         private readonly IFileStoreService _fileStoreService;
+        private readonly IReportElementService _reportElementService;
 
         public IndustryController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService,
                                   IQuestionAnswerService questionAnswerService, IPermissionService permissionService, ISessionCache sessionCache, ILogger logger, IHttpContextService httpContextService
-                                  , IFileStoreService fileStoreService)
+                                  , IFileStoreService fileStoreService, IReportElementService reportElementService)
         {
             _organizationService = organizationService;
             _userService = userService;
@@ -61,6 +65,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _logger = logger;
             _httpContextService = httpContextService;
             _fileStoreService = fileStoreService;
+            _reportElementService = reportElementService;
         }
 
         #endregion
@@ -693,6 +698,188 @@ namespace Linko.LinkoExchange.Web.Controllers
                                      message = MvcValidationExtensions.GetViolationMessages(ruleViolationException:rve)
                                  });
             }
+        }
+
+        #endregion
+
+        #region Show Attachment Details
+
+        [Route(template:"Attachment/New")]
+        public ActionResult NewAttachmentDetails()
+        {
+            var viewModel = new AttachmentViewModel();
+
+            try
+            {
+                viewModel = PrepareAttachmentDetails();
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            return View(viewName:"AttachmentDetails", model:viewModel);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"Attachment/New")]
+        public ActionResult NewAttachmentDetails(AttachmentViewModel model, HttpPostedFileBase upload)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    int id;
+
+                    if (upload != null && upload.ContentLength > 0)
+                    {
+                        using (var reader = new BinaryReader(input:upload.InputStream))
+                        {
+                            var content = reader.ReadBytes(count:upload.ContentLength);
+
+                            var fileStoreDto = new FileStoreDto
+                                               {
+                                                   FileStoreId = model.Id,
+                                                   OriginalFileName = upload.FileName,
+                                                   ReportElementTypeId = model.ReportElementTypeId,
+                                                   ReportElementTypeName = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments)
+                                                                                                .Where(c => c.ReportElementTypeId == model.ReportElementTypeId)
+                                                                                                .Select(c => c.Name)
+                                                                                                .FirstOrDefault(),
+                                                   Description = model.Description,
+                                                   Data = content,
+                                                   MediaType = upload.ContentType
+                                               };
+                            id = _fileStoreService.CreateFileStore(fileStoreDto:fileStoreDto);
+                        }
+                    }
+                    else
+                    {
+                        var validationIssues = new List<RuleViolation>();
+                        var message = "No file was selected.";
+                        validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                        throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+                    }
+
+                    TempData[key:"ShowSuccessMessage"] = true;
+                    TempData[key:"SuccessMessage"] = $"Attachment {(model.Id.HasValue ? "updated" : "created")} successfully!";
+
+                    ModelState.Clear();
+                    return RedirectToAction(actionName:"AttachmentDetails", controllerName:"Industry", routeValues:new {id});
+                }
+                catch (RuleViolationException rve)
+                {
+                    MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+                }
+            }
+
+            var viewModel = PrepareAttachmentDetails(id:model.Id);
+
+            return View(viewName:"AttachmentDetails", model:viewModel);
+        }
+
+        [Route(template:"Attachment/{id:int}/Details")]
+        public ActionResult AttachmentDetails(int id)
+        {
+            var viewModel = new AttachmentViewModel();
+
+            try
+            {
+                viewModel = PrepareAttachmentDetails(id:id);
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            ViewBag.ShowSuccessMessage = TempData[key:"ShowSuccessMessage"] ?? false;
+            ViewBag.SuccessMessage = TempData[key:"SuccessMessage"] ?? "";
+
+            return View(model:viewModel);
+        }
+
+        [Route(template:"Attachment/{id:int}/Download")]
+        public ActionResult DownloadAttachment(int id)
+        {
+            var fileStore = _fileStoreService.GetFileStoreById(fileStoreId:id, includingFileData:true);
+            var fileDownloadName = fileStore.Name;
+            var contentType = $"application/${fileStore.MediaType}";
+            var fileStream = new MemoryStream(buffer:fileStore.Data) {Position = 0};
+
+            return File(fileStream:fileStream, contentType:contentType, fileDownloadName:fileDownloadName);
+        }
+
+        public ActionResult DeleteAttachment(int id)
+        {
+            try
+            {
+                _fileStoreService.DeleteFileStore(fileStoreId:id);
+
+                return View(viewName:"Confirmation", model:new ConfirmationViewModel
+                                                           {
+                                                               Title = "Delete Confirmation",
+                                                               Message = "Attachment deleted successfully."
+                                                           });
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            return View(viewName:"AttachmentDetails", model:PrepareAttachmentDetails(id:id));
+        }
+
+        private AttachmentViewModel PrepareAttachmentDetails(int? id = null)
+        {
+            var viewModel = new AttachmentViewModel();
+
+            if (id.HasValue)
+            {
+                ViewBag.Satus = "Edit";
+
+                var vm = _fileStoreService.GetFileStoreById(fileStoreId:id.Value);
+                viewModel = new AttachmentViewModel
+                            {
+                                Id = vm.FileStoreId,
+                                Name = vm.Name,
+                                OriginalFileName = vm.OriginalFileName,
+                                Description = vm.Description,
+                                MediaType = vm.MediaType,
+                                ReportElementTypeId = vm.ReportElementTypeId,
+                                ReportElementTypeName = vm.ReportElementTypeName,
+                                UploadDateTimeLocal = vm.UploadDateTimeLocal,
+                                UploaderUserFullName = vm.UploaderUserFullName,
+                                UsedByReports = vm.UsedByReports
+                            };
+            }
+            else
+            {
+                ViewBag.Satus = "New";
+                viewModel.UsedByReports = false;
+                viewModel.ReportElementTypeId = 0;
+            }
+
+            // ReportElementTypes
+            viewModel.AvailableReportElementTypes = new List<SelectListItem>();
+            viewModel.AvailableReportElementTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments).Select(c => new SelectListItem
+                                                                                                                                                                {
+                                                                                                                                                                    Text = c.Name,
+                                                                                                                                                                    Value =
+                                                                                                                                                                        c.ReportElementTypeId.ToString(),
+                                                                                                                                                                    Selected =
+                                                                                                                                                                        c.ReportElementTypeId.Equals(
+                                                                                                                                                                                                     other
+                                                                                                                                                                                                     :
+                                                                                                                                                                                                     viewModel
+                                                                                                                                                                                                         .ReportElementTypeId)
+                                                                                                                                                                }).ToList();
+
+            viewModel.AvailableReportElementTypes.Insert(index:0, item:new SelectListItem {Text = @"Select Attachment Type", Value = "0"});
+
+            viewModel.AllowedFileExtensions = string.Join(separator:",", values:_fileStoreService.GetValidAttachmentFileExtensions());
+
+            return viewModel;
         }
 
         #endregion

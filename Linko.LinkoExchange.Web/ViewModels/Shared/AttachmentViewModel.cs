@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
@@ -27,6 +29,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = "Attachment Type")]
         public string ReportElementTypeName { get; set; }
+        public List<SelectListItem> AvailableReportElementTypes { get; set; }
         
 
         [Display(Name = "Upload Date")]
@@ -45,5 +48,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         
         [Display(Name = "Status")]
         public string Status => UsedByReports ? "Reported" : "Draft";
+
+        public string AllowedFileExtensions { get; set; }
     }
 }

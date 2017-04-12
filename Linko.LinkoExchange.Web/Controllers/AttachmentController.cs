@@ -96,6 +96,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     var fileStoreDto = new FileStoreDto();
                     fileStoreDto.OriginalFileName = model.OriginFileName;
+                    fileStoreDto.ReportElementTypeId = 2;
                     fileStoreDto.ReportElementTypeName = model.AttachmentTypeName;
                     fileStoreDto.Description = model.Description;
                     fileStoreDto.Data = content;

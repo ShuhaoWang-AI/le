@@ -121,7 +121,7 @@ namespace Linko.LinkoExchange.Services.FileStore
             if (fileStoreDto.Data == null || fileStoreDto.Data.Length < 1)
             {
                 List<RuleViolation> validationIssues = new List<RuleViolation>();
-                string message = "Empty file.";
+                string message = "No file was selected.";
                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
             }
@@ -143,7 +143,7 @@ namespace Linko.LinkoExchange.Services.FileStore
             {
                 List<RuleViolation> validationIssues = new List<RuleViolation>();
 
-                string message = "Not Supported File Format.";
+                string message = "The file type selected is not supported.";
                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
             }

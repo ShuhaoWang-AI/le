@@ -417,6 +417,7 @@
     <Content Include="Views\Authority\ReportPackageTemplateDetails.cshtml" />
     <Content Include="Views\Attachment\FileStoreInfo.cshtml" />
     <Content Include="Views\Industry\Attachments.cshtml" />
+    <Content Include="Views\Industry\AttachmentDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />

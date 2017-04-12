@@ -202,7 +202,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                     </ul>
                 </li>
 
-                <li class="@Html.IsActive(actions:"Attachments,AttachmentDetails", controllers:"Industry")">
+                <li class="@Html.IsActive(actions:"Attachments,NewAttachmentDetails,AttachmentDetails", controllers:"Industry")">
                     <a href="#" onclick="location.href = '@Url.Action(actionName:"Attachments", controllerName:"Industry")'">
                         <i class="fa fa-file-text fa-fw"></i>
                         <span>Attachments</span>
