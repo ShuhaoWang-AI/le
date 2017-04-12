@@ -34,37 +34,37 @@
                 @(Html.Kendo().Grid<ReportPackageTemplateViewModel>()
                       .Name(componentName:"gridReportPackageTemplate")
                       .Columns(columns =>
-                               {
-                                   columns.Bound(c => c.Name)
-                                          .HtmlAttributes(attributes:new {@class = "col-sm-2"})
-                                          .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.Description)
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.EffectiveDateTimeLocal).Format(value:"{0:MM/dd/yyyy}")
-                                          .HtmlAttributes(attributes:new {style = "width:80px;"})
-                                          .HeaderHtmlAttributes(attributes:new {style = "width:80px;"})
-                                          .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                   columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm:ss}")
-                                          .HtmlAttributes(attributes:new {style = "width:125px;"})
-                                          .HeaderHtmlAttributes(attributes:new {style = "width:125px;"})
-                                          .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                   columns.Bound(c => c.LastModifierUserName)
-                                          .HtmlAttributes(attributes:new {@class = "col-sm-2"})
-                                          .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.Status)
-                                          .HtmlAttributes(attributes:new {@class = "col-sm-1"})
-                                          .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Template(m => { })
-                                          .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
-                                          .Width(pixelWidth:40);
-                               })
+                      {
+                          columns.Bound(c => c.Name)
+                                 .HtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                 .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.Description)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.EffectiveDateTimeLocal).Format(value:"{0:MM/dd/yyyy}")
+                                 .HtmlAttributes(attributes:new {style = "width:80px;"})
+                                 .HeaderHtmlAttributes(attributes:new {style = "width:80px;"})
+                                 .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm:ss tt}")
+                                 .HtmlAttributes(attributes:new {style = "width:135px;"})
+                                 .HeaderHtmlAttributes(attributes:new {style = "width:135px;"})
+                                 .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                          columns.Bound(c => c.LastModifierUserName)
+                                 .HtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                 .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.Status)
+                                 .HtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                 .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Template(m => { })
+                                 .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
+                                 .Width(pixelWidth:40);
+                      })
                       .Pageable(pageable => pageable
                                                 .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
                                                 .Refresh(enabled:true)
@@ -72,10 +72,10 @@
                                                 .Numeric(enabled:false)
                       )
                       .Selectable(selectable =>
-                                  {
-                                      selectable.Mode(mode:GridSelectionMode.Single);
-                                      selectable.Type(type:GridSelectionType.Row);
-                                  })
+                      {
+                          selectable.Mode(mode:GridSelectionMode.Single);
+                          selectable.Type(type:GridSelectionType.Row);
+                      })
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                       //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value:true))
