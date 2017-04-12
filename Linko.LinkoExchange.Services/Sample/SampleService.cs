@@ -46,6 +46,11 @@ namespace Linko.LinkoExchange.Services.Sample
             _settings = settings;
         }
 
+        /// <summary>
+        /// Maps Sample Dto to Sample and saves to database. No validation.
+        /// </summary>
+        /// <param name="sampleDto">Sample Dto to map and save</param>
+        /// <returns>Existing Id or newly created Id of Sample row in tSample table</returns>
         private int SimplePersist(SampleDto sampleDto)
         {
             string sampleIdString = string.Empty;
@@ -215,6 +220,13 @@ namespace Linko.LinkoExchange.Services.Sample
 
         }
 
+        /// <summary>
+        /// Saves a Sample to the database after validating. Throw a list of RuleViolation exceptions
+        /// for failed validation issues.
+        /// </summary>
+        /// <param name="sample">Sample Dto</param>
+        /// <param name="isSavingAsReadyToSubmit">True to perform stricter validation</param>
+        /// <returns>Existing Sample Id or newly created Sample Id</returns>
         public int SaveSample(SampleDto sampleDto, bool isSavingAsReadyToReport = false)
         {
             string sampleIdString = string.Empty;
@@ -247,6 +259,10 @@ namespace Linko.LinkoExchange.Services.Sample
             return sampleId;
         }
 
+        /// <summary>
+        /// Used to simplify and clean up methods where there are multiple validation tests.
+        /// </summary>
+        /// <param name="message">Rule violation message to use when throwing the exception.</param>
         private void ThrowSimpleException(string message)
         {
             _logger.Info($"Enter SampleService.ThrowSimpleException. message={message}");
@@ -259,6 +275,13 @@ namespace Linko.LinkoExchange.Services.Sample
             throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
         }
 
+        /// <summary>
+        /// Tests validation of a passed in Sample in either Draft or ReadyToReport Mode
+        /// </summary>
+        /// <param name="sampleDto">Sample to validate</param>
+        /// <param name="isReadyToSubmit">False = Draft Mode, True = ReadyToReport Mode</param>
+        /// <param name="isSuppressExceptions">False = throws RuleViolation exception, True = does not throw RuleViolation exceptions</param>
+        /// <returns>Boolean indicating if Sample passed all validation (Draft or ReadyToReport mode)</returns>
         public bool IsValidSample(SampleDto sampleDto, bool isReadyToReport, bool isSuppressExceptions = false)
         {
             string sampleIdString = string.Empty;
@@ -392,6 +415,10 @@ namespace Linko.LinkoExchange.Services.Sample
             return isValid;
         }
 
+        /// <summary>
+        /// Deletes a sample from the database
+        /// </summary>
+        /// <param name="sampleId">SampleId associated with the object in the tSample table</param>
         public void DeleteSample(int sampleId)
         {
             _logger.Info($"Enter SampleService.DeleteSample. sampleId={sampleId}");
@@ -451,6 +478,11 @@ namespace Linko.LinkoExchange.Services.Sample
             }
         }
 
+        /// <summary>
+        /// Helper method to map a passed in Sample object to a Sample Dto.
+        /// </summary>
+        /// <param name="sample"></param>
+        /// <returns></returns>
         private SampleDto GetSampleDetails(Core.Domain.Sample sample)
         {
             _logger.Info($"Enter SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
@@ -569,6 +601,12 @@ namespace Linko.LinkoExchange.Services.Sample
             return dto;
         }
 
+        /// <summary>
+        /// Helper function to localize the date/times found in a Sample Result. Also sets Last Modifier.
+        /// </summary>
+        /// <param name="sampleResult">Sample Result containing UTC date/times</param>
+        /// <param name="resultDto">Output Sample Result dto that needs localized date/times</param>
+        /// <param name="timeZoneId">The time zone id used to localize the date/times</param>
         private void SetSampleResultDatesAndLastModified(SampleResult sampleResult, ref SampleResultDto resultDto, int timeZoneId)
         {
             _logger.Info($"Enter SampleService.SetSampleResultDatesAndLastModified. sampleResult.SampleId={sampleResult.SampleId}");
@@ -597,6 +635,11 @@ namespace Linko.LinkoExchange.Services.Sample
             _logger.Info($"Leaving SampleService.SetSampleResultDatesAndLastModified. sampleResult.SampleId={sampleResult.SampleId}");
         }
 
+        /// <summary>
+        /// Gets the complete details of a single Sample
+        /// </summary>
+        /// <param name="sampleId">SampleId associated with the object in the tSample table</param>
+        /// <returns>Sample Dto associated with the passed in Id</returns>
         public SampleDto GetSampleDetails(int sampleId)
         {
             _logger.Info($"Enter SampleService.GetSampleDetails. sampleId={sampleId}");
@@ -613,6 +656,11 @@ namespace Linko.LinkoExchange.Services.Sample
             return dto;
         }
 
+        /// <summary>
+        /// Test to see if a Sample is included in at least 1 report package
+        /// </summary>
+        /// <param name="sampleId">SampleId associated with the object in the tSample table</param>
+        /// <returns>Boolean indicating if the Sample is or isn't included in at least 1 report package</returns>
         public bool IsSampleIncludedInReportPackage(int sampleId)
         {
             _logger.Info($"Enter SampleService.IsSampleIncludedInReportPackage. sampleId={sampleId}");
@@ -624,6 +672,15 @@ namespace Linko.LinkoExchange.Services.Sample
             return isExists;
         }
 
+        /// <summary>
+        /// Gets Samples from the database for displaying in a grid
+        /// </summary>
+        /// <param name="status">SampletStatus type to filter by</param>
+        /// <param name="startDate">Nullable localized date/time time period range. 
+        /// Sample start dates must on or after this date/time. Null parameters are ignored and not part of the filter.</param>
+        /// <param name="endDate">Nullable localized date/time time period range. 
+        /// Sample end dates must on or before this date/time. Null parameters are ignored and not part of the filter.</param>
+        /// <returns>Collection of filtered Sample Dto's</returns>
         public IEnumerable<SampleDto> GetSamples(SampleStatusName status, DateTime? startDate = null, DateTime? endDate = null)
         {
             string startDateString = startDate.HasValue ? startDate.Value.ToString() : "null";
