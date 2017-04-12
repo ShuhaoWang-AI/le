@@ -46,6 +46,11 @@ namespace Linko.LinkoExchange.Services.Report
             throw new System.NotImplementedException();
         }
 
+        public bool VerififyCopyOfRecord(int reportPackageId)
+        {
+            return _copyOfRecordService.ValidCoreData(reportPackageId);
+        }
+
         //TODO: to implement this!
         public ReportPackageDto GetReportPackage(int reportPackageId)
         {

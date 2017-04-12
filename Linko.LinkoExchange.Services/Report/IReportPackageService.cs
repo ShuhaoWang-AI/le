@@ -13,6 +13,8 @@ namespace Linko.LinkoExchange.Services.Report
         ReportPackageDto GetReportPackage(int reportPackageId);
         IList<FileStoreDto> GetReportPackageAttachments(int reportPackageId);
 
+        bool VerififyCopyOfRecord(int reportPackageId);
+
         /// <summary>
         /// The file 'Copy of Record Data.xml' contains below:
         /// 1.  The raw 'text' data including samples and results data, certification name and text, coments,

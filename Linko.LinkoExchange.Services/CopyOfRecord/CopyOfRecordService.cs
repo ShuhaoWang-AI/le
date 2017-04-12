@@ -107,9 +107,10 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             }
         }
 
-        public bool ValidCoreData(int copyOfRecordId)
+        public bool ValidCoreData(int reportPackageId)
         {
-            throw new System.NotImplementedException();
+            var copyOfRecord = _dbContext.CopyOfRecords.Single(i => i.ReportPackageId == reportPackageId);
+            return _digitalSignatureManager.VerifySignature(copyOfRecord.Signature, copyOfRecord.Data);
         }
 
         public CopyOfRecordDto GetCopyOfRecordByReportPackage(ReportPackageDto reportPackage)
@@ -133,11 +134,6 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             return copyOfRecordDto;
         }
 
-        public CopyOfRecordDto GetCopyOfRecordById(int copyOfRecordId)
-        {
-            throw new System.NotImplementedException();
-        }
-
         #region Private functions
 
         private string SignaData(string hash)
@@ -156,7 +152,6 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 streamWriter.CopyTo(destination: archiveEntryStream);
             }
         }
-
 
         //TODO:
         //1. get attachment files

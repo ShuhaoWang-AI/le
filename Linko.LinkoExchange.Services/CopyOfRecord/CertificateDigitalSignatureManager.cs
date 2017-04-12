@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Mapping;
@@ -78,6 +79,15 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             return signature;
         }
 
+        public bool VerifySignature(string currentSignatureStr, byte[] dataToVerify)
+        {
+            var dataToVerifyHash = HashHelper.ComputeSha256Hash(dataToVerify);
+            var dataToVerifyHashBytes = Encoding.UTF8.GetBytes(dataToVerifyHash);
+            var signedDataBytes = Convert.FromBase64String(currentSignatureStr);
+
+            return VerifySignature(dataToVerifyHashBytes, signedDataBytes);
+        }
+
         public int LatestCertificateId()
         {
             return _currentCertificateId;
@@ -98,6 +108,11 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         {
             var halg = new SHA1CryptoServiceProvider();
             return _privateKey.SignData(data, halg);
+        }
+        private bool VerifySignature(byte[] originData, byte[] signedData)
+        {
+            var halg = new SHA1CryptoServiceProvider();
+            return _publicKey.VerifyData(originData, halg, signedData);
         }
 
         #endregion 
