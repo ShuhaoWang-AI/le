@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.CopyOfRecord;
@@ -21,25 +22,26 @@ namespace Linko.LinkoExchange.Test
         CopyOfRecordService _copyOrRecordService;
 
         Mock<IReportPackageService> _reprotPackageService = new Mock<IReportPackageService>();
-        Mock<ILogger> _logger = new Mock<ILogger>();
-        Mock<IHttpContextService> _httpContext = new Mock<IHttpContextService>();
-        ISettingService _settService = Mock.Of<ISettingService>();
+        readonly Mock<ILogger> _logger = new Mock<ILogger>();
+        readonly Mock<IHttpContextService> _httpContext = new Mock<IHttpContextService>();
+        readonly ISettingService _settService = Mock.Of<ISettingService>();
         private IProgramService _programService = Mock.Of<IProgramService>();
+        private LinkoExchangeContext _dbContext;
 
         [TestInitialize]
         public void Init()
         {
             var connectionString = //ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
                   "data source=wtxodev05;initial catalog=LinkoExchange;Integrated Security=True";
-            var dbContext = new LinkoExchangeContext(connectionString);
 
-            var actualTimeZoneService = new TimeZoneService(dbContext, _settService, new MapHelper());
+            _dbContext = new LinkoExchangeContext(connectionString);
+            var actualTimeZoneService = new TimeZoneService(_dbContext, _settService, new MapHelper());
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
 
-            IDigitalSignatureManager certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+            IDigitalSignatureManager certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
 
             _copyOrRecordService = new CopyOfRecordService
-                (dbContext,
+                (_dbContext,
                  new MapHelper(),
                  _logger.Object,
                  _httpContext.Object,
@@ -96,6 +98,140 @@ namespace Linko.LinkoExchange.Test
             var verified = reportPackageService.VerififyCopyOfRecord(reportPackageId);
 
             Assert.IsTrue(verified);
+        }
+
+        [TestMethod]
+        public void Verify_intacted_data_return_true()
+        {
+            var programDto = Mock.Of<OrganizationRegulatoryProgramDto>();
+
+            var programMock = Mock.Get(_programService);
+            programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
+                       .Returns(programDto);
+
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService);
+
+            var reportPackageId = 527466233;
+            var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
+            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+            var result = certificateDigitalSignatureManager.VerifySignature(copyOfRecordDto.Signature, copyOfRecordDto.Data);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void Verify_wrong_signature_1_return_false()
+        {
+            var programDto = Mock.Of<OrganizationRegulatoryProgramDto>();
+
+            var programMock = Mock.Get(_programService);
+            programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
+                       .Returns(programDto);
+
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService);
+
+            var reportPackageId = 527466233;
+            var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
+
+            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+
+            ////1. Modify sigature 
+            copyOfRecordDto.Signature = "aaaa";
+            var result = certificateDigitalSignatureManager.VerifySignature(copyOfRecordDto.Signature, copyOfRecordDto.Data);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void Verify_wrong_signature_2_return_false()
+        {
+            var programDto = Mock.Of<OrganizationRegulatoryProgramDto>();
+
+            var programMock = Mock.Get(_programService);
+            programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
+                       .Returns(programDto);
+
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService);
+
+            var reportPackageId = 527466233;
+            var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
+
+            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+
+            ////1. Modify sigature  
+            var testSingature = "fake signature";
+            var testSignatuerBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(testSingature));
+            copyOfRecordDto.Signature = testSignatuerBase64;
+            var result = certificateDigitalSignatureManager.VerifySignature(copyOfRecordDto.Signature, copyOfRecordDto.Data);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void Verify_wrong_data_1_return_false()
+        {
+            var programDto = Mock.Of<OrganizationRegulatoryProgramDto>();
+
+            var programMock = Mock.Get(_programService);
+            programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
+                       .Returns(programDto);
+
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService);
+
+            var reportPackageId = 527466233;
+            var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
+            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+
+            ////1. Fake signature  
+            var testSingature = "fake data";
+            copyOfRecordDto.Data = Encoding.UTF8.GetBytes(testSingature);
+            var result = certificateDigitalSignatureManager.VerifySignature(copyOfRecordDto.Signature, copyOfRecordDto.Data);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void Verify_wrong_data_2_return_false()
+        {
+            var programDto = Mock.Of<OrganizationRegulatoryProgramDto>();
+
+            var programMock = Mock.Get(_programService);
+            programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
+                       .Returns(programDto);
+
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService);
+
+            var reportPackageId = 527466233;
+            var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
+            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+
+            ////1. change some of the data  
+            copyOfRecordDto.Data[0] = 10;
+            var result = certificateDigitalSignatureManager.VerifySignature(copyOfRecordDto.Signature, copyOfRecordDto.Data);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void Verify_empty_data_return_false()
+        {
+            var programDto = Mock.Of<OrganizationRegulatoryProgramDto>();
+
+            var programMock = Mock.Get(_programService);
+            programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
+                       .Returns(programDto);
+
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService);
+
+            var reportPackageId = 527466233;
+            var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
+            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+
+            ////1. assign empty byte array  
+            copyOfRecordDto.Data = new byte[] { };
+            var result = certificateDigitalSignatureManager.VerifySignature(copyOfRecordDto.Signature, copyOfRecordDto.Data);
+
+            Assert.IsFalse(result);
         }
 
         private ReportPackageDto GetReportPackage(int reportPackageId)
