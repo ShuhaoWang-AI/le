@@ -46,9 +46,15 @@ namespace Linko.LinkoExchange.Services.Parameter
         }
 
         /// <summary>
-        /// Returns a complete list of parameters associated with this Organization Regulatory Program
+        /// Gets all parameters associated with this Authority with optional parameters to filter the returned collection
         /// </summary>
-        /// <returns></returns>
+        /// <param name="startsWith">Optional parameter to filter the Parameter name using "Starts With" condition</param>
+        /// <param name="monitoringPointId">Optional Monitoring Point parameter must be combined with the other
+        /// optional parameter "sampleEndDateTimeUtc"</param>
+        /// <param name="sampleEndDateTimeUtc">If monitoring point and sample end date/time are passed in,
+        ///default unit gets overidden with monitoring point specific unit and default "Calc Mass" boolean is set
+        ///for each child parameter that is associated with the monitoring point and effective date range.</param>
+        /// <returns>A parameter group with children parameters some with potentially overidden default units</returns>
         public IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null, int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null)
         {
             string monitoringPointIdString = string.Empty;
@@ -111,15 +117,14 @@ namespace Linko.LinkoExchange.Services.Parameter
         }
 
         /// <summary>
-        /// Returns all Parameter Groups associated with this Organization Regulatory Program
-        /// including children parameters.
-        ///
-        /// OPTIONAL PARAMETERS: if these are passed in, we update the Default unit and set the Is Mass Calc flag
-        /// for each parameter based on it's potential association with the monitoring point and effective/retire date range.
+        /// Used to obtain a collection of Parameter Groups from the database that matches optionally passed in criteria
         /// </summary>
-        /// <param name="monitoringPointId"></param>
-        /// <param name="sampleEndDateTimeLocal">If provided, must fall between the MonitoringPointParameter's effective/retire date range</param>
-        /// <returns></returns>
+        /// <param name="monitoringPointId">Optional Monitoring Point parameter must be combined with the other
+        /// optional parameter "sampleEndDateTimeUtc"</param>
+        /// <param name="sampleEndDateTimeUtc">If monitoring point and sample end date/time are passed in,
+        ///default unit gets overidden with monitoring point specific unit and default "Calc Mass" boolean is set
+        ///for each child parameter that is associated with the monitoring point and effective date range.</param>
+        /// <returns>Collection of parameter groups with children parameters some with potentially overidden default units</returns>
         public IEnumerable<ParameterGroupDto> GetStaticParameterGroups(int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null)
         {
             string monitoringPointIdString = string.Empty;
@@ -221,10 +226,10 @@ namespace Linko.LinkoExchange.Services.Parameter
         }
 
         /// <summary>
-        /// Returns single Paramater Group associated with Id
-        /// including children parameters
+        /// Used to read the details of a static ParameterGroup from the database along with
+        /// Parameter children contained within.
         /// </summary>
-        /// <param name="parameterGroupId">Id</param>
+        /// <param name="parameterGroupId">Id from tParameterGroup associated with Parameter Group to read</param>
         /// <returns></returns>
         public ParameterGroupDto GetParameterGroup(int parameterGroupId)
         {
@@ -258,10 +263,10 @@ namespace Linko.LinkoExchange.Services.Parameter
         }
 
         /// <summary>
-        /// If ParameterGroupId exists in passed in Dto, finds existing ParameterGroup to update 
-        /// OR creates new object to persist.
+        /// Creates a new Parameter group or updates and existing one in the database.
         /// </summary>
-        /// <param name="parameterGroup"></param>
+        /// <param name="parameterGroup">Parameter group to create new or update if and Id is included</param>
+        /// <returns>Existing Id or newly created Id from tParameterGroup</returns>
         public int SaveParameterGroup(ParameterGroupDto parameterGroup)
         {
             string parameterGroupIdString = string.Empty;
@@ -402,10 +407,9 @@ namespace Linko.LinkoExchange.Services.Parameter
         }
 
         /// <summary>
-        /// Deletes associated child rows from tParameterGroupParameter before deleting 
-        /// from tParamaterGroup
+        /// Removes a Parameter Group from the database
         /// </summary>
-        /// <param name="parameterGroupId">Id</param>
+        /// <param name="parameterGroupId">ParameterGroupId from tParameterGroup of the Parameter Group to delete.</param>
         public void DeleteParameterGroup(int parameterGroupId)
         {
             _logger.Info($"Enter ParameterService.DeleteParameterGroup. parameterGroupId={parameterGroupId}");
@@ -452,6 +456,14 @@ namespace Linko.LinkoExchange.Services.Parameter
 
         }
 
+        /// <summary>
+        /// Gets a collection of both static and dynamic Parameter Groups associated with a Monitoring Point and
+        /// a Sample End Date/time (Local will get converted to UTC for comparison against database items)
+        /// </summary>
+        /// <param name="monitoringPointId">Monitoring point that must be associated with a Sample</param>
+        /// <param name="sampleEndDateTimeLocal">Sample end date/time, once converted to UTC will be used to get monitoring point
+        /// specific parameter information if it falls between effective and retirement date/time values.</param>
+        /// <returns>Static and Dynamic Parameter Groups</returns>
         public IEnumerable<ParameterGroupDto> GetAllParameterGroups(int monitoringPointId, DateTime sampleEndDateTimeLocal)
         {
             _logger.Info($"Enter ParameterService.GetAllParameterGroups. monitoringPointId={monitoringPointId}, sampleEndDateTimeLocal={sampleEndDateTimeLocal}");

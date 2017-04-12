@@ -22,7 +22,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null, int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null);
 
         /// <summary>
-        /// Used to obtain a collection of Parameter Groups from the database that match optionally passed in criteria
+        /// Used to obtain a collection of Parameter Groups from the database that matches optionally passed in criteria
         /// </summary>
         /// <param name="monitoringPointId">Optional Monitoring Point parameter must be combined with the other
         /// optional parameter "sampleEndDateTimeUtc"</param>
