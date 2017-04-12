@@ -51,6 +51,18 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <returns></returns>
         public IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null, int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null)
         {
+            string monitoringPointIdString = string.Empty;
+            if (monitoringPointId.HasValue)
+            {
+                monitoringPointIdString = monitoringPointId.Value.ToString();
+            }
+            else
+            {
+                monitoringPointIdString = "null";
+            }
+
+            _logger.Info($"Enter ParameterService.GetGlobalParameters. monitoringPointId.Value={monitoringPointIdString}");
+
             var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var parameterDtos = new List<ParameterDto>();
@@ -92,6 +104,9 @@ namespace Linko.LinkoExchange.Services.Parameter
                 }
                 parameterDtos.Add(dto);
             }
+
+            _logger.Info($"Leaving ParameterService.GetGlobalParameters. monitoringPointId.Value={monitoringPointIdString}, parameterDtos.Count={parameterDtos.Count()}");
+
             return parameterDtos;
         }
 
@@ -107,6 +122,18 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <returns></returns>
         public IEnumerable<ParameterGroupDto> GetStaticParameterGroups(int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null)
         {
+            string monitoringPointIdString = string.Empty;
+            if (monitoringPointId.HasValue)
+            {
+                monitoringPointIdString = monitoringPointId.Value.ToString();
+            }
+            else
+            {
+                monitoringPointIdString = "null";
+            }
+
+            _logger.Info($"Enter ParameterService.GetStaticParameterGroups. monitoringPointId.Value={monitoringPointIdString}");
+
             var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var parameterGroupDtos = new List<ParameterGroupDto>();
@@ -149,6 +176,9 @@ namespace Linko.LinkoExchange.Services.Parameter
 
                 parameterGroupDtos.Add(paramGroupDto);
             }
+
+            _logger.Info($"Leaving ParameterService.GetStaticParameterGroups. monitoringPointId.Value={monitoringPointIdString}, parameterGroupDtos.Count={parameterGroupDtos.Count()}");
+
             return parameterGroupDtos;
         }
 
@@ -163,6 +193,8 @@ namespace Linko.LinkoExchange.Services.Parameter
         {
             var orgRegProgramId = paramDto.OrganizationRegulatoryProgramId;
             var parameterId = paramDto.ParameterId;
+
+            _logger.Info($"Enter ParameterService.UpdateParameterForMonitoringPoint. orgRegProgramId={orgRegProgramId}, parameterId={parameterId}");
 
             //Check MonitoringPointParameter table
             var foundMonitoringPointParameter = _dbContext.MonitoringPointParameters
@@ -184,6 +216,8 @@ namespace Linko.LinkoExchange.Services.Parameter
 
             }
 
+            _logger.Info($"Leaving ParameterService.UpdateParameterForMonitoringPoint. orgRegProgramId={orgRegProgramId}, parameterId={parameterId}");
+
         }
 
         /// <summary>
@@ -194,6 +228,8 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <returns></returns>
         public ParameterGroupDto GetParameterGroup(int parameterGroupId)
         {
+            _logger.Info($"Enter ParameterService.GetParameterGroup. parameterGroupId={parameterGroupId}");
+
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var foundParamGroup = _dbContext.ParameterGroups
                 .Include(param => param.ParameterGroupParameters.Select(i=>i.Parameter))
@@ -216,6 +252,8 @@ namespace Linko.LinkoExchange.Services.Parameter
                 parameterGroupDto.LastModifierFullName = "N/A";
             }
 
+            _logger.Info($"Leaving ParameterService.GetParameterGroup. parameterGroupId={parameterGroupId}");
+
             return parameterGroupDto;
         }
 
@@ -226,6 +264,18 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <param name="parameterGroup"></param>
         public int SaveParameterGroup(ParameterGroupDto parameterGroup)
         {
+            string parameterGroupIdString = string.Empty;
+            if (parameterGroup.ParameterGroupId.HasValue)
+            {
+                parameterGroupIdString = parameterGroup.ParameterGroupId.Value.ToString();
+            }
+            else
+            {
+                parameterGroupIdString = "null";
+            }
+
+            _logger.Info($"Enter ParameterService.SaveParameterGroup. parameterGroup.ParameterGroupId.Value={parameterGroupIdString}");
+
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId; 
             var parameterGroupIdToReturn = -1;
@@ -344,7 +394,9 @@ namespace Linko.LinkoExchange.Services.Parameter
 
 
             }
-           
+
+            _logger.Info($"Leaving ParameterService.SaveParameterGroup. parameterGroupIdToReturn={parameterGroupIdToReturn}");
+
             return parameterGroupIdToReturn;
 
         }
@@ -356,6 +408,8 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <param name="parameterGroupId">Id</param>
         public void DeleteParameterGroup(int parameterGroupId)
         {
+            _logger.Info($"Enter ParameterService.DeleteParameterGroup. parameterGroupId={parameterGroupId}");
+
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try {
@@ -394,10 +448,14 @@ namespace Linko.LinkoExchange.Services.Parameter
                 }
             }
 
+            _logger.Info($"Leave ParameterService.DeleteParameterGroup. parameterGroupId={parameterGroupId}");
+
         }
 
         public IEnumerable<ParameterGroupDto> GetAllParameterGroups(int monitoringPointId, DateTime sampleEndDateTimeLocal)
         {
+            _logger.Info($"Enter ParameterService.GetAllParameterGroups. monitoringPointId={monitoringPointId}, sampleEndDateTimeLocal={sampleEndDateTimeLocal}");
+
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
             var sampleEndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleEndDateTimeLocal, timeZoneId);
@@ -503,6 +561,8 @@ namespace Linko.LinkoExchange.Services.Parameter
                 parameterGroupDtos.Add(dynamicAllCollectMethodParamGroup);
 
             }
+
+            _logger.Info($"Enter ParameterService.GetAllParameterGroups. monitoringPointId={monitoringPointId}, sampleEndDateTimeLocal={sampleEndDateTimeLocal}, parameterGroupDtos.Count={parameterGroupDtos.Count()}");
 
             return parameterGroupDtos;
         }
