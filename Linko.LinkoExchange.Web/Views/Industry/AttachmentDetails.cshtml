@@ -142,16 +142,33 @@
                                                                                   {
                                                                                       @class = "control-label col-md-2 required"
                                                                                   })
-                <div class="col-md-4">
-                    @Html.DropDownList(name:"ReportElementTypeId", selectList:Model.AvailableReportElementTypes, htmlAttributes:new
-                                                                                                                                {
-                                                                                                                                    @class = "form-control"
-                                                                                                                                })
-                    @Html.ValidationMessageFor(model => model.ReportElementTypeId, validationMessage:"", htmlAttributes:new
-                                                                                                                        {
-                                                                                                                            @class = "text-danger"
-                                                                                                                        })
-                </div>
+                     @if (Model.UsedByReports)
+                     {
+                         <div class="col-md-8">
+                             @Html.EditorFor(model => model.ReportElementTypeName, additionalViewData:new
+                                                                                                      {
+                                                                                                          htmlAttributes = new
+                                                                                                                           {
+                                                                                                                               @class = "form-control",
+                                                                                                                               @readonly = "readonly"
+                                                                                                                           }
+                                                                                                      })
+                         </div>
+
+                     }
+                     else
+                     {
+                         <div class="col-md-4">
+                             @Html.DropDownList(name:"ReportElementTypeId", selectList:Model.AvailableReportElementTypes, htmlAttributes:new
+                                                                                                                                         {
+                                                                                                                                             @class = "form-control"
+                                                                                                                                         })
+                             @Html.ValidationMessageFor(model => model.ReportElementTypeId, validationMessage:"", htmlAttributes:new
+                                                                                                                                 {
+                                                                                                                                     @class = "text-danger"
+                                                                                                                                 })
+                         </div>
+                     }
             </div>
 
             <div class="form-group">

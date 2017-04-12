@@ -411,11 +411,7 @@
     <Content Include="Views\Authority\ReportElementTypes.cshtml" />
     <Content Include="Views\Authority\ReportElementTypeDetails.cshtml" />
     <Content Include="Views\Authority\ReportPackageTemplates.cshtml" />
-    <Content Include="Views\Attachment\Index.cshtml" />
-    <Content Include="Views\Attachment\Create.cshtml" />
-    <Content Include="Views\Attachment\FileStores.cshtml" />
     <Content Include="Views\Authority\ReportPackageTemplateDetails.cshtml" />
-    <Content Include="Views\Attachment\FileStoreInfo.cshtml" />
     <Content Include="Views\Industry\Attachments.cshtml" />
     <Content Include="Views\Industry\AttachmentDetails.cshtml" />
   </ItemGroup>
@@ -427,10 +423,8 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\AttachmentController.cs" />
     <Compile Include="Controllers\CorController.cs" />
     <Compile Include="Extensions\HtmlExtensions.cs" />
-    <Compile Include="ViewModels\Attachment\AttachmentModel.cs" />
     <Compile Include="Controllers\AuthorityController.cs" />
     <Compile Include="Controllers\IndustryController.cs" />
     <Compile Include="Controllers\InviteController.cs" />

@@ -799,6 +799,43 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(model:viewModel);
         }
 
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"Attachment/{id:int}/Details")]
+        public ActionResult AttachmentDetails(int id, AttachmentViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var fileStoreDto = _fileStoreService.GetFileStoreById(fileStoreId:id);
+
+                    fileStoreDto.ReportElementTypeId = model.ReportElementTypeId;
+                    fileStoreDto.ReportElementTypeName = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments)
+                                                                                                .Where(c => c.ReportElementTypeId == model.ReportElementTypeId)
+                                                                                                .Select(c => c.Name)
+                                                                                                .FirstOrDefault();
+                    fileStoreDto.Description = model.Description;
+
+                    _fileStoreService.UpdateFileStore(fileStoreDto:fileStoreDto);
+
+                    TempData[key:"ShowSuccessMessage"] = true;
+                    TempData[key:"SuccessMessage"] = $"Attachment {(model.Id.HasValue ? "updated" : "created")} successfully!";
+
+                    ModelState.Clear();
+                    return RedirectToAction(actionName:"AttachmentDetails", controllerName:"Industry", routeValues:new {id});
+                }
+                catch (RuleViolationException rve)
+                {
+                    MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+                }
+            }
+
+            var viewModel = PrepareAttachmentDetails(id:model.Id);
+
+            return View(viewName:"AttachmentDetails", model:viewModel);
+        }
+
         [Route(template:"Attachment/{id:int}/Download")]
         public ActionResult DownloadAttachment(int id)
         {
@@ -862,18 +899,13 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             // ReportElementTypes
             viewModel.AvailableReportElementTypes = new List<SelectListItem>();
-            viewModel.AvailableReportElementTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments).Select(c => new SelectListItem
-                                                                                                                                                                {
-                                                                                                                                                                    Text = c.Name,
-                                                                                                                                                                    Value =
-                                                                                                                                                                        c.ReportElementTypeId.ToString(),
-                                                                                                                                                                    Selected =
-                                                                                                                                                                        c.ReportElementTypeId.Equals(
-                                                                                                                                                                                                     other
-                                                                                                                                                                                                     :
-                                                                                                                                                                                                     viewModel
-                                                                                                                                                                                                         .ReportElementTypeId)
-                                                                                                                                                                }).ToList();
+            viewModel.AvailableReportElementTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments)
+                                                                         .Select(c => new SelectListItem
+                                                                                      {
+                                                                                          Text = c.Name,
+                                                                                          Value = c.ReportElementTypeId.ToString(),
+                                                                                          Selected = c.ReportElementTypeId.Equals( other:viewModel.ReportElementTypeId)
+                                                                                      }).ToList();
 
             viewModel.AvailableReportElementTypes.Insert(index:0, item:new SelectListItem {Text = @"Select Attachment Type", Value = "0"});
 
