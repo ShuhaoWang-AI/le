@@ -1833,9 +1833,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 model = PrepareParameterGroupDetails(id:model.Id);
 
-                foreach (var issue in ModelState[key:"."].Errors)
+                if (ModelState[key:"."] != null)
                 {
-                    ModelState.AddModelError(key:string.Empty, errorMessage:issue.ErrorMessage);
+                    foreach (var issue in ModelState[key:"."].Errors)
+                    {
+                        ModelState.AddModelError(key:string.Empty, errorMessage:issue.ErrorMessage);
+                    }
                 }
 
                 return View(viewName:"ParameterGroupDetails", model:model);
