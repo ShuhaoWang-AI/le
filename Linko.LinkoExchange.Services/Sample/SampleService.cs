@@ -48,6 +48,17 @@ namespace Linko.LinkoExchange.Services.Sample
 
         private int SimplePersist(SampleDto sampleDto)
         {
+            string sampleIdString = string.Empty;
+            if (sampleDto.SampleId.HasValue)
+            {
+                sampleIdString = sampleDto.SampleId.Value.ToString();
+            }
+            else {
+                sampleIdString = "null";
+            }
+
+            _logger.Info($"Enter SampleService.SimplePersist. sampleDto.SampleId.Value={sampleIdString}");
+
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
@@ -197,12 +208,26 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
 
             }
+
+            _logger.Info($"Leaving SampleService.SimplePersist. sampleIdToReturn={sampleIdToReturn}");
+
             return sampleIdToReturn;
 
         }
 
         public int SaveSample(SampleDto sampleDto, bool isSavingAsReadyToReport = false)
         {
+            string sampleIdString = string.Empty;
+            if (sampleDto.SampleId.HasValue)
+            {
+                sampleIdString = sampleDto.SampleId.Value.ToString();
+            }
+            else
+            {
+                sampleIdString = "null";
+            }
+            _logger.Info($"Enter SampleService.SaveSample. sampleDto.SampleId.Value={sampleIdString}, isSavingAsReadyToReport={isSavingAsReadyToReport}");
+
             var sampleId = -1;
 
             if (this.IsValidSample(sampleDto, isSavingAsReadyToReport, isSuppressExceptions: false))
@@ -218,19 +243,35 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
                 sampleId = this.SimplePersist(sampleDto);
             }
-
+            _logger.Info($"Leaving SampleService.SaveSample. sampleId={sampleId}, isSavingAsReadyToReport={isSavingAsReadyToReport}");
             return sampleId;
         }
 
         private void ThrowSimpleException(string message)
         {
+            _logger.Info($"Enter SampleService.ThrowSimpleException. message={message}");
+
             List<RuleViolation> validationIssues = new List<RuleViolation>();
             validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+
+            _logger.Info($"Leaving SampleService.ThrowSimpleException. message={message}");
+
             throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
         }
 
         public bool IsValidSample(SampleDto sampleDto, bool isReadyToReport, bool isSuppressExceptions = false)
         {
+            string sampleIdString = string.Empty;
+            if (sampleDto.SampleId.HasValue)
+            {
+                sampleIdString = sampleDto.SampleId.Value.ToString();
+            }
+            else
+            {
+                sampleIdString = "null";
+            }
+            _logger.Info($"Enter SampleService.IsValidSample. sampleDto.SampleId.Value={sampleIdString}");
+
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
@@ -346,11 +387,14 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
             }
 
+            _logger.Info($"Leaving SampleService.IsValidSample. sampleDto.SampleId.Value={sampleIdString}, isValid={isValid}");
+
             return isValid;
         }
 
         public void DeleteSample(int sampleId)
         {
+            _logger.Info($"Enter SampleService.DeleteSample. sampleId={sampleId}");
             List<RuleViolation> validationIssues = new List<RuleViolation>();
             using (var transaction = _dbContext.BeginTransaction())
             {
@@ -378,6 +422,8 @@ namespace Linko.LinkoExchange.Services.Sample
                         _dbContext.SaveChanges();
                         transaction.Commit();
                     }
+
+                    _logger.Info($"Leaving SampleService.DeleteSample. sampleId={sampleId}");
 
                 }
                 catch (RuleViolationException ex)
@@ -407,6 +453,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
         private SampleDto GetSampleDetails(Core.Domain.Sample sample)
         {
+            _logger.Info($"Enter SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
 
@@ -518,12 +565,14 @@ namespace Linko.LinkoExchange.Services.Sample
             }
 
             dto.SampleResults = resultDtoList.Values.ToList();
-
+            _logger.Info($"Leaving SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
             return dto;
         }
 
         private void SetSampleResultDatesAndLastModified(SampleResult sampleResult, ref SampleResultDto resultDto, int timeZoneId)
         {
+            _logger.Info($"Enter SampleService.SetSampleResultDatesAndLastModified. sampleResult.SampleId={sampleResult.SampleId}");
+
             //Need to set localized time stamps for SampleResults
             if (sampleResult.AnalysisDateTimeUtc.HasValue)
             {
@@ -544,10 +593,14 @@ namespace Linko.LinkoExchange.Services.Sample
             {
                 resultDto.LastModifierFullName = "N/A";
             }
+
+            _logger.Info($"Leaving SampleService.SetSampleResultDatesAndLastModified. sampleResult.SampleId={sampleResult.SampleId}");
         }
 
         public SampleDto GetSampleDetails(int sampleId)
         {
+            _logger.Info($"Enter SampleService.GetSampleDetails. sampleId={sampleId}");
+
             var sample = _dbContext.Samples
                 .Include(s => s.SampleStatus)
                 .Include(s => s.SampleResults)
@@ -555,18 +608,28 @@ namespace Linko.LinkoExchange.Services.Sample
 
             var dto = this.GetSampleDetails(sample);
 
+            _logger.Info($"Leaving SampleService.GetSampleDetails. sampleId={sampleId}");
+
             return dto;
         }
 
         public bool IsSampleIncludedInReportPackage(int sampleId)
         {
+            _logger.Info($"Enter SampleService.IsSampleIncludedInReportPackage. sampleId={sampleId}");
+
             var isExists = _dbContext.ReportSamples.Any(rs => rs.SampleId == sampleId);
+
+            _logger.Info($"Leaving SampleService.IsSampleIncludedInReportPackage. sampleId={sampleId}");
 
             return isExists;
         }
 
         public IEnumerable<SampleDto> GetSamples(SampleStatusName status, DateTime? startDate = null, DateTime? endDate = null)
         {
+            string startDateString = startDate.HasValue ? startDate.Value.ToString() : "null";
+            string endDateString = endDate.HasValue ? endDate.Value.ToString() : "null";
+            _logger.Info($"Enter SampleService.GetSamples. status={status}, startDate={startDateString}, endDate={endDateString}");
+
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
             var dtos = new List<SampleDto>();
@@ -618,6 +681,8 @@ namespace Linko.LinkoExchange.Services.Sample
                 var dto = this.GetSampleDetails(sample);
                 dtos.Add(dto);
             }
+
+            _logger.Info($"Leaving SampleService.GetSamples. status={status}, startDate={startDateString}, endDate={endDateString}, dtos.Count={dtos.Count()}");
 
             return dtos;
         }
