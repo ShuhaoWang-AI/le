@@ -43,6 +43,8 @@ namespace Linko.LinkoExchange.Services.Report
 
         public IEnumerable<ReportElementTypeDto> GetReportElementTypes(ReportElementCategoryName categoryName)
         {
+            _logger.Info($"Enter ReportElementService.GetReportElementTypes. categoryName={categoryName}");
+
             var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var reportElementTypes = new List<ReportElementTypeDto>();
@@ -73,11 +75,16 @@ namespace Linko.LinkoExchange.Services.Report
 
                 reportElementTypes.Add(dto);
             }
+
+            _logger.Info($"Leaving ReportElementService.GetReportElementTypes. reportElementTypes.Count={reportElementTypes.Count()}");
+
             return reportElementTypes;
         }
 
         public ReportElementTypeDto GetReportElementType(int reportElementTypeId)
         {
+            _logger.Info($"Enter ReportElementService.GetReportElementType. reportElementTypeId={reportElementTypeId}");
+
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var foundREType = _dbContext.ReportElementTypes
                 .Single(re => re.ReportElementTypeId == reportElementTypeId);
@@ -104,11 +111,25 @@ namespace Linko.LinkoExchange.Services.Report
                 dto.LastModifierFullName = "N/A";
             }
 
+            _logger.Info($"Leaving ReportElementService.GetReportElementType. reportElementTypeId={reportElementTypeId}");
+
             return dto;
         }
 
         public int SaveReportElementType(ReportElementTypeDto reportElementType)
         {
+            string reportElementTypeIdString = string.Empty;
+            if (reportElementType.ReportElementTypeId.HasValue)
+            {
+                reportElementTypeIdString = reportElementType.ReportElementTypeId.Value.ToString();
+            }
+            else
+            {
+                reportElementTypeIdString = "null";
+            }
+
+            _logger.Info($"Enter ReportElementService.SaveReportElementType. reportElementType.ReportElementTypeId.Value={reportElementTypeIdString}");
+
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
@@ -243,12 +264,17 @@ namespace Linko.LinkoExchange.Services.Report
                 }
 
             }
+
+            _logger.Info($"Leaving ReportElementService.SaveReportElementType. reportElementTypeIdToReturn={reportElementTypeIdToReturn}");
+
             return reportElementTypeIdToReturn;
         }
 
     
         public void DeleteReportElementType(int reportElementTypeId)
         {
+            _logger.Info($"Enter ReportElementService.DeleteReportElementType. reportElementTypeId={reportElementTypeId}");
+
             var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
             using (var transaction = _dbContext.BeginTransaction())
             {
@@ -307,11 +333,16 @@ namespace Linko.LinkoExchange.Services.Report
                 }
 
             }
-           
+
+            _logger.Info($"Leaving ReportElementService.DeleteReportElementType. reportElementTypeId={reportElementTypeId}");
+
         }
 
         public bool IsReportElementTypeInUse(int reportElementTypeId)
         {
+            bool isInUse;
+            _logger.Info($"Enter ReportElementService.IsReportElementTypeInUse. reportElementTypeId={reportElementTypeId}");
+
             var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
             //Find all Report Package Templates using this Report Element Type
             var rpTemplatesUsingThis = _dbContext.ReportPackageTemplateElementTypes
@@ -320,14 +351,20 @@ namespace Linko.LinkoExchange.Services.Report
                     .Select(r => r.ReportPackageTemplateElementCategory.ReportPackageTemplate)
                     .Where(r => r.OrganizationRegulatoryProgramId == authOrgRegProgramId);
 
+
             if (rpTemplatesUsingThis.Count() > 0)
             {
-                return true;
+                isInUse = true;
             }
             else
             {
-                return false;
+                isInUse = false;
             }
+
+            _logger.Info($"Leaving ReportElementService.IsReportElementTypeInUse. reportElementTypeId={reportElementTypeId}, isInUse={isInUse}");
+
+            return isInUse;
+
         }
     }
 }
