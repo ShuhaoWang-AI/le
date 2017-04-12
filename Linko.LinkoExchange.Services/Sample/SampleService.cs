@@ -69,149 +69,138 @@ namespace Linko.LinkoExchange.Services.Sample
             var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
             var sampleIdToReturn = -1;
-            bool isFlowValuesExist = false;
             var sampleStartDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId);
             var sampleEndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId);
 
-            using (var transaction = _dbContext.BeginTransaction())
+            try
             {
-                try
+                Core.Domain.Sample sampleToPersist = null;
+
+                if (sampleDto.SampleId.HasValue && sampleDto.SampleId.Value > 0)
                 {
-                    Core.Domain.Sample sampleToPersist = null;
 
-                    if (sampleDto.SampleId.HasValue && sampleDto.SampleId.Value > 0)
+                    if (IsSampleIncludedInReportPackage(sampleDto.SampleId.Value))
                     {
-
-                        if (IsSampleIncludedInReportPackage(sampleDto.SampleId.Value))
-                        {
-                            //Sample is in use in a Report Package (draft or otherwise)...  
-                            //Actor can not perform any actions of any kind except view all details.
-                            return sampleDto.SampleId.Value;
-                        }
-
-                        //Update existing
-                        sampleToPersist = _dbContext.Samples.Single(c => c.SampleId == sampleDto.SampleId);
-                        sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto, sampleToPersist);
-
-                        //Delete existing results
-                        var existingSampleResults = _dbContext.SampleResults
-                            .Where(sr => sr.SampleId == sampleDto.SampleId);
-                        _dbContext.SampleResults.RemoveRange(existingSampleResults);
-                    }
-                    else
-                    {
-                        //Get new
-                        sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto);
-                        sampleToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
-                        _dbContext.Samples.Add(sampleToPersist);
+                        //Sample is in use in a Report Package (draft or otherwise)...  
+                        //Actor can not perform any actions of any kind except view all details.
+                        return sampleDto.SampleId.Value;
                     }
 
-                    sampleToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
-                    sampleToPersist.StartDateTimeUtc = sampleStartDateTimeUtc;
-                    sampleToPersist.EndDateTimeUtc = sampleEndDateTimeUtc;
-                    sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
-                    sampleToPersist.LastModifierUserId = currentUserId;
+                    //Update existing
+                    sampleToPersist = _dbContext.Samples.Single(c => c.SampleId == sampleDto.SampleId);
+                    sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto, sampleToPersist);
 
+                    //Delete existing results
+                    var existingSampleResults = _dbContext.SampleResults
+                        .Where(sr => sr.SampleId == sampleDto.SampleId);
+                    _dbContext.SampleResults.RemoveRange(existingSampleResults);
+                }
+                else
+                {
+                    //Get new
+                    sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto);
+                    sampleToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+                    _dbContext.Samples.Add(sampleToPersist);
+                }
 
+                sampleToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
+                sampleToPersist.StartDateTimeUtc = sampleStartDateTimeUtc;
+                sampleToPersist.EndDateTimeUtc = sampleEndDateTimeUtc;
+                sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                sampleToPersist.LastModifierUserId = currentUserId;
 
-                    _dbContext.SaveChanges(); //Needed here?
+                _dbContext.SaveChanges(); //Needed here?
 
-                    sampleIdToReturn = sampleToPersist.SampleId;
+                sampleIdToReturn = sampleToPersist.SampleId;
 
-                    //Add results
-                    sampleToPersist.SampleResults = new Collection<SampleResult>();
-                    //
-                    //Add flow result first (if exists)
-                    //  - this is only required if there is at least 1 mass loading result
+                //Add results
+                sampleToPersist.SampleResults = new Collection<SampleResult>();
+                //
+                //Add flow result first (if exists)
+                //  - this is only required if there is at least 1 mass loading result
 
-                    if (isFlowValuesExist)
+                if (sampleDto.FlowValue != null && sampleDto.FlowUnitId != null && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
+                {
+                    var flowParameter = _dbContext.Parameters
+                        .First(p => p.IsFlowForMassLoadingCalculation == true); //Chris: "Should be one but just get first".
+
+                    var flowResult = new SampleResult()
                     {
-                        var flowParameter = _dbContext.Parameters
-                            .First(p => p.IsFlowForMassLoadingCalculation == true); //Chris: "Should be one but just get first".
+                        SampleId = sampleIdToReturn,
+                        ParameterId = flowParameter.ParameterId,
+                        ParameterName = flowParameter.Name,
+                        Qualifier = "",
+                        Value = sampleDto.FlowValue,
+                        DecimalPlaces = sampleDto.FlowValueDecimalPlaces,
+                        UnitId = sampleDto.FlowUnitId.Value,
+                        UnitName = sampleDto.FlowUnitName,
+                        MethodDetectionLimit = "",
+                        IsFlowForMassLoadingCalculation = true,
+                        LimitTypeId = null,
+                        LimitBasisId = null,
+                        IsCalculated = false
+                    };
+                    sampleToPersist.SampleResults.Add(flowResult);
 
-                        var flowResult = new SampleResult()
-                        {
-                            SampleId = sampleIdToReturn,
-                            ParameterId = flowParameter.ParameterId,
-                            ParameterName = flowParameter.Name,
-                            Qualifier = "",
-                            Value = sampleDto.FlowValue,
-                            DecimalPlaces = sampleDto.FlowValueDecimalPlaces,
-                            UnitId = sampleDto.FlowUnitId.Value,
-                            UnitName = sampleDto.FlowUnitName,
-                            MethodDetectionLimit = "",
-                            IsFlowForMassLoadingCalculation = true,
-                            LimitTypeId = null,
-                            LimitBasisId = null,
-                            IsCalculated = false
-                        };
-                        sampleToPersist.SampleResults.Add(flowResult);
+                }
 
-                    }
+                //Add "regular" sample results
+                var massLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.MassLoading.ToString()).LimitBasisId;
+                var concentrationLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Concentration.ToString()).LimitBasisId;
+                var dailyLimitTypeId = _dbContext.LimitTypes.Single(lt => lt.Name == LimitTypeName.Daily.ToString()).LimitTypeId;
+                foreach (var resultDto in sampleDto.SampleResults)
+                {
 
-                    //Add "regular" sample results
-                    var massLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.MassLoading.ToString()).LimitBasisId;
-                    var concentrationLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Concentration.ToString()).LimitBasisId;
-                    var dailyLimitTypeId = _dbContext.LimitTypes.Single(lt => lt.Name == LimitTypeName.Daily.ToString()).LimitTypeId;
-                    foreach (var resultDto in sampleDto.SampleResults)
+                    //Concentration result
+                    var sampleResult = _mapHelper.GetConcentrationSampleResultFromSampleResultDto(resultDto);
+                    sampleResult.AnalysisDateTimeUtc = _timeZoneService
+                        .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                    sampleResult.LimitBasisId = concentrationLimitBasisId;
+                    sampleResult.LimitTypeId = dailyLimitTypeId;
+                    sampleResult.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+                    sampleResult.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                    sampleResult.LastModifierUserId = currentUserId;
+
+                    sampleToPersist.SampleResults.Add(sampleResult);
+
+                    //Mass result (if calculated)
+                    if (resultDto.IsCalcMassLoading)
                     {
+                        sampleResult.IsMassLoadingCalculationRequired = true;
 
-                        //Concentration result
-                        var sampleResult = _mapHelper.GetConcentrationSampleResultFromSampleResultDto(resultDto);
-                        sampleResult.AnalysisDateTimeUtc = _timeZoneService
+                        var sampleMassResult = _mapHelper.GetMassSampleResultFromSampleResultDto(resultDto);
+                        sampleMassResult.AnalysisDateTimeUtc = _timeZoneService
                             .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
-                        sampleResult.LimitBasisId = concentrationLimitBasisId;
-                        sampleResult.LimitTypeId = dailyLimitTypeId;
-                        sampleResult.CreationDateTimeUtc = DateTimeOffset.UtcNow;
-                        sampleResult.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
-                        sampleResult.LastModifierUserId = currentUserId;
+                        sampleMassResult.LimitBasisId = massLimitBasisId;
+                        sampleMassResult.LimitTypeId = dailyLimitTypeId;
+                        sampleMassResult.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+                        sampleMassResult.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                        sampleMassResult.LastModifierUserId = currentUserId;
 
-                        sampleToPersist.SampleResults.Add(sampleResult);
-
-                        //Mass result (if calculated)
-                        if (resultDto.IsCalcMassLoading)
-                        {
-                            sampleResult.IsMassLoadingCalculationRequired = true;
-
-                            var sampleMassResult = _mapHelper.GetMassSampleResultFromSampleResultDto(resultDto);
-                            sampleMassResult.AnalysisDateTimeUtc = _timeZoneService
-                                .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
-                            sampleMassResult.LimitBasisId = massLimitBasisId;
-                            sampleMassResult.LimitTypeId = dailyLimitTypeId;
-                            sampleMassResult.CreationDateTimeUtc = DateTimeOffset.UtcNow;
-                            sampleMassResult.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
-                            sampleMassResult.LastModifierUserId = currentUserId;
-
-                            sampleToPersist.SampleResults.Add(sampleMassResult);
-                        }
+                        sampleToPersist.SampleResults.Add(sampleMassResult);
                     }
-
-                    _dbContext.SaveChanges();
-
-                    transaction.Commit();
                 }
-                catch (RuleViolationException ex)
+
+                _dbContext.SaveChanges();
+
+            }
+            catch (RuleViolationException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                var errors = new List<string>() { ex.Message };
+
+                while (ex.InnerException != null)
                 {
-                    transaction.Rollback();
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-
-                    var errors = new List<string>() { ex.Message };
-
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(ex.Message);
-                    }
-
-                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
-
-                    throw;
+                    ex = ex.InnerException;
+                    errors.Add(ex.Message);
                 }
 
+                _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                throw;
             }
 
             _logger.Info($"Leaving SampleService.SimplePersist. sampleIdToReturn={sampleIdToReturn}");
@@ -241,20 +230,49 @@ namespace Linko.LinkoExchange.Services.Sample
             _logger.Info($"Enter SampleService.SaveSample. sampleDto.SampleId.Value={sampleIdString}, isSavingAsReadyToReport={isSavingAsReadyToReport}");
 
             var sampleId = -1;
-
-            if (this.IsValidSample(sampleDto, isSavingAsReadyToReport, isSuppressExceptions: false))
+            using (var transaction = _dbContext.BeginTransaction())
             {
-                if (isSavingAsReadyToReport)
-                {
-                    //Update the sample status to "Ready to Report"
-                    var sampleStatusReadyToReport = _dbContext.SampleStatuses
-                        .Single(ss => ss.Name == SampleStatusName.ReadyToReport.ToString());
+                try {
 
-                    sampleDto.SampleStatusId = sampleStatusReadyToReport.SampleStatusId;
+                    if (this.IsValidSample(sampleDto, isSavingAsReadyToReport, isSuppressExceptions: false))
+                    {
+                        if (isSavingAsReadyToReport)
+                        {
+                            //Update the sample status to "Ready to Report"
+                            var sampleStatusReadyToReport = _dbContext.SampleStatuses
+                                .Single(ss => ss.Name == SampleStatusName.ReadyToReport.ToString());
 
+                            sampleDto.SampleStatusId = sampleStatusReadyToReport.SampleStatusId;
+
+                        }
+                        sampleId = this.SimplePersist(sampleDto);
+                        transaction.Commit();
+                    }
                 }
-                sampleId = this.SimplePersist(sampleDto);
+                catch (RuleViolationException ex)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                    throw;
+                }
+
             }
+               
             _logger.Info($"Leaving SampleService.SaveSample. sampleId={sampleId}, isSavingAsReadyToReport={isSavingAsReadyToReport}");
             return sampleId;
         }

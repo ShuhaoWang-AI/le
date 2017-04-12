@@ -135,7 +135,7 @@ namespace Linko.LinkoExchange.Test
         public void SaveSample_Details_Concentration_And_Mass_Results_Valid_NotSavingAsReadyToSubmit()
         {
             var sampleDto = GetTestSampleDto();
-            _sampleService.SaveSample(sampleDto);
+            _sampleService.SaveSample(sampleDto, true);
         }
 
         [TestMethod]
