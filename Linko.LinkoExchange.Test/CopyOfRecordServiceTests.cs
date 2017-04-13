@@ -27,7 +27,7 @@ namespace Linko.LinkoExchange.Test
         readonly ISettingService _settService = Mock.Of<ISettingService>();
         private IProgramService _programService = Mock.Of<IProgramService>();
         private LinkoExchangeContext _dbContext;
-
+        private TimeZoneService _actualTimeZoneService;
         [TestInitialize]
         public void Init()
         {
@@ -35,7 +35,7 @@ namespace Linko.LinkoExchange.Test
                   "data source=wtxodev05;initial catalog=LinkoExchange;Integrated Security=True";
 
             _dbContext = new LinkoExchangeContext(connectionString);
-            var actualTimeZoneService = new TimeZoneService(_dbContext, _settService, new MapHelper());
+            _actualTimeZoneService = new TimeZoneService(_dbContext, _settService, new MapHelper());
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
 
             IDigitalSignatureManager certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
@@ -45,7 +45,7 @@ namespace Linko.LinkoExchange.Test
                  new MapHelper(),
                  _logger.Object,
                  _httpContext.Object,
-                 actualTimeZoneService,
+                 _actualTimeZoneService,
                  certificateDigitalSignatureManager
                 );
         }
@@ -54,15 +54,8 @@ namespace Linko.LinkoExchange.Test
         public void Create_Cor_success()
         {
             //set 
-            var fileDtos = new List<FileStoreDto>();
-            var ft1 = new FileStoreDto { Name = "attachment_1.pdf" };
-            var ft2 = new FileStoreDto { Name = "attachment_2.pdf" };
-
-            fileDtos.AddRange(collection: new[] { ft1, ft2 });
-
             var rnd = new Random();
             int rptId = rnd.Next(int.MaxValue);
-
             var attachments = GetMockAttachmentFiles();
             var copyOfRecordPdfFile = GetCopyOfRecordPdfFile();
             var reportPackageCopyOfRecordDataXml = GetReportPackageCopyOfRecordDataXml();
@@ -80,7 +73,6 @@ namespace Linko.LinkoExchange.Test
             var copyOfRecordPdfInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordPdfFile(rptId);
 
             _copyOrRecordService.CreateCopyOfRecordForReportPackage(rptId, attachmentFiles, copyOfRecordPdfInfo, copyOfRecordDataXmlFileInfo);
-
         }
 
         [TestMethod]
@@ -92,24 +84,23 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
 
             var reportPackageId = 527466233;
-            var verified = reportPackageService.VerififyCopyOfRecord(reportPackageId);
+            var validResult = reportPackageService.VerififyCopyOfRecord(reportPackageId);
 
-            Assert.IsTrue(verified);
+            Assert.IsTrue(validResult.Valid);
         }
 
         [TestMethod]
         public void Verify_intacted_data_return_true()
         {
             var programDto = Mock.Of<OrganizationRegulatoryProgramDto>();
-
             var programMock = Mock.Get(_programService);
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -128,7 +119,7 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -151,7 +142,7 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -176,7 +167,7 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -199,7 +190,7 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -221,7 +212,7 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -283,9 +274,6 @@ namespace Linko.LinkoExchange.Test
                     Data = File.ReadAllBytes(file.FullName),
                     Name = Path.GetFileName(file.Name)
                 };
-
-                //fileStoreDto.Data = new byte[data.Length];
-                //Array.Copy(data, fileStoreDto.Data, data.Length); 
                 fileStoreDtos.Add(fileStoreDto);
             }
 

@@ -160,6 +160,9 @@
     <None Include="testFile\attachments\attachment_2.pdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="testFile\attachments\attachment_3.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="testFile\CopyOfRecordPdf\CopyOfRecordPdf.pdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
