@@ -17,16 +17,11 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly ILogger _logger;
-        private readonly IHttpContextService _httpContextService;
-        private readonly ITimeZoneService _timeZoneService;
         private readonly IDigitalSignatureManager _digitalSignatureManager;
 
         public CopyOfRecordService(
             LinkoExchangeContext dbContext,
-            IMapHelper mapHelper,
             ILogger logger,
-            IHttpContextService httpContextService,
-            ITimeZoneService timeZoneService,
             IDigitalSignatureManager digitalSignatureManager)
         {
             if (dbContext == null)
@@ -34,24 +29,9 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 throw new ArgumentNullException(nameof(dbContext));
             }
 
-            if (mapHelper == null)
-            {
-                throw new ArgumentNullException(nameof(mapHelper));
-            }
-
             if (logger == null)
             {
                 throw new ArgumentNullException(nameof(logger));
-            }
-
-            if (httpContextService == null)
-            {
-                throw new ArgumentNullException(nameof(httpContextService));
-            }
-
-            if (timeZoneService == null)
-            {
-                throw new ArgumentNullException(nameof(timeZoneService));
             }
 
             if (digitalSignatureManager == null)
@@ -61,8 +41,6 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
             _dbContext = dbContext;
             _logger = logger;
-            _httpContextService = httpContextService;
-            _timeZoneService = timeZoneService;
             _digitalSignatureManager = digitalSignatureManager;
         }
 
@@ -119,17 +97,25 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         public CopyOfRecordValidationResultDto ValidCopyOfRecordData(int reportPackageId)
         {
+            _logger.Info($"Enter CopyOfRecordService.ValidCopyOfRecordData. ReportPackageId:{reportPackageId}");
+
             var copyOfRecord = _dbContext.CopyOfRecords.Single(i => i.ReportPackageId == reportPackageId);
             var isValid = _digitalSignatureManager.VerifySignature(copyOfRecord.Signature, copyOfRecord.Data);
-            return new CopyOfRecordValidationResultDto
+            var validationResult = new CopyOfRecordValidationResultDto
             {
                 Valid = isValid,
                 DigitalSignature = copyOfRecord.Signature,
             };
+
+            _logger.Info($"Enter CopyOfRecordService.ValidCopyOfRecordData. ReportPackageId:{reportPackageId}");
+
+            return validationResult;
         }
 
         public CopyOfRecordDto GetCopyOfRecordByReportPackage(ReportPackageDto reportPackage)
         {
+            _logger.Info($"Enter CopyOfRecordService.GetCopyOfRecordByReportPackage. ReportPackageId:{reportPackage.ReportPackageId}");
+
             var copyOfRecord = _dbContext.CopyOfRecords.Single(i => i.ReportPackageId == reportPackage.ReportPackageId);
             var copyOfRecordDto = new CopyOfRecordDto
             {
@@ -146,6 +132,8 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             var permitNumber = reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.PermitNumber;
             copyOfRecordDto.DownloadFileName = $"{permitNumber} {reportPackage.Name} {datetimePart}.zip";
 
+            _logger.Info($"Enter CopyOfRecordService.GetCopyOfRecordByReportPackage. ReportPackageId:{reportPackage.ReportPackageId}");
+
             return copyOfRecordDto;
         }
 
@@ -155,7 +143,6 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         {
             var hashBytes = Encoding.UTF8.GetBytes(s: hash);
             var hashBase64 = Convert.ToBase64String(inArray: hashBytes);
-
             return _digitalSignatureManager.SignData(base64Data: hashBase64);
         }
         private static void AddFileIntoZipArchive(ZipArchive archive, string fileName, byte[] fileData)

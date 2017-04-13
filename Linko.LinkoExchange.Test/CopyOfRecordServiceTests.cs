@@ -42,10 +42,7 @@ namespace Linko.LinkoExchange.Test
 
             _copyOrRecordService = new CopyOfRecordService
                 (_dbContext,
-                 new MapHelper(),
                  _logger.Object,
-                 _httpContext.Object,
-                 _actualTimeZoneService,
                  certificateDigitalSignatureManager
                 );
         }
@@ -84,7 +81,7 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
 
             var reportPackageId = 527466233;
             var validResult = reportPackageService.VerififyCopyOfRecord(reportPackageId);
@@ -100,7 +97,7 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -119,7 +116,7 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -142,7 +139,7 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -167,7 +164,7 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -190,7 +187,7 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -212,7 +209,7 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService);
+            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);

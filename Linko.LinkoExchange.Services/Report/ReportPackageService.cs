@@ -4,6 +4,7 @@ using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.TimeZone;
+using NLog;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -14,15 +15,19 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly IProgramService _programService;
         private readonly ICopyOfRecordService _copyOfRecordService;
         private readonly ITimeZoneService _timeZoneService;
+        private readonly ILogger _logger;
+
         public ReportPackageService(
             IProgramService programService,
             ICopyOfRecordService copyOfRecordService,
-            ITimeZoneService timeZoneService
+            ITimeZoneService timeZoneService,
+            ILogger logger
             )
         {
             _programService = programService;
             _copyOfRecordService = copyOfRecordService;
             _timeZoneService = timeZoneService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -52,7 +57,13 @@ namespace Linko.LinkoExchange.Services.Report
 
         public CopyOfRecordValidationResultDto VerififyCopyOfRecord(int reportPackageId)
         {
-            return _copyOfRecordService.ValidCopyOfRecordData(reportPackageId);
+            _logger.Info("Enter ReportPackageService.VerififyCopyOfRecord. reportPackageId={0}", reportPackageId);
+
+            var validationResult = _copyOfRecordService.ValidCopyOfRecordData(reportPackageId);
+
+            _logger.Info("Enter ReportPackageService.VerififyCopyOfRecord. reportPackageId={0}", reportPackageId);
+
+            return validationResult;
         }
 
         //TODO: to implement this!
@@ -77,19 +88,28 @@ namespace Linko.LinkoExchange.Services.Report
 
         public CopyOfRecordDto GetCopyOfRecordByReportPackageId(int reportPackageId)
         {
+            _logger.Info("Enter ReportPackageService.GetCopyOfRecordByReportPackageId. reportPackageId={0}", reportPackageId);
+
             var reportPackageDto = GetReportPackage(reportPackageId);
-            return _copyOfRecordService.GetCopyOfRecordByReportPackage(reportPackageDto);
+            var copyOfRecordDto = _copyOfRecordService.GetCopyOfRecordByReportPackage(reportPackageDto);
+
+            _logger.Info("Enter ReportPackageService.GetCopyOfRecordByReportPackageId. reportPackageId={0}", reportPackageId);
+
+            return copyOfRecordDto;
         }
 
         public CopyOfRecordDto CreateCopyOfRecordForReportPackage(int reportPackageId)
         {
-            var reportPackageDto = GetReportPackage(reportPackageId);
+            _logger.Info("Enter ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={0}", reportPackageId);
+
             var attachments = GetReportPackageAttachments(reportPackageId);
             var copyOfRecordPdfFile = GetReportPackageCopyOfRecordPdfFile(reportPackageId);
             var copyOfRecordDataXmlFile = GetReportPackageCopyOfRecordDataXmlFile(reportPackageId);
-            _copyOfRecordService.CreateCopyOfRecordForReportPackage(reportPackageId, attachments, copyOfRecordPdfFile, copyOfRecordDataXmlFile);
+            var copyOfRecordDto = _copyOfRecordService.CreateCopyOfRecordForReportPackage(reportPackageId, attachments, copyOfRecordPdfFile, copyOfRecordDataXmlFile);
 
-            return _copyOfRecordService.GetCopyOfRecordByReportPackage(reportPackageDto);
+            _logger.Info("Enter ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={0}", reportPackageId);
+
+            return copyOfRecordDto;
         }
     }
 }
