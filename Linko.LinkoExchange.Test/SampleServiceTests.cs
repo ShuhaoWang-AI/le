@@ -77,15 +77,14 @@ namespace Linko.LinkoExchange.Test
             sampleDto.CtsEventTypeId = 1;
             sampleDto.CtsEventTypeName = "SNC-P";
             sampleDto.CtsEventCategoryName = "Sample Category 1";
-            //sampleDto.OrganizationTypeId = 1;
-            //sampleDto.OrganizationRegulatoryProgramId = 1;
-            sampleDto.FlowUnitId = 10;
+            //sampleDto.FlowUnitId = 10;
             sampleDto.FlowUnitName = "ppd";
             sampleDto.FlowValue = 808.1;
             sampleDto.StartDateTimeLocal = DateTime.Now;
             sampleDto.EndDateTimeLocal = DateTime.Now;
             sampleDto.IsReadyToReport = true;
             sampleDto.IsCalculated = false;
+            sampleDto.IsReadyToReport = false;
             var resultDtos = new List<SampleResultDto>();
 
             var resultDto = new SampleResultDto()
@@ -136,7 +135,7 @@ namespace Linko.LinkoExchange.Test
         {
             var sampleDto = GetTestSampleDto();
             sampleDto.IsReadyToReport = false;
-            _sampleService.SaveSample(sampleDto, false);
+            _sampleService.SaveSample(sampleDto);
         }
 
         [TestMethod]
@@ -144,7 +143,7 @@ namespace Linko.LinkoExchange.Test
         {
             var sampleDto = GetTestSampleDto();
             sampleDto.IsReadyToReport = true;
-            _sampleService.SaveSample(sampleDto, true);
+            _sampleService.SaveSample(sampleDto);
         }
 
         [TestMethod]
@@ -181,7 +180,7 @@ namespace Linko.LinkoExchange.Test
             var sampleDtos = _sampleService.GetSamples(SampleStatusName.All);
             foreach (var sampleDto in sampleDtos)
             {
-                var isValid = _sampleService.IsValidSample(sampleDto, false, false);
+                var isValid = _sampleService.IsValidSample(sampleDto, false);
             }
         }
 
@@ -191,7 +190,7 @@ namespace Linko.LinkoExchange.Test
             var sampleDtos = _sampleService.GetSamples(SampleStatusName.All);
             foreach (var sampleDto in sampleDtos)
             {
-                var isValid = _sampleService.IsValidSample(sampleDto, true, false);
+                var isValid = _sampleService.IsValidSample(sampleDto, false);
             }
         }
 

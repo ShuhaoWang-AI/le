@@ -233,12 +233,11 @@ namespace Linko.LinkoExchange.Services.Sample
 
         /// <summary>
         /// Saves a Sample to the database after validating. Throw a list of RuleViolation exceptions
-        /// for failed validation issues.
+        /// for failed validation issues. If SampleDto.IsReadyToReport is true, validation is more strict.
         /// </summary>
         /// <param name="sample">Sample Dto</param>
-        /// <param name="isSavingAsReadyToSubmit">True to perform stricter validation</param>
         /// <returns>Existing Sample Id or newly created Sample Id</returns>
-        public int SaveSample(SampleDto sampleDto, bool isSavingAsReadyToReport = false)
+        public int SaveSample(SampleDto sampleDto)
         {
             string sampleIdString = string.Empty;
             if (sampleDto.SampleId.HasValue)
@@ -249,16 +248,22 @@ namespace Linko.LinkoExchange.Services.Sample
             {
                 sampleIdString = "null";
             }
-            _logger.Info($"Enter SampleService.SaveSample. sampleDto.SampleId.Value={sampleIdString}, isSavingAsReadyToReport={isSavingAsReadyToReport}");
+            _logger.Info($"Enter SampleService.SaveSample. sampleDto.SampleId.Value={sampleIdString}, isSavingAsReadyToReport={sampleDto.IsReadyToReport}");
 
             var sampleId = -1;
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try {
-
-                    if (this.IsValidSample(sampleDto, isSavingAsReadyToReport, isSuppressExceptions: false))
+                    //If attempting to save as Draft, check if included report
+                    if (sampleDto.SampleId.HasValue && 
+                        !sampleDto.IsReadyToReport && 
+                        this.IsSampleIncludedInReportPackage(sampleDto.SampleId.Value))
                     {
-                        sampleDto.IsReadyToReport = isSavingAsReadyToReport;
+                        ThrowSimpleException("You cannot save a Sample as Draft if it's been included in a Report Package.");
+                    }
+
+                    if (this.IsValidSample(sampleDto, isSuppressExceptions: false))
+                    {
                         sampleId = this.SimplePersist(sampleDto);
                         transaction.Commit();
                     }
@@ -287,7 +292,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
             }
                
-            _logger.Info($"Leaving SampleService.SaveSample. sampleId={sampleId}, isSavingAsReadyToReport={isSavingAsReadyToReport}");
+            _logger.Info($"Leaving SampleService.SaveSample. sampleId={sampleId}, isSavingAsReadyToReport={sampleDto.IsReadyToReport}");
             return sampleId;
         }
 
@@ -308,13 +313,13 @@ namespace Linko.LinkoExchange.Services.Sample
         }
 
         /// <summary>
-        /// Tests validation of a passed in Sample in either Draft or ReadyToReport Mode
+        /// Tests validation of a passed in Sample in either Draft Mode (sampleDto.IsReadyToReport = false)
+        /// or ReadyToReport Mode (sampleDto.IsReadyToReport = true)
         /// </summary>
         /// <param name="sampleDto">Sample to validate</param>
-        /// <param name="isReadyToSubmit">False = Draft Mode, True = ReadyToReport Mode</param>
         /// <param name="isSuppressExceptions">False = throws RuleViolation exception, True = does not throw RuleViolation exceptions</param>
         /// <returns>Boolean indicating if Sample passed all validation (Draft or ReadyToReport mode)</returns>
-        public bool IsValidSample(SampleDto sampleDto, bool isReadyToReport, bool isSuppressExceptions = false)
+        public bool IsValidSample(SampleDto sampleDto, bool isSuppressExceptions = false)
         {
             string sampleIdString = string.Empty;
             if (sampleDto.SampleId.HasValue)
@@ -399,7 +404,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
             foreach (var resultDto in sampleDto.SampleResults)
             {
-                if (isReadyToReport &&
+                if (sampleDto.IsReadyToReport &&
                     ((resultDto.Qualifier == ">" || resultDto.Qualifier == "<" || string.IsNullOrEmpty(resultDto.Qualifier))
                     && resultDto.Value == null))
                 {
@@ -410,7 +415,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     }
                 }
 
-                if (isReadyToReport &&
+                if (sampleDto.IsReadyToReport &&
                     (resultDto.Qualifier == "ND" || resultDto.Qualifier == "NF" && resultDto.Value != null))
                 {
                     isValid = false;
@@ -420,7 +425,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     }
                 }
 
-                if (isReadyToReport &&
+                if (sampleDto.IsReadyToReport &&
                     (resultDto.IsCalcMassLoading && !isValidFlowValueExists))
                 {
                     isValid = false;
@@ -430,7 +435,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     }
                 }
 
-                if (isReadyToReport &&
+                if (sampleDto.IsReadyToReport &&
                     (resultDto.IsCalcMassLoading && 
                     (resultDto.MassLoadingUnitId < 0 || resultDto.MassLoadingValue == null)))
                 {

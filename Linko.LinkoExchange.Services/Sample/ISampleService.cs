@@ -23,12 +23,11 @@ namespace Linko.LinkoExchange.Services.Sample
 
         /// <summary>
         /// Saves a Sample to the database after validating. Throw a list of RuleViolation exceptions
-        /// for failed validation issues.
+        /// for failed validation issues. If SampleDto.IsReadyToReport is true, validation is more strict.
         /// </summary>
         /// <param name="sample">Sample Dto</param>
-        /// <param name="isSavingAsReadyToSubmit">True to perform stricter validation</param>
         /// <returns>Existing Sample Id or newly created Sample Id</returns>
-        int SaveSample(SampleDto sample, bool isSavingAsReadyToSubmit = false);
+        int SaveSample(SampleDto sample);
 
         /// <summary>
         /// Deletes a sample from the database
@@ -51,12 +50,12 @@ namespace Linko.LinkoExchange.Services.Sample
         bool IsSampleIncludedInReportPackage(int sampleId);
 
         /// <summary>
-        /// Tests validation of a passed in Sample in either Draft or ReadyToReport Mode
+        /// Tests validation of a passed in Sample in either Draft Mode (sampleDto.IsReadyToReport = false)
+        /// or ReadyToReport Mode (sampleDto.IsReadyToReport = true)
         /// </summary>
         /// <param name="sampleDto">Sample to validate</param>
-        /// <param name="isReadyToSubmit">False = Draft Mode, True = ReadyToReport Mode</param>
         /// <param name="isSuppressExceptions">False = throws RuleViolation exception, True = does not throw RuleViolation exceptions</param>
         /// <returns>Boolean indicating if Sample passed all validation (Draft or ReadyToReport mode)</returns>
-        bool IsValidSample(SampleDto sampleDto, bool isReadyToSubmit, bool isSuppressExceptions = false);
+        bool IsValidSample(SampleDto sampleDto, bool isSuppressExceptions = false);
     }
 }
