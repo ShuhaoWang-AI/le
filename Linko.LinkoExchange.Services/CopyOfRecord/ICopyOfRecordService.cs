@@ -6,10 +6,9 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 {
     public interface ICopyOfRecordService
     {
-        void CreateCopyOfRecordForReportPackage(int reportPackageId, IEnumerable<FileStoreDto> attachments,
+        CopyOfRecordDto CreateCopyOfRecordForReportPackage(int reportPackageId, IEnumerable<FileStoreDto> attachments,
             CopyOfRecordPdfFileDto copyOfRecordPdfFileDto, CopyOfRecordDataXmlFileDto copyOfRecordDataXmlFileDto);
-
-        bool ValidCoreData(int reportPackageId);
+        CopyOfRecordValidationResultDto ValidCopyOfRecordData(int reportPackageId);
         CopyOfRecordDto GetCopyOfRecordByReportPackage(ReportPackageDto reportPackage);
     }
 }

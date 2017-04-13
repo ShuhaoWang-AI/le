@@ -16,7 +16,6 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
     public class CopyOfRecordService : ICopyOfRecordService
     {
         private readonly LinkoExchangeContext _dbContext;
-        private readonly IMapHelper _mapHelper;
         private readonly ILogger _logger;
         private readonly IHttpContextService _httpContextService;
         private readonly ITimeZoneService _timeZoneService;
@@ -61,14 +60,13 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             }
 
             _dbContext = dbContext;
-            _mapHelper = mapHelper;
             _logger = logger;
             _httpContextService = httpContextService;
             _timeZoneService = timeZoneService;
             _digitalSignatureManager = digitalSignatureManager;
         }
 
-        public void CreateCopyOfRecordForReportPackage(int reportPackageId, IEnumerable<FileStoreDto> attachments, CopyOfRecordPdfFileDto copyOfRecordPdfFileDto, CopyOfRecordDataXmlFileDto copyOfRecordDataXmlFileDto)
+        public CopyOfRecordDto CreateCopyOfRecordForReportPackage(int reportPackageId, IEnumerable<FileStoreDto> attachments, CopyOfRecordPdfFileDto copyOfRecordPdfFileDto, CopyOfRecordDataXmlFileDto copyOfRecordDataXmlFileDto)
         {
             _logger.Info($"Enter CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}");
 
@@ -91,8 +89,20 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 _dbContext.CopyOfRecords.Add(entity: copyOfRecord);
                 _dbContext.SaveChanges();
 
+                var copyOfRecordDto = new CopyOfRecordDto
+                {
+                    ReportPackageId = copyOfRecord.ReportPackageId,
+                    Signature = copyOfRecord.Signature,
+                    SignatureAlgorithm = copyOfRecord.SignatureAlgorithm,
+                    Hash = copyOfRecord.Hash,
+                    HashAlgorithm = copyOfRecord.HashAlgorithm,
+                    CopyOfRecordCertificateId = copyOfRecord.CopyOfRecordCertificateId
+                };
+
                 var message = $"Leave CopyOfRecordService.CreateCopyOfRecordForReportPackage. ReportPackageId:{reportPackageId}.";
                 _logger.Info(message: message);
+
+                return copyOfRecordDto;
             }
             catch (Exception ex)
             {
@@ -100,22 +110,26 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 while (ex.InnerException != null)
                 {
                     ex = ex.InnerException;
-                    errors.Add(ex.Message);
+                    errors.Add(item: ex.Message);
                 }
-                _logger.Error("Error happens {0} ", string.Join("," + Environment.NewLine, errors));
+                _logger.Error(message: "Error happens {0} ", argument: string.Join(separator: "," + Environment.NewLine, values: errors));
                 throw;
             }
         }
 
-        public bool ValidCoreData(int reportPackageId)
+        public CopyOfRecordValidationResultDto ValidCopyOfRecordData(int reportPackageId)
         {
             var copyOfRecord = _dbContext.CopyOfRecords.Single(i => i.ReportPackageId == reportPackageId);
-            return _digitalSignatureManager.VerifySignature(copyOfRecord.Signature, copyOfRecord.Data);
+            var isValid = _digitalSignatureManager.VerifySignature(copyOfRecord.Signature, copyOfRecord.Data);
+            return new CopyOfRecordValidationResultDto
+            {
+                Valid = isValid,
+                DigitalSignature = copyOfRecord.Signature,
+            };
         }
 
         public CopyOfRecordDto GetCopyOfRecordByReportPackage(ReportPackageDto reportPackage)
         {
-            //TODO to verify user permissions?   
             var copyOfRecord = _dbContext.CopyOfRecords.Single(i => i.ReportPackageId == reportPackage.ReportPackageId);
             var copyOfRecordDto = new CopyOfRecordDto
             {
@@ -128,8 +142,9 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 CopyOfRecordCertificateId = copyOfRecord.CopyOfRecordCertificateId
             };
 
-            var datetimePart = reportPackage.SubMissionDateTime.ToString(format: "yyyyMMdd");
-            copyOfRecordDto.DownloadFileName = $"{reportPackage.OrganizationRegulatoryProgramId} {reportPackage.Name} {datetimePart}.zip";
+            var datetimePart = reportPackage.SubMissionDateTimeLocal.ToString(format: "yyyyMMdd");
+            var permitNumber = reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.PermitNumber;
+            copyOfRecordDto.DownloadFileName = $"{permitNumber} {reportPackage.Name} {datetimePart}.zip";
 
             return copyOfRecordDto;
         }
@@ -153,10 +168,9 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             }
         }
 
-        //TODO:
         //1. get attachment files
         //2. get Copy Of Record.pdf
-        //3. get Copy Of Record Data.xml 
+        //3. get Copy Of Record Data.xml
         private byte[] CreateZipFileData(IEnumerable<FileStoreDto> attachments, CopyOfRecordPdfFileDto copyOfRecordPdfFileDto, CopyOfRecordDataXmlFileDto copyOfRecordDataXmlFileDto)
         {
             byte[] coreBytes;

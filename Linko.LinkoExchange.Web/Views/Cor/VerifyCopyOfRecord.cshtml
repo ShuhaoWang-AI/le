@@ -1,0 +1,20 @@
+﻿@model Linko.LinkoExchange.Services.Dto.CopyOfRecordValidationResultDto
+
+@{
+    ViewBag.Title = "title";
+}
+
+<h2>Validation Result</h2>
+
+<p>
+    IsValid?  @Model.Valid
+</p>
+<p>
+    Signature:  @Model.DigitalSignature
+</p>
+<div>
+    Signature Length :  @Model.DigitalSignature.Length;
+</div>
+
+
+

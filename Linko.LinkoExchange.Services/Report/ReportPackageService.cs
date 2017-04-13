@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Program;
+using Linko.LinkoExchange.Services.TimeZone;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -12,13 +13,16 @@ namespace Linko.LinkoExchange.Services.Report
     {
         private readonly IProgramService _programService;
         private readonly ICopyOfRecordService _copyOfRecordService;
+        private readonly ITimeZoneService _timeZoneService;
         public ReportPackageService(
             IProgramService programService,
-            ICopyOfRecordService copyOfRecordService
+            ICopyOfRecordService copyOfRecordService,
+            ITimeZoneService timeZoneService
             )
         {
             _programService = programService;
             _copyOfRecordService = copyOfRecordService;
+            _timeZoneService = timeZoneService;
         }
 
         /// <summary>
@@ -46,9 +50,9 @@ namespace Linko.LinkoExchange.Services.Report
             throw new System.NotImplementedException();
         }
 
-        public bool VerififyCopyOfRecord(int reportPackageId)
+        public CopyOfRecordValidationResultDto VerififyCopyOfRecord(int reportPackageId)
         {
-            return _copyOfRecordService.ValidCoreData(reportPackageId);
+            return _copyOfRecordService.ValidCopyOfRecordData(reportPackageId);
         }
 
         //TODO: to implement this!
@@ -64,6 +68,9 @@ namespace Linko.LinkoExchange.Services.Report
 
             rptDto.OrganizationRegulatoryProgramDto =
                     _programService.GetOrganizationRegulatoryProgram(rptDto.OrganizationRegulatoryProgramId);
+
+            rptDto.SubMissionDateTimeLocal = _timeZoneService
+                .GetLocalizedDateTimeUsingSettingForThisOrg(rptDto.SubMissionDateTime, rptDto.OrganizationRegulatoryProgramId);
 
             return rptDto;
         }

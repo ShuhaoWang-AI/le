@@ -10,6 +10,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public int ReportPackageId { get; set; }
         public string Name { get; set; }
         public DateTime SubMissionDateTime { get; set; }
+        public DateTime SubMissionDateTimeLocal { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
         public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgramDto { get; set; }
     }

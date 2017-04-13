@@ -5,15 +5,13 @@ namespace Linko.LinkoExchange.Services.Report
 {
     public interface IReportPackageService
     {
-        // TODO: Get sample result....  
-
         CopyOfRecordDto GetCopyOfRecordByReportPackageId(int reportPackageId);
         CopyOfRecordDto CreateCopyOfRecordForReportPackage(int reportPackageId);
 
         ReportPackageDto GetReportPackage(int reportPackageId);
         IList<FileStoreDto> GetReportPackageAttachments(int reportPackageId);
 
-        bool VerififyCopyOfRecord(int reportPackageId);
+        CopyOfRecordValidationResultDto VerififyCopyOfRecord(int reportPackageId);
 
         /// <summary>
         /// The file 'Copy of Record Data.xml' contains below:
