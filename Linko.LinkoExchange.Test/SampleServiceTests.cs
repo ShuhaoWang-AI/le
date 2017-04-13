@@ -132,16 +132,18 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
-        public void SaveSample_Details_Concentration_And_Mass_Results_Valid_NotSavingAsReadyToSubmit()
+        public void SaveSample_Details_Concentration_And_Mass_Results_Valid_NotSavingAsReadyToReport()
         {
             var sampleDto = GetTestSampleDto();
+            sampleDto.IsReadyToReport = false;
             _sampleService.SaveSample(sampleDto, false);
         }
 
         [TestMethod]
-        public void SaveSample_Details_Concentration_And_Mass_Results_Valid_SavingAsReadyToSubmit()
+        public void SaveSample_Details_Concentration_And_Mass_Results_Valid_SavingAsReadyToReport()
         {
             var sampleDto = GetTestSampleDto();
+            sampleDto.IsReadyToReport = true;
             _sampleService.SaveSample(sampleDto, true);
         }
 
@@ -193,5 +195,11 @@ namespace Linko.LinkoExchange.Test
             }
         }
 
+        [TestMethod]
+        public void GetSamples_Only_Reported_Status()
+        {
+            var sampleDtos = _sampleService.GetSamples(SampleStatusName.Reported);
+            
+        }
     }
 }

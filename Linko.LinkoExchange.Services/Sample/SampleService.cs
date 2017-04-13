@@ -756,10 +756,10 @@ namespace Linko.LinkoExchange.Services.Sample
                     foundSamples = foundSamples.Where(s => s.IsReadyToReport);
                     break;
                 case SampleStatusName.Reported:
-                    foundSamples = foundSamples.Where(s => s.ReportSamples != null && s.ReportSamples.Count() > 0);
+                    foundSamples = foundSamples.Where(s => s.ReportSamples.Count() > 0);
                     break;
                 case SampleStatusName.DraftOrReadyToReport:
-                    foundSamples = foundSamples.Where(s => s.ReportSamples == null || s.ReportSamples.Count() < 1);
+                    foundSamples = foundSamples.Where(s => s.ReportSamples.Count() < 1);
                     break;
                 //case SampleStatusName.DraftOrReported:
                 //    foundSamples = foundSamples.Where(s => s.SampleStatus.Name == SampleStatusName.Draft.ToString()
