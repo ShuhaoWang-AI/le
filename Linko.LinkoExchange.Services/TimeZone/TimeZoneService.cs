@@ -6,8 +6,6 @@ using Linko.LinkoExchange.Services.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services.TimeZone
 {
@@ -42,7 +40,7 @@ namespace Linko.LinkoExchange.Services.TimeZone
 
         public DateTime GetLocalizedDateTimeUsingSettingForThisOrg(DateTime utcDateTime, int orgId, int regProgramId)
         {
-            var timeZoneId =  Convert.ToInt32(_settings.GetOrganizationSettingValue(orgId, regProgramId, SettingType.TimeZone));
+            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgId, regProgramId, SettingType.TimeZone));
             TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
             return (TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, authorityLocalZone));
         }
@@ -52,6 +50,12 @@ namespace Linko.LinkoExchange.Services.TimeZone
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
             TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
             return (TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, authorityLocalZone));
+        }
+
+        public string GetTimeZoneNameUsingSettingForThisOrg(int orgRegProgramId)
+        {
+            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
+            return GetTimeZoneName(timeZoneId);
         }
 
         public DateTime GetLocalizedDateTimeUsingThisTimeZoneId(DateTime utcDateTime, int timeZoneId)
