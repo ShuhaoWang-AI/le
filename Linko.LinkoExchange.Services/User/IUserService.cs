@@ -1,10 +1,6 @@
 ﻿using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Dto;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -50,7 +46,7 @@ namespace Linko.LinkoExchange.Services.User
         void UpdateProfile(UserDto dto);
 
         RegistrationResult UpdateProfile(UserDto dto, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions);
- 
+
         RegistrationResult ValidateUserProfileData(UserDto userProfile);
 
         RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions);
@@ -76,5 +72,6 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="isApproved"></param>
         RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved);
 
+        ICollection<UserDto> GetOrgRegProgSignators(int orgRegProgId);
     }
 }

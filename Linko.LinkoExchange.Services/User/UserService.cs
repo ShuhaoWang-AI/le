@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
-using Linko.LinkoExchange.Core.Extensions;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
@@ -12,7 +11,6 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
 using Microsoft.AspNet.Identity;
-using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using System.Data.Entity.Validation;
 using Linko.LinkoExchange.Core.Validation;
@@ -541,7 +539,7 @@ namespace Linko.LinkoExchange.Services.User
             //To ensure we don't send duplicate admin emails to the same person (if they are Auth admin and locked person belongs
             //to more than one IU under the same program) 
             var adminEmailList = new List<string>();
-             
+
             foreach (var program in programs.ToList())
             {
                 //Find admin users in each of these
@@ -564,7 +562,7 @@ namespace Linko.LinkoExchange.Services.User
                         _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements, perProgram);
                         adminEmailList.Add(adminEmail);
                     }
-                    
+
                 }
 
                 //Get authority's org id, if it exists. If not, they ARE the authority
@@ -1382,6 +1380,23 @@ namespace Linko.LinkoExchange.Services.User
 
             return new RegistrationResultDto() { Result = RegistrationResult.Success };
 
+        }
+
+        public ICollection<UserDto> GetOrgRegProgSignators(int orgRegProgId)
+        {
+            var signatoryIds = _dbContext.OrganizationRegulatoryProgramUsers.Where(i => i.IsEnabled && i.IsSignatory &&
+                                                                           i.IsRegistrationApproved && !i.IsRegistrationDenied)
+                            .Select(b => b.UserProfileId);
+            var userProfiles = _dbContext.Users.Where(i => i.IsAccountLocked == false && i.IsAccountResetRequired == false
+                                                       && signatoryIds.Contains(i.UserProfileId));
+
+            var userDtos = new List<UserDto>();
+            foreach (var userProfile in userProfiles)
+            {
+                var userDto = _mapHelper.GetUserDtoFromUserProfile(userProfile);
+                userDtos.Add(userDto);
+            }
+            return userDtos;
         }
 
         #endregion
