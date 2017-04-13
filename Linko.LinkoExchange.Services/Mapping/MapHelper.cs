@@ -946,7 +946,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 existingSample = new Core.Domain.Sample();
             }
 
-            existingSample.Name = sampleDto.Name;
+            //existingSample.Name = sampleDto.Name; //set after exit this method
             existingSample.MonitoringPointId = sampleDto.MonitoringPointId;
             existingSample.MonitoringPointName = sampleDto.MonitoringPointName;
             existingSample.CtsEventTypeId = sampleDto.CtsEventTypeId;
@@ -959,8 +959,8 @@ namespace Linko.LinkoExchange.Services.Mapping
             //existingSample.EndDateTimeUtc = sampleDto.EndDateTimeUtc;
             existingSample.IsCalculated = sampleDto.IsCalculated;
             existingSample.SampleStatusId = sampleDto.SampleStatusId;
-            existingSample.OrganizationTypeId = sampleDto.OrganizationTypeId;
-            existingSample.OrganizationRegulatoryProgramId = sampleDto.OrganizationRegulatoryProgramId;
+            //existingSample.OrganizationTypeId = sampleDto.OrganizationTypeId; //set after we exit this method
+            //existingSample.OrganizationRegulatoryProgramId = sampleDto.OrganizationRegulatoryProgramId; //set after we exit this method
 
             return existingSample;
         }

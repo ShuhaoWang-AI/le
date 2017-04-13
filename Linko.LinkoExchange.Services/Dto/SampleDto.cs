@@ -9,7 +9,7 @@ namespace Linko.LinkoExchange.Services.Dto
     public class SampleDto
     {
         public int? SampleId { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } //UI should only read this as it is automatically set based on settings
         public int MonitoringPointId { get; set; }
         public string MonitoringPointName { get; set; }
         public int CtsEventTypeId { get; set; }
@@ -23,8 +23,8 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool IsCalculated { get; set; }
         public int SampleStatusId { get; set; }
         public string SampleStatusName { get; set; }
-        public int OrganizationTypeId { get; set; }
-        public int OrganizationRegulatoryProgramId { get; set; }
+        //public int OrganizationTypeId { get; set; }
+        //public int OrganizationRegulatoryProgramId { get; set; }
         public DateTime LastModificationDateTimeLocal { get; set; }
         public string LastModifierFullName { get; set; }
         

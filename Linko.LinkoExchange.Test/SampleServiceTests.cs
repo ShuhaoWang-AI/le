@@ -77,8 +77,8 @@ namespace Linko.LinkoExchange.Test
             sampleDto.CtsEventTypeId = 1;
             sampleDto.CtsEventTypeName = "SNC-P";
             sampleDto.CtsEventCategoryName = "Sample Category 1";
-            sampleDto.OrganizationTypeId = 1;
-            sampleDto.OrganizationRegulatoryProgramId = 1;
+            //sampleDto.OrganizationTypeId = 1;
+            //sampleDto.OrganizationRegulatoryProgramId = 1;
             sampleDto.FlowUnitId = 10;
             sampleDto.FlowUnitName = "ppd";
             sampleDto.FlowValue = 808.1;
@@ -135,7 +135,7 @@ namespace Linko.LinkoExchange.Test
         public void SaveSample_Details_Concentration_And_Mass_Results_Valid_NotSavingAsReadyToSubmit()
         {
             var sampleDto = GetTestSampleDto();
-            _sampleService.SaveSample(sampleDto, true);
+            _sampleService.SaveSample(sampleDto, false);
         }
 
         [TestMethod]
