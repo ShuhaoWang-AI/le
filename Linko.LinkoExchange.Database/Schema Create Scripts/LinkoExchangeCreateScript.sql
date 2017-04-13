@@ -2216,36 +2216,6 @@ BEGIN
 END
 GO
 
-IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tSampleStatus') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
-BEGIN
-	PRINT CHAR(13)
-    PRINT CHAR(13)
-    PRINT 'Create tSampleStatus'
-    PRINT '--------------------'
-    
-    CREATE TABLE dbo.tSampleStatus 
-    (
-        SampleStatusId                  int IDENTITY(1,1) NOT NULL
-        , Name                          varchar(100) NOT NULL
-        , Description                   varchar(500) NULL
-        , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
-        , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
-        , LastModifierUserId            int NULL  
-    
-        CONSTRAINT PK_tSampleStatus PRIMARY KEY CLUSTERED 
-        (
-	        SampleStatusId ASC
-        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tSampleStatus_Name UNIQUE 
-        (
-            Name ASC
-        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-    ) ON [LinkoExchange_FG1_Data]
-    
-    ALTER TABLE dbo.tSampleStatus ADD CONSTRAINT DF_tSampleStatus_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
-END
-GO
-
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tSample') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
 BEGIN
 	PRINT CHAR(13)
@@ -2268,7 +2238,7 @@ BEGIN
         , StartDateTimeUtc                  datetimeoffset(0) NOT NULL
         , EndDateTimeUtc                    datetimeoffset(0) NOT NULL
         , IsCalculated                      bit NOT NULL
-        , SampleStatusId                    int NOT NULL
+        , IsReadyToReport                   bit NOT NULL
         , OrganizationTypeId                int NOT NULL
         , OrganizationRegulatoryProgramId   int NOT NULL
         , CreationDateTimeUtc               datetimeoffset(0) NOT NULL  
@@ -2279,10 +2249,6 @@ BEGIN
         (
 	        SampleId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT FK_tSample_tSampleStatus FOREIGN KEY 
-		(
-			SampleStatusId
-		) REFERENCES dbo.tSampleStatus(SampleStatusId)
         , CONSTRAINT FK_tSample_tOrganizationType FOREIGN KEY 
 		(
 			OrganizationTypeId
@@ -2295,11 +2261,6 @@ BEGIN
     
     ALTER TABLE dbo.tSample ADD CONSTRAINT DF_tSample_IsCalculated DEFAULT 0 FOR IsCalculated
     ALTER TABLE dbo.tSample ADD CONSTRAINT DF_tSample_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
-
-    CREATE NONCLUSTERED INDEX IX_tSample_SampleStatusId ON dbo.tSample
-	(
-		SampleStatusId ASC
-	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
 
     CREATE NONCLUSTERED INDEX IX_tSample_OrganizationTypeId ON dbo.tSample
 	(
@@ -5629,21 +5590,6 @@ BEGIN
 		VALUES ('.txt', 'text/plain')
     INSERT INTO dbo.tFileType (Extension, Description)
 		VALUES ('.csv', 'text/csv')
-END
-
-IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tSampleStatus)
-BEGIN
-    PRINT CHAR(13)
-    PRINT CHAR(13)
-    PRINT 'Add records to tSampleStatus'
-    PRINT '----------------------------'
-    
-    INSERT INTO dbo.tSampleStatus (Name, Description)
-		VALUES ('Draft', 'Draft')
-    INSERT INTO dbo.tSampleStatus (Name, Description)
-		VALUES ('ReadyToReport', 'Ready to Report')
-    INSERT INTO dbo.tSampleStatus (Name, Description)
-		VALUES ('Reported', 'Reported')
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tReportElementCategory)
