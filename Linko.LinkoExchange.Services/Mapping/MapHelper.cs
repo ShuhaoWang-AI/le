@@ -925,8 +925,8 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             dto.CollectionMethodId = sample.CollectionMethodId;
             dto.CollectionMethodName = sample.CollectionMethodName;
-            dto.SampleStatusId = sample.SampleStatusId;
-            dto.SampleStatusName = sample.SampleStatus.Name;
+            dto.IsReadyToReport = sample.IsReadyToReport;
+            //dto.SampleStatusName = set outside after existing this method
             dto.LabSampleIdentifier = sample.LabSampleIdentifier;
 
             //Handle this in calling code
@@ -958,7 +958,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             //existingSample.StartDateTimeUtc = sampleDto.StartDateTimeUtc;
             //existingSample.EndDateTimeUtc = sampleDto.EndDateTimeUtc;
             existingSample.IsCalculated = sampleDto.IsCalculated;
-            existingSample.SampleStatusId = sampleDto.SampleStatusId;
+            existingSample.IsReadyToReport = sampleDto.IsReadyToReport;
             //existingSample.OrganizationTypeId = sampleDto.OrganizationTypeId; //set after we exit this method
             //existingSample.OrganizationRegulatoryProgramId = sampleDto.OrganizationRegulatoryProgramId; //set after we exit this method
 

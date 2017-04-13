@@ -84,7 +84,7 @@ namespace Linko.LinkoExchange.Test
             sampleDto.FlowValue = 808.1;
             sampleDto.StartDateTimeLocal = DateTime.Now;
             sampleDto.EndDateTimeLocal = DateTime.Now;
-            sampleDto.SampleStatusId = 1;
+            sampleDto.IsReadyToReport = true;
             sampleDto.IsCalculated = false;
             var resultDtos = new List<SampleResultDto>();
 

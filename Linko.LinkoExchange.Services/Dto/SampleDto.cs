@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Linko.LinkoExchange.Core.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,8 +22,8 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTime StartDateTimeLocal { get; set; }
         public DateTime EndDateTimeLocal { get; set; }
         public bool IsCalculated { get; set; }
-        public int SampleStatusId { get; set; }
-        public string SampleStatusName { get; set; }
+        public bool IsReadyToReport { get; set; }
+        public SampleStatusName SampleStatusName { get; set; }
         //public int OrganizationTypeId { get; set; }
         //public int OrganizationRegulatoryProgramId { get; set; }
         public DateTime LastModificationDateTimeLocal { get; set; }

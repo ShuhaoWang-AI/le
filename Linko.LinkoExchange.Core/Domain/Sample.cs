@@ -49,8 +49,7 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public bool IsCalculated { get; set; }
 
-        public int SampleStatusId { get; set; }
-        public virtual SampleStatus SampleStatus { get; set; }
+        public bool IsReadyToReport { get; set; }
 
         public int OrganizationTypeId { get; set; }
         public virtual OrganizationType OrganizationType { get; set; }

@@ -127,7 +127,6 @@
     <Compile Include="Domain\SampleRequirement.cs" />
     <Compile Include="Domain\SampleResult.cs" />
     <Compile Include="Domain\SampleFrequency.cs" />
-    <Compile Include="Domain\SampleStatus.cs" />
     <Compile Include="Domain\SettingTemplate.cs" />
     <Compile Include="Domain\SignatoryRequest.cs" />
     <Compile Include="Domain\SignatoryRequestStatus.cs" />

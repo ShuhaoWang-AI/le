@@ -108,7 +108,6 @@
     <Compile Include="Mapping\ReportStatusMap.cs" />
     <Compile Include="Mapping\RepudiationReasonMap.cs" />
     <Compile Include="Mapping\SampleRequirementMap.cs" />
-    <Compile Include="Mapping\SampleStatusMap.cs" />
     <Compile Include="Mapping\SampleResultMap.cs" />
     <Compile Include="Mapping\SampleMap.cs" />
     <Compile Include="Mapping\ParameterMap.cs" />

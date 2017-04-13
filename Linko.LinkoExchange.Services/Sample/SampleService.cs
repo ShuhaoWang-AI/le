@@ -258,15 +258,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
                     if (this.IsValidSample(sampleDto, isSavingAsReadyToReport, isSuppressExceptions: false))
                     {
-                        if (isSavingAsReadyToReport)
-                        {
-                            //Update the sample status to "Ready to Report"
-                            var sampleStatusReadyToReport = _dbContext.SampleStatuses
-                                .Single(ss => ss.Name == SampleStatusName.ReadyToReport.ToString());
-
-                            sampleDto.SampleStatusId = sampleStatusReadyToReport.SampleStatusId;
-
-                        }
+                        sampleDto.IsReadyToReport = isSavingAsReadyToReport;
                         sampleId = this.SimplePersist(sampleDto);
                         transaction.Commit();
                     }
@@ -685,11 +677,16 @@ namespace Linko.LinkoExchange.Services.Sample
             _logger.Info($"Enter SampleService.GetSampleDetails. sampleId={sampleId}");
 
             var sample = _dbContext.Samples
-                .Include(s => s.SampleStatus)
+                .Include(s => s.ReportSamples)
                 .Include(s => s.SampleResults)
                 .Single(s => s.SampleId == sampleId);
 
             var dto = this.GetSampleDetails(sample);
+
+            if (sample.ReportSamples != null && sample.ReportSamples.Count() > 0)
+            {
+                dto.SampleStatusName = SampleStatusName.Reported;
+            }
 
             _logger.Info($"Leaving SampleService.GetSampleDetails. sampleId={sampleId}");
 
@@ -731,7 +728,7 @@ namespace Linko.LinkoExchange.Services.Sample
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
             var dtos = new List<SampleDto>();
             var foundSamples = _dbContext.Samples
-                .Include(s => s.SampleStatus)
+                .Include(s => s.ReportSamples)
                 .Include(s => s.SampleResults)
                 .Where(s => s.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
 
@@ -753,24 +750,27 @@ namespace Linko.LinkoExchange.Services.Sample
                     //don't filter any further
                     break;
                 case SampleStatusName.Draft:
+                    foundSamples = foundSamples.Where(s => !s.IsReadyToReport);
+                    break;
                 case SampleStatusName.ReadyToReport:
+                    foundSamples = foundSamples.Where(s => s.IsReadyToReport);
+                    break;
                 case SampleStatusName.Reported:
-                    foundSamples = foundSamples.Where(s => s.SampleStatus.Name == status.ToString());
+                    foundSamples = foundSamples.Where(s => s.ReportSamples != null && s.ReportSamples.Count() > 0);
                     break;
                 case SampleStatusName.DraftOrReadyToReport:
-                    foundSamples = foundSamples.Where(s => s.SampleStatus.Name == SampleStatusName.Draft.ToString()
-                            || s.SampleStatus.Name == SampleStatusName.ReadyToReport.ToString());
+                    foundSamples = foundSamples.Where(s => s.ReportSamples == null || s.ReportSamples.Count() < 1);
                     break;
-                case SampleStatusName.DraftOrReported:
-                    foundSamples = foundSamples.Where(s => s.SampleStatus.Name == SampleStatusName.Draft.ToString()
-                            || s.SampleStatus.Name == SampleStatusName.Reported.ToString());
-                    break;
-                case SampleStatusName.ReadyToReportOrReported:
-                    foundSamples = foundSamples.Where(s => s.SampleStatus.Name == SampleStatusName.ReadyToReport.ToString()
-                            || s.SampleStatus.Name == SampleStatusName.Reported.ToString());
-                    break;
+                //case SampleStatusName.DraftOrReported:
+                //    foundSamples = foundSamples.Where(s => s.SampleStatus.Name == SampleStatusName.Draft.ToString()
+                //            || s.SampleStatus.Name == SampleStatusName.Reported.ToString());
+                //    break;
+                //case SampleStatusName.ReadyToReportOrReported:
+                //    foundSamples = foundSamples.Where(s => s.SampleStatus.Name == SampleStatusName.ReadyToReport.ToString()
+                //            || s.SampleStatus.Name == SampleStatusName.Reported.ToString());
+                //    break;
                 default:
-                    throw new Exception($"Unknown SampleStatusName = {status}");
+                    throw new Exception($"Unhandled SampleStatusName = {status}");
             }
 
             foreach (var sample in foundSamples.ToList())

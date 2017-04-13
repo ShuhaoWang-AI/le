@@ -35,10 +35,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.IsCalculated).IsRequired();
 
-            HasRequired(a => a.SampleStatus)
-                .WithMany()
-                .HasForeignKey(c => c.SampleStatusId)
-                .WillCascadeOnDelete(false);
+            Property(x => x.IsReadyToReport).IsRequired();
 
             HasRequired(a => a.OrganizationType)
                 .WithMany()
