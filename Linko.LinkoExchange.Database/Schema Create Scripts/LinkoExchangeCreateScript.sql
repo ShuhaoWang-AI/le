@@ -2135,14 +2135,14 @@ BEGIN
     
     CREATE TABLE dbo.tSampleRequirement 
     (
-        SampleRequirementId             int IDENTITY(1,1) NOT NULL
-        , MonitoringPointParameterId    int NOT NULL
-        , PeriodStartDateTimeUtc        datetimeoffset(0) NOT NULL  
-        , PeriodEndDateTimeUtc          datetimeoffset(0) NOT NULL
-        , SamplesRequired               int NOT NULL
-        , LimitEffectiveDateTimeUtc     datetimeoffset(0) NOT NULL
-        , LimitRetirementDateTimeUtc    datetimeoffset(0) NULL
-        , OrganizationTypeId            int NOT NULL
+        SampleRequirementId					int IDENTITY(1,1) NOT NULL
+        , MonitoringPointParameterId		int NOT NULL
+        , PeriodStartDateTimeUtc			datetimeoffset(0) NOT NULL  
+        , PeriodEndDateTimeUtc				datetimeoffset(0) NOT NULL
+        , SamplesRequired					int NOT NULL
+        , LimitEffectiveDateTimeUtc			datetimeoffset(0) NOT NULL
+        , LimitRetirementDateTimeUtc		datetimeoffset(0) NULL
+        , ByOrganizationRegulatoryProgramId	int NOT NULL
     
         CONSTRAINT PK_tSampleRequirement PRIMARY KEY CLUSTERED 
         (
@@ -2152,10 +2152,10 @@ BEGIN
 		(
 			MonitoringPointParameterId
 		) REFERENCES dbo.tMonitoringPointParameter(MonitoringPointParameterId)
-        , CONSTRAINT FK_tSampleRequirement_tOrganizationType FOREIGN KEY 
+        , CONSTRAINT FK_tSampleRequirement_tOrganizationRegulatoryProgram FOREIGN KEY 
 		(
-			OrganizationTypeId
-		) REFERENCES dbo.tOrganizationType(OrganizationTypeId)
+			ByOrganizationRegulatoryProgramId
+		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
     ) ON [LinkoExchange_FG1_Data]
     
     CREATE NONCLUSTERED INDEX IX_tSampleRequirement_MonitoringPointParameterId ON dbo.tSampleRequirement
@@ -2163,9 +2163,9 @@ BEGIN
 		MonitoringPointParameterId ASC
 	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
 
-    CREATE NONCLUSTERED INDEX IX_tSampleRequirement_OrganizationTypeId ON dbo.tSampleRequirement
+    CREATE NONCLUSTERED INDEX IX_tSampleRequirement_ByOrganizationRegulatoryProgramId ON dbo.tSampleRequirement
 	(
-		OrganizationTypeId ASC
+		ByOrganizationRegulatoryProgramId ASC
 	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
 END
 GO
@@ -2225,51 +2225,51 @@ BEGIN
     
     CREATE TABLE dbo.tSample 
     (
-        SampleId                            int IDENTITY(1,1) NOT NULL
-        , Name                              varchar(100) NOT NULL
-        , MonitoringPointId                 int NOT NULL
-        , MonitoringPointName               varchar(100) NOT NULL
-        , CtsEventTypeId                    int NOT NULL
-        , CtsEventTypeName                  varchar(100) NOT NULL
-        , CtsEventCategoryName              varchar(100) NOT NULL
-        , CollectionMethodId                int NOT NULL
-        , CollectionMethodName              varchar(100) NOT NULL
-        , LabSampleIdentifier               varchar(50) NULL
-        , StartDateTimeUtc                  datetimeoffset(0) NOT NULL
-        , EndDateTimeUtc                    datetimeoffset(0) NOT NULL
-        , IsCalculated                      bit NOT NULL
-        , IsReadyToReport                   bit NOT NULL
-        , OrganizationTypeId                int NOT NULL
-        , OrganizationRegulatoryProgramId   int NOT NULL
-        , CreationDateTimeUtc               datetimeoffset(0) NOT NULL  
-        , LastModificationDateTimeUtc       datetimeoffset(0) NULL  
-        , LastModifierUserId                int NULL  
+        SampleId								int IDENTITY(1,1) NOT NULL
+        , Name									varchar(100) NOT NULL
+        , MonitoringPointId						int NOT NULL
+        , MonitoringPointName					varchar(100) NOT NULL
+        , CtsEventTypeId						int NOT NULL
+        , CtsEventTypeName						varchar(100) NOT NULL
+        , CtsEventCategoryName					varchar(100) NOT NULL
+        , CollectionMethodId					int NOT NULL
+        , CollectionMethodName					varchar(100) NOT NULL
+        , LabSampleIdentifier					varchar(50) NULL
+        , StartDateTimeUtc						datetimeoffset(0) NOT NULL
+        , EndDateTimeUtc						datetimeoffset(0) NOT NULL
+        , IsCalculated							bit NOT NULL
+        , IsReadyToReport						bit NOT NULL
+        , ByOrganizationRegulatoryProgramId     int NOT NULL
+        , ForOrganizationRegulatoryProgramId	int NOT NULL
+        , CreationDateTimeUtc					datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc			datetimeoffset(0) NULL  
+        , LastModifierUserId					int NULL  
     
         CONSTRAINT PK_tSample PRIMARY KEY CLUSTERED 
         (
 	        SampleId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT FK_tSample_tOrganizationType FOREIGN KEY 
+        , CONSTRAINT FK_tSample_tOrganizationRegulatoryProgram_By FOREIGN KEY 
 		(
-			OrganizationTypeId
-		) REFERENCES dbo.tOrganizationType(OrganizationTypeId)
-        , CONSTRAINT FK_tSample_tOrganizationRegulatoryProgram FOREIGN KEY 
+			ByOrganizationRegulatoryProgramId
+		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
+		, CONSTRAINT FK_tSample_tOrganizationRegulatoryProgram_For FOREIGN KEY 
 		(
-			OrganizationRegulatoryProgramId
+			ForOrganizationRegulatoryProgramId
 		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
     ) ON [LinkoExchange_FG1_Data]
     
     ALTER TABLE dbo.tSample ADD CONSTRAINT DF_tSample_IsCalculated DEFAULT 0 FOR IsCalculated
     ALTER TABLE dbo.tSample ADD CONSTRAINT DF_tSample_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
 
-    CREATE NONCLUSTERED INDEX IX_tSample_OrganizationTypeId ON dbo.tSample
+    CREATE NONCLUSTERED INDEX IX_tSample_OrganizationRegulatoryProgramId_By ON dbo.tSample
 	(
-		OrganizationTypeId ASC
+		ByOrganizationRegulatoryProgramId ASC
 	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
 
-    CREATE NONCLUSTERED INDEX IX_tSample_OrganizationRegulatoryProgramId ON dbo.tSample
+    CREATE NONCLUSTERED INDEX IX_tSample_OrganizationRegulatoryProgramId_For ON dbo.tSample
 	(
-		OrganizationRegulatoryProgramId ASC
+		ForOrganizationRegulatoryProgramId ASC
 	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
 END
 GO

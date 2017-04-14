@@ -65,11 +65,6 @@ namespace Linko.LinkoExchange.Services.Sample
             _logger.Info($"Enter SampleService.SimplePersist. sampleDto.SampleId.Value={sampleIdString}");
 
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            int orgTypeId = _dbContext.OrganizationRegulatoryPrograms //Could be something other than IU in the future -- must lookup.
-                .Include(org => org.Organization)
-                .Single(org => org.OrganizationRegulatoryProgramId == currentOrgRegProgramId)
-                .Organization.OrganizationTypeId;
-
             var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
@@ -124,8 +119,8 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
 
                 sampleToPersist.Name = sampleName;
-                sampleToPersist.OrganizationTypeId = orgTypeId; //Could be something other than IU in the future -- must lookup.
-                sampleToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
+                sampleToPersist.ByOrganizationRegulatoryProgramId = currentOrgRegProgramId; //these are the same only per current workflow
+                sampleToPersist.ForOrganizationRegulatoryProgramId = currentOrgRegProgramId; //these are the same only per current workflow
                 sampleToPersist.StartDateTimeUtc = sampleStartDateTimeUtc;
                 sampleToPersist.EndDateTimeUtc = sampleEndDateTimeUtc;
                 sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
@@ -397,7 +392,8 @@ namespace Linko.LinkoExchange.Services.Sample
             //  - if calc mass loading, we have mass value(s)
 
             bool isValidFlowValueExists = false;
-            if (sampleDto.FlowValue != null && sampleDto.FlowUnitId != null && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
+            if (sampleDto.FlowValue != null && sampleDto.FlowUnitId != null && 
+                sampleDto.FlowUnitId.Value > 0 && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
             {
                 isValidFlowValueExists = true;
             }
@@ -735,7 +731,7 @@ namespace Linko.LinkoExchange.Services.Sample
             var foundSamples = _dbContext.Samples
                 .Include(s => s.ReportSamples)
                 .Include(s => s.SampleResults)
-                .Where(s => s.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+                .Where(s => s.ForOrganizationRegulatoryProgramId == currentOrgRegProgramId);
 
             if (startDate.HasValue)
             {

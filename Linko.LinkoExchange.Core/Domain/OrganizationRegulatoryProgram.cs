@@ -66,7 +66,11 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public virtual ICollection<ParameterGroup> ParameterGroups { get; set; }
 
-        public virtual ICollection<Sample> Samples { get; set; }
+        public virtual ICollection<Sample> ByOrganizationRegulatoryProgram_Samples { get; set; }
+
+        public virtual ICollection<Sample> ForOrganizationRegulatoryProgram_Samples { get; set; }
+
+        public virtual ICollection<SampleRequirement> SampleRequirements { get; set; }
 
         public virtual ICollection<FileStore> FileStores { get; set; }
 

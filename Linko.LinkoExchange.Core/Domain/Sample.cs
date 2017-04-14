@@ -51,14 +51,17 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public bool IsReadyToReport { get; set; }
 
-        public int OrganizationTypeId { get; set; }
-        public virtual OrganizationType OrganizationType { get; set; }
+        /// <summary>
+        /// Typical value: Industry Regulatory Program id. May be the Authority in the future.
+        /// </summary>
+        public int ByOrganizationRegulatoryProgramId { get; set; }
+        public virtual OrganizationRegulatoryProgram ByOrganizationRegulatoryProgram { get; set; }
 
         /// <summary>
         /// Typical value: Industry Regulatory Program id.
         /// </summary>
-        public int OrganizationRegulatoryProgramId { get; set; }
-        public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
+        public int ForOrganizationRegulatoryProgramId { get; set; }
+        public virtual OrganizationRegulatoryProgram ForOrganizationRegulatoryProgram { get; set; }
 
         public DateTimeOffset CreationDateTimeUtc { get; set; }
 

@@ -26,10 +26,10 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.LimitRetirementDateTimeUtc).IsOptional();
 
-            HasRequired(a => a.OrganizationType)
-                 .WithMany()
-                 .HasForeignKey(c => c.OrganizationTypeId)
-                 .WillCascadeOnDelete(false);
+            HasRequired(a => a.ByOrganizationRegulatoryProgram)
+                .WithMany(b => b.SampleRequirements)
+                .HasForeignKey(c => c.ByOrganizationRegulatoryProgramId)
+                .WillCascadeOnDelete(false);
         }
     }
 }

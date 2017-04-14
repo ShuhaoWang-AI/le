@@ -37,14 +37,14 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.IsReadyToReport).IsRequired();
 
-            HasRequired(a => a.OrganizationType)
-                .WithMany()
-                .HasForeignKey(c => c.OrganizationTypeId)
+            HasRequired(a => a.ByOrganizationRegulatoryProgram)
+                .WithMany(b => b.ByOrganizationRegulatoryProgram_Samples)
+                .HasForeignKey(c => c.ByOrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(false);
 
-            HasRequired(a => a.OrganizationRegulatoryProgram)
-                .WithMany(b => b.Samples)
-                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
+            HasRequired(a => a.ForOrganizationRegulatoryProgram)
+                .WithMany(b => b.ForOrganizationRegulatoryProgram_Samples)
+                .HasForeignKey(c => c.ForOrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(false);
 
             Property(x => x.CreationDateTimeUtc).IsRequired();

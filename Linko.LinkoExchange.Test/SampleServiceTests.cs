@@ -77,7 +77,7 @@ namespace Linko.LinkoExchange.Test
             sampleDto.CtsEventTypeId = 1;
             sampleDto.CtsEventTypeName = "SNC-P";
             sampleDto.CtsEventCategoryName = "Sample Category 1";
-            //sampleDto.FlowUnitId = 10;
+            sampleDto.FlowUnitId = 10;
             sampleDto.FlowUnitName = "ppd";
             sampleDto.FlowValue = 808.1;
             sampleDto.StartDateTimeLocal = DateTime.Now;
@@ -142,6 +142,7 @@ namespace Linko.LinkoExchange.Test
         public void SaveSample_Details_Concentration_And_Mass_Results_Valid_SavingAsReadyToReport()
         {
             var sampleDto = GetTestSampleDto();
+            //sampleDto.FlowUnitId = -1;
             sampleDto.IsReadyToReport = true;
             _sampleService.SaveSample(sampleDto);
         }
