@@ -58,14 +58,7 @@ namespace Linko.LinkoExchange.Test
                 actualSettings);
         }
 
-
-        [TestMethod]
-        public void SaveSample_DetailsOnly_NoResults_Valid()
-        {
-            var sampleDto = new SampleDto();
-            _sampleService.SaveSample(sampleDto);
-        }
-
+        #region Private helper functions
         private SampleDto GetTestSampleDto()
         {
             var sampleDto = new SampleDto();
@@ -130,6 +123,127 @@ namespace Linko.LinkoExchange.Test
             return sampleDto;
         }
 
+        private void RemoveAllSamplesFromDb()
+        {
+            var sampleDtos = _sampleService.GetSamples(SampleStatusName.All);
+            foreach (var sampleDto in sampleDtos)
+            {
+                _sampleService.DeleteSample(sampleDto.SampleId.Value);
+            }
+        }
+
+        #endregion
+
+        [TestMethod]
+        public void SaveSample_Invalid_Sample_Type()
+        {
+            var sampleDto = new SampleDto();
+            try
+            {
+                _sampleService.SaveSample(sampleDto);
+            }
+            catch (RuleViolationException rve)
+            {
+                //Sample Type is required.
+                Assert.AreEqual("Sample Type is required.", rve.ValidationIssues[0].ErrorMessage);
+
+            }
+        }
+
+        [TestMethod]
+        public void SaveSample_Invalid_Collection_Method()
+        {
+            var sampleDto = new SampleDto();
+            sampleDto.CtsEventTypeId = 1;
+            try
+            {
+                _sampleService.SaveSample(sampleDto);
+            }
+            catch (RuleViolationException rve)
+            {
+                //Sample Type is required.
+                Assert.AreEqual("Collection Method is required.", rve.ValidationIssues[0].ErrorMessage);
+
+            }
+        }
+
+        [TestMethod]
+        public void SaveSample_Invalid_Start_Date()
+        {
+            var sampleDto = new SampleDto();
+            sampleDto.CtsEventTypeId = 1;
+            sampleDto.CollectionMethodId = 1;
+            try
+            {
+                _sampleService.SaveSample(sampleDto);
+            }
+            catch (RuleViolationException rve)
+            {
+                //Sample Type is required.
+                Assert.AreEqual("Start Date/Time is required.", rve.ValidationIssues[0].ErrorMessage);
+
+            }
+        }
+
+        [TestMethod]
+        public void SaveSample_Invalid_End_Date()
+        {
+            var sampleDto = new SampleDto();
+            sampleDto.CtsEventTypeId = 1;
+            sampleDto.CollectionMethodId = 1;
+            sampleDto.StartDateTimeLocal = DateTime.Now;
+            try
+            {
+                _sampleService.SaveSample(sampleDto);
+            }
+            catch (RuleViolationException rve)
+            {
+                //Sample Type is required.
+                Assert.AreEqual("End Date/Time is required.", rve.ValidationIssues[0].ErrorMessage);
+
+            }
+        }
+
+        [TestMethod]
+        public void SaveSample_Future_Start_Date()
+        {
+            var sampleDto = new SampleDto();
+            sampleDto.CtsEventTypeId = 1;
+            sampleDto.CollectionMethodId = 1;
+            sampleDto.StartDateTimeLocal = DateTime.Now.AddDays(1);
+            sampleDto.EndDateTimeLocal = DateTime.Now.AddDays(-1);
+            try
+            {
+                _sampleService.SaveSample(sampleDto);
+            }
+            catch (RuleViolationException rve)
+            {
+                //Sample Type is required.
+                Assert.AreEqual("Sample dates cannot be future dates.", rve.ValidationIssues[0].ErrorMessage);
+
+            }
+        }
+
+        [TestMethod]
+        public void SaveSample_Future_End_Date()
+        {
+            var sampleDto = new SampleDto();
+            sampleDto.CtsEventTypeId = 1;
+            sampleDto.CollectionMethodId = 1;
+            sampleDto.StartDateTimeLocal = DateTime.Now.AddDays(-1);
+            sampleDto.EndDateTimeLocal = DateTime.Now.AddDays(1);
+            try
+            {
+                _sampleService.SaveSample(sampleDto);
+            }
+            catch (RuleViolationException rve)
+            {
+                //Sample Type is required.
+                Assert.AreEqual("Sample dates cannot be future dates.", rve.ValidationIssues[0].ErrorMessage);
+
+            }
+        }
+
         [TestMethod]
         public void SaveSample_Details_Concentration_And_Mass_Results_Valid_NotSavingAsReadyToReport()
         {
@@ -139,12 +253,64 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
-        public void SaveSample_Details_Concentration_And_Mass_Results_Valid_SavingAsReadyToReport()
+        public void SaveSample_ReadyToReport_Mass_Results_Missing_Flow_Unit()
         {
             var sampleDto = GetTestSampleDto();
-            //sampleDto.FlowUnitId = -1;
+            sampleDto.FlowUnitId = null;
             sampleDto.IsReadyToReport = true;
-            _sampleService.SaveSample(sampleDto);
+            try {
+                _sampleService.SaveSample(sampleDto);
+            }
+            catch (RuleViolationException rve)
+            {
+                //Sample Type is required.
+                Assert.AreEqual("You must provide valid a flow value to calculate mass loading results.", rve.ValidationIssues[0].ErrorMessage);
+
+            }
+        }
+
+        [TestMethod]
+        public void SaveSample_ReadyToReport_Mass_Results_Missing_Flow_Value()
+        {
+            var sampleDto = GetTestSampleDto();
+            sampleDto.FlowUnitId = 1;
+            sampleDto.FlowValue = null;
+            sampleDto.IsReadyToReport = true;
+            try
+            {
+                _sampleService.SaveSample(sampleDto);
+            }
+            catch (RuleViolationException rve)
+            {
+                //Sample Type is required.
+                Assert.AreEqual("You must provide valid a flow value to calculate mass loading results.", rve.ValidationIssues[0].ErrorMessage);
+
+            }
+        }
+
+        [TestMethod]
+        public void SaveSample_ReadyToReport_NonNumeric_Qualifier_With_Value()
+        {
+            var sampleDto = GetTestSampleDto();
+            var sampleResults = new List<SampleResultDto>();
+            var invalidResultDto = new SampleResultDto()
+            {
+                Qualifier = "ND",
+                Value = 99
+            };
+            sampleResults.Add(invalidResultDto);
+            sampleDto.SampleResults = sampleResults;
+            sampleDto.IsReadyToReport = true;
+            try
+            {
+                _sampleService.SaveSample(sampleDto);
+            }
+            catch (RuleViolationException rve)
+            {
+                //Sample Type is required.
+                Assert.AreEqual("Result values and result units must be provided together.", rve.ValidationIssues[0].ErrorMessage);
+
+            }
         }
 
         [TestMethod]
