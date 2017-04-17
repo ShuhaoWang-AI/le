@@ -73,5 +73,6 @@ namespace Linko.LinkoExchange.Services.User
         RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved);
 
         ICollection<UserDto> GetOrgRegProgSignators(int orgRegProgId);
+        ICollection<UserDto> GetAuthorityAdministratorAndStandardUsers(int authorityOrganizationId);
     }
 }

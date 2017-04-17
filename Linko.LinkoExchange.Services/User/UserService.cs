@@ -1399,6 +1399,28 @@ namespace Linko.LinkoExchange.Services.User
             return userDtos;
         }
 
+        public ICollection<UserDto> GetAuthorityAdministratorAndStandardUsers(int authorityOrganizationId)
+        {
+            var userIds = _dbContext.OrganizationRegulatoryProgramUsers
+                .Where(i => i.OrganizationRegulatoryProgram.OrganizationId == authorityOrganizationId &&
+                       i.OrganizationRegulatoryProgram.Organization.OrganizationType.Name == OrganizationTypeName.Authority.ToString() &&
+                       (i.PermissionGroup.Name == PermissionGroupName.Administrator.ToString() ||
+                        i.PermissionGroup.Name == PermissionGroupName.Standard.ToString())
+                       ).Select(i => i.UserProfileId);
+
+
+            var userProfiles = _dbContext.Users.Where(i => userIds.Contains(i.UserProfileId));
+            var userDtos = new List<UserDto>();
+            foreach (var userProfile in userProfiles)
+            {
+                var userDto = _mapHelper.GetUserDtoFromUserProfile(userProfile);
+                userDtos.Add(userDto);
+            }
+            return userDtos;
+            //var userProfiles = _dbContext.Users.Where(i => userIds.Contains(i.UserProfileId));
+            //return userProfiles.Select(a => _mapHelper.GetUserDtoFromUserProfile(a)).ToList();
+        }
+
         #endregion
     }
 }
