@@ -52,10 +52,32 @@ namespace Linko.LinkoExchange.Services.TimeZone
             return (TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, authorityLocalZone));
         }
 
-        public string GetTimeZoneNameUsingSettingForThisOrg(int orgRegProgramId)
+        public string GetAbbreviationTimeZoneNameUsingSettingForThisOrg(int orgRegProgramId)
         {
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
-            return GetTimeZoneName(timeZoneId);
+            var timeZoneName = GetTimeZoneName(timeZoneId);
+            //var t = TimeZoneInfo.FindSystemTimeZoneById(timeZoneFullName);   
+            switch (timeZoneName)
+            {
+                case "Hawaiian Standard Time":
+                    return "HST";
+                case "Alaskan Standard Time":
+                    return "AST";
+                case "Pacific Standard Time":
+                    return "PST";
+                case "Mountain Standard Time":
+                    return "MST";
+                case "Central Standard Time":
+                    return "CST";
+                case "Eastern Standard Time":
+                    return "EST";
+                case "Atlantic Standard Time":
+                    return "AST";
+                case "Newfoundland Standard Time":
+                    return "NST";
+                default:
+                    return timeZoneName;
+            }
         }
 
         public DateTime GetLocalizedDateTimeUsingThisTimeZoneId(DateTime utcDateTime, int timeZoneId)
