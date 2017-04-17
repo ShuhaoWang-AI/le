@@ -114,7 +114,7 @@ namespace Linko.LinkoExchange.Services.Email
                 Subject = ReplaceUsingTemplates(emailTemplate.SubjectTemplate, keyValues)
             };
 
-            var emailMessage = mailDefinition.CreateMailMessage(sendTo, (IDictionary) replacements,
+            var emailMessage = mailDefinition.CreateMailMessage(sendTo, (IDictionary)replacements,
                 emailTemplate.MessageTemplate, new System.Web.UI.Control());
             return Task.FromResult(emailMessage);
         }
@@ -228,6 +228,7 @@ namespace Linko.LinkoExchange.Services.Email
                 case EmailType.Signature_SignatoryRevoked:
                 case EmailType.Registration_AuthorityUserRegistrationPendingToApprovers:
                 case EmailType.Registration_IndustryUserRegistrationPendingToApprovers:
+                case EmailType.Report_SubmissionIU:
                     emailAuditLogs.AddRange(PopulateSingleRecipientProgramData(receipientEmail));
                     break;
 

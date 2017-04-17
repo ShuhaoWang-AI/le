@@ -150,6 +150,7 @@
     <Compile Include="Enum\LimitTypeName.cs" />
     <Compile Include="Enum\LinkoExchangeError.cs" />
     <Compile Include="Enum\InvitationType.cs" />
+    <Compile Include="Enum\PermissionGroupName.cs" />
     <Compile Include="Enum\RegistrationResult.cs" />
     <Compile Include="Enum\OrganizationTypeName.cs" />
     <Compile Include="Enum\RegistrationType.cs" />

@@ -78,6 +78,10 @@
         Registration_RegistrationResetPending,
 
         // UC-5.7 Industry invites industry user 
-        Registration_IndustryInviteIndustryUser
+        Registration_IndustryInviteIndustryUser,
+
+        // UC-54 Submission Receipt email to all signatories and to all admin and standard Users for the authority
+        Report_SubmissionIU,
+        Report_SubmissionAU
     }
 }
