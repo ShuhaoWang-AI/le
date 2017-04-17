@@ -382,14 +382,8 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
             }
 
-            //Check results
-            //
-
-            //
-            //Iterate through all the sample result dtos to make sure
-            //  - qualifier exists and if required, concentration values and units exist
-            //  - if calc mass loading, we have flow value(s)
-            //  - if calc mass loading, we have mass value(s)
+            
+            //Check Flow Value exists and is complete if provided (both value and unit)
 
             bool isValidFlowValueExists = false;
             if (!sampleDto.FlowValue.HasValue && sampleDto.FlowUnitId.HasValue && 
@@ -406,74 +400,97 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
             }
 
+            //
+            //Validation for Sample Results
+            //
+
             if (sampleDto.SampleResults != null)
             {
                 foreach (var resultDto in sampleDto.SampleResults)
                 {
-                    if ((resultDto.Value.HasValue && resultDto.UnitId < 1) ||
-                        (!resultDto.Value.HasValue && resultDto.UnitId > 0))
+                    //All results must have a unit if provided (applied to both Draft or ReadyToReport)
+                    if (resultDto.UnitId < 1)
                     {
+                        isValid = false;
                         if (!isSuppressExceptions)
                         {
-                            this.ThrowSimpleException("Result values and result units must be provided together.");
+                            this.ThrowSimpleException("All results must be associated with a valid unit.");
                         }
                     }
 
-                    if ((sampleDto.FlowValue.HasValue && !sampleDto.FlowUnitId.HasValue) ||
-                            (!sampleDto.FlowValue.HasValue && sampleDto.FlowUnitId.HasValue))
+                    if (resultDto.IsCalcMassLoading && resultDto.MassLoadingUnitId < 1)
                     {
+                        isValid = false;
                         if (!isSuppressExceptions)
                         {
-                            this.ThrowSimpleException("Flow value and flow unit must be provided together.");
+                            this.ThrowSimpleException("All mass loading calculations must be associated with a valid unit.");
                         }
                     }
 
                     if (sampleDto.IsReadyToReport)
                     {
-                        if (sampleDto.IsReadyToReport &&
-                        ((resultDto.Qualifier == ">" || resultDto.Qualifier == "<" || string.IsNullOrEmpty(resultDto.Qualifier))
-                        && resultDto.Value == null))
+                        //
+                        //ReadyToReport Validation For Concentration Results
+                        //
+
+                        if ((resultDto.Qualifier == ">" || resultDto.Qualifier == "<" || string.IsNullOrEmpty(resultDto.Qualifier))
+                        && !resultDto.Value.HasValue)
                         {
                             isValid = false;
                             if (!isSuppressExceptions)
                             {
-                                this.ThrowSimpleException("All numeric values must be accompanied by a numeric qualifier.");
+                                this.ThrowSimpleException("Numeric qualifiers must be followed by a valid value.");
                             }
                         }
 
-                        if (sampleDto.IsReadyToReport &&
-                            (resultDto.Qualifier == "ND" || resultDto.Qualifier == "NF" && resultDto.Value != null))
+                        if ((resultDto.Qualifier == "ND" || resultDto.Qualifier == "NF")
+                            && resultDto.Value.HasValue)
                         {
                             isValid = false;
                             if (!isSuppressExceptions)
                             {
-                                this.ThrowSimpleException("Only null values can be associated with non-numeric qualifiers.");
+                                this.ThrowSimpleException("ND or NF qualifiers cannot be followed by a value.");
                             }
                         }
 
-                        if (sampleDto.IsReadyToReport &&
-                            (resultDto.IsCalcMassLoading && !isValidFlowValueExists))
+                        if (resultDto.IsCalcMassLoading)
                         {
-                            isValid = false;
-                            if (!isSuppressExceptions)
-                            {
-                                this.ThrowSimpleException("You must provide valid a flow value to calculate mass loading results.");
-                            }
-                        }
+                            //
+                            //ReadyToReport Validation For Mass Calculations
+                            // 
 
-                        if (sampleDto.IsReadyToReport &&
-                            (resultDto.IsCalcMassLoading &&
-                            (resultDto.MassLoadingUnitId < 0 || resultDto.MassLoadingValue == null)))
-                        {
-                            isValid = false;
-                            if (!isSuppressExceptions)
+                            if (!isValidFlowValueExists)
                             {
-                                this.ThrowSimpleException("You must provide valid mass loading unit/value if electing to calculate mass loading results.");
+                                isValid = false;
+                                if (!isSuppressExceptions)
+                                {
+                                    this.ThrowSimpleException("You must provide valid a flow value to calculate mass loading results.");
+                                }
                             }
+
+                            if ((resultDto.Qualifier == ">" || resultDto.Qualifier == "<" || string.IsNullOrEmpty(resultDto.Qualifier))
+                            && !resultDto.MassLoadingValue.HasValue)
+                            {
+                                isValid = false;
+                                if (!isSuppressExceptions)
+                                {
+                                    this.ThrowSimpleException("When calculating mass loading, a numeric qualifier must be followed by a valid mass loading value.");
+                                }
+                            }
+
+                            if ((resultDto.Qualifier == "ND" || resultDto.Qualifier == "NF")
+                            && resultDto.MassLoadingValue.HasValue)
+                            {
+                                isValid = false;
+                                if (!isSuppressExceptions)
+                                {
+                                    this.ThrowSimpleException("When calculating mass loading, ND or NF qualifiers cannot be followed by a mass loading value.");
+                                }
+                            }
+
+
                         }
                     }
-
-                    
                 }
             }
             

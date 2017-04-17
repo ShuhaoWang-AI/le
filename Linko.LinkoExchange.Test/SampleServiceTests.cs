@@ -144,7 +144,7 @@ namespace Linko.LinkoExchange.Test
             }
             catch (RuleViolationException rve)
             {
-                //Sample Type is required.
+                
                 Assert.AreEqual("Sample Type is required.", rve.ValidationIssues[0].ErrorMessage);
 
             }
@@ -161,7 +161,7 @@ namespace Linko.LinkoExchange.Test
             }
             catch (RuleViolationException rve)
             {
-                //Sample Type is required.
+                
                 Assert.AreEqual("Collection Method is required.", rve.ValidationIssues[0].ErrorMessage);
 
             }
@@ -179,7 +179,7 @@ namespace Linko.LinkoExchange.Test
             }
             catch (RuleViolationException rve)
             {
-                //Sample Type is required.
+                
                 Assert.AreEqual("Start Date/Time is required.", rve.ValidationIssues[0].ErrorMessage);
 
             }
@@ -198,7 +198,7 @@ namespace Linko.LinkoExchange.Test
             }
             catch (RuleViolationException rve)
             {
-                //Sample Type is required.
+                
                 Assert.AreEqual("End Date/Time is required.", rve.ValidationIssues[0].ErrorMessage);
 
             }
@@ -218,7 +218,7 @@ namespace Linko.LinkoExchange.Test
             }
             catch (RuleViolationException rve)
             {
-                //Sample Type is required.
+                
                 Assert.AreEqual("Sample dates cannot be future dates.", rve.ValidationIssues[0].ErrorMessage);
 
             }
@@ -238,7 +238,7 @@ namespace Linko.LinkoExchange.Test
             }
             catch (RuleViolationException rve)
             {
-                //Sample Type is required.
+                
                 Assert.AreEqual("Sample dates cannot be future dates.", rve.ValidationIssues[0].ErrorMessage);
 
             }
@@ -256,34 +256,33 @@ namespace Linko.LinkoExchange.Test
         public void SaveSample_ReadyToReport_Mass_Results_Missing_Flow_Unit()
         {
             var sampleDto = GetTestSampleDto();
-            sampleDto.FlowUnitId = null;
             sampleDto.IsReadyToReport = true;
             try {
                 _sampleService.SaveSample(sampleDto);
             }
             catch (RuleViolationException rve)
             {
-                //Sample Type is required.
+                
                 Assert.AreEqual("You must provide valid a flow value to calculate mass loading results.", rve.ValidationIssues[0].ErrorMessage);
 
             }
         }
 
         [TestMethod]
-        public void SaveSample_ReadyToReport_Mass_Results_Missing_Flow_Value()
+        public void SaveSample_Flow_Unit_Provided_But_Missing_Flow_Value()
         {
             var sampleDto = GetTestSampleDto();
             sampleDto.FlowUnitId = 1;
             sampleDto.FlowValue = null;
-            sampleDto.IsReadyToReport = true;
+            sampleDto.IsReadyToReport = false;
             try
             {
                 _sampleService.SaveSample(sampleDto);
             }
             catch (RuleViolationException rve)
             {
-                //Sample Type is required.
-                Assert.AreEqual("You must provide valid a flow value to calculate mass loading results.", rve.ValidationIssues[0].ErrorMessage);
+                
+                Assert.AreEqual("Flow value and flow unit must be provided together.", rve.ValidationIssues[0].ErrorMessage);
 
             }
         }
@@ -296,7 +295,8 @@ namespace Linko.LinkoExchange.Test
             var invalidResultDto = new SampleResultDto()
             {
                 Qualifier = "ND",
-                Value = 99
+                Value = 99,
+                UnitId = 1
             };
             sampleResults.Add(invalidResultDto);
             sampleDto.SampleResults = sampleResults;
@@ -307,8 +307,64 @@ namespace Linko.LinkoExchange.Test
             }
             catch (RuleViolationException rve)
             {
-                //Sample Type is required.
-                Assert.AreEqual("Result values and result units must be provided together.", rve.ValidationIssues[0].ErrorMessage);
+                
+                Assert.AreEqual("ND or NF qualifiers cannot be followed by a value.", rve.ValidationIssues[0].ErrorMessage);
+
+            }
+        }
+
+        [TestMethod]
+        public void SaveSample_ReadyToReport_CalcMassLoading_Numeric_Qualifier_With_Missing_Mass_Unit()
+        {
+            var sampleDto = GetTestSampleDto();
+            var sampleResults = new List<SampleResultDto>();
+            var invalidResultDto = new SampleResultDto()
+            {
+                Qualifier = ">",
+                Value = 99,
+                UnitId = 1,
+                IsCalcMassLoading = true
+            };
+            sampleResults.Add(invalidResultDto);
+            sampleDto.SampleResults = sampleResults;
+            sampleDto.IsReadyToReport = true;
+            try
+            {
+                _sampleService.SaveSample(sampleDto);
+            }
+            catch (RuleViolationException rve)
+            {
+
+                Assert.AreEqual("All mass loading calculations must be associated with a valid unit.", rve.ValidationIssues[0].ErrorMessage);
+
+            }
+        }
+
+        [TestMethod]
+        public void SaveSample_ReadyToReport_CalcMassLoading_Numeric_Qualifier_With_Missing_Mass_Value()
+        {
+            var sampleDto = GetTestSampleDto();
+            var sampleResults = new List<SampleResultDto>();
+            var invalidResultDto = new SampleResultDto()
+            {
+                Qualifier = ">",
+                Value = 99,
+                UnitId = 1,
+                IsCalcMassLoading = true,
+                MassLoadingUnitId = 1,
+                MassLoadingValue = null
+            };
+            sampleResults.Add(invalidResultDto);
+            sampleDto.SampleResults = sampleResults;
+            sampleDto.IsReadyToReport = true;
+            try
+            {
+                _sampleService.SaveSample(sampleDto);
+            }
+            catch (RuleViolationException rve)
+            {
+
+                Assert.AreEqual("You must provide valid a flow value to calculate mass loading results.", rve.ValidationIssues[0].ErrorMessage);
 
             }
         }
