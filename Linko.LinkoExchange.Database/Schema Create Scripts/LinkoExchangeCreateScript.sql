@@ -4804,9 +4804,105 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         </html>'
     )
 	
+	--UC-54 4.3 Sign and submit report package, email to IU signatories
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'Report_Submission_IU' , 
+        'Email',  
+        'Report', 
+        'SignAndSubmissionToIU',
+        
+        '{reportPackageName} Submission Received', 
+        ' <html>
+            <body> 
+                <pre>
+Your report was received. Please keep this email as proof of your report submissions.
+
+Report Details:
+	Report Name: {reportPackageName}
+	Period Start: {periodStartDate}
+	Period end: {periodEndDate}
+	Submission Date:{submissionDateTime}
+	LinkoExchange COR Signature:{corSignature} 
+	
+Submitted To:
+	{recipientOrganizationName}
+	{recipientOrganizationAddressLine1}
+	{recipientOrganizationAddressLine2}
+	{recipientOrganizationCityName} {recipientOrganizationJurisdictionName} {recipientOrganizationZipCode}
+
+Submitted By:
+	{submitterFirstName} {submitterLastName}
+	{submitterTitle}
+	{iuOrganizationName} 
+	Permit #:{permitNumber} 
+	{organizationAddressLine1} 
+	{organizationAddressLine2}
+	{organizationCityName} {organizationJurisdictionName} {organizationZipCode} 
+	
+	User Name:{userName}
+	
+To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser.  Login is required to view the report.
+
+	https://Linkoexchange.com{corViewLink}
+	
+                            
+This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
+If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+                </pre>
+            </body>
+        </html>'  
+    )
+	
+	--UC-54 4.4 Sign and submit report package, email to authority
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'Report_Submission_AU' , 
+        'Email',  
+        'Report', 
+        'SignAndSubmissionAU',
+        
+        '{iuOrganizationName} {reportPackageName} Received', 
+        ' <html>
+            <body> 
+                <pre>
+The following report was received.
+
+Report Details:
+	Report Name: {reportPackageName}
+	Period Start: {periodStartDate}
+	Period end: {periodEndDate}
+	Submission Date:{submissionDateTime}
+	LinkoExchange COR Signature:{corSignature}  
+
+Submitted By:
+	{submitterFirstName} {submitterLastName}
+	{submitterTitle}
+	{iuOrganizationName} 
+	Permit #:{permitNumber} 
+	{organizationAddressLine1} 
+	{organizationAddressLine2}
+	{organizationCityName} {organizationJurisdictionName} {organizationZipCode} 
+	
+	User Name:{userName}
+	
+To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser.  Login is required to view the report.
+
+	https://Linkoexchange.com{corViewLink}
+	
+                            
+This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
+If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+                </pre>
+            </body>
+        </html>'  
+    )
+	
 	-- Cromerr Event Log Templates
 	
-	    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+	INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
     VALUES 
     (
         'CromerrEvent_Registration_InviteSent', 
