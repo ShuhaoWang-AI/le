@@ -1048,5 +1048,31 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             return massResult;
         }
+
+        public ReportPackageDto GetReportPackageDtoFromReportPackage(ReportPackage rpt)
+        {
+            if (rpt == null) return null;
+            return new ReportPackageDto
+            {
+                Name = rpt.Name,
+                PeriodStartDateTime = rpt.PeriodStartDateTimeUtc.DateTime,
+                PeriodEndDateTime = rpt.PeriodEndDateTimeUtc.DateTime,
+                IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired,
+                ReportStatusId = rpt.ReportStatusId,
+                OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId,
+                OrganizationName = rpt.OrganizationName,
+                OrganizationAddressLine1 = rpt.OrganizationAddressLine1,
+                OrganizationAddressLine2 = rpt.OrganizationAddressLine2,
+                OrganizationCityName = rpt.OrganizationCityName,
+                OrganizationJurisdictionName = rpt.OrganizationJurisdictionName,
+                RecipientOrganizationName = rpt.RecipientOrganizationName,
+                RecipientOrganizationAddressLine1 = rpt.RecipientOrganizationAddressLine1,
+                RecipientOrganizationAddressLine2 = rpt.RecipientOrganizationAddressLine2,
+                RecipientOrganizationCityName = rpt.RecipientOrganizationCityName,
+                RecipientOrganizationJurisdictionName = rpt.RecipientOrganizationJurisdictionName,
+                RecipientOrganizationZipCode = rpt.RecipientOrganizationZipCode,
+                CreationDateTime = rpt.CreationDateTimeUtc.DateTime
+            };
+        }
     }
 }
