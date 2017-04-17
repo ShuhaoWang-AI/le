@@ -4808,7 +4808,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
     INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
     VALUES 
     (
-        'Report_Submission_IU' , 
+        'Email_Report_Submission_IU' , 
         'Email',  
         'Report', 
         'SignAndSubmissionToIU',
@@ -4859,7 +4859,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
     INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
     VALUES 
     (
-        'Report_Submission_AU' , 
+        'Email_Report_Submission_AU' , 
         'Email',  
         'Report', 
         'SignAndSubmissionAU',
