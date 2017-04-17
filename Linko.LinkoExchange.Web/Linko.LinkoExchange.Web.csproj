@@ -428,7 +428,7 @@
     <Compile Include="Controllers\AuthorityController.cs" />
     <Compile Include="Controllers\IndustryController.cs" />
     <Compile Include="Controllers\InviteController.cs" />
-    <Compile Include="Controllers\ReprotPackageController.cs" />
+    <Compile Include="Controllers\ReportPackageController.cs" />
     <Compile Include="GlimpseSecurityPolicy.cs" />
     <Compile Include="Mapping\IMapHelper.cs" />
     <Compile Include="Mapping\MapHelper.cs" />

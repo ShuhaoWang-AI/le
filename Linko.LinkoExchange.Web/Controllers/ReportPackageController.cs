@@ -18,18 +18,20 @@ namespace Linko.LinkoExchange.Web.Controllers
     /// <summary>
     /// This is a testing controller,  dev who implement this controller should replace it. 
     /// </summary>
-    public class ReprotPackageController : Controller
+    public class ReportPackageController : Controller
     {
         private readonly IReportTemplateService _reportTemplateService;
         private readonly ISettingService _settingService;
         private readonly IHttpContextService _httpContextService;
         private readonly IUnitService _unitService;
+        private readonly IReportPackageService _reportPackageService;
 
-        public ReprotPackageController(
+        public ReportPackageController(
             IReportTemplateService reportTemplateService,
             ISettingService settingService,
             IHttpContextService httpContextService,
-            IUnitService unitService)
+            IUnitService unitService,
+            IReportPackageService reportPackageService)
         {
             if (reportTemplateService == null)
             {
@@ -40,6 +42,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _settingService = settingService;
             _httpContextService = httpContextService;
             _unitService = unitService;
+            _reportPackageService = reportPackageService;
         }
         // GET: ReprotPackage 
         public JsonResult Index()
@@ -132,5 +135,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             return Json(units, JsonRequestBehavior.AllowGet);
         }
 
+        [Route("submission/{reportPackageId:int}")]
+        public ViewResult Submission(int reportPackageId)
+        {
+            _reportPackageService.SignAndSubmitReportPackage(reportPackageId);
+            return View();
+        }
     }
 }

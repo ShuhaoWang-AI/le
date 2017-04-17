@@ -14,6 +14,14 @@ using Linko.LinkoExchange.Services.TimeZone;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NLog;
+using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Services.Email;
+using Microsoft.AspNet.Identity;
+using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.AuditLog;
+
 namespace Linko.LinkoExchange.Test
 {
     [TestClass]
@@ -28,6 +36,20 @@ namespace Linko.LinkoExchange.Test
         private IProgramService _programService = Mock.Of<IProgramService>();
         private LinkoExchangeContext _dbContext;
         private TimeZoneService _actualTimeZoneService;
+        private IUserService _userService;
+
+        private Mock<IAuditLogEntry> _auditLoger = new Mock<IAuditLogEntry>();
+        private Mock<IPasswordHasher> _passwordHasher = new Mock<IPasswordHasher>();
+        private Mock<IEmailService> emailService = new Mock<IEmailService>();
+        private Mock<ISettingService> _settingService = new Mock<ISettingService>();
+        private Mock<ISessionCache> _sessionCache = new Mock<ISessionCache>();
+        private Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
+        private Mock<IRequestCache> _requestCache = new Mock<IRequestCache>();
+        private Mock<IQuestionAnswerService> _questionAnswerServices = new Mock<IQuestionAnswerService>();
+        private MapHelper _mapHeper = new MapHelper();
+        private Mock<ICromerrAuditLogService> _crommerAuditLogService = new Mock<ICromerrAuditLogService>();
+
+
         [TestInitialize]
         public void Init()
         {
@@ -37,6 +59,12 @@ namespace Linko.LinkoExchange.Test
             _dbContext = new LinkoExchangeContext(connectionString);
             _actualTimeZoneService = new TimeZoneService(_dbContext, _settService, new MapHelper());
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
+
+
+            _userService = new UserService(_dbContext, _auditLoger.Object, _passwordHasher.Object, _httpContext.Object, emailService.Object,
+                _settingService.Object, _sessionCache.Object, _orgService.Object, _requestCache.Object, _actualTimeZoneService,
+                _questionAnswerServices.Object, _logger.Object, _mapHeper, _crommerAuditLogService.Object);
+
 
             IDigitalSignatureManager certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
 
@@ -81,7 +109,15 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
+            IReportPackageService reportPackageService =
+                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
+                  _logger.Object,
+                  _dbContext,
+                  _httpContext.Object,
+                  _userService,
+                 emailService.Object,
+                 _settService,
+                 _mapHeper);
 
             var reportPackageId = 527466233;
             var validResult = reportPackageService.VerififyCopyOfRecord(reportPackageId);
@@ -97,7 +133,14 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
+            IReportPackageService reportPackageService =
+                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
+                  _logger.Object,
+                  _dbContext,
+                  _httpContext.Object,
+                  _userService,
+                 emailService.Object,
+                  _settService, _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -116,7 +159,14 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
+            IReportPackageService reportPackageService =
+                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
+                  _logger.Object,
+                  _dbContext,
+                  _httpContext.Object,
+                  _userService,
+                 emailService.Object,
+                  _settService, _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -139,7 +189,14 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
+            IReportPackageService reportPackageService =
+                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
+                  _logger.Object,
+                  _dbContext,
+                  _httpContext.Object,
+                  _userService,
+                 emailService.Object,
+                  _settService, _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -164,7 +221,14 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
+            IReportPackageService reportPackageService =
+                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
+                  _logger.Object,
+                  _dbContext,
+                  _httpContext.Object,
+                  _userService,
+                 emailService.Object,
+                  _settService, _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -187,7 +251,14 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
+            IReportPackageService reportPackageService =
+                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
+                  _logger.Object,
+                  _dbContext,
+                  _httpContext.Object,
+                  _userService,
+                 emailService.Object,
+                  _settService, _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -209,7 +280,14 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
-            IReportPackageService reportPackageService = new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService, _logger.Object);
+            IReportPackageService reportPackageService =
+                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
+                  _logger.Object,
+                  _dbContext,
+                  _httpContext.Object,
+                  _userService,
+                 emailService.Object,
+                  _settService, _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);

@@ -5,7 +5,8 @@ namespace Linko.LinkoExchange.Services.Report
 {
     public interface IReportPackageService
     {
-        CopyOfRecordDto GetCopyOfRecordByReportPackageId(int reportPackageId);
+        void SignAndSubmitReportPackage(int reportPackageId);
+        CopyOfRecordDto GetCopyOfRecordByReportPackageId(int reportPackageId, ReportPackageDto reportPackageDto = null);
         CopyOfRecordDto CreateCopyOfRecordForReportPackage(int reportPackageId);
 
         ReportPackageDto GetReportPackage(int reportPackageId);
