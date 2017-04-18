@@ -7,8 +7,6 @@ using System.Text;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
-using Linko.LinkoExchange.Services.Mapping;
-using Linko.LinkoExchange.Services.TimeZone;
 using NLog;
 
 namespace Linko.LinkoExchange.Services.CopyOfRecord
@@ -131,13 +129,24 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             var datetimePart = reportPackage.SubMissionDateTimeLocal.ToString(format: "yyyyMMdd");
             var permitNumber = reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.PermitNumber;
             copyOfRecordDto.DownloadFileName = $"{permitNumber} {reportPackage.Name} {datetimePart}.zip";
+            copyOfRecordDto.DownloadFileName = StripReservedCharacters(copyOfRecordDto.DownloadFileName);
 
             _logger.Info($"Enter CopyOfRecordService.GetCopyOfRecordByReportPackage. ReportPackageId:{reportPackage.ReportPackageId}");
-
             return copyOfRecordDto;
         }
 
         #region Private functions
+
+        private string StripReservedCharacters(string fileName)
+        {
+            var reservedChars = new[] { "^", "<", ">", ":", "\"", "\\", "/", "|", "?", "*" };
+            foreach (var reservedChar in reservedChars)
+            {
+                fileName = fileName.Replace(oldValue: reservedChar, newValue: "");
+            }
+
+            return fileName;
+        }
 
         private string SignaData(string hash)
         {
