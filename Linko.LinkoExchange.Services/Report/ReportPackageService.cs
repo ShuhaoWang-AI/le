@@ -110,7 +110,7 @@ namespace Linko.LinkoExchange.Services.Report
                     var submitterFirstName = _httpContextService.GetClaimValue(CacheKey.FirstName);
                     var submitterLastName = _httpContextService.GetClaimValue(CacheKey.LastName);
                     var submitterTitleRole = _httpContextService.GetClaimValue(CacheKey.UserRole);
-                    var submitterIPAddress = _httpContextService.CurrentUserIPAddress();
+                    var submitterIpAddress = _httpContextService.CurrentUserIPAddress();
                     var submitterUserName = _httpContextService.GetClaimValue(CacheKey.UserName);
 
                     reportPackage.SubmissionDateTimeUtc = DateTimeOffset.Now;
@@ -118,7 +118,7 @@ namespace Linko.LinkoExchange.Services.Report
                     reportPackage.SubmitterFirstName = submitterFirstName;
                     reportPackage.SubmitterLastName = submitterLastName;
                     reportPackage.SubmitterTitleRole = submitterTitleRole;
-                    reportPackage.SubmitterIPAddress = submitterIPAddress;
+                    reportPackage.SubmitterIPAddress = submitterIpAddress;
                     reportPackage.SubmitterUserName = submitterUserName;
 
                     _dbContext.SaveChanges();
@@ -163,22 +163,22 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns></returns>
         public IList<FileStoreDto> GetReportPackageAttachments(int reportPackageId)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public IList<ReportPackageELementTypeDto> GetReportPackageCertifications(int reportPackageId)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(int reportPackageId)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public CopyOfRecordDataXmlFileDto GetReportPackageCopyOfRecordDataXmlFile(int reportPackageId)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public CopyOfRecordValidationResultDto VerififyCopyOfRecord(int reportPackageId)
@@ -198,8 +198,7 @@ namespace Linko.LinkoExchange.Services.Report
             _logger.Info("Enter ReportPackageService.GetReportPackage. reportPackageId={0}", reportPackageId);
 
             var rpt = _dbContext.ReportPackages.Single(i => i.ReportPackageId == reportPackageId);
-            var rptDto = new ReportPackageDto();
-            rptDto = _mapHelper.GetReportPackageDtoFromReportPackage(rpt);
+            var rptDto = _mapHelper.GetReportPackageDtoFromReportPackage(rpt);
             rptDto.OrganizationRegulatoryProgramDto =
                     _programService.GetOrganizationRegulatoryProgram(rpt.OrganizationRegulatoryProgramId);
 
@@ -310,11 +309,11 @@ namespace Linko.LinkoExchange.Services.Report
             //TODO: use the real cor view path
             emailContentReplacements.Add("corViewLink", $"/reportPackage/cor/{reportPackage.ReportPackageId}");
 
-            // Send emails to all IU signators 
-            var signatorsEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
-            _emailService.SendEmail(signatorsEmails, EmailType.Report_Submission_IU, emailContentReplacements, false);
+            // Send emails to all IU signatories 
+            var signatoriesEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
+            _emailService.SendEmail(signatoriesEmails, EmailType.Report_Submission_IU, emailContentReplacements, false);
 
-            // Send emails to all Standard Users for the autority  
+            // Send emails to all Standard Users for the authority  
             var authorityOrganzationId = reportPackage.OrganizationRegulatoryProgramDto.OrganizationId;
             var authorityAdminAndStandardUsersEmails = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganzationId).Select(i => i.Email).ToList();
             _emailService.SendEmail(authorityAdminAndStandardUsersEmails, EmailType.Report_Submission_AU, emailContentReplacements, false);
