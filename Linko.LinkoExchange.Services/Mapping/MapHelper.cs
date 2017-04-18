@@ -1055,8 +1055,8 @@ namespace Linko.LinkoExchange.Services.Mapping
             return new ReportPackageDto
             {
                 Name = rpt.Name,
-                PeriodStartDateTime = rpt.PeriodStartDateTimeUtc.DateTime,
-                PeriodEndDateTime = rpt.PeriodEndDateTimeUtc.DateTime,
+                PeriodStartDateTimeLocal = rpt.PeriodStartDateTimeUtc.DateTime,
+                PeriodEndDateTimeLocal = rpt.PeriodEndDateTimeUtc.DateTime,
                 IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired,
                 ReportStatusId = rpt.ReportStatusId,
                 OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId,
@@ -1071,7 +1071,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 RecipientOrganizationCityName = rpt.RecipientOrganizationCityName,
                 RecipientOrganizationJurisdictionName = rpt.RecipientOrganizationJurisdictionName,
                 RecipientOrganizationZipCode = rpt.RecipientOrganizationZipCode,
-                CreationDateTime = rpt.CreationDateTimeUtc.DateTime
+                CreationDateTimeLocal = rpt.CreationDateTimeUtc.DateTime
             };
         }
     }

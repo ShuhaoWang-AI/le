@@ -60,6 +60,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         public void SignAndSubmitReportPackage(int reportPackageId)
         {
+            _logger.Info("Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
 
             //TODO to add reportPakcage data temporary
             // To be removed once saving reportPackage is done 
@@ -133,11 +134,12 @@ namespace Linko.LinkoExchange.Services.Report
                     reportPackageDto.ReportPackageId = 1355344931;
                     var copyOfRecordDto = GetCopyOfRecordByReportPackageId(1355344931, reportPackageDto);
                     reportPackageDto.ReportPackageId = temp;
-                    //// 
-                    // Sending email.... 
+
+                    //// Send emails 
                     SendSignAndSubmitEmail(reportPackageDto, copyOfRecordDto);
                     _dbContext.SaveChanges();
                     transaction.Commit();
+                    _logger.Info("Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
                 }
                 catch (Exception ex)
                 {
@@ -193,13 +195,7 @@ namespace Linko.LinkoExchange.Services.Report
         //TODO: to implement this!
         public ReportPackageDto GetReportPackage(int reportPackageId)
         {
-            //var rptDto = new ReportPackageDto
-            //{
-            //    ReportPackageId = reportPackageId,
-            //    Name = " 1st Quarter PCR",
-            //    OrganizationRegulatoryProgramId = 3,
-            //    SubMissionDateTime = DateTime.UtcNow,
-            //};
+            _logger.Info("Enter ReportPackageService.GetReportPackage. reportPackageId={0}", reportPackageId);
 
             var rpt = _dbContext.ReportPackages.Single(i => i.ReportPackageId == reportPackageId);
             var rptDto = new ReportPackageDto();
@@ -208,8 +204,18 @@ namespace Linko.LinkoExchange.Services.Report
                     _programService.GetOrganizationRegulatoryProgram(rpt.OrganizationRegulatoryProgramId);
 
             rptDto.SubMissionDateTimeLocal = _timeZoneService
-                .GetLocalizedDateTimeUsingSettingForThisOrg(rptDto.SubMissionDateTime, rptDto.OrganizationRegulatoryProgramId);
+                .GetLocalizedDateTimeUsingSettingForThisOrg(rpt.CreationDateTimeUtc.DateTime, rpt.OrganizationRegulatoryProgramId);
 
+            rptDto.PeriodEndDateTimeLocal = _timeZoneService
+                .GetLocalizedDateTimeUsingSettingForThisOrg(rpt.PeriodEndDateTimeUtc.DateTime, rpt.OrganizationRegulatoryProgramId);
+
+            rptDto.PeriodStartDateTimeLocal = _timeZoneService
+                .GetLocalizedDateTimeUsingSettingForThisOrg(rpt.PeriodStartDateTimeUtc.DateTime, rpt.OrganizationRegulatoryProgramId);
+
+            rptDto.CreationDateTimeLocal = _timeZoneService
+                .GetLocalizedDateTimeUsingSettingForThisOrg(rpt.CreationDateTimeUtc.DateTime, rpt.OrganizationRegulatoryProgramId);
+
+            _logger.Info("Leave ReportPackageService.GetReportPackage. reportPackageId={0}", reportPackageId);
             return rptDto;
         }
 
@@ -223,7 +229,7 @@ namespace Linko.LinkoExchange.Services.Report
             }
 
             var copyOfRecordDto = _copyOfRecordService.GetCopyOfRecordByReportPackage(reportPackageDto);
-            _logger.Info("Enter ReportPackageService.GetCopyOfRecordByReportPackageId. reportPackageId={0}", reportPackageId);
+            _logger.Info("Leave ReportPackageService.GetCopyOfRecordByReportPackageId. reportPackageId={0}", reportPackageId);
 
             return copyOfRecordDto;
         }
@@ -237,20 +243,22 @@ namespace Linko.LinkoExchange.Services.Report
             var copyOfRecordDataXmlFile = GetReportPackageCopyOfRecordDataXmlFile(reportPackageId);
             var copyOfRecordDto = _copyOfRecordService.CreateCopyOfRecordForReportPackage(reportPackageId, attachments, copyOfRecordPdfFile, copyOfRecordDataXmlFile);
 
-            _logger.Info("Enter ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={0}", reportPackageId);
+            _logger.Info("Leave ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={0}", reportPackageId);
 
             return copyOfRecordDto;
         }
 
         private void SendSignAndSubmitEmail(ReportPackageDto reportPackage, CopyOfRecordDto copyOfRecordDto)
         {
+            _logger.Info("Enter ReportPackageService.SendSignAndSubmitEmail. reportPackageId={0}", reportPackage.ReportPackageId);
+
             var emailContentReplacements = new Dictionary<string, string>();
 
             emailContentReplacements.Add("iuOrganizationName", reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
             emailContentReplacements.Add("reportPackageName", reportPackage.Name);
 
-            emailContentReplacements.Add("periodStartDate", reportPackage.PeriodStartDateTime.ToString("MMM dd, yyyy"));
-            emailContentReplacements.Add("periodEndDate", reportPackage.PeriodEndDateTime.ToString("MMM dd, yyyy"));
+            emailContentReplacements.Add("periodStartDate", reportPackage.PeriodStartDateTimeLocal.ToString("MMM dd, yyyy"));
+            emailContentReplacements.Add("periodEndDate", reportPackage.PeriodEndDateTimeLocal.ToString("MMM dd, yyyy"));
 
             var submissionDateTime =
                 $"{reportPackage.SubMissionDateTimeLocal.ToString("MMM dd, yyyy HHtt ")}{_timeZoneService.GetAbbreviationTimeZoneNameUsingSettingForThisOrg(reportPackage.OrganizationRegulatoryProgramId)}";
@@ -302,17 +310,16 @@ namespace Linko.LinkoExchange.Services.Report
             //TODO: use the real cor view path
             emailContentReplacements.Add("corViewLink", $"/reportPackage/cor/{reportPackage.ReportPackageId}");
 
-            // Send emails  
-            // Get all signators for the program 
+            // Send emails to all IU signators 
             var signatorsEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
-            signatorsEmails.Add("shuhao.wang@watertrax.com");
-            _emailService.SendEmail(signatorsEmails, Core.Enum.EmailType.Report_Submission_IU, emailContentReplacements, false);
+            _emailService.SendEmail(signatorsEmails, EmailType.Report_Submission_IU, emailContentReplacements, false);
 
-            // Get all Standard Users for the autority  
+            // Send emails to all Standard Users for the autority  
             var authorityOrganzationId = reportPackage.OrganizationRegulatoryProgramDto.OrganizationId;
             var authorityAdminAndStandardUsersEmails = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganzationId).Select(i => i.Email).ToList();
-            authorityAdminAndStandardUsersEmails.Add("shuhao.wang@watertrax.com");
-            _emailService.SendEmail(authorityAdminAndStandardUsersEmails, Core.Enum.EmailType.Report_Submission_AU, emailContentReplacements, false);
+            _emailService.SendEmail(authorityAdminAndStandardUsersEmails, EmailType.Report_Submission_AU, emailContentReplacements, false);
+
+            _logger.Info("Leave ReportPackageService.SendSignAndSubmitEmail. reportPackageId={0}", reportPackage.ReportPackageId);
         }
     }
 }
