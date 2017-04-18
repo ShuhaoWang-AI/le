@@ -133,12 +133,9 @@ namespace Linko.LinkoExchange.Services.Report
                     reportPackageDto.ReportPackageId = 1355344931;
                     var copyOfRecordDto = GetCopyOfRecordByReportPackageId(1355344931, reportPackageDto);
                     reportPackageDto.ReportPackageId = temp;
-                    ////  
-
+                    //// 
                     // Sending email.... 
                     SendSignAndSubmitEmail(reportPackageDto, copyOfRecordDto);
-
-
                     _dbContext.SaveChanges();
                     transaction.Commit();
                 }
@@ -267,7 +264,13 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("permitNumber", reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.PermitNumber);
 
             emailContentReplacements.Add("organizationAddressLine1", reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.AddressLine1);
-            emailContentReplacements.Add("organizationAddressLine2", reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.AddressLine2);
+            var organizationAddressLine2 = "";
+            if (!string.IsNullOrWhiteSpace(reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.AddressLine2))
+            {
+                organizationAddressLine2 = reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.AddressLine2;
+            }
+
+            emailContentReplacements.Add("organizationAddressLine2", organizationAddressLine2);
 
             emailContentReplacements.Add("organizationCityName", reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.CityName);
             emailContentReplacements.Add("organizationJurisdictionName", reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.State);
@@ -277,7 +280,14 @@ namespace Linko.LinkoExchange.Services.Report
 
             emailContentReplacements.Add("recipientOrganizationName", reportPackage.RecipientOrganizationName);
             emailContentReplacements.Add("recipientOrganizationAddressLine1", reportPackage.RecipientOrganizationAddressLine1);
-            emailContentReplacements.Add("recipientOrganizationAddressLine2", reportPackage.RecipientOrganizationAddressLine2);
+
+            var recipientOrganizationAddressLine2 = "";
+            if (!string.IsNullOrWhiteSpace(reportPackage.RecipientOrganizationAddressLine2))
+            {
+                recipientOrganizationAddressLine2 = reportPackage.RecipientOrganizationAddressLine2;
+            }
+
+            emailContentReplacements.Add("recipientOrganizationAddressLine2", recipientOrganizationAddressLine2);
             emailContentReplacements.Add("recipientOrganizationCityName", reportPackage.RecipientOrganizationCityName);
             emailContentReplacements.Add("recipientOrganizationJurisdictionName", reportPackage.RecipientOrganizationJurisdictionName);
             emailContentReplacements.Add("recipientOrganizationZipCode", reportPackage.RecipientOrganizationZipCode);
@@ -294,14 +304,15 @@ namespace Linko.LinkoExchange.Services.Report
 
             // Send emails  
             // Get all signators for the program 
-            var signatorsEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email);
-            _emailService.SendEmail(signatorsEmails, Core.Enum.EmailType.Report_SubmissionIU, emailContentReplacements, false);
+            var signatorsEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
+            signatorsEmails.Add("shuhao.wang@watertrax.com");
+            _emailService.SendEmail(signatorsEmails, Core.Enum.EmailType.Report_Submission_IU, emailContentReplacements, false);
 
             // Get all Standard Users for the autority  
-            var authorityOrganzationId = reportPackage.OrganizationRegulatoryProgramDto.RegulatorOrganizationId.Value;
-            var authorityAdminAndStandardUsersEmails = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganzationId).Select(i => i.Email);
-
-            _emailService.SendEmail(authorityAdminAndStandardUsersEmails, Core.Enum.EmailType.Report_SubmissionAU, emailContentReplacements, false);
+            var authorityOrganzationId = reportPackage.OrganizationRegulatoryProgramDto.OrganizationId;
+            var authorityAdminAndStandardUsersEmails = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganzationId).Select(i => i.Email).ToList();
+            authorityAdminAndStandardUsersEmails.Add("shuhao.wang@watertrax.com");
+            _emailService.SendEmail(authorityAdminAndStandardUsersEmails, Core.Enum.EmailType.Report_Submission_AU, emailContentReplacements, false);
         }
     }
 }

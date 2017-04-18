@@ -228,7 +228,8 @@ namespace Linko.LinkoExchange.Services.Email
                 case EmailType.Signature_SignatoryRevoked:
                 case EmailType.Registration_AuthorityUserRegistrationPendingToApprovers:
                 case EmailType.Registration_IndustryUserRegistrationPendingToApprovers:
-                case EmailType.Report_SubmissionIU:
+                case EmailType.Report_Submission_IU:
+                case EmailType.Report_Submission_AU:
                     emailAuditLogs.AddRange(PopulateSingleRecipientProgramData(receipientEmail));
                     break;
 

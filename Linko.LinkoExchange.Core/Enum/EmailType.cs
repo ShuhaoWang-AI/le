@@ -81,7 +81,7 @@
         Registration_IndustryInviteIndustryUser,
 
         // UC-54 Submission Receipt email to all signatories and to all admin and standard Users for the authority
-        Report_SubmissionIU,
-        Report_SubmissionAU
+        Report_Submission_IU,
+        Report_Submission_AU
     }
 }
