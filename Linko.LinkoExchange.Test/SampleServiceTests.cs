@@ -75,8 +75,6 @@ namespace Linko.LinkoExchange.Test
             sampleDto.FlowValue = 808.1;
             sampleDto.StartDateTimeLocal = DateTime.Now;
             sampleDto.EndDateTimeLocal = DateTime.Now;
-            sampleDto.IsReadyToReport = true;
-            sampleDto.IsCalculated = false;
             sampleDto.IsReadyToReport = false;
             var resultDtos = new List<SampleResultDto>();
 
@@ -123,7 +121,9 @@ namespace Linko.LinkoExchange.Test
             return sampleDto;
         }
 
-        private void RemoveAllSamplesFromDb()
+        [TestMethod]
+
+        public void Remove_All_Samples_From_Db()
         {
             var sampleDtos = _sampleService.GetSamples(SampleStatusName.All);
             foreach (var sampleDto in sampleDtos)

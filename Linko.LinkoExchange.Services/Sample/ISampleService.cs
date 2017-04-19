@@ -18,8 +18,9 @@ namespace Linko.LinkoExchange.Services.Sample
         /// Sample start dates must on or after this date/time. Null parameters are ignored and not part of the filter.</param>
         /// <param name="endDate">Nullable localized date/time time period range. 
         /// Sample end dates must on or before this date/time. Null parameters are ignored and not part of the filter.</param>
+        /// <param name="isIncludeChildObjects">Switch to load result list or not (for display in grid)</param>
         /// <returns>Collection of filtered Sample Dto's</returns>
-        IEnumerable<SampleDto> GetSamples(SampleStatusName status, DateTime? startDate = null, DateTime? endDate = null);
+        IEnumerable<SampleDto> GetSamples(SampleStatusName status, DateTime? startDate = null, DateTime? endDate = null, bool isIncludeChildObjects = false);
 
         /// <summary>
         /// Saves a Sample to the database after validating. Throw a list of RuleViolation exceptions
@@ -57,5 +58,8 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <param name="isSuppressExceptions">False = throws RuleViolation exception, True = does not throw RuleViolation exceptions</param>
         /// <returns>Boolean indicating if Sample passed all validation (Draft or ReadyToReport mode)</returns>
         bool IsValidSample(SampleDto sampleDto, bool isSuppressExceptions = false);
+
+        IEnumerable<CollectionMethodDto> GetCollectionMethods();
+
     }
 }

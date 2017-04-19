@@ -7,6 +7,7 @@ using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.TimeZone;
 using NLog;
+using Linko.LinkoExchange.Services.Organization;
 
 namespace Linko.LinkoExchange.Services.Unit
 {
@@ -17,13 +18,15 @@ namespace Linko.LinkoExchange.Services.Unit
         private readonly ILogger _logger;
         private readonly IHttpContextService _httpContextService;
         private readonly ITimeZoneService _timeZoneService;
+        private readonly IOrganizationService _orgService;
 
         public UnitService(
             LinkoExchangeContext dbContext,
             IMapHelper mapHelper,
             ILogger logger,
             IHttpContextService httpContextService,
-            ITimeZoneService timeZoneService)
+            ITimeZoneService timeZoneService,
+            IOrganizationService orgService)
         {
             if (dbContext == null)
             {
@@ -50,26 +53,53 @@ namespace Linko.LinkoExchange.Services.Unit
                 throw new ArgumentNullException(nameof(timeZoneService));
             }
 
+            if (orgService == null)
+            {
+                throw new ArgumentNullException(nameof(orgService));
+            }
+
             _dbContext = dbContext;
             _mapHelper = mapHelper;
             _logger = logger;
             _httpContextService = httpContextService;
             _timeZoneService = timeZoneService;
+            _orgService = orgService;
         }
 
         public List<UnitDto> GetFlowUnits()
         {
             _logger.Info("Enter UnitService.GetFlowUnits.");
 
-            var currentOrganizationId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationId));
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var authOrganizationId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationId;
 
-            var units = _dbContext.Units.Where(i => i.IsFlowUnit && i.OrganizationId == currentOrganizationId).ToList();
+            var units = _dbContext.Units.Where(i => i.IsFlowUnit && i.OrganizationId == authOrganizationId).ToList();
 
             var unitDtos = UnitDtosHelper(units);
 
             _logger.Info("Leave UnitService.GetFlowUnits.");
 
             return unitDtos;
+        }
+
+        /// <summary>
+        /// Always ppd as per client's requirements
+        /// </summary>
+        /// <returns></returns>
+        public UnitDto GetUnitForMassLoadingCalculations()
+        {
+            _logger.Info("Enter UnitService.GetUnitForMassLoadingCalculations.");
+
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var authOrganizationId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationId;
+
+            var units = _dbContext.Units.Where(i => i.Name == "ppd" && i.OrganizationId == authOrganizationId).ToList();
+
+            var unitDtos = UnitDtosHelper(units);
+
+            _logger.Info("Leave UnitService.GetUnitForMassLoadingCalculations.");
+
+            return unitDtos.First();
         }
 
         private List<UnitDto> UnitDtosHelper(List<Core.Domain.Unit> units)

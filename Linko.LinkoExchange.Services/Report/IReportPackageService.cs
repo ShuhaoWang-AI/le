@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
+using System;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -33,5 +34,32 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageId"></param>
         /// <returns></returns>
         CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(int reportPackageId);
+
+        /// <summary>
+        /// *WARNING: NO VALIDATION CHECK -- CASCADE DELETE*
+        /// Hard delete of row from tReportPackage table associated with passed in parameter.
+        /// Programatically cascade deletes rows in the following associated tables:
+        /// - tReportPackageElementCategory (via ReportPackageId)
+        /// - tReportPackageElementType (via ReportPackageElementCategoryId)
+        /// - tReportSample (via ReportPackageElementTypeId)
+        /// - tReportFile (via ReportPackageElementTypeId)
+        /// - tCopyofRecord (via ReportPackageId)
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        void DeleteReportPackage(int reportPackageId);
+
+        /// <summary>
+        /// To be called after a User selects a template and date range but: 
+        ///     1) Before the User clicks the "Save Draft" button (no reportPackageDto to save yet) or...
+        ///         - Only "copies over" template report package elements and creates a "minimal row" in tReportPackage.
+        ///     2) After the User clicks the "Save Draft" button. (must pass in reportPackageDto to attempt Save) 
+        ///         - Both "copies over" template report package elements and saves a complete row in tReportPackage (representing the reportPackageDto)
+        /// </summary>
+        /// <param name="reportPackageTemplateId"></param>
+        /// <param name="startDateTimeLocal"></param>
+        /// <param name="endDateTimeLocal"></param>
+        /// <param name="reportPackageDto"></param>
+        /// <returns>The newly created tReportPackage.ReportPackageId</returns>
+        int CreateDraft(int reportPackageTemplateId, DateTime startDateTimeLocal, DateTime endDateTimeLocal, ReportPackageDto reportPackageDto = null);
     }
 }

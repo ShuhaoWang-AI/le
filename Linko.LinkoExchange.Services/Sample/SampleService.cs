@@ -141,6 +141,8 @@ namespace Linko.LinkoExchange.Services.Sample
                     var flowParameter = _dbContext.Parameters
                         .First(p => p.IsFlowForMassLoadingCalculation == true); //Chris: "Should be one but just get first".
 
+                    var flowLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.VolumeFlowRate.ToString()).LimitBasisId;
+
                     var flowResult = new SampleResult()
                     {
                         SampleId = sampleIdToReturn,
@@ -154,7 +156,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         MethodDetectionLimit = "",
                         IsFlowForMassLoadingCalculation = true,
                         LimitTypeId = null,
-                        LimitBasisId = null,
+                        LimitBasisId = flowLimitBasisId,
                         IsCalculated = false
                     };
                     sampleToPersist.SampleResults.Add(flowResult);
@@ -568,11 +570,13 @@ namespace Linko.LinkoExchange.Services.Sample
         /// </summary>
         /// <param name="sample"></param>
         /// <returns></returns>
-        private SampleDto GetSampleDetails(Core.Domain.Sample sample)
+        private SampleDto GetSampleDetails(Core.Domain.Sample sample, bool isIncludeChildObjects = true)
         {
             _logger.Info($"Enter SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
+            int flowLimitBasisId = _dbContext.LimitBases
+                .Single(lb => lb.Name == LimitBasisName.VolumeFlowRate.ToString()).LimitBasisId;
 
             var dto = _mapHelper.GetSampleDtoFromSample(sample);
 
@@ -599,86 +603,93 @@ namespace Linko.LinkoExchange.Services.Sample
                 dto.LastModifierFullName = "N/A";
             }
 
+
             var resultDtoList = new Dictionary<int, SampleResultDto>();
-            foreach (var sampleResult in sample.SampleResults)
+
+            if (isIncludeChildObjects)
             {
-                //Handle "special case" Sample Results. These do not get mapped to their own
-                //SampleResult dtos.
-                //1. Flow - gets mapped to properties of the parent Sample Dto
-                //2. Mass - gets mapped to corresponding Concentration result Dto
-                //
-                //Remember that the items in this collection are unordered.
-
-                var resultDto = new SampleResultDto();
-                
-                if (sampleResult.IsFlowForMassLoadingCalculation &&
-                    (sampleResult.LimitBasisId == null && sampleResult.LimitTypeId == null))
+                foreach (var sampleResult in sample.SampleResults)
                 {
-                    dto.FlowValue = sampleResult.Value;
-                    dto.FlowUnitId = sampleResult.UnitId;
-                    dto.FlowUnitName = sampleResult.UnitName;
-                    dto.FlowValueDecimalPlaces = sampleResult.DecimalPlaces;
+                    //Handle "special case" Sample Results. These do not get mapped to their own
+                    //SampleResult dtos.
+                    //1. Flow - gets mapped to properties of the parent Sample Dto
+                    //2. Mass - gets mapped to corresponding Concentration result Dto
+                    //
+                    //Remember that the items in this collection are unordered.
 
-                }
-                else if (sampleResult.IsFlowForMassLoadingCalculation == false &&
-                    sampleResult.LimitType.Name == LimitTypeName.Daily.ToString() &&
-                    (sampleResult.LimitBasis.Name == LimitBasisName.MassLoading.ToString() 
-                    || sampleResult.LimitBasis.Name == LimitBasisName.Concentration.ToString()))
-                {
+                    var resultDto = new SampleResultDto();
 
-                    if (resultDtoList.ContainsKey(sampleResult.ParameterId))
+                    if (sampleResult.IsFlowForMassLoadingCalculation &&
+                        sampleResult.LimitBasisId == flowLimitBasisId)
                     {
-                        //There was already a result dto added for this parameter
-                        //and we are now handling the corresponding concentration (or mass) result
-                        //and must attach these fields to that dto
-                        resultDto = resultDtoList[sampleResult.ParameterId];
+                        dto.FlowValue = sampleResult.Value;
+                        dto.FlowUnitId = sampleResult.UnitId;
+                        dto.FlowUnitName = sampleResult.UnitName;
+                        dto.FlowValueDecimalPlaces = sampleResult.DecimalPlaces;
+                    }
+                    else if (sampleResult.IsFlowForMassLoadingCalculation == false &&
+                        sampleResult.LimitType.Name == LimitTypeName.Daily.ToString() &&
+                        (sampleResult.LimitBasis.Name == LimitBasisName.MassLoading.ToString()
+                        || sampleResult.LimitBasis.Name == LimitBasisName.Concentration.ToString()))
+                    {
+
+                        if (resultDtoList.ContainsKey(sampleResult.ParameterId))
+                        {
+                            //There was already a result dto added for this parameter
+                            //and we are now handling the corresponding concentration (or mass) result
+                            //and must attach these fields to that dto
+                            resultDto = resultDtoList[sampleResult.ParameterId];
+                        }
+                        else
+                        {
+                            //There may be a corresponding concentation (or mass) result
+                            //later in the collection that needs to be attached to this result dto
+                            //so we need to save this for looking up later. 
+                            resultDtoList.Add(sampleResult.ParameterId, resultDto);
+                        }
+
+
+                        if (sampleResult.LimitBasis.Name == LimitBasisName.Concentration.ToString())
+                        {
+                            resultDto.SampleId = sampleResult.SampleId;
+                            resultDto.ParameterId = sampleResult.ParameterId;
+                            resultDto.ParameterName = sampleResult.ParameterName;
+                            resultDto.MethodDetectionLimit = sampleResult.MethodDetectionLimit;
+                            resultDto.AnalysisMethod = sampleResult.AnalysisMethod;
+                            resultDto.IsApprovedEPAMethod = sampleResult.IsApprovedEPAMethod;
+                            resultDto.ParameterId = sampleResult.ParameterId;
+                            //resultDto.IsCalcMassLoading = sampleResult.IsMassLoadingCalculationRequired;
+                            resultDto.Qualifier = sampleResult.Qualifier;
+                            resultDto.Value = sampleResult.Value;
+                            resultDto.DecimalPlaces = sampleResult.DecimalPlaces;
+                            resultDto.UnitId = sampleResult.UnitId;
+                            resultDto.UnitName = sampleResult.UnitName;
+                            resultDto.LimitBasisName = LimitBasisName.Concentration;
+
+                            SetSampleResultDatesAndLastModified(sampleResult, ref resultDto, timeZoneId);
+
+                        }
+                        else
+                        {
+                            //Mass Result
+                            resultDto.MassLoadingQualifier = sampleResult.Qualifier;
+                            resultDto.MassLoadingValue = sampleResult.Value;
+                            resultDto.MassLoadingDecimalPlaces = sampleResult.DecimalPlaces;
+                            resultDto.MassLoadingUnitId = sampleResult.UnitId;
+                            resultDto.MassLoadingUnitName = sampleResult.UnitName;
+                            resultDto.LimitBasisName = LimitBasisName.MassLoading;
+                        }
+
+
                     }
                     else
                     {
-                        //There may be a corresponding concentation (or mass) result
-                        //later in the collection that needs to be attached to this result dto
-                        //so we need to save this for looking up later. 
-                        resultDtoList.Add(sampleResult.ParameterId, resultDto);
-                    }
-
-                    if (sampleResult.LimitBasis.Name == LimitBasisName.Concentration.ToString())
-                    {
-                        resultDto.SampleId = sampleResult.SampleId;
-                        resultDto.ParameterId = sampleResult.ParameterId;
-                        resultDto.ParameterName = sampleResult.ParameterName;
-                        resultDto.MethodDetectionLimit = sampleResult.MethodDetectionLimit;
-                        resultDto.AnalysisMethod = sampleResult.AnalysisMethod;
-                        resultDto.IsApprovedEPAMethod = sampleResult.IsApprovedEPAMethod;
-                        resultDto.ParameterId = sampleResult.ParameterId;
-                        //resultDto.IsCalcMassLoading = sampleResult.IsMassLoadingCalculationRequired;
-                        resultDto.Qualifier = sampleResult.Qualifier;
-                        resultDto.Value = sampleResult.Value;
-                        resultDto.DecimalPlaces = sampleResult.DecimalPlaces;
-                        resultDto.UnitId = sampleResult.UnitId;
-                        resultDto.UnitName = sampleResult.UnitName;
-
-                        SetSampleResultDatesAndLastModified(sampleResult, ref resultDto, timeZoneId);
+                        //  "Any introduction of a new Limit Type or new Limit Basis at the data level 
+                        //  will be ignored until we change the code..." - mj
 
                     }
-                    else {
-                        //Mass Result
-                        resultDto.MassLoadingQualifier = sampleResult.Qualifier;
-                        resultDto.MassLoadingValue = sampleResult.Value;
-                        resultDto.MassLoadingDecimalPlaces = sampleResult.DecimalPlaces;
-                        resultDto.MassLoadingUnitId = sampleResult.UnitId;
-                        resultDto.MassLoadingUnitName = sampleResult.UnitName;
-                    }
-
 
                 }
-                else
-                {
-                    //  "Any introduction of a new Limit Type or new Limit Basis at the data level 
-                    //  will be ignored until we change the code..." - mj
-                  
-                }
-
-              
             }
 
             dto.SampleResults = resultDtoList.Values.ToList();
@@ -771,7 +782,8 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <param name="endDate">Nullable localized date/time time period range. 
         /// Sample end dates must on or before this date/time. Null parameters are ignored and not part of the filter.</param>
         /// <returns>Collection of filtered Sample Dto's</returns>
-        public IEnumerable<SampleDto> GetSamples(SampleStatusName status, DateTime? startDate = null, DateTime? endDate = null)
+        /// <param name="isIncludeChildObjects">Switch to load result list or not (for display in grid)</param>
+        public IEnumerable<SampleDto> GetSamples(SampleStatusName status, DateTime? startDate = null, DateTime? endDate = null, bool isIncludeChildObjects = false)
         {
             string startDateString = startDate.HasValue ? startDate.Value.ToString() : "null";
             string endDateString = endDate.HasValue ? endDate.Value.ToString() : "null";
@@ -828,13 +840,33 @@ namespace Linko.LinkoExchange.Services.Sample
 
             foreach (var sample in foundSamples.ToList())
             {
-                var dto = this.GetSampleDetails(sample);
+                var dto = this.GetSampleDetails(sample, isIncludeChildObjects);
                 dtos.Add(dto);
             }
 
             _logger.Info($"Leaving SampleService.GetSamples. status={status}, startDate={startDateString}, endDate={endDateString}, dtos.Count={dtos.Count()}");
 
             return dtos;
+        }
+
+        public IEnumerable<CollectionMethodDto> GetCollectionMethods()
+        {
+            var collectionMethodList = new List<CollectionMethodDto>();
+            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var authOrganizationId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationId;
+            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
+
+            var collectionMethods = _dbContext.CollectionMethods
+                .Where(cm => cm.IsEnabled
+                && !cm.IsRemoved
+                && cm.OrganizationId == authOrganizationId);
+
+            foreach (var cm in collectionMethods)
+            {
+                collectionMethodList.Add(new Dto.CollectionMethodDto() { CollectionMethodId = cm.CollectionMethodId, Name = cm.Name });
+            }
+
+            return collectionMethodList;
         }
     }
 }

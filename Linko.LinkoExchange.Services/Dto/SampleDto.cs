@@ -21,7 +21,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public string LabSampleIdentifier { get; set; }
         public DateTime StartDateTimeLocal { get; set; }
         public DateTime EndDateTimeLocal { get; set; }
-        public bool IsCalculated { get; set; }
         public bool IsReadyToReport { get; set; }
         public SampleStatusName SampleStatusName { get; set; }
         public DateTime LastModificationDateTimeLocal { get; set; }

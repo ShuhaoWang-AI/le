@@ -2090,7 +2090,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             // CtsEventTypes
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
-            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes().Select(c => new SelectListItem
+            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(false).Select(c => new SelectListItem
                                                                                                      {
                                                                                                          Text = c.Name,
                                                                                                          Value = c.CtsEventTypeId.ToString(),
@@ -2395,7 +2395,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             
             // CtsEventTypes
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
-            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes().OrderBy(c => c.CtsEventCategoryName).Select(c => new SelectListItem
+            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(false).OrderBy(c => c.CtsEventCategoryName).Select(c => new SelectListItem
                                                                                                                                           {
                                                                                                                                               Text = $"({c.CtsEventCategoryName}) {c.Name}",
                                                                                                                                               Value = c.CtsEventTypeId.ToString(),

@@ -11,7 +11,7 @@ namespace Linko.LinkoExchange.Services.Report
         IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates(bool includeChildObjects = true);
         int SaveReportPackageTemplate(ReportPackageTemplateDto rpt);
 
-        IEnumerable<CtsEventTypeDto> GetCtsEventTypes();
+        IEnumerable<CtsEventTypeDto> GetCtsEventTypes(bool isForSample);
         CtsEventTypeDto GetCtsEventType(int ctsEventTypeId);
         IEnumerable<ReportElementTypeDto> GetCertificationTypes();
         IEnumerable<ReportElementTypeDto> GetAttachmentTypes();

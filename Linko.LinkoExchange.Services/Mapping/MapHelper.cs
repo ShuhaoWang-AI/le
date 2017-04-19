@@ -957,7 +957,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             existingSample.LabSampleIdentifier = sampleDto.LabSampleIdentifier;
             //existingSample.StartDateTimeUtc = sampleDto.StartDateTimeUtc;
             //existingSample.EndDateTimeUtc = sampleDto.EndDateTimeUtc;
-            existingSample.IsCalculated = sampleDto.IsCalculated;
+            existingSample.IsCalculated = false; //not currently used
             existingSample.IsReadyToReport = sampleDto.IsReadyToReport;
             //existingSample.OrganizationTypeId = sampleDto.OrganizationTypeId; //set after we exit this method
             //existingSample.OrganizationRegulatoryProgramId = sampleDto.OrganizationRegulatoryProgramId; //set after we exit this method
@@ -984,8 +984,8 @@ namespace Linko.LinkoExchange.Services.Mapping
             //dto.AnalysisDateTimeLocal = set outside MapHelper
             dto.IsApprovedEPAMethod = sampleResult.IsApprovedEPAMethod;
             dto.IsCalculated = sampleResult.IsCalculated;
-            dto.LimitTypeId = sampleResult.LimitTypeId;
-            dto.LimitBasisId = sampleResult.LimitBasisId;
+            //dto.LimitTypeName = set outside MapHelper
+            //dto.LimitBasisName = set outside MapHelper
             //dto.LastModificationDateTimeLocal = set outside MapHelper
             //dto.LastModifierUserFullName = set outside MapHelper
 

@@ -116,6 +116,7 @@
     <Compile Include="CopyOfRecord\HashHelper.cs" />
     <Compile Include="CopyOfRecord\ICopyOfRecordService.cs" />
     <Compile Include="CopyOfRecord\IDigitalSignatureManager.cs" />
+    <Compile Include="Dto\CollectionMethodDto.cs" />
     <Compile Include="Dto\CopyOfRecordDto.cs" />
     <Compile Include="Dto\CopyOfRecordValidationResult.cs" />
     <Compile Include="Dto\CorFileDtoBase.cs" />

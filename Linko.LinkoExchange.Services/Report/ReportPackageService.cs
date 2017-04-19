@@ -14,6 +14,7 @@ using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Mapping;
+using System.Data.Entity;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -319,6 +320,111 @@ namespace Linko.LinkoExchange.Services.Report
             _emailService.SendEmail(authorityAdminAndStandardUsersEmails, EmailType.Report_Submission_AU, emailContentReplacements, false);
 
             _logger.Info("Leave ReportPackageService.SendSignAndSubmitEmail. reportPackageId={0}", reportPackage.ReportPackageId);
+        }
+
+        /// <summary>
+        /// *WARNING: NO VALIDATION CHECK -- CASCADE DELETE*
+        /// Hard delete of row from tReportPackage table associated with passed in parameter.
+        /// Programatically cascade deletes rows in the following associated tables:
+        /// - tReportPackageElementCategory (via ReportPackageId)
+        /// - tReportPackageElementType (via ReportPackageElementCategoryId)
+        /// - tReportSample (via ReportPackageElementTypeId)
+        /// - tReportFile (via ReportPackageElementTypeId)
+        /// - tCopyofRecord (via ReportPackageId)
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        public void DeleteReportPackage(int reportPackageId)
+        {
+            using (var transaction = _dbContext.BeginTransaction())
+            {
+                try {
+                    var reportPackageElementCategories = _dbContext.ReportPackageElementCategories
+                    .Include(rpec => rpec.ReportPackageElementTypes)
+                    .Where(rpec => rpec.ReportPackageId == reportPackageId);
+
+                    foreach (var rpec in reportPackageElementCategories)
+                    {
+                        foreach (var rpet in rpec.ReportPackageElementTypes)
+                        {
+                            var reportSamples = _dbContext.ReportSamples
+                                .Where(rs => rs.ReportPackageElementTypeId == rpet.ReportPackageElementTypeId);
+                            if (reportSamples.Count() > 0)
+                            {
+                                _dbContext.ReportSamples.RemoveRange(reportSamples);
+                            }
+
+                            var reportFiles = _dbContext.ReportFiles
+                                .Where(rf => rf.ReportPackageElementTypeId == rpet.ReportPackageElementTypeId);
+                            if (reportFiles.Count() > 0)
+                            {
+                                _dbContext.ReportFiles.RemoveRange(reportFiles);
+                            }
+
+                        }
+                        _dbContext.ReportPackageElementTypes.RemoveRange(rpec.ReportPackageElementTypes);
+
+                    }
+                    _dbContext.ReportPackageElementCategories.RemoveRange(reportPackageElementCategories);
+
+                    _dbContext.SaveChanges();
+
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error(s): {0} ", String.Join("," + Environment.NewLine, errors));
+
+                    throw;
+                }
+                
+            }
+
+        }
+
+        /// <summary>
+        /// To be called after a User selects a template and date range but: 
+        ///     1) Before the User clicks the "Save Draft" button (no reportPackageDto to save yet) or...
+        ///         - Only "copies over" template report package elements and creates a "minimal row" in tReportPackage.
+        ///     2) After the User clicks the "Save Draft" button. (must pass in reportPackageDto to attempt Save) 
+        ///         - Both "copies over" template report package elements and saves a complete row in tReportPackage (representing the reportPackageDto)
+        /// </summary>
+        /// <param name="reportPackageTemplateId"></param>
+        /// <param name="startDateTimeLocal"></param>
+        /// <param name="endDateTimeLocal"></param>
+        /// <param name="reportPackageDto"></param>
+        /// <returns>The newly created tReportPackage.ReportPackageId</returns>
+        public int CreateDraft(int reportPackageTemplateId, DateTime startDateTimeLocal, DateTime endDateTimeLocal, ReportPackageDto reportPackageDto = null)
+        {
+            int newReportPackageId = -1;
+
+            //o	Step 1 - create a row in tReportPackageElementCategory for each row in tReportPackageTemplateElementCategory (where ReportPackageTemplateId="n")
+            var reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories
+                .Include(rptec => rptec.ReportPackageTemplateElementTypes)
+                .Where(rptec => rptec.ReportPackageTemplateId == reportPackageTemplateId);
+
+            //o Step 2 - create a row in tReportPackageElementType for each row in tReportPackageTemplateElementType(associated with the rows found in Step 1)
+            foreach (var rptec in reportPackageTemplateElementCategories)
+            {
+                foreach (var rptet in rptec.ReportPackageTemplateElementTypes)
+                {
+                    var reportElementType = _dbContext.ReportElementTypes
+                        .Single(ret => ret.ReportElementTypeId == rptet.ReportElementTypeId);
+                }
+            }
+
+
+
+            return newReportPackageId;
         }
     }
 }

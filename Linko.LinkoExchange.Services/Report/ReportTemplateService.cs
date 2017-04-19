@@ -333,13 +333,14 @@ namespace Linko.LinkoExchange.Services.Report
             }
         }
 
-        public IEnumerable<CtsEventTypeDto> GetCtsEventTypes()
+        public IEnumerable<CtsEventTypeDto> GetCtsEventTypes(bool isForSample)
         {
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var ctsEventTypes =
                 _dbContext.CtsEventTypes.Where(
                     i =>
                         i.IsEnabled && i.IsRemoved == false &&
+                        ((i.CtsEventCategoryName == "Sample") == isForSample) &&
                         i.OrganizationRegulatoryProgramId == currentOrgRegProgramId).ToList();
 
             return ctsEventTypes.Select(i => _mapHelper.GetCtsEventTypeDtoFromEventType(i));
