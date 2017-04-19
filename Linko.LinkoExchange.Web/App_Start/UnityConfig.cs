@@ -30,6 +30,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using Microsoft.Practices.Unity;
 using NLog;
+using Linko.LinkoExchange.Services.Config;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -108,6 +109,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<ITimeZoneService, TimeZoneService>();
             container.RegisterType<IUnitService, UnitService>();
             container.RegisterType<IUserService, UserService>();
+            container.RegisterType<IConfigSettingService, ConfigSettingService>();
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
