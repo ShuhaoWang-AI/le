@@ -434,5 +434,81 @@ namespace Linko.LinkoExchange.Services.Report
 
             return newReportPackageId;
         }
+
+        /// <summary>
+        /// Performs validation to ensure only allowed state transitions are occur,
+        /// throw RuleViolationException otherwise
+        /// </summary>
+        /// <param name="reportStatus">Intended target state</param>
+        public void UpdateStatus(int reportPackageId, ReportStatusName reportStatus)
+        {
+            using (var transaction = _dbContext.BeginTransaction())
+            {
+                try
+                {
+                    var reportPackage = _dbContext.ReportPackages
+                       .Include(rp => rp.ReportStatus)
+                       .Single(rp => rp.ReportPackageId == reportPackageId);
+
+                    var previousStatus = reportPackage.ReportStatus.Name;
+
+                    if (previousStatus == reportStatus.ToString())
+                    {
+                        //No transition -- allowed?
+                    }
+                    else if ((previousStatus == ReportStatusName.Draft.ToString() && reportStatus == ReportStatusName.ReadyToSubmit) ||
+                        (previousStatus == ReportStatusName.ReadyToSubmit.ToString() && reportStatus == ReportStatusName.Draft))
+                    {
+                        //allowed
+                    }
+                    else if (previousStatus == ReportStatusName.ReadyToSubmit.ToString() && reportStatus == ReportStatusName.Submitted)
+                    {
+                        //allowed
+                    }
+                    else if (previousStatus == ReportStatusName.Submitted.ToString() && reportStatus == ReportStatusName.Repudiated)
+                    {
+                        //allowed
+                    }
+                    else
+                    {
+                        //not allowed
+                        string message = $"Cannot change a Report Package status from '{previousStatus}' to '{reportStatus}'.";
+                        List<RuleViolation> validationIssues = new List<RuleViolation>();
+                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    }
+
+                    string targetReportStatusName = reportStatus.ToString();
+                    var targetReportStatusId = _dbContext.ReportStatuses
+                        .Single(rs => rs.Name == targetReportStatusName).ReportStatusId;
+                    reportPackage.ReportStatusId = targetReportStatusId;
+
+                    _dbContext.SaveChanges();
+
+                    transaction.Commit();
+
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                    throw;
+                }
+
+            }
+
+           
+        }
+
     }
 }

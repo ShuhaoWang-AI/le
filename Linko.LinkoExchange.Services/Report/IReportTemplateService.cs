@@ -8,7 +8,7 @@ namespace Linko.LinkoExchange.Services.Report
     {
         void DeleteReportPackageTemplate(int reportPackageTemplateId);
         ReportPackageTemplateDto GetReportPackageTemplate(int reportPackageTemplateId);
-        IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates(bool includeChildObjects = true);
+        IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates(bool isGetAssignedToThisUserOnly = false, bool includeChildObjects = true);
         int SaveReportPackageTemplate(ReportPackageTemplateDto rpt);
 
         IEnumerable<CtsEventTypeDto> GetCtsEventTypes(bool isForSample);
@@ -18,5 +18,6 @@ namespace Linko.LinkoExchange.Services.Report
         IEnumerable<ReportElementTypeDto> GetSampleAndResultTypes();
         IEnumerable<ReportElementCategoryDto> GetReportElementCategories();
         IEnumerable<ReportElementCategoryName> GetReportElementCategoryNames();
+        
     }
 }

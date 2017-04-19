@@ -114,22 +114,35 @@ namespace Linko.LinkoExchange.Services.Report
             return rptDto;
         }
 
-        public IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates(bool includeChildObjects = true)
+        public IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates(bool isGetAssignedToThisUserOnly = false, bool includeChildObjects = true)
         {
             _logger.Info("Enter ReportTemplateService.GetReportPackageTemplates.");
 
             var currentRegulatoryProgramId =
                        int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
-            var rpts =
-                _dbContext.ReportPackageTempates.Where(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId)
+            var rptsQuery =
+                _dbContext.ReportPackageTempates
                     .Include(a => a.CtsEventType)
                     .Include(a => a.OrganizationRegulatoryProgram)
                     .Include(a => a.ReportPackageTemplateAssignments.Select(b => b.OrganizationRegulatoryProgram))
                     .Include(a => a.ReportPackageTemplateElementCategories.Select(b => b.ReportElementCategory))
-                    .Include(a => a.ReportPackageTemplateElementCategories.Select(b => b.ReportPackageTemplateElementTypes.Select(d => d.ReportElementType)))
-                    .Distinct()
-                    .ToArray();
+                    .Include(a => a.ReportPackageTemplateElementCategories.Select(b => b.ReportPackageTemplateElementTypes.Select(d => d.ReportElementType)));
+
+            if (isGetAssignedToThisUserOnly)
+            {
+                rptsQuery = rptsQuery
+                    .Where(i => i.ReportPackageTemplateAssignments
+                        .Select(j => j.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId)
+                            .Contains(currentRegulatoryProgramId));
+            }
+            else {
+                rptsQuery = rptsQuery
+                    .Where(i => i.OrganizationRegulatoryProgramId == currentRegulatoryProgramId);
+            }
+
+            var rpts = rptsQuery.Distinct().ToArray();
+
             if (includeChildObjects)
             {
                 _reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories.Include(i => i.ReportPackageTemplate)

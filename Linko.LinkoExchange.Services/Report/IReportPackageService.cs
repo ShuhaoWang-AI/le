@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Linko.LinkoExchange.Services.Dto;
 using System;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -66,5 +67,12 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageDto"></param>
         /// <returns>The newly created tReportPackage.ReportPackageId</returns>
         int CreateDraft(int reportPackageTemplateId, DateTime startDateTimeLocal, DateTime endDateTimeLocal, ReportPackageDto reportPackageDto = null);
+
+        /// <summary>
+        /// Performs validation to ensure only allowed state transitions are occur,
+        /// throw RuleViolationException otherwise
+        /// </summary>
+        /// <param name="reportStatus">Intended target state</param>
+        void UpdateStatus(int reportPackageId, ReportStatusName reportStatus);
     }
 }
