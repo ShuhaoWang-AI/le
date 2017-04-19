@@ -85,15 +85,12 @@ namespace Linko.LinkoExchange.Test
             var copyOfRecordPdfFile = GetCopyOfRecordPdfFile();
             var reportPackageCopyOfRecordDataXml = GetReportPackageCopyOfRecordDataXml();
 
-            _reprotPackageService.Setup(i => i.GetReportPackageAttachments(It.IsAny<int>()))
-                                 .Returns(attachments);
-
             _reprotPackageService.Setup(i => i.GetReportPackageCopyOfRecordDataXmlFile(It.IsAny<int>()))
                                  .Returns(reportPackageCopyOfRecordDataXml);
             _reprotPackageService.Setup(i => i.GetReportPackageCopyOfRecordPdfFile(It.IsAny<int>()))
                                  .Returns(copyOfRecordPdfFile);
 
-            var attachmentFiles = _reprotPackageService.Object.GetReportPackageAttachments(rptId);
+            var attachmentFiles = attachments;
             var copyOfRecordDataXmlFileInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordDataXmlFile(rptId);
             var copyOfRecordPdfInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordPdfFile(rptId);
 

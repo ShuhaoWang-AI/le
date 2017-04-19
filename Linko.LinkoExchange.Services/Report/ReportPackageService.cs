@@ -59,6 +59,10 @@ namespace Linko.LinkoExchange.Services.Report
         }
 
 
+        /// <summary>
+        /// Note:  before call this function,  make sure to update draf first.
+        /// </summary>
+        /// <param name="reportPackageId"></param>
         public void SignAndSubmitReportPackage(int reportPackageId)
         {
             _logger.Info("Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
@@ -124,11 +128,11 @@ namespace Linko.LinkoExchange.Services.Report
 
                     _dbContext.SaveChanges();
 
-                    var reportPackageDto = GetReportPackage(reportPackageId);
+                    var reportPackageDto = GetReportPackage(reportPackageId, true);
 
                     //// TODO:
                     //// Comment out temporary, using hard code temporary 
-                    //// var copyOfRecordDto = CreateCopyOfRecordForReportPackage(reportPackageId);  
+                    //// var copyOfRecordDto = CreateCopyOfRecordForReportPackage(reportPackageDto);
 
                     //// TODO: to remove below line for hard code testing purpose 
                     var temp = reportPackageDto.ReportPackageId;
@@ -157,15 +161,6 @@ namespace Linko.LinkoExchange.Services.Report
             }
         }
 
-        /// <summary>
-        ///  Prepare Mock data;
-        /// </summary>
-        /// <param name="reportPackageId"></param>
-        /// <returns></returns>
-        public IList<FileStoreDto> GetReportPackageAttachments(int reportPackageId)
-        {
-            throw new NotImplementedException();
-        }
 
         public IList<ReportPackageELementTypeDto> GetReportPackageCertifications(int reportPackageId)
         {
@@ -194,7 +189,7 @@ namespace Linko.LinkoExchange.Services.Report
         }
 
         //TODO: to implement this!
-        public ReportPackageDto GetReportPackage(int reportPackageId)
+        public ReportPackageDto GetReportPackage(int reportPackageId, bool incldingAttachmentFileData)
         {
             _logger.Info("Enter ReportPackageService.GetReportPackage. reportPackageId={0}", reportPackageId);
 
@@ -225,7 +220,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             if (reportPackageDto == null)
             {
-                reportPackageDto = GetReportPackage(reportPackageId);
+                reportPackageDto = GetReportPackage(reportPackageId, false);
             }
 
             var copyOfRecordDto = _copyOfRecordService.GetCopyOfRecordByReportPackage(reportPackageDto);
@@ -234,11 +229,11 @@ namespace Linko.LinkoExchange.Services.Report
             return copyOfRecordDto;
         }
 
-        public CopyOfRecordDto CreateCopyOfRecordForReportPackage(int reportPackageId)
+        public CopyOfRecordDto CreateCopyOfRecordForReportPackage(ReportPackageDto reportPackageDto)
         {
-            _logger.Info("Enter ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={0}", reportPackageId);
-
-            var attachments = GetReportPackageAttachments(reportPackageId);
+            _logger.Info("Enter ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={0}", reportPackageDto.ReportPackageId);
+            int reportPackageId = reportPackageDto.ReportPackageId;
+            var attachments = reportPackageDto.AttachmentDtos;
             var copyOfRecordPdfFile = GetReportPackageCopyOfRecordPdfFile(reportPackageId);
             var copyOfRecordDataXmlFile = GetReportPackageCopyOfRecordDataXmlFile(reportPackageId);
             var copyOfRecordDto = _copyOfRecordService.CreateCopyOfRecordForReportPackage(reportPackageId, attachments, copyOfRecordPdfFile, copyOfRecordDataXmlFile);

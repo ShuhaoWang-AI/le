@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
-
     //TODO: to add more, 
     // Here is just for Cor usage
     public class ReportPackageDto
@@ -28,5 +28,8 @@ namespace Linko.LinkoExchange.Services.Dto
         public string OrganizationCityName { get; internal set; }
         public string OrganizationJurisdictionName { get; internal set; }
         public DateTime CreationDateTimeLocal { get; internal set; }
+        public List<FileStoreDto> AttachmentDtos { get; set; }
+        public List<SampleDto> SamplesDtos { get; set; }
+        public List<ReportPackageELementTypeDto> CertificationDtos { get; set; }
     }
 }

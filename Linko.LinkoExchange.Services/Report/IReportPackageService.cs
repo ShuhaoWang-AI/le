@@ -8,12 +8,17 @@ namespace Linko.LinkoExchange.Services.Report
     {
         void SignAndSubmitReportPackage(int reportPackageId);
         CopyOfRecordDto GetCopyOfRecordByReportPackageId(int reportPackageId, ReportPackageDto reportPackageDto = null);
-        CopyOfRecordDto CreateCopyOfRecordForReportPackage(int reportPackageId);
-
-        ReportPackageDto GetReportPackage(int reportPackageId);
-        IList<FileStoreDto> GetReportPackageAttachments(int reportPackageId);
-
+        CopyOfRecordDto CreateCopyOfRecordForReportPackage(ReportPackageDto reportPackageDto);
         CopyOfRecordValidationResultDto VerififyCopyOfRecord(int reportPackageId);
+
+
+        /// <summary>
+        /// Get ReportPackageDto object by report package Id. 
+        /// </summary>
+        /// <param name="reportPackageId">ReportPackageId</param>
+        /// <param name="incldingAttachmentFileData">Indicating attachments binary data is included or not</param>
+        /// <returns>ReportPackageDto Object</returns> 
+        ReportPackageDto GetReportPackage(int reportPackageId, bool incldingAttachmentFileData);
 
         /// <summary>
         /// The file 'Copy of Record Data.xml' contains below:
