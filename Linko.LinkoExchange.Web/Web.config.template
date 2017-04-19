@@ -70,7 +70,8 @@ For more information on how to configure your ASP.NET application, please visit 
     <add key="UnauthorizedPagePath" value="~/Views/Common/Unauthorized.cshtml" />
     <add key="DefaultInviteExpirationHours" value="72" />
     <add key="EncryptionPassword" value="L1nk0Exch@ng3" />
-
+    <add key="ppdUnitName" value="ppd" />
+    
     <add key="webpages:Version"
          value="3.0.0.0" />
     <add key="webpages:Enabled"

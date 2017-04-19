@@ -8,6 +8,7 @@ using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.TimeZone;
 using NLog;
 using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Config;
 
 namespace Linko.LinkoExchange.Services.Unit
 {
@@ -19,6 +20,7 @@ namespace Linko.LinkoExchange.Services.Unit
         private readonly IHttpContextService _httpContextService;
         private readonly ITimeZoneService _timeZoneService;
         private readonly IOrganizationService _orgService;
+        private readonly IConfigSettingService _configService;
 
         public UnitService(
             LinkoExchangeContext dbContext,
@@ -26,7 +28,8 @@ namespace Linko.LinkoExchange.Services.Unit
             ILogger logger,
             IHttpContextService httpContextService,
             ITimeZoneService timeZoneService,
-            IOrganizationService orgService)
+            IOrganizationService orgService,
+            IConfigSettingService configService)
         {
             if (dbContext == null)
             {
@@ -58,12 +61,18 @@ namespace Linko.LinkoExchange.Services.Unit
                 throw new ArgumentNullException(nameof(orgService));
             }
 
+            if (configService == null)
+            {
+                throw new ArgumentNullException(nameof(orgService));
+            }
+
             _dbContext = dbContext;
             _mapHelper = mapHelper;
             _logger = logger;
             _httpContextService = httpContextService;
             _timeZoneService = timeZoneService;
             _orgService = orgService;
+            _configService = configService;
         }
 
         public List<UnitDto> GetFlowUnits()
@@ -92,8 +101,9 @@ namespace Linko.LinkoExchange.Services.Unit
 
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authOrganizationId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationId;
+            var ppdLabelForLookup = _configService.GetConfigValue("ppdUnitName");
 
-            var units = _dbContext.Units.Where(i => i.Name == "ppd" && i.OrganizationId == authOrganizationId).ToList();
+            var units = _dbContext.Units.Where(i => i.Name == ppdLabelForLookup && i.OrganizationId == authOrganizationId).ToList();
 
             var unitDtos = UnitDtosHelper(units);
 
