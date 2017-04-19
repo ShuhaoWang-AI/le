@@ -15,6 +15,7 @@ using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Mapping;
 using System.Data.Entity;
+using Linko.LinkoExchange.Core.Validation;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -109,7 +110,15 @@ namespace Linko.LinkoExchange.Services.Report
             {
                 try
                 {
+                    List<RuleViolation> validationIssues = new List<RuleViolation>();
+
                     var reportPackage = _dbContext.ReportPackages.Single(i => i.ReportPackageId == reportPackageId);
+                    if (reportPackage.ReportStatus.Name != ReportStatusName.ReadyToSubmit.ToString())
+                    {
+                        string message = "Report Package is not ready to submit.";
+                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    }
 
                     var submitterUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
                     var submitterFirstName = _httpContextService.GetClaimValue(CacheKey.FirstName);
@@ -125,6 +134,9 @@ namespace Linko.LinkoExchange.Services.Report
                     reportPackage.SubmitterTitleRole = submitterTitleRole;
                     reportPackage.SubmitterIPAddress = submitterIpAddress;
                     reportPackage.SubmitterUserName = submitterUserName;
+
+                    var reportStatus = _dbContext.ReportStatuses.Single(i => i.Name.Equals(ReportStatusName.Submitted.ToString()));
+                    reportPackage.ReportStatusId = reportStatus.ReportStatusId;
 
                     _dbContext.SaveChanges();
 
@@ -332,7 +344,8 @@ namespace Linko.LinkoExchange.Services.Report
         {
             using (var transaction = _dbContext.BeginTransaction())
             {
-                try {
+                try
+                {
                     var reportPackageElementCategories = _dbContext.ReportPackageElementCategories
                     .Include(rpec => rpec.ReportPackageElementTypes)
                     .Where(rpec => rpec.ReportPackageId == reportPackageId);
@@ -381,7 +394,7 @@ namespace Linko.LinkoExchange.Services.Report
 
                     throw;
                 }
-                
+
             }
 
         }
