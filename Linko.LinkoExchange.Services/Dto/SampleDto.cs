@@ -22,6 +22,13 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTime StartDateTimeLocal { get; set; }
         public DateTime EndDateTimeLocal { get; set; }
         public bool IsReadyToReport { get; set; }
+
+        public string FlowUnitValidValues { get; set; }
+        public string ResultQualifierValidValues { get; set; }
+        public double? MassLoadingConversionFactorPounds { get; set; }
+        public int? MassLoadingCalculationDecimalPlaces { get; set; }
+        public bool IsMassLoadingResultToUseLessThanSign { get; set; }
+
         public SampleStatusName SampleStatusName { get; set; }
         public DateTime LastModificationDateTimeLocal { get; set; }
         public string LastModifierFullName { get; set; }

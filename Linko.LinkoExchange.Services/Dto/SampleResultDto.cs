@@ -21,18 +21,14 @@ namespace Linko.LinkoExchange.Services.Dto
         public string AnalysisMethod { get; set; }
         public DateTime? AnalysisDateTimeLocal { get; set; }
         public bool IsApprovedEPAMethod { get; set; }
-        //public bool IsMassLoadingCalculationRequired { get; set; } // Set by the service when persisting mass result row (values below)
-        //public bool IsFlowForMassLoadingCalculation { get; set; } // Flow value is stored in SampleDto
         public bool IsCalculated { get; set; }
         public LimitTypeName LimitTypeName { get; set; }
         public LimitBasisName LimitBasisName { get; set; }
         public DateTime LastModificationDateTimeLocal { get; set; }
         public string LastModifierFullName { get; set; }
-
         public bool IsCalcMassLoading { get; set; }
         public string MassLoadingQualifier { get; set; }
         public double? MassLoadingValue { get; set; }
-        public int? MassLoadingDecimalPlaces { get; set; }
         public int MassLoadingUnitId { get; set; }
         public string MassLoadingUnitName { get; set; }
 

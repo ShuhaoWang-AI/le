@@ -387,7 +387,7 @@ namespace Linko.LinkoExchange.Services.Sample
             //Check Flow Value exists and is complete if provided (both value and unit)
 
             bool isValidFlowValueExists = false;
-            if (!sampleDto.FlowValue.HasValue && sampleDto.FlowUnitId.HasValue && 
+            if (sampleDto.FlowValue.HasValue && sampleDto.FlowUnitId.HasValue && 
                 sampleDto.FlowUnitId.Value > 0 && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
             {
                 isValidFlowValueExists = true;

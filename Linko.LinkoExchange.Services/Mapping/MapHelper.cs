@@ -927,7 +927,11 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.IsReadyToReport = sample.IsReadyToReport;
             //dto.SampleStatusName = set outside after existing this method
             dto.LabSampleIdentifier = sample.LabSampleIdentifier;
-
+            dto.FlowUnitValidValues = sample.FlowUnitValidValues;
+            dto.ResultQualifierValidValues = sample.ResultQualifierValidValues;
+            dto.MassLoadingConversionFactorPounds = sample.MassLoadingConversionFactorPounds;
+            dto.MassLoadingCalculationDecimalPlaces = sample.MassLoadingCalculationDecimalPlaces;
+            dto.IsMassLoadingResultToUseLessThanSign = sample.IsMassLoadingResultToUseLessThanSign;
             //Handle this in calling code
             //var resultDtos = new List<SampleResultDto>();
             //foreach (var sampleResult in sample.SampleResults)
@@ -958,6 +962,11 @@ namespace Linko.LinkoExchange.Services.Mapping
             //existingSample.EndDateTimeUtc = sampleDto.EndDateTimeUtc;
             existingSample.IsSystemGenerated = false; //not currently used
             existingSample.IsReadyToReport = sampleDto.IsReadyToReport;
+            existingSample.FlowUnitValidValues = sampleDto.FlowUnitValidValues;
+            existingSample.ResultQualifierValidValues = sampleDto.ResultQualifierValidValues;
+            existingSample.MassLoadingConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds;
+            existingSample.MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces;
+            existingSample.IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign;
             //existingSample.OrganizationTypeId = sampleDto.OrganizationTypeId; //set after we exit this method
             //existingSample.OrganizationRegulatoryProgramId = sampleDto.OrganizationRegulatoryProgramId; //set after we exit this method
 

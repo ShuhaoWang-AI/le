@@ -15,6 +15,7 @@ using System;
 using Linko.LinkoExchange.Services.Parameter;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Sample;
+using System.Reflection;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -62,7 +63,7 @@ namespace Linko.LinkoExchange.Test
         private SampleDto GetTestSampleDto()
         {
             var sampleDto = new SampleDto();
-            sampleDto.Name = "Sample XYZ";
+            //sampleDto.Name = "Sample XYZ"; //THIS IS NOT SET FROM UI
             sampleDto.MonitoringPointId = 1;
             sampleDto.MonitoringPointName = "0002-Retired";
             sampleDto.CollectionMethodId = 1;
@@ -76,6 +77,7 @@ namespace Linko.LinkoExchange.Test
             sampleDto.StartDateTimeLocal = DateTime.Now;
             sampleDto.EndDateTimeLocal = DateTime.Now;
             sampleDto.IsReadyToReport = false;
+            sampleDto.MassLoadingCalculationDecimalPlaces = 4;
             var resultDtos = new List<SampleResultDto>();
 
             var resultDto = new SampleResultDto()
@@ -95,7 +97,6 @@ namespace Linko.LinkoExchange.Test
                 MassLoadingUnitId = 8,
                 MassLoadingUnitName = "mgd",
                 MassLoadingValue = 1001.2005,
-                MassLoadingDecimalPlaces = 4
             };
             resultDtos.Add(resultDto);
             resultDto = new SampleResultDto()
@@ -420,6 +421,62 @@ namespace Linko.LinkoExchange.Test
         {
             var sampleDtos = _sampleService.GetSamples(SampleStatusName.Reported);
             
+        }
+
+        [TestMethod]
+        public void Persist_And_Read_Back_SampleDto_And_Compare_Fields()
+        {
+            Remove_All_Samples_From_Db();
+
+            //Create test Sample Dto
+            var sampleDto = GetTestSampleDto();
+            sampleDto.IsReadyToReport = true;
+
+            //Persist
+            int sampleId = _sampleService.SaveSample(sampleDto);
+
+            //Get
+            var fetchedSampleDto = _sampleService.GetSampleDetails(sampleId);
+
+            //Compare
+            Type type = sampleDto.GetType();
+            PropertyInfo[] properties = type.GetProperties();
+
+            foreach (PropertyInfo property in properties)
+            {
+                var fieldName = property.Name;
+                var beforeValue = property.GetValue(sampleDto, null);
+                var afterValue = property.GetValue(fetchedSampleDto, null);
+
+                Console.WriteLine($"Name: {fieldName}, Before Value: {beforeValue}, After Value: {afterValue}");
+
+                if (fieldName == "SampleId") //set within service code
+                {
+
+                }
+                else if (fieldName == "Name") //set within service code
+                {
+
+                }
+                else if (fieldName == "LastModificationDateTimeLocal") //set within service code
+                {
+
+                }
+                else if (fieldName == "LastModifierFullName") //set within service code
+                {
+
+                }
+                else if (fieldName == "SampleResults")
+                {
+
+                }
+                else {
+
+                    Assert.AreEqual(beforeValue, afterValue);
+                }
+                
+            }
+
         }
     }
 }
