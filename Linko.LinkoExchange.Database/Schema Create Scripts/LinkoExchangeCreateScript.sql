@@ -280,8 +280,8 @@ BEGIN
         , PhoneNumber                   varchar(25) NULL  
         , PhoneExt                      int NULL  
         , FaxNumber                     varchar(25) NULL  
-        , WebsiteURL                    varchar(256) NULL  
-        , PermitNumber                  varchar(50) NULL  
+        , WebsiteURL                    varchar(256) NULL
+        , PermitNumber                  varchar(50) NULL    
         , Signer                        varchar(250) NULL
 		, Classification                varchar(50) NULL  
         , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
@@ -382,7 +382,8 @@ BEGIN
         , RegulatoryProgramId           int NOT NULL  
         , OrganizationId                int NOT NULL  
         , RegulatorOrganizationId       int NULL  
-        , AssignedTo                    varchar(50) NULL  
+        , AssignedTo                    varchar(50) NULL
+        , ReferenceNumber               varchar(50) NULL  
         , IsEnabled                     bit NOT NULL  
         , IsRemoved                     bit NOT NULL  
         , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
@@ -2237,8 +2238,13 @@ BEGIN
         , LabSampleIdentifier					varchar(50) NULL
         , StartDateTimeUtc						datetimeoffset(0) NOT NULL
         , EndDateTimeUtc						datetimeoffset(0) NOT NULL
-        , IsCalculated							bit NOT NULL
+        , IsSystemGenerated						bit NOT NULL
         , IsReadyToReport						bit NOT NULL
+        , FlowUnitValidValues                   varchar(50) NULL
+        , ResultQualifierValidValues            varchar(50) NULL
+        , MassLoadingConversionFactorPounds     float NULL
+        , MassLoadingCalculationDecimalPlaces   int NULL
+        , IsMassLoadingResultToUseLessThanSign  bit NOT NULL
         , ByOrganizationRegulatoryProgramId     int NOT NULL
         , ForOrganizationRegulatoryProgramId	int NOT NULL
         , CreationDateTimeUtc					datetimeoffset(0) NOT NULL  
@@ -2259,7 +2265,9 @@ BEGIN
 		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
     ) ON [LinkoExchange_FG1_Data]
     
-    ALTER TABLE dbo.tSample ADD CONSTRAINT DF_tSample_IsCalculated DEFAULT 0 FOR IsCalculated
+    ALTER TABLE dbo.tSample ADD CONSTRAINT DF_tSample_IsSystemGenerated DEFAULT 0 FOR IsSystemGenerated
+    ALTER TABLE dbo.tSample ADD CONSTRAINT DF_tSample_IsReadyToReport DEFAULT 0 FOR IsReadyToReport
+    ALTER TABLE dbo.tSample ADD CONSTRAINT DF_tSample_IsMassLoadingResultToUseLessThanSign DEFAULT 0 FOR IsMassLoadingResultToUseLessThanSign
     ALTER TABLE dbo.tSample ADD CONSTRAINT DF_tSample_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
 
     CREATE NONCLUSTERED INDEX IX_tSample_OrganizationRegulatoryProgramId_By ON dbo.tSample
@@ -2288,11 +2296,12 @@ BEGIN
         , ParameterId                       int NOT NULL
         , ParameterName                     varchar(254) NOT NULL
         , Qualifier                         varchar(2) NULL
+        , EnteredValue                      varchar(50) NULL
         , Value                             float NULL
-        , DecimalPlaces                     int NULL
         , UnitId                            int NOT NULL
         , UnitName                          varchar(100) NOT NULL
-        , MethodDetectionLimit              varchar(50) NULL
+        , EnteredMethodDetectionLimit       varchar(50) NULL
+        , MethodDetectionLimit              float NULL
         , AnalysisMethod                    varchar(50) NULL
         , AnalysisDateTimeUtc               datetimeoffset(0) NULL
         , IsApprovedEPAMethod               bit NOT NULL
@@ -2300,7 +2309,7 @@ BEGIN
         , IsFlowForMassLoadingCalculation   bit NOT NULL
         , IsCalculated                      bit NOT NULL
         , LimitTypeId                       int NULL
-        , LimitBasisId                      int NULL
+        , LimitBasisId                      int NOT NULL
         , CreationDateTimeUtc               datetimeoffset(0) NOT NULL  
         , LastModificationDateTimeUtc       datetimeoffset(0) NULL  
         , LastModifierUserId                int NULL  
@@ -2309,11 +2318,12 @@ BEGIN
         (
 	        SampleResultId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        --, CONSTRAINT AK_tSampleResult_SampleId_ParameterName UNIQUE 
-        --(
-        --    SampleId ASC
-        --    , ParameterName ASC
-        --) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT AK_tSampleResult_SampleId_ParameterName_LimitBasisId UNIQUE 
+        (
+            SampleId ASC
+            , ParameterName ASC
+            , LimitBasisId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tSampleResult_tSample FOREIGN KEY 
 		(
 			SampleId
@@ -3549,12 +3559,13 @@ BEGIN
     PRINT '---------------------------------------------'
     
     -- GRESD
-    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, IsEnabled)
+    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, ReferenceNumber, IsEnabled)
 		VALUES 
 		(
 		    @RegulatoryProgramId_IPP
 		    , @OrganizationId_GRESD
 		    , NULL
+            , 'MI0026069'
 		    , 1
 		)
 END
@@ -5652,7 +5663,9 @@ BEGIN
     INSERT INTO dbo.tLimitBasis (Name, Description)
 		VALUES ('Concentration', 'Concentration')
     INSERT INTO dbo.tLimitBasis (Name, Description)
-		VALUES ('MassLoading', 'MassLoading')
+		VALUES ('MassLoading', 'Mass Loading')
+    INSERT INTO dbo.tLimitBasis (Name, Description)
+		VALUES ('VolumeFlowRate', 'Volume Flow Rate')
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tFileType)

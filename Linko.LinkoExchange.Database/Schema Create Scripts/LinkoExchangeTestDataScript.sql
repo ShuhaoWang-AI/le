@@ -3041,8 +3041,8 @@ BEGIN
     
     -- GRESD Industries
     -- AssignedTo: TM
-    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, IsEnabled)
-	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'TM', 1 
+    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, ReferenceNumber, IsEnabled)
+	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'TM', PermitNumber, 1 
     FROM dbo.tOrganization
     WHERE OrganizationTypeId = @OrganizationTypeId_Industry
         AND PermitNumber IN 
@@ -3082,8 +3082,8 @@ BEGIN
         )
 
     -- AssignedTo: HB
-    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, IsEnabled)
-	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'HB', 1 
+    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, ReferenceNumber, IsEnabled)
+	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'HB', PermitNumber, 1 
     FROM dbo.tOrganization
     WHERE OrganizationTypeId = @OrganizationTypeId_Industry
         AND PermitNumber IN 
@@ -3095,8 +3095,8 @@ BEGIN
         )
 
     -- AssignedTo: KA
-    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, IsEnabled)
-	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'KA', 1 
+    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, ReferenceNumber, IsEnabled)
+	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'KA', PermitNumber, 1 
     FROM dbo.tOrganization
     WHERE OrganizationTypeId = @OrganizationTypeId_Industry
         AND PermitNumber IN 
@@ -3105,8 +3105,8 @@ BEGIN
         )
 
     -- AssignedTo: MB
-    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, IsEnabled)
-	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'KA', 1 
+    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, ReferenceNumber, IsEnabled)
+	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'KA', PermitNumber, 1 
     FROM dbo.tOrganization
     WHERE OrganizationTypeId = @OrganizationTypeId_Industry
         AND PermitNumber IN 
@@ -3115,8 +3115,8 @@ BEGIN
         )
 
     -- AssignedTo: PK
-    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, IsEnabled)
-	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'PK', 1 
+    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, ReferenceNumber, IsEnabled)
+	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'PK', PermitNumber, 1 
     FROM dbo.tOrganization
     WHERE OrganizationTypeId = @OrganizationTypeId_Industry
         AND PermitNumber IN 
@@ -3124,8 +3124,8 @@ BEGIN
             '8315'
         )
 
-    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, IsEnabled)
-	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 1 
+    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, ReferenceNumber, IsEnabled)
+	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, PermitNumber, 1 
     FROM dbo.tOrganization
     WHERE OrganizationTypeId = @OrganizationTypeId_Industry
         AND PermitNumber NOT IN
@@ -3556,10 +3556,21 @@ BEGIN
     PRINT 'Add records to tCollectionMethod'
     PRINT '--------------------------------'
     
-    INSERT INTO dbo.tCollectionMethod (Name, OrganizationId)
+    INSERT INTO dbo.tCollectionMethod (Name, OrganizationId, CollectionMethodTypeId)
 		SELECT CTSCollectMethCode
             , @OrganizationId_GRESD
+            , 2
         FROM dbo.ts_LE_CTSCollectionMethods
+        WHERE CTSCollectMethCode <> 'GRAB'
+
+    INSERT INTO dbo.tCollectionMethod (Name, OrganizationId, CollectionMethodTypeId)
+		SELECT CTSCollectMethCode
+            , @OrganizationId_GRESD
+            , 1
+        FROM dbo.ts_LE_CTSCollectionMethods
+        WHERE CTSCollectMethCode = 'GRAB'
+    INSERT dbo.tCollectionMethod (Name, OrganizationId, CollectionMethodTypeId)
+        VALUES ('Sample Flow', @OrganizationId_GRESD, 3)
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tUnit)
