@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -138,10 +139,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                     PhoneNumber = vm.UserProfileDto.PhoneNumber,
                                                     Email = vm.UserProfileDto.Email,
                                                     ResetEmail = vm.UserProfileDto.Email,
-                                                    DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime,
+                                                    DateRegistered = vm.RegistrationDateTimeUtc?.DateTime,
                                                     Status = vm.IsEnabled,
                                                     AccountLocked = vm.UserProfileDto.IsAccountLocked,
-                                                    Role = vm.PermissionGroup.PermissionGroupId.Value,
+                                                    Role = vm.PermissionGroup.PermissionGroupId ?? 0,
                                                     RoleText = vm.PermissionGroup.Name
                                                 });
 
@@ -154,7 +155,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.PhoneNumber,
                                                                                            vm.Email,
                                                                                            vm.ResetEmail,
-                                                                                           vm.DateRegistered,
+                                                                                           DateRegistered = vm.DateRegistered.ToString(),
                                                                                            vm.StatusText,
                                                                                            vm.AccountLockedText,
                                                                                            vm.Role,
@@ -218,8 +219,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.FirstName,
                                                                                            vm.LastName,
                                                                                            vm.Email,
-                                                                                           vm.DateInvited,
-                                                                                           vm.InviteExpires
+                                                                                           DateInvited = vm.DateInvited.ToString(),
+                                                                                           InviteExpires = vm.InviteExpires.ToString()
                                                                                        });
 
             return Json(data:result);
@@ -233,11 +234,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return Json(data:items.ToDataSourceResult(request:request, modelState:ModelState));
             }
 
+            var viewModels = items as IList<PendingInvitationViewModel> ?? items.ToList();
             try
             {
-                if (items.Any())
+                if (viewModels.Any())
                 {
-                    var item = items.First();
+                    var item = viewModels.First();
 
                     _invitationService.DeleteInvitation(invitationId:item.Id);
                 }
@@ -247,7 +249,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
 
-            return Json(data:items.ToDataSourceResult(request:request, modelState:ModelState));
+            return Json(data:viewModels.ToDataSourceResult(request:request, modelState:ModelState));
         }
 
         #endregion
@@ -440,7 +442,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                     BusinessName = vm.UserProfileDto.BusinessName,
                                                     PhoneNumber = vm.UserProfileDto.PhoneNumber,
                                                     Email = vm.UserProfileDto.Email,
-                                                    DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime
+                                                    DateRegistered = vm.RegistrationDateTimeUtc?.DateTime
                                                 });
 
             var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
@@ -455,7 +457,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.BusinessName,
                                                                                            vm.PhoneNumber,
                                                                                            vm.Email,
-                                                                                           vm.DateRegistered,
+                                                                                           DateRegistered = vm.DateRegistered.ToString(),
                                                                                            Role = 1 // role need to be more than 0 otherwise ModelState.IsValid = false 
                                                                                        });
 
@@ -556,7 +558,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 try
                 {
-                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId:model.Id, permissionGroupId:model.Role.Value, isApproved:false);
+                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId:model.Id, permissionGroupId:model.Role ?? 0, isApproved:false);
                     switch (result.Result)
                     {
                         case RegistrationResult.Success:
@@ -662,7 +664,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.OriginalFileName,
                                                                                            vm.Description,
                                                                                            vm.ReportElementTypeName,
-                                                                                           vm.UploadDateTimeLocal,
+                                                                                           UploadDateTimeLocal = vm.UploadDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.UploaderUserFullName,
                                                                                            vm.Status
                                                                                        });

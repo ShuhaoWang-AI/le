@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Web.Mvc;
@@ -171,10 +172,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                                .ForEach(s => s.Value = "" + model.EmailContactInfoEmailAddress);
                 //ResultQualifierValidValues
                 programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues)).ToList()
-                               .ForEach(s => s.Value = string.Join(",", model.AvailableResultQualifierValidValues.Where(x => x.Selected).Select(x => x.Value).ToList()));
+                               .ForEach(s => s.Value = string.Join(separator:",", values:model.AvailableResultQualifierValidValues.Where(x => x.Selected).Select(x => x.Value).ToList()));
                 //FlowUnitValidValues
                 programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.FlowUnitValidValues)).ToList()
-                               .ForEach(s => s.Value = string.Join(",", model.AvailableFlowUnitValidValues.Where(x => x.Selected).Select(x => x.Value).ToList()));
+                               .ForEach(s => s.Value = string.Join(separator:",", values:model.AvailableFlowUnitValidValues.Where(x => x.Selected).Select(x => x.Value).ToList()));
                 //SampleNameCreationRule
                 programSettings.Where(s => s.TemplateName.Equals(obj:SettingType.SampleNameCreationRule)).ToList().ForEach(s => s.Value = model.SampleNameCreationRule);
 
@@ -477,7 +478,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                           CromerrAuditLogId = dto.CromerrAuditLogId,
                                                           AuditLogTemplateId = dto.AuditLogTemplateId,
                                                           RegulatoryProgramName = dto.RegulatoryProgramName,
-                                                          OrganizationId = dto.OrganizationId.Value,
+                                                          OrganizationId = dto.OrganizationId ?? 0,
                                                           OrganizationName = dto.OrganizationName,
                                                           RegulatorName = dto.RegulatorOrganizationName,
                                                           EventCategory = dto.EventCategory,
@@ -490,7 +491,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                           IPAddress = dto.IPAddress,
                                                           HostName = dto.HostName,
                                                           Comment = dto.Comment,
-                                                          //Need to modify datetime to local
+                                                          //Need to modify date time to local
                                                           LogDateTimeUtc = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(
                                                                                                                                     utcDateTime:dto.LogDateTimeUtc.DateTime,
                                                                                                                                     timeZoneId:timeZoneId)
@@ -514,7 +515,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.IPAddress,
                                                                                            vm.HostName,
                                                                                            vm.Comment,
-                                                                                           LogDateTimeUtc = vm.LogDateTimeUtc.ToString(),
+                                                                                           LogDateTimeUtc = vm.LogDateTimeUtc.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.LogDateTimeUtcDetailString
                                                                                        });
             result.Total = totalCount;
@@ -598,10 +599,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                     PhoneNumber = vm.UserProfileDto.PhoneNumber,
                                                     Email = vm.UserProfileDto.Email,
                                                     ResetEmail = vm.UserProfileDto.Email,
-                                                    DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime,
+                                                    DateRegistered = vm.RegistrationDateTimeUtc?.DateTime,
                                                     Status = vm.IsEnabled,
                                                     AccountLocked = vm.UserProfileDto.IsAccountLocked,
-                                                    Role = vm.PermissionGroup.PermissionGroupId.Value,
+                                                    Role = vm.PermissionGroup.PermissionGroupId ?? 0,
                                                     RoleText = vm.PermissionGroup.Name
                                                 });
 
@@ -614,7 +615,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.PhoneNumber,
                                                                                            vm.Email,
                                                                                            vm.ResetEmail,
-                                                                                           vm.DateRegistered,
+                                                                                           DateRegistered = vm.DateRegistered.ToString(),
                                                                                            vm.StatusText,
                                                                                            vm.AccountLockedText,
                                                                                            vm.Role,
@@ -678,8 +679,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.FirstName,
                                                                                            vm.LastName,
                                                                                            vm.Email,
-                                                                                           vm.DateInvited,
-                                                                                           vm.InviteExpires
+                                                                                           DateInvited = vm.DateInvited.ToString(),
+                                                                                           InviteExpires = vm.InviteExpires.ToString()
                                                                                        });
 
             return Json(data:result);
@@ -693,11 +694,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return Json(data:items.ToDataSourceResult(request:request, modelState:ModelState));
             }
 
+            var viewModels = items as IList<PendingInvitationViewModel> ?? items.ToList();
             try
             {
-                if (items.Any())
+                if (viewModels.Any())
                 {
-                    var item = items.First();
+                    var item = viewModels.First();
 
                     _invitationService.DeleteInvitation(invitationId:item.Id);
                 }
@@ -707,7 +709,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
 
-            return Json(data:items.ToDataSourceResult(request:request, modelState:ModelState));
+            return Json(data:viewModels.ToDataSourceResult(request:request, modelState:ModelState));
         }
 
         #endregion
@@ -925,22 +927,23 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 PhoneExt = user.UserProfileDto.PhoneExt,
                                 Email = user.UserProfileDto.Email,
                                 ResetEmail = user.UserProfileDto.Email,
-                                DateRegistered = user.RegistrationDateTimeUtc.Value.DateTime,
+                                DateRegistered = user.RegistrationDateTimeUtc?.DateTime,
                                 Status = user.IsEnabled,
                                 AccountLocked = user.UserProfileDto.IsAccountLocked,
-                                Role = user.PermissionGroup.PermissionGroupId.Value,
+                                Role = user.PermissionGroup.PermissionGroupId ?? 0,
                                 RoleText = user.PermissionGroup.Name,
                                 SecurityQuestion1 = userQuesAns.Count > 0 && userQuesAns.ElementAt(index:0) != null ? userQuesAns.ElementAt(index:0).Question.Content : "",
                                 Answer1 = userQuesAns.Count > 0 && userQuesAns.ElementAt(index:0) != null ? userQuesAns.ElementAt(index:0).Answer.Content : "",
                                 SecurityQuestion2 = userQuesAns.Count > 1 && userQuesAns.ElementAt(index:1) != null ? userQuesAns.ElementAt(index:1).Question.Content : "",
-                                Answer2 = userQuesAns.Count > 1 && userQuesAns.ElementAt(index:1) != null ? userQuesAns.ElementAt(index:1).Answer.Content : ""
+                                Answer2 = userQuesAns.Count > 1 && userQuesAns.ElementAt(index:1) != null ? userQuesAns.ElementAt(index:1).Answer.Content : "",
+                                AvailableRoles = new List<SelectListItem>()
                             };
             // Roles
-            viewModel.AvailableRoles = new List<SelectListItem>();
             var roles = _permissionService.GetRoles(orgRegProgramId:user.OrganizationRegulatoryProgramId);
-            if (roles.Count() > 0)
+            var permissionGroupDtos = roles as IList<PermissionGroupDto> ?? roles.ToList();
+            if (permissionGroupDtos.Any())
             {
-                viewModel.AvailableRoles = roles.Select(r => new SelectListItem
+                viewModel.AvailableRoles = permissionGroupDtos.Select(r => new SelectListItem
                                                              {
                                                                  Text = r.Name,
                                                                  Value = r.PermissionGroupId.ToString(),
@@ -1112,7 +1115,6 @@ namespace Linko.LinkoExchange.Web.Controllers
         private IndustryViewModel PrepareIndustryDetails(int id)
         {
             var industry = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:id);
-            var userRole = _httpContextService.GetClaimValue(claimType:CacheKey.UserRole) ?? "";
 
             var viewModel = new IndustryViewModel
                             {
@@ -1171,10 +1173,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                     PhoneNumber = vm.UserProfileDto.PhoneNumber,
                                                     Email = vm.UserProfileDto.Email,
                                                     ResetEmail = vm.UserProfileDto.Email,
-                                                    DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime,
+                                                    DateRegistered = vm.RegistrationDateTimeUtc?.DateTime,
                                                     Status = vm.IsEnabled,
                                                     AccountLocked = vm.UserProfileDto.IsAccountLocked,
-                                                    Role = vm.PermissionGroup.PermissionGroupId.Value,
+                                                    Role = vm.PermissionGroup.PermissionGroupId ?? 0,
                                                     RoleText = vm.PermissionGroup.Name
                                                 });
 
@@ -1188,7 +1190,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.PhoneNumber,
                                                                                            vm.Email,
                                                                                            vm.ResetEmail,
-                                                                                           vm.DateRegistered,
+                                                                                           DateRegistered = vm.DateRegistered.ToString(),
                                                                                            vm.StatusText,
                                                                                            vm.AccountLockedText,
                                                                                            vm.Role,
@@ -1254,8 +1256,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.FirstName,
                                                                                            vm.LastName,
                                                                                            vm.Email,
-                                                                                           vm.DateInvited,
-                                                                                           vm.InviteExpires
+                                                                                           DateInvited = vm.DateInvited.ToString(),
+                                                                                           InviteExpires = vm.InviteExpires.ToString()
                                                                                        });
 
             return Json(data:result);
@@ -1269,11 +1271,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return Json(data:items.ToDataSourceResult(request:request, modelState:ModelState));
             }
 
+            var viewModels = items as IList<PendingInvitationViewModel> ?? items.ToList();
             try
             {
-                if (items.Any())
+                if (viewModels.Any())
                 {
-                    var item = items.First();
+                    var item = viewModels.First();
 
                     _invitationService.DeleteInvitation(invitationId:item.Id);
                 }
@@ -1283,7 +1286,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
 
-            return Json(data:items.ToDataSourceResult(request:request, modelState:ModelState));
+            return Json(data:viewModels.ToDataSourceResult(request:request, modelState:ModelState));
         }
 
         #endregion
@@ -1451,10 +1454,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 PhoneExt = user.UserProfileDto.PhoneExt,
                                 Email = user.UserProfileDto.Email,
                                 ResetEmail = user.UserProfileDto.Email,
-                                DateRegistered = user.RegistrationDateTimeUtc.Value.DateTime,
+                                DateRegistered = user.RegistrationDateTimeUtc?.DateTime,
                                 Status = user.IsEnabled,
                                 AccountLocked = user.UserProfileDto.IsAccountLocked,
-                                Role = user.PermissionGroup.PermissionGroupId.Value,
+                                Role = user.PermissionGroup.PermissionGroupId ?? 0,
                                 RoleText = user.PermissionGroup.Name,
                                 IsSignatory = user.IsSignatory,
                                 SecurityQuestion1 = userQuesAns.Count > 0 && userQuesAns.ElementAt(index:0) != null ? userQuesAns.ElementAt(index:0).Question.Content : "",
@@ -1493,7 +1496,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                     BusinessName = vm.UserProfileDto.BusinessName,
                                                     PhoneNumber = vm.UserProfileDto.PhoneNumber,
                                                     Email = vm.UserProfileDto.Email,
-                                                    DateRegistered = vm.RegistrationDateTimeUtc.Value.DateTime
+                                                    DateRegistered = vm.RegistrationDateTimeUtc?.DateTime
                                                 });
 
             var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
@@ -1508,7 +1511,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.BusinessName,
                                                                                            vm.PhoneNumber,
                                                                                            vm.Email,
-                                                                                           vm.DateRegistered,
+                                                                                           DateRegistered = vm.DateRegistered.ToString(),
                                                                                            Role = 1 // role need to be more than 0 otherwise ModelState.IsValid = false 
                                                                                        });
 
@@ -1661,7 +1664,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 Email = result.UserProfileDto.Email,
                                 PhoneNumber = result.UserProfileDto.PhoneNumber,
                                 PhoneExt = result.UserProfileDto.PhoneExt,
-                                DateRegistered = result.RegistrationDateTimeUtc.Value.DateTime,
+                                DateRegistered = result.RegistrationDateTimeUtc?.DateTime,
                                 Role = result.PermissionGroup == null ? 0 : result.PermissionGroup.PermissionGroupId,
                                 RoleText = result.PermissionGroup == null ? "" : result.PermissionGroup.Name
                             };
@@ -1669,9 +1672,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             viewModel.AvailableRoles = new List<SelectListItem>();
             var roles = _permissionService.GetRoles(orgRegProgramId:result.OrganizationRegulatoryProgramId);
 
-            if (roles.Count() > 0)
+            var permissionGroupDtos = roles as IList<PermissionGroupDto> ?? roles.ToList();
+            if (permissionGroupDtos.Any())
             {
-                viewModel.AvailableRoles = roles.Select(r => new SelectListItem
+                viewModel.AvailableRoles = permissionGroupDtos.Select(r => new SelectListItem
                                                              {
                                                                  Text = r.Name,
                                                                  Value = r.PermissionGroupId.ToString(),
@@ -1700,7 +1704,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             if (viewModel.Type.IsCaseInsensitiveEqual(comparing:OrganizationTypeName.Industry.ToString())
                 && (!viewModel.Role.HasValue || viewModel.Role.Value == 0))
             {
-                viewModel.Role = roles.Where(r => r.Name.IsCaseInsensitiveEqual(comparing:UserRole.Administrator.ToString())).First().PermissionGroupId;
+                viewModel.Role = permissionGroupDtos.First(r => r.Name.IsCaseInsensitiveEqual(comparing:UserRole.Administrator.ToString())).PermissionGroupId;
                 viewModel.RoleText = UserRole.Administrator.ToString();
             }
 
@@ -1737,7 +1741,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.Name,
                                                                                            vm.Description,
                                                                                            vm.Status,
-                                                                                           vm.LastModificationDateTimeLocal,
+                                                                                           LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.LastModifierUserName
                                                                                        });
 
@@ -1947,7 +1951,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.Id,
                                                                                            vm.Name,
                                                                                            vm.Description,
-                                                                                           vm.LastModificationDateTimeLocal,
+                                                                                           LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.LastModifierUserName
                                                                                        });
 
@@ -2090,7 +2094,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             // CtsEventTypes
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
-            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(false).Select(c => new SelectListItem
+            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample:false).Select(c => new SelectListItem
                                                                                                      {
                                                                                                          Text = c.Name,
                                                                                                          Value = c.CtsEventTypeId.ToString(),
@@ -2174,8 +2178,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.Name,
                                                                                            vm.Description,
                                                                                            vm.Status,
-                                                                                           vm.EffectiveDateTimeLocal,
-                                                                                           vm.LastModificationDateTimeLocal,
+                                                                                           EffectiveDateTimeLocal = vm.EffectiveDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.LastModifierUserName
                                                                                        });
 
@@ -2395,7 +2399,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             
             // CtsEventTypes
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
-            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(false).OrderBy(c => c.CtsEventCategoryName).Select(c => new SelectListItem
+            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample:false).OrderBy(c => c.CtsEventCategoryName).Select(c => new SelectListItem
                                                                                                                                           {
                                                                                                                                               Text = $"({c.CtsEventCategoryName}) {c.Name}",
                                                                                                                                               Value = c.CtsEventTypeId.ToString(),
