@@ -35,6 +35,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public ICollection<ParameterViewModel> Parameters { get; set; }
         public List<ParameterViewModel> AllParameters { private get; set; }
         public List<ParameterViewModel> AvailableParameters => AllParameters.Where(a => Parameters.All(b => a.Id != b.Id)).ToList();
+        
+        public List<int> ParameterIds { get; set; }
     }
 
     public partial class ParameterGroupViewModelValidator:AbstractValidator<ParameterGroupViewModel>

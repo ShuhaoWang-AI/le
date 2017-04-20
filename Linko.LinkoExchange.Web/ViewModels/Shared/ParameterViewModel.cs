@@ -20,5 +20,6 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string DefaultUnitName { get; set; }
 
         public bool IsRemoved { get; set; }
+        public bool IsCalcMassLoading { get; set; }
     }
 }

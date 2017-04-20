@@ -77,6 +77,7 @@ namespace Linko.LinkoExchange.Web
 
             // Custom filter
             container.RegisterType<CommonInfoAttribute>();
+            container.RegisterType<LogAttribute>();
             container.RegisterType<CustomHandleErrorAttribute>(new InjectionConstructor(typeof(ILogger)));
 
             // Services

@@ -50,8 +50,8 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info($"Enter ReportElementService.GetReportElementTypes. categoryName={categoryName}");
 
-            var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var reportElementTypes = new List<ReportElementTypeDto>();
             var reportElementCategoryId = _dbContext.ReportElementCategories
                 .Single(r => r.Name == categoryName.ToString()).ReportElementCategoryId;

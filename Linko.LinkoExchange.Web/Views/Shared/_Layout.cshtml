@@ -64,12 +64,12 @@
         </div>
 
         <footer class="main-footer">
-            <div class="pull-right hidden-xs">
-                <b>Version</b> 2.3.6
-            </div>
             <strong>
                 Copyright &copy; @DateTime.Now.Year - <a href="#" target="_blank">@Label.LinkoExchange</a>.
             </strong> All rights reserved.
+            <div class="pull-right hidden-xs">
+                <b>Version</b> @ViewContext.Controller.GetType().Assembly.GetName().Version
+            </div>
         </footer>
     </div>
 

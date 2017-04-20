@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
-using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {
@@ -22,11 +22,11 @@ namespace Linko.LinkoExchange.Web.Mvc
         {
             if (filterContext.HttpContext.User.Identity.IsAuthenticated)
             {
-                var portalName = _httpContextService.GetClaimValue(CacheKey.PortalName);
-                filterContext.Controller.ViewBag.PortalName = string.IsNullOrWhiteSpace(portalName) ? "" : portalName;
-                filterContext.Controller.ViewBag.OrganizationName = string.IsNullOrWhiteSpace(portalName) ? "" : _httpContextService.GetClaimValue(CacheKey.OrganizationName);
-                filterContext.Controller.ViewBag.UserName = _httpContextService.GetClaimValue(CacheKey.UserName);
-                filterContext.Controller.ViewBag.UserRole = _httpContextService.GetClaimValue(CacheKey.UserRole);
+                var portalName = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName);
+                filterContext.Controller.ViewBag.PortalName = string.IsNullOrWhiteSpace(value:portalName) ? "" : portalName;
+                filterContext.Controller.ViewBag.OrganizationName = string.IsNullOrWhiteSpace(value:portalName) ? "" : _httpContextService.GetClaimValue(claimType:CacheKey.OrganizationName);
+                filterContext.Controller.ViewBag.UserName = _httpContextService.GetClaimValue(claimType:CacheKey.UserName);
+                filterContext.Controller.ViewBag.UserRole = _httpContextService.GetClaimValue(claimType:CacheKey.UserRole);
             }
             else
             {
@@ -35,6 +35,7 @@ namespace Linko.LinkoExchange.Web.Mvc
                 filterContext.Controller.ViewBag.UserName = "";
                 filterContext.Controller.ViewBag.UserRole = "";
             }
+            base.OnResultExecuting(filterContext:filterContext);
         }
         #endregion
     }

@@ -30,6 +30,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         public bool IsContentProvided { get; set; }
 
+        [Display(Name = "CTS Event Type")]
         public int CtsEventTypeId { get; set; }
 
         [Display(Name = "CTS Event Type")]
