@@ -15,10 +15,9 @@ namespace Linko.LinkoExchange.Services.Dto
         public string ParameterName { get; set; }
         public string Qualifier { get; set; }
         public double? Value { get; set; }
-        public int? DecimalPlaces { get; set; }
         public int UnitId { get; set; }
         public string UnitName { get; set; }
-        public string MethodDetectionLimit { get; set; }
+        public string EnteredMethodDetectionLimit { get; set; }
         public string AnalysisMethod { get; set; }
         public DateTime? AnalysisDateTimeLocal { get; set; }
         public bool IsApprovedEPAMethod { get; set; }

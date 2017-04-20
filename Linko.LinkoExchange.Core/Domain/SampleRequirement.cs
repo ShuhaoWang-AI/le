@@ -44,7 +44,7 @@ namespace Linko.LinkoExchange.Core.Domain
 
         /// <summary>
         /// Identifies who needs to sample.
-        /// Typical value: Industry Org Reg Program  
+        /// Typical value: Industry OrganizationRegulatoryProgramId.  
         /// However, Authority may need to sample as well.
         /// </summary>
         public int ByOrganizationRegulatoryProgramId { get; set; }

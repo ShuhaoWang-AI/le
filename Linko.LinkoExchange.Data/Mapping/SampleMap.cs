@@ -33,17 +33,27 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.EndDateTimeUtc).IsRequired();
 
-            Property(x => x.IsCalculated).IsRequired();
+            Property(x => x.IsSystemGenerated).IsRequired();
 
             Property(x => x.IsReadyToReport).IsRequired();
 
+            Property(x => x.FlowUnitValidValues).IsOptional().HasMaxLength(50);
+
+            Property(x => x.ResultQualifierValidValues).IsOptional().HasMaxLength(50);
+
+            Property(x => x.MassLoadingConversionFactorPounds).IsOptional();
+
+            Property(x => x.MassLoadingCalculationDecimalPlaces).IsOptional();
+
+            Property(x => x.IsMassLoadingResultToUseLessThanSign).IsRequired();
+
             HasRequired(a => a.ByOrganizationRegulatoryProgram)
-                .WithMany(b => b.ByOrganizationRegulatoryProgram_Samples)
+                .WithMany(b => b.SampledBySamples)
                 .HasForeignKey(c => c.ByOrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(false);
 
             HasRequired(a => a.ForOrganizationRegulatoryProgram)
-                .WithMany(b => b.ForOrganizationRegulatoryProgram_Samples)
+                .WithMany(b => b.SampledForSamples)
                 .HasForeignKey(c => c.ForOrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(false);
 

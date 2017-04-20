@@ -24,9 +24,12 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public string Qualifier { get; set; }
 
-        public double? Value { get; set; }
+        /// <summary>
+        /// Value as entered by the user.
+        /// </summary>
+        public string EnteredValue { get; set; }
 
-        public int? DecimalPlaces { get; set; }
+        public double? Value { get; set; }
 
         public int UnitId { get; set; }
 
@@ -35,7 +38,12 @@ namespace Linko.LinkoExchange.Core.Domain
         /// </summary>
         public string UnitName { get; set; }
 
-        public string MethodDetectionLimit { get; set; }
+        /// <summary>
+        /// Method detection limit as entered by the user.
+        /// </summary>
+        public string EnteredMethodDetectionLimit { get; set; }
+
+        public double? MethodDetectionLimit { get; set; }
 
         public string AnalysisMethod { get; set; }
 
@@ -52,7 +60,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public int? LimitTypeId { get; set; }
         public virtual LimitType LimitType { get; set; }
 
-        public int? LimitBasisId { get; set; }
+        public int LimitBasisId { get; set; }
         public virtual LimitBasis LimitBasis { get; set; }
 
         public DateTimeOffset CreationDateTimeUtc { get; set; }

@@ -210,7 +210,7 @@ namespace Linko.LinkoExchange.Services.Report
             rptDto.OrganizationRegulatoryProgramDto =
                     _programService.GetOrganizationRegulatoryProgram(rpt.OrganizationRegulatoryProgramId);
 
-            rptDto.SubMissionDateTimeLocal = _timeZoneService
+            rptDto.SubmissionDateTimeLocal = _timeZoneService
                 .GetLocalizedDateTimeUsingSettingForThisOrg(rpt.CreationDateTimeUtc.DateTime, rpt.OrganizationRegulatoryProgramId);
 
             rptDto.PeriodEndDateTimeLocal = _timeZoneService
@@ -268,7 +268,7 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("periodEndDate", reportPackage.PeriodEndDateTimeLocal.ToString("MMM dd, yyyy"));
 
             var submissionDateTime =
-                $"{reportPackage.SubMissionDateTimeLocal.ToString("MMM dd, yyyy HHtt ")}{_timeZoneService.GetAbbreviationTimeZoneNameUsingSettingForThisOrg(reportPackage.OrganizationRegulatoryProgramId)}";
+                $"{reportPackage.SubmissionDateTimeLocal.ToString("MMM dd, yyyy HHtt ")}{_timeZoneService.GetAbbreviationTimeZoneNameUsingSettingForThisOrg(reportPackage.OrganizationRegulatoryProgramId)}";
 
             emailContentReplacements.Add("submissionDateTime", submissionDateTime);
             emailContentReplacements.Add("corSignature", copyOfRecordDto.Signature);
@@ -276,7 +276,7 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("submitterLastName", _httpContextService.GetClaimValue(CacheKey.LastName));
             emailContentReplacements.Add("submitterTitle", _httpContextService.GetClaimValue(CacheKey.UserRole));
 
-            emailContentReplacements.Add("permitNumber", reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.PermitNumber);
+            emailContentReplacements.Add("permitNumber", reportPackage.OrganizationRegulatoryProgramDto.ReferenceNumber);
 
             emailContentReplacements.Add("organizationAddressLine1", reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.AddressLine1);
             var organizationAddressLine2 = "";

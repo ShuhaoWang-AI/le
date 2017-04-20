@@ -209,7 +209,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 Id = authority.OrganizationRegulatoryProgramId,
                                 ExchangeAuthorityId = authority.OrganizationDto.OrganizationId,
                                 AuthorityName = authority.OrganizationDto.OrganizationName,
-                                Npdes = authority.OrganizationDto.PermitNumber,
+                                Npdes = authority.ReferenceNumber,
                                 Signer = authority.OrganizationDto.Signer,
                                 AddressLine1 = authority.OrganizationDto.AddressLine1,
                                 AddressLine2 = authority.OrganizationDto.AddressLine2,

@@ -38,12 +38,6 @@ namespace Linko.LinkoExchange.Core.Domain
         public string WebsiteUrl { get; set; }
 
         /// <summary>
-        /// Authority: NPDES Permit Number. 
-        /// Industry: Permit Number.
-        /// </summary>
-        public string PermitNumber { get; set; }
-
-        /// <summary>
         /// Authority specific column.
         /// </summary>
         public string Signer { get; set; }

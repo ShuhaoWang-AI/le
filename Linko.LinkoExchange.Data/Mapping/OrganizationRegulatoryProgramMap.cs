@@ -28,6 +28,8 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.AssignedTo).IsOptional().HasMaxLength(50);
 
+            Property(x => x.ReferenceNumber).IsOptional().HasMaxLength(50);
+
             Property(x => x.IsEnabled).IsRequired();
 
             Property(x => x.IsRemoved).IsRequired();

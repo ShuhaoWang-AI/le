@@ -26,7 +26,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTime LastModificationDateTimeLocal { get; set; }
         public string LastModifierFullName { get; set; }
         public double? FlowValue { get; set; }
-        public int? FlowValueDecimalPlaces { get; set; }
         public int? FlowUnitId { get; set; }
         public string FlowUnitName { get; set; }
         public IEnumerable<SampleResultDto> SampleResults { get; set; }

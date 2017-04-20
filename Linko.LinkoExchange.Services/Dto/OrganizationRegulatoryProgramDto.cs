@@ -13,6 +13,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool IsEnabled { get; set; }
         public bool IsRemoved { get; set; }
         public string AssignedTo { get; set; }
+        public string ReferenceNumber { get; set; }
         public bool HasSignatory { get; set; }
         public bool HasAdmin { get; set; }
     }

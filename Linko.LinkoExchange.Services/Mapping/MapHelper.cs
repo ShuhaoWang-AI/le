@@ -34,7 +34,6 @@ namespace Linko.LinkoExchange.Services.Mapping
                 dto.PhoneExt = organization.PhoneExt.Value.ToString();
             dto.FaxNumber = organization.FaxNumber;
             dto.WebsiteURL = organization.WebsiteUrl;
-            dto.PermitNumber = organization.PermitNumber;
             dto.Signer = organization.Signer;
             dto.Classification = organization.Classification;
             return dto;
@@ -64,7 +63,6 @@ namespace Linko.LinkoExchange.Services.Mapping
                 dto.PhoneExt = organization.PhoneExt.Value.ToString();
             dto.FaxNumber = organization.FaxNumber;
             dto.WebsiteURL = organization.WebsiteUrl;
-            dto.PermitNumber = organization.PermitNumber;
             dto.Signer = organization.Signer;
 
             return dto;
@@ -201,6 +199,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.IsEnabled = org.IsEnabled;
             dto.IsRemoved = org.IsRemoved;
             dto.AssignedTo = org.AssignedTo;
+            dto.ReferenceNumber = org.ReferenceNumber;
 
             //IGNORE HasSignatory
             //IGNORE HasAdmin
@@ -957,7 +956,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             existingSample.LabSampleIdentifier = sampleDto.LabSampleIdentifier;
             //existingSample.StartDateTimeUtc = sampleDto.StartDateTimeUtc;
             //existingSample.EndDateTimeUtc = sampleDto.EndDateTimeUtc;
-            existingSample.IsCalculated = false; //not currently used
+            existingSample.IsSystemGenerated = false; //not currently used
             existingSample.IsReadyToReport = sampleDto.IsReadyToReport;
             //existingSample.OrganizationTypeId = sampleDto.OrganizationTypeId; //set after we exit this method
             //existingSample.OrganizationRegulatoryProgramId = sampleDto.OrganizationRegulatoryProgramId; //set after we exit this method
@@ -979,7 +978,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.Value = sampleResult.Value;
             dto.UnitId = sampleResult.UnitId;
             dto.UnitName = sampleResult.UnitName;
-            dto.MethodDetectionLimit = sampleResult.MethodDetectionLimit;
+            dto.EnteredMethodDetectionLimit = sampleResult.EnteredMethodDetectionLimit;
             dto.AnalysisMethod = sampleResult.AnalysisMethod;
             //dto.AnalysisDateTimeLocal = set outside MapHelper
             dto.IsApprovedEPAMethod = sampleResult.IsApprovedEPAMethod;
@@ -1001,10 +1000,9 @@ namespace Linko.LinkoExchange.Services.Mapping
                 ParameterName = dto.ParameterName,
                 Qualifier = dto.Qualifier,
                 Value = dto.Value,
-                DecimalPlaces = dto.DecimalPlaces,
                 UnitId = dto.UnitId,
                 UnitName = dto.UnitName,
-                MethodDetectionLimit = dto.MethodDetectionLimit,
+                EnteredMethodDetectionLimit = dto.EnteredMethodDetectionLimit,
                 AnalysisMethod = dto.AnalysisMethod,
                 //AnalysisDateTimeUtc = set outside after calling line
                 IsApprovedEPAMethod = dto.IsApprovedEPAMethod,
@@ -1030,10 +1028,9 @@ namespace Linko.LinkoExchange.Services.Mapping
                 ParameterName = dto.ParameterName,
                 Qualifier = dto.MassLoadingQualifier,
                 Value = dto.MassLoadingValue.Value,
-                DecimalPlaces = dto.MassLoadingDecimalPlaces,
                 UnitId = dto.MassLoadingUnitId,
                 UnitName = dto.MassLoadingUnitName,
-                MethodDetectionLimit = dto.MethodDetectionLimit,
+                EnteredMethodDetectionLimit = dto.EnteredMethodDetectionLimit,
                 AnalysisMethod = dto.AnalysisMethod,
                 //AnalysisDateTimeUtc = set outside after calling line
                 IsApprovedEPAMethod = dto.IsApprovedEPAMethod,

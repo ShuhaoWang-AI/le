@@ -15,7 +15,6 @@
         public string PhoneExt { get; set; }
         public string FaxNumber { get; set; }
         public string WebsiteURL { get; set; }
-        public string PermitNumber { get; set; }
         public string Signer { get; set; }
         public string Classification { get; set; }
     }

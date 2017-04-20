@@ -304,7 +304,7 @@ namespace Linko.LinkoExchange.Test
                 ReportPackageId = reportPackageId,
                 Name = " 1st Quarter PCR",
                 OrganizationRegulatoryProgramId = 3,
-                SubMissionDateTimeLocal = DateTime.UtcNow
+                SubmissionDateTimeLocal = DateTime.UtcNow
             };
         }
 

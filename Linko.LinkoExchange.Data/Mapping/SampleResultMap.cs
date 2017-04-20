@@ -22,15 +22,17 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.Qualifier).IsOptional().HasMaxLength(2);
 
-            Property(x => x.Value).IsOptional();
+            Property(x => x.EnteredValue).IsOptional().HasMaxLength(50);
 
-            Property(x => x.DecimalPlaces).IsOptional();
+            Property(x => x.Value).IsOptional();
 
             Property(x => x.UnitId).IsRequired();
 
             Property(x => x.UnitName).IsRequired().HasMaxLength(100);
 
-            Property(x => x.MethodDetectionLimit).IsOptional().HasMaxLength(50);
+            Property(x => x.EnteredMethodDetectionLimit).IsOptional().HasMaxLength(50);
+
+            Property(x => x.MethodDetectionLimit).IsOptional();
 
             Property(x => x.AnalysisMethod).IsOptional().HasMaxLength(50);
 
@@ -49,7 +51,7 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .HasForeignKey(c => c.LimitTypeId)
                 .WillCascadeOnDelete(false);
 
-            HasOptional(a => a.LimitBasis)
+            HasRequired(a => a.LimitBasis)
                .WithMany()
                .HasForeignKey(c => c.LimitBasisId)
                .WillCascadeOnDelete(false);

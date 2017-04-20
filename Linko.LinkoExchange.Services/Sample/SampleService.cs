@@ -150,10 +150,9 @@ namespace Linko.LinkoExchange.Services.Sample
                         ParameterName = flowParameter.Name,
                         Qualifier = "",
                         Value = sampleDto.FlowValue,
-                        DecimalPlaces = sampleDto.FlowValueDecimalPlaces,
                         UnitId = sampleDto.FlowUnitId.Value,
                         UnitName = sampleDto.FlowUnitName,
-                        MethodDetectionLimit = "",
+                        EnteredMethodDetectionLimit = "",
                         IsFlowForMassLoadingCalculation = true,
                         LimitTypeId = null,
                         LimitBasisId = flowLimitBasisId,
@@ -625,7 +624,6 @@ namespace Linko.LinkoExchange.Services.Sample
                         dto.FlowValue = sampleResult.Value;
                         dto.FlowUnitId = sampleResult.UnitId;
                         dto.FlowUnitName = sampleResult.UnitName;
-                        dto.FlowValueDecimalPlaces = sampleResult.DecimalPlaces;
                     }
                     else if (sampleResult.IsFlowForMassLoadingCalculation == false &&
                         sampleResult.LimitType.Name == LimitTypeName.Daily.ToString() &&
@@ -654,14 +652,13 @@ namespace Linko.LinkoExchange.Services.Sample
                             resultDto.SampleId = sampleResult.SampleId;
                             resultDto.ParameterId = sampleResult.ParameterId;
                             resultDto.ParameterName = sampleResult.ParameterName;
-                            resultDto.MethodDetectionLimit = sampleResult.MethodDetectionLimit;
+                            resultDto.EnteredMethodDetectionLimit = sampleResult.EnteredMethodDetectionLimit;
                             resultDto.AnalysisMethod = sampleResult.AnalysisMethod;
                             resultDto.IsApprovedEPAMethod = sampleResult.IsApprovedEPAMethod;
                             resultDto.ParameterId = sampleResult.ParameterId;
                             //resultDto.IsCalcMassLoading = sampleResult.IsMassLoadingCalculationRequired;
                             resultDto.Qualifier = sampleResult.Qualifier;
                             resultDto.Value = sampleResult.Value;
-                            resultDto.DecimalPlaces = sampleResult.DecimalPlaces;
                             resultDto.UnitId = sampleResult.UnitId;
                             resultDto.UnitName = sampleResult.UnitName;
                             resultDto.LimitBasisName = LimitBasisName.Concentration;
@@ -674,7 +671,6 @@ namespace Linko.LinkoExchange.Services.Sample
                             //Mass Result
                             resultDto.MassLoadingQualifier = sampleResult.Qualifier;
                             resultDto.MassLoadingValue = sampleResult.Value;
-                            resultDto.MassLoadingDecimalPlaces = sampleResult.DecimalPlaces;
                             resultDto.MassLoadingUnitId = sampleResult.UnitId;
                             resultDto.MassLoadingUnitName = sampleResult.UnitName;
                             resultDto.LimitBasisName = LimitBasisName.MassLoading;

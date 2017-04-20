@@ -31,6 +31,12 @@ namespace Linko.LinkoExchange.Core.Domain
         public string AssignedTo { get; set; }
 
         /// <summary>
+        /// Authority: NPDES Permit Number. 
+        /// Industry: Industry Number (in IPP).
+        /// </summary>
+        public string ReferenceNumber { get; set; }
+
+        /// <summary>
         /// True: the Organization has access to this particular Regulatory Program. False, otherwise.
         /// </summary>
         public bool IsEnabled { get; set; }
@@ -66,9 +72,9 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public virtual ICollection<ParameterGroup> ParameterGroups { get; set; }
 
-        public virtual ICollection<Sample> ByOrganizationRegulatoryProgram_Samples { get; set; }
+        public virtual ICollection<Sample> SampledBySamples { get; set; }
 
-        public virtual ICollection<Sample> ForOrganizationRegulatoryProgram_Samples { get; set; }
+        public virtual ICollection<Sample> SampledForSamples { get; set; }
 
         public virtual ICollection<SampleRequirement> SampleRequirements { get; set; }
 

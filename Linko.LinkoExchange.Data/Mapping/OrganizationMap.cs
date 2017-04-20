@@ -39,8 +39,6 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.WebsiteUrl).IsOptional().HasMaxLength(256);
 
-            Property(x => x.PermitNumber).IsOptional().HasMaxLength(50);
-
             Property(x => x.Signer).IsOptional().HasMaxLength(250);
 
             Property(x => x.CreationDateTimeUtc).IsRequired();
