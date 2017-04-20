@@ -149,7 +149,8 @@ namespace Linko.LinkoExchange.Services.Sample
                         ParameterId = flowParameter.ParameterId,
                         ParameterName = flowParameter.Name,
                         Qualifier = "",
-                        Value = sampleDto.FlowValue,
+                        EnteredValue = sampleDto.FlowValue,
+                        //Value = Convert.ToDouble(sampleDto.FlowValue), //handle this below
                         UnitId = sampleDto.FlowUnitId.Value,
                         UnitName = sampleDto.FlowUnitName,
                         EnteredMethodDetectionLimit = "",
@@ -158,6 +159,13 @@ namespace Linko.LinkoExchange.Services.Sample
                         LimitBasisId = flowLimitBasisId,
                         IsCalculated = false
                     };
+                    Double valueAsDouble;
+                    if (!Double.TryParse(flowResult.EnteredValue, out valueAsDouble))
+                    {
+                        //Could not convert -- throw exception
+                        ThrowSimpleException($"Could not convert entered flow value to double: \"{flowResult.EnteredValue}\"");
+                    }
+                    flowResult.Value = valueAsDouble;
                     sampleToPersist.SampleResults.Add(flowResult);
 
                 }
@@ -171,6 +179,13 @@ namespace Linko.LinkoExchange.Services.Sample
 
                     //Concentration result
                     var sampleResult = _mapHelper.GetConcentrationSampleResultFromSampleResultDto(resultDto);
+                    Double valueAsDouble;
+                    if (!Double.TryParse(sampleResult.EnteredValue, out valueAsDouble))
+                    {
+                        //Could not convert -- throw exception
+                        ThrowSimpleException($"Could not convert entered concentration value to double: \"{sampleResult.EnteredValue}\"");
+                    }
+                    sampleResult.Value = valueAsDouble;
                     sampleResult.AnalysisDateTimeUtc = _timeZoneService
                         .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
                     sampleResult.LimitBasisId = concentrationLimitBasisId;
@@ -187,6 +202,13 @@ namespace Linko.LinkoExchange.Services.Sample
                         sampleResult.IsMassLoadingCalculationRequired = true;
 
                         var sampleMassResult = _mapHelper.GetMassSampleResultFromSampleResultDto(resultDto);
+                        Double massValueAsDouble;
+                        if (!Double.TryParse(sampleMassResult.EnteredValue, out massValueAsDouble))
+                        {
+                            //Could not convert -- throw exception
+                            ThrowSimpleException($"Could not convert entered mass value to double: \"{sampleMassResult.EnteredValue}\"");
+                        }
+                        sampleMassResult.Value = massValueAsDouble;
                         sampleMassResult.AnalysisDateTimeUtc = _timeZoneService
                             .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
                         sampleMassResult.LimitBasisId = massLimitBasisId;
@@ -387,13 +409,13 @@ namespace Linko.LinkoExchange.Services.Sample
             //Check Flow Value exists and is complete if provided (both value and unit)
 
             bool isValidFlowValueExists = false;
-            if (sampleDto.FlowValue.HasValue && sampleDto.FlowUnitId.HasValue && 
+            if (!string.IsNullOrEmpty(sampleDto.FlowValue) && sampleDto.FlowUnitId.HasValue && 
                 sampleDto.FlowUnitId.Value > 0 && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
             {
                 isValidFlowValueExists = true;
             }
-            else if ((sampleDto.FlowValue.HasValue && !sampleDto.FlowUnitId.HasValue) ||
-                            (!sampleDto.FlowValue.HasValue && sampleDto.FlowUnitId.HasValue))
+            else if ((!string.IsNullOrEmpty(sampleDto.FlowValue) && !sampleDto.FlowUnitId.HasValue) ||
+                            (string.IsNullOrEmpty(sampleDto.FlowValue) && sampleDto.FlowUnitId.HasValue))
             {
                 if (!isSuppressExceptions)
                 {
@@ -435,7 +457,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         //
 
                         if ((resultDto.Qualifier == ">" || resultDto.Qualifier == "<" || string.IsNullOrEmpty(resultDto.Qualifier))
-                        && !resultDto.Value.HasValue)
+                        && string.IsNullOrEmpty(resultDto.Value))
                         {
                             isValid = false;
                             if (!isSuppressExceptions)
@@ -445,7 +467,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         }
 
                         if ((resultDto.Qualifier == "ND" || resultDto.Qualifier == "NF")
-                            && resultDto.Value.HasValue)
+                            && !string.IsNullOrEmpty(resultDto.Value))
                         {
                             isValid = false;
                             if (!isSuppressExceptions)
@@ -470,7 +492,7 @@ namespace Linko.LinkoExchange.Services.Sample
                             }
 
                             if ((resultDto.Qualifier == ">" || resultDto.Qualifier == "<" || string.IsNullOrEmpty(resultDto.Qualifier))
-                            && !resultDto.MassLoadingValue.HasValue)
+                            && string.IsNullOrEmpty(resultDto.MassLoadingValue))
                             {
                                 isValid = false;
                                 if (!isSuppressExceptions)
@@ -480,7 +502,7 @@ namespace Linko.LinkoExchange.Services.Sample
                             }
 
                             if ((resultDto.Qualifier == "ND" || resultDto.Qualifier == "NF")
-                            && resultDto.MassLoadingValue.HasValue)
+                            && !string.IsNullOrEmpty(resultDto.MassLoadingValue))
                             {
                                 isValid = false;
                                 if (!isSuppressExceptions)
@@ -621,7 +643,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     if (sampleResult.IsFlowForMassLoadingCalculation &&
                         sampleResult.LimitBasisId == flowLimitBasisId)
                     {
-                        dto.FlowValue = sampleResult.Value;
+                        dto.FlowValue = sampleResult.EnteredValue;
                         dto.FlowUnitId = sampleResult.UnitId;
                         dto.FlowUnitName = sampleResult.UnitName;
                     }
@@ -658,7 +680,7 @@ namespace Linko.LinkoExchange.Services.Sample
                             resultDto.ParameterId = sampleResult.ParameterId;
                             //resultDto.IsCalcMassLoading = sampleResult.IsMassLoadingCalculationRequired;
                             resultDto.Qualifier = sampleResult.Qualifier;
-                            resultDto.Value = sampleResult.Value;
+                            resultDto.Value = sampleResult.EnteredValue;
                             resultDto.UnitId = sampleResult.UnitId;
                             resultDto.UnitName = sampleResult.UnitName;
                             resultDto.LimitBasisName = LimitBasisName.Concentration;
@@ -670,7 +692,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         {
                             //Mass Result
                             resultDto.MassLoadingQualifier = sampleResult.Qualifier;
-                            resultDto.MassLoadingValue = sampleResult.Value;
+                            resultDto.MassLoadingValue = sampleResult.EnteredValue;
                             resultDto.MassLoadingUnitId = sampleResult.UnitId;
                             resultDto.MassLoadingUnitName = sampleResult.UnitName;
                             resultDto.LimitBasisName = LimitBasisName.MassLoading;

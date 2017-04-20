@@ -984,7 +984,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.ParameterId = sampleResult.ParameterId;
             dto.ParameterName = sampleResult.ParameterName;
             dto.Qualifier = sampleResult.Qualifier;
-            dto.Value = sampleResult.Value;
+            dto.Value = sampleResult.EnteredValue;
             dto.UnitId = sampleResult.UnitId;
             dto.UnitName = sampleResult.UnitName;
             dto.EnteredMethodDetectionLimit = sampleResult.EnteredMethodDetectionLimit;
@@ -1008,7 +1008,8 @@ namespace Linko.LinkoExchange.Services.Mapping
                 ParameterId = dto.ParameterId,
                 ParameterName = dto.ParameterName,
                 Qualifier = dto.Qualifier,
-                Value = dto.Value,
+                EnteredValue = dto.Value,
+                //Value = Convert.ToDouble(dto.Value), //set outside after calling line
                 UnitId = dto.UnitId,
                 UnitName = dto.UnitName,
                 EnteredMethodDetectionLimit = dto.EnteredMethodDetectionLimit,
@@ -1036,7 +1037,8 @@ namespace Linko.LinkoExchange.Services.Mapping
                 ParameterId = dto.ParameterId,
                 ParameterName = dto.ParameterName,
                 Qualifier = dto.MassLoadingQualifier,
-                Value = dto.MassLoadingValue.Value,
+                EnteredValue = dto.MassLoadingValue,
+                //Value = Convert.ToDouble(dto.MassLoadingValue), //set outside after calling line
                 UnitId = dto.MassLoadingUnitId,
                 UnitName = dto.MassLoadingUnitName,
                 EnteredMethodDetectionLimit = dto.EnteredMethodDetectionLimit,

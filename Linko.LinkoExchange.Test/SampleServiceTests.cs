@@ -73,7 +73,7 @@ namespace Linko.LinkoExchange.Test
             sampleDto.CtsEventCategoryName = "Sample Category 1";
             sampleDto.FlowUnitId = 10;
             sampleDto.FlowUnitName = "ppd";
-            sampleDto.FlowValue = 808.1;
+            sampleDto.FlowValue = "808.1";
             sampleDto.StartDateTimeLocal = DateTime.Now;
             sampleDto.EndDateTimeLocal = DateTime.Now;
             sampleDto.IsReadyToReport = false;
@@ -87,7 +87,7 @@ namespace Linko.LinkoExchange.Test
                 Qualifier = ">",
                 UnitId = 7,
                 UnitName = "mg/L",
-                Value = 20,
+                Value = "20",
                 EnteredMethodDetectionLimit = "MDL 2",
                 AnalysisMethod = "Analysis Method 2",
                 AnalysisDateTimeLocal = DateTime.Now,
@@ -96,7 +96,7 @@ namespace Linko.LinkoExchange.Test
                 MassLoadingQualifier = ">",
                 MassLoadingUnitId = 8,
                 MassLoadingUnitName = "mgd",
-                MassLoadingValue = 1001.2005,
+                MassLoadingValue = "1001.2005",
             };
             resultDtos.Add(resultDto);
             resultDto = new SampleResultDto()
@@ -106,7 +106,7 @@ namespace Linko.LinkoExchange.Test
                 Qualifier = "<",
                 UnitId = 11,
                 UnitName = "su",
-                Value = 991,
+                Value = "991",
                 EnteredMethodDetectionLimit = "MDL 5",
                 AnalysisMethod = "Analysis Method 5",
                 AnalysisDateTimeLocal = DateTime.Now,
@@ -294,7 +294,7 @@ namespace Linko.LinkoExchange.Test
             var invalidResultDto = new SampleResultDto()
             {
                 Qualifier = "ND",
-                Value = 99,
+                Value = "99",
                 UnitId = 1
             };
             sampleResults.Add(invalidResultDto);
@@ -320,7 +320,7 @@ namespace Linko.LinkoExchange.Test
             var invalidResultDto = new SampleResultDto()
             {
                 Qualifier = ">",
-                Value = 99,
+                Value = "99",
                 UnitId = 1,
                 IsCalcMassLoading = true
             };
@@ -347,7 +347,7 @@ namespace Linko.LinkoExchange.Test
             var invalidResultDto = new SampleResultDto()
             {
                 Qualifier = ">",
-                Value = 99,
+                Value = "99",
                 UnitId = 1,
                 IsCalcMassLoading = true,
                 MassLoadingUnitId = 1,
@@ -468,7 +468,26 @@ namespace Linko.LinkoExchange.Test
                 }
                 else if (fieldName == "SampleResults")
                 {
+                    var fetchedResultsEnumerator = fetchedSampleDto.SampleResults.GetEnumerator();
+                    foreach (var resultDto in sampleDto.SampleResults)
+                    {
+                        fetchedResultsEnumerator.MoveNext();
+                        var fetchedSampleResult = fetchedResultsEnumerator.Current;
 
+                        //Compare Results
+                        Type sampleResultDto = resultDto.GetType();
+                        PropertyInfo[] resultProperties = sampleResultDto.GetProperties();
+                        foreach (PropertyInfo resultProperty in resultProperties)
+                        {
+                            var resultFieldName = resultProperty.Name;
+                            var resultBeforeValue = resultProperty.GetValue(resultDto, null);
+                            var resultAfterValue = resultProperty.GetValue(fetchedSampleResult, null);
+
+                            Assert.AreEqual(beforeValue, afterValue);
+                        }
+
+                    }
+                   
                 }
                 else {
 
