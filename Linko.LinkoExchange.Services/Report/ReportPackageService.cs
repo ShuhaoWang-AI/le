@@ -15,8 +15,12 @@ using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Mapping;
 using System.Data.Entity;
+using System.IO;
+using System.Text;
+using System.Xml.Serialization;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Report.DataXML;
+using FileInfo = Linko.LinkoExchange.Services.Report.DataXML.FileInfo;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -181,62 +185,57 @@ namespace Linko.LinkoExchange.Services.Report
 
         public CopyOfRecordDataXmlFileDto GetReportPackageCopyOfRecordDataXmlFile(ReportPackageDto reportPackageDto)
         {
-            var dataXmlObj = new CopyOfRecordDataXml();
-            dataXmlObj.XmlFileVersionNumber = new XmlFileVersion
+            var dataXmlObj = new CopyOfRecordDataXml
             {
-                VersionNumber = "1.0"
-            };
-
-            var timeZoneAbbr = _timeZoneService.GetAbbreviationTimeZoneNameUsingSettingForThisOrg(reportPackageDto.OrganizationRegulatoryProgramId);
-            dataXmlObj.ReportHeader = new ReportHeader
-            {
-                ReportName = reportPackageDto.Name,
-
-                //TODO:  UTC or local time?  
-                ReportPeriodStartDateTimeUtc = reportPackageDto.PeriodStartDateTimeLocal.ToString(format: "yyyy-MM-dd"),
-                ReportPeriodEndDateTimeUtc = reportPackageDto.PeriodEndDateTimeLocal.ToString(format: "yyyy-MM-dd"),
-                ReportSubmissionDateUtc = $"{reportPackageDto.SubmissionDateTimeLocal:MMM dd, yyyy HHtt} {timeZoneAbbr}",
-                CurrentTimeZoneName = "Place_holder"
-            };
-
-            dataXmlObj.SubmittedTo = new SubmittedTo
-            {
-                OrganizationName = reportPackageDto.RecipientOrganizationName,
-                Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
-                Address2 = reportPackageDto.RecipientOrganizationAddressLine2,
-                City = reportPackageDto.RecipientOrganizationCityName,
-                State = reportPackageDto.RecipientOrganizationJurisdictionName,
-                ZipCode = reportPackageDto.RecipientOrganizationZipCode
-            };
-
-            dataXmlObj.SubmittedOnBehalfOf = new SubmittedOnBehalfOf
-            {
-                OrganizationName = reportPackageDto.RecipientOrganizationName,
-                ReferenceNumber = reportPackageDto.OrganizationRegulatoryProgramDto.ReferenceNumber,
-                Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
-                Address2 = reportPackageDto.RecipientOrganizationAddressLine2,
-                City = reportPackageDto.RecipientOrganizationCityName,
-                State = reportPackageDto.RecipientOrganizationJurisdictionName,
-                ZipCode = reportPackageDto.RecipientOrganizationZipCode
-            };
-
-            dataXmlObj.SubmittedBy = new SubmittedBy
-            {
-                FirstName = reportPackageDto.SubmitterFirstName,
-                LastName = reportPackageDto.SubmitterLastName,
-                Title = reportPackageDto.SubmitterTitleRole,
-                UserName = reportPackageDto.SubmitterUserName,
-                ReportSubmissionFromIP = reportPackageDto.SubmitterIPAddress
-            };
-
-            dataXmlObj.FileManifest = new FileManifest
-            {
-                Files = reportPackageDto.AttachmentDtos.Select(i => new FileInfo
+                XmlFileVersionNumber = new XmlFileVersion
                 {
-                    OriginalFileName = i.OriginalFileName,
-                    SystemGeneratedUnqiueFileName = i.Name,
-                    AttachmentType = i.FileType
-                }).ToList()
+                    VersionNumber = "1.0"
+                },
+                ReportHeader = new ReportHeader
+                {
+                    ReportName = reportPackageDto.Name,
+                    //TODO:  UTC or local time?  
+                    ReportPeriodStartDateTimeUtc = reportPackageDto.PeriodStartDateTimeLocal.ToString(format: "yyyy-MM-dd"),
+                    ReportPeriodEndDateTimeUtc = reportPackageDto.PeriodEndDateTimeLocal.ToString(format: "yyyy-MM-dd"),
+                    ReportSubmissionDateUtc = $"{reportPackageDto.SubmissionDateTimeLocal:MMM dd, yyyy HHtt}",
+                    CurrentTimeZoneName = "Place_holder"
+                },
+                SubmittedTo = new SubmittedTo
+                {
+                    OrganizationName = reportPackageDto.RecipientOrganizationName,
+                    Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
+                    Address2 = reportPackageDto.RecipientOrganizationAddressLine2,
+                    City = reportPackageDto.RecipientOrganizationCityName,
+                    State = reportPackageDto.RecipientOrganizationJurisdictionName,
+                    ZipCode = reportPackageDto.RecipientOrganizationZipCode
+                },
+                SubmittedOnBehalfOf = new SubmittedOnBehalfOf
+                {
+                    OrganizationName = reportPackageDto.RecipientOrganizationName,
+                    ReferenceNumber = reportPackageDto.OrganizationRegulatoryProgramDto.ReferenceNumber,
+                    Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
+                    Address2 = reportPackageDto.RecipientOrganizationAddressLine2,
+                    City = reportPackageDto.RecipientOrganizationCityName,
+                    State = reportPackageDto.RecipientOrganizationJurisdictionName,
+                    ZipCode = reportPackageDto.RecipientOrganizationZipCode
+                },
+                SubmittedBy = new SubmittedBy
+                {
+                    FirstName = reportPackageDto.SubmitterFirstName,
+                    LastName = reportPackageDto.SubmitterLastName,
+                    Title = reportPackageDto.SubmitterTitleRole,
+                    UserName = reportPackageDto.SubmitterUserName,
+                    ReportSubmissionFromIP = reportPackageDto.SubmitterIPAddress
+                },
+                FileManifest = new FileManifest
+                {
+                    Files = reportPackageDto.AttachmentDtos.Select(i => new FileInfo
+                    {
+                        OriginalFileName = i.OriginalFileName,
+                        SystemGeneratedUnqiueFileName = i.Name,
+                        AttachmentType = i.FileType
+                    }).ToList()
+                }
             };
 
             dataXmlObj.FileManifest.Files.Add(
@@ -306,10 +305,22 @@ namespace Linko.LinkoExchange.Services.Report
                         LimitBasis = sampleResultDto.LimitBasisName.ToString()
                     };
 
+                    dataXmlObj.SampleResults.Add(sampleResultNode);
                 }
             }
 
-            throw new NotImplementedException();
+            // Convert to xml string
+            var strWriter = new StringWriter();
+            var xmlSerializer = new XmlSerializer(dataXmlObj.GetType());
+            xmlSerializer.Serialize(strWriter, dataXmlObj);
+            var xmlString = strWriter.ToString();
+
+            var xmlData = new CopyOfRecordDataXmlFileDto
+            {
+                FileData = Encoding.UTF8.GetBytes(s: xmlString),
+                FileName = "Copy Of Record Data.xml"
+            };
+            return xmlData;
         }
 
         public CopyOfRecordValidationResultDto VerififyCopyOfRecord(int reportPackageId)
@@ -552,8 +563,6 @@ namespace Linko.LinkoExchange.Services.Report
                         .Single(ret => ret.ReportElementTypeId == rptet.ReportElementTypeId);
                 }
             }
-
-
 
             return newReportPackageId;
         }
