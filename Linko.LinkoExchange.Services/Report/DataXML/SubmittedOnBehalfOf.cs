@@ -3,7 +3,7 @@
     public class SubmittedOnBehalfOf
     {
         public string OrganizationName { get; set; }
-        public string PermitNumber { get; set; }
+        public string ReferenceNumber { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
         public string City { get; set; }

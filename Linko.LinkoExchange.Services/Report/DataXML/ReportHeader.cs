@@ -3,9 +3,9 @@
     public class ReportHeader
     {
         public string ReportName { get; set; }
-        public string ReportPeriodStart { get; set; }
-        public string ReportPeriodEnd { get; set; }
-        public string ReportSubmissionDate { get; set; }
-        public string TimeZone { get; set; }
+        public string ReportPeriodStartDateTimeUtc { get; set; }
+        public string ReportPeriodEndDateTimeUtc { get; set; }
+        public string ReportSubmissionDateUtc { get; set; }
+        public string CurrentTimeZoneName { get; set; }
     }
 }

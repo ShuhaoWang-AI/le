@@ -1,24 +1,33 @@
-﻿namespace Linko.LinkoExchange.Services.Report.DataXML
+﻿using System.Xml.Serialization;
+
+namespace Linko.LinkoExchange.Services.Report.DataXML
 {
+    [XmlRoot("SampleResult")]
     public class SampleResultNode
     {
-        public string MonitoringPointAbbrv { get; set; }
-        public string MonitoringPointDescription { get; set; }
-        public string Parameter { get; set; }
-        public string ResultQualifier { get; set; }
-        public string Result { get; set; }
-        public string ResultUnit { get; set; }
-        public string SampleStartDate { get; set; }
-        public string SampleStartTime { get; set; }
-        public string SampleEndDate { get; set; }
-        public string SampleEndtime { get; set; }
-        public string CollectionMethod { get; set; }
-        public string AnaylsisMethod { get; set; }
-        public string AnalysisDate { get; set; }
-        public string AnalysisTime { get; set; }
-        public string IsEPAApprovedMethod { get; set; }
-        public string SampleFlow { get; set; }
-        public string SampleFlowUnits { get; set; }
-
+        public string SampleName { get; set; }
+        public string MonitoringPointName { get; set; }
+        public string CtsEventTypeCategoryName { get; set; }
+        public string CtsEventTypeName { get; set; }
+        public string CollectionMethodName { get; set; }
+        public string LabSampleIdentifier { get; set; }
+        public string StartDateTimeUtc { get; set; }
+        public string EndDateTimeUtc { get; set; }
+        public string MassLoadingsConversionFactorPounds { get; set; }
+        public string MassLoadingCalculationDecimalPlaces { get; set; }
+        public string IsMassLoadingResultToUseLessThanSign { get; set; }
+        public string SampledBy { get; set; }
+        public string ParameterName { get; set; }
+        public string Qualifier { get; set; }
+        public string EnteredValue { get; set; }
+        public string Value { get; set; }
+        public string UnitName { get; set; }
+        public string EnteredMethodDetectionLimit { get; set; }
+        public string MethodDetectionLimit { get; set; }
+        public string AnalysisMethod { get; set; }
+        public string AnalysisDateTimUtc { get; set; }
+        public string IsApprovedEPAMethod { get; set; }
+        public string IsFlowForMassLoadingCalculation { get; set; }
+        public string LimitBasis { get; set; }
     }
 }

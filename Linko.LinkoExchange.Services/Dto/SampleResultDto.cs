@@ -31,7 +31,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public string MassLoadingValue { get; set; }
         public int MassLoadingUnitId { get; set; }
         public string MassLoadingUnitName { get; set; }
-
-
+        public string MethodDetectionLimit { get; set; }
     }
 }

@@ -191,11 +191,12 @@ namespace Linko.LinkoExchange.Services.Report
             dataXmlObj.ReportHeader = new ReportHeader
             {
                 ReportName = reportPackageDto.Name,
-                // UTC or local time?  
-                ReportPeriodStart = reportPackageDto.PeriodStartDateTimeLocal.ToString(format: "yyyy-MM-dd"),
-                ReportPeriodEnd = reportPackageDto.PeriodEndDateTimeLocal.ToString(format: "yyyy-MM-dd"),
-                ReportSubmissionDate = $"{reportPackageDto.SubmissionDateTimeLocal:MMM dd, yyyy HHtt} {timeZoneAbbr}",
-                TimeZone = timeZoneAbbr
+
+                //TODO:  UTC or local time?  
+                ReportPeriodStartDateTimeUtc = reportPackageDto.PeriodStartDateTimeLocal.ToString(format: "yyyy-MM-dd"),
+                ReportPeriodEndDateTimeUtc = reportPackageDto.PeriodEndDateTimeLocal.ToString(format: "yyyy-MM-dd"),
+                ReportSubmissionDateUtc = $"{reportPackageDto.SubmissionDateTimeLocal:MMM dd, yyyy HHtt} {timeZoneAbbr}",
+                CurrentTimeZoneName = "Place_holder"
             };
 
             dataXmlObj.SubmittedTo = new SubmittedTo
@@ -211,7 +212,7 @@ namespace Linko.LinkoExchange.Services.Report
             dataXmlObj.SubmittedOnBehalfOf = new SubmittedOnBehalfOf
             {
                 OrganizationName = reportPackageDto.RecipientOrganizationName,
-                PermitNumber = reportPackageDto.PermitNumber,
+                ReferenceNumber = reportPackageDto.OrganizationRegulatoryProgramDto.ReferenceNumber,
                 Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
                 Address2 = reportPackageDto.RecipientOrganizationAddressLine2,
                 City = reportPackageDto.RecipientOrganizationCityName,
@@ -273,30 +274,36 @@ namespace Linko.LinkoExchange.Services.Report
                 {
                     var sampleResultNode = new SampleResultNode
                     {
-                        //// TODO to change to MonitoryingPointNaer?
-                        MonitoringPointAbbrv = sampleDto.MonitoringPointName,
+                        SampleName = sampleDto.Name,
+                        MonitoringPointName = sampleDto.MonitoringPointName,
+                        CtsEventTypeCategoryName = sampleDto.CtsEventCategoryName,
+                        CtsEventTypeName = sampleDto.CtsEventTypeName,
+                        CollectionMethodName = sampleDto.CollectionMethodName,
+                        LabSampleIdentifier = sampleDto.LabSampleIdentifier,
 
-                        //// TODO to remove monitor pointer descption?
-                        ////MonitoringPointDescription = i.M 
-                        ResultQualifier = sampleResultDto.Qualifier,
-                        Result = sampleResultDto.Value.ToString(),
-                        ResultUnit = sampleResultDto.UnitName,
-                        SampleStartDate = sampleDto.StartDateTimeLocal.ToString(format: "MMM dd, yyyy"),
-                        SampleStartTime = sampleResultDto.ToString(),
-                        SampleEndDate = sampleDto.EndDateTimeLocal.ToString(format: "MMM dd, yyyy"),
-                        SampleEndtime = sampleDto.EndDateTimeLocal.ToShortTimeString(),
-                        CollectionMethod = sampleDto.CollectionMethodName,
-                        AnaylsisMethod = sampleResultDto.AnalysisMethod,
+                        //TODO to covert the date time here 
+                        StartDateTimeUtc = sampleDto.StartDateTimeLocal.ToString(),
+                        EndDateTimeUtc = sampleDto.EndDateTimeLocal.ToString(),
 
-                        //TODO to check hasValue or not
+                        MassLoadingsConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds?.ToString(),
+                        MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces?.ToString(),
+                        IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign.ToString(),
 
-                        AnalysisDate = sampleResultDto.AnalysisDateTimeLocal?.ToString(format: "MMM dd, yyyy") ?? "",
-                        AnalysisTime = sampleResultDto.AnalysisDateTimeLocal?.ToShortTimeString(),
-                        IsEPAApprovedMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
+                        SampledBy = sampleDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName,
+                        ParameterName = sampleResultDto.ParameterName,
+                        Qualifier = sampleResultDto.Qualifier,
+                        Value = sampleResultDto.Value,
+                        UnitName = sampleResultDto.UnitName,
+                        EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit,
+                        MethodDetectionLimit = sampleResultDto.MethodDetectionLimit,
+                        AnalysisMethod = sampleResultDto.AnalysisMethod,
 
-                        //TODO: SampleFlow?
-                        SampleFlow = sampleDto.FlowValue.ToString(),
-                        SampleFlowUnits = sampleDto.FlowUnitName
+                        //TODO handle the datatime here
+                        AnalysisDateTimUtc = sampleResultDto.AnalysisDateTimeLocal.ToString(),
+                        IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
+
+                        IsFlowForMassLoadingCalculation = sampleResultDto.IsCalcMassLoading.ToString(),
+                        LimitBasis = sampleResultDto.LimitBasisName.ToString()
                     };
 
                 }
