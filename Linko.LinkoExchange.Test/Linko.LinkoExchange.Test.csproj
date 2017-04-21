@@ -130,6 +130,7 @@
     <Compile Include="QuestionAnswerServiceTests.cs" />
     <Compile Include="SettingServiceTests.cs" />
     <Compile Include="CopyOfRecordServiceTests.cs" />
+    <Compile Include="UnitServiceTests.cs" />
     <Compile Include="UserServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>

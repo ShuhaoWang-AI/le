@@ -9,6 +9,7 @@ using Linko.LinkoExchange.Services.TimeZone;
 using NLog;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Config;
+using Linko.LinkoExchange.Services.Settings;
 
 namespace Linko.LinkoExchange.Services.Unit
 {
@@ -21,6 +22,7 @@ namespace Linko.LinkoExchange.Services.Unit
         private readonly ITimeZoneService _timeZoneService;
         private readonly IOrganizationService _orgService;
         private readonly IConfigSettingService _configService;
+        private readonly ISettingService _settingService;
 
         public UnitService(
             LinkoExchangeContext dbContext,
@@ -29,7 +31,8 @@ namespace Linko.LinkoExchange.Services.Unit
             IHttpContextService httpContextService,
             ITimeZoneService timeZoneService,
             IOrganizationService orgService,
-            IConfigSettingService configService)
+            IConfigSettingService configService,
+            ISettingService settingService)
         {
             if (dbContext == null)
             {
@@ -66,6 +69,11 @@ namespace Linko.LinkoExchange.Services.Unit
                 throw new ArgumentNullException(nameof(orgService));
             }
 
+            if (settingService == null)
+            {
+                throw new ArgumentNullException(nameof(settingService));
+            }
+
             _dbContext = dbContext;
             _mapHelper = mapHelper;
             _logger = logger;
@@ -73,9 +81,14 @@ namespace Linko.LinkoExchange.Services.Unit
             _timeZoneService = timeZoneService;
             _orgService = orgService;
             _configService = configService;
+            _settingService = settingService;
         }
 
-        public List<UnitDto> GetFlowUnits()
+        /// <summary>
+        /// Gets all available flow units for an Organization where IsFlowUnit = true in tUnit table
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<UnitDto> GetFlowUnits()
         {
             _logger.Info("Enter UnitService.GetFlowUnits.");
 
@@ -87,6 +100,32 @@ namespace Linko.LinkoExchange.Services.Unit
             var unitDtos = UnitDtosHelper(units);
 
             _logger.Info("Leave UnitService.GetFlowUnits.");
+
+            return unitDtos;
+        }
+
+        /// <summary>
+        /// Reads unit labels from the Org Reg Program Setting "FlowUnitValidValues"
+        /// </summary>
+        /// <returns>Collection of unit dto's corresponding to the labels read from the setting</returns>
+        public IEnumerable<UnitDto> GetFlowUnitValidValues()
+        {
+            _logger.Info("Enter UnitService.GetFlowUnitValidValues.");
+
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var authOrganizationId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationId;
+            var flowUnitValidValuesString = _settingService.GetOrganizationSettingValue(currentOrgRegProgramId, Core.Enum.SettingType.FlowUnitValidValues);
+            var flowUnitValidValuesArray = flowUnitValidValuesString.Split(',');
+
+            var units = _dbContext.Units
+                .Where(i => i.IsFlowUnit 
+                    && i.OrganizationId == authOrganizationId
+                    && flowUnitValidValuesArray.Contains(i.Name)
+                    ).ToList();
+
+            var unitDtos = UnitDtosHelper(units);
+
+            _logger.Info("Leave UnitService.GetFlowUnitValidValues.");
 
             return unitDtos;
         }

@@ -322,7 +322,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             var selectedFlowUnits = viewModel.FlowUnitValidValues.Split(',').ToList();
             viewModel.AvailableFlowUnitValidValues = new List<SelectListItem>();
             var flowUnits = _unitService.GetFlowUnits();
-            if (flowUnits.Count > 0)
+            if (flowUnits.Count() > 0)
             {
                 viewModel.AvailableFlowUnitValidValues = flowUnits.Select(x => new SelectListItem
                                                                      {
