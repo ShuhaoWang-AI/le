@@ -85,14 +85,15 @@ namespace Linko.LinkoExchange.Test
             var copyOfRecordPdfFile = GetCopyOfRecordPdfFile();
             var reportPackageCopyOfRecordDataXml = GetReportPackageCopyOfRecordDataXml();
 
-            _reprotPackageService.Setup(i => i.GetReportPackageCopyOfRecordDataXmlFile(It.IsAny<int>()))
+            _reprotPackageService.Setup(i => i.GetReportPackageCopyOfRecordDataXmlFile(It.IsAny<ReportPackageDto>()))
                                  .Returns(reportPackageCopyOfRecordDataXml);
-            _reprotPackageService.Setup(i => i.GetReportPackageCopyOfRecordPdfFile(It.IsAny<int>()))
+            _reprotPackageService.Setup(i => i.GetReportPackageCopyOfRecordPdfFile(It.IsAny<ReportPackageDto>()))
                                  .Returns(copyOfRecordPdfFile);
+            var reportPackageDto = new ReportPackageDto();
 
             var attachmentFiles = attachments;
-            var copyOfRecordDataXmlFileInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordDataXmlFile(rptId);
-            var copyOfRecordPdfInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordPdfFile(rptId);
+            var copyOfRecordDataXmlFileInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
+            var copyOfRecordPdfInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordPdfFile(reportPackageDto);
 
             _copyOrRecordService.CreateCopyOfRecordForReportPackage(rptId, attachmentFiles, copyOfRecordPdfInfo, copyOfRecordDataXmlFileInfo);
         }
@@ -295,6 +296,15 @@ namespace Linko.LinkoExchange.Test
             var result = certificateDigitalSignatureManager.VerifySignature(copyOfRecordDto.Signature, copyOfRecordDto.Data);
 
             Assert.IsFalse(result);
+        }
+
+
+        [TestMethod]
+        public void Test_generate_Xml_data()
+        {
+
+
+
         }
 
         private ReportPackageDto GetReportPackage(int reportPackageId)

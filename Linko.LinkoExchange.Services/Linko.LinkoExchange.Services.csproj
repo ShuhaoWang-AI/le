@@ -187,6 +187,16 @@
     <Compile Include="Dto\ReportPackageTemplateElementCategoryDto.cs" />
     <Compile Include="MonitoringPoint\IMonitoringPointService.cs" />
     <Compile Include="MonitoringPoint\MonitoringPointService.cs" />
+    <Compile Include="Report\DataXML\Certification.cs" />
+    <Compile Include="Report\DataXML\CopyOfRecordDataXml.cs" />
+    <Compile Include="Report\DataXML\FileInfo.cs" />
+    <Compile Include="Report\DataXML\FileManifest.cs" />
+    <Compile Include="Report\DataXML\ReportHeader.cs" />
+    <Compile Include="Report\DataXML\SampleResultNode.cs" />
+    <Compile Include="Report\DataXML\SubmittedBy.cs" />
+    <Compile Include="Report\DataXML\SubmittedOnBehalfOf.cs" />
+    <Compile Include="Report\DataXML\SubmittedTo.cs" />
+    <Compile Include="Report\DataXML\XmlFileVersion.cs" />
     <Compile Include="Report\IReportPackageService.cs" />
     <Compile Include="Report\IReportTemplateService.cs" />
     <Compile Include="Dto\ReportPackageTemplateDto.cs" />

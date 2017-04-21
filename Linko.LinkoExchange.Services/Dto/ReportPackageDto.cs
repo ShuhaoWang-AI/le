@@ -18,6 +18,13 @@ namespace Linko.LinkoExchange.Services.Dto
         public string RecipientOrganizationCityName { get; internal set; }
         public string RecipientOrganizationJurisdictionName { get; internal set; }
         public string RecipientOrganizationZipCode { get; internal set; }
+        public string SubmissionReviewerUserId { get; set; }
+        public string SubmitterFirstName { get; set; }
+        public string SubmitterLastName { get; set; }
+        public string SubmitterTitleRole { get; set; }
+        public string SubmitterIPAddress { get; set; }
+        public string SubmitterUserName { get; set; }
+
         public DateTime PeriodStartDateTimeLocal { get; internal set; }
         public DateTime PeriodEndDateTimeLocal { get; internal set; }
         public bool IsSubmissionBySignatoryRequired { get; internal set; }
@@ -27,9 +34,12 @@ namespace Linko.LinkoExchange.Services.Dto
         public string OrganizationAddressLine2 { get; internal set; }
         public string OrganizationCityName { get; internal set; }
         public string OrganizationJurisdictionName { get; internal set; }
+        public string PermitNumber { get; set; }
+        public string Comments { get; set; }
         public DateTime CreationDateTimeLocal { get; internal set; }
         public List<FileStoreDto> AttachmentDtos { get; set; }
         public List<SampleDto> SamplesDtos { get; set; }
         public List<ReportPackageELementTypeDto> CertificationDtos { get; set; }
+
     }
 }

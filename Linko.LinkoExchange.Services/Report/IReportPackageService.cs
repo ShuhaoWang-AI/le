@@ -12,7 +12,6 @@ namespace Linko.LinkoExchange.Services.Report
         CopyOfRecordDto CreateCopyOfRecordForReportPackage(ReportPackageDto reportPackageDto);
         CopyOfRecordValidationResultDto VerififyCopyOfRecord(int reportPackageId);
 
-
         /// <summary>
         /// Get ReportPackageDto object by report package Id. 
         /// </summary>
@@ -28,18 +27,18 @@ namespace Linko.LinkoExchange.Services.Report
         /// 2.  Copy of Record receit, including UserProfile Details,  Organization Details, and ReportDetails
         /// 3.  Copy of Record file Manifest: A list of earch file in the .zip      
         /// </summary>
-        /// <param name="reportPackageId"></param>
-        /// <returns></returns>
-        CopyOfRecordDataXmlFileDto GetReportPackageCopyOfRecordDataXmlFile(int reportPackageId);
+        /// <param name="reportPackageDto">The ReportPackageDto containing all detailed information </param>
+        /// <returns>CopyOfRecordDataXmlFileDto</returns>
+        CopyOfRecordDataXmlFileDto GetReportPackageCopyOfRecordDataXmlFile(ReportPackageDto reportPackageDto);
 
         /// <summary>
         /// System generated formatted PDF containing(nearly all) data in the Copy of Record Data.xml, 
         /// combined into a single formatted PDF. This is a human readable and printable report.
         /// Format to match COR Standard Report Format.docx
         /// </summary>
-        /// <param name="reportPackageId"></param>
-        /// <returns></returns>
-        CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(int reportPackageId);
+        /// <param name="reportPackageDto">The ReportPackageDto containing all detailed information </param>
+        /// <returns>CopyOfRecordPdfFileDto</returns>
+        CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(ReportPackageDto reportPackageDto);
 
         /// <summary>
         /// *WARNING: NO VALIDATION CHECK -- CASCADE DELETE*

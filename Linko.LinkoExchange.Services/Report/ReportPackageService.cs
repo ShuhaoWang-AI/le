@@ -16,6 +16,7 @@ using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Mapping;
 using System.Data.Entity;
 using Linko.LinkoExchange.Core.Validation;
+using Linko.LinkoExchange.Services.Report.DataXML;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -173,19 +174,134 @@ namespace Linko.LinkoExchange.Services.Report
             }
         }
 
-
-        public IList<ReportPackageELementTypeDto> GetReportPackageCertifications(int reportPackageId)
+        public CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(ReportPackageDto reportPackageDto)
         {
             throw new NotImplementedException();
         }
 
-        public CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(int reportPackageId)
+        public CopyOfRecordDataXmlFileDto GetReportPackageCopyOfRecordDataXmlFile(ReportPackageDto reportPackageDto)
         {
-            throw new NotImplementedException();
-        }
+            var dataXmlObj = new CopyOfRecordDataXml();
+            dataXmlObj.XmlFileVersionNumber = new XmlFileVersion
+            {
+                VersionNumber = "1.0"
+            };
 
-        public CopyOfRecordDataXmlFileDto GetReportPackageCopyOfRecordDataXmlFile(int reportPackageId)
-        {
+            var timeZoneAbbr = _timeZoneService.GetAbbreviationTimeZoneNameUsingSettingForThisOrg(reportPackageDto.OrganizationRegulatoryProgramId);
+            dataXmlObj.ReportHeader = new ReportHeader
+            {
+                ReportName = reportPackageDto.Name,
+                // UTC or local time?  
+                ReportPeriodStart = reportPackageDto.PeriodStartDateTimeLocal.ToString(format: "yyyy-MM-dd"),
+                ReportPeriodEnd = reportPackageDto.PeriodEndDateTimeLocal.ToString(format: "yyyy-MM-dd"),
+                ReportSubmissionDate = $"{reportPackageDto.SubMissionDateTimeLocal:MMM dd, yyyy HHtt} {timeZoneAbbr}",
+                TimeZone = timeZoneAbbr
+            };
+
+            dataXmlObj.SubmittedTo = new SubmittedTo
+            {
+                OrganizationName = reportPackageDto.RecipientOrganizationName,
+                Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
+                Address2 = reportPackageDto.RecipientOrganizationAddressLine2,
+                City = reportPackageDto.RecipientOrganizationCityName,
+                State = reportPackageDto.RecipientOrganizationJurisdictionName,
+                ZipCode = reportPackageDto.RecipientOrganizationZipCode
+            };
+
+            dataXmlObj.SubmittedOnBehalfOf = new SubmittedOnBehalfOf
+            {
+                OrganizationName = reportPackageDto.RecipientOrganizationName,
+                PermitNumber = reportPackageDto.PermitNumber,
+                Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
+                Address2 = reportPackageDto.RecipientOrganizationAddressLine2,
+                City = reportPackageDto.RecipientOrganizationCityName,
+                State = reportPackageDto.RecipientOrganizationJurisdictionName,
+                ZipCode = reportPackageDto.RecipientOrganizationZipCode
+            };
+
+            dataXmlObj.SubmittedBy = new SubmittedBy
+            {
+                FirstName = reportPackageDto.SubmitterFirstName,
+                LastName = reportPackageDto.SubmitterLastName,
+                Title = reportPackageDto.SubmitterTitleRole,
+                UserName = reportPackageDto.SubmitterUserName,
+                ReportSubmissionFromIP = reportPackageDto.SubmitterIPAddress
+            };
+
+            dataXmlObj.FileManifest = new FileManifest
+            {
+                Files = reportPackageDto.AttachmentDtos.Select(i => new FileInfo
+                {
+                    OriginalFileName = i.OriginalFileName,
+                    SystemGeneratedUnqiueFileName = i.Name,
+                    AttachmentType = i.FileType
+                }).ToList()
+            };
+
+            dataXmlObj.FileManifest.Files.Add(
+                new FileInfo
+                {
+                    OriginalFileName = "Copy Of Record Data.xml",
+                    SystemGeneratedUnqiueFileName = "Copy Of Record Data.xml",
+                    AttachmentType = "Xml"
+                });
+
+            dataXmlObj.FileManifest.Files.Add(
+                new FileInfo
+                {
+                    OriginalFileName = "Copy Of Record.pdf",
+                    SystemGeneratedUnqiueFileName = "Copy Of Record.pdf",
+                    AttachmentType = "Pdf"
+                });
+
+
+            dataXmlObj.Certifications = new List<Certification>();
+            dataXmlObj.Certifications = reportPackageDto.CertificationDtos.Select(i => new Certification
+            {
+                CertificationType = i.ReportElementTypeName,
+                CertificationText = i.ReportElementTypeContent
+            }).ToList();
+
+            dataXmlObj.Comment = reportPackageDto.Comments;
+
+            // SampleResults part 
+            dataXmlObj.SampleResults = new List<SampleResultNode>();
+
+            foreach (var sampleDto in reportPackageDto.SamplesDtos)
+            {
+                foreach (var sampleResultDto in sampleDto.SampleResults)
+                {
+                    var sampleResultNode = new SampleResultNode
+                    {
+                        //// TODO to change to MonitoryingPointNaer?
+                        MonitoringPointAbbrv = sampleDto.MonitoringPointName,
+
+                        //// TODO to remove monitor pointer descption?
+                        ////MonitoringPointDescription = i.M 
+                        ResultQualifier = sampleResultDto.Qualifier,
+                        Result = sampleResultDto.Value.ToString(),
+                        ResultUnit = sampleResultDto.UnitName,
+                        SampleStartDate = sampleDto.StartDateTimeLocal.ToString(format: "MMM dd, yyyy"),
+                        SampleStartTime = sampleResultDto.ToString(),
+                        SampleEndDate = sampleDto.EndDateTimeLocal.ToString(format: "MMM dd, yyyy"),
+                        SampleEndtime = sampleDto.EndDateTimeLocal.ToShortTimeString(),
+                        CollectionMethod = sampleDto.CollectionMethodName,
+                        AnaylsisMethod = sampleResultDto.AnalysisMethod,
+
+                        //TODO to check hasValue or not
+
+                        AnalysisDate = sampleResultDto.AnalysisDateTimeLocal?.ToString(format: "MMM dd, yyyy") ?? "",
+                        AnalysisTime = sampleResultDto.AnalysisDateTimeLocal?.ToShortTimeString(),
+                        IsEPAApprovedMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
+
+                        //TODO: SampleFlow?
+                        SampleFlow = sampleDto.FlowValue.ToString(),
+                        SampleFlowUnits = sampleDto.FlowUnitName
+                    };
+
+                }
+            }
+
             throw new NotImplementedException();
         }
 
@@ -246,8 +362,8 @@ namespace Linko.LinkoExchange.Services.Report
             _logger.Info("Enter ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={0}", reportPackageDto.ReportPackageId);
             int reportPackageId = reportPackageDto.ReportPackageId;
             var attachments = reportPackageDto.AttachmentDtos;
-            var copyOfRecordPdfFile = GetReportPackageCopyOfRecordPdfFile(reportPackageId);
-            var copyOfRecordDataXmlFile = GetReportPackageCopyOfRecordDataXmlFile(reportPackageId);
+            var copyOfRecordPdfFile = GetReportPackageCopyOfRecordPdfFile(reportPackageDto);
+            var copyOfRecordDataXmlFile = GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
             var copyOfRecordDto = _copyOfRecordService.CreateCopyOfRecordForReportPackage(reportPackageId, attachments, copyOfRecordPdfFile, copyOfRecordDataXmlFile);
 
             _logger.Info("Leave ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={0}", reportPackageId);
