@@ -94,8 +94,8 @@ namespace Linko.LinkoExchange.Test
             sampleDto.MassLoadingCalculationDecimalPlaces = 4;
 
             var flowUnitValidValues = new List<UnitDto>();
-            flowUnitValidValues.Add(new UnitDto() { UnitId = 5, Name = "gpd" });
-            flowUnitValidValues.Add(new UnitDto() { UnitId = 8, Name = "mgd" });
+            flowUnitValidValues.Add(new UnitDto() { UnitId = 5, Name = "gpd", IsFlowUnit = true });
+            flowUnitValidValues.Add(new UnitDto() { UnitId = 8, Name = "mgd", IsFlowUnit = true });
 
             sampleDto.FlowUnitValidValues = flowUnitValidValues;
 
@@ -127,7 +127,7 @@ namespace Linko.LinkoExchange.Test
                 Qualifier = "<",
                 UnitId = 11,
                 UnitName = "su",
-                Value = "991",
+                Value = "991.00000",
                 EnteredMethodDetectionLimit = "MDL 5",
                 AnalysisMethod = "Analysis Method 5",
                 AnalysisDateTimeLocal = DateTime.Now,
@@ -478,7 +478,8 @@ namespace Linko.LinkoExchange.Test
                 }
                 else if (fieldName == "Name") //set within service code
                 {
-
+                    Assert.IsNull(beforeValue);
+                    Assert.AreEqual(sampleDto.CtsEventTypeName, afterValue);
                 }
                 else if (fieldName == "LastModificationDateTimeLocal") //set within service code
                 {
@@ -490,7 +491,16 @@ namespace Linko.LinkoExchange.Test
                 }
                 else if (fieldName == "FlowUnitValidValues")
                 {
+                    var fetchedFlowUnitsEnumerator = fetchedSampleDto.FlowUnitValidValues.GetEnumerator();
+                    foreach (var unitDto in sampleDto.FlowUnitValidValues)
+                    {
+                        fetchedFlowUnitsEnumerator.MoveNext();
+                        var fetchedFlowUnit = fetchedFlowUnitsEnumerator.Current;
 
+                        //Compare Results -- just name and id
+                        Assert.AreEqual(unitDto.UnitId, fetchedFlowUnit.UnitId);
+                        Assert.AreEqual(unitDto.Name, fetchedFlowUnit.Name);
+                    }
                 }
                 else if (fieldName == "SampleResults")
                 {
