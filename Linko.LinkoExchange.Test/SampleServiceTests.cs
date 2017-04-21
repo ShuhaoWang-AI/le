@@ -17,6 +17,7 @@ using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Sample;
 using System.Reflection;
 using Linko.LinkoExchange.Services.Unit;
+using Linko.LinkoExchange.Services.Config;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -51,7 +52,16 @@ namespace Linko.LinkoExchange.Test
             var actualSettings = new SettingService(connection, _logger.Object, new MapHelper());
 
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
-            _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });
+            _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1, OrganizationId = 1000 });
+
+            var actualUnitService = new UnitService(connection,
+                new MapHelper(),
+                _logger.Object,
+                _httpContext.Object,
+                actualTimeZoneService,
+                _orgService.Object,
+                new Mock<IConfigSettingService>().Object,
+                actualSettings);
 
             _sampleService = new SampleService(connection, 
                 _httpContext.Object, 
@@ -60,7 +70,7 @@ namespace Linko.LinkoExchange.Test
                 _logger.Object,
                 actualTimeZoneService,
                 actualSettings,
-                _unitService.Object);
+                actualUnitService);
         }
 
         #region Private helper functions
@@ -75,13 +85,20 @@ namespace Linko.LinkoExchange.Test
             sampleDto.CtsEventTypeId = 1;
             sampleDto.CtsEventTypeName = "SNC-P";
             sampleDto.CtsEventCategoryName = "Sample Category 1";
-            sampleDto.FlowUnitId = 10;
-            sampleDto.FlowUnitName = "ppd";
+            sampleDto.FlowUnitId = 5;
+            sampleDto.FlowUnitName = "gpd";
             sampleDto.FlowValue = "808.1";
             sampleDto.StartDateTimeLocal = DateTime.Now;
             sampleDto.EndDateTimeLocal = DateTime.Now;
             sampleDto.IsReadyToReport = false;
             sampleDto.MassLoadingCalculationDecimalPlaces = 4;
+
+            var flowUnitValidValues = new List<UnitDto>();
+            flowUnitValidValues.Add(new UnitDto() { UnitId = 5, Name = "gpd" });
+            flowUnitValidValues.Add(new UnitDto() { UnitId = 8, Name = "mgd" });
+
+            sampleDto.FlowUnitValidValues = flowUnitValidValues;
+
             var resultDtos = new List<SampleResultDto>();
 
             var resultDto = new SampleResultDto()
@@ -470,6 +487,10 @@ namespace Linko.LinkoExchange.Test
                 {
 
                 }
+                else if (fieldName == "FlowUnitValidValues")
+                {
+
+                }
                 else if (fieldName == "SampleResults")
                 {
                     var fetchedResultsEnumerator = fetchedSampleDto.SampleResults.GetEnumerator();
@@ -487,7 +508,22 @@ namespace Linko.LinkoExchange.Test
                             var resultBeforeValue = resultProperty.GetValue(resultDto, null);
                             var resultAfterValue = resultProperty.GetValue(fetchedSampleResult, null);
 
-                            Assert.AreEqual(beforeValue, afterValue);
+                            if (resultFieldName == "SampleId")
+                            {
+                                //ignore
+                            }
+                            else if (resultFieldName == "LastModifierFullName")
+                            {
+                                //ignore
+                            }
+                            else if (resultFieldName.Contains("DateTimeLocal"))
+                            {
+
+                            }
+                            else
+                            {
+                                Assert.AreEqual(resultBeforeValue, resultAfterValue);
+                            }
                         }
 
                     }

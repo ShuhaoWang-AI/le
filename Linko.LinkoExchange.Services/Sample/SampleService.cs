@@ -131,15 +131,18 @@ namespace Linko.LinkoExchange.Services.Sample
                 sampleToPersist.LastModifierUserId = currentUserId;
 
                 //Handle FlowUnitValidValues
-                var flowUnitValidValues = "";
-                var commaString = "";
-                foreach (var unitDto in sampleDto.FlowUnitValidValues)
+                if (sampleDto.FlowUnitValidValues != null)
                 {
-                    flowUnitValidValues += commaString + unitDto.Name;
-                    commaString = ",";
-                }
+                    var flowUnitValidValues = "";
+                    var commaString = "";
+                    foreach (var unitDto in sampleDto.FlowUnitValidValues)
+                    {
+                        flowUnitValidValues += commaString + unitDto.Name;
+                        commaString = ",";
+                    }
 
-                sampleToPersist.FlowUnitValidValues = flowUnitValidValues;
+                    sampleToPersist.FlowUnitValidValues = flowUnitValidValues;
+                }
 
                 _dbContext.SaveChanges(); //Need to Save before getting new SampleId
 
@@ -153,6 +156,12 @@ namespace Linko.LinkoExchange.Services.Sample
 
                 if (sampleDto.FlowValue != null && sampleDto.FlowUnitId != null && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
                 {
+                    //Check flow unit id is within valid values
+                    if (sampleDto.FlowUnitValidValues == null || !sampleDto.FlowUnitValidValues.Select(fu => fu.UnitId).Contains(sampleDto.FlowUnitId.Value))
+                    {
+                        ThrowSimpleException($"ERROR: Selected flow unit (id={sampleDto.FlowUnitId.Value}, name={sampleDto.FlowUnitName}) could not be found within passed in FlowUnitValidValues collection.");
+                    }
+
                     var flowParameter = _dbContext.Parameters
                         .First(p => p.IsFlowForMassLoadingCalculation == true); //Chris: "Should be one but just get first".
 
@@ -696,7 +705,7 @@ namespace Linko.LinkoExchange.Services.Sample
                             resultDto.AnalysisMethod = sampleResult.AnalysisMethod;
                             resultDto.IsApprovedEPAMethod = sampleResult.IsApprovedEPAMethod;
                             resultDto.ParameterId = sampleResult.ParameterId;
-                            //resultDto.IsCalcMassLoading = sampleResult.IsMassLoadingCalculationRequired;
+                            resultDto.IsCalcMassLoading = sampleResult.IsMassLoadingCalculationRequired;
                             resultDto.Qualifier = sampleResult.Qualifier;
                             resultDto.Value = sampleResult.EnteredValue;
                             resultDto.UnitId = sampleResult.UnitId;
@@ -708,12 +717,11 @@ namespace Linko.LinkoExchange.Services.Sample
                         }
                         else
                         {
-                            //Mass Result
+                            //Mass Result -- must be included with a resultDto where LimitBasisName = LimitBasisName.Concentration
                             resultDto.MassLoadingQualifier = sampleResult.Qualifier;
                             resultDto.MassLoadingValue = sampleResult.EnteredValue;
                             resultDto.MassLoadingUnitId = sampleResult.UnitId;
                             resultDto.MassLoadingUnitName = sampleResult.UnitName;
-                            resultDto.LimitBasisName = LimitBasisName.MassLoading;
                         }
 
 
