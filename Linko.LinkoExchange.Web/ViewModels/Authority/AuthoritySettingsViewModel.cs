@@ -148,7 +148,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         {
             get
             {
-                var selectedValues = ResultQualifierValidValues?.Split(',').ToList() ?? new List<string> {""};
+                var selectedValues = SampleNameCreationRule?.Split(',').ToList() ?? new List<string> {""};
                 var options = Enum.GetValues(enumType:typeof(SampleNameCreationRuleOption))
                                   .Cast<SampleNameCreationRuleOption>()
                                   .Select(
