@@ -944,9 +944,11 @@ namespace Linko.LinkoExchange.Services.Mapping
         }
         public Core.Domain.Sample GetSampleFromSampleDto(SampleDto sampleDto, Core.Domain.Sample existingSample = null)
         {
+            bool isNewSample = false;
             if (existingSample == null)
             {
                 existingSample = new Core.Domain.Sample();
+                isNewSample = true;
             }
 
             //existingSample.Name = sampleDto.Name; //set after exit this method
@@ -962,11 +964,16 @@ namespace Linko.LinkoExchange.Services.Mapping
             //existingSample.EndDateTimeUtc = sampleDto.EndDateTimeUtc;
             existingSample.IsSystemGenerated = false; //not currently used
             existingSample.IsReadyToReport = sampleDto.IsReadyToReport;
-            //existingSample.FlowUnitValidValues = sampleDto.FlowUnitValidValues; //set after we exit this method
-            existingSample.ResultQualifierValidValues = sampleDto.ResultQualifierValidValues;
-            existingSample.MassLoadingConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds;
-            existingSample.MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces;
-            existingSample.IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign;
+
+            if (isNewSample) //SNAPSHOT TAKEN WHEN SAMPLE FIRST CREATED -- no need to keep overwriting
+            {
+                //existingSample.FlowUnitValidValues = sampleDto.FlowUnitValidValues; //set after we exit this method
+                existingSample.ResultQualifierValidValues = sampleDto.ResultQualifierValidValues;
+                existingSample.MassLoadingConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds;
+                existingSample.MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces;
+                existingSample.IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign;
+            }
+
             //existingSample.OrganizationTypeId = sampleDto.OrganizationTypeId; //set after we exit this method
             //existingSample.OrganizationRegulatoryProgramId = sampleDto.OrganizationRegulatoryProgramId; //set after we exit this method
 
@@ -988,10 +995,11 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.UnitId = sampleResult.UnitId;
             dto.UnitName = sampleResult.UnitName;
             dto.EnteredMethodDetectionLimit = sampleResult.EnteredMethodDetectionLimit;
+            dto.MethodDetectionLimit = sampleResult.MethodDetectionLimit;
             dto.AnalysisMethod = sampleResult.AnalysisMethod;
             //dto.AnalysisDateTimeLocal = set outside MapHelper
             dto.IsApprovedEPAMethod = sampleResult.IsApprovedEPAMethod;
-            dto.IsCalculated = sampleResult.IsCalculated;
+            //dto.IsCalculated = sampleResult.IsCalculated;
             //dto.LimitTypeName = set outside MapHelper
             //dto.LimitBasisName = set outside MapHelper
             //dto.LastModificationDateTimeLocal = set outside MapHelper

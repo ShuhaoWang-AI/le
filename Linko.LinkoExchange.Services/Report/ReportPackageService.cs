@@ -295,7 +295,7 @@ namespace Linko.LinkoExchange.Services.Report
                         Value = sampleResultDto.Value,
                         UnitName = sampleResultDto.UnitName,
                         EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit,
-                        MethodDetectionLimit = sampleResultDto.MethodDetectionLimit,
+                        MethodDetectionLimit = sampleResultDto.MethodDetectionLimit.ToString(),
                         AnalysisMethod = sampleResultDto.AnalysisMethod,
 
                         //TODO handle the datatime here

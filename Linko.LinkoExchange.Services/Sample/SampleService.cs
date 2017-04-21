@@ -210,8 +210,11 @@ namespace Linko.LinkoExchange.Services.Sample
                         ThrowSimpleException($"Could not convert entered concentration value to double: \"{sampleResult.EnteredValue}\"");
                     }
                     sampleResult.Value = valueAsDouble;
-                    sampleResult.AnalysisDateTimeUtc = _timeZoneService
-                        .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                    if (resultDto.AnalysisDateTimeLocal.HasValue)
+                    {
+                        sampleResult.AnalysisDateTimeUtc = _timeZoneService
+                            .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                    }
                     sampleResult.LimitBasisId = concentrationLimitBasisId;
                     sampleResult.LimitTypeId = dailyLimitTypeId;
                     sampleResult.CreationDateTimeUtc = DateTimeOffset.UtcNow;
@@ -233,8 +236,11 @@ namespace Linko.LinkoExchange.Services.Sample
                             ThrowSimpleException($"Could not convert entered mass value to double: \"{sampleMassResult.EnteredValue}\"");
                         }
                         sampleMassResult.Value = massValueAsDouble;
-                        sampleMassResult.AnalysisDateTimeUtc = _timeZoneService
-                            .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                        if (resultDto.AnalysisDateTimeLocal.HasValue)
+                        {
+                            sampleMassResult.AnalysisDateTimeUtc = _timeZoneService
+                                .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                        }
                         sampleMassResult.LimitBasisId = massLimitBasisId;
                         sampleMassResult.LimitTypeId = dailyLimitTypeId;
                         sampleMassResult.CreationDateTimeUtc = DateTimeOffset.UtcNow;
@@ -248,22 +254,8 @@ namespace Linko.LinkoExchange.Services.Sample
                 _dbContext.SaveChanges();
 
             }
-            catch (RuleViolationException ex)
+            catch (RuleViolationException)
             {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                var errors = new List<string>() { ex.Message };
-
-                while (ex.InnerException != null)
-                {
-                    ex = ex.InnerException;
-                    errors.Add(ex.Message);
-                }
-
-                _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
-
                 throw;
             }
 
@@ -737,7 +729,6 @@ namespace Linko.LinkoExchange.Services.Sample
                             resultDto.Value = sampleResult.EnteredValue;
                             resultDto.UnitId = sampleResult.UnitId;
                             resultDto.UnitName = sampleResult.UnitName;
-                            resultDto.LimitBasisName = LimitBasisName.Concentration;
 
                             SetSampleResultDatesAndLastModified(sampleResult, ref resultDto, timeZoneId);
 

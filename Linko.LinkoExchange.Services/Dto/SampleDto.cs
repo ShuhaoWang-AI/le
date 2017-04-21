@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+[assembly: InternalsVisibleTo("Linko.LinkoExchange.Test")]
 
 namespace Linko.LinkoExchange.Services.Dto
 {
@@ -36,7 +38,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public int? FlowUnitId { get; set; }
         public string FlowUnitName { get; set; }
         public IEnumerable<SampleResultDto> SampleResults { get; set; }
-        public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgramDto { get; set; }
+        internal OrganizationRegulatoryProgramDto OrganizationRegulatoryProgramDto { get; set; }
     }
 }
 
