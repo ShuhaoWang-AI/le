@@ -515,13 +515,40 @@ namespace Linko.LinkoExchange.Services.Sample
                                 }
                             }
 
+                            if (!string.IsNullOrEmpty(resultDto.MassLoadingQualifier))
+                            {
+                                if (resultDto.Qualifier == "<" && resultDto.MassLoadingQualifier == "<" && sampleDto.IsMassLoadingResultToUseLessThanSign)
+                                {
+                                    //this is the only allowable scenario for mass loading qualifier
+                                }
+                                else
+                                {
+                                    isValid = false;
+                                    if (!isSuppressExceptions)
+                                    {
+                                        this.ThrowSimpleException("Mass loading qualifer can only be '<' and only if the IsMassLoadingResultToUseLessThanSign setting = true.");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (resultDto.Qualifier == "<" && sampleDto.IsMassLoadingResultToUseLessThanSign)
+                                {
+                                    isValid = false;
+                                    if (!isSuppressExceptions)
+                                    {
+                                        this.ThrowSimpleException("If a concentration qualifier is '<' and the IsMassLoadingResultToUseLessThanSign setting = true, then mass loading qualifer must also be '<'.");
+                                    }
+                                }
+                            }
+
                             if ((resultDto.Qualifier == ">" || resultDto.Qualifier == "<" || string.IsNullOrEmpty(resultDto.Qualifier))
                             && string.IsNullOrEmpty(resultDto.MassLoadingValue))
                             {
                                 isValid = false;
                                 if (!isSuppressExceptions)
                                 {
-                                    this.ThrowSimpleException("When calculating mass loading, a numeric qualifier must be followed by a valid mass loading value.");
+                                    this.ThrowSimpleException("When calculating mass loading, a concentration numeric qualifier must be followed by a valid mass loading value.");
                                 }
                             }
 
@@ -531,7 +558,7 @@ namespace Linko.LinkoExchange.Services.Sample
                                 isValid = false;
                                 if (!isSuppressExceptions)
                                 {
-                                    this.ThrowSimpleException("When calculating mass loading, ND or NF qualifiers cannot be followed by a mass loading value.");
+                                    this.ThrowSimpleException("When calculating mass loading, concentration ND or NF qualifiers cannot be followed by a mass loading value.");
                                 }
                             }
 

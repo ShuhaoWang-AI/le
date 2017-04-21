@@ -105,7 +105,7 @@ namespace Linko.LinkoExchange.Test
             {
                 ParameterId = 14,
                 ParameterName = "1,2-Dibromo-3-chloropropane",
-                Qualifier = ">",
+                Qualifier = "<",
                 UnitId = 7,
                 UnitName = "mg/L",
                 Value = "20",
@@ -114,7 +114,7 @@ namespace Linko.LinkoExchange.Test
                 AnalysisDateTimeLocal = DateTime.Now,
                 IsApprovedEPAMethod = true,
                 IsCalcMassLoading = true,
-                MassLoadingQualifier = ">",
+                MassLoadingQualifier = "<",
                 MassLoadingUnitId = 8,
                 MassLoadingUnitName = "mgd",
                 MassLoadingValue = "1001.2005",
@@ -451,6 +451,7 @@ namespace Linko.LinkoExchange.Test
 
             //Create test Sample Dto
             var sampleDto = GetTestSampleDto();
+            sampleDto.IsMassLoadingResultToUseLessThanSign = true;
             sampleDto.IsReadyToReport = true;
 
             //Persist
