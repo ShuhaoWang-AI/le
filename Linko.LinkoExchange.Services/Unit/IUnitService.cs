@@ -20,6 +20,13 @@ namespace Linko.LinkoExchange.Services.Unit
         IEnumerable<UnitDto> GetFlowUnitValidValues();
 
         /// <summary>
+        /// Reads unit labels from passed in comma delimited string
+        /// </summary>
+        /// <param name="commaDelimitedString"></param>
+        /// <returns>Collection of unit dto's corresponding to the labels read from passed in string</returns>
+        IEnumerable<UnitDto> GetFlowUnitsFromCommaDelimitedString(string commaDelimitedString);
+
+        /// <summary>
         /// Always ppd as per client's requirements
         /// </summary>
         /// <returns></returns>

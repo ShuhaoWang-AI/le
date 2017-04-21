@@ -16,6 +16,7 @@ using Linko.LinkoExchange.Services.Parameter;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Sample;
 using System.Reflection;
+using Linko.LinkoExchange.Services.Unit;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -28,6 +29,7 @@ namespace Linko.LinkoExchange.Test
         Mock<ILogger> _logger;
         Mock<ITimeZoneService> _timeZoneService;
         Mock<ISettingService> _settingsService;
+        Mock<IUnitService> _unitService;
 
         public SampleServiceTests()
         {
@@ -43,6 +45,7 @@ namespace Linko.LinkoExchange.Test
             _logger = new Mock<ILogger>();
             _timeZoneService = new Mock<ITimeZoneService>();
             _settingsService = new Mock<ISettingService>();
+            _unitService = new Mock<IUnitService>();
 
             var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper()), new MapHelper());
             var actualSettings = new SettingService(connection, _logger.Object, new MapHelper());
@@ -56,7 +59,8 @@ namespace Linko.LinkoExchange.Test
                 new MapHelper(), 
                 _logger.Object,
                 actualTimeZoneService,
-                actualSettings);
+                actualSettings,
+                _unitService.Object);
         }
 
         #region Private helper functions

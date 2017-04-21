@@ -69,6 +69,12 @@ namespace Linko.LinkoExchange.Test
             var dtos = _unitService.GetFlowUnitValidValues();
         }
 
-        
+        [TestMethod]
+        public void GetFlowUnitsFromCommaDelimitedString()
+        {
+            var dtos = _unitService.GetFlowUnitsFromCommaDelimitedString("gpd,mgd");
+        }
+
+
     }
 }

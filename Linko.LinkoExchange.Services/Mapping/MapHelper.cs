@@ -925,9 +925,9 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.CollectionMethodId = sample.CollectionMethodId;
             dto.CollectionMethodName = sample.CollectionMethodName;
             dto.IsReadyToReport = sample.IsReadyToReport;
-            //dto.SampleStatusName = set outside after existing this method
+            //dto.SampleStatusName = set outside after exiting this method
             dto.LabSampleIdentifier = sample.LabSampleIdentifier;
-            dto.FlowUnitValidValues = sample.FlowUnitValidValues;
+            //dto.FlowUnitValidValues = sample.FlowUnitValidValues; // set outside after exiting this method
             dto.ResultQualifierValidValues = sample.ResultQualifierValidValues;
             dto.MassLoadingConversionFactorPounds = sample.MassLoadingConversionFactorPounds;
             dto.MassLoadingCalculationDecimalPlaces = sample.MassLoadingCalculationDecimalPlaces;
@@ -962,7 +962,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             //existingSample.EndDateTimeUtc = sampleDto.EndDateTimeUtc;
             existingSample.IsSystemGenerated = false; //not currently used
             existingSample.IsReadyToReport = sampleDto.IsReadyToReport;
-            existingSample.FlowUnitValidValues = sampleDto.FlowUnitValidValues;
+            //existingSample.FlowUnitValidValues = sampleDto.FlowUnitValidValues; //set after we exit this method
             existingSample.ResultQualifierValidValues = sampleDto.ResultQualifierValidValues;
             existingSample.MassLoadingConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds;
             existingSample.MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces;

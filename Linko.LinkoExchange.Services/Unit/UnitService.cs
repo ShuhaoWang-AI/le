@@ -131,6 +131,32 @@ namespace Linko.LinkoExchange.Services.Unit
         }
 
         /// <summary>
+        /// Reads unit labels from passed in comma delimited string
+        /// </summary>
+        /// <param name="commaDelimitedString"></param>
+        /// <returns>Collection of unit dto's corresponding to the labels read from passed in string</returns>
+        public IEnumerable<UnitDto> GetFlowUnitsFromCommaDelimitedString(string commaDelimitedString)
+        {
+            _logger.Info("Enter UnitService.GetFlowUnitsFromCommaDelimitedString.");
+
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var authOrganizationId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationId;
+            var flowUnitsArray = commaDelimitedString.Split(',');
+
+            var units = _dbContext.Units
+                .Where(i => i.IsFlowUnit
+                    && i.OrganizationId == authOrganizationId
+                    && flowUnitsArray.Contains(i.Name)
+                    ).ToList();
+
+            var unitDtos = UnitDtosHelper(units);
+
+            _logger.Info("Leave UnitService.GetFlowUnitsFromCommaDelimitedString.");
+
+            return unitDtos;
+        }
+
+        /// <summary>
         /// Always ppd as per client's requirements
         /// </summary>
         /// <returns></returns>

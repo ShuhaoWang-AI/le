@@ -16,6 +16,7 @@ using System.Data.Entity;
 using Linko.LinkoExchange.Services.Cache;
 using System.Collections.ObjectModel;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Services.Unit;
 
 namespace Linko.LinkoExchange.Services.Sample
 {
@@ -28,6 +29,7 @@ namespace Linko.LinkoExchange.Services.Sample
         private readonly ILogger _logger;
         private readonly ITimeZoneService _timeZoneService;
         private readonly ISettingService _settings;
+        private readonly IUnitService _unitService;
 
         public SampleService(LinkoExchangeContext dbContext,
             IHttpContextService httpContext,
@@ -35,7 +37,8 @@ namespace Linko.LinkoExchange.Services.Sample
             IMapHelper mapHelper,
             ILogger logger,
             ITimeZoneService timeZoneService,
-            ISettingService settings)
+            ISettingService settings,
+            IUnitService unitService)
         {
             _dbContext = dbContext;
             _httpContext = httpContext;
@@ -44,6 +47,7 @@ namespace Linko.LinkoExchange.Services.Sample
             _logger = logger;
             _timeZoneService = timeZoneService;
             _settings = settings;
+            _unitService = unitService;
         }
 
         /// <summary>
@@ -102,7 +106,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     sampleToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
                     _dbContext.Samples.Add(sampleToPersist);
                 }
-
+                
                 //Set Name auto-generated using settings format
                 string sampleName;
                 string nameCreationRule = _settings.GetOrgRegProgramSettingValue(currentOrgRegProgramId, SettingType.SampleNameCreationRule);
@@ -125,6 +129,17 @@ namespace Linko.LinkoExchange.Services.Sample
                 sampleToPersist.EndDateTimeUtc = sampleEndDateTimeUtc;
                 sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                 sampleToPersist.LastModifierUserId = currentUserId;
+
+                //Handle FlowUnitValidValues
+                var flowUnitValidValues = "";
+                var commaString = "";
+                foreach (var unitDto in sampleDto.FlowUnitValidValues)
+                {
+                    flowUnitValidValues += commaString + unitDto.Name;
+                    commaString = ",";
+                }
+
+                sampleToPersist.FlowUnitValidValues = flowUnitValidValues;
 
                 _dbContext.SaveChanges(); //Need to Save before getting new SampleId
 
@@ -600,6 +615,9 @@ namespace Linko.LinkoExchange.Services.Sample
                 .Single(lb => lb.Name == LimitBasisName.VolumeFlowRate.ToString()).LimitBasisId;
 
             var dto = _mapHelper.GetSampleDtoFromSample(sample);
+
+            //Handle FlowUnitValidValues
+            dto.FlowUnitValidValues = _unitService.GetFlowUnitsFromCommaDelimitedString(sample.FlowUnitValidValues);
 
             //Set Sample Start Local Timestamp
             dto.StartDateTimeLocal = _timeZoneService
