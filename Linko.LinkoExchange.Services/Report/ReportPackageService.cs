@@ -194,7 +194,7 @@ namespace Linko.LinkoExchange.Services.Report
                 // UTC or local time?  
                 ReportPeriodStart = reportPackageDto.PeriodStartDateTimeLocal.ToString(format: "yyyy-MM-dd"),
                 ReportPeriodEnd = reportPackageDto.PeriodEndDateTimeLocal.ToString(format: "yyyy-MM-dd"),
-                ReportSubmissionDate = $"{reportPackageDto.SubMissionDateTimeLocal:MMM dd, yyyy HHtt} {timeZoneAbbr}",
+                ReportSubmissionDate = $"{reportPackageDto.SubmissionDateTimeLocal:MMM dd, yyyy HHtt} {timeZoneAbbr}",
                 TimeZone = timeZoneAbbr
             };
 
@@ -623,7 +623,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             }
 
-           
+
         }
 
     }

@@ -2,7 +2,7 @@
 namespace Linko.LinkoExchange.Services.Dto
 {
     public class OrganizationRegulatoryProgramDto
-    { 
+    {
         public int OrganizationRegulatoryProgramId { get; set; }
         public int RegulatoryProgramId { get; set; }
         public ProgramDto RegulatoryProgramDto { get; set; }
@@ -16,5 +16,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public string ReferenceNumber { get; set; }
         public bool HasSignatory { get; set; }
         public bool HasAdmin { get; set; }
+        public string ReferenceNumber { get; set; }
     }
 }

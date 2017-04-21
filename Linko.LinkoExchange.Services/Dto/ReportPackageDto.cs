@@ -40,6 +40,5 @@ namespace Linko.LinkoExchange.Services.Dto
         public List<FileStoreDto> AttachmentDtos { get; set; }
         public List<SampleDto> SamplesDtos { get; set; }
         public List<ReportPackageELementTypeDto> CertificationDtos { get; set; }
-
     }
 }

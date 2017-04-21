@@ -127,8 +127,8 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             };
 
             var datetimePart = reportPackage.SubmissionDateTimeLocal.ToString(format: "yyyyMMdd");
-            var referenceNumber = reportPackage.OrganizationRegulatoryProgramDto.ReferenceNumber;
-            copyOfRecordDto.DownloadFileName = $"{referenceNumber} {reportPackage.Name} {datetimePart}.zip";
+            var permitNumber = reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.PermitNumber;
+            copyOfRecordDto.DownloadFileName = $"{permitNumber} {reportPackage.Name} {datetimePart}.zip";
             copyOfRecordDto.DownloadFileName = StripReservedCharacters(copyOfRecordDto.DownloadFileName);
 
             _logger.Info($"Enter CopyOfRecordService.GetCopyOfRecordByReportPackage. ReportPackageId:{reportPackage.ReportPackageId}");
