@@ -16,6 +16,5 @@ namespace Linko.LinkoExchange.Services.Dto
         public string ReferenceNumber { get; set; }
         public bool HasSignatory { get; set; }
         public bool HasAdmin { get; set; }
-        public string ReferenceNumber { get; set; }
     }
 }
