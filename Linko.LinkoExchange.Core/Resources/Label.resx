@@ -162,6 +162,9 @@
   <data name="DownloadSignatoryAgreement" xml:space="preserve">
     <value>Download Signatory Agreement</value>
   </data>
+  <data name="Draft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
   <data name="Email" xml:space="preserve">
     <value>Email Address</value>
   </data>
@@ -177,8 +180,14 @@
   <data name="Password" xml:space="preserve">
     <value>Password</value>
   </data>
+  <data name="ReadyToReport" xml:space="preserve">
+    <value>Ready to Report</value>
+  </data>
   <data name="RememberMe" xml:space="preserve">
     <value>Remember Me</value>
+  </data>
+  <data name="Reported" xml:space="preserve">
+    <value>Reported</value>
   </data>
   <data name="SampleEventType" xml:space="preserve">
     <value>Sample Event Type</value>

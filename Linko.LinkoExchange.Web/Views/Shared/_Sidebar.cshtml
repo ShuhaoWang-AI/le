@@ -1,4 +1,5 @@
-﻿@if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.PortalName.ToLower().Equals(value:"authority"))
+﻿@using Linko.LinkoExchange.Core.Enum
+@if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.PortalName.ToLower().Equals(value:"authority"))
 {
     <aside class="main-sidebar">
         <section class="sidebar">
@@ -132,7 +133,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
         <section class="sidebar">
             @* BEGIN Menu *@
             <ul class="sidebar-menu">
-                <li class="treeview">
+                <li class="treeview @Html.IsActive(actions:"Samples", controllers:"Industry")">
                     <a href="#">
                         <i class="fa fa-fw fa-th-list"></i>
                         <span>Samples</span>
@@ -141,8 +142,8 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                         </span>*@
                     </a>
                     <ul class="treeview-menu">
-                        <li>
-                            <a href="#">
+                        <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag: "sampleStatus:" + SampleStatusName.Draft.ToString())">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.Draft})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Drafts</span>
                                 @*<span class="pull-right-container">
@@ -150,8 +151,14 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                                 </span>*@
                             </a>
                         </li>
-                        <li>
-                            <a href="#">
+                        <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag: "sampleStatus:" + SampleStatusName.ReadyToReport.ToString())">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.ReadyToReport})'">
+                                <i class="fa fa-fw"></i>
+                                <span>Ready to Report</span>
+                            </a>
+                        </li>
+                        <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag: "sampleStatus:" + SampleStatusName.Reported.ToString())">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.Reported})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Reported</span>
                             </a>
@@ -209,7 +216,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                     </a>
                 </li>
 
-                <li class="treeview @Html.IsActive(actions:"IndustryUsers,IndustryUserDetails,IndustryUserRemove,IndustryUserChangeStatus,Settings,PendingUserApprovals,PendingUserApprovalDetails", controllers: "Industry")">
+                <li class="treeview @Html.IsActive(actions:"IndustryUsers,IndustryUserDetails,IndustryUserRemove,IndustryUserChangeStatus,Settings,PendingUserApprovals,PendingUserApprovalDetails", controllers:"Industry")">
                     <a href="#">
                         <i class="fa fa-bank fa-fw"></i>
                         <span>Industry Account</span>

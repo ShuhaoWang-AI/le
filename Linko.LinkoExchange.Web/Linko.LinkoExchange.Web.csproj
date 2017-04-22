@@ -415,6 +415,7 @@
     <Content Include="Views\Industry\Attachments.cshtml" />
     <Content Include="Views\Cor\VerifyCopyOfRecord.cshtml" />
     <Content Include="Views\Industry\AttachmentDetails.cshtml" />
+    <Content Include="Views\Industry\Samples.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -462,6 +463,7 @@
     <Compile Include="ViewModels\Authority\AuthorityUserViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
+    <Compile Include="ViewModels\Shared\SampleResultViewModel.cs" />
     <Compile Include="ViewModels\Shared\SampleViewModel.cs" />
     <Compile Include="ViewModels\Shared\AttachmentViewModel.cs" />
     <Compile Include="ViewModels\Shared\ReportPackageTemplateViewModel.cs" />

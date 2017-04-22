@@ -8,6 +8,7 @@ using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Config;
 using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
@@ -20,6 +21,7 @@ using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
+using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Unit;
@@ -30,7 +32,6 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using Microsoft.Practices.Unity;
 using NLog;
-using Linko.LinkoExchange.Services.Config;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -86,6 +87,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IAuditLogService, EmailAuditLogService>();
             container.RegisterType<IAuthenticationManager>(new InjectionFactory(c => HttpContext.Current.GetOwinContext().Authentication));
             container.RegisterType<IAuthenticationService, AuthenticationService>();
+            container.RegisterType<IConfigSettingService, ConfigSettingService>();
             container.RegisterType<ICopyOfRecordService, CopyOfRecordService>();
             container.RegisterType<ICromerrAuditLogService, CromerrAuditLogService>();
             container.RegisterType<IDigitalSignatureManager, CertificateDigitalSignatureManager>();
@@ -105,12 +107,12 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IReportPackageService, ReportPackageService>();
             container.RegisterType<IReportTemplateService, ReportTemplateService>();
             container.RegisterType<IRequestCache, RequestCache>();
+            container.RegisterType<ISampleService, SampleService>();
             container.RegisterType<ISessionCache, SessionCache>();
             container.RegisterType<ISettingService, SettingService>();
             container.RegisterType<ITimeZoneService, TimeZoneService>();
             container.RegisterType<IUnitService, UnitService>();
             container.RegisterType<IUserService, UserService>();
-            container.RegisterType<IConfigSettingService, ConfigSettingService>();
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();

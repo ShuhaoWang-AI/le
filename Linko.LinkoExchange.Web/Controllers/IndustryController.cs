@@ -18,6 +18,8 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
+using Linko.LinkoExchange.Services.Sample;
+using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mvc;
@@ -42,20 +44,22 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #region constructor
 
-        private readonly IOrganizationService _organizationService;
-        private readonly IUserService _userService;
-        private readonly IInvitationService _invitationService;
-        private readonly IQuestionAnswerService _questionAnswerService;
-        private readonly IPermissionService _permissionService;
-        private readonly ISessionCache _sessionCache;
-        private readonly ILogger _logger;
-        private readonly IHttpContextService _httpContextService;
         private readonly IFileStoreService _fileStoreService;
+        private readonly IHttpContextService _httpContextService;
+        private readonly IInvitationService _invitationService;
+        private readonly ILogger _logger;
+        private readonly IOrganizationService _organizationService;
+        private readonly IPermissionService _permissionService;
+        private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IReportElementService _reportElementService;
+        private readonly ISampleService _sampleService;
+        private readonly ISessionCache _sessionCache;
+        private readonly IUnitService _unitService;
+        private readonly IUserService _userService;
 
-        public IndustryController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService,
-                                  IQuestionAnswerService questionAnswerService, IPermissionService permissionService, ISessionCache sessionCache, ILogger logger, IHttpContextService httpContextService
-                                  , IFileStoreService fileStoreService, IReportElementService reportElementService)
+        public IndustryController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService, IQuestionAnswerService questionAnswerService,
+                                  IPermissionService permissionService, ISessionCache sessionCache, ILogger logger, IHttpContextService httpContextService, IFileStoreService fileStoreService,
+                                  IReportElementService reportElementService, ISampleService sampleService, IUnitService unitService)
         {
             _organizationService = organizationService;
             _userService = userService;
@@ -67,6 +71,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             _httpContextService = httpContextService;
             _fileStoreService = fileStoreService;
             _reportElementService = reportElementService;
+            _sampleService = sampleService;
+            _unitService = unitService;
         }
 
         #endregion
@@ -814,9 +820,9 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     fileStoreDto.ReportElementTypeId = model.ReportElementTypeId;
                     fileStoreDto.ReportElementTypeName = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments)
-                                                                                                .Where(c => c.ReportElementTypeId == model.ReportElementTypeId)
-                                                                                                .Select(c => c.Name)
-                                                                                                .FirstOrDefault();
+                                                                              .Where(c => c.ReportElementTypeId == model.ReportElementTypeId)
+                                                                              .Select(c => c.Name)
+                                                                              .FirstOrDefault();
                     fileStoreDto.Description = model.Description;
 
                     _fileStoreService.UpdateFileStore(fileStoreDto:fileStoreDto);
@@ -906,7 +912,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                       {
                                                                                           Text = c.Name,
                                                                                           Value = c.ReportElementTypeId.ToString(),
-                                                                                          Selected = c.ReportElementTypeId.Equals( other:viewModel.ReportElementTypeId)
+                                                                                          Selected = c.ReportElementTypeId.Equals(other:viewModel.ReportElementTypeId)
                                                                                       }).ToList();
 
             viewModel.AvailableReportElementTypes.Insert(index:0, item:new SelectListItem {Text = @"Select Attachment Type", Value = "0"});
@@ -914,6 +920,80 @@ namespace Linko.LinkoExchange.Web.Controllers
             viewModel.AllowedFileExtensions = string.Join(separator:",", values:_fileStoreService.GetValidAttachmentFileExtensions());
 
             return viewModel;
+        }
+
+        #endregion
+
+        #region Show Sample List
+
+        // GET: /Industry/Samples
+        [Route(template:"Samples/{sampleStatus}")]
+        public ActionResult Samples(SampleStatusName sampleStatus)
+        {
+            ViewBag.SampleStatusName = sampleStatus;
+            return View();
+        }
+
+        public ActionResult Samples_Read([DataSourceRequest] DataSourceRequest request, SampleStatusName sampleStatus)
+        {
+            var dtos = _sampleService.GetSamples(status:sampleStatus);
+
+            var viewModels = dtos.Select(vm => new SampleViewModel
+                                               {
+                                                   Id = vm.SampleId,
+                                                   MonitoringPointName = vm.MonitoringPointName,
+                                                   CtsEventTypeName = vm.CtsEventTypeName,
+                                                   CollectionMethodName = vm.CollectionMethodName,
+                                                   StartDateTimeLocal = vm.StartDateTimeLocal,
+                                                   EndDateTimeLocal = vm.EndDateTimeLocal,
+                                                   LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal,
+                                                   LastModifierUserName = vm.LastModifierFullName
+                                               });
+
+            var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
+                                                                                       {
+                                                                                           vm.Id,
+                                                                                           vm.MonitoringPointName,
+                                                                                           vm.CtsEventTypeName,
+                                                                                           vm.CollectionMethodName,
+                                                                                           StartDateTimeLocal = vm.StartDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           EndDateTimeLocal = vm.EndDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           LastModificationDateTimeLocal =
+                                                                                           vm.LastModificationDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           vm.LastModifierUserName
+                                                                                       });
+
+            return Json(data:result);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        public ActionResult Samples_Select(IEnumerable<SampleViewModel> items)
+        {
+            try
+            {
+                if (items != null)
+                {
+                    var item = items.First();
+                    return Json(data:new
+                                     {
+                                         redirect = true,
+                                         newurl = Url.Action(actionName:"SampleDetails", controllerName:"Industry", routeValues:new {id = item.Id})
+                                     });
+                }
+                return Json(data:new
+                                 {
+                                     redirect = false,
+                                     message = "Please select a Sample."
+                                 });
+            }
+            catch (RuleViolationException rve)
+            {
+                return Json(data:new
+                                 {
+                                     redirect = false,
+                                     message = MvcValidationExtensions.GetViolationMessages(ruleViolationException:rve)
+                                 });
+            }
         }
 
         #endregion

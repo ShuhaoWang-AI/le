@@ -39,17 +39,18 @@ namespace Linko.LinkoExchange.Services.MonitoringPoint
             _logger = logger;
             _timeZoneService = timeZoneService;
             _settings = settings;
+            _orgService = orgService;
         }
 
         public IEnumerable<MonitoringPointDto> GetMonitoringPoints()
         {
-            var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var monPointDtos = new List<MonitoringPointDto>();
             var foundMonPoints = _dbContext.MonitoringPoints
-                .Where(mp => mp.OrganizationRegulatoryProgramId == authOrgRegProgramId
-                && mp.IsEnabled == true && mp.IsRemoved == false)
-                .ToList();
+                                           .Where(mp => mp.OrganizationRegulatoryProgramId == authOrgRegProgramId
+                                                        && mp.IsEnabled == true && mp.IsRemoved == false)
+                                           .ToList();
 
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
             foreach (var mp in foundMonPoints)
@@ -58,8 +59,7 @@ namespace Linko.LinkoExchange.Services.MonitoringPoint
 
                 //Set LastModificationDateTimeLocal
                 dto.LastModificationDateTimeLocal = _timeZoneService
-                        .GetLocalizedDateTimeUsingThisTimeZoneId((mp.LastModificationDateTimeUtc.HasValue ? mp.LastModificationDateTimeUtc.Value.DateTime
-                         : mp.CreationDateTimeUtc.DateTime), timeZoneId);
+                        .GetLocalizedDateTimeUsingThisTimeZoneId(mp.LastModificationDateTimeUtc?.DateTime ?? mp.CreationDateTimeUtc.DateTime, timeZoneId);
 
                 if (mp.LastModifierUserId.HasValue)
                 {
@@ -78,9 +78,8 @@ namespace Linko.LinkoExchange.Services.MonitoringPoint
 
         public MonitoringPointDto GetMonitoringPoint(int monitoringPointId)
         {
-            var authOrgRegProgramId = _orgService.GetAuthority(int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId))).OrganizationRegulatoryProgramId;
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            var monPointDtos = new List<MonitoringPointDto>();
+            
             var foundMonPoint = _dbContext.MonitoringPoints
                 .Single(mp => mp.MonitoringPointId == monitoringPointId);
 
@@ -89,8 +88,7 @@ namespace Linko.LinkoExchange.Services.MonitoringPoint
 
             //Set LastModificationDateTimeLocal
             dto.LastModificationDateTimeLocal = _timeZoneService
-                    .GetLocalizedDateTimeUsingThisTimeZoneId((foundMonPoint.LastModificationDateTimeUtc.HasValue ? foundMonPoint.LastModificationDateTimeUtc.Value.DateTime
-                        : foundMonPoint.CreationDateTimeUtc.DateTime), timeZoneId);
+                    .GetLocalizedDateTimeUsingThisTimeZoneId(foundMonPoint.LastModificationDateTimeUtc?.DateTime ?? foundMonPoint.CreationDateTimeUtc.DateTime, timeZoneId);
 
             if (foundMonPoint.LastModifierUserId.HasValue)
             {
@@ -101,8 +99,6 @@ namespace Linko.LinkoExchange.Services.MonitoringPoint
             {
                 dto.LastModifierFullName = "N/A";
             }
-
-            monPointDtos.Add(dto);
 
             return dto;
         }
