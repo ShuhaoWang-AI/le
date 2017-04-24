@@ -2,7 +2,7 @@
 
 namespace Linko.LinkoExchange.Services.Report.DataXML
 {
-    [XmlRoot("SampleResult")]
+    [XmlType(TypeName = "SampleResult")]
     public class SampleResultNode
     {
         public string SampleName { get; set; }

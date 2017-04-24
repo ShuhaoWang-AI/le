@@ -9,6 +9,7 @@ namespace Linko.LinkoExchange.Services.Dto
     {
         public int ReportPackageId { get; set; }
         public string Name { get; set; }
+        public DateTimeOffset SubmissionDateTimeOffset { get; set; }
         public DateTime SubmissionDateTimeLocal { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
         public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgramDto { get; set; }
@@ -24,6 +25,9 @@ namespace Linko.LinkoExchange.Services.Dto
         public string SubmitterTitleRole { get; set; }
         public string SubmitterIPAddress { get; set; }
         public string SubmitterUserName { get; set; }
+
+        public DateTimeOffset PeriodStartDateTime { get; set; }
+        public DateTimeOffset PeriodEndDateTime { get; set; }
 
         public DateTime PeriodStartDateTimeLocal { get; internal set; }
         public DateTime PeriodEndDateTimeLocal { get; internal set; }

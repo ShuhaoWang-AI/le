@@ -5,7 +5,7 @@ namespace Linko.LinkoExchange.Services.Report.DataXML
 {
     public class FileManifest
     {
-        [XmlElement("Files")]
+        [XmlElement("File")]
         public List<FileInfo> Files { get; set; }
     }
 }

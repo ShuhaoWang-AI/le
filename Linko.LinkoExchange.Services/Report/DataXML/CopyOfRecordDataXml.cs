@@ -6,7 +6,7 @@ namespace Linko.LinkoExchange.Services.Report.DataXML
     [XmlRoot("Root")]
     public class CopyOfRecordDataXml
     {
-        public XmlFileVersion XmlFileVersionNumber { get; set; }
+        public XmlFileVersion XmlFileVersion { get; set; }
         public ReportHeader ReportHeader { get; set; }
         public SubmittedTo SubmittedTo { get; set; }
         public SubmittedOnBehalfOf SubmittedOnBehalfOf { get; set; }

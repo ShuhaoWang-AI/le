@@ -21,6 +21,9 @@ namespace Linko.LinkoExchange.Services.Dto
         public int CollectionMethodId { get; set; }
         public string CollectionMethodName { get; set; }
         public string LabSampleIdentifier { get; set; }
+        public DateTimeOffset StartDateTime { get; set; }
+        public DateTimeOffset EndDateTime { get; set; }
+
         public DateTime StartDateTimeLocal { get; set; }
         public DateTime EndDateTimeLocal { get; set; }
         public bool IsReadyToReport { get; set; }

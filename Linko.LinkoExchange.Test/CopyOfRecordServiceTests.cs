@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.CopyOfRecord;
@@ -302,8 +304,25 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Test_generate_Xml_data()
         {
+            //prepare ReportPackageDto 
+            var reportPackageDto = GetMockReportPackageDto();
 
+            var programDto = Mock.Of<OrganizationRegulatoryProgramDto>();
 
+            var programMock = Mock.Get(_programService);
+            programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
+                       .Returns(programDto);
+
+            IReportPackageService reportPackageService =
+                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
+                  _logger.Object,
+                  _dbContext,
+                  _httpContext.Object,
+                  _userService,
+                 emailService.Object,
+                  _settService, _mapHeper);
+
+            var xmlDate = reportPackageService.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
 
         }
 
@@ -342,6 +361,260 @@ namespace Linko.LinkoExchange.Test
             return fileDto;
         }
 
+        private ReportPackageDto GetMockReportPackageDto()
+        {
+            // mock:  submitter userProfileId = 7 
+            //        OrgRegProgramUserId = 8 
+            //        OrganizationRegulatoryProgramId = 11  
+            //        
+            var orgRegProgamId = 11;
+            var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(i => i.OrganizationRegulatoryProgramId == orgRegProgamId);
+
+            var userProfile = _dbContext.Users.Single(t => t.UserProfileId == orgRegProgamId);
+            var recipientOrg = _dbContext.Organizations.Include("Jurisdiction").Single(i => i.OrganizationId == 1000);
+
+            return new ReportPackageDto
+            {
+                ReportPackageId = 15,
+                Name = " 1st Quarter PCR",
+
+                SubmissionDateTimeLocal = DateTime.UtcNow,
+                SubmissionDateTimeOffset = DateTimeOffset.UtcNow,
+                OrganizationRegulatoryProgramId = 3,
+                OrganizationRegulatoryProgramDto = _mapHeper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram),
+                RecipientOrganizationName = recipientOrg.Name,
+                RecipientOrganizationAddressLine1 = recipientOrg.AddressLine1,
+                RecipientOrganizationAddressLine2 = recipientOrg.AddressLine2,
+                RecipientOrganizationCityName = recipientOrg.CityName,
+                RecipientOrganizationJurisdictionName = recipientOrg.Jurisdiction.Name,
+                RecipientOrganizationZipCode = recipientOrg.ZipCode,
+                SubmitterFirstName = userProfile.FirstName,
+                SubmitterLastName = userProfile.LastName,
+                SubmitterTitleRole = userProfile.TitleRole,
+                SubmitterIPAddress = "::0",
+                SubmitterUserName = userProfile.UserName,
+
+                PeriodEndDateTime = DateTimeOffset.UtcNow,
+                PeriodStartDateTime = DateTimeOffset.UtcNow,
+
+                ReportStatusId = (int)ReportStatusName.ReadyToSubmit,
+
+                OrganizationName = orgRegProgram.Organization.Name,
+                OrganizationAddressLine1 = orgRegProgram.Organization.AddressLine1,
+                OrganizationAddressLine2 = orgRegProgram.Organization.AddressLine2,
+                OrganizationCityName = orgRegProgram.Organization.CityName,
+                OrganizationJurisdictionName = orgRegProgram.Organization.Jurisdiction.Name,
+
+                PermitNumber = "Test---Permit---Number",
+                Comments = "Test comments",
+
+                AttachmentDtos = GetMockAttachmentFiles(),
+                SamplesDtos = GetMockSampleDtos(),
+                CertificationDtos = GetMockCertifications(),
+            };
+
+        }
+
+        private List<SampleDto> GetMockSampleDtos()
+        {
+            var orgRegProgamId = 11;
+            var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(i => i.OrganizationRegulatoryProgramId == orgRegProgamId);
+
+
+            var sample1 = new SampleDto
+            {
+                SampleId = 1,
+                Name = "Sample 1",
+                MonitoringPointId = 1,
+                MonitoringPointName = "0002-Retired",
+                CtsEventTypeId = 1,
+                CtsEventTypeName = "SNC-P",
+                CtsEventCategoryName = "VIOLATION",
+                CollectionMethodId = 2,
+                CollectionMethodName = "24 hour flow",
+                LabSampleIdentifier = "Test-lab-sample-identifier",
+
+                StartDateTime = DateTimeOffset.UtcNow,
+                EndDateTime = DateTimeOffset.UtcNow,
+
+                IsReadyToReport = true,
+                FlowUnitValidValues = new[]{
+                    new UnitDto
+                    {
+                        UnitId = 1,
+                        Name = "%"
+                        },
+                    new UnitDto
+                    {
+                        UnitId = 2, Name = "C"
+                    }
+                },
+
+                ResultQualifierValidValues = "200",
+                MassLoadingCalculationDecimalPlaces = 2,
+                IsMassLoadingResultToUseLessThanSign = true,
+                SampleStatusName = SampleStatusName.ReadyToReport,
+                LastModifierFullName = "Test-Modification-full-name",
+                FlowValue = "1.11",
+                FlowUnitId = 1,
+                FlowUnitName = "%",
+                SampleResults = new[]
+                                {
+                                    new SampleResultDto
+                                    {
+                                         SampleId = 1,
+                                         SampleResultId = 1,
+                                         ParameterId = 1,
+                                         ParameterName = "1,1,1,2-Tetrachloroethane",
+                                         Qualifier = "<",
+                                         Value = "12.21",
+                                         UnitId = 1,
+                                         UnitName = "%",
+                                         EnteredMethodDetectionLimit ="10",
+                                         MethodDetectionLimit = 9.1,
+                                         AnalysisMethod = "test-analysis method",
+
+                                         AnalysisDateTimeLocal = DateTime.Now,
+                                         IsApprovedEPAMethod = false,
+                                         LastModifierFullName = "Last modificationfull-name",
+                                         IsCalcMassLoading = true,
+                                         MassLoadingQualifier = "<",
+                                         MassLoadingValue = "220.0",
+                                         MassLoadingUnitId = 1,
+                                         MassLoadingUnitName = "%",
+                                         LimitBasisName = LimitBasisName.Concentration
+                                    },
+
+                                    new SampleResultDto
+                                    {
+                                         SampleId = 1,
+                                         SampleResultId = 2,
+                                         ParameterId = 2,
+                                         ParameterName = "1,1,1-Trichloroethane",
+                                         Qualifier = "<",
+                                         Value = "4.221",
+                                         UnitId = 1,
+                                         UnitName = "%",
+                                         EnteredMethodDetectionLimit ="333",
+                                         MethodDetectionLimit = 8.5,
+                                         AnalysisMethod = "test-analysis method",
+
+                                         AnalysisDateTimeLocal = DateTime.Now,
+                                         IsApprovedEPAMethod = false,
+                                         LastModifierFullName = "Last modificationfull-name",
+                                         IsCalcMassLoading = true,
+                                         MassLoadingQualifier = ">",
+                                         MassLoadingValue = "20.9",
+                                         MassLoadingUnitId = 1,
+                                         MassLoadingUnitName = "F",
+                                         LimitBasisName = LimitBasisName.MassLoading
+                                    },
+                                },
+
+                OrganizationRegulatoryProgramDto = _mapHeper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram)
+            };
+
+
+            var sample2 = new SampleDto
+            {
+                SampleId = 2,
+                Name = "Sample 2",
+                MonitoringPointId = 2,
+                MonitoringPointName = "427-retired",
+                CtsEventTypeId = 1,
+                CtsEventTypeName = "SNC-P",
+                CtsEventCategoryName = "VIOLATION",
+                CollectionMethodId = 3,
+                CollectionMethodName = "8HR",
+                LabSampleIdentifier = "Test-lab-sample-identifier-2",
+
+                StartDateTime = DateTimeOffset.UtcNow,
+                EndDateTime = DateTimeOffset.UtcNow,
+
+                IsReadyToReport = true,
+                FlowUnitValidValues = new[]{
+                    new UnitDto
+                    {
+                        UnitId = 4,
+                        Name = "g/day"
+                        },
+                    new UnitDto
+                    {
+                        UnitId = 5, Name = "gpd"
+                    }
+                },
+
+                ResultQualifierValidValues = "210",
+                MassLoadingCalculationDecimalPlaces = 3,
+                IsMassLoadingResultToUseLessThanSign = true,
+                SampleStatusName = SampleStatusName.ReadyToReport,
+                LastModifierFullName = "Test-Modification-full-name",
+                FlowValue = "51.23",
+                FlowUnitId = 1,
+                FlowUnitName = "gpd",
+                SampleResults = new[]
+                                {
+                                    new SampleResultDto
+                                    {
+                                         SampleId = 2,
+                                         SampleResultId = 3,
+                                         ParameterId = 1,
+                                         ParameterName = "1,1,1,2-Tetrachloroethane",
+                                         Qualifier = "<",
+                                         Value = "12.21",
+                                         UnitId = 1,
+                                         UnitName = "%",
+                                         EnteredMethodDetectionLimit ="10",
+                                         MethodDetectionLimit = 9.1,
+                                         AnalysisMethod = "test-analysis method",
+
+                                         AnalysisDateTimeLocal = DateTime.Now,
+                                         IsApprovedEPAMethod = false,
+                                         LastModifierFullName = "Last modificationfull-name",
+                                         IsCalcMassLoading = true,
+                                         MassLoadingQualifier = "<",
+                                         MassLoadingValue = "220.0",
+                                         MassLoadingUnitId = 1,
+                                         MassLoadingUnitName = "%",
+                                         LimitBasisName = LimitBasisName.Concentration
+                                    },
+
+                                    new SampleResultDto
+                                    {
+                                         SampleId = 3,
+                                         SampleResultId = 4,
+                                         ParameterId = 2,
+                                         ParameterName = "1,1,1-Trichloroethane",
+                                         Qualifier = "<",
+                                         Value = "4.221",
+                                         UnitId = 1,
+                                         UnitName = "%",
+                                         EnteredMethodDetectionLimit ="333",
+                                         MethodDetectionLimit = 8.5,
+                                         AnalysisMethod = "test-analysis method",
+
+                                         AnalysisDateTimeLocal = DateTime.Now,
+                                         IsApprovedEPAMethod = false,
+                                         LastModifierFullName = "Last modificationfull-name",
+                                         IsCalcMassLoading = true,
+                                         MassLoadingQualifier = ">",
+                                         MassLoadingValue = "20.9",
+                                         MassLoadingUnitId = 1,
+                                         MassLoadingUnitName = "F",
+                                         LimitBasisName = LimitBasisName.MassLoading
+                                    },
+                                },
+
+                OrganizationRegulatoryProgramDto = _mapHeper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram)
+            };
+
+            var samples = new List<SampleDto>();
+            samples.Add(sample1);
+            samples.Add(sample2);
+
+            return samples;
+        }
+
         private List<FileStoreDto> GetMockAttachmentFiles()
         {
             var fileStoreDtos = new List<FileStoreDto>();
@@ -354,7 +627,10 @@ namespace Linko.LinkoExchange.Test
                 var fileStoreDto = new FileStoreDto
                 {
                     Data = File.ReadAllBytes(file.FullName),
-                    Name = Path.GetFileName(file.Name)
+                    Name = Path.GetFileName(file.Name),
+                    OriginalFileName = file.Name,
+                    ReportElementTypeName = "Lab Analysis Report",
+                    FileType = "Lab Analysis Report",
                 };
                 fileStoreDtos.Add(fileStoreDto);
             }
@@ -373,7 +649,7 @@ namespace Linko.LinkoExchange.Test
             {
                 var rptetdto = new ReportPackageELementTypeDto
                 {
-                    ReportElementTypeContent = File.ReadAllText(file.FullName),
+                    ReportElementTypeContent = File.ReadAllText(file.FullName, Encoding.UTF8),
                     ReportElementTypeName = Path.GetFileNameWithoutExtension(file.Name)
                 };
 

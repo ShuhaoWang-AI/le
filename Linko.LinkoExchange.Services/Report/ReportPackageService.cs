@@ -187,7 +187,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             var dataXmlObj = new CopyOfRecordDataXml
             {
-                XmlFileVersionNumber = new XmlFileVersion
+                XmlFileVersion = new XmlFileVersion
                 {
                     VersionNumber = "1.0"
                 },
@@ -204,7 +204,7 @@ namespace Linko.LinkoExchange.Services.Report
                 {
                     OrganizationName = reportPackageDto.RecipientOrganizationName,
                     Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
-                    Address2 = reportPackageDto.RecipientOrganizationAddressLine2,
+                    Address2 = string.IsNullOrEmpty(reportPackageDto.RecipientOrganizationAddressLine2) == true ? "" : reportPackageDto.RecipientOrganizationAddressLine2,
                     City = reportPackageDto.RecipientOrganizationCityName,
                     State = reportPackageDto.RecipientOrganizationJurisdictionName,
                     ZipCode = reportPackageDto.RecipientOrganizationZipCode
@@ -214,7 +214,7 @@ namespace Linko.LinkoExchange.Services.Report
                     OrganizationName = reportPackageDto.RecipientOrganizationName,
                     ReferenceNumber = reportPackageDto.OrganizationRegulatoryProgramDto.ReferenceNumber,
                     Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
-                    Address2 = reportPackageDto.RecipientOrganizationAddressLine2,
+                    Address2 = string.IsNullOrEmpty(reportPackageDto.RecipientOrganizationAddressLine2) == true ? "" : reportPackageDto.RecipientOrganizationAddressLine2,
                     City = reportPackageDto.RecipientOrganizationCityName,
                     State = reportPackageDto.RecipientOrganizationJurisdictionName,
                     ZipCode = reportPackageDto.RecipientOrganizationZipCode
@@ -243,7 +243,7 @@ namespace Linko.LinkoExchange.Services.Report
                 {
                     OriginalFileName = "Copy Of Record Data.xml",
                     SystemGeneratedUnqiueFileName = "Copy Of Record Data.xml",
-                    AttachmentType = "Xml"
+                    AttachmentType = "Xml Raw Data"
                 });
 
             dataXmlObj.FileManifest.Files.Add(
@@ -251,7 +251,7 @@ namespace Linko.LinkoExchange.Services.Report
                 {
                     OriginalFileName = "Copy Of Record.pdf",
                     SystemGeneratedUnqiueFileName = "Copy Of Record.pdf",
-                    AttachmentType = "Pdf"
+                    AttachmentType = "Copy Of Record PDF"
                 });
 
 
@@ -290,7 +290,7 @@ namespace Linko.LinkoExchange.Services.Report
 
                         SampledBy = sampleDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName,
                         ParameterName = sampleResultDto.ParameterName,
-                        Qualifier = sampleResultDto.Qualifier,
+                        Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier),
                         Value = sampleResultDto.Value,
                         UnitName = sampleResultDto.UnitName,
                         EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit,
@@ -310,7 +310,8 @@ namespace Linko.LinkoExchange.Services.Report
             }
 
             // Convert to xml string
-            var strWriter = new StringWriter();
+            var strWriter = new Utf8StringWriter();
+
             var xmlSerializer = new XmlSerializer(dataXmlObj.GetType());
             xmlSerializer.Serialize(strWriter, dataXmlObj);
             var xmlString = strWriter.ToString();
@@ -642,5 +643,9 @@ namespace Linko.LinkoExchange.Services.Report
 
         }
 
+        private class Utf8StringWriter : StringWriter
+        {
+            public override Encoding Encoding { get { return Encoding.UTF8; } }
+        }
     }
 }
