@@ -54,18 +54,23 @@ namespace Linko.LinkoExchange.Services.Report
         void DeleteReportPackage(int reportPackageId);
 
         /// <summary>
-        /// To be called after a User selects a template and date range but: 
-        ///     1) Before the User clicks the "Save Draft" button (no reportPackageDto to save yet) or...
-        ///         - Only "copies over" template report package elements and creates a "minimal row" in tReportPackage.
-        ///     2) After the User clicks the "Save Draft" button. (must pass in reportPackageDto to attempt Save) 
-        ///         - Both "copies over" template report package elements and saves a complete row in tReportPackage (representing the reportPackageDto)
+        /// To be called after a User selects a template and date range but before 
+        /// the User clicks the "Save Draft" button (no reportPackageDto to save yet)
         /// </summary>
         /// <param name="reportPackageTemplateId"></param>
         /// <param name="startDateTimeLocal"></param>
         /// <param name="endDateTimeLocal"></param>
-        /// <param name="reportPackageDto"></param>
         /// <returns>The newly created tReportPackage.ReportPackageId</returns>
-        int CreateDraft(int reportPackageTemplateId, DateTime startDateTimeLocal, DateTime endDateTimeLocal, ReportPackageDto reportPackageDto = null);
+
+        int CreateDraft(int reportPackageTemplateId, DateTime startDateTimeLocal, DateTime endDateTimeLocal);
+
+        /// <summary>
+        /// Cannot be used to CREATE, only to UPDATE. Use "CreateDraft" to create.
+        /// reportPackageDto.ReportPackageId must exist or exception thrown
+        /// </summary>
+        /// <param name="reportPackageDto">Existing Report Package to update</param>
+        /// <returns>Existing ReportPackage.ReportPackageId</returns>
+        int SaveReportPackage(ReportPackageDto reportPackageDto);
 
         /// <summary>
         /// Performs validation to ensure only allowed state transitions are occur,

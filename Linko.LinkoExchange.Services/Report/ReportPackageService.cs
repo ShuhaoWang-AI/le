@@ -21,6 +21,7 @@ using System.Xml.Serialization;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Report.DataXML;
 using FileInfo = Linko.LinkoExchange.Services.Report.DataXML.FileInfo;
+using Linko.LinkoExchange.Services.Organization;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -37,6 +38,7 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
         private readonly ISettingService _settingService;
+        private readonly IOrganizationService _orgService;
         private readonly IMapHelper _mapHelper;
 
         public ReportPackageService(
@@ -49,6 +51,7 @@ namespace Linko.LinkoExchange.Services.Report
             IUserService userService,
             IEmailService emailService,
             ISettingService settingService,
+            IOrganizationService orgService,
             IMapHelper mapHelper
             )
         {
@@ -61,6 +64,7 @@ namespace Linko.LinkoExchange.Services.Report
             _userService = userService;
             _emailService = emailService;
             _settingService = settingService;
+            _orgService = orgService;
             _mapHelper = mapHelper;
         }
 
@@ -535,37 +539,117 @@ namespace Linko.LinkoExchange.Services.Report
         }
 
         /// <summary>
-        /// To be called after a User selects a template and date range but: 
-        ///     1) Before the User clicks the "Save Draft" button (no reportPackageDto to save yet) or...
-        ///         - Only "copies over" template report package elements and creates a "minimal row" in tReportPackage.
-        ///     2) After the User clicks the "Save Draft" button. (must pass in reportPackageDto to attempt Save) 
-        ///         - Both "copies over" template report package elements and saves a complete row in tReportPackage (representing the reportPackageDto)
+        /// To be called after a User selects a template and date range but before 
+        /// the User clicks the "Save Draft" button (no reportPackageDto to save yet)
         /// </summary>
         /// <param name="reportPackageTemplateId"></param>
         /// <param name="startDateTimeLocal"></param>
         /// <param name="endDateTimeLocal"></param>
-        /// <param name="reportPackageDto"></param>
         /// <returns>The newly created tReportPackage.ReportPackageId</returns>
-        public int CreateDraft(int reportPackageTemplateId, DateTime startDateTimeLocal, DateTime endDateTimeLocal, ReportPackageDto reportPackageDto = null)
+        public int CreateDraft(int reportPackageTemplateId, DateTime startDateTimeLocal, DateTime endDateTimeLocal)
         {
-            int newReportPackageId = -1;
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
+            var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+            var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
 
-            //o	Step 1 - create a row in tReportPackageElementCategory for each row in tReportPackageTemplateElementCategory (where ReportPackageTemplateId="n")
+            //Step 1 - copy fields from template to new Report Package instance (tReportPackage)
+
+            //Get template
+            var reportPackageTemplate = _dbContext.ReportPackageTempates
+                .Include(rpt => rpt.CtsEventType)
+                .Include(rpt => rpt.OrganizationRegulatoryProgram)
+                .Include(rpt => rpt.OrganizationRegulatoryProgram.Organization)
+                .Include(rpt => rpt.OrganizationRegulatoryProgram.Organization.Jurisdiction)
+                .Include(rpt => rpt.OrganizationRegulatoryProgram.RegulatorOrganization)
+                .Include(rpt => rpt.OrganizationRegulatoryProgram.RegulatorOrganization.Jurisdiction)
+                .Single(rpt => rpt.ReportPackageTemplateId == reportPackageTemplateId);
+
+            var newReportPackage = _mapHelper.GetReportPackageFromReportPackageTemplate(reportPackageTemplate);
+            newReportPackage.PeriodStartDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(startDateTimeLocal, timeZoneId);
+            newReportPackage.PeriodEndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(endDateTimeLocal, timeZoneId);
+            newReportPackage.ReportStatusId = _dbContext.ReportStatuses
+                .Single(rs => rs.Name == ReportStatusName.Draft.ToString()).ReportStatusId;
+            newReportPackage.CreationDateTimeUtc = DateTime.UtcNow;
+
+            //Need to populate with Authority fields
+            newReportPackage.RecipientOrganizationName = authorityOrganization.OrganizationDto.OrganizationName;
+            newReportPackage.RecipientOrganizationAddressLine1 = authorityOrganization.OrganizationDto.AddressLine1;
+            newReportPackage.RecipientOrganizationAddressLine2 = authorityOrganization.OrganizationDto.AddressLine2;
+            newReportPackage.RecipientOrganizationCityName = authorityOrganization.OrganizationDto.CityName;
+            newReportPackage.RecipientOrganizationJurisdictionName = _dbContext.Organizations
+                .Include(o => o.Jurisdiction)
+                .Single(o => o.OrganizationId == authorityOrganization.OrganizationDto.OrganizationId).Jurisdiction.Name;
+            newReportPackage.RecipientOrganizationZipCode = authorityOrganization.OrganizationDto.ZipCode;
+
+            //Step 2 - create a row in tReportPackageElementCategory for each row in tReportPackageTemplateElementCategory (where ReportPackageTemplateId="n")
+            
+            //Step 3 - create a row in tReportPackageElementType for each row in tReportPackageTemplateElementType(associated with the rows found in Step 1)
+
             var reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories
                 .Include(rptec => rptec.ReportPackageTemplateElementTypes)
                 .Where(rptec => rptec.ReportPackageTemplateId == reportPackageTemplateId);
 
-            //o Step 2 - create a row in tReportPackageElementType for each row in tReportPackageTemplateElementType(associated with the rows found in Step 1)
             foreach (var rptec in reportPackageTemplateElementCategories)
             {
+                //Create a row in tReportPackageElementCategory
+                var newReportPackageElementCategory = new ReportPackageElementCategory()
+                {
+                    ReportElementCategoryId = rptec.ReportElementCategoryId,
+                    SortOrder = rptec.SortOrder
+                };
+                newReportPackage.ReportPackageElementCategories.Add(newReportPackageElementCategory); //handles setting ReportPackageId
+
                 foreach (var rptet in rptec.ReportPackageTemplateElementTypes)
                 {
                     var reportElementType = _dbContext.ReportElementTypes
+                        .Include(ret => ret.CtsEventType)
                         .Single(ret => ret.ReportElementTypeId == rptet.ReportElementTypeId);
+
+                    //Create a row in tReportPackageElementType
+                    var newReportPackageElementType = new ReportPackageElementType() {
+                        ReportElementTypeId = rptet.ReportElementTypeId,
+                        ReportElementTypeName = reportElementType.Name,
+                        ReportElementTypeContent = reportElementType.Content,
+                        ReportElementTypeIsContentProvided = reportElementType.IsContentProvided,
+                        CtsEventTypeId = reportElementType.CtsEventTypeId,
+                        CtsEventTypeName = reportElementType.CtsEventType.Name,
+                        CtsEventCategoryName = reportElementType.CtsEventType.CtsEventCategoryName,
+                        IsRequired = rptet.IsRequired,
+                        SortOrder = rptet.SortOrder
+                    };
+                    newReportPackageElementType.ReportPackageElementCategory = newReportPackageElementCategory; //handles setting ReportPackageElementCategoryId
                 }
             }
 
-            return newReportPackageId;
+            _dbContext.ReportPackages.Add(newReportPackage);
+            return newReportPackage.ReportPackageId;
+        }
+
+        /// <summary>
+        /// Cannot be used to CREATE, only to UPDATE. Use "CreateDraft" to create.
+        /// reportPackageDto.ReportPackageId must exist or exception thrown
+        /// </summary>
+        /// <param name="reportPackageDto">Existing Report Package to update</param>
+        /// <returns>Existing ReportPackage.ReportPackageId</returns>
+        public int SaveReportPackage(ReportPackageDto reportPackageDto)
+        {
+            //Report Package will have already been saved before this call and therefore exists
+            if (reportPackageDto.ReportPackageId < 1)
+            {
+                throw new Exception("ERROR: Cannot call 'SaveReportPackage' without setting reportPackageDto.ReportPackageId.");
+            }
+
+            var reportPackage = _dbContext.ReportPackages
+                .Single(rp => rp.ReportPackageId == reportPackageDto.ReportPackageId);
+
+            //
+            //TO-DO: Add/remove report package elements (samples and files)
+            //
+
+            _dbContext.SaveChanges();
+
+            return reportPackage.ReportPackageId;
         }
 
         /// <summary>

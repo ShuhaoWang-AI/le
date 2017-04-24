@@ -1090,5 +1090,37 @@ namespace Linko.LinkoExchange.Services.Mapping
                 CreationDateTimeLocal = rpt.CreationDateTimeUtc.DateTime
             };
         }
+
+        public ReportPackage GetReportPackageFromReportPackageTemplate(ReportPackageTemplate rpt)
+        {
+            if (rpt == null) return null;
+            return new ReportPackage
+            {
+                Name = rpt.Name,
+                Description = rpt.Description,
+                //PeriodStartDateTimeUtc = set outside after calling line
+                //PeriodEndDateTimeUtc = set outside after calling line
+                CtsEventTypeId = rpt.CtsEventTypeId,
+                CtsEventTypeName = rpt.CtsEventType.Name,
+                CtsEventCategoryName = rpt.CtsEventType.CtsEventCategoryName,
+                IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired,
+                ReportPackageTemplateId = rpt.ReportPackageTemplateId,
+                //ReportStatusId = set outside after calling line
+                OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId,
+                OrganizationName = rpt.OrganizationRegulatoryProgram.Organization.Name,
+                OrganizationAddressLine1 = rpt.OrganizationRegulatoryProgram.Organization.AddressLine1,
+                OrganizationAddressLine2 = rpt.OrganizationRegulatoryProgram.Organization.AddressLine2,
+                OrganizationCityName = rpt.OrganizationRegulatoryProgram.Organization.CityName,
+                OrganizationJurisdictionName = rpt.OrganizationRegulatoryProgram.Organization.Jurisdiction.Name,
+                //RecipientOrganizationName = set outside after calling line
+                //RecipientOrganizationAddressLine1 = set outside after calling line
+                //RecipientOrganizationAddressLine2 = set outside after calling line
+                //RecipientOrganizationCityName = set outside after calling line
+                //RecipientOrganizationJurisdictionName = set outside after calling line
+                //RecipientOrganizationZipCode = set outside after calling line
+                //CreationDateTimeUtc = set outside after calling line
+            };
+        }
+
     }
 }

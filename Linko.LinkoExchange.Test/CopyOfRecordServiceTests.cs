@@ -51,7 +51,6 @@ namespace Linko.LinkoExchange.Test
         private MapHelper _mapHeper = new MapHelper();
         private Mock<ICromerrAuditLogService> _crommerAuditLogService = new Mock<ICromerrAuditLogService>();
 
-
         [TestInitialize]
         public void Init()
         {
@@ -117,6 +116,7 @@ namespace Linko.LinkoExchange.Test
                   _userService,
                  emailService.Object,
                  _settService,
+                 _orgService.Object,
                  _mapHeper);
 
             var reportPackageId = 527466233;
@@ -140,7 +140,7 @@ namespace Linko.LinkoExchange.Test
                   _httpContext.Object,
                   _userService,
                  emailService.Object,
-                  _settService, _mapHeper);
+                  _settService, _orgService.Object, _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -166,7 +166,7 @@ namespace Linko.LinkoExchange.Test
                   _httpContext.Object,
                   _userService,
                  emailService.Object,
-                  _settService, _mapHeper);
+                  _settService, _orgService.Object, _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -196,7 +196,7 @@ namespace Linko.LinkoExchange.Test
                   _httpContext.Object,
                   _userService,
                  emailService.Object,
-                  _settService, _mapHeper);
+                  _settService, _orgService.Object, _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -228,7 +228,7 @@ namespace Linko.LinkoExchange.Test
                   _httpContext.Object,
                   _userService,
                  emailService.Object,
-                  _settService, _mapHeper);
+                  _settService, _orgService.Object, _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -258,7 +258,7 @@ namespace Linko.LinkoExchange.Test
                   _httpContext.Object,
                   _userService,
                  emailService.Object,
-                  _settService, _mapHeper);
+                  _settService, _orgService.Object, _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -287,7 +287,7 @@ namespace Linko.LinkoExchange.Test
                   _httpContext.Object,
                   _userService,
                  emailService.Object,
-                  _settService, _mapHeper);
+                  _settService, _orgService.Object, _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);

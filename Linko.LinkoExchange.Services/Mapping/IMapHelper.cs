@@ -61,5 +61,6 @@ namespace Linko.LinkoExchange.Services.Mapping
         SampleResult GetConcentrationSampleResultFromSampleResultDto(SampleResultDto dto);
         SampleResult GetMassSampleResultFromSampleResultDto(SampleResultDto dto);
         ReportPackageDto GetReportPackageDtoFromReportPackage(ReportPackage rpt);
+        ReportPackage GetReportPackageFromReportPackageTemplate(ReportPackageTemplate rpt);
     }
 }
