@@ -305,7 +305,6 @@ namespace Linko.LinkoExchange.Services.Report
                         AnalysisDateTimUtc = sampleResultDto.AnalysisDateTimeLocal.ToString(),
                         IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
 
-                        IsFlowForMassLoadingCalculation = sampleResultDto.IsCalcMassLoading.ToString(),
                         LimitBasis = sampleResultDto.LimitBasisName.ToString()
                     };
 

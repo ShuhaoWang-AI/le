@@ -320,7 +320,7 @@ namespace Linko.LinkoExchange.Test
                   _httpContext.Object,
                   _userService,
                  emailService.Object,
-                  _settService, _mapHeper);
+                  _settService, _orgService.Object, _mapHeper);
 
             var xmlDate = reportPackageService.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
 

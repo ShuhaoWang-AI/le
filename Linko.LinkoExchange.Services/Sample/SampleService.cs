@@ -178,7 +178,6 @@ namespace Linko.LinkoExchange.Services.Sample
                         UnitId = sampleDto.FlowUnitId.Value,
                         UnitName = sampleDto.FlowUnitName,
                         EnteredMethodDetectionLimit = "",
-                        IsFlowForMassLoadingCalculation = true,
                         LimitTypeId = null,
                         LimitBasisId = flowLimitBasisId,
                         IsCalculated = false
@@ -686,15 +685,13 @@ namespace Linko.LinkoExchange.Services.Sample
 
                     var resultDto = new SampleResultDto();
 
-                    if (sampleResult.IsFlowForMassLoadingCalculation &&
-                        sampleResult.LimitBasisId == flowLimitBasisId)
+                    if (sampleResult.LimitBasisId == flowLimitBasisId)
                     {
                         dto.FlowValue = sampleResult.EnteredValue;
                         dto.FlowUnitId = sampleResult.UnitId;
                         dto.FlowUnitName = sampleResult.UnitName;
                     }
-                    else if (sampleResult.IsFlowForMassLoadingCalculation == false &&
-                        sampleResult.LimitType.Name == LimitTypeName.Daily.ToString() &&
+                    else if (sampleResult.LimitType.Name == LimitTypeName.Daily.ToString() &&
                         (sampleResult.LimitBasis.Name == LimitBasisName.MassLoading.ToString()
                         || sampleResult.LimitBasis.Name == LimitBasisName.Concentration.ToString()))
                     {

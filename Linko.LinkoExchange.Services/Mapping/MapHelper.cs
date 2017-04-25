@@ -1024,7 +1024,6 @@ namespace Linko.LinkoExchange.Services.Mapping
                 AnalysisMethod = dto.AnalysisMethod,
                 //AnalysisDateTimeUtc = set outside after calling line
                 IsApprovedEPAMethod = dto.IsApprovedEPAMethod,
-                IsFlowForMassLoadingCalculation = false,
                 IsCalculated = false
                 //LimitTypeId = set outside after calling line
                 //LimitBasisId = set outside after calling line
@@ -1053,7 +1052,6 @@ namespace Linko.LinkoExchange.Services.Mapping
                 AnalysisMethod = dto.AnalysisMethod,
                 //AnalysisDateTimeUtc = set outside after calling line
                 IsApprovedEPAMethod = dto.IsApprovedEPAMethod,
-                IsFlowForMassLoadingCalculation = false,
                 IsCalculated = false
                 //LimitTypeId = set outside after calling line
                 //LimitBasisId = set outside after calling line

@@ -27,7 +27,6 @@ namespace Linko.LinkoExchange.Services.Report.DataXML
         public string AnalysisMethod { get; set; }
         public string AnalysisDateTimUtc { get; set; }
         public string IsApprovedEPAMethod { get; set; }
-        public string IsFlowForMassLoadingCalculation { get; set; }
         public string LimitBasis { get; set; }
     }
 }

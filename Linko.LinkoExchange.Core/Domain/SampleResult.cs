@@ -53,8 +53,6 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public bool IsMassLoadingCalculationRequired { get; set; }
 
-        public bool IsFlowForMassLoadingCalculation { get; set; }
-
         public bool IsCalculated { get; set; }
 
         public int? LimitTypeId { get; set; }

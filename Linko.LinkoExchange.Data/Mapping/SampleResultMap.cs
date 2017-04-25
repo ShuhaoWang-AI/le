@@ -42,8 +42,6 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.IsMassLoadingCalculationRequired).IsRequired();
 
-            Property(x => x.IsFlowForMassLoadingCalculation).IsRequired();
-
             Property(x => x.IsCalculated).IsRequired();
 
             HasOptional(a => a.LimitType)
