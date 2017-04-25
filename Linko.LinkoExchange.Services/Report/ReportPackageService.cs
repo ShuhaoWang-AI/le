@@ -198,7 +198,7 @@ namespace Linko.LinkoExchange.Services.Report
                 ReportHeader = new ReportHeader
                 {
                     ReportName = reportPackageDto.Name,
-                    //TODO:  UTC or local time?  
+                    //TODO:  UTC 
                     ReportPeriodStartDateTimeUtc = reportPackageDto.PeriodStartDateTimeLocal.ToString(format: "yyyy-MM-dd"),
                     ReportPeriodEndDateTimeUtc = reportPackageDto.PeriodEndDateTimeLocal.ToString(format: "yyyy-MM-dd"),
                     ReportSubmissionDateUtc = $"{reportPackageDto.SubmissionDateTimeLocal:MMM dd, yyyy HHtt}",
@@ -208,7 +208,7 @@ namespace Linko.LinkoExchange.Services.Report
                 {
                     OrganizationName = reportPackageDto.RecipientOrganizationName,
                     Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
-                    Address2 = string.IsNullOrEmpty(reportPackageDto.RecipientOrganizationAddressLine2) == true ? "" : reportPackageDto.RecipientOrganizationAddressLine2,
+                    Address2 = EmtpyStringIfNull(reportPackageDto.RecipientOrganizationAddressLine2),
                     City = reportPackageDto.RecipientOrganizationCityName,
                     State = reportPackageDto.RecipientOrganizationJurisdictionName,
                     ZipCode = reportPackageDto.RecipientOrganizationZipCode
@@ -218,18 +218,18 @@ namespace Linko.LinkoExchange.Services.Report
                     OrganizationName = reportPackageDto.RecipientOrganizationName,
                     ReferenceNumber = reportPackageDto.OrganizationRegulatoryProgramDto.ReferenceNumber,
                     Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
-                    Address2 = string.IsNullOrEmpty(reportPackageDto.RecipientOrganizationAddressLine2) == true ? "" : reportPackageDto.RecipientOrganizationAddressLine2,
+                    Address2 = EmtpyStringIfNull(reportPackageDto.RecipientOrganizationAddressLine2),
                     City = reportPackageDto.RecipientOrganizationCityName,
                     State = reportPackageDto.RecipientOrganizationJurisdictionName,
                     ZipCode = reportPackageDto.RecipientOrganizationZipCode
                 },
                 SubmittedBy = new SubmittedBy
                 {
-                    FirstName = string.IsNullOrEmpty(reportPackageDto.SubmitterFirstName) ? "" : reportPackageDto.SubmitterFirstName,
-                    LastName = string.IsNullOrEmpty(reportPackageDto.SubmitterLastName) ? "" : reportPackageDto.SubmitterLastName,
-                    Title = string.IsNullOrEmpty(reportPackageDto.SubmitterTitleRole) ? "" : reportPackageDto.SubmitterTitleRole,
-                    UserName = string.IsNullOrEmpty(reportPackageDto.SubmitterUserName) ? "" : reportPackageDto.SubmitterUserName,
-                    ReportSubmissionFromIP = reportPackageDto.SubmitterIPAddress
+                    FirstName = EmtpyStringIfNull(reportPackageDto.SubmitterFirstName),
+                    LastName = EmtpyStringIfNull(reportPackageDto.SubmitterLastName),
+                    Title = EmtpyStringIfNull(reportPackageDto.SubmitterTitleRole),
+                    UserName = EmtpyStringIfNull(reportPackageDto.SubmitterUserName),
+                    ReportSubmissionFromIP = EmtpyStringIfNull(reportPackageDto.SubmitterIPAddress)
                 },
                 FileManifest = new FileManifest
                 {
@@ -278,14 +278,14 @@ namespace Linko.LinkoExchange.Services.Report
                     CtsEventTypeCategoryName = sampleDto.CtsEventCategoryName,
                     CtsEventTypeName = sampleDto.CtsEventTypeName,
                     CollectionMethodName = sampleDto.CollectionMethodName,
-                    LabSampleIdentifier = sampleDto.LabSampleIdentifier,
+                    LabSampleIdentifier = EmtpyStringIfNull(sampleDto.LabSampleIdentifier),
 
                     //TODO to covert the date time here 
                     StartDateTimeUtc = sampleDto.StartDateTimeLocal.ToString(),
                     EndDateTimeUtc = sampleDto.EndDateTimeLocal.ToString(),
 
-                    SampleFlowForMassCalcs = sampleDto.FlowValue,
-                    SampleFlowForMassCalcsUnitName = sampleDto.FlowUnitName,
+                    SampleFlowForMassCalcs = EmtpyStringIfNull(sampleDto.FlowValue),
+                    SampleFlowForMassCalcsUnitName = EmtpyStringIfNull(sampleDto.FlowUnitName),
 
                     MassLoadingsConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds?.ToString(),
                     MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces?.ToString(),
@@ -300,16 +300,16 @@ namespace Linko.LinkoExchange.Services.Report
                 foreach (var sampleResultDto in sampleDto.SampleResults)
                 {
                     var sampleResultValue = "";
-                    var limitBasicValue = "";
+                    var limitBasisValue = "";
 
                     if (string.IsNullOrEmpty(sampleResultDto.MassLoadingValue))
                     {
-                        limitBasicValue = LimitBasisName.Concentration.ToString();
+                        limitBasisValue = LimitBasisName.Concentration.ToString();
                         sampleResultValue = sampleResultDto.Value;
                     }
                     else
                     {
-                        limitBasicValue = LimitBasisName.MassLoading.ToString();
+                        limitBasisValue = LimitBasisName.MassLoading.ToString();
                         sampleResultValue = sampleResultDto.MassLoadingValue;
                     }
 
@@ -326,7 +326,7 @@ namespace Linko.LinkoExchange.Services.Report
                         //TODO handle the datatime here
                         AnalysisDateTimeUtc = sampleResultDto.AnalysisDateTimeLocal.ToString(),
                         IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
-                        LimitBasis = limitBasicValue
+                        LimitBasis = limitBasisValue
                     };
 
                     sampleNode.SampleResults.Add(sampleResultNode);
@@ -780,10 +780,11 @@ namespace Linko.LinkoExchange.Services.Report
                 }
 
             }
-
-
         }
-
+        private string EmtpyStringIfNull(string value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? "" : value;
+        }
         private class Utf8StringWriter : StringWriter
         {
             public override Encoding Encoding { get { return Encoding.UTF8; } }
