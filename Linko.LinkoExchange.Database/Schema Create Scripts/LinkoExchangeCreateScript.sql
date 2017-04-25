@@ -2868,13 +2868,13 @@ BEGIN
         , OrganizationRegulatoryProgramId       int NOT NULL
         , OrganizationName                      varchar(254) NOT NULL
         , OrganizationAddressLine1              varchar(100) NOT NULL
-        , OrganizationAddressLine2              varchar(100) NOT NULL
+        , OrganizationAddressLine2              varchar(100) NULL
         , OrganizationCityName                  varchar(100) NOT NULL
         , OrganizationJurisdictionName          varchar(100) NOT NULL
         , OrganizationZipCode                   varchar(50) NOT NULL
         , RecipientOrganizationName             varchar(254) NOT NULL
         , RecipientOrganizationAddressLine1     varchar(100) NOT NULL
-        , RecipientOrganizationAddressLine2     varchar(100) NOT NULL
+        , RecipientOrganizationAddressLine2     varchar(100) NULL
         , RecipientOrganizationCityName         varchar(100) NOT NULL
         , RecipientOrganizationJurisdictionName varchar(100) NOT NULL
         , RecipientOrganizationZipCode          varchar(50) NOT NULL
