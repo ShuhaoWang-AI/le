@@ -376,7 +376,7 @@ namespace Linko.LinkoExchange.Test
             var copyOfRecordDataXmlFileInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
             //var copyOfRecordPdfInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordPdfFile(reportPackageDto);
 
-            _copyOrRecordService.CreateCopyOfRecordForReportPackage(rptId, reportPackageDto.AttachmentDtos, copyOfRecordPdfFile, copyOfRecordDataXmlFileInfo);
+            _copyOrRecordService.CreateCopyOfRecordForReportPackage(rptId, reportPackageDto.AssociatedFiles.Select(af => af.FileStore), copyOfRecordPdfFile, copyOfRecordDataXmlFileInfo);
         }
 
         private ReportPackageDto GetReportPackage(int reportPackageId)
@@ -461,11 +461,23 @@ namespace Linko.LinkoExchange.Test
                 PermitNumber = "Test---Permit---Number",
                 Comments = "Test comments",
 
-                AttachmentDtos = GetMockAttachmentFiles(),
+                AssociatedFiles = GetMockReportFiles(GetMockAttachmentFiles()),
                 AssociatedSamples = GetMockReportSamples(GetMockSampleDtos()),
                 CertificationDtos = GetMockCertifications(),
             };
 
+        }
+
+        //.AssociatedFiles.Select(af => af.FileStore)
+        private List<ReportFileDto> GetMockReportFiles(List<FileStoreDto> mockFileDtos)
+        {
+            var reportFilesDtoList = new List<ReportFileDto>();
+            foreach (var mockFileDto in mockFileDtos)
+            {
+                reportFilesDtoList.Add(new ReportFileDto() { FileStoreId = mockFileDto.FileStoreId.Value, FileStore = mockFileDto, ReportPackageElementTypeId = 2 });
+            }
+
+            return reportFilesDtoList;
         }
 
         private List<ReportSampleDto> GetMockReportSamples(List<SampleDto> mockSampleDtos)

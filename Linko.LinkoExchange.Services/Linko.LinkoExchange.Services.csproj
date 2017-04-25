@@ -123,6 +123,7 @@
     <Compile Include="Dto\CorFileDtoBase.cs" />
     <Compile Include="Dto\CopyOfRecordDataXmlFileDto.cs" />
     <Compile Include="Dto\CopyOfRecordPdfFileDto.cs" />
+    <Compile Include="Dto\ReportFileDto.cs" />
     <Compile Include="Dto\ReportPackageDto.cs" />
     <Compile Include="Dto\ReportPackageELementTypeDto.cs" />
     <Compile Include="Dto\ReportSampleDto.cs" />

@@ -233,7 +233,7 @@ namespace Linko.LinkoExchange.Services.Report
                 },
                 FileManifest = new FileManifest
                 {
-                    Files = reportPackageDto.AttachmentDtos.Select(i => new FileInfo
+                    Files = reportPackageDto.AssociatedFiles.Select(af => af.FileStore).Select(i => new FileInfo
                     {
                         OriginalFileName = i.OriginalFileName,
                         SystemGeneratedUniqueFileName = i.Name,
@@ -405,7 +405,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info("Enter ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={0}", reportPackageDto.ReportPackageId);
             int reportPackageId = reportPackageDto.ReportPackageId;
-            var attachments = reportPackageDto.AttachmentDtos;
+            var attachments = reportPackageDto.AssociatedFiles.Select(af => af.FileStore);
             var copyOfRecordPdfFile = GetReportPackageCopyOfRecordPdfFile(reportPackageDto);
             var copyOfRecordDataXmlFile = GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
             var copyOfRecordDto = _copyOfRecordService.CreateCopyOfRecordForReportPackage(reportPackageId, attachments, copyOfRecordPdfFile, copyOfRecordDataXmlFile);
