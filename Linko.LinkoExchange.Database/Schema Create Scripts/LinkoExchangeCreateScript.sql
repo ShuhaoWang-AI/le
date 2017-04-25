@@ -2894,7 +2894,7 @@ BEGIN
         , SubmissionReviewerTitleRole           varchar(250) NULL
         , SubmissionReviewComments              varchar(500) NULL
 
-        , RepudationDateTimeUtc                 datetimeoffset(0) NULL
+        , RepudiationDateTimeUtc                datetimeoffset(0) NULL
         , RepudiatorUserId                      int NULL
         , RepudiatorFirstName                   varchar(50) NULL
         , RepudiatorLastName                    varchar(50) NULL
