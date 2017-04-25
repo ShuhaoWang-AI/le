@@ -1013,18 +1013,21 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                   Description = vm.Description
                                                                                               }).ToList();
 
-            return View(model:monitoringPoints);
+            var viewModel = new NewSampleStep1ViewModel {AllMonitoringPoints = monitoringPoints};
+
+            return View(model:viewModel);
         }
-        
+
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"Sample/New/Step1")]
-        public ActionResult NewSampleDetailsStep1(int monitoringPointId, DateTime startDateTime, DateTime endDateTime)
+        public ActionResult NewSampleDetailsStep1(NewSampleStep1ViewModel model)
         {
-            throw new NotImplementedException();
+            TempData[key:"NewSampleStep1ViewModel"] = model;
+            return RedirectToAction(actionName:"NewSampleDetailsStep2");
         }
 
-        public ActionResult NewSampleDetailStep2()
+        public ActionResult NewSampleDetailsStep2()
         {
             throw new NotImplementedException();
         }

@@ -464,6 +464,7 @@
     <Compile Include="ViewModels\Authority\AuthorityUserViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
+    <Compile Include="ViewModels\Industry\NewSampleStep1ViewModel.cs" />
     <Compile Include="ViewModels\Shared\MonitoringPointViewModel.cs" />
     <Compile Include="ViewModels\Shared\SampleResultViewModel.cs" />
     <Compile Include="ViewModels\Shared\SampleViewModel.cs" />
