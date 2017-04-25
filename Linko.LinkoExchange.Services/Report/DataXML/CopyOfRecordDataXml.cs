@@ -12,9 +12,8 @@ namespace Linko.LinkoExchange.Services.Report.DataXML
         public SubmittedOnBehalfOf SubmittedOnBehalfOf { get; set; }
         public SubmittedBy SubmittedBy { get; set; }
         public FileManifest FileManifest { get; set; }
-
         public List<Certification> Certifications { get; set; }
         public string Comment { get; set; }
-        public List<SampleResultNode> SampleResults { get; set; }
+        public List<SampleNode> Samples { get; set; }
     }
 }

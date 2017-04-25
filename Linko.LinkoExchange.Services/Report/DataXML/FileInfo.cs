@@ -3,7 +3,7 @@
     public class FileInfo
     {
         public string OriginalFileName { get; set; }
-        public string SystemGeneratedUnqiueFileName { get; set; }
+        public string SystemGeneratedUniqueFileName { get; set; }
         public string AttachmentType { get; set; }
     }
 }

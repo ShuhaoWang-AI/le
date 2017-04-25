@@ -114,10 +114,10 @@ namespace Linko.LinkoExchange.Test
                   _dbContext,
                   _httpContext.Object,
                   _userService,
-                 emailService.Object,
-                 _settService,
-                 _orgService.Object,
-                 _mapHeper);
+                  emailService.Object,
+                  _settService,
+                  _orgService.Object,
+                  _mapHeper);
 
             var reportPackageId = 527466233;
             var validResult = reportPackageService.VerififyCopyOfRecord(reportPackageId);
@@ -139,8 +139,10 @@ namespace Linko.LinkoExchange.Test
                   _dbContext,
                   _httpContext.Object,
                   _userService,
-                 emailService.Object,
-                  _settService, _orgService.Object, _mapHeper);
+                  emailService.Object,
+                  _settService,
+                  _orgService.Object,
+                  _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -165,8 +167,10 @@ namespace Linko.LinkoExchange.Test
                   _dbContext,
                   _httpContext.Object,
                   _userService,
-                 emailService.Object,
-                  _settService, _orgService.Object, _mapHeper);
+                  emailService.Object,
+                  _settService,
+                  _orgService.Object,
+                  _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -195,8 +199,10 @@ namespace Linko.LinkoExchange.Test
                   _dbContext,
                   _httpContext.Object,
                   _userService,
-                 emailService.Object,
-                  _settService, _orgService.Object, _mapHeper);
+                  emailService.Object,
+                  _settService,
+                  _orgService.Object,
+                  _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -227,8 +233,10 @@ namespace Linko.LinkoExchange.Test
                   _dbContext,
                   _httpContext.Object,
                   _userService,
-                 emailService.Object,
-                  _settService, _orgService.Object, _mapHeper);
+                  emailService.Object,
+                  _settService,
+                  _orgService.Object,
+                  _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -257,8 +265,10 @@ namespace Linko.LinkoExchange.Test
                   _dbContext,
                   _httpContext.Object,
                   _userService,
-                 emailService.Object,
-                  _settService, _orgService.Object, _mapHeper);
+                  emailService.Object,
+                  _settService,
+                  _orgService.Object,
+                  _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -286,8 +296,10 @@ namespace Linko.LinkoExchange.Test
                   _dbContext,
                   _httpContext.Object,
                   _userService,
-                 emailService.Object,
-                  _settService, _orgService.Object, _mapHeper);
+                  emailService.Object,
+                  _settService,
+                  _orgService.Object,
+                  _mapHeper);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -319,11 +331,52 @@ namespace Linko.LinkoExchange.Test
                   _dbContext,
                   _httpContext.Object,
                   _userService,
-                 emailService.Object,
-                  _settService, _orgService.Object, _mapHeper);
+                  emailService.Object,
+                  _settService,
+                  _orgService.Object,
+                  _mapHeper);
 
             var xmlDate = reportPackageService.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
 
+        }
+
+        [TestMethod]
+        public void Create_Cor_success_using_mock_reportPackageDto()
+        {
+            //set 
+            var rnd = new Random();
+            int rptId = rnd.Next(int.MaxValue);
+
+            var reportPackageDto = GetMockReportPackageDto();
+            reportPackageDto.ReportPackageId = rptId;
+            var copyOfRecordPdfFile = GetCopyOfRecordPdfFile();
+            var programDto = Mock.Of<OrganizationRegulatoryProgramDto>();
+
+            var programMock = Mock.Get(_programService);
+            programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
+                       .Returns(programDto);
+
+            IReportPackageService reportPackageService =
+                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
+                  _logger.Object,
+                  _dbContext,
+                  _httpContext.Object,
+                  _userService,
+                  emailService.Object,
+                  _settService,
+                  _orgService.Object,
+                  _mapHeper);
+
+            var xmlFileData = reportPackageService.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
+
+
+            _reprotPackageService.Setup(i => i.GetReportPackageCopyOfRecordDataXmlFile(It.IsAny<ReportPackageDto>()))
+                                 .Returns(xmlFileData);
+
+            var copyOfRecordDataXmlFileInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
+            //var copyOfRecordPdfInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordPdfFile(reportPackageDto);
+
+            _copyOrRecordService.CreateCopyOfRecordForReportPackage(rptId, reportPackageDto.AttachmentDtos, copyOfRecordPdfFile, copyOfRecordDataXmlFileInfo);
         }
 
         private ReportPackageDto GetReportPackage(int reportPackageId)
@@ -365,8 +418,8 @@ namespace Linko.LinkoExchange.Test
         {
             // mock:  submitter userProfileId = 7 
             //        OrgRegProgramUserId = 8 
-            //        OrganizationRegulatoryProgramId = 11  
-            //        
+            //        OrganizationRegulatoryProgramId = 11    
+
             var orgRegProgamId = 11;
             var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(i => i.OrganizationRegulatoryProgramId == orgRegProgamId);
 

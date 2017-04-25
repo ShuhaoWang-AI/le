@@ -192,6 +192,7 @@
     <Compile Include="Report\DataXML\FileInfo.cs" />
     <Compile Include="Report\DataXML\FileManifest.cs" />
     <Compile Include="Report\DataXML\ReportHeader.cs" />
+    <Compile Include="Report\DataXML\SampleNode.cs" />
     <Compile Include="Report\DataXML\SampleResultNode.cs" />
     <Compile Include="Report\DataXML\SubmittedBy.cs" />
     <Compile Include="Report\DataXML\SubmittedOnBehalfOf.cs" />

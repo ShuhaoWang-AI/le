@@ -225,10 +225,10 @@ namespace Linko.LinkoExchange.Services.Report
                 },
                 SubmittedBy = new SubmittedBy
                 {
-                    FirstName = reportPackageDto.SubmitterFirstName,
-                    LastName = reportPackageDto.SubmitterLastName,
-                    Title = reportPackageDto.SubmitterTitleRole,
-                    UserName = reportPackageDto.SubmitterUserName,
+                    FirstName = string.IsNullOrEmpty(reportPackageDto.SubmitterFirstName) ? "" : reportPackageDto.SubmitterFirstName,
+                    LastName = string.IsNullOrEmpty(reportPackageDto.SubmitterLastName) ? "" : reportPackageDto.SubmitterLastName,
+                    Title = string.IsNullOrEmpty(reportPackageDto.SubmitterTitleRole) ? "" : reportPackageDto.SubmitterTitleRole,
+                    UserName = string.IsNullOrEmpty(reportPackageDto.SubmitterUserName) ? "" : reportPackageDto.SubmitterUserName,
                     ReportSubmissionFromIP = reportPackageDto.SubmitterIPAddress
                 },
                 FileManifest = new FileManifest
@@ -236,7 +236,7 @@ namespace Linko.LinkoExchange.Services.Report
                     Files = reportPackageDto.AttachmentDtos.Select(i => new FileInfo
                     {
                         OriginalFileName = i.OriginalFileName,
-                        SystemGeneratedUnqiueFileName = i.Name,
+                        SystemGeneratedUniqueFileName = i.Name,
                         AttachmentType = i.FileType
                     }).ToList()
                 }
@@ -246,7 +246,7 @@ namespace Linko.LinkoExchange.Services.Report
                 new FileInfo
                 {
                     OriginalFileName = "Copy Of Record Data.xml",
-                    SystemGeneratedUnqiueFileName = "Copy Of Record Data.xml",
+                    SystemGeneratedUniqueFileName = "Copy Of Record Data.xml",
                     AttachmentType = "Xml Raw Data"
                 });
 
@@ -254,61 +254,82 @@ namespace Linko.LinkoExchange.Services.Report
                 new FileInfo
                 {
                     OriginalFileName = "Copy Of Record.pdf",
-                    SystemGeneratedUnqiueFileName = "Copy Of Record.pdf",
+                    SystemGeneratedUniqueFileName = "Copy Of Record.pdf",
                     AttachmentType = "Copy Of Record PDF"
                 });
-
 
             dataXmlObj.Certifications = new List<Certification>();
             dataXmlObj.Certifications = reportPackageDto.CertificationDtos.Select(i => new Certification
             {
                 CertificationType = i.ReportElementTypeName,
-                CertificationText = i.ReportElementTypeContent
+                CertificationText = string.IsNullOrWhiteSpace(i.ReportElementTypeContent) ? "" : i.ReportElementTypeContent
             }).ToList();
 
             dataXmlObj.Comment = reportPackageDto.Comments;
 
             // SampleResults part 
-            dataXmlObj.SampleResults = new List<SampleResultNode>();
-
+            dataXmlObj.Samples = new List<SampleNode>();
             foreach (var sampleDto in reportPackageDto.SamplesDtos)
             {
+                var sampleNode = new SampleNode
+                {
+                    SampleName = sampleDto.Name,
+                    MonitoringPointName = sampleDto.MonitoringPointName,
+                    CtsEventTypeCategoryName = sampleDto.CtsEventCategoryName,
+                    CtsEventTypeName = sampleDto.CtsEventTypeName,
+                    CollectionMethodName = sampleDto.CollectionMethodName,
+                    LabSampleIdentifier = sampleDto.LabSampleIdentifier,
+
+                    //TODO to covert the date time here 
+                    StartDateTimeUtc = sampleDto.StartDateTimeLocal.ToString(),
+                    EndDateTimeUtc = sampleDto.EndDateTimeLocal.ToString(),
+
+                    SampleFlowForMassCalcs = sampleDto.FlowValue,
+                    SampleFlowForMassCalcsUnitName = sampleDto.FlowUnitName,
+
+                    MassLoadingsConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds?.ToString(),
+                    MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces?.ToString(),
+                    IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign.ToString(),
+
+                    SampledBy = sampleDto.ByOrganizationRegulatoryProgramDto.OrganizationDto.OrganizationType.Name,
+                    SampleResults = new List<SampleResultNode>(),
+                };
+
+                dataXmlObj.Samples.Add(sampleNode);
+
                 foreach (var sampleResultDto in sampleDto.SampleResults)
                 {
+                    var sampleResultValue = "";
+                    var limitBasicValue = "";
+
+                    if (string.IsNullOrEmpty(sampleResultDto.MassLoadingValue))
+                    {
+                        limitBasicValue = LimitBasisName.Concentration.ToString();
+                        sampleResultValue = sampleResultDto.Value;
+                    }
+                    else
+                    {
+                        limitBasicValue = LimitBasisName.MassLoading.ToString();
+                        sampleResultValue = sampleResultDto.MassLoadingValue;
+                    }
+
                     var sampleResultNode = new SampleResultNode
                     {
-                        SampleName = sampleDto.Name,
-                        MonitoringPointName = sampleDto.MonitoringPointName,
-                        CtsEventTypeCategoryName = sampleDto.CtsEventCategoryName,
-                        CtsEventTypeName = sampleDto.CtsEventTypeName,
-                        CollectionMethodName = sampleDto.CollectionMethodName,
-                        LabSampleIdentifier = sampleDto.LabSampleIdentifier,
-
-                        //TODO to covert the date time here 
-                        StartDateTimeUtc = sampleDto.StartDateTimeLocal.ToString(),
-                        EndDateTimeUtc = sampleDto.EndDateTimeLocal.ToString(),
-
-                        MassLoadingsConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds?.ToString(),
-                        MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces?.ToString(),
-                        IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign.ToString(),
-
-                        SampledBy = sampleDto.ByOrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName,
                         ParameterName = sampleResultDto.ParameterName,
                         Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier),
-                        Value = sampleResultDto.Value,
+                        Value = sampleResultValue,
                         UnitName = sampleResultDto.UnitName,
                         EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit,
                         MethodDetectionLimit = sampleResultDto.MethodDetectionLimit.ToString(),
                         AnalysisMethod = sampleResultDto.AnalysisMethod,
 
                         //TODO handle the datatime here
-                        AnalysisDateTimUtc = sampleResultDto.AnalysisDateTimeLocal.ToString(),
+                        AnalysisDateTimeUtc = sampleResultDto.AnalysisDateTimeLocal.ToString(),
                         IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
-
-                        LimitBasis = LimitBasisName.Concentration.ToString()
+                        LimitBasis = limitBasicValue
                     };
 
-                    dataXmlObj.SampleResults.Add(sampleResultNode);
+                    sampleNode.SampleResults.Add(sampleResultNode);
                 }
             }
 
@@ -514,7 +535,7 @@ namespace Linko.LinkoExchange.Services.Report
                     _dbContext.ReportPackageElementCategories.RemoveRange(reportPackage.ReportPackageElementCategories);
 
                     _dbContext.ReportPackages.Remove(reportPackage);
-                    
+
                     _dbContext.SaveChanges();
 
                     transaction.Commit();
@@ -617,23 +638,19 @@ namespace Linko.LinkoExchange.Services.Report
                                 .Single(ret => ret.ReportElementTypeId == rptet.ReportElementTypeId);
 
                             //Create a row in tReportPackageElementType
-                            var newReportPackageElementType = new ReportPackageElementType();
-                            newReportPackageElementType.ReportElementTypeId = rptet.ReportElementTypeId;
-                            newReportPackageElementType.ReportElementTypeName = reportElementType.Name;
-                            newReportPackageElementType.ReportElementTypeContent = reportElementType.Content;
-                            newReportPackageElementType.ReportElementTypeIsContentProvided = reportElementType.IsContentProvided;
-                            newReportPackageElementType.IsRequired = rptet.IsRequired;
-                            newReportPackageElementType.SortOrder = rptet.SortOrder;
-
-                            if (reportElementType.CtsEventTypeId.HasValue)
+                            var newReportPackageElementType = new ReportPackageElementType()
                             {
-                                newReportPackageElementType.CtsEventTypeId = reportElementType.CtsEventTypeId;
-                                newReportPackageElementType.CtsEventTypeName = reportElementType.CtsEventType.Name;
-                                newReportPackageElementType.CtsEventCategoryName = reportElementType.CtsEventType.CtsEventCategoryName;
-                            }
-
+                                ReportElementTypeId = rptet.ReportElementTypeId,
+                                ReportElementTypeName = reportElementType.Name,
+                                ReportElementTypeContent = reportElementType.Content,
+                                ReportElementTypeIsContentProvided = reportElementType.IsContentProvided,
+                                CtsEventTypeId = reportElementType.CtsEventTypeId,
+                                CtsEventTypeName = reportElementType.CtsEventType.Name,
+                                CtsEventCategoryName = reportElementType.CtsEventType.CtsEventCategoryName,
+                                IsRequired = rptet.IsRequired,
+                                SortOrder = rptet.SortOrder
+                            };
                             newReportPackageElementType.ReportPackageElementCategory = newReportPackageElementCategory; //handles setting ReportPackageElementCategoryId
-                            _dbContext.ReportPackageElementTypes.Add(newReportPackageElementType);
                         }
                     }
 
@@ -643,7 +660,7 @@ namespace Linko.LinkoExchange.Services.Report
 
                     newReportPackageId = newReportPackage.ReportPackageId;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     transaction.Rollback();
 

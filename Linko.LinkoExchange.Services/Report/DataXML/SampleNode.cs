@@ -1,9 +1,10 @@
-﻿using System.Xml.Serialization;
+using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace Linko.LinkoExchange.Services.Report.DataXML
 {
-    [XmlType(TypeName = "SampleResult")]
-    public class SampleResultNode
+    [XmlType(TypeName = "Sample")]
+    public class SampleNode
     {
         public string SampleName { get; set; }
         public string MonitoringPointName { get; set; }
@@ -13,20 +14,12 @@ namespace Linko.LinkoExchange.Services.Report.DataXML
         public string LabSampleIdentifier { get; set; }
         public string StartDateTimeUtc { get; set; }
         public string EndDateTimeUtc { get; set; }
+        public string SampleFlowForMassCalcs { get; set; }
+        public string SampleFlowForMassCalcsUnitName { get; set; }
         public string MassLoadingsConversionFactorPounds { get; set; }
         public string MassLoadingCalculationDecimalPlaces { get; set; }
         public string IsMassLoadingResultToUseLessThanSign { get; set; }
         public string SampledBy { get; set; }
-        public string ParameterName { get; set; }
-        public string Qualifier { get; set; }
-        public string EnteredValue { get; set; }
-        public string Value { get; set; }
-        public string UnitName { get; set; }
-        public string EnteredMethodDetectionLimit { get; set; }
-        public string MethodDetectionLimit { get; set; }
-        public string AnalysisMethod { get; set; }
-        public string AnalysisDateTimeUtc { get; set; }
-        public string IsApprovedEPAMethod { get; set; }
-        public string LimitBasis { get; set; }
+        public List<SampleResultNode> SampleResults { get; set; }
     }
 }
