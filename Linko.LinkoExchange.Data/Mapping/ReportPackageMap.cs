@@ -46,7 +46,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.OrganizationAddressLine1).IsRequired().HasMaxLength(100);
 
-            Property(x => x.OrganizationAddressLine2).IsRequired().HasMaxLength(100);
+            Property(x => x.OrganizationAddressLine2).IsOptional().HasMaxLength(100);
 
             Property(x => x.OrganizationCityName).IsRequired().HasMaxLength(100);
 
@@ -58,7 +58,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.RecipientOrganizationAddressLine1).IsRequired().HasMaxLength(100);
 
-            Property(x => x.RecipientOrganizationAddressLine2).IsRequired().HasMaxLength(100);
+            Property(x => x.RecipientOrganizationAddressLine2).IsOptional().HasMaxLength(100);
 
             Property(x => x.RecipientOrganizationCityName).IsRequired().HasMaxLength(100);
 
