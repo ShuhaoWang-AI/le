@@ -939,6 +939,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             //    resultDtos.Add(this.GetSampleResultDtoFromSampleResult(sampleResult));
             //}
             //dto.SampleResults = resultDtos;
+            dto.ByOrganizationRegulatoryProgramDto = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(sample.ByOrganizationRegulatoryProgram);
 
             return dto;
         }
@@ -1110,6 +1111,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 OrganizationAddressLine2 = rpt.OrganizationRegulatoryProgram.Organization.AddressLine2,
                 OrganizationCityName = rpt.OrganizationRegulatoryProgram.Organization.CityName,
                 OrganizationJurisdictionName = rpt.OrganizationRegulatoryProgram.Organization.Jurisdiction.Name,
+                OrganizationZipCode = rpt.OrganizationRegulatoryProgram.Organization.ZipCode,
                 //RecipientOrganizationName = set outside after calling line
                 //RecipientOrganizationAddressLine1 = set outside after calling line
                 //RecipientOrganizationAddressLine2 = set outside after calling line
@@ -1117,6 +1119,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 //RecipientOrganizationJurisdictionName = set outside after calling line
                 //RecipientOrganizationZipCode = set outside after calling line
                 //CreationDateTimeUtc = set outside after calling line
+                ReportPackageElementCategories = new List<ReportPackageElementCategory>()
             };
         }
 

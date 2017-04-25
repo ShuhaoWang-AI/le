@@ -800,6 +800,7 @@ namespace Linko.LinkoExchange.Services.Sample
             var sample = _dbContext.Samples
                 .Include(s => s.ReportSamples)
                 .Include(s => s.SampleResults)
+                .Include(s => s.ByOrganizationRegulatoryProgram)
                 .Single(s => s.SampleId == sampleId);
 
             var dto = this.GetSampleDetails(sample);
@@ -852,6 +853,7 @@ namespace Linko.LinkoExchange.Services.Sample
             var foundSamples = _dbContext.Samples
                 .Include(s => s.ReportSamples)
                 .Include(s => s.SampleResults)
+                .Include(s => s.ByOrganizationRegulatoryProgram)
                 .Where(s => s.ForOrganizationRegulatoryProgramId == currentOrgRegProgramId);
 
             if (startDate.HasValue)

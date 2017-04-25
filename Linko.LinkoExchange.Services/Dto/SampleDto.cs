@@ -41,7 +41,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public int? FlowUnitId { get; set; }
         public string FlowUnitName { get; set; }
         public IEnumerable<SampleResultDto> SampleResults { get; set; }
-        public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgramDto { get; internal set; }
+        public OrganizationRegulatoryProgramDto ByOrganizationRegulatoryProgramDto { get; internal set; }
     }
 }
 

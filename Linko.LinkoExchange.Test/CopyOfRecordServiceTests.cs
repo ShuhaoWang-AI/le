@@ -509,7 +509,7 @@ namespace Linko.LinkoExchange.Test
                                     },
                                 },
 
-                OrganizationRegulatoryProgramDto = _mapHeper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram)
+                ByOrganizationRegulatoryProgramDto = _mapHeper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram)
             };
 
 
@@ -601,7 +601,7 @@ namespace Linko.LinkoExchange.Test
                                     },
                                 },
 
-                OrganizationRegulatoryProgramDto = _mapHeper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram)
+                ByOrganizationRegulatoryProgramDto = _mapHeper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram)
             };
 
             var samples = new List<SampleDto>();

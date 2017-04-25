@@ -292,7 +292,7 @@ namespace Linko.LinkoExchange.Services.Report
                         MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces?.ToString(),
                         IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign.ToString(),
 
-                        SampledBy = sampleDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName,
+                        SampledBy = sampleDto.ByOrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName,
                         ParameterName = sampleResultDto.ParameterName,
                         Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier),
                         Value = sampleResultDto.Value,
@@ -484,11 +484,12 @@ namespace Linko.LinkoExchange.Services.Report
             {
                 try
                 {
-                    var reportPackageElementCategories = _dbContext.ReportPackageElementCategories
-                    .Include(rpec => rpec.ReportPackageElementTypes)
-                    .Where(rpec => rpec.ReportPackageId == reportPackageId);
+                    var reportPackage = _dbContext.ReportPackages
+                        .Include(rp => rp.ReportPackageElementCategories)
+                        .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes))
+                        .Single(rp => rp.ReportPackageId == reportPackageId);
 
-                    foreach (var rpec in reportPackageElementCategories)
+                    foreach (var rpec in reportPackage.ReportPackageElementCategories)
                     {
                         foreach (var rpet in rpec.ReportPackageElementTypes)
                         {
@@ -510,8 +511,10 @@ namespace Linko.LinkoExchange.Services.Report
                         _dbContext.ReportPackageElementTypes.RemoveRange(rpec.ReportPackageElementTypes);
 
                     }
-                    _dbContext.ReportPackageElementCategories.RemoveRange(reportPackageElementCategories);
+                    _dbContext.ReportPackageElementCategories.RemoveRange(reportPackage.ReportPackageElementCategories);
 
+                    _dbContext.ReportPackages.Remove(reportPackage);
+                    
                     _dbContext.SaveChanges();
 
                     transaction.Commit();
@@ -547,82 +550,120 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns>The newly created tReportPackage.ReportPackageId</returns>
         public int CreateDraft(int reportPackageTemplateId, DateTime startDateTimeLocal, DateTime endDateTimeLocal)
         {
-            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
-            var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
-            var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
+            var newReportPackageId = -1;
 
-            //Step 1 - copy fields from template to new Report Package instance (tReportPackage)
-
-            //Get template
-            var reportPackageTemplate = _dbContext.ReportPackageTempates
-                .Include(rpt => rpt.CtsEventType)
-                .Include(rpt => rpt.OrganizationRegulatoryProgram)
-                .Include(rpt => rpt.OrganizationRegulatoryProgram.Organization)
-                .Include(rpt => rpt.OrganizationRegulatoryProgram.Organization.Jurisdiction)
-                .Include(rpt => rpt.OrganizationRegulatoryProgram.RegulatorOrganization)
-                .Include(rpt => rpt.OrganizationRegulatoryProgram.RegulatorOrganization.Jurisdiction)
-                .Single(rpt => rpt.ReportPackageTemplateId == reportPackageTemplateId);
-
-            var newReportPackage = _mapHelper.GetReportPackageFromReportPackageTemplate(reportPackageTemplate);
-            newReportPackage.PeriodStartDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(startDateTimeLocal, timeZoneId);
-            newReportPackage.PeriodEndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(endDateTimeLocal, timeZoneId);
-            newReportPackage.ReportStatusId = _dbContext.ReportStatuses
-                .Single(rs => rs.Name == ReportStatusName.Draft.ToString()).ReportStatusId;
-            newReportPackage.CreationDateTimeUtc = DateTime.UtcNow;
-
-            //Need to populate with Authority fields
-            newReportPackage.RecipientOrganizationName = authorityOrganization.OrganizationDto.OrganizationName;
-            newReportPackage.RecipientOrganizationAddressLine1 = authorityOrganization.OrganizationDto.AddressLine1;
-            newReportPackage.RecipientOrganizationAddressLine2 = authorityOrganization.OrganizationDto.AddressLine2;
-            newReportPackage.RecipientOrganizationCityName = authorityOrganization.OrganizationDto.CityName;
-            newReportPackage.RecipientOrganizationJurisdictionName = _dbContext.Organizations
-                .Include(o => o.Jurisdiction)
-                .Single(o => o.OrganizationId == authorityOrganization.OrganizationDto.OrganizationId).Jurisdiction.Name;
-            newReportPackage.RecipientOrganizationZipCode = authorityOrganization.OrganizationDto.ZipCode;
-
-            //Step 2 - create a row in tReportPackageElementCategory for each row in tReportPackageTemplateElementCategory (where ReportPackageTemplateId="n")
-            
-            //Step 3 - create a row in tReportPackageElementType for each row in tReportPackageTemplateElementType(associated with the rows found in Step 1)
-
-            var reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories
-                .Include(rptec => rptec.ReportPackageTemplateElementTypes)
-                .Where(rptec => rptec.ReportPackageTemplateId == reportPackageTemplateId);
-
-            foreach (var rptec in reportPackageTemplateElementCategories)
+            using (var transaction = _dbContext.BeginTransaction())
             {
-                //Create a row in tReportPackageElementCategory
-                var newReportPackageElementCategory = new ReportPackageElementCategory()
+                try
                 {
-                    ReportElementCategoryId = rptec.ReportElementCategoryId,
-                    SortOrder = rptec.SortOrder
-                };
-                newReportPackage.ReportPackageElementCategories.Add(newReportPackageElementCategory); //handles setting ReportPackageId
+                    var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+                    var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
+                    var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+                    var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
 
-                foreach (var rptet in rptec.ReportPackageTemplateElementTypes)
-                {
-                    var reportElementType = _dbContext.ReportElementTypes
-                        .Include(ret => ret.CtsEventType)
-                        .Single(ret => ret.ReportElementTypeId == rptet.ReportElementTypeId);
+                    //Step 1 - copy fields from template to new Report Package instance (tReportPackage)
 
-                    //Create a row in tReportPackageElementType
-                    var newReportPackageElementType = new ReportPackageElementType() {
-                        ReportElementTypeId = rptet.ReportElementTypeId,
-                        ReportElementTypeName = reportElementType.Name,
-                        ReportElementTypeContent = reportElementType.Content,
-                        ReportElementTypeIsContentProvided = reportElementType.IsContentProvided,
-                        CtsEventTypeId = reportElementType.CtsEventTypeId,
-                        CtsEventTypeName = reportElementType.CtsEventType.Name,
-                        CtsEventCategoryName = reportElementType.CtsEventType.CtsEventCategoryName,
-                        IsRequired = rptet.IsRequired,
-                        SortOrder = rptet.SortOrder
-                    };
-                    newReportPackageElementType.ReportPackageElementCategory = newReportPackageElementCategory; //handles setting ReportPackageElementCategoryId
+                    //Get template
+                    var reportPackageTemplate = _dbContext.ReportPackageTempates
+                        .Include(rpt => rpt.CtsEventType)
+                        .Include(rpt => rpt.OrganizationRegulatoryProgram)
+                        .Include(rpt => rpt.OrganizationRegulatoryProgram.Organization)
+                        .Include(rpt => rpt.OrganizationRegulatoryProgram.Organization.Jurisdiction)
+                        .Include(rpt => rpt.OrganizationRegulatoryProgram.RegulatorOrganization)
+                        .Include(rpt => rpt.OrganizationRegulatoryProgram.RegulatorOrganization.Jurisdiction)
+                        .Single(rpt => rpt.ReportPackageTemplateId == reportPackageTemplateId);
+
+                    var newReportPackage = _mapHelper.GetReportPackageFromReportPackageTemplate(reportPackageTemplate);
+
+                    newReportPackage.PeriodStartDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(startDateTimeLocal, timeZoneId);
+                    newReportPackage.PeriodEndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(endDateTimeLocal, timeZoneId);
+                    newReportPackage.ReportStatusId = _dbContext.ReportStatuses
+                        .Single(rs => rs.Name == ReportStatusName.Draft.ToString()).ReportStatusId;
+                    newReportPackage.CreationDateTimeUtc = DateTime.UtcNow;
+
+                    //Need to populate with Authority fields
+                    newReportPackage.RecipientOrganizationName = authorityOrganization.OrganizationDto.OrganizationName;
+                    newReportPackage.RecipientOrganizationAddressLine1 = authorityOrganization.OrganizationDto.AddressLine1;
+                    newReportPackage.RecipientOrganizationAddressLine2 = authorityOrganization.OrganizationDto.AddressLine2;
+                    newReportPackage.RecipientOrganizationCityName = authorityOrganization.OrganizationDto.CityName;
+                    newReportPackage.RecipientOrganizationJurisdictionName = _dbContext.Organizations
+                        .Include(o => o.Jurisdiction)
+                        .Single(o => o.OrganizationId == authorityOrganization.OrganizationDto.OrganizationId).Jurisdiction.Name;
+                    newReportPackage.RecipientOrganizationZipCode = authorityOrganization.OrganizationDto.ZipCode;
+
+                    //Step 2 - create a row in tReportPackageElementCategory for each row in tReportPackageTemplateElementCategory (where ReportPackageTemplateId="n")
+
+                    //Step 3 - create a row in tReportPackageElementType for each row in tReportPackageTemplateElementType(associated with the rows found in Step 1)
+
+                    var reportPackageTemplateElementCategories = _dbContext.ReportPackageTemplateElementCategories
+                        .Include(rptec => rptec.ReportPackageTemplateElementTypes)
+                        .Where(rptec => rptec.ReportPackageTemplateId == reportPackageTemplateId)
+                        .ToList();
+
+                    foreach (var rptec in reportPackageTemplateElementCategories)
+                    {
+                        //Create a row in tReportPackageElementCategory
+                        var newReportPackageElementCategory = new ReportPackageElementCategory()
+                        {
+                            ReportElementCategoryId = rptec.ReportElementCategoryId,
+                            SortOrder = rptec.SortOrder
+                        };
+                        newReportPackage.ReportPackageElementCategories.Add(newReportPackageElementCategory); //handles setting ReportPackageId
+
+                        foreach (var rptet in rptec.ReportPackageTemplateElementTypes)
+                        {
+                            var reportElementType = _dbContext.ReportElementTypes
+                                .Include(ret => ret.CtsEventType)
+                                .Single(ret => ret.ReportElementTypeId == rptet.ReportElementTypeId);
+
+                            //Create a row in tReportPackageElementType
+                            var newReportPackageElementType = new ReportPackageElementType();
+                            newReportPackageElementType.ReportElementTypeId = rptet.ReportElementTypeId;
+                            newReportPackageElementType.ReportElementTypeName = reportElementType.Name;
+                            newReportPackageElementType.ReportElementTypeContent = reportElementType.Content;
+                            newReportPackageElementType.ReportElementTypeIsContentProvided = reportElementType.IsContentProvided;
+                            newReportPackageElementType.IsRequired = rptet.IsRequired;
+                            newReportPackageElementType.SortOrder = rptet.SortOrder;
+
+                            if (reportElementType.CtsEventTypeId.HasValue)
+                            {
+                                newReportPackageElementType.CtsEventTypeId = reportElementType.CtsEventTypeId;
+                                newReportPackageElementType.CtsEventTypeName = reportElementType.CtsEventType.Name;
+                                newReportPackageElementType.CtsEventCategoryName = reportElementType.CtsEventType.CtsEventCategoryName;
+                            }
+
+                            newReportPackageElementType.ReportPackageElementCategory = newReportPackageElementCategory; //handles setting ReportPackageElementCategoryId
+                            _dbContext.ReportPackageElementTypes.Add(newReportPackageElementType);
+                        }
+                    }
+
+                    _dbContext.ReportPackages.Add(newReportPackage);
+                    _dbContext.SaveChanges();
+                    transaction.Commit();
+
+                    newReportPackageId = newReportPackage.ReportPackageId;
                 }
+                catch(Exception ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                    throw;
+                }
+
+
             }
 
-            _dbContext.ReportPackages.Add(newReportPackage);
-            return newReportPackage.ReportPackageId;
+            return newReportPackageId;
         }
 
         /// <summary>
