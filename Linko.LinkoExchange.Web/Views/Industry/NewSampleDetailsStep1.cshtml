@@ -26,55 +26,70 @@
             </div>
         </div>
         <div class="box-body box-collapse collapse form-horizontal in">
+
+            @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-danger"})
+
             <div class="form-group">
                 <div class="col-md-12">
-                    <strong>Select Monitoring Point</strong>
+                    @Html.Label(expression:"Select Monitoring Point", htmlAttributes:new
+                                                                                     {
+                                                                                         @class = "control-label col-md-2 required"
+                                                                                     })
                 </div>
                 <div class="col-md-12">
                     @foreach (var m in Model.AllMonitoringPoints)
-                        {
-                            <div class="col-md-12 form-group">
-                                <label class="col-md-offset-2">
-                                    @Html.RadioButtonFor(model => model.SelectedMonitoringPointId, value:m.Id)
+                    {
+                        <div class="col-md-12 form-group">
+                            <label class="col-md-offset-2">
+                                @Html.RadioButtonFor(model => model.SelectedMonitoringPointId, value:m.Id)
 
-                                    <span>@m.Name</span>
-                                    @if (!m.Description.IsEmpty())
-                                    {
-                                        <span class="text-info"> - @m.Description</span>
-                                    }
-                                </label>
-                            </div>
-                        }
+                                <span>@m.Name</span>
+                                @if (!m.Description.IsEmpty())
+                                {
+                                    <span class="text-info"> - @m.Description</span>
+                                }
+                            </label>
+                        </div>
+                    }
                 </div>
 
                 <div class="col-md-12">
                     <!-- Date range -->
-                    <strong>Enter Sample Period</strong>
+                    @Html.Label(expression:"Enter Sample Period", htmlAttributes:new
+                                                                                 {
+                                                                                     @class = "control-label col-md-2"
+                                                                                 })
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label class="col-md-2 control-label" for="startDateTime">* Start Date:</label>
+                        @Html.LabelFor(model => model.StartDateTimeLocal, htmlAttributes:new
+                                                                                         {
+                                                                                             @class = "control-label col-md-2 required"
+                                                                                         })
                         <div class="col-md-4">
                             @(Html.Kendo().DateTimePicker()
-                                  .Name(componentName: "StartDateTimeLocal")
+                                  .Name(componentName:"StartDateTimeLocal")
                                   .Value(date:DateTime.Now)
                                   .Format(format:"MM/dd/yyyy hh:mm:ss tt")
                                   .HtmlAttributes(attributes:new
-                                  {
-                                      style = "width:210px;"
-                                  }))
+                                                             {
+                                                                 style = "width:210px;"
+                                                             }))
                         </div>
 
-                        <label class="col-md-2 control-label" for="endDateTime">* End Date:</label>
+                        @Html.LabelFor(model => model.EndDateTimeLocal, htmlAttributes:new
+                                                                                       {
+                                                                                           @class = "control-label col-md-2 required"
+                                                                                       })
                         <div class="col-md-4">
                             @(Html.Kendo().DateTimePicker()
-                                  .Name(componentName: "EndDateTimeLocal")
+                                  .Name(componentName:"EndDateTimeLocal")
                                   .Value(date:DateTime.Now)
                                   .Format(format:"MM/dd/yyyy hh:mm:ss tt")
                                   .HtmlAttributes(attributes:new
-                                  {
-                                      style = "width:210px;"
-                                  }))
+                                                             {
+                                                                 style = "width:210px;"
+                                                             }))
                         </div>
                     </div>
                 </div>
@@ -82,7 +97,7 @@
         </div>
         <div class="box-footer">
             <div class="col-md-12 form-group">
-                <input type="submit" value="Create Draft" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"NewSampleDetailsStep1", controllerName:"Industry")" formmethod="post" />
+                <input type="submit" value="Next" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"NewSampleDetailsStep1", controllerName:"Industry")" formmethod="post" />
             </div>
         </div><!-- box-footer -->
     </div>

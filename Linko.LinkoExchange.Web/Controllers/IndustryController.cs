@@ -1023,11 +1023,46 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route(template:"Sample/New/Step1")]
         public ActionResult NewSampleDetailsStep1(NewSampleStep1ViewModel model)
         {
-            TempData[key:"NewSampleStep1ViewModel"] = model;
-            return RedirectToAction(actionName:"NewSampleDetailsStep2");
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if (model.EndDateTimeLocal < model.StartDateTimeLocal)
+                    {
+                        var validationIssues = new List<RuleViolation>();
+                        var message = "End Date must be greater than Start Date.";
+                        validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
+                        throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
+                    }
+
+                    TempData[key:"NewSampleStep1ViewModel"] = model;
+                    return RedirectToAction(actionName:"NewSampleDetailsStep2");
+                }
+                catch (RuleViolationException rve)
+                {
+                    MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+                }
+            }
+
+            var monitoringPoints = _monitoringPointService.GetMonitoringPoints().Select(vm => new MonitoringPointViewModel
+                                                                                              {
+                                                                                                  Id = vm.MonitoringPointId,
+                                                                                                  Name = vm.Name,
+                                                                                                  Description = vm.Description
+                                                                                              }).ToList();
+            model.AllMonitoringPoints = monitoringPoints;
+            return View(model:model);
         }
 
         public ActionResult NewSampleDetailsStep2()
+        {
+            throw new NotImplementedException();
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"Sample/New/Step2")]
+        public ActionResult NewSampleDetailsStep2(SampleViewModel model)
         {
             throw new NotImplementedException();
         }

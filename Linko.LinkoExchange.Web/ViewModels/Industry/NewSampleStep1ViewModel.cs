@@ -14,12 +14,22 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         public int SelectedMonitoringPointId { get; set; }
         public List<MonitoringPointViewModel> AllMonitoringPoints { get; set; }
 
-        [Display(Name = "Sample Start")]
+        [Display(Name = "Start Date")]
         public DateTime StartDateTimeLocal { get; set; }
 
-        [Display(Name = "Sample End")]
+        [Display(Name = "End Date")]
         public DateTime EndDateTimeLocal { get; set; }
     }
 
-    public class NewSampleStep1ViewModelValidator:AbstractValidator<NewSampleStep1ViewModel> {}
+    public class NewSampleStep1ViewModelValidator:AbstractValidator<NewSampleStep1ViewModel> {
+        public NewSampleStep1ViewModelValidator()
+        {
+            //SelectedMonitoringPointId
+            RuleFor(x => x.SelectedMonitoringPointId).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
+            //StartDateTimeLocal
+            RuleFor(x => x.StartDateTimeLocal).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
+            //EndDateTimeLocal
+            RuleFor(x => x.EndDateTimeLocal).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
+        }
+    }
 }
