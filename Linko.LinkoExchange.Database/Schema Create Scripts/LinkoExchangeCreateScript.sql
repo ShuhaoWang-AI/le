@@ -2306,7 +2306,6 @@ BEGIN
         , AnalysisDateTimeUtc               datetimeoffset(0) NULL
         , IsApprovedEPAMethod               bit NOT NULL
         , IsMassLoadingCalculationRequired  bit NOT NULL
-        , IsFlowForMassLoadingCalculation   bit NOT NULL
         , IsCalculated                      bit NOT NULL
         , LimitTypeId                       int NULL
         , LimitBasisId                      int NOT NULL
@@ -2340,7 +2339,6 @@ BEGIN
     
     ALTER TABLE dbo.tSampleResult ADD CONSTRAINT DF_tSampleResult_IsApprovedEPAMethod DEFAULT 0 FOR IsApprovedEPAMethod
     ALTER TABLE dbo.tSampleResult ADD CONSTRAINT DF_tSampleResult_IsMassLoadingCalculationRequired DEFAULT 0 FOR IsMassLoadingCalculationRequired
-    ALTER TABLE dbo.tSampleResult ADD CONSTRAINT DF_tSampleResult_IsFlowForMassLoadingCalculation DEFAULT 0 FOR IsFlowForMassLoadingCalculation
     ALTER TABLE dbo.tSampleResult ADD CONSTRAINT DF_tSampleResult_IsCalculated DEFAULT 0 FOR IsCalculated
     ALTER TABLE dbo.tSampleResult ADD CONSTRAINT DF_tSampleResult_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
 
