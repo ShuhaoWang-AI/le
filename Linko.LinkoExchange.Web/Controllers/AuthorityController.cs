@@ -2245,7 +2245,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return SaveReportPackageTemplateDetails(model:model);
         }
         
-        [Route(template:"ReportPackageTemplate/Details")]
+        [Route(template:"ReportPackageTemplate/{id:int}/Details")]
         public ActionResult ReportPackageTemplateDetails(int? id)
         {
            
@@ -2268,7 +2268,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
-        [Route(template:"ReportPackageTemplate/Details")]
+        [Route(template:"ReportPackageTemplate/{id:int}/Details")]
         public ActionResult ReportPackageTemplateDetails(int? id, ReportPackageTemplateViewModel model)
         {
             return SaveReportPackageTemplateDetails(model:model);

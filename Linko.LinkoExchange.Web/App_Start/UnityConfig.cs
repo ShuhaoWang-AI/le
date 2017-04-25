@@ -15,6 +15,7 @@ using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Jurisdiction;
+using Linko.LinkoExchange.Services.MonitoringPoint;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Parameter;
 using Linko.LinkoExchange.Services.Permission;
@@ -97,6 +98,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IHttpContextService, HttpContextService>();
             container.RegisterType<IInvitationService, InvitationService>();
             container.RegisterType<IJurisdictionService, JurisdictionService>();
+            container.RegisterType<IMonitoringPointService, MonitoringPointService>();
             container.RegisterType<IOrganizationService, OrganizationService>();
             container.RegisterType<IParameterService, ParameterService>();
             container.RegisterType<IPasswordHasher, PasswordHasher>();

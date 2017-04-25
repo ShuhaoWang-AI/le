@@ -3528,6 +3528,17 @@ BEGIN
     PRINT 'Add records to tMonitoringPoint'
     PRINT '-------------------------------'
     
+  
+	UPDATE dbo.ts_LE_CTSOrganizations
+	   SET LEOrganizationRegulatoryProgramID = orp.OrganizationRegulatoryProgramId
+	   FROM dbo.ts_LE_CTSOrganizations ctsOrg
+	   INNER JOIN dbo.tOrganizationRegulatoryProgram orp on orp.ReferenceNumber like ctsOrg.CTSPermitNo
+  
+	UPDATE dbo.ts_LE_CTSMonitoringPoints
+	   SET LEOrganizationRegulatoryProgramID = ctsOrg.LEOrganizationRegulatoryProgramID
+	   FROM dbo.ts_LE_CTSMonitoringPoints mp
+	   INNER JOIN dbo.ts_LE_CTSOrganizations ctsOrg on ctsOrg.CTSPermitID = mp.CTSPermitID
+	
     INSERT INTO dbo.tMonitoringPoint (Name, Description, OrganizationRegulatoryProgramId)
 		SELECT CTSMonPointAbbrv
             , CTSMonPointDesc

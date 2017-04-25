@@ -632,6 +632,7 @@ namespace Linko.LinkoExchange.Services.Sample
         /// Helper method to map a passed in Sample object to a Sample Dto.
         /// </summary>
         /// <param name="sample"></param>
+        /// <param name="isIncludeChildObjects"></param>
         /// <returns></returns>
         private SampleDto GetSampleDetails(Core.Domain.Sample sample, bool isIncludeChildObjects = true)
         {
@@ -705,7 +706,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         }
                         else
                         {
-                            //There may be a corresponding concentation (or mass) result
+                            //There may be a corresponding concentration (or mass) result
                             //later in the collection that needs to be attached to this result dto
                             //so we need to save this for looking up later. 
                             resultDtoList.Add(sampleResult.ParameterId, resultDto);
@@ -738,8 +739,6 @@ namespace Linko.LinkoExchange.Services.Sample
                             resultDto.MassLoadingUnitId = sampleResult.UnitId;
                             resultDto.MassLoadingUnitName = sampleResult.UnitName;
                         }
-
-
                     }
                     else
                     {
@@ -747,7 +746,6 @@ namespace Linko.LinkoExchange.Services.Sample
                         //  will be ignored until we change the code..." - mj
 
                     }
-
                 }
             }
 

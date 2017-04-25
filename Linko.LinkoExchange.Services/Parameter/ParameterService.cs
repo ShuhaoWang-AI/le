@@ -204,7 +204,7 @@ namespace Linko.LinkoExchange.Services.Parameter
             //Check MonitoringPointParameter table
             var foundMonitoringPointParameter = _dbContext.MonitoringPointParameters
                 .Include(mppl => mppl.DefaultUnit)
-                .FirstOrDefault(mppl => mppl.OrganizationRegulatoryProgramId == orgRegProgramId
+                .FirstOrDefault(mppl => mppl.OrganizationRegulatoryProgramId == orgRegProgramId  //TODO: should be industry OrganizationRegulatoryProgramId not Authority
                     && mppl.MonitoringPointId == monitoringPointId
                     && mppl.ParameterId == parameterId
                     && mppl.EffectiveDateTimeUtc <= sampleEndDateTimeUtc

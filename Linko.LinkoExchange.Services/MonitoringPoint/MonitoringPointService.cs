@@ -45,10 +45,10 @@ namespace Linko.LinkoExchange.Services.MonitoringPoint
         public IEnumerable<MonitoringPointDto> GetMonitoringPoints()
         {
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
+
             var monPointDtos = new List<MonitoringPointDto>();
             var foundMonPoints = _dbContext.MonitoringPoints
-                                           .Where(mp => mp.OrganizationRegulatoryProgramId == authOrgRegProgramId
+                                           .Where(mp => mp.OrganizationRegulatoryProgramId == currentOrgRegProgramId
                                                         && mp.IsEnabled == true && mp.IsRemoved == false)
                                            .ToList();
 
@@ -84,7 +84,7 @@ namespace Linko.LinkoExchange.Services.MonitoringPoint
                 .Single(mp => mp.MonitoringPointId == monitoringPointId);
 
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
-            var dto = _mapHelper.GetMonitoringPointDtoFromMonitoringPoint(foundMonPoint);
+            var dto = _mapHelper.GetMonitoringPointDtoFromMonitoringPoint(foundMonPoint); // TODO: if null what will happen to following code?
 
             //Set LastModificationDateTimeLocal
             dto.LastModificationDateTimeLocal = _timeZoneService

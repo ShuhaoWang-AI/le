@@ -14,6 +14,7 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.MonitoringPoint;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.QuestionAnswer;
@@ -48,6 +49,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IHttpContextService _httpContextService;
         private readonly IInvitationService _invitationService;
         private readonly ILogger _logger;
+        private readonly IMonitoringPointService _monitoringPointService;
         private readonly IOrganizationService _organizationService;
         private readonly IPermissionService _permissionService;
         private readonly IQuestionAnswerService _questionAnswerService;
@@ -59,7 +61,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public IndustryController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService, IQuestionAnswerService questionAnswerService,
                                   IPermissionService permissionService, ISessionCache sessionCache, ILogger logger, IHttpContextService httpContextService, IFileStoreService fileStoreService,
-                                  IReportElementService reportElementService, ISampleService sampleService, IUnitService unitService)
+                                  IReportElementService reportElementService, ISampleService sampleService, IUnitService unitService, IMonitoringPointService monitoringPointService)
         {
             _organizationService = organizationService;
             _userService = userService;
@@ -73,6 +75,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _reportElementService = reportElementService;
             _sampleService = sampleService;
             _unitService = unitService;
+            _monitoringPointService = monitoringPointService;
         }
 
         #endregion
@@ -994,6 +997,41 @@ namespace Linko.LinkoExchange.Web.Controllers
                                      message = MvcValidationExtensions.GetViolationMessages(ruleViolationException:rve)
                                  });
             }
+        }
+
+        #endregion
+
+        #region Show Sample
+
+        [Route(template:"Sample/New/Step1")]
+        public ActionResult NewSampleDetailsStep1()
+        {
+            var monitoringPoints = _monitoringPointService.GetMonitoringPoints().Select(vm => new MonitoringPointViewModel
+                                                                                              {
+                                                                                                  Id = vm.MonitoringPointId,
+                                                                                                  Name = vm.Name,
+                                                                                                  Description = vm.Description
+                                                                                              }).ToList();
+
+            return View(model:monitoringPoints);
+        }
+        
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"Sample/New/Step1")]
+        public ActionResult NewSampleDetailsStep1(int monitoringPointId, DateTime startDateTime, DateTime endDateTime)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ActionResult NewSampleDetailStep2()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ActionResult SampleDetails(int? id)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
