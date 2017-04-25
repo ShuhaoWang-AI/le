@@ -269,8 +269,9 @@ namespace Linko.LinkoExchange.Services.Report
 
             // SampleResults part 
             dataXmlObj.Samples = new List<SampleNode>();
-            foreach (var sampleDto in reportPackageDto.SamplesDtos)
+            foreach (var sampleAssociation in reportPackageDto.AssociatedSamples)
             {
+                var sampleDto = sampleAssociation.Sample;
                 var sampleNode = new SampleNode
                 {
                     SampleName = sampleDto.Name,
@@ -501,6 +502,8 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
         public void DeleteReportPackage(int reportPackageId)
         {
+            _logger.Info($"Enter ReportPackageService.DeleteReportPackage. reportPackageId={reportPackageId}");
+
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try
@@ -559,6 +562,8 @@ namespace Linko.LinkoExchange.Services.Report
 
             }
 
+            _logger.Info($"Leave ReportPackageService.DeleteReportPackage. reportPackageId={reportPackageId}");
+
         }
 
         /// <summary>
@@ -571,6 +576,8 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns>The newly created tReportPackage.ReportPackageId</returns>
         public int CreateDraft(int reportPackageTemplateId, DateTime startDateTimeLocal, DateTime endDateTimeLocal)
         {
+            _logger.Info($"Enter ReportPackageService.CreateDraft. reportPackageTemplateId={reportPackageTemplateId}, startDateTimeLocal={startDateTimeLocal}, endDateTimeLocal={endDateTimeLocal}");
+
             var newReportPackageId = -1;
 
             using (var transaction = _dbContext.BeginTransaction())
@@ -680,6 +687,8 @@ namespace Linko.LinkoExchange.Services.Report
 
             }
 
+            _logger.Info($"Leave ReportPackageService.CreateDraft. newReportPackageId={newReportPackageId}, reportPackageTemplateId={reportPackageTemplateId}, startDateTimeLocal={startDateTimeLocal}, endDateTimeLocal={endDateTimeLocal}");
+
             return newReportPackageId;
         }
 
@@ -697,14 +706,74 @@ namespace Linko.LinkoExchange.Services.Report
                 throw new Exception("ERROR: Cannot call 'SaveReportPackage' without setting reportPackageDto.ReportPackageId.");
             }
 
+            _logger.Info($"Enter ReportPackageService.SaveReportPackage. reportPackageDto.ReportPackageId={reportPackageDto.ReportPackageId}");
+
             var reportPackage = _dbContext.ReportPackages
+                .Include(rp => rp.ReportPackageElementCategories)
+                .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportElementCategory))
+                .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes))
+                .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes.Select(rt => rt.ReportSamples)))
+                .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes.Select(rt => rt.ReportFiles)))
                 .Single(rp => rp.ReportPackageId == reportPackageDto.ReportPackageId);
 
             //
             //TO-DO: Add/remove report package elements (samples and files)
             //
 
+            //Samples
+
+            //Find entry in tReportPackageElementType for this reportPackage associated with Samples category
+            var sampleReportPackageElementCategory = reportPackage.ReportPackageElementCategories
+                .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.SamplesAndResults.ToString());
+
+            if (sampleReportPackageElementCategory == null)
+            {
+                //throw Exception
+            }
+
+
+            //Handle deletions first
+            // - Iterate through all SampleAndResult rows in ReportSample and delete ones that cannot be matched with an item in reportPackageDto.AssociatedSamples
+            foreach (var existingSampleReportPackageElementType in sampleReportPackageElementCategory.ReportPackageElementTypes)
+            {
+                foreach (var reportSampleAssociated in existingSampleReportPackageElementType.ReportSamples)
+                {
+                    //Find match in dto samples
+                    var matchedSampleAssociation = reportPackageDto.AssociatedSamples
+                    .SingleOrDefault(sa => sa.ReportPackageElementTypeId == reportSampleAssociated.ReportPackageElementTypeId
+                        && sa.SampleId == reportSampleAssociated.SampleId);
+
+                    if (matchedSampleAssociation == null)
+                    {
+                        //existing association must have been deleted -- remove
+                        _dbContext.ReportSamples.Remove(reportSampleAssociated);
+                    }
+                }
+            }
+
+            //Now handle additions
+            // - Iteration through all requested sample associations (in dto) and add ones that do not already exist
+            foreach (var requestedSampleAssociations in reportPackageDto.AssociatedSamples)
+            {
+                var foundReportSample = _dbContext.ReportSamples
+                    .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedSampleAssociations.ReportPackageElementTypeId
+                        && rs.SampleId == requestedSampleAssociations.SampleId);
+
+                if (foundReportSample == null)
+                {
+                    //Need to add association
+                    _dbContext.ReportSamples.Add(new ReportSample()
+                    {
+                        SampleId = requestedSampleAssociations.SampleId,
+                        ReportPackageElementTypeId = requestedSampleAssociations.ReportPackageElementTypeId
+                    });
+                }
+
+            }
+
             _dbContext.SaveChanges();
+
+            _logger.Info($"Leave ReportPackageService.SaveReportPackage. reportPackageDto.ReportPackageId={reportPackageDto.ReportPackageId}");
 
             return reportPackage.ReportPackageId;
         }
@@ -716,6 +785,8 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportStatus">Intended target state</param>
         public void UpdateStatus(int reportPackageId, ReportStatusName reportStatus)
         {
+            _logger.Info($"Enter ReportPackageService.UpdateStatus. reportPackageId={reportPackageId}, reportStatus={reportStatus}");
+
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try
@@ -780,6 +851,8 @@ namespace Linko.LinkoExchange.Services.Report
                 }
 
             }
+
+            _logger.Info($"Leave ReportPackageService.UpdateStatus. reportPackageId={reportPackageId}, reportStatus={reportStatus}");
         }
         private string EmtpyStringIfNull(string value)
         {

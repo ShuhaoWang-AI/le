@@ -1,6 +1,6 @@
 ﻿namespace Linko.LinkoExchange.Services.Dto
 {
-    public class ReportPackageELementTypeDto
+    public class ReportPackageElementTypeDto
     {
         public int ReportPackageELementTypeId { get; set; }
         public string ReportElementTypeName { get; set; }

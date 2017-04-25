@@ -462,10 +462,21 @@ namespace Linko.LinkoExchange.Test
                 Comments = "Test comments",
 
                 AttachmentDtos = GetMockAttachmentFiles(),
-                SamplesDtos = GetMockSampleDtos(),
+                AssociatedSamples = GetMockReportSamples(GetMockSampleDtos()),
                 CertificationDtos = GetMockCertifications(),
             };
 
+        }
+
+        private List<ReportSampleDto> GetMockReportSamples(List<SampleDto> mockSampleDtos)
+        {
+            var reportSampleDtoList = new List<ReportSampleDto>();
+            foreach (var mockSampleDto in mockSampleDtos)
+            {
+                reportSampleDtoList.Add(new ReportSampleDto() { SampleId = mockSampleDto.SampleId.Value, Sample = mockSampleDto, ReportPackageElementTypeId = 1 });
+            }
+
+            return reportSampleDtoList;
         }
 
         private List<SampleDto> GetMockSampleDtos()
@@ -687,16 +698,16 @@ namespace Linko.LinkoExchange.Test
             return fileStoreDtos;
         }
 
-        private List<ReportPackageELementTypeDto> GetMockCertifications()
+        private List<ReportPackageElementTypeDto> GetMockCertifications()
         {
-            var reportPackageELementTypeDtos = new List<ReportPackageELementTypeDto>();
+            var reportPackageELementTypeDtos = new List<ReportPackageElementTypeDto>();
             var fileFolder = $"./testFile/certifications";
 
             var filesDirectory = new DirectoryInfo(fileFolder);
             var files = filesDirectory.EnumerateFiles();
             foreach (var file in files)
             {
-                var rptetdto = new ReportPackageELementTypeDto
+                var rptetdto = new ReportPackageElementTypeDto
                 {
                     ReportElementTypeContent = File.ReadAllText(file.FullName, Encoding.UTF8),
                     ReportElementTypeName = Path.GetFileNameWithoutExtension(file.Name)

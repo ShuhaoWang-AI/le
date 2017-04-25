@@ -910,8 +910,11 @@ namespace Linko.LinkoExchange.Services.Sample
 
         public IEnumerable<CollectionMethodDto> GetCollectionMethods()
         {
-            var collectionMethodList = new List<CollectionMethodDto>();
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+            _logger.Info($"Enter SampleService.GetCollectionMethods. currentOrgRegProgramId={currentOrgRegProgramId}");
+
+            var collectionMethodList = new List<CollectionMethodDto>();
             var authOrganizationId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationId;
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
 
@@ -924,6 +927,8 @@ namespace Linko.LinkoExchange.Services.Sample
             {
                 collectionMethodList.Add(new Dto.CollectionMethodDto() { CollectionMethodId = cm.CollectionMethodId, Name = cm.Name });
             }
+
+            _logger.Info($"Leave SampleService.GetCollectionMethods. currentOrgRegProgramId={currentOrgRegProgramId}");
 
             return collectionMethodList;
         }

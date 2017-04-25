@@ -1069,6 +1069,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             if (rpt == null) return null;
             return new ReportPackageDto
             {
+                ReportPackageId = rpt.ReportPackageId,
                 Name = rpt.Name,
                 PeriodStartDateTimeLocal = rpt.PeriodStartDateTimeUtc.DateTime,
                 PeriodEndDateTimeLocal = rpt.PeriodEndDateTimeUtc.DateTime,

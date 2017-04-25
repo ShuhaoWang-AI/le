@@ -96,6 +96,19 @@ namespace Linko.LinkoExchange.Test
             var newId = _reportPackageService.CreateDraft(templateId, startDateTimeLocal, endDateTimeLocal);
         }
 
-     
+        [TestMethod]
+        public void SaveReportPackage()
+        {
+            //Fetch existing
+            var existingReportPackage = _reportPackageService.GetReportPackage(2, false);
+
+            //Add sample association
+            existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
+            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 35, ReportPackageElementTypeId = 1 });
+
+            var existingId = _reportPackageService.SaveReportPackage(existingReportPackage);
+        }
+
+
     }
 }

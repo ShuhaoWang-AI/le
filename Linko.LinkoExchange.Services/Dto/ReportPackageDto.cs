@@ -42,7 +42,8 @@ namespace Linko.LinkoExchange.Services.Dto
         public string Comments { get; set; }
         public DateTime CreationDateTimeLocal { get; internal set; }
         public List<FileStoreDto> AttachmentDtos { get; set; }
-        public List<SampleDto> SamplesDtos { get; set; }
-        public List<ReportPackageELementTypeDto> CertificationDtos { get; set; }
+        public List<ReportSampleDto> AssociatedSamples { get; set; }
+        public List<ReportPackageElementTypeDto> CertificationDtos { get; set; }
+
     }
 }
