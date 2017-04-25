@@ -481,8 +481,7 @@ namespace Linko.LinkoExchange.Test
                                          MassLoadingQualifier = "<",
                                          MassLoadingValue = "220.0",
                                          MassLoadingUnitId = 1,
-                                         MassLoadingUnitName = "%",
-                                         LimitBasisName = LimitBasisName.Concentration
+                                         MassLoadingUnitName = "%"
                                     },
 
                                     new SampleResultDto
@@ -506,8 +505,7 @@ namespace Linko.LinkoExchange.Test
                                          MassLoadingQualifier = ">",
                                          MassLoadingValue = "20.9",
                                          MassLoadingUnitId = 1,
-                                         MassLoadingUnitName = "F",
-                                         LimitBasisName = LimitBasisName.MassLoading
+                                         MassLoadingUnitName = "F"
                                     },
                                 },
 
@@ -575,8 +573,7 @@ namespace Linko.LinkoExchange.Test
                                          MassLoadingQualifier = "<",
                                          MassLoadingValue = "220.0",
                                          MassLoadingUnitId = 1,
-                                         MassLoadingUnitName = "%",
-                                         LimitBasisName = LimitBasisName.Concentration
+                                         MassLoadingUnitName = "%"
                                     },
 
                                     new SampleResultDto
@@ -600,8 +597,7 @@ namespace Linko.LinkoExchange.Test
                                          MassLoadingQualifier = ">",
                                          MassLoadingValue = "20.9",
                                          MassLoadingUnitId = 1,
-                                         MassLoadingUnitName = "F",
-                                         LimitBasisName = LimitBasisName.MassLoading
+                                         MassLoadingUnitName = "F"
                                     },
                                 },
 

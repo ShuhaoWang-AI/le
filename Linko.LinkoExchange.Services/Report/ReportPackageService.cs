@@ -305,7 +305,7 @@ namespace Linko.LinkoExchange.Services.Report
                         AnalysisDateTimUtc = sampleResultDto.AnalysisDateTimeLocal.ToString(),
                         IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
 
-                        LimitBasis = sampleResultDto.LimitBasisName.ToString()
+                        LimitBasis = LimitBasisName.Concentration.ToString()
                     };
 
                     dataXmlObj.SampleResults.Add(sampleResultNode);
