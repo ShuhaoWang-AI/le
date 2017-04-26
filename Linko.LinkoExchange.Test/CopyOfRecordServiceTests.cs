@@ -23,6 +23,7 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Services.Sample;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -50,6 +51,7 @@ namespace Linko.LinkoExchange.Test
         private Mock<IQuestionAnswerService> _questionAnswerServices = new Mock<IQuestionAnswerService>();
         private MapHelper _mapHeper = new MapHelper();
         private Mock<ICromerrAuditLogService> _crommerAuditLogService = new Mock<ICromerrAuditLogService>();
+        private Mock<ISampleService> _sampleService = new Mock<ISampleService>();
 
         [TestInitialize]
         public void Init()
@@ -117,6 +119,7 @@ namespace Linko.LinkoExchange.Test
                   emailService.Object,
                   _settService,
                   _orgService.Object,
+                  _sampleService.Object,
                   _mapHeper);
 
             var reportPackageId = 527466233;
@@ -142,6 +145,7 @@ namespace Linko.LinkoExchange.Test
                   emailService.Object,
                   _settService,
                   _orgService.Object,
+                  _sampleService.Object,
                   _mapHeper);
 
             var reportPackageId = 527466233;
@@ -170,6 +174,7 @@ namespace Linko.LinkoExchange.Test
                   emailService.Object,
                   _settService,
                   _orgService.Object,
+                  _sampleService.Object,
                   _mapHeper);
 
             var reportPackageId = 527466233;
@@ -202,6 +207,7 @@ namespace Linko.LinkoExchange.Test
                   emailService.Object,
                   _settService,
                   _orgService.Object,
+                  _sampleService.Object,
                   _mapHeper);
 
             var reportPackageId = 527466233;
@@ -236,6 +242,7 @@ namespace Linko.LinkoExchange.Test
                   emailService.Object,
                   _settService,
                   _orgService.Object,
+                  _sampleService.Object,
                   _mapHeper);
 
             var reportPackageId = 527466233;
@@ -268,6 +275,7 @@ namespace Linko.LinkoExchange.Test
                   emailService.Object,
                   _settService,
                   _orgService.Object,
+                  _sampleService.Object,
                   _mapHeper);
 
             var reportPackageId = 527466233;
@@ -299,6 +307,7 @@ namespace Linko.LinkoExchange.Test
                   emailService.Object,
                   _settService,
                   _orgService.Object,
+                  _sampleService.Object,
                   _mapHeper);
 
             var reportPackageId = 527466233;
@@ -334,6 +343,7 @@ namespace Linko.LinkoExchange.Test
                   emailService.Object,
                   _settService,
                   _orgService.Object,
+                  _sampleService.Object,
                   _mapHeper);
 
             var xmlDate = reportPackageService.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
@@ -365,6 +375,7 @@ namespace Linko.LinkoExchange.Test
                   emailService.Object,
                   _settService,
                   _orgService.Object,
+                  _sampleService.Object,
                   _mapHeper);
 
             var xmlFileData = reportPackageService.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);

@@ -22,6 +22,7 @@ using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Report.DataXML;
 using FileInfo = Linko.LinkoExchange.Services.Report.DataXML.FileInfo;
 using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Sample;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -39,6 +40,7 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly IEmailService _emailService;
         private readonly ISettingService _settingService;
         private readonly IOrganizationService _orgService;
+        private readonly ISampleService _sampleService;
         private readonly IMapHelper _mapHelper;
 
         public ReportPackageService(
@@ -52,6 +54,7 @@ namespace Linko.LinkoExchange.Services.Report
             IEmailService emailService,
             ISettingService settingService,
             IOrganizationService orgService,
+            ISampleService sampleService,
             IMapHelper mapHelper
             )
         {
@@ -65,6 +68,7 @@ namespace Linko.LinkoExchange.Services.Report
             _emailService = emailService;
             _settingService = settingService;
             _orgService = orgService;
+            _sampleService = sampleService;
             _mapHelper = mapHelper;
         }
 
@@ -428,7 +432,7 @@ namespace Linko.LinkoExchange.Services.Report
                     };
                     if (isIncludeAssociatedElementData)
                     {
-                        reportSampleDto.Sample = _mapHelper.GetSampleDtoFromSample(_dbContext.Samples.Single(s => s.SampleId == reportSampleAssociated.SampleId));
+                        reportSampleDto.Sample = _sampleService.GetSampleDetails(reportSampleAssociated.SampleId);
                     }
                     reportPackagegDto.AssociatedSamples.Add(reportSampleDto);
                     

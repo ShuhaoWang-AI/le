@@ -12,6 +12,7 @@ using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.User;
 using NLog;
 using Linko.LinkoExchange.Services.TimeZone;
+using Linko.LinkoExchange.Services.Organization;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -23,6 +24,7 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly ILogger _logger;
         private readonly UserService _userService;
         private readonly ITimeZoneService _timeZoneService;
+        private readonly IOrganizationService _orgService;
         private List<ReportPackageTemplateElementCategory> _reportPackageTemplateElementCategories;
         private List<ReportPackageTemplateElementType> _reportPackageTemplateElementTypes;
 
@@ -32,7 +34,8 @@ namespace Linko.LinkoExchange.Services.Report
             UserService userService,
             IMapHelper mapHelper,
             ILogger logger,
-            ITimeZoneService timeZoneService)
+            ITimeZoneService timeZoneService,
+            IOrganizationService orgService)
         {
             _dbContext = dbContext;
             _httpContextService = httpContextService;
@@ -40,6 +43,7 @@ namespace Linko.LinkoExchange.Services.Report
             _logger = logger;
             _userService = userService;
             _timeZoneService = timeZoneService;
+            _orgService = orgService;
         }
 
         /// <summary>
@@ -349,12 +353,13 @@ namespace Linko.LinkoExchange.Services.Report
         public IEnumerable<CtsEventTypeDto> GetCtsEventTypes(bool isForSample)
         {
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var ctsEventTypes =
                 _dbContext.CtsEventTypes.Where(
                     i =>
                         i.IsEnabled && i.IsRemoved == false &&
-                        ((i.CtsEventCategoryName == "Sample") == isForSample) &&
-                        i.OrganizationRegulatoryProgramId == currentOrgRegProgramId).ToList();
+                        ((i.CtsEventCategoryName.ToLower() == "sample") == isForSample) &&
+                        i.OrganizationRegulatoryProgramId == authOrgRegProgramId).ToList();
 
             return ctsEventTypes.Select(i => _mapHelper.GetCtsEventTypeDtoFromEventType(i));
         }

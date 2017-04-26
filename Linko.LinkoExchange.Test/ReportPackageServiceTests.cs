@@ -18,6 +18,9 @@ using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.CopyOfRecord;
+using Linko.LinkoExchange.Services.Sample;
+using Linko.LinkoExchange.Services.Unit;
+using Linko.LinkoExchange.Services.Config;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -34,6 +37,7 @@ namespace Linko.LinkoExchange.Test
         Mock<IEmailService> _emailService = new Mock<IEmailService>();
         Mock<ISettingService> _settingService = new Mock<ISettingService>();
         Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
+        Mock<ConfigSettingService> _configService = new Mock<ConfigSettingService>();
 
         public ReportPackageServiceTests()
         {
@@ -65,6 +69,9 @@ namespace Linko.LinkoExchange.Test
 
             _timeZoneService.Setup(s => s.GetUTCDateTimeUsingThisTimeZoneId(It.IsAny<DateTime>(), It.IsAny<int>())).Returns(DateTimeOffset.UtcNow);
 
+            var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, _configService.Object, actualSettingService);
+            var actualSampleService = new SampleService(connection, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService);
+
             _reportPackageService = new ReportPackageService(
                 _programService.Object,
                 _copyOfRecordService.Object,
@@ -76,6 +83,7 @@ namespace Linko.LinkoExchange.Test
                 _emailService.Object,
                 actualSettingService,
                 _orgService.Object,
+                actualSampleService,
                 new MapHelper()
             );
         }
@@ -94,6 +102,20 @@ namespace Linko.LinkoExchange.Test
             var startDateTimeLocal = new DateTime(2017, 4, 20);
             var endDateTimeLocal = new DateTime(2017, 4, 22);
             var newId = _reportPackageService.CreateDraft(templateId, startDateTimeLocal, endDateTimeLocal);
+        }
+
+        [TestMethod]
+        public void GetReportPackage()
+        {
+            //Fetch existing
+            var existingReportPackage = _reportPackageService.GetReportPackage(6, false);
+        }
+
+        [TestMethod]
+        public void GetReportPackage_With_Associated_Element_Children()
+        {
+            //Fetch existing
+            var existingReportPackage = _reportPackageService.GetReportPackage(6, true);
         }
 
         [TestMethod]
