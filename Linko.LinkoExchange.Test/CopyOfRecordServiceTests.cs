@@ -343,11 +343,6 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Create_Cor_success_using_mock_reportPackageDto()
         {
-            var t = DateTime.UtcNow;
-
-            var ti = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-
-
             //set 
             var rnd = new Random();
             int rptId = rnd.Next(int.MaxValue);
@@ -391,7 +386,9 @@ namespace Linko.LinkoExchange.Test
                 ReportPackageId = reportPackageId,
                 Name = " 1st Quarter PCR",
                 OrganizationRegulatoryProgramId = 3,
-                SubmissionDateTimeLocal = DateTime.UtcNow
+                PeriodStartDateTimeLocal = DateTimeOffset.UtcNow.DateTime,
+                SubmissionDateTimeOffset = DateTimeOffset.UtcNow,
+                SubmissionDateTimeLocal = DateTimeOffset.UtcNow.DateTime,
             };
         }
 
@@ -454,7 +451,8 @@ namespace Linko.LinkoExchange.Test
 
                 PeriodEndDateTime = DateTimeOffset.UtcNow,
                 PeriodStartDateTime = DateTimeOffset.UtcNow,
-
+                PeriodEndDateTimeLocal = DateTime.UtcNow,
+                PeriodStartDateTimeLocal = DateTime.UtcNow,
                 ReportStatusId = (int)ReportStatusName.ReadyToSubmit,
 
                 OrganizationName = orgRegProgram.Organization.Name,
@@ -554,7 +552,7 @@ namespace Linko.LinkoExchange.Test
                                          MethodDetectionLimit = 9.1,
                                          AnalysisMethod = "test-analysis method",
 
-                                         AnalysisDateTimeLocal = DateTime.Now,
+                                         AnalysisDateTimeLocal =  DateTime.Now,
                                          IsApprovedEPAMethod = false,
                                          LastModifierFullName = "Last modificationfull-name",
                                          IsCalcMassLoading = true,
@@ -707,6 +705,7 @@ namespace Linko.LinkoExchange.Test
                     OriginalFileName = file.Name,
                     ReportElementTypeName = "Lab Analysis Report",
                     FileType = "Lab Analysis Report",
+                    FileStoreId = 5
                 };
                 fileStoreDtos.Add(fileStoreDto);
             }
