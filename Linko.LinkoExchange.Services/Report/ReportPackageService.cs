@@ -604,8 +604,10 @@ namespace Linko.LinkoExchange.Services.Report
 
                     var newReportPackage = _mapHelper.GetReportPackageFromReportPackageTemplate(reportPackageTemplate);
 
-                    newReportPackage.PeriodStartDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(startDateTimeLocal, timeZoneId);
-                    newReportPackage.PeriodEndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(endDateTimeLocal, timeZoneId);
+                    var startDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(startDateTimeLocal, timeZoneId);
+                    var endDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(endDateTimeLocal, timeZoneId);
+                    newReportPackage.PeriodStartDateTimeUtc = startDateTimeUtc;
+                    newReportPackage.PeriodEndDateTimeUtc = endDateTimeUtc;
                     newReportPackage.ReportStatusId = _dbContext.ReportStatuses
                         .Single(rs => rs.Name == ReportStatusName.Draft.ToString()).ReportStatusId;
                     newReportPackage.CreationDateTimeUtc = DateTime.UtcNow;
@@ -635,7 +637,8 @@ namespace Linko.LinkoExchange.Services.Report
                         var newReportPackageElementCategory = new ReportPackageElementCategory()
                         {
                             ReportElementCategoryId = rptec.ReportElementCategoryId,
-                            SortOrder = rptec.SortOrder
+                            SortOrder = rptec.SortOrder,
+                            ReportPackageElementTypes = new List<ReportPackageElementType>()
                         };
                         newReportPackage.ReportPackageElementCategories.Add(newReportPackageElementCategory); //handles setting ReportPackageId
 
@@ -646,23 +649,70 @@ namespace Linko.LinkoExchange.Services.Report
                                 .Single(ret => ret.ReportElementTypeId == rptet.ReportElementTypeId);
 
                             //Create a row in tReportPackageElementType
-                            var newReportPackageElementType = new ReportPackageElementType()
+                            var newReportPackageElementType = new ReportPackageElementType();
+                            newReportPackageElementType.ReportElementTypeId = rptet.ReportElementTypeId;
+                            newReportPackageElementType.ReportElementTypeName = reportElementType.Name;
+                            newReportPackageElementType.ReportElementTypeContent = reportElementType.Content;
+                            newReportPackageElementType.ReportElementTypeIsContentProvided = reportElementType.IsContentProvided;
+                            
+                            if (reportElementType.CtsEventType != null)
                             {
-                                ReportElementTypeId = rptet.ReportElementTypeId,
-                                ReportElementTypeName = reportElementType.Name,
-                                ReportElementTypeContent = reportElementType.Content,
-                                ReportElementTypeIsContentProvided = reportElementType.IsContentProvided,
-                                CtsEventTypeId = reportElementType.CtsEventTypeId,
-                                CtsEventTypeName = reportElementType.CtsEventType.Name,
-                                CtsEventCategoryName = reportElementType.CtsEventType.CtsEventCategoryName,
-                                IsRequired = rptet.IsRequired,
-                                SortOrder = rptet.SortOrder
-                            };
-                            newReportPackageElementType.ReportPackageElementCategory = newReportPackageElementCategory; //handles setting ReportPackageElementCategoryId
+                                newReportPackageElementType.CtsEventTypeId = reportElementType.CtsEventType.CtsEventTypeId;
+                                newReportPackageElementType.CtsEventTypeName = reportElementType.CtsEventType.Name;
+                                newReportPackageElementType.CtsEventCategoryName = reportElementType.CtsEventType.CtsEventCategoryName;
+                            }
+                            
+                            newReportPackageElementType.IsRequired = rptet.IsRequired;
+                            newReportPackageElementType.SortOrder = rptet.SortOrder;
+                            newReportPackageElementType.ReportPackageElementCategory = newReportPackageElementCategory; 
+                            //handles setting ReportPackageElementCategoryId
+                            newReportPackageElementCategory.ReportPackageElementTypes.Add(newReportPackageElementType);
                         }
                     }
 
                     _dbContext.ReportPackages.Add(newReportPackage);
+
+                    //Associate all existing and eligible samples to this draft
+                    //
+                    //From UC-16.4: "System pulls all samples in status "Ready to Report" with 
+                    //Sample Start date or Sample End Date on or between report period into Draft"
+                    //
+
+                    var existingEligibleSamples = _dbContext.Samples
+                        .Where(s => s.ForOrganizationRegulatoryProgramId == currentOrgRegProgramId
+                            && s.IsReadyToReport
+                            && ((s.StartDateTimeUtc <= endDateTimeUtc && s.StartDateTimeUtc >= startDateTimeUtc) ||
+                                (s.EndDateTimeUtc <= endDateTimeUtc && s.EndDateTimeUtc >= startDateTimeUtc)));
+
+                    _dbContext.SaveChanges(); //Need to do this to get new Id for samplesAndResultsReportPackageElementCategory
+
+                    var samplesAndResultsReportPackageElementCategory = _dbContext.ReportPackageElementCategories
+                        .Include(rpec => rpec.ReportElementCategory)
+                        .Include(rpec => rpec.ReportPackageElementTypes)
+                        .SingleOrDefault(rpec => rpec.ReportPackageId == newReportPackage.ReportPackageId
+                            && rpec.ReportElementCategory.Name == ReportElementCategoryName.SamplesAndResults.ToString());
+
+                    if (samplesAndResultsReportPackageElementCategory == null)
+                    {
+                        //throw Exception
+                    }
+
+                    var samplesAndResultsReportPackageElementType = samplesAndResultsReportPackageElementCategory.ReportPackageElementTypes.FirstOrDefault();
+                    //Should be 1 and only 1 Report Package Element Type for Sample and Results 
+                    //(but may be more than 1 in the future -- if so, which one is used to add samples??)
+                    if (samplesAndResultsReportPackageElementType == null)
+                    {
+                        //throw Exception
+                    }
+
+                    foreach (var sample in existingEligibleSamples)
+                    {
+                        var reportSampleAssociation = new ReportSample();
+                        reportSampleAssociation.ReportPackageElementTypeId = samplesAndResultsReportPackageElementType.ReportPackageElementTypeId;
+                        reportSampleAssociation.SampleId = sample.SampleId;
+                        _dbContext.ReportSamples.Add(reportSampleAssociation);
+                    }
+
                     _dbContext.SaveChanges();
                     transaction.Commit();
 

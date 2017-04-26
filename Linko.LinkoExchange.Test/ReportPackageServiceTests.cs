@@ -48,8 +48,8 @@ namespace Linko.LinkoExchange.Test
             _orgService = new Mock<IOrganizationService>();
             _logger = new Mock<ILogger>();
             _timeZoneService = new Mock<ITimeZoneService>();
-            var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper()), new MapHelper());
-
+            var actualSettingService = new SettingService(connection, _logger.Object, new MapHelper());
+            var actualTimeZoneService = new TimeZoneService(connection, actualSettingService, new MapHelper());
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
 
             var authorityOrgRegProgramDto = new OrganizationRegulatoryProgramDto();
@@ -68,13 +68,13 @@ namespace Linko.LinkoExchange.Test
             _reportPackageService = new ReportPackageService(
                 _programService.Object,
                 _copyOfRecordService.Object,
-                _timeZoneService.Object,
+                actualTimeZoneService,
                 _logger.Object,
                 connection,
                 _httpContext.Object,
                 _userService.Object,
                 _emailService.Object,
-                _settingService.Object,
+                actualSettingService,
                 _orgService.Object,
                 new MapHelper()
             );
@@ -83,7 +83,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void DeleteReportPackage()
         {
-            var reportPackageId = 1;
+            var reportPackageId = 2;
             _reportPackageService.DeleteReportPackage(reportPackageId);
         }
 
@@ -91,8 +91,8 @@ namespace Linko.LinkoExchange.Test
         public void CreateDraft()
         {
             var templateId = 1;
-            var startDateTimeLocal = DateTime.Now;
-            var endDateTimeLocal = DateTime.Now;
+            var startDateTimeLocal = new DateTime(2017, 4, 20);
+            var endDateTimeLocal = new DateTime(2017, 4, 22);
             var newId = _reportPackageService.CreateDraft(templateId, startDateTimeLocal, endDateTimeLocal);
         }
 
