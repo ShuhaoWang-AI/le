@@ -97,16 +97,42 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
-        public void SaveReportPackage()
+        public void SaveReportPackage_Add_Samples()
         {
             //Fetch existing
             var existingReportPackage = _reportPackageService.GetReportPackage(2, false);
 
-            //Add sample association
+            //Add sample associations
             existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
             existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 35, ReportPackageElementTypeId = 1 });
 
             var existingId = _reportPackageService.SaveReportPackage(existingReportPackage);
+        }
+
+        [TestMethod]
+        public void SaveReportPackage_Add_Files()
+        {
+            //Fetch existing
+            var existingReportPackage = _reportPackageService.GetReportPackage(2, false);
+
+            //Add sample associations
+            existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
+            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 35, ReportPackageElementTypeId = 1 });
+
+            //Add file associations
+            existingReportPackage.AssociatedFiles = new List<ReportFileDto>();
+            existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 1, ReportPackageElementTypeId = 2 });
+
+            var existingId = _reportPackageService.SaveReportPackage(existingReportPackage);
+        }
+
+
+        [TestMethod]
+        public void UpdateStatus()
+        {
+            //Change status
+            _reportPackageService.UpdateStatus(2, ReportStatusName.Submitted, false);
+
         }
 
 

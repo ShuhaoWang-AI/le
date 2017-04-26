@@ -77,6 +77,8 @@ namespace Linko.LinkoExchange.Services.Report
         /// throw RuleViolationException otherwise
         /// </summary>
         /// <param name="reportStatus">Intended target state</param>
-        void UpdateStatus(int reportPackageId, ReportStatusName reportStatus);
+        /// <param name="isUseTransaction">If true, runs within transaction object</param>
+
+        void UpdateStatus(int reportPackageId, ReportStatusName reportStatus, bool isUseTransaction);
     }
 }

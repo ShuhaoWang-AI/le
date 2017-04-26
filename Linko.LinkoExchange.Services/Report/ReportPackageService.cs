@@ -717,26 +717,31 @@ namespace Linko.LinkoExchange.Services.Report
                 .Single(rp => rp.ReportPackageId == reportPackageDto.ReportPackageId);
 
             //
-            //TO-DO: Add/remove report package elements (samples and files)
+            //Add/remove report package elements 
+            // 1. Samples
+            // 2. Files
             //
 
-            //Samples
+            //SAMPLES
+            //===================
 
             //Find entry in tReportPackageElementType for this reportPackage associated with Samples category
-            var sampleReportPackageElementCategory = reportPackage.ReportPackageElementCategories
+            var samplesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
                 .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.SamplesAndResults.ToString());
 
-            if (sampleReportPackageElementCategory == null)
+            if (samplesReportPackageElementCategory == null)
             {
                 //throw Exception
             }
 
-
             //Handle deletions first
             // - Iterate through all SampleAndResult rows in ReportSample and delete ones that cannot be matched with an item in reportPackageDto.AssociatedSamples
-            foreach (var existingSampleReportPackageElementType in sampleReportPackageElementCategory.ReportPackageElementTypes)
+            foreach (var existingSamplesReportPackageElementType in samplesReportPackageElementCategory.ReportPackageElementTypes)
             {
-                foreach (var reportSampleAssociated in existingSampleReportPackageElementType.ReportSamples)
+                //Should just be one iteration through this loop for the current phase, but in the future
+                //we might have more than one "Sample and Results" section in a Report Package
+
+                foreach (var reportSampleAssociated in existingSamplesReportPackageElementType.ReportSamples)
                 {
                     //Find match in dto samples
                     var matchedSampleAssociation = reportPackageDto.AssociatedSamples
@@ -753,19 +758,70 @@ namespace Linko.LinkoExchange.Services.Report
 
             //Now handle additions
             // - Iteration through all requested sample associations (in dto) and add ones that do not already exist
-            foreach (var requestedSampleAssociations in reportPackageDto.AssociatedSamples)
+            foreach (var requestedSampleAssociation in reportPackageDto.AssociatedSamples)
             {
                 var foundReportSample = _dbContext.ReportSamples
-                    .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedSampleAssociations.ReportPackageElementTypeId
-                        && rs.SampleId == requestedSampleAssociations.SampleId);
+                    .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedSampleAssociation.ReportPackageElementTypeId
+                        && rs.SampleId == requestedSampleAssociation.SampleId);
 
                 if (foundReportSample == null)
                 {
                     //Need to add association
                     _dbContext.ReportSamples.Add(new ReportSample()
                     {
-                        SampleId = requestedSampleAssociations.SampleId,
-                        ReportPackageElementTypeId = requestedSampleAssociations.ReportPackageElementTypeId
+                        SampleId = requestedSampleAssociation.SampleId,
+                        ReportPackageElementTypeId = requestedSampleAssociation.ReportPackageElementTypeId
+                    });
+                }
+
+            }
+
+            //FILES
+            //===================
+
+            //Find entry in tReportPackageElementType for this reportPackage associated with Files category
+            var filesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
+                .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.Attachments.ToString());
+
+            if (filesReportPackageElementCategory == null)
+            {
+                //throw Exception
+            }
+
+            //Handle deletions first
+            // - Iterate through all Attachment rows in ReportFile and delete ones that cannot be matched with an item in reportPackageDto.AssociatedSamples
+            foreach (var existingFilesReportPackageElementType in filesReportPackageElementCategory.ReportPackageElementTypes)
+            {
+                foreach (var reportFileAssociated in existingFilesReportPackageElementType.ReportFiles)
+                {
+                    //Find match in dto files
+                    var matchedFileAssociation = reportPackageDto.AssociatedFiles
+                    .SingleOrDefault(sa => sa.ReportPackageElementTypeId == reportFileAssociated.ReportPackageElementTypeId
+                        && sa.FileStoreId == reportFileAssociated.FileStoreId);
+
+                    if (matchedFileAssociation == null)
+                    {
+                        //existing association must have been deleted -- remove
+                        _dbContext.ReportFiles.Remove(reportFileAssociated);
+                    }
+                }
+            }
+
+            //Now handle additions
+            // - Iteration through all requested file associations (in dto) and add ones that do not already exist
+            foreach (var requestedFileAssociation in reportPackageDto.AssociatedFiles)
+            {
+                var foundReportFile = _dbContext.ReportFiles
+                    .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedFileAssociation.ReportPackageElementTypeId
+                        && rs.FileStoreId == requestedFileAssociation.FileStoreId);
+
+                if (foundReportFile == null)
+                {
+                    //Need to add association
+                    _dbContext.ReportFiles.Add(new ReportFile()
+                    {
+                        FileStoreId = requestedFileAssociation.FileStoreId,
+                        ReportPackageElementTypeId = requestedFileAssociation.ReportPackageElementTypeId
                     });
                 }
 
@@ -783,73 +839,89 @@ namespace Linko.LinkoExchange.Services.Report
         /// throw RuleViolationException otherwise
         /// </summary>
         /// <param name="reportStatus">Intended target state</param>
-        public void UpdateStatus(int reportPackageId, ReportStatusName reportStatus)
+        /// <param name="isUseTransaction">If true, runs within transaction object</param>
+        public void UpdateStatus(int reportPackageId, ReportStatusName reportStatus, bool isUseTransaction)
         {
             _logger.Info($"Enter ReportPackageService.UpdateStatus. reportPackageId={reportPackageId}, reportStatus={reportStatus}");
 
-            using (var transaction = _dbContext.BeginTransaction())
+            DbContextTransaction transaction = null;
+            if (isUseTransaction)
             {
-                try
+                transaction = _dbContext.BeginTransaction();
+            }
+
+            try
+            {
+                var reportPackage = _dbContext.ReportPackages
+                      .Include(rp => rp.ReportStatus)
+                      .Single(rp => rp.ReportPackageId == reportPackageId);
+
+                var previousStatus = reportPackage.ReportStatus.Name;
+
+                if (previousStatus == reportStatus.ToString())
                 {
-                    var reportPackage = _dbContext.ReportPackages
-                       .Include(rp => rp.ReportStatus)
-                       .Single(rp => rp.ReportPackageId == reportPackageId);
-
-                    var previousStatus = reportPackage.ReportStatus.Name;
-
-                    if (previousStatus == reportStatus.ToString())
-                    {
-                        //No transition -- allowed?
-                    }
-                    else if ((previousStatus == ReportStatusName.Draft.ToString() && reportStatus == ReportStatusName.ReadyToSubmit) ||
-                        (previousStatus == ReportStatusName.ReadyToSubmit.ToString() && reportStatus == ReportStatusName.Draft))
-                    {
-                        //allowed
-                    }
-                    else if (previousStatus == ReportStatusName.ReadyToSubmit.ToString() && reportStatus == ReportStatusName.Submitted)
-                    {
-                        //allowed
-                    }
-                    else if (previousStatus == ReportStatusName.Submitted.ToString() && reportStatus == ReportStatusName.Repudiated)
-                    {
-                        //allowed
-                    }
-                    else
-                    {
-                        //not allowed
-                        string message = $"Cannot change a Report Package status from '{previousStatus}' to '{reportStatus}'.";
-                        List<RuleViolation> validationIssues = new List<RuleViolation>();
-                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
-                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
-                    }
-
-                    string targetReportStatusName = reportStatus.ToString();
-                    var targetReportStatusId = _dbContext.ReportStatuses
-                        .Single(rs => rs.Name == targetReportStatusName).ReportStatusId;
-                    reportPackage.ReportStatusId = targetReportStatusId;
-
-                    _dbContext.SaveChanges();
-
-                    transaction.Commit();
-
+                    //No transition -- allowed?
                 }
-                catch (Exception ex)
+                else if ((previousStatus == ReportStatusName.Draft.ToString() && reportStatus == ReportStatusName.ReadyToSubmit) ||
+                    (previousStatus == ReportStatusName.ReadyToSubmit.ToString() && reportStatus == ReportStatusName.Draft))
+                {
+                    //allowed
+                }
+                else if (previousStatus == ReportStatusName.ReadyToSubmit.ToString() && reportStatus == ReportStatusName.Submitted)
+                {
+                    //allowed
+                }
+                else if (previousStatus == ReportStatusName.Submitted.ToString() && reportStatus == ReportStatusName.Repudiated)
+                {
+                    //allowed
+                }
+                else
+                {
+                    //not allowed
+                    string message = $"Cannot change a Report Package status from '{previousStatus}' to '{reportStatus}'.";
+                    List<RuleViolation> validationIssues = new List<RuleViolation>();
+                    validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                    throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                }
+
+                string targetReportStatusName = reportStatus.ToString();
+                var targetReportStatusId = _dbContext.ReportStatuses
+                    .Single(rs => rs.Name == targetReportStatusName).ReportStatusId;
+                reportPackage.ReportStatusId = targetReportStatusId;
+
+                _dbContext.SaveChanges();
+
+                if (isUseTransaction)
+                {
+                    transaction.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                if (isUseTransaction)
                 {
                     transaction.Rollback();
-
-                    var errors = new List<string>() { ex.Message };
-
-                    while (ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                        errors.Add(ex.Message);
-                    }
-
-                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
-
-                    throw;
                 }
 
+                var errors = new List<string>() { ex.Message };
+
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                    errors.Add(ex.Message);
+                }
+
+                _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                throw;
+            }
+            finally
+            {
+                if (isUseTransaction)
+                {
+                    transaction.Dispose();
+                }
+                
             }
 
             _logger.Info($"Leave ReportPackageService.UpdateStatus. reportPackageId={reportPackageId}, reportStatus={reportStatus}");

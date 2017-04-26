@@ -468,7 +468,6 @@ namespace Linko.LinkoExchange.Test
 
         }
 
-        //.AssociatedFiles.Select(af => af.FileStore)
         private List<ReportFileDto> GetMockReportFiles(List<FileStoreDto> mockFileDtos)
         {
             var reportFilesDtoList = new List<ReportFileDto>();
