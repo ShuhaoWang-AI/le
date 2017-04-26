@@ -343,6 +343,11 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Create_Cor_success_using_mock_reportPackageDto()
         {
+            var t = DateTime.UtcNow;
+
+            var ti = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+
+
             //set 
             var rnd = new Random();
             int rptId = rnd.Next(int.MaxValue);

@@ -144,9 +144,7 @@ namespace Linko.LinkoExchange.Services.Report
                     reportPackage.SubmitterIPAddress = submitterIpAddress;
                     reportPackage.SubmitterUserName = submitterUserName;
 
-                    var reportStatus = _dbContext.ReportStatuses.Single(i => i.Name.Equals(ReportStatusName.Submitted.ToString()));
-                    reportPackage.ReportStatusId = reportStatus.ReportStatusId;
-
+                    UpdateStatus(reportPackageId, ReportStatusName.Submitted, false);
                     _dbContext.SaveChanges();
 
                     var reportPackageDto = GetReportPackage(reportPackageId, true);
@@ -165,7 +163,7 @@ namespace Linko.LinkoExchange.Services.Report
                     SendSignAndSubmitEmail(reportPackageDto, copyOfRecordDto);
                     _dbContext.SaveChanges();
                     transaction.Commit();
-                    _logger.Info("Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
+                    _logger.Info("Leave ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
                 }
                 catch (Exception ex)
                 {
@@ -189,6 +187,8 @@ namespace Linko.LinkoExchange.Services.Report
 
         public CopyOfRecordDataXmlFileDto GetReportPackageCopyOfRecordDataXmlFile(ReportPackageDto reportPackageDto)
         {
+            _logger.Info("Enter ReportPackageService.CopyOfRecordDataXmlFileDto. reportPackageId={0}", reportPackageDto.ReportPackageId);
+
             var dataXmlObj = new CopyOfRecordDataXml
             {
                 XmlFileVersion = new XmlFileVersion
@@ -334,9 +334,7 @@ namespace Linko.LinkoExchange.Services.Report
                 }
             }
 
-            // Convert to xml string
             var strWriter = new Utf8StringWriter();
-
             var xmlSerializer = new XmlSerializer(dataXmlObj.GetType());
             xmlSerializer.Serialize(strWriter, dataXmlObj);
             var xmlString = strWriter.ToString();
@@ -346,6 +344,9 @@ namespace Linko.LinkoExchange.Services.Report
                 FileData = Encoding.UTF8.GetBytes(s: xmlString),
                 FileName = "Copy Of Record Data.xml"
             };
+
+            _logger.Info("Leave ReportPackageService.CopyOfRecordDataXmlFileDto. reportPackageId={0}", reportPackageDto.ReportPackageId);
+
             return xmlData;
         }
 
@@ -921,7 +922,7 @@ namespace Linko.LinkoExchange.Services.Report
                 {
                     transaction.Dispose();
                 }
-                
+
             }
 
             _logger.Info($"Leave ReportPackageService.UpdateStatus. reportPackageId={reportPackageId}, reportStatus={reportStatus}");
