@@ -27,8 +27,6 @@ using Linko.LinkoExchange.Services.Config;
 
 namespace Linko.LinkoExchange.Services.Report
 {
-    // TODO: To implement more 
-
     public class ReportPackageService : IReportPackageService
     {
         private readonly IProgramService _programService;
@@ -224,7 +222,7 @@ namespace Linko.LinkoExchange.Services.Report
                 },
                 SubmittedOnBehalfOf = new SubmittedOnBehalfOf
                 {
-                    OrganizationName = reportPackageDto.RecipientOrganizationName,
+                    OrganizationName = reportPackageDto.OrganizationName,
                     ReferenceNumber = reportPackageDto.OrganizationRegulatoryProgramDto.ReferenceNumber,
                     Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
                     Address2 = EmtpyStringIfNull(reportPackageDto.RecipientOrganizationAddressLine2),
@@ -407,7 +405,7 @@ namespace Linko.LinkoExchange.Services.Report
             //
             //ADD SAMPLE ASSOCIATIONS (AND OPTIONALLY SAMPLE DATA)
             //
-            
+
             //Find entry in tReportPackageElementType for this reportPackage associated with Samples category
             var samplesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
                 .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.SamplesAndResults.ToString());
@@ -437,7 +435,7 @@ namespace Linko.LinkoExchange.Services.Report
                         reportSampleDto.Sample = _sampleService.GetSampleDetails(reportSampleAssociated.SampleId);
                     }
                     reportPackagegDto.AssociatedSamples.Add(reportSampleDto);
-                    
+
                 }
             }
 
@@ -745,17 +743,17 @@ namespace Linko.LinkoExchange.Services.Report
                             newReportPackageElementType.ReportElementTypeName = reportElementType.Name;
                             newReportPackageElementType.ReportElementTypeContent = reportElementType.Content;
                             newReportPackageElementType.ReportElementTypeIsContentProvided = reportElementType.IsContentProvided;
-                            
+
                             if (reportElementType.CtsEventType != null)
                             {
                                 newReportPackageElementType.CtsEventTypeId = reportElementType.CtsEventType.CtsEventTypeId;
                                 newReportPackageElementType.CtsEventTypeName = reportElementType.CtsEventType.Name;
                                 newReportPackageElementType.CtsEventCategoryName = reportElementType.CtsEventType.CtsEventCategoryName;
                             }
-                            
+
                             newReportPackageElementType.IsRequired = rptet.IsRequired;
                             newReportPackageElementType.SortOrder = rptet.SortOrder;
-                            newReportPackageElementType.ReportPackageElementCategory = newReportPackageElementCategory; 
+                            newReportPackageElementType.ReportPackageElementCategory = newReportPackageElementCategory;
                             //handles setting ReportPackageElementCategoryId
                             newReportPackageElementCategory.ReportPackageElementTypes.Add(newReportPackageElementType);
                         }
@@ -955,7 +953,7 @@ namespace Linko.LinkoExchange.Services.Report
                         _dbContext.ReportFiles.Remove(existingReportFile);
                     }
                 }
-               
+
             }
 
             //Now handle additions
