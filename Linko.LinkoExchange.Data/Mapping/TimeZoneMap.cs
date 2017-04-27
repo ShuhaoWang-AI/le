@@ -13,6 +13,10 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.Name).IsRequired().HasMaxLength(100);
 
+            Property(x => x.StandardAbbreviation).IsRequired().HasMaxLength(5);
+
+            Property(x => x.DaylightAbbreviation).IsOptional().HasMaxLength(5);
+
             Property(x => x.CreationDateTimeUtc).IsRequired();
 
             Property(x => x.LastModificationDateTimeUtc).IsOptional();

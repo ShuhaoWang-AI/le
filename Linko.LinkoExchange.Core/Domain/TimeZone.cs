@@ -14,6 +14,10 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public string Name { get; set; }
 
+        public string StandardAbbreviation { get; set; }
+
+        public string DaylightAbbreviation { get; set; }
+
         public DateTimeOffset CreationDateTimeUtc { get; set; }
 
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
