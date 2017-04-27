@@ -23,6 +23,7 @@ using Linko.LinkoExchange.Services.Report.DataXML;
 using FileInfo = Linko.LinkoExchange.Services.Report.DataXML.FileInfo;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Sample;
+using Linko.LinkoExchange.Services.Config;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -42,6 +43,7 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly IOrganizationService _orgService;
         private readonly ISampleService _sampleService;
         private readonly IMapHelper _mapHelper;
+        private readonly IConfigSettingService _configService;
 
         public ReportPackageService(
             IProgramService programService,
@@ -55,7 +57,8 @@ namespace Linko.LinkoExchange.Services.Report
             ISettingService settingService,
             IOrganizationService orgService,
             ISampleService sampleService,
-            IMapHelper mapHelper
+            IMapHelper mapHelper,
+            IConfigSettingService configService
             )
         {
             _programService = programService;
@@ -70,6 +73,7 @@ namespace Linko.LinkoExchange.Services.Report
             _orgService = orgService;
             _sampleService = sampleService;
             _mapHelper = mapHelper;
+            _configService = configService;
         }
 
 
@@ -1077,6 +1081,8 @@ namespace Linko.LinkoExchange.Services.Report
         public ICollection<FileStoreDto> GetFilesForSelection(int reportPackageId)
         {
             var fileStoreList = new List<FileStoreDto>();
+            var ageInMonthsSinceFileUploaded = Int32.Parse(_configService.GetConfigValue("ageInMonthsSinceFileUploaded"));
+            var xMonthsAgo = DateTimeOffset.UtcNow.AddMonths(-16);
 
             var reportPackage = _dbContext.ReportPackages
                 .Include(rp => rp.ReportPackageElementCategories)
@@ -1097,7 +1103,8 @@ namespace Linko.LinkoExchange.Services.Report
             {
                 var filesOfThisReportElementType = _dbContext.FileStores
                     .Where(fs => fs.ReportElementTypeId == existingFilesReportPackageElementType.ReportElementTypeId
-                        && fs.UploadDateTimeUtc >= DateTimeOffset.UtcNow.AddMonths(-16)); //Need to move this hardcoded number of months to config
+                        && fs.UploadDateTimeUtc >= xMonthsAgo)
+                    .ToList();
 
                 foreach (var eligibleFile in filesOfThisReportElementType)
                 {

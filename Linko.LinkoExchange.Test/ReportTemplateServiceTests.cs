@@ -37,7 +37,7 @@ namespace Linko.LinkoExchange.Test
         Mock<IEmailService> _emailService = new Mock<IEmailService>();
         Mock<ISettingService> _settingService = new Mock<ISettingService>();
         Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
-        Mock<ConfigSettingService> _configService = new Mock<ConfigSettingService>();
+        Mock<IConfigSettingService> _configService = new Mock<IConfigSettingService>();
 
         public ReportTemplateServiceTests()
         {

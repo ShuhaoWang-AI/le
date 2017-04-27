@@ -37,7 +37,7 @@ namespace Linko.LinkoExchange.Test
         Mock<IEmailService> _emailService = new Mock<IEmailService>();
         Mock<ISettingService> _settingService = new Mock<ISettingService>();
         Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
-        Mock<ConfigSettingService> _configService = new Mock<ConfigSettingService>();
+        Mock<IConfigSettingService> _configService = new Mock<IConfigSettingService>();
 
         public ReportPackageServiceTests()
         {
@@ -69,6 +69,8 @@ namespace Linko.LinkoExchange.Test
 
             _timeZoneService.Setup(s => s.GetUTCDateTimeUsingThisTimeZoneId(It.IsAny<DateTime>(), It.IsAny<int>())).Returns(DateTimeOffset.UtcNow);
 
+            _configService.Setup(s => s.GetConfigValue(It.IsAny<string>())).Returns("16");
+
             var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, _configService.Object, actualSettingService);
             var actualSampleService = new SampleService(connection, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService);
 
@@ -84,7 +86,8 @@ namespace Linko.LinkoExchange.Test
                 actualSettingService,
                 _orgService.Object,
                 actualSampleService,
-                new MapHelper()
+                new MapHelper(),
+                _configService.Object
             );
         }
 
@@ -156,6 +159,13 @@ namespace Linko.LinkoExchange.Test
         {
             //Change status
             _reportPackageService.UpdateStatus(2, ReportStatusName.Submitted, false);
+
+        }
+
+        [TestMethod]
+        public void GetFilesForSelection()
+        {
+            var eligibleFiles = _reportPackageService.GetFilesForSelection(8);
 
         }
 
