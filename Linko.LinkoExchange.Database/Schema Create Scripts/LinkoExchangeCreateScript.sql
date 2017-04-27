@@ -77,7 +77,9 @@ BEGIN
     CREATE TABLE dbo.tTimeZone 
     (
         TimeZoneId                      int IDENTITY(1,1) NOT NULL  
-        , Name                          varchar(100) NOT NULL  
+        , Name                          varchar(100) NOT NULL
+        , StandardAbbreviation          varchar(5) NOT NULL
+        , DaylightAbbreviation          varchar(5) NULL
 		, CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
         , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
         , LastModifierUserId            int NULL  
@@ -3207,22 +3209,22 @@ BEGIN
     PRINT 'Add records to tTimeZone'
     PRINT '------------------------'
 
-	INSERT INTO dbo.tTimeZone (Name)
-		VALUES ('Hawaiian Standard Time')
-    INSERT INTO dbo.tTimeZone (Name)
-		VALUES ('Alaskan Standard Time')    
-	INSERT INTO dbo.tTimeZone (Name)
-		VALUES ('Pacific Standard Time')
-	INSERT INTO dbo.tTimeZone (Name)
-		VALUES ('Mountain Standard Time')
-	INSERT INTO dbo.tTimeZone (Name)
-		VALUES ('Central Standard Time')
-	INSERT INTO dbo.tTimeZone (Name)
-		VALUES ('Eastern Standard Time')
-	INSERT INTO dbo.tTimeZone (Name)
-		VALUES ('Atlantic Standard Time')
-	INSERT INTO dbo.tTimeZone (Name)
-		VALUES ('Newfoundland Standard Time')
+	INSERT INTO dbo.tTimeZone (Name, StandardAbbreviation, DaylightAbbreviation)
+		VALUES ('Hawaiian Standard Time', 'HAST', 'HADT')
+    INSERT INTO dbo.tTimeZone (Name, StandardAbbreviation, DaylightAbbreviation)
+		VALUES ('Alaskan Standard Time', 'AKST', 'AKDT')    
+	INSERT INTO dbo.tTimeZone (Name, StandardAbbreviation, DaylightAbbreviation)
+		VALUES ('Pacific Standard Time', 'PST', 'PDT')
+	INSERT INTO dbo.tTimeZone (Name, StandardAbbreviation, DaylightAbbreviation)
+		VALUES ('Mountain Standard Time', 'MST', 'MDT')
+	INSERT INTO dbo.tTimeZone (Name, StandardAbbreviation, DaylightAbbreviation)
+		VALUES ('Central Standard Time', 'CST', 'CDT')
+	INSERT INTO dbo.tTimeZone (Name, StandardAbbreviation, DaylightAbbreviation)
+		VALUES ('Eastern Standard Time', 'EST', 'EDT')
+	INSERT INTO dbo.tTimeZone (Name, StandardAbbreviation, DaylightAbbreviation)
+		VALUES ('Atlantic Standard Time', 'AST', 'ADT')
+	INSERT INTO dbo.tTimeZone (Name, StandardAbbreviation, DaylightAbbreviation)
+		VALUES ('Newfoundland Standard Time', 'NST', 'NDT')
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tJurisdiction)
