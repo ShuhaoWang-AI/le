@@ -81,6 +81,13 @@ namespace Linko.LinkoExchange.Services.Report
 
         void UpdateStatus(int reportPackageId, ReportStatusName reportStatus, bool isUseTransaction);
 
+        /// <summary>
+        /// Gets a collection of FileStoreDto's that are eligible to be added this Report Package
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <returns>Collection of FileStoreDto objects</returns>
         ICollection<FileStoreDto> GetFilesForSelection(int reportPackageId);
+
+        ICollection<SampleDto> GetSamplesForSelection(int reportPackageId);
     }
 }

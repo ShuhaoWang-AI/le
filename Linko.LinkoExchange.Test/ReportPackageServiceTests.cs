@@ -140,6 +140,8 @@ namespace Linko.LinkoExchange.Test
             //Fetch existing
             var existingReportPackage = _reportPackageService.GetReportPackage(8, false);
 
+            existingReportPackage.Comments = "This is a TEST of saving comments.";
+
             //Add sample associations
             existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
             existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 36, ReportPackageElementTypeId = 13 });
@@ -166,6 +168,13 @@ namespace Linko.LinkoExchange.Test
         public void GetFilesForSelection()
         {
             var eligibleFiles = _reportPackageService.GetFilesForSelection(8);
+
+        }
+
+        [TestMethod]
+        public void GetSamplesForSelection()
+        {
+            var eligibleSamples = _reportPackageService.GetSamplesForSelection(8);
 
         }
 

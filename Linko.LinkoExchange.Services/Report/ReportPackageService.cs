@@ -858,6 +858,9 @@ namespace Linko.LinkoExchange.Services.Report
                 .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes.Select(rt => rt.ReportFiles)))
                 .Single(rp => rp.ReportPackageId == reportPackageDto.ReportPackageId);
 
+            //Comments
+            reportPackage.Comments = reportPackageDto.Comments;
+
             //
             //Add/remove report package elements 
             // 1. Samples
@@ -1076,6 +1079,11 @@ namespace Linko.LinkoExchange.Services.Report
             _logger.Info($"Leave ReportPackageService.UpdateStatus. reportPackageId={reportPackageId}, reportStatus={reportStatus}");
         }
 
+        /// <summary>
+        /// Gets a collection of FileStoreDto's that are eligible to be added this Report Package
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <returns>Collection of FileStoreDto objects</returns>
         public ICollection<FileStoreDto> GetFilesForSelection(int reportPackageId)
         {
             var fileStoreList = new List<FileStoreDto>();
@@ -1113,6 +1121,39 @@ namespace Linko.LinkoExchange.Services.Report
             }
 
             return fileStoreList;
+        }
+
+        public ICollection<SampleDto> GetSamplesForSelection(int reportPackageId)
+        {
+            var reportPackage = _dbContext.ReportPackages
+                .Single(rp => rp.ReportPackageId == reportPackageId);
+
+            var eligibleSampleList = new List<SampleDto>();
+             
+            var existingEligibleSamples = _dbContext.Samples
+                        .Include(s => s.ByOrganizationRegulatoryProgram)
+                        .Include(s => s.ByOrganizationRegulatoryProgram.RegulatoryProgram)
+                        .Include(s => s.ByOrganizationRegulatoryProgram.Organization)
+                        .Include(s => s.ByOrganizationRegulatoryProgram.Organization.OrganizationType)
+                        .Include(s => s.ByOrganizationRegulatoryProgram.Organization.Jurisdiction)
+                        .Include(s => s.ByOrganizationRegulatoryProgram.RegulatorOrganization)
+                        .Include(s => s.ForOrganizationRegulatoryProgram)
+                        .Include(s => s.ForOrganizationRegulatoryProgram.RegulatoryProgram)
+                        .Include(s => s.ForOrganizationRegulatoryProgram.Organization)
+                        .Include(s => s.ForOrganizationRegulatoryProgram.Organization.OrganizationType)
+                        .Include(s => s.ForOrganizationRegulatoryProgram.Organization.Jurisdiction)
+                        .Include(s => s.ForOrganizationRegulatoryProgram.RegulatorOrganization)
+                        .Where(s => s.ForOrganizationRegulatoryProgramId == reportPackage.OrganizationRegulatoryProgramId                            && s.IsReadyToReport
+                            && ((s.StartDateTimeUtc <= reportPackage.PeriodEndDateTimeUtc && s.StartDateTimeUtc >= reportPackage.PeriodStartDateTimeUtc) ||
+                                (s.EndDateTimeUtc <= reportPackage.PeriodEndDateTimeUtc && s.EndDateTimeUtc >= reportPackage.PeriodStartDateTimeUtc)));
+
+            foreach (var existingEligibleSample in existingEligibleSamples)
+            {
+                var sampleDto = _mapHelper.GetSampleDtoFromSample(existingEligibleSample);
+                eligibleSampleList.Add(sampleDto);
+            }
+
+            return eligibleSampleList;
         }
 
         private string EmtpyStringIfNull(string value)

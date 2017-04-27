@@ -1073,6 +1073,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 Name = rpt.Name,
                 PeriodStartDateTimeLocal = rpt.PeriodStartDateTimeUtc.DateTime,
                 PeriodEndDateTimeLocal = rpt.PeriodEndDateTimeUtc.DateTime,
+                Comments = rpt.Comments,
                 IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired,
                 ReportStatusId = rpt.ReportStatusId,
                 OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId,
