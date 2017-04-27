@@ -80,5 +80,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="isUseTransaction">If true, runs within transaction object</param>
 
         void UpdateStatus(int reportPackageId, ReportStatusName reportStatus, bool isUseTransaction);
+
+        ICollection<FileStoreDto> GetFilesForSelection(int reportPackageId);
     }
 }

@@ -1073,6 +1073,43 @@ namespace Linko.LinkoExchange.Services.Report
 
             _logger.Info($"Leave ReportPackageService.UpdateStatus. reportPackageId={reportPackageId}, reportStatus={reportStatus}");
         }
+
+        public ICollection<FileStoreDto> GetFilesForSelection(int reportPackageId)
+        {
+            var fileStoreList = new List<FileStoreDto>();
+
+            var reportPackage = _dbContext.ReportPackages
+                .Include(rp => rp.ReportPackageElementCategories)
+                .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportElementCategory))
+                .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes))
+                .Single(rp => rp.ReportPackageId == reportPackageId);
+
+            var filesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
+               .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.Attachments.ToString());
+
+            if (filesReportPackageElementCategory == null)
+            {
+                //throw Exception
+                throw new Exception();
+            }
+
+            foreach (var existingFilesReportPackageElementType in filesReportPackageElementCategory.ReportPackageElementTypes)
+            {
+                var filesOfThisReportElementType = _dbContext.FileStores
+                    .Where(fs => fs.ReportElementTypeId == existingFilesReportPackageElementType.ReportElementTypeId
+                        && fs.UploadDateTimeUtc >= DateTimeOffset.UtcNow.AddMonths(-16)); //Need to move this hardcoded number of months to config
+
+                foreach (var eligibleFile in filesOfThisReportElementType)
+                {
+                    var fileStoreDto = _mapHelper.GetFileStoreDtoFromFileStore(eligibleFile);
+                    fileStoreDto.ReportPackageElementTypeId = existingFilesReportPackageElementType.ReportPackageElementTypeId;
+                    fileStoreList.Add(fileStoreDto);
+                }
+            }
+
+            return fileStoreList;
+        }
+
         private string EmtpyStringIfNull(string value)
         {
             return string.IsNullOrWhiteSpace(value) ? "" : value;
