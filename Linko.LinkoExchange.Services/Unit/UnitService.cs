@@ -114,7 +114,7 @@ namespace Linko.LinkoExchange.Services.Unit
 
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authOrganizationId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationId;
-            var flowUnitValidValuesString = _settingService.GetOrganizationSettingValue(currentOrgRegProgramId, Core.Enum.SettingType.FlowUnitValidValues);
+            var flowUnitValidValuesString = _settingService.GetOrgRegProgramSettingValue(currentOrgRegProgramId, Core.Enum.SettingType.FlowUnitValidValues);
             var flowUnitValidValuesArray = flowUnitValidValuesString.Split(',');
 
             var units = _dbContext.Units

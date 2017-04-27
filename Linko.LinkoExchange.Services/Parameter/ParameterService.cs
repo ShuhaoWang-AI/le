@@ -160,7 +160,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                     for (int paramIndex = 0; paramIndex < paramGroupDto.Parameters.Count; paramIndex++)
                     {
                         var paramDto = paramGroupDto.Parameters.ElementAt(paramIndex);
-                        UpdateParameterForMonitoringPoint(ref paramDto, monitoringPointId.Value, sampleEndDateTimeUtc.Value);
+                        UpdateParameterForMonitoringPoint(ref paramDto, monitoringPointId.Value, sampleEndDateTimeUtc.Value); // TODO: Need to reduce DB call inside the function
                     }
                 }
 
@@ -204,13 +204,13 @@ namespace Linko.LinkoExchange.Services.Parameter
             //Check MonitoringPointParameter table
             var foundMonitoringPointParameter = _dbContext.MonitoringPointParameters
                 .Include(mppl => mppl.DefaultUnit)
-                .FirstOrDefault(mppl => mppl.OrganizationRegulatoryProgramId == currentOrgRegProgramId
+                .FirstOrDefault(mppl => mppl.OrganizationRegulatoryProgramId == currentOrgRegProgramId 
                     && mppl.MonitoringPointId == monitoringPointId
                     && mppl.ParameterId == parameterId
                     && mppl.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
                     && mppl.RetirementDateTimeUtc >= sampleEndDateTimeUtc);
 
-            if (foundMonitoringPointParameter != null)
+            if (foundMonitoringPointParameter?.DefaultUnit != null)
             {
                 paramDto.DefaultUnit = _mapHelper.GetUnitDtoFromUnit(foundMonitoringPointParameter.DefaultUnit);
                 paramDto.IsCalcMassLoading = _dbContext.MonitoringPointParameterLimits

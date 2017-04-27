@@ -417,6 +417,7 @@
     <Content Include="Views\Industry\AttachmentDetails.cshtml" />
     <Content Include="Views\Industry\Samples.cshtml" />
     <Content Include="Views\Industry\NewSampleDetailsStep1.cshtml" />
+    <Content Include="Views\Industry\SampleDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />

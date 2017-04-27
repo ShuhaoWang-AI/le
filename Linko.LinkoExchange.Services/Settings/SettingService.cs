@@ -397,7 +397,7 @@ namespace Linko.LinkoExchange.Services.Settings
 
         }
 
-        private OrganizationRegulatoryProgram GetAuthority(int? organizationId = null, int? regProgramId = null, int? orgRegProgramId = null)
+        public OrganizationRegulatoryProgram GetAuthority(int? organizationId = null, int? regProgramId = null, int? orgRegProgramId = null)
         {
             OrganizationRegulatoryProgram thisOrgRegProgram;
             if (orgRegProgramId.HasValue)

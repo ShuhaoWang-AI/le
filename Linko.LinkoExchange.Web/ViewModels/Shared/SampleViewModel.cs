@@ -43,10 +43,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Lab Sample ID")]
         public string LabSampleIdentifier { get; set; }
 
-        [Display(Name = "Sample Start")]
+        [Display(Name = "Start Date")]
         public DateTime StartDateTimeLocal { get; set; }
 
-        [Display(Name = "Sample End")]
+        [Display(Name = "End Date")]
         public DateTime EndDateTimeLocal { get; set; }
 
         [Display(Name = "Is Ready to Report")]
@@ -61,7 +61,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Last Modified By")]
         public string LastModifierUserName { get; set; }
 
-        [Display(Name = "Sample Flow")]
+        [Display(Name = "Flow")]
         public string FlowValue { get; set; }
 
         public int? FlowUnitId { get; set; }
@@ -99,7 +99,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public int MassLoadingMassLoadingUnitId { get; set; }
         public string MassLoadingMassLoadingUnitName { get; set; }
 
-        // public IEnumerable<SampleResultViewModel> SampleResults { get; set; }
+        public IEnumerable<SampleResultViewModel> SampleResults { get; set; }
         public List<ParameterGroupViewModel> ParameterGroups { get; set; }
         public List<ParameterViewModel> AllParameters { get; set; }
     }

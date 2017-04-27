@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Core.Enum;
 
@@ -55,5 +56,6 @@ namespace Linko.LinkoExchange.Services.Settings
         void CreateOrUpdateProgramSetting(int orgRegProgId, SettingDto settingDto);
         void CreateOrUpdateOrganizationSettings(int organizationId, IEnumerable<SettingDto> settingDtos);
         void CreateOrUpdateOrganizationSetting(int organizationId, SettingDto settingDto);
+        OrganizationRegulatoryProgram GetAuthority(int? organizationId = null, int? regProgramId = null, int? orgRegProgramId = null);
     }
 }

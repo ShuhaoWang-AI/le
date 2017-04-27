@@ -173,3 +173,7 @@ table tbody td .btn
 {
     background-color: #2db245;
 }
+
+.validation-summary-valid {
+    display:none;
+}

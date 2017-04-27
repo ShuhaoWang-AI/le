@@ -16,16 +16,19 @@ using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.MonitoringPoint;
 using Linko.LinkoExchange.Services.Organization;
+using Linko.LinkoExchange.Services.Parameter;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
+using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.Industry;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
+using Microsoft.Ajax.Utilities;
 using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
@@ -51,31 +54,38 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly ILogger _logger;
         private readonly IMonitoringPointService _monitoringPointService;
         private readonly IOrganizationService _organizationService;
+        private readonly IParameterService _parameterService;
         private readonly IPermissionService _permissionService;
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IReportElementService _reportElementService;
+        private readonly IReportTemplateService _reportTemplateService;
         private readonly ISampleService _sampleService;
+        private readonly ISettingService _settingService;
         private readonly ISessionCache _sessionCache;
         private readonly IUnitService _unitService;
         private readonly IUserService _userService;
 
         public IndustryController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService, IQuestionAnswerService questionAnswerService,
                                   IPermissionService permissionService, ISessionCache sessionCache, ILogger logger, IHttpContextService httpContextService, IFileStoreService fileStoreService,
-                                  IReportElementService reportElementService, ISampleService sampleService, IUnitService unitService, IMonitoringPointService monitoringPointService)
+                                  IReportElementService reportElementService, ISampleService sampleService, IUnitService unitService, IMonitoringPointService monitoringPointService,
+                                  IReportTemplateService reportTemplateService, ISettingService settingService, IParameterService parameterService)
         {
-            _organizationService = organizationService;
-            _userService = userService;
-            _invitationService = invitationService;
-            _questionAnswerService = questionAnswerService;
-            _permissionService = permissionService;
-            _sessionCache = sessionCache;
-            _logger = logger;
-            _httpContextService = httpContextService;
             _fileStoreService = fileStoreService;
-            _reportElementService = reportElementService;
-            _sampleService = sampleService;
-            _unitService = unitService;
+            _httpContextService = httpContextService;
+            _invitationService = invitationService;
+            _logger = logger;
             _monitoringPointService = monitoringPointService;
+            _organizationService = organizationService;
+            _parameterService = parameterService;
+            _permissionService = permissionService;
+            _questionAnswerService = questionAnswerService;
+            _reportElementService = reportElementService;
+            _reportTemplateService = reportTemplateService;
+            _sampleService = sampleService;
+            _settingService = settingService;
+            _sessionCache = sessionCache;
+            _unitService = unitService;
+            _userService = userService;
         }
 
         #endregion
@@ -1043,6 +1053,16 @@ namespace Linko.LinkoExchange.Web.Controllers
                     MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
                 }
             }
+            else
+            {
+                if (ModelState[key:"."] != null)
+                {
+                    foreach (var issue in ModelState[key:"."].Errors)
+                    {
+                        ModelState.AddModelError(key:string.Empty, errorMessage:issue.ErrorMessage);
+                    }
+                }
+            }
 
             var monitoringPoints = _monitoringPointService.GetMonitoringPoints().Select(vm => new MonitoringPointViewModel
                                                                                               {
@@ -1054,9 +1074,100 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(model:model);
         }
 
+        [Route(template:"Sample/New/Step2")]
         public ActionResult NewSampleDetailsStep2()
         {
-            throw new NotImplementedException();
+            if (TempData[key:"NewSampleStep1ViewModel"] == null)
+            {
+                return RedirectToAction(actionName:"NewSampleDetailsStep1");
+            }
+            else
+            {
+                var newSampleStep1ViewModel = TempData[key:"NewSampleStep1ViewModel"] as NewSampleStep1ViewModel;
+                TempData.Keep(key:"NewSampleStep1ViewModel");
+
+                if (newSampleStep1ViewModel == null)
+                {
+                    return RedirectToAction(actionName:"NewSampleDetailsStep1");
+                }
+                else
+                {
+                    ViewBag.Satus = "New";
+                    var monitoringPoint = _monitoringPointService.GetMonitoringPoint(monitoringPointId:newSampleStep1ViewModel.SelectedMonitoringPointId);
+                    var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+                    var programSettings =
+                        _settingService.GetProgramSettingsById(orgRegProgramId:_settingService.GetAuthority(orgRegProgramId:currentOrganizationRegulatoryProgramId).OrganizationRegulatoryProgramId);
+                    var viewModelMassLoadingMassLoadingUnitId = _unitService.GetUnitForMassLoadingCalculations();
+
+                    var viewModel = new SampleViewModel
+                                    {
+                                        MonitoringPointId = monitoringPoint.MonitoringPointId,
+                                        MonitoringPointName = $"{monitoringPoint.Name} - {monitoringPoint.Description}",
+                                        StartDateTimeLocal = newSampleStep1ViewModel.StartDateTimeLocal,
+                                        EndDateTimeLocal = newSampleStep1ViewModel.EndDateTimeLocal,
+                                        AvailableCollectionMethods = new List<SelectListItem>(),
+                                        AvailableCtsEventTypes = new List<SelectListItem>(),
+                                        MassLoadingMassLoadingUnitId = viewModelMassLoadingMassLoadingUnitId.UnitId,
+                                        MassLoadingMassLoadingUnitName = viewModelMassLoadingMassLoadingUnitId.Name,
+                                        ParameterGroups = new List<ParameterGroupViewModel>(),
+                                        AllParameters = new List<ParameterViewModel>(),
+                                        SampleStatusName = SampleStatusName.Draft
+                                    };
+
+                    viewModel.ResultQualifierValidValues = programSettings.Settings.Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues)).Select(s => s.Value).First();
+                    viewModel.MassLoadingConversionFactorPounds =
+                        double.Parse(s:programSettings.Settings.Where(s => s.TemplateName.Equals(obj:SettingType.MassLoadingConversionFactorPounds))
+                                                      .Select(s => s.Value)
+                                                      .First()
+                                                      .IfNullOrWhiteSpace(defaultValue:"0.0"));
+                    viewModel.MassLoadingCalculationDecimalPlaces =
+                        int.Parse(s:programSettings.Settings.Where(s => s.TemplateName.Equals(obj:SettingType.MassLoadingCalculationDecimalPlaces))
+                                                   .Select(s => s.Value)
+                                                   .First()
+                                                   .IfNullOrWhiteSpace(defaultValue:"0"));
+                    viewModel.IsMassLoadingResultToUseLessThanSign =
+                        bool.Parse(value:programSettings.Settings.Where(s => s.TemplateName.Equals(obj:SettingType.MassLoadingResultToUseLessThanSign))
+                                                        .Select(s => s.Value)
+                                                        .First()
+                                                        .IfNullOrWhiteSpace(defaultValue:"true"));
+
+                    viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:monitoringPoint.MonitoringPointId, sampleEndDateTimeUtc:newSampleStep1ViewModel.EndDateTimeLocal)
+                                                               .Select(c => new ParameterViewModel
+                                                                            {
+                                                                                Id = c.ParameterId,
+                                                                                Name = c.Name,
+                                                                                DefaultUnitId = c.DefaultUnit.UnitId,
+                                                                                DefaultUnitName = c.DefaultUnit.Name,
+                                                                                IsCalcMassLoading = c.IsCalcMassLoading
+                                                                            }).OrderBy(c => c.Name).ToList();
+
+                    viewModel.ParameterGroups =
+                        _parameterService.GetAllParameterGroups(monitoringPointId:monitoringPoint.MonitoringPointId, sampleEndDateTimeLocal:newSampleStep1ViewModel.EndDateTimeLocal)
+                                         .Select(c => new ParameterGroupViewModel
+                                                      {
+                                                          Id = c.ParameterGroupId,
+                                                          Name = c.Name,
+                                                          Description = c.Description,
+                                                          ParameterIds = c.Parameters.Select(p => p.ParameterId).ToList()
+                                                      }).OrderBy(c => c.Name).ToList();
+                    viewModel.AvailableCollectionMethods = _sampleService.GetCollectionMethods().Select(c => new SelectListItem
+                                                                                                             {
+                                                                                                                 Text = c.Name,
+                                                                                                                 Value = c.CollectionMethodId.ToString(),
+                                                                                                                 Selected = c.CollectionMethodId.Equals(obj:viewModel.CollectionMethodId)
+                                                                                                             }).OrderBy(c => c.Text).ToList();
+
+                    viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample:true).Select(c => new SelectListItem
+                                                                                                                             {
+                                                                                                                                 Text = c.Name,
+                                                                                                                                 Value = c.CtsEventTypeId.ToString(),
+                                                                                                                                 Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
+                                                                                                                             }).OrderBy(c => c.Text).ToList();
+                    viewModel.FlowUnitValidValues = _unitService.GetFlowUnitValidValues();
+
+                    return View(viewName:"SampleDetails", model:viewModel);
+                }
+            }
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
