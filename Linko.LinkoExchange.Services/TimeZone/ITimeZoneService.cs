@@ -1,9 +1,6 @@
 ﻿using Linko.LinkoExchange.Services.Dto;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services.TimeZone
 {
@@ -20,6 +17,6 @@ namespace Linko.LinkoExchange.Services.TimeZone
         DateTimeOffset GetUTCDateTimeUsingSettingForThisOrg(DateTime localDateTime, int orgRegProgramId);
 
         DateTimeOffset GetUTCDateTimeUsingThisTimeZoneId(DateTime localDateTime, int timeZoneId);
-        string GetAbbreviationTimeZoneNameUsingSettingForThisOrg(int orgRegProgramId);
+        string GetTimeZoneNameUsingSettingForThisOrg(int orgRegProgramId, bool abbreviationName);
     }
 }

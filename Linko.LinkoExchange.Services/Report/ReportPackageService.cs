@@ -193,20 +193,21 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info("Enter ReportPackageService.CopyOfRecordDataXmlFileDto. reportPackageId={0}", reportPackageDto.ReportPackageId);
 
+            var dateTimeFormat = "MM/dd/yyyyThh:mm:ss zzz";
+            var timeZoneName = _timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(reportPackageDto.OrganizationRegulatoryProgramId, false);
             var dataXmlObj = new CopyOfRecordDataXml
             {
                 XmlFileVersion = new XmlFileVersion
                 {
-                    VersionNumber = "1.0"
+                    VersionNumber = "1.0.0"
                 },
                 ReportHeader = new ReportHeader
                 {
                     ReportName = reportPackageDto.Name,
-                    //TODO:  UTC 
-                    ReportPeriodStartDateTimeUtc = reportPackageDto.PeriodStartDateTimeLocal.ToString(format: "yyyy-MM-dd"),
-                    ReportPeriodEndDateTimeUtc = reportPackageDto.PeriodEndDateTimeLocal.ToString(format: "yyyy-MM-dd"),
-                    ReportSubmissionDateUtc = $"{reportPackageDto.SubmissionDateTimeLocal:MMM dd, yyyy HHtt}",
-                    CurrentTimeZoneName = "Place_holder"
+                    ReportPeriodStartDateTimeUtc = reportPackageDto.PeriodStartDateTimeLocal.ToString(dateTimeFormat),
+                    ReportPeriodEndDateTimeUtc = reportPackageDto.PeriodEndDateTimeLocal.ToString(dateTimeFormat),
+                    ReportSubmissionDateUtc = $"{reportPackageDto.SubmissionDateTimeLocal:dateTimeFormat}",
+                    CurrentTimeZoneName = timeZoneName,
                 },
                 SubmittedTo = new SubmittedTo
                 {
@@ -285,9 +286,8 @@ namespace Linko.LinkoExchange.Services.Report
                     CollectionMethodName = sampleDto.CollectionMethodName,
                     LabSampleIdentifier = EmtpyStringIfNull(sampleDto.LabSampleIdentifier),
 
-                    //TODO to covert the date time here 
-                    StartDateTimeUtc = sampleDto.StartDateTimeLocal.ToString(),
-                    EndDateTimeUtc = sampleDto.EndDateTimeLocal.ToString(),
+                    StartDateTimeUtc = sampleDto.StartDateTimeLocal.ToString(dateTimeFormat),
+                    EndDateTimeUtc = sampleDto.EndDateTimeLocal.ToString(dateTimeFormat),
 
                     SampleFlowForMassCalcs = EmtpyStringIfNull(sampleDto.FlowValue),
                     SampleFlowForMassCalcsUnitName = EmtpyStringIfNull(sampleDto.FlowUnitName),
@@ -327,9 +327,7 @@ namespace Linko.LinkoExchange.Services.Report
                         EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit,
                         MethodDetectionLimit = sampleResultDto.MethodDetectionLimit.ToString(),
                         AnalysisMethod = sampleResultDto.AnalysisMethod,
-
-                        //TODO handle the datatime here
-                        AnalysisDateTimeUtc = sampleResultDto.AnalysisDateTimeLocal.ToString(),
+                        AnalysisDateTimeUtc = sampleResultDto.AnalysisDateTimeLocal?.ToString(dateTimeFormat) ?? "",
                         IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
                         LimitBasis = limitBasisValue
                     };
@@ -518,7 +516,7 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("periodEndDate", reportPackage.PeriodEndDateTimeLocal.ToString("MMM dd, yyyy"));
 
             var submissionDateTime =
-                $"{reportPackage.SubmissionDateTimeLocal.ToString("MMM dd, yyyy HHtt ")}{_timeZoneService.GetAbbreviationTimeZoneNameUsingSettingForThisOrg(reportPackage.OrganizationRegulatoryProgramId)}";
+                $"{reportPackage.SubmissionDateTimeLocal.ToString("MMM dd, yyyy HHtt ")}{_timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(reportPackage.OrganizationRegulatoryProgramId, true)}";
 
             emailContentReplacements.Add("submissionDateTime", submissionDateTime);
             emailContentReplacements.Add("corSignature", copyOfRecordDto.Signature);
