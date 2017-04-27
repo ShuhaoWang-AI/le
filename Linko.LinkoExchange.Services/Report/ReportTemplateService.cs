@@ -22,7 +22,7 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly IHttpContextService _httpContextService;
         private readonly IMapHelper _mapHelper;
         private readonly ILogger _logger;
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
         private readonly ITimeZoneService _timeZoneService;
         private readonly IOrganizationService _orgService;
         private List<ReportPackageTemplateElementCategory> _reportPackageTemplateElementCategories;
@@ -31,7 +31,7 @@ namespace Linko.LinkoExchange.Services.Report
         public ReportTemplateService(
             LinkoExchangeContext dbContext,
             IHttpContextService httpContextService,
-            UserService userService,
+            IUserService userService,
             IMapHelper mapHelper,
             ILogger logger,
             ITimeZoneService timeZoneService,
@@ -118,7 +118,7 @@ namespace Linko.LinkoExchange.Services.Report
             return rptDto;
         }
 
-        public IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates(bool isGetAssignedToThisUserOnly = false, bool includeChildObjects = true)
+        public IEnumerable<ReportPackageTemplateDto> GetReportPackageTemplates(bool isForCreatingDraft = false, bool includeChildObjects = true)
         {
             _logger.Info("Enter ReportTemplateService.GetReportPackageTemplates.");
 
@@ -133,12 +133,17 @@ namespace Linko.LinkoExchange.Services.Report
                     .Include(a => a.ReportPackageTemplateElementCategories.Select(b => b.ReportElementCategory))
                     .Include(a => a.ReportPackageTemplateElementCategories.Select(b => b.ReportPackageTemplateElementTypes.Select(d => d.ReportElementType)));
 
-            if (isGetAssignedToThisUserOnly)
+            if (isForCreatingDraft)
             {
                 rptsQuery = rptsQuery
-                    .Where(i => i.ReportPackageTemplateAssignments
+                    .Where(i => i.IsActive &&
+                        i.EffectiveDateTimeUtc >= DateTimeOffset.UtcNow &&
+                        i.ReportPackageTemplateAssignments
                         .Select(j => j.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId)
-                            .Contains(currentRegulatoryProgramId));
+                            .Contains(currentRegulatoryProgramId))
+                    .GroupBy(x => x.Name, (key, g) => g.OrderByDescending(e => e.EffectiveDateTimeUtc).FirstOrDefault());
+                //the last line of query ensures we only get the newest template when there are multiple with the same name (UC-16.4 1.1.4.)
+
             }
             else {
                 rptsQuery = rptsQuery

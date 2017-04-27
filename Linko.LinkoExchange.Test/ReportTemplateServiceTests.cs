@@ -25,9 +25,9 @@ using Linko.LinkoExchange.Services.Config;
 namespace Linko.LinkoExchange.Test
 {
     [TestClass]
-    public class ReportPackageServiceTests
+    public class ReportTemplateServiceTests
     {
-        ReportPackageService _reportPackageService;
+        ReportTemplateService _reportTemplateService;
         Mock<IProgramService> _programService = new Mock<IProgramService>();
         Mock<ICopyOfRecordService> _copyOfRecordService = new Mock<ICopyOfRecordService>();
         Mock<ITimeZoneService> _timeZoneService = new Mock<ITimeZoneService>();
@@ -39,7 +39,7 @@ namespace Linko.LinkoExchange.Test
         Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
         Mock<ConfigSettingService> _configService = new Mock<ConfigSettingService>();
 
-        public ReportPackageServiceTests()
+        public ReportTemplateServiceTests()
         {
         }
 
@@ -72,93 +72,23 @@ namespace Linko.LinkoExchange.Test
             var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, _configService.Object, actualSettingService);
             var actualSampleService = new SampleService(connection, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService);
 
-            _reportPackageService = new ReportPackageService(
-                _programService.Object,
-                _copyOfRecordService.Object,
-                actualTimeZoneService,
-                _logger.Object,
+            _reportTemplateService = new ReportTemplateService(
                 connection,
                 _httpContext.Object,
                 _userService.Object,
-                _emailService.Object,
-                actualSettingService,
-                _orgService.Object,
-                actualSampleService,
-                new MapHelper()
+                new MapHelper(),
+                _logger.Object,
+                actualTimeZoneService,
+                _orgService.Object
             );
         }
 
         [TestMethod]
-        public void DeleteReportPackage()
+        public void GetReportPackageTemplates()
         {
-            var reportPackageId = 7;
-            _reportPackageService.DeleteReportPackage(reportPackageId);
+            var templateDtos = _reportTemplateService.GetReportPackageTemplates(true, false);
         }
 
-        [TestMethod]
-        public void CreateDraft()
-        {
-            var templateId = 1;
-            var startDateTimeLocal = new DateTime(2017, 4, 20);
-            var endDateTimeLocal = new DateTime(2017, 4, 28);
-            var newId = _reportPackageService.CreateDraft(templateId, startDateTimeLocal, endDateTimeLocal);
-        }
-
-        [TestMethod]
-        public void GetReportPackage()
-        {
-            //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(8, false);
-        }
-
-        [TestMethod]
-        public void GetReportPackage_With_Associated_Element_Children()
-        {
-            //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(8, true);
-        }
-
-        [TestMethod]
-        public void SaveReportPackage_Add_Samples()
-        {
-            //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(2, false);
-
-            //Add sample associations
-            existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
-            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 35, ReportPackageElementTypeId = 1 });
-
-            var existingId = _reportPackageService.SaveReportPackage(existingReportPackage);
-        }
-
-        [TestMethod]
-        public void SaveReportPackage_Add_Files()
-        {
-            //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(8, false);
-
-            //Add sample associations
-            existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
-            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 36, ReportPackageElementTypeId = 13 });
-            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 38, ReportPackageElementTypeId = 13 });
-
-            //Add file associations
-            existingReportPackage.AssociatedFiles = new List<ReportFileDto>();
-            existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 14 });
-            existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 14 });
-
-            var existingId = _reportPackageService.SaveReportPackage(existingReportPackage);
-        }
-
-
-        [TestMethod]
-        public void UpdateStatus()
-        {
-            //Change status
-            _reportPackageService.UpdateStatus(2, ReportStatusName.Submitted, false);
-
-        }
-
-
+      
     }
 }

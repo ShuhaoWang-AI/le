@@ -489,6 +489,10 @@ namespace Linko.LinkoExchange.Test
                 {
 
                 }
+                else if (fieldName == "ByOrganizationRegulatoryProgramDto")
+                {
+
+                }
                 else if (fieldName == "FlowUnitValidValues")
                 {
                     var fetchedFlowUnitsEnumerator = fetchedSampleDto.FlowUnitValidValues.GetEnumerator();
