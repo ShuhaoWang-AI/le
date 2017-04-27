@@ -884,17 +884,19 @@ namespace Linko.LinkoExchange.Services.Report
                 //Should just be one iteration through this loop for the current phase, but in the future
                 //we might have more than one "Sample and Results" section in a Report Package
 
-                foreach (var reportSampleAssociated in existingSamplesReportPackageElementType.ReportSamples)
+                var existingReportSamples = existingSamplesReportPackageElementType.ReportSamples.ToArray();
+                for (var i = 0; i < existingReportSamples.Length; i++)
                 {
+                    var existingReportSample = existingReportSamples[i];
                     //Find match in dto samples
                     var matchedSampleAssociation = reportPackageDto.AssociatedSamples
-                    .SingleOrDefault(sa => sa.ReportPackageElementTypeId == reportSampleAssociated.ReportPackageElementTypeId
-                        && sa.SampleId == reportSampleAssociated.SampleId);
+                    .SingleOrDefault(sa => sa.ReportPackageElementTypeId == existingReportSample.ReportPackageElementTypeId
+                        && sa.SampleId == existingReportSample.SampleId);
 
                     if (matchedSampleAssociation == null)
                     {
                         //existing association must have been deleted -- remove
-                        _dbContext.ReportSamples.Remove(reportSampleAssociated);
+                        _dbContext.ReportSamples.Remove(existingReportSample);
                     }
                 }
             }
@@ -936,19 +938,22 @@ namespace Linko.LinkoExchange.Services.Report
             // - Iterate through all Attachment rows in ReportFile and delete ones that cannot be matched with an item in reportPackageDto.AssociatedSamples
             foreach (var existingFilesReportPackageElementType in filesReportPackageElementCategory.ReportPackageElementTypes)
             {
-                foreach (var reportFileAssociated in existingFilesReportPackageElementType.ReportFiles)
+                var existingReportFiles = existingFilesReportPackageElementType.ReportFiles.ToArray();
+                for (var i = 0; i < existingReportFiles.Length; i++)
                 {
+                    var existingReportFile = existingReportFiles[i];
                     //Find match in dto files
                     var matchedFileAssociation = reportPackageDto.AssociatedFiles
-                    .SingleOrDefault(sa => sa.ReportPackageElementTypeId == reportFileAssociated.ReportPackageElementTypeId
-                        && sa.FileStoreId == reportFileAssociated.FileStoreId);
+                    .SingleOrDefault(sa => sa.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId
+                        && sa.FileStoreId == existingReportFile.FileStoreId);
 
                     if (matchedFileAssociation == null)
                     {
                         //existing association must have been deleted -- remove
-                        _dbContext.ReportFiles.Remove(reportFileAssociated);
+                        _dbContext.ReportFiles.Remove(existingReportFile);
                     }
                 }
+               
             }
 
             //Now handle additions

@@ -135,15 +135,15 @@ namespace Linko.LinkoExchange.Test
         public void SaveReportPackage_Add_Files()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(2, false);
+            var existingReportPackage = _reportPackageService.GetReportPackage(6, false);
 
             //Add sample associations
             existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
-            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 35, ReportPackageElementTypeId = 1 });
+            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 35, ReportPackageElementTypeId = 5 });
 
             //Add file associations
             existingReportPackage.AssociatedFiles = new List<ReportFileDto>();
-            existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 1, ReportPackageElementTypeId = 2 });
+            existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 6 });
 
             var existingId = _reportPackageService.SaveReportPackage(existingReportPackage);
         }
