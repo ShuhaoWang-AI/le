@@ -295,7 +295,7 @@ namespace Linko.LinkoExchange.Services.Report
                     MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces?.ToString(),
                     IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign.ToString(),
 
-                    SampledBy = sampleDto.ByOrganizationRegulatoryProgramDto.OrganizationDto.OrganizationType.Name,
+                    SampledBy = sampleDto.ByOrganizationTypeName,
                     SampleResults = new List<SampleResultNode>(),
                 };
 
@@ -1128,19 +1128,9 @@ namespace Linko.LinkoExchange.Services.Report
             var eligibleSampleList = new List<SampleDto>();
              
             var existingEligibleSamples = _dbContext.Samples
-                        .Include(s => s.ByOrganizationRegulatoryProgram)
-                        .Include(s => s.ByOrganizationRegulatoryProgram.RegulatoryProgram)
-                        .Include(s => s.ByOrganizationRegulatoryProgram.Organization)
                         .Include(s => s.ByOrganizationRegulatoryProgram.Organization.OrganizationType)
-                        .Include(s => s.ByOrganizationRegulatoryProgram.Organization.Jurisdiction)
-                        .Include(s => s.ByOrganizationRegulatoryProgram.RegulatorOrganization)
-                        .Include(s => s.ForOrganizationRegulatoryProgram)
-                        .Include(s => s.ForOrganizationRegulatoryProgram.RegulatoryProgram)
-                        .Include(s => s.ForOrganizationRegulatoryProgram.Organization)
-                        .Include(s => s.ForOrganizationRegulatoryProgram.Organization.OrganizationType)
-                        .Include(s => s.ForOrganizationRegulatoryProgram.Organization.Jurisdiction)
-                        .Include(s => s.ForOrganizationRegulatoryProgram.RegulatorOrganization)
-                        .Where(s => s.ForOrganizationRegulatoryProgramId == reportPackage.OrganizationRegulatoryProgramId                            && s.IsReadyToReport
+                        .Where(s => s.ForOrganizationRegulatoryProgramId == reportPackage.OrganizationRegulatoryProgramId                            
+                            && s.IsReadyToReport
                             && ((s.StartDateTimeUtc <= reportPackage.PeriodEndDateTimeUtc && s.StartDateTimeUtc >= reportPackage.PeriodStartDateTimeUtc) ||
                                 (s.EndDateTimeUtc <= reportPackage.PeriodEndDateTimeUtc && s.EndDateTimeUtc >= reportPackage.PeriodStartDateTimeUtc)));
 

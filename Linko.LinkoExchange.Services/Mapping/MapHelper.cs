@@ -939,7 +939,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             //    resultDtos.Add(this.GetSampleResultDtoFromSampleResult(sampleResult));
             //}
             //dto.SampleResults = resultDtos;
-            dto.ByOrganizationRegulatoryProgramDto = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(sample.ByOrganizationRegulatoryProgram);
+            dto.ByOrganizationTypeName = sample.ByOrganizationRegulatoryProgram.Organization.OrganizationType.Name;
 
             return dto;
         }

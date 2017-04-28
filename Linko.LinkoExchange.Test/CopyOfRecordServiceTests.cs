@@ -25,6 +25,7 @@ using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Config;
+using System.Data.Entity;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -508,7 +509,9 @@ namespace Linko.LinkoExchange.Test
         private List<SampleDto> GetMockSampleDtos()
         {
             var orgRegProgamId = 11;
-            var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(i => i.OrganizationRegulatoryProgramId == orgRegProgamId);
+            var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms
+                .Include(i => i.Organization.OrganizationType)
+                .Single(i => i.OrganizationRegulatoryProgramId == orgRegProgamId);
 
 
             var sample1 = new SampleDto
@@ -599,7 +602,7 @@ namespace Linko.LinkoExchange.Test
                                     },
                                 },
 
-                ByOrganizationRegulatoryProgramDto = _mapHeper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram)
+                ByOrganizationTypeName = orgRegProgram.Organization.OrganizationType.Name
             };
 
 
@@ -691,7 +694,7 @@ namespace Linko.LinkoExchange.Test
                                     },
                                 },
 
-                ByOrganizationRegulatoryProgramDto = _mapHeper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram)
+                ByOrganizationTypeName = orgRegProgram.Organization.OrganizationType.Name
             };
 
             var samples = new List<SampleDto>();
