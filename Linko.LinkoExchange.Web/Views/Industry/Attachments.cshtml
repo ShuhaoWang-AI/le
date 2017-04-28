@@ -43,6 +43,9 @@
                           columns.Bound(c => c.Description)
                                  .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
                                                                          .SuggestionOperator(filterType: FilterType.Contains)));
+                          columns.Bound(c => c.ReportElementTypeName)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
                           columns.Bound(c => c.UploadDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm:ss tt}")
                                  .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
                           columns.Bound(c => c.UploaderUserFullName)
@@ -72,7 +75,7 @@
                       {
                           sortable.SortMode(value: GridSortMode.MultipleColumn);
                       })
-                      //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                      .Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value: true))
                       .Scrollable(s => s.Height(value: "auto"))
                       .NoRecords(text: "No attachment exists.")
