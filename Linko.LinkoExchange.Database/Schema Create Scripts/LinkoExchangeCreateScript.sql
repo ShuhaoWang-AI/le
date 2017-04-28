@@ -3830,6 +3830,20 @@ BEGIN
 		    , 'wtraxadc2.watertrax.local'
 		    , ''
 		)
+    INSERT INTO dbo.tSystemSetting (Name, Value, Description)
+		VALUES 
+		(
+		    'MassLoadingUnitName'
+		    , 'ppd'
+		    , 'Unit name for mass loading calculation'
+		)
+    INSERT INTO dbo.tSystemSetting (Name, Value, Description)
+		VALUES 
+		(
+		    'FileAvailableToAttachMaxAgeMonths'
+		    , '16'
+		    , 'Maximum age in months that a file is available to be selected as an attachment'
+		)
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tOrganizationSetting)
