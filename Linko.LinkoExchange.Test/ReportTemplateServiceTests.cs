@@ -37,7 +37,6 @@ namespace Linko.LinkoExchange.Test
         Mock<IEmailService> _emailService = new Mock<IEmailService>();
         Mock<ISettingService> _settingService = new Mock<ISettingService>();
         Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
-        Mock<IConfigSettingService> _configService = new Mock<IConfigSettingService>();
 
         public ReportTemplateServiceTests()
         {
@@ -69,7 +68,7 @@ namespace Linko.LinkoExchange.Test
 
             _timeZoneService.Setup(s => s.GetUTCDateTimeUsingThisTimeZoneId(It.IsAny<DateTime>(), It.IsAny<int>())).Returns(DateTimeOffset.UtcNow);
 
-            var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, _configService.Object, actualSettingService);
+            var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, actualSettingService);
             var actualSampleService = new SampleService(connection, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService);
 
             _reportTemplateService = new ReportTemplateService(

@@ -10,6 +10,7 @@ using NLog;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Config;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.Unit
 {
@@ -21,7 +22,6 @@ namespace Linko.LinkoExchange.Services.Unit
         private readonly IHttpContextService _httpContextService;
         private readonly ITimeZoneService _timeZoneService;
         private readonly IOrganizationService _orgService;
-        private readonly IConfigSettingService _configService;
         private readonly ISettingService _settingService;
 
         public UnitService(
@@ -31,7 +31,6 @@ namespace Linko.LinkoExchange.Services.Unit
             IHttpContextService httpContextService,
             ITimeZoneService timeZoneService,
             IOrganizationService orgService,
-            IConfigSettingService configService,
             ISettingService settingService)
         {
             if (dbContext == null)
@@ -64,11 +63,6 @@ namespace Linko.LinkoExchange.Services.Unit
                 throw new ArgumentNullException(nameof(orgService));
             }
 
-            if (configService == null)
-            {
-                throw new ArgumentNullException(nameof(orgService));
-            }
-
             if (settingService == null)
             {
                 throw new ArgumentNullException(nameof(settingService));
@@ -80,7 +74,6 @@ namespace Linko.LinkoExchange.Services.Unit
             _httpContextService = httpContextService;
             _timeZoneService = timeZoneService;
             _orgService = orgService;
-            _configService = configService;
             _settingService = settingService;
         }
 
@@ -166,7 +159,7 @@ namespace Linko.LinkoExchange.Services.Unit
 
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authOrganizationId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationId;
-            var ppdLabelForLookup = _configService.GetConfigValue("ppdUnitName");
+            var ppdLabelForLookup = _settingService.GetGlobalSettings()[SystemSettingType.MassLoadingUnitName];
 
             var units = _dbContext.Units.Where(i => i.Name == ppdLabelForLookup && i.OrganizationId == authOrganizationId).ToList();
 

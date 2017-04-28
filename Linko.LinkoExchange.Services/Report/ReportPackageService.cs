@@ -41,7 +41,6 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly IOrganizationService _orgService;
         private readonly ISampleService _sampleService;
         private readonly IMapHelper _mapHelper;
-        private readonly IConfigSettingService _configService;
 
         public ReportPackageService(
             IProgramService programService,
@@ -55,8 +54,7 @@ namespace Linko.LinkoExchange.Services.Report
             ISettingService settingService,
             IOrganizationService orgService,
             ISampleService sampleService,
-            IMapHelper mapHelper,
-            IConfigSettingService configService
+            IMapHelper mapHelper
             )
         {
             _programService = programService;
@@ -71,7 +69,6 @@ namespace Linko.LinkoExchange.Services.Report
             _orgService = orgService;
             _sampleService = sampleService;
             _mapHelper = mapHelper;
-            _configService = configService;
         }
 
 
@@ -1087,8 +1084,8 @@ namespace Linko.LinkoExchange.Services.Report
         public ICollection<FileStoreDto> GetFilesForSelection(int reportPackageId)
         {
             var fileStoreList = new List<FileStoreDto>();
-            var ageInMonthsSinceFileUploaded = Int32.Parse(_configService.GetConfigValue("ageInMonthsSinceFileUploaded"));
-            var xMonthsAgo = DateTimeOffset.UtcNow.AddMonths(-16);
+            var ageInMonthsSinceFileUploaded = Int32.Parse(_settingService.GetGlobalSettings()[SystemSettingType.FileAvailableToAttachMaxAgeMonths]);
+            var xMonthsAgo = DateTimeOffset.UtcNow.AddMonths(-ageInMonthsSinceFileUploaded);
 
             var reportPackage = _dbContext.ReportPackages
                 .Include(rp => rp.ReportPackageElementCategories)

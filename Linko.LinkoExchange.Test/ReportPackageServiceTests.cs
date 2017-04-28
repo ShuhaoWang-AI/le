@@ -71,7 +71,7 @@ namespace Linko.LinkoExchange.Test
 
             _configService.Setup(s => s.GetConfigValue(It.IsAny<string>())).Returns("16");
 
-            var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, _configService.Object, actualSettingService);
+            var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, actualSettingService);
             var actualSampleService = new SampleService(connection, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService);
 
             _reportPackageService = new ReportPackageService(
@@ -86,8 +86,7 @@ namespace Linko.LinkoExchange.Test
                 actualSettingService,
                 _orgService.Object,
                 actualSampleService,
-                new MapHelper(),
-                _configService.Object
+                new MapHelper()
             );
         }
 

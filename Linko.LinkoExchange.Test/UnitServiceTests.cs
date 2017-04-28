@@ -59,7 +59,6 @@ namespace Linko.LinkoExchange.Test
                 _httpContext.Object,
                 _timeZones.Object,
                 _orgService.Object,
-                _configService.Object,
                 _settings.Object);
         }
 

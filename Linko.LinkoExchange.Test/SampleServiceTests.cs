@@ -60,7 +60,6 @@ namespace Linko.LinkoExchange.Test
                 _httpContext.Object,
                 actualTimeZoneService,
                 _orgService.Object,
-                new Mock<IConfigSettingService>().Object,
                 actualSettings);
 
             _sampleService = new SampleService(connection, 

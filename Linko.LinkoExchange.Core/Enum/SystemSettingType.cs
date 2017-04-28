@@ -11,6 +11,8 @@
         PasswordExpiredDays,
         SupportPhoneNumber,
         SupportEmailAddress,
-        EmailServer
+        EmailServer,
+        MassLoadingUnitName,
+        FileAvailableToAttachMaxAgeMonths
     }
 }
