@@ -88,6 +88,11 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns>Collection of FileStoreDto objects</returns>
         ICollection<FileStoreDto> GetFilesForSelection(int reportPackageId);
 
+        /// <summary>
+        /// Gets a collection of SampleDto's that are eligible to be added this Report Package
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <returns>Collection of SampleDto objects</returns>
         ICollection<SampleDto> GetSamplesForSelection(int reportPackageId);
     }
 }

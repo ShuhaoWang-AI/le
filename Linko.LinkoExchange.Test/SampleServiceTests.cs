@@ -488,7 +488,7 @@ namespace Linko.LinkoExchange.Test
                 {
 
                 }
-                else if (fieldName == "ByOrganizationRegulatoryProgramDto")
+                else if (fieldName == "ByOrganizationTypeName")
                 {
 
                 }

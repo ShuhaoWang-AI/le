@@ -139,17 +139,17 @@ namespace Linko.LinkoExchange.Test
             //Fetch existing
             var existingReportPackage = _reportPackageService.GetReportPackage(8, false);
 
-            existingReportPackage.Comments = "This is a TEST of saving comments.";
+            existingReportPackage.Comments = "TESTING COMMENTS!";
 
             //Add sample associations
             existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
-            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 36, ReportPackageElementTypeId = 13 });
+            //existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 36, ReportPackageElementTypeId = 13 });
             existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 38, ReportPackageElementTypeId = 13 });
 
             //Add file associations
             existingReportPackage.AssociatedFiles = new List<ReportFileDto>();
-            existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 14 });
-            existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 14 });
+            //existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 14 });
+            //existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 14 });
 
             var existingId = _reportPackageService.SaveReportPackage(existingReportPackage);
         }
