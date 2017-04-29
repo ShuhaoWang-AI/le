@@ -30,13 +30,13 @@
             <div class="box-tools pull-right">
                 @if (!ViewBag.Satus.Equals("ViewOnly"))
                 {
-                    ViewBag.PostURL = Url.Action(actionName: "NewReportPackageTemplateDetails", controllerName:"Authority");
+                    ViewBag.PostURL = Url.Action(actionName:"NewReportPackageTemplateDetails", controllerName:"Authority");
 
-                    <input type="button" value="Save" id="btnSave" class="btn btn-primary btn-sm"/>
+                    <input class="btn btn-primary btn-sm" id="btnSave" type="button" value="Save" />
 
                     if (!ViewBag.Satus.Equals("New"))
                     {
-                        ViewBag.PostURL = Url.Action(actionName: "ReportPackageTemplateDetails", controllerName: "Authority");
+                        ViewBag.PostURL = Url.Action(actionName:"ReportPackageTemplateDetails", controllerName:"Authority");
 
                         <input class="btn btn-primary btn-sm" data-target="#DeleteReportPackageTemplateModal" data-toggle="modal" type="button" value="Delete" />
                     }
@@ -207,13 +207,13 @@
 
             <div class="col-md-6">
                 <h4 class="box-title">Available Sample And Result Types</h4>
-                <table class="hover table table-bordered table-condensed table-responsive table-striped" id="availableSamplesAndResultsTable">
+                <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="availableSamplesAndResultsTable">
                     <thead>
                         <tr>
-                            <th>Id</th>
+                            <th class="never">Id</th>
                             <th>Name</th>
                             <th>Description</th>
-                            <th class="text-center" style="width: 25px">Add</th>
+                            <th style="width: 25px">Add</th>
                         </tr>
                     </thead>
 
@@ -238,14 +238,14 @@
             <div class="col-md-6">
                 <h4 class="box-title">Selected Samples And Results Types</h4>
 
-                <table class="table table-bordered table-condensed table-hover table-responsive table-striped" id="selectedSamplesAndResultsTable">
+                <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="selectedSamplesAndResultsTable">
                     <thead>
                         <tr>
                             <th style="width: 30px"></th>
-                            <th>Id</th>
+                            <th class="never">Id</th>
                             <th>Name</th>
                             <th>Description</th>
-                            <th class="text-center" style="width: 60px">Remove</th>
+                            <th style="width: 60px">Remove</th>
                         </tr>
                     </thead>
 
@@ -297,13 +297,13 @@
 
             <div class="col-md-6">
                 <h4 class="box-title">Available Attachment Types</h4>
-                <table class="hover table table-bordered table-condensed table-responsive table-striped" id="availableAttachmentTable">
+                <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="availableAttachmentTable">
                     <thead>
                         <tr>
-                            <th>Id</th>
+                            <th class="never">Id</th>
                             <th>Name</th>
                             <th>Description</th>
-                            <th class="text-center" style="width: 25px">Add</th>
+                            <th style="width: 25px">Add</th>
                         </tr>
                     </thead>
 
@@ -328,14 +328,14 @@
             <div class="col-md-6">
                 <h4 class="box-title">Selected Attachment Types</h4>
 
-                <table class="table table-bordered table-condensed table-hover table-responsive table-striped" id="selectedAttachmentTable">
+                <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="selectedAttachmentTable">
                     <thead>
                         <tr>
                             <th style="width: 30px"></th>
-                            <th>Id</th>
+                            <th class="never">Id</th>
                             <th>Name</th>
                             <th>Description</th>
-                            <th class="text-center" style="width: 60px">Remove</th>
+                            <th style="width: 60px">Remove</th>
                         </tr>
                     </thead>
 
@@ -387,13 +387,13 @@
 
             <div class="col-md-6">
                 <h4 class="box-title">Available Certification Types</h4>
-                <table class="hover table table-bordered table-condensed table-responsive table-striped" id="availableCertificationTable">
+                <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="availableCertificationTable">
                     <thead>
                         <tr>
-                            <th>Id</th>
+                            <th class="never">Id</th>
                             <th>Name</th>
                             <th>Description</th>
-                            <th class="text-center" style="width: 25px">Add</th>
+                            <th style="width: 25px">Add</th>
                         </tr>
                     </thead>
 
@@ -418,14 +418,14 @@
             <div class="col-md-6">
                 <h4 class="box-title">Selected Certification Types</h4>
 
-                <table class="table table-bordered table-condensed table-hover table-responsive table-striped" id="selectedCertificationTable">
+                <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="selectedCertificationTable">
                     <thead>
                         <tr>
                             <th style="width: 30px"></th>
-                            <th>Id</th>
+                            <th class="never">Id</th>
                             <th>Name</th>
                             <th>Description</th>
-                            <th class="text-center" style="width: 60px">Remove</th>
+                            <th style="width: 60px">Remove</th>
                         </tr>
                     </thead>
 
@@ -478,15 +478,15 @@
 
             <div class="col-md-6">
                 <h4 class="box-title">Available Industries</h4>
-                <table class="hover table table-bordered table-condensed table-responsive table-striped" id="availableIndustryTable">
+                <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="availableIndustryTable">
                     <thead>
                         <tr>
-                            <th>Id</th>
+                            <th class="never">Id</th>
                             <th>No</th>
                             <th>Name</th>
                             <th>Address</th>
                             <th>Classification</th>
-                            <th class="text-center" style="width: 25px">Add</th>
+                            <th style="width: 25px">Add</th>
                         </tr>
                     </thead>
 
@@ -513,15 +513,15 @@
             <div class="col-md-6">
                 <h4 class="box-title">Selected Industries</h4>
 
-                <table class="table table-bordered table-condensed table-hover table-responsive table-striped" id="selectedIndustryTable">
+                <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="selectedIndustryTable">
                     <thead>
                         <tr>
-                            <th>Id</th>
+                            <th class="never">Id</th>
                             <th>No</th>
                             <th>Name</th>
                             <th>Address</th>
                             <th>Classification</th>
-                            <th class="text-center" style="width: 60px">Remove</th>
+                            <th style="width: 60px">Remove</th>
                         </tr>
                     </thead>
 
@@ -551,10 +551,6 @@
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 
-    <link href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script>
-
     <script>
 
         var noHint = $.noop;
@@ -570,14 +566,13 @@
         }
 
         $(document)
-            .ready(function ()
+            .ready(function()
             {
                 $('#availableSamplesAndResultsTable')
                     .DataTable(
                         {
                             "columnDefs": [
                                 { "searchable": true, "targets": [1, 2] }
-                                , { "targets": [0], "visible": false, "searchable": false }
                                 , {
                                     "defaultContent":
                                         "<button class='btn btn-primary btn-sm' id='btnAddSamplesAndResults' disabled='disabled'><i class='fa fa-plus'></i></button>"
@@ -587,10 +582,10 @@
                             , "searching": false
                             , "ordering": true
                             , "order": [[1, 'asc']]
-                            , "scrollY": "35vh"
-                            , "scrollCollapse": true
                             , "paging": false
                             , "info": false
+                            , "responsive": true
+                            , "autoWidth": false
                             , "processing": true
                             , "stateSave": false
                             , "language": {
@@ -606,7 +601,6 @@
                         {
                             "columnDefs": [
                                 { "searchable": true, "targets": [2, 3] }
-                                , { "targets": [1], "visible": false, "searchable": false }
                                 , {
                                     "defaultContent":
                                         "<span class='btn btn-sm handler'>&nbsp;</span>"
@@ -620,10 +614,10 @@
                             ]
                             , "searching": false
                             , "ordering": false
-                            , "scrollY": "35vh"
-                            , "scrollCollapse": true
                             , "paging": false
                             , "info": false
+                            , "responsive": true
+                            , "autoWidth": false
                             , "processing": true
                             , "stateSave": false
                             , "language": {
@@ -639,7 +633,6 @@
                         {
                             "columnDefs": [
                                 { "searchable": true, "targets": [1, 2] }
-                                , { "targets": [0], "visible": false, "searchable": false }
                                 , {
                                     "defaultContent":
                                         "<button class='btn btn-primary btn-sm' id='btnAddAttachment'><i class='fa fa-plus'></i></button>"
@@ -649,10 +642,10 @@
                             , "searching": false
                             , "ordering": true
                             , "order": [[1, 'asc']]
-                            , "scrollY": "35vh"
-                            , "scrollCollapse": true
                             , "paging": false
                             , "info": false
+                            , "responsive": true
+                            , "autoWidth": false
                             , "processing": true
                             , "stateSave": false
                             , "language": {
@@ -668,7 +661,6 @@
                         {
                             "columnDefs": [
                                 { "searchable": true, "targets": [2, 3] }
-                                , { "targets": [1], "visible": false, "searchable": false }
                                 , {
                                     "defaultContent":
                                         "<span class='btn btn-sm handler'>&nbsp;</span>"
@@ -682,10 +674,10 @@
                             ]
                             , "searching": false
                             , "ordering": false
-                            , "scrollY": "35vh"
-                            , "scrollCollapse": true
                             , "paging": false
                             , "info": false
+                            , "responsive": true
+                            , "autoWidth": false
                             , "processing": true
                             , "stateSave": false
                             , "language": {
@@ -701,7 +693,6 @@
                         {
                             "columnDefs": [
                                 { "searchable": true, "targets": [1, 2] }
-                                , { "targets": [0], "visible": false, "searchable": false }
                                 , {
                                     "defaultContent":
                                         "<button class='btn btn-primary btn-sm' id='btnAddCertification'><i class='fa fa-plus'></i></button>"
@@ -711,10 +702,10 @@
                             , "searching": false
                             , "ordering": true
                             , "order": [[1, 'asc']]
-                            , "scrollY": "35vh"
-                            , "scrollCollapse": true
                             , "paging": false
                             , "info": false
+                            , "responsive": true
+                            , "autoWidth": false
                             , "processing": true
                             , "stateSave": false
                             , "language": {
@@ -730,7 +721,6 @@
                         {
                             "columnDefs": [
                                 { "searchable": true, "targets": [2, 3] }
-                                , { "targets": [1], "visible": false, "searchable": false }
                                 , {
                                     "defaultContent":
                                         "<span class='btn btn-sm handler'>&nbsp;</span>"
@@ -744,10 +734,10 @@
                             ]
                             , "searching": false
                             , "ordering": false
-                            , "scrollY": "35vh"
-                            , "scrollCollapse": true
                             , "paging": false
                             , "info": false
+                            , "responsive": true
+                            , "autoWidth": false
                             , "processing": true
                             , "stateSave": false
                             , "language": {
@@ -763,7 +753,6 @@
                         {
                             "columnDefs": [
                                 { "searchable": true, "targets": [1, 2, 3, 4] }
-                                , { "targets": [0], "visible": false, "searchable": false }
                                 , {
                                     "defaultContent":
                                         "<button class='btn btn-primary btn-sm' id='btnAddIndustry'><i class='fa fa-plus'></i></button>"
@@ -772,10 +761,10 @@
                             ]
                             , "ordering": true
                             , "order": [[1, 'asc']]
-                            , "scrollY": "35vh"
-                            , "scrollCollapse": true
                             , "paging": false
                             , "info": false
+                            , "responsive": true
+                            , "autoWidth": false
                             , "processing": true
                             , "stateSave": false
                             , "language": {
@@ -791,7 +780,6 @@
                         {
                             "columnDefs": [
                                 { "searchable": true, "targets": [1, 2, 3, 4] }
-                                , { "targets": [0], "visible": false, "searchable": false }
                                 , {
                                     "defaultContent":
                                         "<button class='btn btn-danger btn-sm' id='btnRemoveIndustry'><i class='fa fa-minus'></i></button>"
@@ -800,10 +788,10 @@
                             ]
                             , "ordering": true
                             , "order": [[1, 'asc']]
-                            , "scrollY": "35vh"
-                            , "scrollCollapse": true
                             , "paging": false
                             , "info": false
+                            , "responsive": true
+                            , "autoWidth": false
                             , "processing": true
                             , "stateSave": false
                             , "language": {
@@ -818,7 +806,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnAddSamplesAndResults']"
-                , function ()
+                , function()
                 {
                     var tableMoveFrom = $('#availableSamplesAndResultsTable').DataTable();
 
@@ -841,7 +829,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnRemoveSamplesAndResults']"
-                , function ()
+                , function()
                 {
                     var tableMoveFrom = $('#selectedSamplesAndResultsTable').DataTable();
 
@@ -864,7 +852,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnAddAttachment']"
-                , function ()
+                , function()
                 {
                     var tableMoveFrom = $('#availableAttachmentTable').DataTable();
 
@@ -887,7 +875,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnRemoveAttachment']"
-                , function ()
+                , function()
                 {
                     var tableMoveFrom = $('#selectedAttachmentTable').DataTable();
 
@@ -910,7 +898,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnAddCertification']"
-                , function ()
+                , function()
                 {
                     var tableMoveFrom = $('#availableCertificationTable').DataTable();
 
@@ -933,7 +921,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnRemoveCertification']"
-                , function ()
+                , function()
                 {
                     var tableMoveFrom = $('#selectedCertificationTable').DataTable();
 
@@ -956,7 +944,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnAddIndustry']"
-                , function ()
+                , function()
                 {
                     var tableMoveFrom = $('#availableIndustryTable').DataTable();
 
@@ -979,7 +967,7 @@
         $(document)
             .on('click'
                 , "button[id^='btnRemoveIndustry']"
-                , function ()
+                , function()
                 {
                     var tableMoveFrom = $('#selectedIndustryTable').DataTable();
 
@@ -1001,20 +989,20 @@
 
         $("#btnSave")
             .on("click"
-                , function ()
+                , function()
                 {
                     var selectedSamplesAndResults = [];
                     $('#selectedSamplesAndResultsTable')
                         .DataTable()
                         .rows()
                         .data()
-                        .each(function (value, index)
+                        .each(function(value, index)
                         {
                             var reportElementTypeViewModel = {};
                             reportElementTypeViewModel.Id = value[1];
                             reportElementTypeViewModel.Name = value[2];
                             selectedSamplesAndResults.push(reportElementTypeViewModel);
-                            console.log( 'Data in index: '+index+' is: '+value );
+                            console.log('Data in index: ' + index + ' is: ' + value);
                         });
 
                     var selectedAttachments = [];
@@ -1022,13 +1010,13 @@
                         .DataTable()
                         .rows()
                         .data()
-                        .each(function (value, index)
+                        .each(function(value, index)
                         {
                             var reportElementTypeViewModel = {};
                             reportElementTypeViewModel.Id = value[1];
                             reportElementTypeViewModel.Name = value[2];
                             selectedAttachments.push(reportElementTypeViewModel);
-                            console.log( 'Data in index: '+index+' is: '+value );
+                            console.log('Data in index: ' + index + ' is: ' + value);
                         });
 
                     var selectedCertifications = [];
@@ -1036,13 +1024,13 @@
                         .DataTable()
                         .rows()
                         .data()
-                        .each(function (value, index)
+                        .each(function(value, index)
                         {
                             var reportElementTypeViewModel = {};
                             reportElementTypeViewModel.Id = value[1];
                             reportElementTypeViewModel.Name = value[2];
                             selectedCertifications.push(reportElementTypeViewModel);
-                            console.log( 'Data in index: '+index+' is: '+value );
+                            console.log('Data in index: ' + index + ' is: ' + value);
                         });
 
                     var selectedIndustries = [];
@@ -1050,7 +1038,7 @@
                         .DataTable()
                         .rows()
                         .data()
-                        .each(function (value, index)
+                        .each(function(value, index)
                         {
                             var industryViewModel = {};
                             industryViewModel.Id = value[0];
@@ -1083,7 +1071,7 @@
                         type: "POST"
                         , url: postUrl
                         , data: viewModel
-                        , success: function (response)
+                        , success: function(response)
                         {
                             if (response.redirect != null && response.redirect)
                             {

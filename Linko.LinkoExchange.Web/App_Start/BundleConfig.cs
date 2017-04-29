@@ -12,6 +12,8 @@ namespace Linko.LinkoExchange.Web
                             //.Include(virtualPath: "~/Content/select2.css")
                             .Include(virtualPath:"~/Content/bootstrap-switch/bootstrap3/bootstrap-switch.css")
                             .Include(virtualPath:"~/Content/AdminLTE/css/datepicker3.css")
+                            .Include(virtualPath:"~/Content/AdminLTE/css/dataTables.bootstrap.css")
+                            .Include(virtualPath:"~/Content/AdminLTE/css/dataTables.responsive.css")
                             // .Include(virtualPath: "~/Content/AdminLTE/css/AdminLTE.css") // Don't include this file in bundling as it fails to load fonts
                             //.Include(virtualPath: "~/Content/AdminLTE/css/skins/skin-blue-light.css")
                             .Include(virtualPath:"~/Content/site.css",
@@ -33,6 +35,9 @@ namespace Linko.LinkoExchange.Web
                             //.Include(virtualPath: "~/Scripts/moment.js")
                             .Include(virtualPath:"~/Scripts/AdminLTE/bootstrap-datepicker.js")
                             .Include(virtualPath:"~/Scripts/jquery.icheck.js")
+                            .Include(virtualPath:"~/Scripts/AdminLTE/dataTables.bootstrap.js")
+                            .Include(virtualPath:"~/Scripts/AdminLTE/jquery.dataTables.js")
+                            .Include(virtualPath:"~/Scripts/AdminLTE/dataTables.responsive.js")
                             .Include(virtualPath:"~/Scripts/AdminLTE/app.js")
                             .Include(virtualPath:"~/Scripts/AdminLTE/init.js")
                             .Include(virtualPath:"~/Scripts/linkoExchange.js"));

@@ -863,7 +863,7 @@ namespace Linko.LinkoExchange.Services.Sample
             }
             if (endDate.HasValue)
             {
-                var endDateUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(startDate.Value, timeZoneId);
+                var endDateUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(endDate.Value, timeZoneId);
                 foundSamples = foundSamples.Where(s => s.EndDateTimeUtc <= endDateUtc);
             }
 

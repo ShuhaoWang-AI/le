@@ -20,6 +20,54 @@ module.exports = function (grunt) {
                     expand: true
                 }
                 , {
+                    cwd: 'plugins/datatables/',
+                    src: 'dataTables.bootstrap.css',
+                    dest: '../Linko.LinkoExchange.Web/Content/AdminLTE/css/',
+                    expand: true
+                }
+                , {
+                    cwd: 'plugins/datatables/',
+                    src: 'dataTables.bootstrap.js',
+                    dest: '../Linko.LinkoExchange.Web/scripts/AdminLTE/',
+                    expand: true
+                }
+                , {
+                    cwd: 'plugins/datatables/',
+                    src: 'dataTables.bootstrap.min.js',
+                    dest: '../Linko.LinkoExchange.Web/scripts/AdminLTE/',
+                    expand: true
+                }
+                , {
+                    cwd: 'plugins/datatables/extensions/Responsive/css',
+                    src: 'dataTables.responsive.css',
+                    dest: '../Linko.LinkoExchange.Web/Content/AdminLTE/css/',
+                    expand: true
+                }
+                , {
+                    cwd: 'plugins/datatables/extensions/Responsive/js',
+                    src: 'dataTables.responsive.js',
+                    dest: '../Linko.LinkoExchange.Web/scripts/AdminLTE/',
+                    expand: true
+                }
+                , {
+                    cwd: 'plugins/datatables/extensions/Responsive/js',
+                    src: 'dataTables.responsive.min.js',
+                    dest: '../Linko.LinkoExchange.Web/scripts/AdminLTE/',
+                    expand: true
+                }
+                , {
+                    cwd: 'plugins/datatables/',
+                    src: 'jquery.dataTables.js',
+                    dest: '../Linko.LinkoExchange.Web/scripts/AdminLTE/',
+                    expand: true
+                }
+                , {
+                    cwd: 'plugins/datatables/',
+                    src: 'jquery.dataTables.min.js',
+                    dest: '../Linko.LinkoExchange.Web/scripts/AdminLTE/',
+                    expand: true
+                }
+                , {
                     cwd: 'plugins/slimScroll/',
                     src: 'jquery.slimscroll.js',
                     dest: '../Linko.LinkoExchange.Web/scripts/AdminLTE/',

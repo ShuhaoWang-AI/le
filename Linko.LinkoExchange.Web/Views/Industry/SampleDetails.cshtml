@@ -1,4 +1,5 @@
 ﻿@using Linko.LinkoExchange.Core.Enum
+@using Microsoft.Ajax.Utilities
 @model Linko.LinkoExchange.Web.ViewModels.Shared.SampleViewModel
 
 @{
@@ -18,7 +19,9 @@
             <li>
                 <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.Draft})'"><i class=""></i> Samples </a>
             </li>
-            <li class="active">Details</li>
+            <li class="active">
+                Details
+            </li>
         </ol>
     </section>
 
@@ -30,31 +33,16 @@
 
             <div class="box-tools pull-right">
 
-                @if (!Model.IsReadyToReport)
-                {
-                    if (!ViewBag.Satus.Equals("New"))
-                    {
-                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"SampleDetails", controllerName:"Industry")" formmethod="post" />
-
-                        <input class="btn btn-primary btn-sm" data-target="#DeleteSampleModal" data-toggle="modal" type="button" value="Delete" />
-                    }
-                    else
-                    {
-                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"NewSampleDetailsStep2", controllerName:"Industry")" formmethod="post" />
-                    }
-                }
-
-
                 @switch (Model.SampleStatusName)
                 {
                     case SampleStatusName.Draft:
-                        <strong class="bg-yellow text-info"> &nbsp;&nbsp;Draft&nbsp; </strong>
+                        <strong class="bg-yellow btn-sm text-info"> &nbsp;&nbsp;Draft&nbsp; </strong>
                         break;
                     case SampleStatusName.ReadyToReport:
-                        <strong class="bg-yellow text-info"> &nbsp;&nbsp;Ready to Report&nbsp; </strong>
+                        <strong class="bg-yellow btn-sm text-info"> &nbsp;&nbsp;Ready to Report&nbsp; </strong>
                         break;
                     case SampleStatusName.Reported:
-                        <strong class="bg-yellow text-info"> &nbsp;&nbsp;Reported&nbsp; </strong>
+                        <strong class="bg-yellow btn-sm text-info"> &nbsp;&nbsp;Reported&nbsp; </strong>
                         break;
                 }
 
@@ -103,17 +91,18 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                @Html.HiddenFor(model => model.Id)
-                @Html.HiddenFor(model => model.MassLoadingConversionFactorPounds)
-                @Html.HiddenFor(model => model.MassLoadingCalculationDecimalPlaces)
-                @Html.HiddenFor(model => model.IsMassLoadingResultToUseLessThanSign)
-                @Html.HiddenFor(model => model.MassLoadingMassLoadingUnitId)
-                @Html.HiddenFor(model => model.MassLoadingMassLoadingUnitName)
-                @Html.HiddenFor(model => model.ResultQualifierValidValues)
-                @Html.HiddenFor(model => model.SampleStatusName)
-            </div>
             <div class="form-horizontal">
+                <div class="form-group">
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.HiddenFor(model => model.MassLoadingConversionFactorPounds)
+                    @Html.HiddenFor(model => model.MassLoadingCalculationDecimalPlaces)
+                    @Html.HiddenFor(model => model.IsMassLoadingResultToUseLessThanSign)
+                    @Html.HiddenFor(model => model.MassLoadingMassLoadingUnitId)
+                    @Html.HiddenFor(model => model.MassLoadingMassLoadingUnitName)
+                    @Html.HiddenFor(model => model.ResultQualifierValidValues)
+                    @Html.HiddenFor(model => model.SampleStatusName)
+                </div>
+
                 <div class="form-group">
                     <div class="col-sm-4">
                         @Html.LabelFor(model => model.CollectionMethodId, htmlAttributes:new
@@ -157,7 +146,7 @@
                         <div class="col-sm-8">
                             @(Html.Kendo().DateTimePicker()
                                   .Name(componentName:"StartDateTimeLocal")
-                                  .Value(date: Model.StartDateTimeLocal)
+                                  .Value(date:Model.StartDateTimeLocal)
                                   .Format(format:"MM/dd/yyyy hh:mm:ss tt")
                                   .HtmlAttributes(attributes:new
                                                              {
@@ -214,12 +203,12 @@
                         <div class="col-sm-8">
                             @(Html.Kendo().DateTimePicker()
                                   .Name(componentName:"EndDateTimeLocal")
-                                  .Value(date: Model.EndDateTimeLocal)
+                                  .Value(date:Model.EndDateTimeLocal)
                                   .Format(format:"MM/dd/yyyy hh:mm:ss tt")
                                   .HtmlAttributes(attributes:new
-                                  {
-                                      style = "width:210px;"
-                                  }))
+                                                             {
+                                                                 style = "width:210px;"
+                                                             }))
                         </div>
                     </div>
                 </div>
@@ -230,21 +219,23 @@
     //parameter Groups
 
     <div class="box box-primary">
-        <div class="box-header with-border" data-toggle="collapse" data-target="#step2">
+        <div class="box-header with-border" data-target="#step2" data-toggle="collapse">
             <strong>Parameter Groups</strong>
             <div class="box-tools pull-right">
-                <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            </div><!-- /.box-tools -->
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
         </div>
         <div class="box-body box-collapse collapse in" id="step2">
-            <table class="table table-striped table-bordered table-condensed" id="ParameterGroupTable">
+            <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="ParameterGroupTable">
                 <thead>
                     <tr>
-                        <th>Id</th>
+                        <th class="never">Id</th>
                         <th>Parameter Group</th>
                         <th>Description</th>
-                        <th>ParameterIds</th>
-                        <th class="text-center">Add</th>
+                        <th class="never">ParameterIds</th>
+                        <th style="width: 50px">Add</th>
                     </tr>
                 </thead>
 
@@ -255,9 +246,9 @@
                             <td>@parameterGroup.Id</td>
                             <td>@parameterGroup.Name</td>
                             <td>@parameterGroup.Description</td>
-                            <td>@string.Join(",", parameterGroup.ParameterIds)</td>
-                            <td align="center">
-                                <button class="btn btn-sm btn-primary" name="AddParamsFromGroup" data-title="AddParamsFromGroup">
+                            <td>@parameterGroup.ParameterIds</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" data-title="btnAddParamsFromGroup" name="btnAddParamsFromGroup">
                                     <i class="fa fa-lg fa-plus"></i>
                                 </button>
                             </td>
@@ -267,4 +258,342 @@
             </table>
         </div>
     </div>
-}
+
+    // Results
+
+    <div class="box box-primary">
+        <div class="box-header with-border" data-target="#step3" data-toggle="collapse">
+            <strong>Results</strong>
+            <div class="box-tools pull-right">
+                <button class="btn btn-primary btn-sm">Add Parameter</button>
+                <button class="btn btn-primary btn-sm">Delete Empty Parameters</button>
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="box-body box-collapse collapse in" id="step3">
+            <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="ParameterTable">
+                <thead>
+                    <tr>
+                        <th class="never"> Id </th>
+                        <th> Parameter Name</th>
+                        <th style="width: 50px"> Qualifier </th>
+                        <th> Result </th>
+                        <th style="width: 80px"> MDL </th>
+                        <th> Analysis Method </th>
+                        <th> Analysis Date & Time </th>
+                        <th style="width: 50px"> EPA Method </th>
+                        <th style="width: 50px"> Calculate Loading </th>
+                        <th> Mass Loading Result</th>
+                        <th style="width: 50px"> Remove</th>
+                    </tr>
+                </thead>
+
+                <tbody class="input-sm">
+                    @foreach (var sampleResult in Model.SampleResults)
+                    {
+                        <tr>
+                            <td>
+                                <input id="sampleResultId_@sampleResult.ParameterId" type="hidden" value=@(sampleResult.Id.HasValue ? sampleResult.Id.Value.ToString() : "")>
+                            </td>
+                            <td>@sampleResult.ParameterName</td>
+                            <td>
+                                <select class="form-control input-sm no-margin no-padding" id="Qualifier_@sampleResult.ParameterId" style="width: 100%">
+                                    @foreach (var q in Model.AvailableResultQualifierValidValues)
+                                    {
+                                        if (q.Value.Equals(value:sampleResult.Qualifier.IfNullOrWhiteSpace(defaultValue:"NUMERIC")))
+                                        {
+                                            <option value=@q.Value selected> @q.Text </option>
+                                        }
+                                        else
+                                        {
+                                            <option value=@q.Value> @q.Text </option>
+                                        }
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                <div class="input-group input-group-sm">
+                                    <input class="form-control input-sm" id="Result_@sampleResult.ParameterId" type="text" value=@sampleResult.Value>
+                                    <input id="UnitId_@sampleResult.ParameterId" type="hidden" value=@sampleResult.UnitId>
+                                    <span class="input-group-addon">@sampleResult.UnitName</span>
+                                </div>
+                            </td>
+                            <td>
+                                <input class="form-control input-sm" id="MDL_@sampleResult.ParameterId" type="text" value=@sampleResult.EnteredMethodDetectionLimit>
+                            </td>
+                            <td>
+                                <div class="input-group input-group-sm">
+                                    <input class="form-control input-sm" id="AnalysisMethod_@sampleResult.ParameterId" type="text" value=@sampleResult.AnalysisMethod>
+                                </div>
+                            </td>
+                            <td>
+                                @(Html.Kendo().DateTimePicker()
+                                      .Name(componentName:"AnalysisDateTime_" + sampleResult.ParameterId)
+                                      .Value(date:sampleResult.AnalysisDateTimeLocal)
+                                      .Format(format:"MM/dd/yyyy hh:mm:ss tt")
+                                      .HtmlAttributes(attributes:new
+                                                                 {
+                                                                     style = "width:200px; font-size:12px"
+                                                                 }))
+                            </td>
+                            <td>
+                                @if (sampleResult.IsApprovedEPAMethod)
+                                {
+                                    <input type='checkbox' class='checkbox' id="EPAMethod_@sampleResult.ParameterId" checked />
+                                }
+                                else
+                                {
+                                    <input type='checkbox' class='checkbox' id="EPAMethod_@sampleResult.ParameterId" />
+                                }
+                            </td>
+                            <td>
+                                @if (sampleResult.IsCalcMassLoading)
+                                {
+                                    <input type='checkbox' class='checkbox' name="CkCalcLoading" id="CalcLoading_@sampleResult.ParameterId" checked />
+                                }
+                                else
+                                {
+                                    <input type='checkbox' class='checkbox' name="CkCalcLoading" id="CalcLoading_@sampleResult.ParameterId" />
+                                }
+                            </td>
+                            <td>
+                                <strong id="MassResult_@sampleResult.ParameterId"> @sampleResult.MassLoadingValue </strong>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" data-title="Delete Parameter" id="btnDeleteParam">
+                                    <i class="fa fa-lg fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    // Buttons
+
+    <div class="box box-default">
+        <div class="box-body">
+            <strong>&nbsp;</strong>
+            <div class="box-tools pull-right">
+
+                @if (Model.SampleStatusName != SampleStatusName.Reported)
+                {
+                    if (!ViewBag.Satus.Equals("New"))
+                    {
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"SampleDetails", controllerName:"Industry")" formmethod="post" />
+
+                        <input class="btn btn-primary btn-sm" data-target="#DeleteSampleModal" data-toggle="modal" type="button" value="Delete" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"NewSampleDetailsStep2", controllerName:"Industry")" formmethod="post" />
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document)
+            .ready(function()
+            {
+                $('#ParameterGroupTable')
+                    .DataTable(
+                        {
+                            "columnDefs": [
+                                {
+                                    "defaultContent":
+                                        "<button class='btn btn-primary btn-sm' data-title='btnAddParamsFromGroup' name='btnAddParamsFromGroup'><i class='fa fa-lg fa-plus'></i></button>"
+                                    , "targets": 4
+                                }
+                            ]
+                            , "searching": false
+                            , "ordering": false
+                            , "order": [[1, 'asc']]
+                            , "paging": false
+                            , "info": false
+                            , "responsive": true
+                            , "autoWidth": false
+                            , "processing": true
+                            , "stateSave": false
+                        }
+                    );
+
+                $('#ParameterTable')
+                    .DataTable(
+                        {
+                            "columnDefs": [
+                                {
+                                    "defaultContent":
+                                        "<button class='btn btn-danger btn-sm' id='btnDeleteParam'><i class='fa fa-plus'></i></button>"
+                                    , "targets": 10
+                                }
+                            ]
+                            , "searching": false
+                            , "ordering": false
+                            , "order": [[1, 'asc']]
+                            , "paging": false
+                            , "info": false
+                            , "responsive": true
+                            , "autoWidth": false
+                            , "processing": true
+                            , "stateSave": false
+                            , language: {
+                                search: ""
+                                , searchPlaceholder: "Search Parameter..."
+                            }
+                        }
+                    );
+
+                $("input[id^='CalcLoading_']:checkbox:checked")
+                    .each(function()
+                    {
+                        var paramId = this.id.replace('CalcLoading_', '');
+                        displayMassLoading(paramId);
+                    });
+            });
+
+        function displayMassLoading(paramId)
+        {
+            var clChecked = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
+            if (clChecked)
+            {
+                var qualifier = $("#Qualifier_" + paramId).val();
+                var massLoadingMultiplier = parseFloat($("#MassLoadingConversionFactorPounds").val());
+                var massLoadingUnit = $("#MassLoadingMassLoadingUnitName").val();
+                var isMassLoadingResultToUseLessThanSign = $("#IsMassLoadingResultToUseLessThanSign").val();
+                var massLoadingCalculationDecimalPlaces = parseInt($("#MassLoadingCalculationDecimalPlaces").val());
+
+                if (qualifier == "ND" || qualifier == "NF")
+                {
+                    $("#MassResult_" + paramId).html("").fadeOut(2000);
+                }
+                else if (qualifier == "NUMERIC" || qualifier == ">")
+                {
+                    var result = parseFloat($("#Result_" + paramId).val());
+                    var sampleFlowResult = parseFloat($("#FlowValue").val());
+
+                    if (isNaN(result) || isNaN(sampleFlowResult))
+                    {
+                        $("#MassResult_" + paramId).html("").fadeOut(2000);
+                    }
+                    else
+                    {
+                        $("#MassResult_" + paramId)
+                            .html("")
+                            .fadeOut(1000
+                                , function()
+                                {
+                                    $("#MassResult_" + paramId)
+                                        .html((result * sampleFlowResult * massLoadingMultiplier)
+                                            .toFixed(massLoadingCalculationDecimalPlaces)
+                                            + " "
+                                            + massLoadingUnit)
+                                        .fadeIn(2000);
+                                });
+                    }
+                }
+                else if (qualifier == "<")
+                {
+                    var result = parseFloat($("#Result_" + paramId).val());
+                    var sampleFlowResult = parseFloat($("#FlowValue").val());
+
+                    if (isNaN(result) || isNaN(sampleFlowResult))
+                    {
+                        $("#MassResult_" + paramId).html("").fadeOut(2000);
+                    }
+                    else
+                    {
+                        $("#MassResult_" + paramId)
+                            .html("")
+                            .fadeOut(1000
+                                , function()
+                                {
+                                    $("#MassResult_" + paramId)
+                                        .html((isMassLoadingResultToUseLessThanSign ? qualifier + " " : "")
+                                            + (result * sampleFlowResult * massLoadingMultiplier)
+                                            .toFixed(massLoadingCalculationDecimalPlaces)
+                                            + " "
+                                            + massLoadingUnit)
+                                        .fadeIn(2000);
+                                });
+                    }
+                }
+            }
+            else
+            {
+                $("#MassResult_" + paramId).html("").fadeOut(2000);
+            }
+        }
+
+        $("#FlowValue")
+            .blur(function()
+            {
+                $("input[id^='CalcLoading_']:checkbox:checked")
+                    .each(function()
+                    {
+                        var paramId = this.id.replace('CalcLoading_', '');
+                        displayMassLoading(paramId);
+                    });
+            });
+
+        $("select[id^='Qualifier_']")
+            .change(function()
+            {
+                var paramId = this.id.replace('Qualifier_', '');
+                var qualifier = $("#Qualifier_" + paramId).val();
+
+                if (qualifier == "ND" || qualifier == "NF")
+                {
+                    $("#Result_" + paramId).val("").attr("readonly", "readonly");
+                }
+                else
+                {
+                    $("#Result_" + paramId).removeAttr("readonly");
+                }
+
+                displayMassLoading(paramId);
+            });
+
+        $("input[id^='Result_']")
+            .blur(function()
+            {
+                var paramId = this.id.replace('Result_', '');
+                displayMassLoading(paramId);
+            });
+
+        $("input[id^='CalcLoading_']")
+            .on('ifChecked'
+                , function(event)
+                {
+                    var paramId = this.id.replace('CalcLoading_', '');
+                    displayMassLoading(paramId);
+                });
+
+        $("input[id^='CalcLoading_']")
+            .on('ifUnchecked'
+                , function(event)
+                {
+                    var paramId = this.id.replace('CalcLoading_', '');
+                    displayMassLoading(paramId);
+                });
+
+        $("button[id^='btnDeleteParam']")
+            .click(function()
+            {
+                var table = $('#ParameterTable').DataTable();
+                table
+                    .row($(this).parents('tr'))
+                    .remove()
+                    .draw();
+            });
+    </script>
+}}

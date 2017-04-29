@@ -84,7 +84,6 @@
     transform: translate(50%, -50%) rotate(180deg);
 }
 
-
 .modal
 {
     padding: 0 !important;
@@ -145,6 +144,10 @@ table tbody td .btn
     display: block;
     horizontal-align: middle;
     margin: auto;
+}
+
+.table > tbody > tr > td {
+     vertical-align: middle;
 }
 
 /*tr:nth-child(even) {background-color: #f2f2f2}*/

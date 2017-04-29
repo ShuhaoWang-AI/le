@@ -1102,16 +1102,17 @@ namespace Linko.LinkoExchange.Web.Controllers
                     var viewModel = new SampleViewModel
                                     {
                                         MonitoringPointId = monitoringPoint.MonitoringPointId,
-                                        MonitoringPointName = $"{monitoringPoint.Name} - {monitoringPoint.Description}",
+                                        MonitoringPointName = monitoringPoint.Name,
                                         StartDateTimeLocal = newSampleStep1ViewModel.StartDateTimeLocal,
                                         EndDateTimeLocal = newSampleStep1ViewModel.EndDateTimeLocal,
-                                        AvailableCollectionMethods = new List<SelectListItem>(),
-                                        AvailableCtsEventTypes = new List<SelectListItem>(),
                                         MassLoadingMassLoadingUnitId = viewModelMassLoadingMassLoadingUnitId.UnitId,
                                         MassLoadingMassLoadingUnitName = viewModelMassLoadingMassLoadingUnitId.Name,
+                                        SampleStatusName = SampleStatusName.Draft,
+                                        AvailableCollectionMethods = new List<SelectListItem>(),
+                                        AvailableCtsEventTypes = new List<SelectListItem>(),
+                                        SampleResults = new List<SampleResultViewModel>(),
                                         ParameterGroups = new List<ParameterGroupViewModel>(),
-                                        AllParameters = new List<ParameterViewModel>(),
-                                        SampleStatusName = SampleStatusName.Draft
+                                        //AllParameters = new List<ParameterViewModel>()
                                     };
 
                     viewModel.ResultQualifierValidValues = programSettings.Settings.Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues)).Select(s => s.Value).First();
@@ -1131,15 +1132,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                         .First()
                                                         .IfNullOrWhiteSpace(defaultValue:"true"));
 
-                    viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:monitoringPoint.MonitoringPointId, sampleEndDateTimeUtc:newSampleStep1ViewModel.EndDateTimeLocal)
-                                                               .Select(c => new ParameterViewModel
-                                                                            {
-                                                                                Id = c.ParameterId,
-                                                                                Name = c.Name,
-                                                                                DefaultUnitId = c.DefaultUnit.UnitId,
-                                                                                DefaultUnitName = c.DefaultUnit.Name,
-                                                                                IsCalcMassLoading = c.IsCalcMassLoading
-                                                                            }).OrderBy(c => c.Name).ToList();
+                    //viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:monitoringPoint.MonitoringPointId, sampleEndDateTimeUtc:newSampleStep1ViewModel.EndDateTimeLocal)
+                    //                                           .Select(c => new ParameterViewModel
+                    //                                                        {
+                    //                                                            Id = c.ParameterId,
+                    //                                                            Name = c.Name,
+                    //                                                            DefaultUnitId = c.DefaultUnit.UnitId,
+                    //                                                            DefaultUnitName = c.DefaultUnit.Name,
+                    //                                                            IsCalcMassLoading = c.IsCalcMassLoading
+                    //                                                        }).OrderBy(c => c.Name).ToList();
 
                     viewModel.ParameterGroups =
                         _parameterService.GetAllParameterGroups(monitoringPointId:monitoringPoint.MonitoringPointId, sampleEndDateTimeLocal:newSampleStep1ViewModel.EndDateTimeLocal)
@@ -1148,7 +1149,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                           Id = c.ParameterGroupId,
                                                           Name = c.Name,
                                                           Description = c.Description,
-                                                          ParameterIds = c.Parameters.Select(p => p.ParameterId).ToList()
+                                                          ParameterIds = string.Join(separator:",", values:c.Parameters.Select(p => p.ParameterId).ToList())
                                                       }).OrderBy(c => c.Name).ToList();
                     viewModel.AvailableCollectionMethods = _sampleService.GetCollectionMethods().Select(c => new SelectListItem
                                                                                                              {
@@ -1177,10 +1178,106 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             throw new NotImplementedException();
         }
-
-        public ActionResult SampleDetails(int? id)
+        
+        [Route(template:"Sample/{id:int}/Details")]
+        public ActionResult SampleDetails(int id)
         {
-            throw new NotImplementedException();
+            var viewModel = new SampleViewModel();
+
+            try
+            {
+                ViewBag.Satus = "Edit";
+
+                var vm = _sampleService.GetSampleDetails(sampleId:id);
+                var viewModelMassLoadingMassLoadingUnitId = _unitService.GetUnitForMassLoadingCalculations();
+
+                viewModel = new SampleViewModel
+                                {
+                                    AvailableCollectionMethods           = new List<SelectListItem>(),
+                                    AvailableCtsEventTypes               = new List<SelectListItem>(),
+                                    CollectionMethodId                   = vm.CollectionMethodId,
+                                    CollectionMethodName                 = vm.CollectionMethodName,
+                                    CtsEventTypeId                       = vm.CtsEventTypeId,
+                                    CtsEventTypeName                     = vm.CtsEventTypeName,
+                                    EndDateTimeLocal                     = vm.EndDateTimeLocal,
+                                    FlowUnitId                           = vm.FlowUnitId,
+                                    FlowUnitName                         = vm.FlowUnitName,
+                                    FlowUnitValidValues                  = vm.FlowUnitValidValues,
+                                    FlowValue                            = vm.FlowValue,
+                                    Id                                   = vm.SampleId,
+                                    IsMassLoadingResultToUseLessThanSign = vm.IsMassLoadingResultToUseLessThanSign,
+                                    IsReadyToReport                      = vm.IsReadyToReport,
+                                    LabSampleIdentifier                  = vm.LabSampleIdentifier,
+                                    LastModificationDateTimeLocal        = vm.LastModificationDateTimeLocal,
+                                    LastModifierUserName                 = vm.LastModifierFullName,
+                                    MassLoadingCalculationDecimalPlaces  = vm.MassLoadingCalculationDecimalPlaces ?? 0,
+                                    MassLoadingConversionFactorPounds    = vm.MassLoadingConversionFactorPounds ?? 0.0,
+                                    MassLoadingMassLoadingUnitId         = viewModelMassLoadingMassLoadingUnitId.UnitId,
+                                    MassLoadingMassLoadingUnitName       = viewModelMassLoadingMassLoadingUnitId.Name,
+                                    MonitoringPointId                    = vm.MonitoringPointId,
+                                    MonitoringPointName                  =vm.Name,
+                                    Name                                 = vm.Name,
+                                    ParameterGroups                      = new List<ParameterGroupViewModel>(),
+                                    ResultQualifierValidValues           = vm.ResultQualifierValidValues,
+                                    SampleResults                        = new List<SampleResultViewModel>(),
+                                    SampleStatusName                     = vm.SampleStatusName,
+                                    StartDateTimeLocal                   = vm.StartDateTimeLocal
+                                    //AllParameters = new List<ParameterViewModel>()
+                                };
+
+                viewModel.SampleResults = vm.SampleResults.Select(c => new SampleResultViewModel
+                                                                       {
+                                                                           AnalysisDateTimeLocal       = c.AnalysisDateTimeLocal,
+                                                                           AnalysisMethod              = c.AnalysisMethod,
+                                                                           EnteredMethodDetectionLimit = c.EnteredMethodDetectionLimit,
+                                                                           Id                          = c.SampleResultId,
+                                                                           IsApprovedEPAMethod         = c.IsApprovedEPAMethod,
+                                                                           IsCalcMassLoading           = c.IsCalcMassLoading,
+                                                                           MassLoadingQualifier        = c.MassLoadingQualifier,
+                                                                           MassLoadingUnitId           = c.MassLoadingUnitId,
+                                                                           MassLoadingUnitName         = c.MassLoadingUnitName,
+                                                                           MassLoadingValue            = c.MassLoadingValue,
+                                                                           ParameterId                 = c.ParameterId,
+                                                                           ParameterName               = c.ParameterName,
+                                                                           Qualifier                   = c.Qualifier,
+                                                                           UnitId                      = c.UnitId,
+                                                                           Value                       = c.Value,
+                                                                           UnitName                    = c.UnitName
+                                                                       });
+
+                viewModel.ParameterGroups =
+                    _parameterService.GetAllParameterGroups(monitoringPointId:vm.MonitoringPointId, sampleEndDateTimeLocal:vm.EndDateTimeLocal)
+                                        .Select(c => new ParameterGroupViewModel
+                                                    {
+                                                        Id = c.ParameterGroupId,
+                                                        Name = c.Name,
+                                                        Description = c.Description,
+                                                        ParameterIds = string.Join(separator:",", values:c.Parameters.Select(p => p.ParameterId).ToList())
+                                                    }).OrderBy(c => c.Name).ToList();
+
+                viewModel.AvailableCollectionMethods = _sampleService.GetCollectionMethods().Select(c => new SelectListItem
+                                                                                                            {
+                                                                                                                Text = c.Name,
+                                                                                                                Value = c.CollectionMethodId.ToString(),
+                                                                                                                Selected = c.CollectionMethodId.Equals(obj:viewModel.CollectionMethodId)
+                                                                                                            }).OrderBy(c => c.Text).ToList();
+
+                viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample:true).Select(c => new SelectListItem
+                                                                                                                            {
+                                                                                                                                Text = c.Name,
+                                                                                                                                Value = c.CtsEventTypeId.ToString(),
+                                                                                                                                Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
+                                                                                                                            }).OrderBy(c => c.Text).ToList();
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            ViewBag.ShowSuccessMessage = TempData[key:"ShowSuccessMessage"] ?? false;
+            ViewBag.SuccessMessage = TempData[key:"SuccessMessage"] ?? "";
+
+            return View(model:viewModel);
         }
 
         #endregion

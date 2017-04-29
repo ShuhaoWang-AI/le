@@ -203,6 +203,8 @@
   <ItemGroup>
     <Content Include="Content\AdminLTE\css\AdminLTE.css" />
     <Content Include="Content\AdminLTE\css\AdminLTE.min.css" />
+    <Content Include="Content\AdminLTE\css\dataTables.bootstrap.css" />
+    <Content Include="Content\AdminLTE\css\dataTables.responsive.css" />
     <Content Include="Content\AdminLTE\css\datepicker3.css" />
     <Content Include="Content\AdminLTE\css\skins\skin-blue-light.css" />
     <Content Include="Content\AdminLTE\css\skins\skin-blue-light.min.css" />
@@ -355,7 +357,13 @@
     <Content Include="Scripts\AdminLTE\app.js" />
     <Content Include="Scripts\AdminLTE\app.min.js" />
     <Content Include="Scripts\AdminLTE\bootstrap-datepicker.js" />
+    <Content Include="Scripts\AdminLTE\dataTables.bootstrap.js" />
+    <Content Include="Scripts\AdminLTE\dataTables.bootstrap.min.js" />
+    <Content Include="Scripts\AdminLTE\dataTables.responsive.js" />
+    <Content Include="Scripts\AdminLTE\dataTables.responsive.min.js" />
     <Content Include="Scripts\AdminLTE\init.js" />
+    <Content Include="Scripts\AdminLTE\jquery.dataTables.js" />
+    <Content Include="Scripts\AdminLTE\jquery.dataTables.min.js" />
     <Content Include="Scripts\AdminLTE\jquery.slimscroll.js" />
     <Content Include="Scripts\AdminLTE\jquery.slimscroll.min.js" />
     <Content Include="Scripts\AuditLogs.js" />

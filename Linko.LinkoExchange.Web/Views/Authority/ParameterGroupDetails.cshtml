@@ -1,5 +1,4 @@
-﻿@using Linko.LinkoExchange.Web.ViewModels.Shared
-@model ParameterGroupViewModel
+﻿@model Linko.LinkoExchange.Web.ViewModels.Shared.ParameterGroupViewModel
 
 @{
     ViewBag.Title = "Parameter Group Details";
@@ -28,7 +27,7 @@
             <div class="box-tools pull-right">
                 @if (!ViewBag.Satus.Equals("ViewOnly"))
                 {
-                    <input class="btn btn-primary btn-sm" type="button" id="btnSave" value="Save" />
+                    <input class="btn btn-primary btn-sm" id="btnSave" type="button" value="Save" />
 
                     if (!ViewBag.Satus.Equals("New"))
                     {
@@ -147,17 +146,17 @@
 
             <div class="col-md-6">
                 <h4 class="box-title">Available Parameters</h4>
-                <table class="hover table table-condensed table-bordered table-responsive table-striped" id="availableParameterTable">
+                <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="availableParameterTable">
                     <thead>
                         <tr>
-                            <th>Id</th>
+                            <th class="never">Id</th>
                             <th>Parameter</th>
-                            <th class="text-center" style="width: 60px">Add</th>
+                            <th style="width: 60px">Add</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        @foreach (ParameterViewModel parameter in Model.AvailableParameters)
+                        @foreach (var parameter in Model.AvailableParameters)
                         {
                             <tr>
                                 <td>@parameter.Id</td>
@@ -176,12 +175,12 @@
             <div class="col-md-6">
                 <h4 class="box-title">Selected Parameters</h4>
 
-                <table class="table table-condensed table-bordered table-hover table-responsive table-striped" id="selectedParameterTable">
+                <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="selectedParameterTable">
                     <thead>
                         <tr>
-                            <th>Id</th>
+                            <th class="never">Id</th>
                             <th>Parameter</th>
-                            <th class="text-center" style="width: 60px">Remove</th>
+                            <th style="width: 60px">Remove</th>
                         </tr>
                     </thead>
 
@@ -209,10 +208,6 @@
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 
-    <link href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script>
-
     <script>
         $(document)
             .ready(function()
@@ -222,7 +217,6 @@
                         {
                             "columnDefs": [
                                 { "searchable": true, "targets": 1 }
-                                , { "targets": [0], "visible": false, "searchable": false }
                                 , {
                                     "defaultContent":
                                         "<button class='btn btn-primary btn-sm' id='btnAddParameter'><i class='fa fa-plus'></i></button>"
@@ -231,10 +225,10 @@
                             ]
                             , "ordering": true
                             , "order": [[1, 'asc']]
-                            , "scrollY": "35vh"
-                            , "scrollCollapse": true
                             , "paging": false
                             , "info": false
+                            , "responsive": true
+                            , "autoWidth": false
                             , "processing": true
                             , "stateSave": false
                             , "language": {
@@ -250,7 +244,6 @@
                         {
                             "columnDefs": [
                                 { "searchable": true, "targets": 1 }
-                                , { "targets": [0], "visible": false, "searchable": false }
                                 , {
                                     "defaultContent":
                                         "<button class='btn btn-danger btn-sm' id='btnRemoveParameter'><i class='fa fa-minus'></i></button>"
@@ -259,10 +252,10 @@
                             ]
                             , "ordering": true
                             , "order": [[1, 'asc']]
-                            , "scrollY": "35vh"
-                            , "scrollCollapse": true
                             , "paging": false
                             , "info": false
+                            , "responsive": true
+                            , "autoWidth": false
                             , "processing": true
                             , "stateSave": false
                             , "language": {

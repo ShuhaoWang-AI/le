@@ -82,13 +82,16 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
             get
             {
                 var selectedValues = ResultQualifierValidValues?.Split(',').ToList() ?? new List<string> {""};
-                var options = selectedValues.Select(
-                                                    x => new SelectListItem
-                                                         {
-                                                             Text = x,
-                                                             Value = x
-                                                         }
-                                                   ).ToList();
+
+                var options = new List<SelectListItem> {new SelectListItem {Text = " ", Value = "NUMERIC"}};
+
+                options.AddRange(collection:selectedValues.Select(
+                                                       x => new SelectListItem
+                                                            {
+                                                                Text = x,
+                                                                Value = x
+                                                            }
+                                                      ).ToList());
                 return options;
             }
         }
@@ -100,8 +103,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string MassLoadingMassLoadingUnitName { get; set; }
 
         public IEnumerable<SampleResultViewModel> SampleResults { get; set; }
-        public List<ParameterGroupViewModel> ParameterGroups { get; set; }
-        public List<ParameterViewModel> AllParameters { get; set; }
+        public IList<ParameterGroupViewModel> ParameterGroups { get; set; }
+       // public IList<ParameterViewModel> AllParameters { get; set; }
     }
 
     public class SampleViewModelValidator:AbstractValidator<SampleViewModel> {}
