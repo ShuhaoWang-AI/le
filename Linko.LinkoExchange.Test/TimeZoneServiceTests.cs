@@ -59,7 +59,7 @@ namespace Linko.LinkoExchange.Test
             regDatePST = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(registrationDate.Value.UtcDateTime, 1000, 1);
             regDateEST = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(registrationDate.Value.UtcDateTime, 1000, 2);
             Assert.AreEqual(regDateEST, regDatePST.AddHours(3));
-           
+
         }
 
         [TestMethod]
@@ -84,5 +84,33 @@ namespace Linko.LinkoExchange.Test
             Assert.AreEqual(dateTimeUtcNow, convertedBackToDateTimeUtc);
         }
 
+        [TestMethod]
+        public void GetLocalizedDateTimeOffsetUsingSettingForThisOrg_WinterTime()
+        {
+            // return Pacific time;
+            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("3");
+
+            DateTime dateTimeUtcNow = new DateTime(2016, 12, 9, 16, 5, 7, 123);
+
+            var localizedDateTimeOffset = _tZservice.GetLocalizedDateTimeOffsetUsingSettingForThisOrg(dateTimeUtcNow, 1);
+
+            //offset is UTC-8
+            Assert.AreEqual(-8, localizedDateTimeOffset.Offset.Hours);
+        }
+
+        [TestMethod]
+        public void GetLocalizedDateTimeOffsetUsingSettingForThisOrg_SummarTime()
+        {
+            // return Pacific time;
+            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("3");
+            DateTime dateTimeUtcNow = new DateTime(2016, 6, 9, 16, 5, 7, 123);
+
+            var localizedDateTimeOffset = _tZservice.GetLocalizedDateTimeOffsetUsingSettingForThisOrg(dateTimeUtcNow, 1);
+            var ft = localizedDateTimeOffset.ToString("MM/dd/yyyyThh:mm:ss zzzz");
+
+            // DaylingSaving, offset is UTC-7
+            Assert.AreEqual(-7, localizedDateTimeOffset.Offset.Hours);
+
+        }
     }
 }
