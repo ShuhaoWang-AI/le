@@ -1088,7 +1088,14 @@ namespace Linko.LinkoExchange.Services.Mapping
                 RecipientOrganizationCityName = rpt.RecipientOrganizationCityName,
                 RecipientOrganizationJurisdictionName = rpt.RecipientOrganizationJurisdictionName,
                 RecipientOrganizationZipCode = rpt.RecipientOrganizationZipCode,
-                CreationDateTimeLocal = rpt.CreationDateTimeUtc.DateTime
+                CreationDateTimeLocal = rpt.CreationDateTimeUtc.DateTime,
+                SubmitterUserId = rpt.SubmitterUserId.HasValue ? rpt.SubmitterUserId.Value : -1,
+                SubmitterUserName = rpt.SubmitterUserName,
+                SubmitterFirstName = rpt.SubmitterFirstName,
+                SubmitterLastName = rpt.SubmitterLastName,
+                SubmitterTitleRole = rpt.SubmitterTitleRole,
+                SubmitterIPAddress = rpt.SubmitterIPAddress,
+                SubmissionDateTimeOffset = rpt.SubmissionDateTimeUtc.Value
             };
         }
 

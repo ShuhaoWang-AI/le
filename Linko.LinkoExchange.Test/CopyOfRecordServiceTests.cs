@@ -475,6 +475,7 @@ namespace Linko.LinkoExchange.Test
                 RecipientOrganizationCityName = recipientOrg.CityName,
                 RecipientOrganizationJurisdictionName = recipientOrg.Jurisdiction.Name,
                 RecipientOrganizationZipCode = recipientOrg.ZipCode,
+                SubmitterUserId = userProfile.UserProfileId,
                 SubmitterFirstName = userProfile.FirstName,
                 SubmitterLastName = userProfile.LastName,
                 SubmitterTitleRole = userProfile.TitleRole,

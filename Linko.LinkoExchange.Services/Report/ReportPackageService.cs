@@ -19,6 +19,7 @@ using System.IO;
 using System.Text;
 using System.Xml.Serialization;
 using Linko.LinkoExchange.Core.Validation;
+using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Report.DataXML;
 using FileInfo = Linko.LinkoExchange.Services.Report.DataXML.FileInfo;
 using Linko.LinkoExchange.Services.Organization;
@@ -91,7 +92,7 @@ namespace Linko.LinkoExchange.Services.Report
             reportPackageTemp.PeriodStartDateTimeUtc = DateTime.UtcNow;
             reportPackageTemp.PeriodStartDateTimeUtc = DateTime.UtcNow.AddMonths(10);
             reportPackageTemp.IsSubmissionBySignatoryRequired = true;
-            reportPackageTemp.ReportStatusId = 1;
+            reportPackageTemp.ReportStatusId = 2;  // readyToSubmit
 
             // organizationid = 1012, organizationTypeId =2 
             // name:Valley City Plating
@@ -162,12 +163,16 @@ namespace Linko.LinkoExchange.Services.Report
 
                     //// TODO: to remove below line for hard code testing purpose 
                     var temp = reportPackageDto.ReportPackageId;
-                    reportPackageDto.ReportPackageId = 1355344931;
-                    var copyOfRecordDto = GetCopyOfRecordByReportPackageId(1355344931, reportPackageDto);
+                    reportPackageDto.ReportPackageId = 1370983575;
+                    var copyOfRecordDto = GetCopyOfRecordByReportPackageId(1370983575, reportPackageDto);
                     reportPackageDto.ReportPackageId = temp;
 
                     //// Send emails 
                     SendSignAndSubmitEmail(reportPackageDto, copyOfRecordDto);
+
+                    // Add for crommer log
+                    WriteCrommerrLog(reportPackageDto, submitterIpAddress, copyOfRecordDto);
+
                     _dbContext.SaveChanges();
                     transaction.Commit();
                     _logger.Info("Leave ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
@@ -499,6 +504,36 @@ namespace Linko.LinkoExchange.Services.Report
             return copyOfRecordDto;
         }
 
+        private void WriteCrommerrLog(ReportPackageDto reportPackageDto, string submitterIpAddress, CopyOfRecordDto copyOfRecordDto)
+        {
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = reportPackageDto.OrganizationRegulatoryProgramId;
+            cromerrAuditLogEntryDto.UserProfileId = reportPackageDto.SubmitterUserId;
+            cromerrAuditLogEntryDto.UserName = reportPackageDto.SubmitterUserName;
+            cromerrAuditLogEntryDto.UserFirstName = reportPackageDto.SubmitterFirstName;
+            cromerrAuditLogEntryDto.UserLastName = reportPackageDto.SubmitterLastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = _httpContextService.GetClaimValue(CacheKey.Email);
+
+            cromerrAuditLogEntryDto.IPAddress = submitterIpAddress;
+            cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
+
+            var crommerContentReplacements = new Dictionary<string, string>();
+            crommerContentReplacements.Add("organizationName", reportPackageDto.OrganizationName);
+            crommerContentReplacements.Add("reportPackageName", reportPackageDto.Name);
+
+            var dateTimeFormat = "MM/dd/yyyyThh:mm:ss zzzz";
+            crommerContentReplacements.Add("periodStart", reportPackageDto.PeriodStartDateTimeLocal.ToString(dateTimeFormat));
+            crommerContentReplacements.Add("periodEnd", reportPackageDto.PeriodEndDateTimeLocal.ToString(dateTimeFormat));
+            crommerContentReplacements.Add("corSignature", copyOfRecordDto.Signature);
+
+            crommerContentReplacements.Add("firstName", reportPackageDto.SubmitterFirstName);
+            crommerContentReplacements.Add("lastName", reportPackageDto.SubmitterLastName);
+            crommerContentReplacements.Add("userName", reportPackageDto.SubmitterUserName);
+            crommerContentReplacements.Add("emailAddress", cromerrAuditLogEntryDto.UserEmailAddress);
+
+            _crommerAuditLogService.Log(CromerrEvent.Report_Submitted, cromerrAuditLogEntryDto, crommerContentReplacements);
+        }
+
         private void SendSignAndSubmitEmail(ReportPackageDto reportPackage, CopyOfRecordDto copyOfRecordDto)
         {
             _logger.Info("Enter ReportPackageService.SendSignAndSubmitEmail. reportPackageId={0}", reportPackage.ReportPackageId);
@@ -559,7 +594,7 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
 
             //TODO: use the real cor view path
-            emailContentReplacements.Add("corViewLink", $"/reportPackage/cor/{reportPackage.ReportPackageId}");
+            emailContentReplacements.Add("corViewLink", $"/reportPackage/{reportPackage.ReportPackageId}/cor");
 
             // Send emails to all IU signatories 
             var signatoriesEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
@@ -1357,7 +1392,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             //System sends Submission Receipt to all Standard Users for the Authority (UC-19 8.4.)
 
-            
+
             //Cromerr Log (UC-19 8.6.)
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
             cromerrAuditLogEntryDto.RegulatoryProgramId = reportPackage.OrganizationRegulatoryProgram.RegulatoryProgramId;
