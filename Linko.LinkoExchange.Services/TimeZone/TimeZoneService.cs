@@ -68,7 +68,7 @@ namespace Linko.LinkoExchange.Services.TimeZone
             }
 
             var timezoneInfo = TimeZoneInfo.FindSystemTimeZoneById(leTimeZone.Name);
-            return timezoneInfo.DisplayName;
+            return timezoneInfo.DisplayName.Substring(timezoneInfo.DisplayName.IndexOf(" ") + 1);
         }
 
         public DateTime GetLocalizedDateTimeUsingThisTimeZoneId(DateTime utcDateTime, int timeZoneId)

@@ -6,6 +6,6 @@
         public string ReportPeriodStartDateTimeUtc { get; set; }
         public string ReportPeriodEndDateTimeUtc { get; set; }
         public string ReportSubmissionDateUtc { get; set; }
-        public string CurrentTimeZoneName { get; set; }
+        public string AuthorityTimeZone { get; set; }
     }
 }

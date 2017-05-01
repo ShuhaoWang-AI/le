@@ -192,22 +192,18 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info("Enter ReportPackageService.CopyOfRecordDataXmlFileDto. reportPackageId={0}", reportPackageDto.ReportPackageId);
 
-            var dateTimeFormat = "MM/dd/yyyyThh:mm:ss";
+            var dateTimeFormat = "MM/dd/yyyyThh:mm:ss zzzz";
             var timeZoneName = _timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(reportPackageDto.OrganizationRegulatoryProgramId,
                                 reportPackageDto.SubmissionDateTimeLocal, false);
-
-            var startOffset = GetDateTimeOffset(reportPackageDto.PeriodStartDateTimeLocal, reportPackageDto.OrganizationRegulatoryProgramId);
-            var endOffset = GetDateTimeOffset(reportPackageDto.PeriodEndDateTimeLocal, reportPackageDto.OrganizationRegulatoryProgramId);
-            var submissionOffset = GetDateTimeOffset(reportPackageDto.SubmissionDateTimeLocal, reportPackageDto.OrganizationRegulatoryProgramId);
 
             var reportHeader = new ReportHeader
             {
                 ReportName = reportPackageDto.Name,
-                ReportPeriodStartDateTimeUtc = $"{reportPackageDto.PeriodStartDateTimeLocal.ToString(dateTimeFormat)} {startOffset}",
-                ReportPeriodEndDateTimeUtc = $"{reportPackageDto.PeriodEndDateTimeLocal.ToString(dateTimeFormat)} {endOffset}",
-                ReportSubmissionDateUtc = $"{reportPackageDto.SubmissionDateTimeLocal.ToString(dateTimeFormat)} {submissionOffset}",
+                ReportPeriodStartDateTimeUtc = reportPackageDto.PeriodStartDateTimeLocal.ToString(dateTimeFormat),
+                ReportPeriodEndDateTimeUtc = reportPackageDto.PeriodEndDateTimeLocal.ToString(dateTimeFormat),
+                ReportSubmissionDateUtc = reportPackageDto.SubmissionDateTimeLocal.ToString(dateTimeFormat),
 
-                CurrentTimeZoneName = timeZoneName,
+                AuthorityTimeZone = timeZoneName,
             };
 
             var dataXmlObj = new CopyOfRecordDataXml
@@ -287,9 +283,6 @@ namespace Linko.LinkoExchange.Services.Report
             foreach (var sampleAssociation in reportPackageDto.AssociatedSamples)
             {
                 var sampleDto = sampleAssociation.Sample;
-                var sampleStartDateTimeOffset = GetDateTimeOffset(sampleDto.StartDateTimeLocal, reportPackageDto.OrganizationRegulatoryProgramId);
-                var sampleEndDateTimeOffset = GetDateTimeOffset(sampleDto.EndDateTimeLocal, reportPackageDto.OrganizationRegulatoryProgramId);
-
                 var sampleNode = new SampleNode
                 {
                     SampleName = sampleDto.Name,
@@ -299,8 +292,8 @@ namespace Linko.LinkoExchange.Services.Report
                     CollectionMethodName = sampleDto.CollectionMethodName,
                     LabSampleIdentifier = EmtpyStringIfNull(sampleDto.LabSampleIdentifier),
 
-                    StartDateTimeUtc = $"{sampleDto.StartDateTimeLocal.ToString(dateTimeFormat)} {sampleStartDateTimeOffset}",
-                    EndDateTimeUtc = $"{sampleDto.EndDateTimeLocal.ToString(dateTimeFormat)} {sampleEndDateTimeOffset}",
+                    StartDateTimeUtc = sampleDto.StartDateTimeLocal.ToString(dateTimeFormat),
+                    EndDateTimeUtc = sampleDto.EndDateTimeLocal.ToString(dateTimeFormat),
 
                     SampleFlowForMassCalcs = EmtpyStringIfNull(sampleDto.FlowValue),
                     SampleFlowForMassCalcsUnitName = EmtpyStringIfNull(sampleDto.FlowUnitName),
@@ -334,8 +327,7 @@ namespace Linko.LinkoExchange.Services.Report
                     var analysisDateTime = "";
                     if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
                     {
-                        var analysisOffset = GetDateTimeOffset(sampleResultDto.AnalysisDateTimeLocal.Value, reportPackageDto.OrganizationRegulatoryProgramId);
-                        analysisDateTime = $"{sampleResultDto.AnalysisDateTimeLocal.Value.ToString(dateTimeFormat)} {analysisOffset}";
+                        analysisDateTime = sampleResultDto.AnalysisDateTimeLocal.Value.ToString(dateTimeFormat);
                     }
 
                     var sampleResultNode = new SampleResultNode
@@ -1236,11 +1228,6 @@ namespace Linko.LinkoExchange.Services.Report
                 .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.CreationDateTimeUtc.DateTime, timeZoneId);
 
             return reportPackagegDto;
-        }
-
-        private string GetDateTimeOffset(DateTime dateTime, int orgRegProgramId)
-        {
-            return _timeZoneService.GetLocalizedDateTimeOffsetUsingSettingForThisOrg(dateTime, orgRegProgramId).Offset.ToString();
         }
 
         private string EmtpyStringIfNull(string value)

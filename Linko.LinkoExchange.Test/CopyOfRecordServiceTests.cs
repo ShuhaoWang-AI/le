@@ -455,7 +455,7 @@ namespace Linko.LinkoExchange.Test
                 ReportPackageId = 15,
                 Name = " 1st Quarter PCR",
 
-                SubmissionDateTimeLocal = DateTime.UtcNow,
+                SubmissionDateTimeLocal = DateTime.Now,
                 SubmissionDateTimeOffset = DateTimeOffset.UtcNow,
                 OrganizationRegulatoryProgramId = 3,
                 OrganizationRegulatoryProgramDto = _mapHeper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram),
