@@ -5665,7 +5665,7 @@ Email: {emailAddress}
         'CromerrEvent_Report_Repudiated', 
         'CromerrEvent',
         'Report',   
-        'Submitted', 
+        'Repudiated', 
         '',
         'Report repudiated for:
 Organization: {organizationName}
