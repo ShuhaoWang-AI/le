@@ -24,6 +24,7 @@ using FileInfo = Linko.LinkoExchange.Services.Report.DataXML.FileInfo;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Config;
+using Linko.LinkoExchange.Services.AuditLog;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -41,6 +42,7 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly IOrganizationService _orgService;
         private readonly ISampleService _sampleService;
         private readonly IMapHelper _mapHelper;
+        private readonly ICromerrAuditLogService _crommerAuditLogService;
 
         public ReportPackageService(
             IProgramService programService,
@@ -54,7 +56,8 @@ namespace Linko.LinkoExchange.Services.Report
             ISettingService settingService,
             IOrganizationService orgService,
             ISampleService sampleService,
-            IMapHelper mapHelper
+            IMapHelper mapHelper,
+            ICromerrAuditLogService crommerAuditLogService
             )
         {
             _programService = programService;
@@ -69,6 +72,7 @@ namespace Linko.LinkoExchange.Services.Report
             _orgService = orgService;
             _sampleService = sampleService;
             _mapHelper = mapHelper;
+            _crommerAuditLogService = crommerAuditLogService;
         }
 
 
@@ -1200,6 +1204,192 @@ namespace Linko.LinkoExchange.Services.Report
         }
 
         /// <summary>
+        /// Gets items to populate a dropdown list of reasons to repudiate a report package (for a specific Org Reg Program Id)
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<RepudiationReasonDto> GetRepudiationReasons()
+        {
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
+            var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+            var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
+
+
+            _logger.Info($"Enter ReportPackageService.GetRepudiationReasons. currentOrgRegProgramId={currentOrgRegProgramId}");
+
+            var repudiationReasonDtos = new List<RepudiationReasonDto>();
+
+            var repudiationReasons = _dbContext.RepudiationReasons
+                .Where(rr => rr.OrganizationRegulatoryProgramId == authorityOrganization.OrganizationRegulatoryProgramId);
+
+            foreach (var repudiationReason in repudiationReasons)
+            {
+                var repudiationReasonDto = _mapHelper.GetRepudiationReasonDtoFromRepudiationReason(repudiationReason);
+                repudiationReasonDto.CreationLocalDateTime = _timeZoneService
+                    .GetLocalizedDateTimeUsingThisTimeZoneId(repudiationReason.CreationDateTimeUtc.DateTime, timeZoneId);
+
+                if (repudiationReason.LastModificationDateTimeUtc.HasValue)
+                {
+                    repudiationReasonDto.LastModificationLocalDateTime = _timeZoneService
+                        .GetLocalizedDateTimeUsingThisTimeZoneId(repudiationReason.LastModificationDateTimeUtc.Value.DateTime, timeZoneId);
+                }
+
+                repudiationReasonDtos.Add(repudiationReasonDto);
+            }
+
+            _logger.Info($"Leaving ReportPackageService.GetRepudiationReasons. currentOrgRegProgramId={currentOrgRegProgramId}");
+
+            return repudiationReasonDtos;
+        }
+
+        /// <summary>
+        /// Performs various validation checks before putting a report package into a virtual state of "Repudiated".
+        /// Also logs action and emails stakeholders.
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <param name="repudiationReasonId">tRepudiationReason.RepudiationReasonId</param>
+        /// <param name="repudiationReasonName">Snapshot of tRepudiationReason.Name</param>
+        /// <param name="comments">Optional field to accompany "other reason"</param>
+        public void RepudiateReport(int reportPackageId, int repudiationReasonId, string repudiationReasonName, string comments = null)
+        {
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+            _logger.Info($"Enter ReportPackageService.RepudiateReport. reportPackageId={reportPackageId}, repudiationReasonId={repudiationReasonId}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+
+            var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
+            var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
+
+            //Check has Signatory Rights (UC-19 5.1.)
+            var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(orpu => orpu.UserProfileId == currentUserId
+                    && orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+            if (!orgRegProgramUser.IsSignatory)
+            {
+                ThrowSimpleException("User not authorized to repudiate report packages.");
+            }
+
+            //Check ARP config "Max days after report period end date to repudiate" has not passed (UC-19 5.2.)
+            var reportRepudiatedDays = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.ReportRepudiatedDays));
+
+            var reportPackage = _dbContext.ReportPackages
+                .Single(rep => rep.ReportPackageId == reportPackageId);
+
+            if (reportPackage.PeriodEndDateTimeUtc < DateTime.UtcNow.AddDays(-reportRepudiatedDays))
+            {
+                ThrowSimpleException($"Report repudiation time period of {reportRepudiatedDays} days has expired.");
+            }
+
+            //Check valid reason (UC-19 7.a.)
+            if (repudiationReasonId < 1)
+            {
+                ThrowSimpleException($"Reason is required.");
+            }
+
+            //=========
+            //Repudiate
+            //=========
+            var currentUser = _dbContext.Users
+                .Single(user => user.UserProfileId == currentUserId);
+
+            reportPackage.RepudiationDateTimeUtc = _timeZoneService.GetLocalizedDateTimeOffsetUsingThisTimeZoneId(DateTime.UtcNow, timeZoneId);
+            reportPackage.RepudiatorUserId = currentUserId;
+            reportPackage.RepudiatorFirstName = currentUser.FirstName;
+            reportPackage.RepudiatorLastName = currentUser.LastName;
+            reportPackage.RepudiatorTitleRole = currentUser.TitleRole;
+            reportPackage.RepudiationReasonId = repudiationReasonId;
+            reportPackage.RepudiationReasonName = repudiationReasonName;
+            if (!String.IsNullOrEmpty(comments))
+            {
+                reportPackage.RepudiationComments = comments;
+            }
+
+            reportPackage.LastModificationDateTimeUtc = reportPackage.RepudiationDateTimeUtc;
+            reportPackage.LastModifierUserId = currentUserId;
+
+            //===========
+            //Send emails
+            //===========
+
+            //System sends Repudiation Receipt email to all Signatories for Industry (UC-19 8.3.)
+            var industrySignatories = _dbContext.OrganizationRegulatoryProgramUsers
+                .Where(orpu => orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId
+                    && orpu.IsSignatory
+                    && !orpu.IsRemoved
+                    && !orpu.IsRegistrationDenied);
+
+            var corHash = _dbContext.CopyOfRecords
+                .Single(cor => cor.ReportPackageId == reportPackageId);
+
+            //Use the same contentReplacement dictionary for both emails and Cromerr audit logging
+            var contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("reportPackageName", reportPackage.Name);
+            contentReplacements.Add("reportPeriodStart", reportPackage.PeriodStartDateTimeUtc.DateTime.ToShortDateString());
+            contentReplacements.Add("reportPeriodEnd", reportPackage.PeriodEndDateTimeUtc.DateTime.ToShortDateString());
+            contentReplacements.Add("submissionDateTime", reportPackage.SubmissionDateTimeUtc.Value.DateTime.ToShortDateString());
+            contentReplacements.Add("corHash", corHash.Hash);
+            contentReplacements.Add("reportPeriodEnd", reportPackage.PeriodEndDateTimeUtc.DateTime.ToShortDateString());
+            contentReplacements.Add("firstName", currentUser.FirstName);
+            contentReplacements.Add("lastName", currentUser.LastName);
+            contentReplacements.Add("titleRole", currentUser.TitleRole);
+            contentReplacements.Add("repudiationDateTime", reportPackage.RepudiationDateTimeUtc.Value.DateTime.ToShortDateString());
+            contentReplacements.Add("organizationName", reportPackage.OrganizationName);
+            contentReplacements.Add("addressLine1", reportPackage.OrganizationAddressLine1);
+            contentReplacements.Add("addressLine2", reportPackage.OrganizationAddressLine2);
+            contentReplacements.Add("organizationName", reportPackage.OrganizationName);
+            contentReplacements.Add("recipientOrganizationName", reportPackage.RecipientOrganizationName);
+            contentReplacements.Add("reportPackageName", reportPackage.Name);
+            contentReplacements.Add("reportPeriodStart", reportPackage.PeriodStartDateTimeUtc.DateTime.ToShortDateString());
+            contentReplacements.Add("reportPeriodEnd", reportPackage.PeriodEndDateTimeUtc.DateTime.ToShortDateString());
+            contentReplacements.Add("corHash", corHash.Hash);
+            contentReplacements.Add("firstName", currentUser.FirstName);
+            contentReplacements.Add("lastName", currentUser.LastName);
+            contentReplacements.Add("userName", currentUser.UserName);
+            contentReplacements.Add("emailAddress", currentUser.Email);
+
+            foreach (var industrySignatory in industrySignatories)
+            {
+                var industrySignatoryUser = _dbContext.Users
+                    .Single(user => user.UserProfileId == industrySignatory.UserProfileId);
+
+                _emailService.SendEmail(new[] { industrySignatoryUser.Email }, EmailType.Report_Repudiation_IU, contentReplacements);
+            }
+
+            //System sends Submission Receipt to all Standard Users for the Authority (UC-19 8.4.)
+
+            
+            //Cromerr Log (UC-19 8.6.)
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = reportPackage.OrganizationRegulatoryProgram.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = reportPackage.OrganizationRegulatoryProgram.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = reportPackage.OrganizationRegulatoryProgram.RegulatorOrganizationId ??
+                                                              cromerrAuditLogEntryDto.OrganizationId;
+            cromerrAuditLogEntryDto.UserProfileId = currentUser.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = currentUser.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = currentUser.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = currentUser.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = currentUser.Email;
+            cromerrAuditLogEntryDto.IPAddress = _httpContextService.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
+
+            _crommerAuditLogService.Log(CromerrEvent.Report_Repudiated, cromerrAuditLogEntryDto,
+                                        contentReplacements);
+
+
+            _logger.Info($"Leave ReportPackageService.RepudiateReport. reportPackageId={reportPackageId}, repudiationReasonId={repudiationReasonId}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+
+        }
+
+        private string EmtpyStringIfNull(string value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? "" : value;
+        }
+        private class Utf8StringWriter : StringWriter
+        {
+            public override Encoding Encoding { get { return Encoding.UTF8; } }
+        }
+
+        /// <summary>
         /// Helper function used by both "GetReportPackagesByStatusName" and "GetReportPackage" methods
         /// </summary>
         /// <param name="reportPackage"></param>
@@ -1230,13 +1420,20 @@ namespace Linko.LinkoExchange.Services.Report
             return reportPackagegDto;
         }
 
-        private string EmtpyStringIfNull(string value)
+        /// <summary>
+        /// Used to simplify and clean up methods where there are multiple validation tests.
+        /// </summary>
+        /// <param name="message">Rule violation message to use when throwing the exception.</param>
+        private void ThrowSimpleException(string message)
         {
-            return string.IsNullOrWhiteSpace(value) ? "" : value;
-        }
-        private class Utf8StringWriter : StringWriter
-        {
-            public override Encoding Encoding { get { return Encoding.UTF8; } }
+            _logger.Info($"Enter SampleService.ThrowSimpleException. message={message}");
+
+            List<RuleViolation> validationIssues = new List<RuleViolation>();
+            validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+
+            _logger.Info($"Leaving SampleService.ThrowSimpleException. message={message}");
+
+            throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
         }
     }
 }

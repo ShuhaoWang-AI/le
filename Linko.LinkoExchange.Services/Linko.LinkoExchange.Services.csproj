@@ -127,6 +127,7 @@
     <Compile Include="Dto\ReportPackageDto.cs" />
     <Compile Include="Dto\ReportPackageELementTypeDto.cs" />
     <Compile Include="Dto\ReportSampleDto.cs" />
+    <Compile Include="Dto\RepudiationReasonDto.cs" />
     <Compile Include="FileStore\FileStoreService.cs" />
     <Compile Include="FileStore\IFileStoreService.cs" />
     <Compile Include="Dto\FileStoreDto.cs" />

@@ -1125,5 +1125,18 @@ namespace Linko.LinkoExchange.Services.Mapping
             };
         }
 
+        public RepudiationReasonDto GetRepudiationReasonDtoFromRepudiationReason(RepudiationReason repudiationReason)
+        {
+            if (repudiationReason == null) return null;
+            return new RepudiationReasonDto
+            {
+                RepudiationReasonId = repudiationReason.RepudiationReasonId,
+                Name = repudiationReason.Name,
+                Description = repudiationReason.Description
+                //CreationLocalDateTime = set outside after calling line
+                //LastModificationLocalDateTime = set outside after calling line
+            };
+        }
+
     }
 }

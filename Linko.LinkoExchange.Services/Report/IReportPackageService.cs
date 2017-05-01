@@ -98,8 +98,24 @@ namespace Linko.LinkoExchange.Services.Report
         /// <summary>
         /// Gets Report Package information (without children element data) for displaying in a grid.
         /// </summary>
-        /// <param name="reportStatusName">Fetches report packages of this status only</param>
+        /// <param name="reportStatusName">tReportStatus.Name</param>
         /// <returns>Collection of ReportPackageDto objects (without children element data)</returns>
         IEnumerable<ReportPackageDto> GetReportPackagesByStatusName(ReportStatusName reportStatusName);
+
+        /// <summary>
+        /// Gets items to populate a dropdown list of reasons to repudiate a report package (for a specific Org Reg Program Id)
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<RepudiationReasonDto> GetRepudiationReasons();
+
+        /// <summary>
+        /// Performs various validation checks before putting a report package into a virtual state of "Repudiated".
+        /// Also logs action and emails stakeholders.
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <param name="repudiationReasonId">tRepudiationReason.RepudiationReasonId</param>
+        /// <param name="repudiationReasonName">Snapshot of tRepudiationReason.Name</param>
+        /// <param name="comments">Optional field to accompany "other reason"</param>
+        void RepudiateReport(int reportPackageId, int repudiationReasonId, string repudiationReasonName, string comments = null);
     }
 }

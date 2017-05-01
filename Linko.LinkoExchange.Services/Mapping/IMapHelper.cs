@@ -62,5 +62,6 @@ namespace Linko.LinkoExchange.Services.Mapping
         SampleResult GetMassSampleResultFromSampleResultDto(SampleResultDto dto);
         ReportPackageDto GetReportPackageDtoFromReportPackage(ReportPackage rpt);
         ReportPackage GetReportPackageFromReportPackageTemplate(ReportPackageTemplate rpt);
+        RepudiationReasonDto GetRepudiationReasonDtoFromRepudiationReason(RepudiationReason repudiationReason);
     }
 }

@@ -36,7 +36,9 @@
         Signature_SignatoryGranted,
         Signature_SignatoryRevoked,
         Signature_SignFailed,
-        Signature_AccountLocked
+        Signature_AccountLocked,
+        Report_Submitted,
+        Report_Repudiated
 
     }
 }

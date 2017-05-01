@@ -21,6 +21,7 @@ using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.Config;
+using Linko.LinkoExchange.Services.AuditLog;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -38,6 +39,7 @@ namespace Linko.LinkoExchange.Test
         Mock<ISettingService> _settingService = new Mock<ISettingService>();
         Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
         Mock<IConfigSettingService> _configService = new Mock<IConfigSettingService>();
+        Mock<ICromerrAuditLogService> _cromerrService = new Mock<ICromerrAuditLogService>();
 
         public ReportPackageServiceTests()
         {
@@ -86,7 +88,8 @@ namespace Linko.LinkoExchange.Test
                 actualSettingService,
                 _orgService.Object,
                 actualSampleService,
-                new MapHelper()
+                new MapHelper(),
+                _cromerrService.Object
             );
         }
 

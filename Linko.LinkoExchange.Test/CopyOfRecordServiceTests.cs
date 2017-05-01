@@ -54,6 +54,7 @@ namespace Linko.LinkoExchange.Test
         private MapHelper _mapHeper = new MapHelper();
         private Mock<ICromerrAuditLogService> _crommerAuditLogService = new Mock<ICromerrAuditLogService>();
         private Mock<ISampleService> _sampleService = new Mock<ISampleService>();
+        private Mock<ICromerrAuditLogService> _cromerrService = new Mock<ICromerrAuditLogService>();
 
         [TestInitialize]
         public void Init()
@@ -130,7 +131,8 @@ namespace Linko.LinkoExchange.Test
                   _settService,
                   _orgService.Object,
                   _sampleService.Object,
-                  _mapHeper);
+                  _mapHeper,
+                  _cromerrService.Object);
 
             var reportPackageId = 527466233;
             var validResult = reportPackageService.VerififyCopyOfRecord(reportPackageId);
@@ -156,7 +158,8 @@ namespace Linko.LinkoExchange.Test
                   _settService,
                   _orgService.Object,
                   _sampleService.Object,
-                  _mapHeper);
+                  _mapHeper,
+                  _cromerrService.Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -185,7 +188,8 @@ namespace Linko.LinkoExchange.Test
                   _settService,
                   _orgService.Object,
                   _sampleService.Object,
-                  _mapHeper);
+                  _mapHeper,
+                  _cromerrService.Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -218,7 +222,8 @@ namespace Linko.LinkoExchange.Test
                   _settService,
                   _orgService.Object,
                   _sampleService.Object,
-                  _mapHeper);
+                  _mapHeper,
+                  _cromerrService.Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -253,7 +258,8 @@ namespace Linko.LinkoExchange.Test
                   _settService,
                   _orgService.Object,
                   _sampleService.Object,
-                  _mapHeper);
+                  _mapHeper,
+                  _cromerrService.Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -286,7 +292,8 @@ namespace Linko.LinkoExchange.Test
                   _settService,
                   _orgService.Object,
                   _sampleService.Object,
-                  _mapHeper);
+                  _mapHeper,
+                  _cromerrService.Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -318,7 +325,8 @@ namespace Linko.LinkoExchange.Test
                   _settService,
                   _orgService.Object,
                   _sampleService.Object,
-                  _mapHeper);
+                  _mapHeper,
+                  _cromerrService.Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -354,7 +362,8 @@ namespace Linko.LinkoExchange.Test
                   _settService,
                   _orgService.Object,
                   _sampleService.Object,
-                  _mapHeper);
+                  _mapHeper,
+                  _cromerrService.Object);
 
             var xmlDate = reportPackageService.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
 
@@ -387,7 +396,8 @@ namespace Linko.LinkoExchange.Test
                   _settingService.Object,
                   _orgService.Object,
                   _sampleService.Object,
-                  _mapHeper);
+                  _mapHeper,
+                  _cromerrService.Object);
 
             var xmlFileData = reportPackageService.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
 

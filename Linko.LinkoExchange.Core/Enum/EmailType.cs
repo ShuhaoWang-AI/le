@@ -82,6 +82,10 @@
 
         // UC-54 Submission Receipt email to all signatories and to all admin and standard Users for the authority
         Report_Submission_IU,
-        Report_Submission_AU
+        Report_Submission_AU,
+
+        // UC-19 Report Repudiation
+        Report_Repudiation_IU,
+        Report_Repudiation_AU
     }
 }
