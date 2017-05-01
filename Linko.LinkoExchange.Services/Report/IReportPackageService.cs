@@ -94,5 +94,12 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
         /// <returns>Collection of SampleDto objects</returns>
         ICollection<SampleDto> GetSamplesForSelection(int reportPackageId);
+
+        /// <summary>
+        /// Gets Report Package information (without children element data) for displaying in a grid.
+        /// </summary>
+        /// <param name="reportStatusName">Fetches report packages of this status only</param>
+        /// <returns>Collection of ReportPackageDto objects (without children element data)</returns>
+        IEnumerable<ReportPackageDto> GetReportPackagesByStatusName(ReportStatusName reportStatusName);
     }
 }

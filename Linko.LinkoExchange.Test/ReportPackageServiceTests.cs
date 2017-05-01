@@ -177,6 +177,12 @@ namespace Linko.LinkoExchange.Test
 
         }
 
+        //
+        [TestMethod]
+        public void GetReportPackagesByStatusName_Draft()
+        {
+            var filteredReportPackages = _reportPackageService.GetReportPackagesByStatusName(ReportStatusName.Draft);
+        }
 
     }
 }
