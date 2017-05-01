@@ -52,36 +52,22 @@ namespace Linko.LinkoExchange.Services.TimeZone
             return (TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, authorityLocalZone));
         }
 
-        public string GetTimeZoneNameUsingSettingForThisOrg(int orgRegProgramId, bool abbreviationName)
+        public string GetTimeZoneNameUsingSettingForThisOrg(int orgRegProgramId, DateTime datetime, bool abbreviationName)
         {
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
-            var timeZoneName = GetTimeZoneName(timeZoneId);
+
+            var leTimeZone = _dbContext.TimeZones.Single(t => t.TimeZoneId == timeZoneId);
+
             if (abbreviationName)
             {
-
-                switch (timeZoneName)
+                if (TimeZoneInfo.Local.IsAmbiguousTime(datetime) || TimeZoneInfo.Local.IsDaylightSavingTime(datetime))
                 {
-                    case "Hawaiian Standard Time":
-                        return "HST";
-                    case "Alaskan Standard Time":
-                        return "AST";
-                    case "Pacific Standard Time":
-                        return "PST";
-                    case "Mountain Standard Time":
-                        return "MST";
-                    case "Central Standard Time":
-                        return "CST";
-                    case "Eastern Standard Time":
-                        return "EST";
-                    case "Atlantic Standard Time":
-                        return "AST";
-                    case "Newfoundland Standard Time":
-                        return "NST";
-                    default:
-                        return timeZoneName;
+                    return leTimeZone.DaylightAbbreviation;
                 }
+                return leTimeZone.StandardAbbreviation;
             }
-            var timezoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZoneName);
+
+            var timezoneInfo = TimeZoneInfo.FindSystemTimeZoneById(leTimeZone.Name);
             return timezoneInfo.DisplayName;
         }
 

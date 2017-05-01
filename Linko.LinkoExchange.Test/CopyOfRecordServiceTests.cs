@@ -62,9 +62,17 @@ namespace Linko.LinkoExchange.Test
                   "data source=wtxodev05;initial catalog=LinkoExchange;Integrated Security=True";
 
             _dbContext = new LinkoExchangeContext(connectionString);
+
+            var settServiceMock = Mock.Get(_settService);
+            settServiceMock.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>()))
+                .Returns("3");
+
+
+            _settingService.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>()))
+                .Returns("1");
+
             _actualTimeZoneService = new TimeZoneService(_dbContext, _settService, new MapHelper());
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
-
 
             _userService = new UserService(_dbContext, _auditLoger.Object, _passwordHasher.Object, _httpContext.Object, emailService.Object,
                 _settingService.Object, _sessionCache.Object, _orgService.Object, _requestCache.Object, _actualTimeZoneService,
@@ -368,6 +376,7 @@ namespace Linko.LinkoExchange.Test
             programMock.Setup(i => i.GetOrganizationRegulatoryProgram(It.IsAny<int>()))
                        .Returns(programDto);
 
+
             IReportPackageService reportPackageService =
                 new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
                   _logger.Object,
@@ -375,7 +384,7 @@ namespace Linko.LinkoExchange.Test
                   _httpContext.Object,
                   _userService,
                   emailService.Object,
-                  _settService,
+                  _settingService.Object,
                   _orgService.Object,
                   _sampleService.Object,
                   _mapHeper);
@@ -399,9 +408,9 @@ namespace Linko.LinkoExchange.Test
                 ReportPackageId = reportPackageId,
                 Name = " 1st Quarter PCR",
                 OrganizationRegulatoryProgramId = 3,
-                PeriodStartDateTimeLocal = DateTimeOffset.UtcNow.DateTime,
-                SubmissionDateTimeOffset = DateTimeOffset.UtcNow,
-                SubmissionDateTimeLocal = DateTimeOffset.UtcNow.DateTime,
+                PeriodStartDateTimeLocal = _actualTimeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(DateTime.UtcNow, 1), //  DateTimeOffset.UtcNow.LocalDateTime,
+                SubmissionDateTimeOffset = _actualTimeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(DateTime.UtcNow, 1), // DateTimeOffset.UtcNow,
+                SubmissionDateTimeLocal = _actualTimeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(DateTime.UtcNow, 1), // DateTimeOffset.UtcNow.LocalDateTime,
             };
         }
 
@@ -464,8 +473,8 @@ namespace Linko.LinkoExchange.Test
 
                 PeriodEndDateTime = DateTimeOffset.UtcNow,
                 PeriodStartDateTime = DateTimeOffset.UtcNow,
-                PeriodEndDateTimeLocal = DateTime.UtcNow,
-                PeriodStartDateTimeLocal = DateTime.UtcNow,
+                PeriodEndDateTimeLocal = DateTime.UtcNow.ToLocalTime(),
+                PeriodStartDateTimeLocal = DateTime.UtcNow.ToLocalTime(),
                 ReportStatusId = (int)ReportStatusName.ReadyToSubmit,
 
                 OrganizationName = orgRegProgram.Organization.Name,
@@ -526,7 +535,8 @@ namespace Linko.LinkoExchange.Test
                 CollectionMethodId = 2,
                 CollectionMethodName = "24 hour flow",
                 LabSampleIdentifier = "Test-lab-sample-identifier",
-
+                StartDateTimeLocal = DateTime.Now,
+                EndDateTimeLocal = DateTime.Now,
                 StartDateTime = DateTimeOffset.UtcNow,
                 EndDateTime = DateTimeOffset.UtcNow,
 
@@ -618,7 +628,8 @@ namespace Linko.LinkoExchange.Test
                 CollectionMethodId = 3,
                 CollectionMethodName = "8HR",
                 LabSampleIdentifier = "Test-lab-sample-identifier-2",
-
+                StartDateTimeLocal = DateTime.Now,
+                EndDateTimeLocal = DateTime.Now,
                 StartDateTime = DateTimeOffset.UtcNow,
                 EndDateTime = DateTimeOffset.UtcNow,
 
