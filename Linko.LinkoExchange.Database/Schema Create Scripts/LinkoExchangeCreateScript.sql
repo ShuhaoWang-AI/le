@@ -4925,6 +4925,103 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         </html>'  
     )
 	
+	--UC-19 Report Repudiation sent to standard users of Authority (UC-19 8.3.)
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'Email_Report_Repudiation_IU' , 
+        'Email',  
+        'Report', 
+        'RepudiationToIU',
+        
+        '{reportPackageName} Repudiation Received', 
+        ' <html>
+            <body> 
+                <pre>
+Your report repudiation was received.  Please keep this email as proof of your report repudiation.
+
+Report Details:
+	Report Name: {reportPackageName}
+	Period Start: {periodStartDate}
+	Period end: {periodEndDate}
+	Submission Date: {submissionDateTime}
+	LinkoExchange COR Signature: {corSignature}  
+	Repudiated Date: {repudiatedDateTime}
+
+Repudiated To:
+	{authOrganizationName}
+	{authOrganizationAddressLine1}
+	{authOrganizationAddressLine2}
+	{authOrganizationCityName} {authOrganizationJurisdictionName} {authOrganizationZipCode} 
+
+Repudiated By:
+	{submitterFirstName} {submitterLastName}
+	{submitterTitle}
+	{iuOrganizationName} 
+	Permit #: {permitNumber} 
+	{organizationAddressLine1} 
+	{organizationAddressLine2}
+	{organizationCityName} {organizationJurisdictionName} {organizationZipCode} 
+	
+	User Name: {userName}
+	
+To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser.  Login is required to view the report.
+
+	https://Linkoexchange.com{corViewLink}
+	
+                            
+This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
+If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+                </pre>
+            </body>
+        </html>'  
+    )
+
+
+	--UC-19 Report Repudiation sent to standard users of Authority (UC-19 8.4.)
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'Email_Report_Repudiation_AU' , 
+        'Email',  
+        'Report', 
+        'RepudiationToAU',
+        
+        '{iuOrganizationName} {reportPackageName} Repudiated', 
+        ' <html>
+            <body> 
+                <pre>
+The following report was repudiated.
+
+Report Details:
+	Report Name: {reportPackageName}
+	Period Start: {periodStartDate}
+	Period end: {periodEndDate}
+	Original Submission Date: {submissionDateTime}
+	LinkoExchange COR Signature: {corSignature}  
+	Repudiated Date: {repudiatedDateTime}
+	Reason: {repudiationReason}
+	Comments: {repudiationReasonComments}
+
+Repudiated By:
+	{submitterFirstName} {submitterLastName}
+	{submitterTitle}
+	{iuOrganizationName} 
+	Permit #: {permitNumber} 
+	{organizationAddressLine1} 
+	{organizationAddressLine2}
+	{organizationCityName} {organizationJurisdictionName} {organizationZipCode} 
+	
+	User Name: {userName}
+	
+To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser.  Login is required to view the report.
+
+	https://Linkoexchange.com{corViewLink}
+                </pre>
+            </body>
+        </html>'  
+    )
+
 	-- Cromerr Event Log Templates
 	
 	INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
@@ -5541,6 +5638,48 @@ Email: {emailAddress}
 ' 
 )
    
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Report_Submitted', 
+        'CromerrEvent',
+        'Report',   
+        'Submitted', 
+        '',
+        'Report submitted for:
+Organization: {organizationName}
+Report: {reportPackageName}
+Report Period: {periodStartDate} - {periodEndDate}
+LinkoExchange COR Signature: {corSignature}
+
+By:
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Report_Repudiated', 
+        'CromerrEvent',
+        'Report',   
+        'Submitted', 
+        '',
+        'Report repudiated for:
+Organization: {organizationName}
+Report: {reportPackageName}
+Report Period: {periodStartDate} - {periodEndDate}
+LinkoExchange COR Signature: {corSignature}
+
+By:
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+' 
+)
+
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tPermissionGroupTemplate)
