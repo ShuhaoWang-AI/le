@@ -87,10 +87,13 @@ namespace Linko.LinkoExchange.Test
             sampleDto.FlowUnitId = 5;
             sampleDto.FlowUnitName = "gpd";
             sampleDto.FlowValue = "808.1";
-            sampleDto.StartDateTimeLocal = DateTime.Now;
+            sampleDto.StartDateTimeLocal = DateTime.Now.AddDays(-7);
             sampleDto.EndDateTimeLocal = DateTime.Now;
             sampleDto.IsReadyToReport = false;
-            sampleDto.MassLoadingCalculationDecimalPlaces = 4;
+            sampleDto.MassLoadingCalculationDecimalPlaces = 2;
+            sampleDto.MassLoadingConversionFactorPounds = 8.34;
+            sampleDto.IsMassLoadingResultToUseLessThanSign = true;
+            sampleDto.ResultQualifierValidValues = "<,>,ND,NF";
 
             var flowUnitValidValues = new List<UnitDto>();
             flowUnitValidValues.Add(new UnitDto() { UnitId = 5, Name = "gpd", IsFlowUnit = true });

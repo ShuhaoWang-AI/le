@@ -48,6 +48,8 @@ namespace Linko.LinkoExchange.Services.Settings
             _globalSettings.Add(SystemSettingType.PasswordRequireDigit, systemSettings.First(i => i.Name == SystemSettingType.PasswordRequireDigit.ToString()).Value);
             _globalSettings.Add(SystemSettingType.PasswordRequiredLength, systemSettings.First(i => i.Name == SystemSettingType.PasswordRequiredLength.ToString()).Value);
             _globalSettings.Add(SystemSettingType.PasswordRequiredMaxLength, systemSettings.First(i => i.Name == SystemSettingType.PasswordRequiredMaxLength.ToString()).Value);
+            _globalSettings.Add(SystemSettingType.MassLoadingUnitName, systemSettings.First(i => i.Name == SystemSettingType.MassLoadingUnitName.ToString()).Value);
+            _globalSettings.Add(SystemSettingType.FileAvailableToAttachMaxAgeMonths, systemSettings.First(i => i.Name == SystemSettingType.FileAvailableToAttachMaxAgeMonths.ToString()).Value);
         }
 
         /// <summary>
