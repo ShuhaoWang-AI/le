@@ -66,12 +66,22 @@ namespace Linko.LinkoExchange.Test
         public void Convert_Current_UTC_To_Local_And_Back_To_UTC_Test()
         {
             DateTime now = DateTime.UtcNow;
-            DateTimeOffset? registrationDate = now;
 
             var localTime = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(now, 1);
             var convertedBackToUTC = _tZservice.GetUTCDateTimeUsingSettingForThisOrg(localTime, 1);
 
             Assert.AreEqual(now, convertedBackToUTC);
+        }
+
+        [TestMethod]
+        public void GetLocalizedDateTimeOffsetUsingSettingForThisOrg()
+        {
+            DateTime dateTimeUtcNow = DateTime.UtcNow;
+
+            var localizedDateTimeOffset = _tZservice.GetLocalizedDateTimeOffsetUsingSettingForThisOrg(dateTimeUtcNow, 1);
+            var convertedBackToDateTimeUtc = localizedDateTimeOffset.UtcDateTime;
+
+            Assert.AreEqual(dateTimeUtcNow, convertedBackToDateTimeUtc);
         }
 
     }

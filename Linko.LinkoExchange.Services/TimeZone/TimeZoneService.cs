@@ -105,5 +105,20 @@ namespace Linko.LinkoExchange.Services.TimeZone
             return (TimeZoneInfo.ConvertTimeToUtc(localDateTime, orgRegProgramLocalZone));
         }
 
+        public DateTimeOffset GetLocalizedDateTimeOffsetUsingSettingForThisOrg(DateTime utcDateTime, int orgRegProgramId)
+        {
+            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
+            TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
+
+            return (new DateTimeOffset(utcDateTime).ToOffset(authorityLocalZone.GetUtcOffset(utcDateTime)));
+        }
+
+        public DateTimeOffset GetLocalizedDateTimeOffsetUsingThisTimeZoneId(DateTime utcDateTime, int timeZoneId)
+        {
+            TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
+
+            return (new DateTimeOffset(utcDateTime).ToOffset(authorityLocalZone.GetUtcOffset(utcDateTime)));
+        }
+
     }
 }

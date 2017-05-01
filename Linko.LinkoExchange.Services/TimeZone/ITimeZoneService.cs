@@ -17,6 +17,11 @@ namespace Linko.LinkoExchange.Services.TimeZone
         DateTimeOffset GetUTCDateTimeUsingSettingForThisOrg(DateTime localDateTime, int orgRegProgramId);
 
         DateTimeOffset GetUTCDateTimeUsingThisTimeZoneId(DateTime localDateTime, int timeZoneId);
+
         string GetTimeZoneNameUsingSettingForThisOrg(int orgRegProgramId, bool abbreviationName);
+
+        DateTimeOffset GetLocalizedDateTimeOffsetUsingSettingForThisOrg(DateTime utcDateTime, int orgRegProgramId);
+
+        DateTimeOffset GetLocalizedDateTimeOffsetUsingThisTimeZoneId(DateTime utcDateTime, int timeZoneId);
     }
 }
