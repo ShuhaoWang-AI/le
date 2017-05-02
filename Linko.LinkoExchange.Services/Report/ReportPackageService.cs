@@ -1538,6 +1538,12 @@ namespace Linko.LinkoExchange.Services.Report
                 .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.RepudiationDateTimeUtc.Value.DateTime, timeZoneId);
             }
 
+            if (reportPackage.RepudiationReviewDateTimeUtc.HasValue)
+            {
+                reportPackagegDto.RepudiationReviewDateTimeLocal = _timeZoneService
+                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.RepudiationReviewDateTimeUtc.Value.DateTime, timeZoneId);
+            }
+
             reportPackagegDto.PeriodEndDateTimeLocal = _timeZoneService
                 .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.PeriodEndDateTimeUtc.DateTime, timeZoneId);
 

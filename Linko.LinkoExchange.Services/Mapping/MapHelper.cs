@@ -1066,37 +1066,69 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public ReportPackageDto GetReportPackageDtoFromReportPackage(ReportPackage rpt)
         {
-            if (rpt == null) return null;
-            return new ReportPackageDto
+            if (rpt == null)
+                return null;
+
+            var reportPackageDto = new ReportPackageDto();
+
+            reportPackageDto.ReportPackageId = rpt.ReportPackageId;
+            reportPackageDto.Name = rpt.Name;
+            reportPackageDto.PeriodStartDateTimeLocal = rpt.PeriodStartDateTimeUtc.DateTime;
+            reportPackageDto.PeriodEndDateTimeLocal = rpt.PeriodEndDateTimeUtc.DateTime;
+            reportPackageDto.Comments = rpt.Comments;
+            reportPackageDto.IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired;
+            reportPackageDto.ReportStatusId = rpt.ReportStatusId;
+            reportPackageDto.OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId;
+            reportPackageDto.OrganizationName = rpt.OrganizationName;
+            reportPackageDto.OrganizationAddressLine1 = rpt.OrganizationAddressLine1;
+            reportPackageDto.OrganizationAddressLine2 = rpt.OrganizationAddressLine2;
+            reportPackageDto.OrganizationCityName = rpt.OrganizationCityName;
+            reportPackageDto.OrganizationJurisdictionName = rpt.OrganizationJurisdictionName;
+            reportPackageDto.RecipientOrganizationName = rpt.RecipientOrganizationName;
+            reportPackageDto.RecipientOrganizationAddressLine1 = rpt.RecipientOrganizationAddressLine1;
+            reportPackageDto.RecipientOrganizationAddressLine2 = rpt.RecipientOrganizationAddressLine2;
+            reportPackageDto.RecipientOrganizationCityName = rpt.RecipientOrganizationCityName;
+            reportPackageDto.RecipientOrganizationJurisdictionName = rpt.RecipientOrganizationJurisdictionName;
+            reportPackageDto.RecipientOrganizationZipCode = rpt.RecipientOrganizationZipCode;
+            reportPackageDto.CreationDateTimeLocal = rpt.CreationDateTimeUtc.DateTime;
+            reportPackageDto.SubmitterUserId = rpt.SubmitterUserId.HasValue ? rpt.SubmitterUserId.Value : -1;
+            reportPackageDto.SubmitterUserName = rpt.SubmitterUserName;
+            reportPackageDto.SubmitterFirstName = rpt.SubmitterFirstName;
+            reportPackageDto.SubmitterLastName = rpt.SubmitterLastName;
+            reportPackageDto.SubmitterTitleRole = rpt.SubmitterTitleRole;
+            reportPackageDto.SubmitterIPAddress = rpt.SubmitterIPAddress;
+            reportPackageDto.SubmissionDateTimeOffset = rpt.SubmissionDateTimeUtc;
+
+            if (rpt.RepudiationDateTimeUtc.HasValue 
+                && rpt.RepudiatorUserId.HasValue
+                && rpt.RepudiationReasonId.HasValue)
             {
-                ReportPackageId = rpt.ReportPackageId,
-                Name = rpt.Name,
-                PeriodStartDateTimeLocal = rpt.PeriodStartDateTimeUtc.DateTime,
-                PeriodEndDateTimeLocal = rpt.PeriodEndDateTimeUtc.DateTime,
-                Comments = rpt.Comments,
-                IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired,
-                ReportStatusId = rpt.ReportStatusId,
-                OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId,
-                OrganizationName = rpt.OrganizationName,
-                OrganizationAddressLine1 = rpt.OrganizationAddressLine1,
-                OrganizationAddressLine2 = rpt.OrganizationAddressLine2,
-                OrganizationCityName = rpt.OrganizationCityName,
-                OrganizationJurisdictionName = rpt.OrganizationJurisdictionName,
-                RecipientOrganizationName = rpt.RecipientOrganizationName,
-                RecipientOrganizationAddressLine1 = rpt.RecipientOrganizationAddressLine1,
-                RecipientOrganizationAddressLine2 = rpt.RecipientOrganizationAddressLine2,
-                RecipientOrganizationCityName = rpt.RecipientOrganizationCityName,
-                RecipientOrganizationJurisdictionName = rpt.RecipientOrganizationJurisdictionName,
-                RecipientOrganizationZipCode = rpt.RecipientOrganizationZipCode,
-                CreationDateTimeLocal = rpt.CreationDateTimeUtc.DateTime,
-                SubmitterUserId = rpt.SubmitterUserId.HasValue ? rpt.SubmitterUserId.Value : -1,
-                SubmitterUserName = rpt.SubmitterUserName,
-                SubmitterFirstName = rpt.SubmitterFirstName,
-                SubmitterLastName = rpt.SubmitterLastName,
-                SubmitterTitleRole = rpt.SubmitterTitleRole,
-                SubmitterIPAddress = rpt.SubmitterIPAddress,
-                SubmissionDateTimeOffset = rpt.SubmissionDateTimeUtc
-            };
+                //Map all Repudiation related fields
+                
+                //reportPackageDto.RepudiationDateTimeLocal = set outside after calling line
+                reportPackageDto.RepudiatorUserId = rpt.RepudiatorUserId;
+                reportPackageDto.RepudiatorFirstName  = rpt.RepudiatorFirstName;
+                reportPackageDto.RepudiatorLastName = rpt.RepudiatorLastName;
+                reportPackageDto.RepudiatorTitleRole = rpt.RepudiatorTitleRole;
+                reportPackageDto.RepudiationReasonId = rpt.RepudiationReasonId;
+                reportPackageDto.RepudiationReasonName = rpt.RepudiationReasonName;
+                reportPackageDto.RepudiationComments = rpt.RepudiationComments;
+            }
+
+            if (rpt.RepudiationReviewDateTimeUtc.HasValue
+                && rpt.RepudiationReviewerUserId.HasValue)
+            {
+                //Map all Repudiation Review related fields
+
+                //reportPackageDto.RepudiationReviewDateTimeLocal = set outside after calling line
+                reportPackageDto.RepudiationReviewerUserId = rpt.RepudiationReviewerUserId;
+                reportPackageDto.RepudiationReviewerFirstName = rpt.RepudiationReviewerFirstName;
+                reportPackageDto.RepudiationReviewerLastName = rpt.RepudiationReviewerLastName;
+                reportPackageDto.RepudiationReviewerTitleRole = rpt.RepudiationReviewerTitleRole;
+                reportPackageDto.RepudiationReviewComments = rpt.RepudiationReviewComments;
+            }
+
+            return reportPackageDto;
         }
 
         public ReportPackage GetReportPackageFromReportPackageTemplate(ReportPackageTemplate rpt)
