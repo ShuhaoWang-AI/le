@@ -801,7 +801,12 @@ namespace Linko.LinkoExchange.Services.Sample
                 .Include(s => s.ReportSamples)
                 .Include(s => s.SampleResults)
                 .Include(s => s.ByOrganizationRegulatoryProgram)
-                .Single(s => s.SampleId == sampleId);
+                .SingleOrDefault(s => s.SampleId == sampleId);
+
+            if (sample == null)
+            {
+                throw new Exception($"ERROR: Could not find Sample associated with sampleId={sampleId}");
+            }
 
             var dto = this.GetSampleDetails(sample);
 

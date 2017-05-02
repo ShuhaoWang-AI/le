@@ -394,7 +394,12 @@ namespace Linko.LinkoExchange.Services.Report
                 .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes))
                 .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes.Select(rt => rt.ReportSamples)))
                 .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes.Select(rt => rt.ReportFiles)))
-                .Single(rp => rp.ReportPackageId == reportPackageId);
+                .SingleOrDefault(rp => rp.ReportPackageId == reportPackageId);
+
+            if (reportPackage == null)
+            {
+                throw new Exception($"ERROR: Could not find Report Package associated with reportPackageId={reportPackageId}");
+            }
 
             var reportPackagegDto = GetReportPackageDtoFromReportPackage(reportPackage, timeZoneId);
 
@@ -1520,6 +1525,12 @@ namespace Linko.LinkoExchange.Services.Report
             {
                 reportPackagegDto.SubmissionDateTimeLocal = _timeZoneService
                 .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.SubmissionDateTimeUtc.Value.DateTime, timeZoneId);
+            }
+
+            if (reportPackage.RepudiationDateTimeUtc.HasValue)
+            {
+                reportPackagegDto.RepudiationDateTimeLocal = _timeZoneService
+                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.RepudiationDateTimeUtc.Value.DateTime, timeZoneId);
             }
 
             reportPackagegDto.PeriodEndDateTimeLocal = _timeZoneService
