@@ -201,15 +201,14 @@ namespace Linko.LinkoExchange.Services.Report
 
             var dateTimeFormat = "MM/dd/yyyyThh:mm:ss zzzz";
             var timeZoneName = _timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(reportPackageDto.OrganizationRegulatoryProgramId,
-                                reportPackageDto.SubmissionDateTimeLocal, false);
+                                reportPackageDto.SubmissionDateTimeLocal.Value, false);
 
             var reportHeader = new ReportHeader
             {
                 ReportName = reportPackageDto.Name,
                 ReportPeriodStartDateTimeUtc = reportPackageDto.PeriodStartDateTimeLocal.ToString(dateTimeFormat),
                 ReportPeriodEndDateTimeUtc = reportPackageDto.PeriodEndDateTimeLocal.ToString(dateTimeFormat),
-                ReportSubmissionDateUtc = reportPackageDto.SubmissionDateTimeLocal.ToString(dateTimeFormat),
-
+                ReportSubmissionDateUtc = reportPackageDto.SubmissionDateTimeLocal.Value.ToString(dateTimeFormat),
                 AuthorityTimeZone = timeZoneName,
             };
 
@@ -544,8 +543,9 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("periodStartDate", reportPackage.PeriodStartDateTimeLocal.ToString("MMM dd, yyyy"));
             emailContentReplacements.Add("periodEndDate", reportPackage.PeriodEndDateTimeLocal.ToString("MMM dd, yyyy"));
 
+            var timeZoneNameAbbreviation = _timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(reportPackage.OrganizationRegulatoryProgramId, reportPackage.SubmissionDateTimeLocal.Value, true);
             var submissionDateTime =
-                $"{reportPackage.SubmissionDateTimeLocal.ToString("MMM dd, yyyy HHtt ")}{_timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(reportPackage.OrganizationRegulatoryProgramId, reportPackage.SubmissionDateTimeLocal, true)}";
+                $"{reportPackage.SubmissionDateTimeLocal.Value.ToString("MMM dd, yyyy HHtt ")}{timeZoneNameAbbreviation}";
 
             emailContentReplacements.Add("submissionDateTime", submissionDateTime);
             emailContentReplacements.Add("corSignature", copyOfRecordDto.Signature);
@@ -1364,7 +1364,7 @@ namespace Linko.LinkoExchange.Services.Report
             contentReplacements.Add("reportPackageName", reportPackage.Name);
             contentReplacements.Add("periodStartDate", reportPackage.PeriodStartDateTimeUtc.DateTime.ToShortDateString());
             contentReplacements.Add("periodEndDate", reportPackage.PeriodEndDateTimeUtc.DateTime.ToShortDateString());
-            contentReplacements.Add("submissionDateTime", reportPackage.SubmissionDateTimeUtc.Value.DateTime.ToShortDateString() + 
+            contentReplacements.Add("submissionDateTime", reportPackage.SubmissionDateTimeUtc.Value.DateTime.ToShortDateString() +
                 $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.SubmissionDateTimeUtc.Value.DateTime, true)}");
             contentReplacements.Add("corSignature", corHash.Hash);
             contentReplacements.Add("repudiatedDateTime", reportPackage.RepudiationDateTimeUtc.Value.DateTime.ToShortDateString() +

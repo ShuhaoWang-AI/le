@@ -126,7 +126,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 CopyOfRecordCertificateId = copyOfRecord.CopyOfRecordCertificateId
             };
 
-            var datetimePart = reportPackage.SubmissionDateTimeLocal.ToString(format: "yyyyMMdd");
+            var datetimePart = reportPackage.SubmissionDateTimeLocal.Value.ToString(format: "yyyyMMdd");
             var referenceNumber = reportPackage.OrganizationRegulatoryProgramDto.ReferenceNumber;
             copyOfRecordDto.DownloadFileName = $"{referenceNumber} {reportPackage.Name} {datetimePart}.zip";
             copyOfRecordDto.DownloadFileName = StripReservedCharacters(copyOfRecordDto.DownloadFileName);

@@ -9,8 +9,8 @@ namespace Linko.LinkoExchange.Services.Dto
     {
         public int ReportPackageId { get; set; }
         public string Name { get; set; }
-        public DateTimeOffset SubmissionDateTimeOffset { get; set; }
-        public DateTime SubmissionDateTimeLocal { get; set; }
+        public DateTimeOffset? SubmissionDateTimeOffset { get; set; }
+        public DateTime? SubmissionDateTimeLocal { get; set; }
         public int OrganizationRegulatoryProgramId { get; set; }
         public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgramDto { get; set; }
         public string RecipientOrganizationName { get; internal set; }

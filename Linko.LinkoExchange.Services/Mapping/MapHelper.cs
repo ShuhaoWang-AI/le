@@ -1095,7 +1095,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 SubmitterLastName = rpt.SubmitterLastName,
                 SubmitterTitleRole = rpt.SubmitterTitleRole,
                 SubmitterIPAddress = rpt.SubmitterIPAddress,
-                SubmissionDateTimeOffset = rpt.SubmissionDateTimeUtc.Value
+                SubmissionDateTimeOffset = rpt.SubmissionDateTimeUtc
             };
         }
 
