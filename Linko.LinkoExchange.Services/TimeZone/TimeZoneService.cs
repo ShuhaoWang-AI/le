@@ -27,6 +27,20 @@ namespace Linko.LinkoExchange.Services.TimeZone
             return (_dbContext.TimeZones.Single(t => t.TimeZoneId == timeZoneId).Name);
         }
 
+        public TimeZoneDto GetTimeZone(int timeZoneId)
+        {
+            var timeZone = _dbContext.TimeZones
+                .Single(t => t.TimeZoneId == timeZoneId);
+
+            var timeZoneDto = new TimeZoneDto() {
+                Name = timeZone.Name,
+                StandardAbbreviation = timeZone.StandardAbbreviation,
+                DaylightAbbreviation = timeZone.DaylightAbbreviation
+            };
+
+            return (timeZoneDto);
+        }
+
         public ICollection<TimeZoneDto> GetTimeZones()
         {
             var dtos = new List<TimeZoneDto>();
@@ -58,6 +72,11 @@ namespace Linko.LinkoExchange.Services.TimeZone
 
             var leTimeZone = _dbContext.TimeZones.Single(t => t.TimeZoneId == timeZoneId);
 
+            return GetTimeZoneNameUsingThisTimeZone(leTimeZone, datetime, abbreviationName);
+        }
+
+        public string GetTimeZoneNameUsingThisTimeZone(Core.Domain.TimeZone leTimeZone, DateTime datetime, bool abbreviationName)
+        {
             if (abbreviationName)
             {
                 if (TimeZoneInfo.Local.IsAmbiguousTime(datetime) || TimeZoneInfo.Local.IsDaylightSavingTime(datetime))

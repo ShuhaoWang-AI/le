@@ -7,7 +7,11 @@ namespace Linko.LinkoExchange.Services.TimeZone
     public interface ITimeZoneService
     {
         string GetTimeZoneName(int timeZoneId);
+
+        TimeZoneDto GetTimeZone(int timeZoneId);
+
         ICollection<TimeZoneDto> GetTimeZones();
+
         DateTime GetLocalizedDateTimeUsingSettingForThisOrg(DateTime utcDateTime, int orgId, int regProgramId);
 
         DateTime GetLocalizedDateTimeUsingSettingForThisOrg(DateTime utcDateTime, int orgRegProgramId);
@@ -19,6 +23,8 @@ namespace Linko.LinkoExchange.Services.TimeZone
         DateTimeOffset GetUTCDateTimeUsingThisTimeZoneId(DateTime localDateTime, int timeZoneId);
 
         string GetTimeZoneNameUsingSettingForThisOrg(int orgRegProgramId, DateTime dateTime, bool abbreviationName);
+
+        string GetTimeZoneNameUsingThisTimeZone(Core.Domain.TimeZone leTimeZone, DateTime dateTime, bool abbreviationName);
 
         DateTimeOffset GetLocalizedDateTimeOffsetUsingSettingForThisOrg(DateTime utcDateTime, int orgRegProgramId);
 

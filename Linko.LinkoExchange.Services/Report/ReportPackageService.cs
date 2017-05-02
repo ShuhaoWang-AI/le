@@ -24,8 +24,6 @@ using Linko.LinkoExchange.Services.Report.DataXML;
 using FileInfo = Linko.LinkoExchange.Services.Report.DataXML.FileInfo;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Sample;
-using Linko.LinkoExchange.Services.Config;
-using Linko.LinkoExchange.Services.AuditLog;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -1293,6 +1291,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
             var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
+            var timeZone = _dbContext.TimeZones.Single(tz => tz.TimeZoneId == timeZoneId);
 
             //Check has Signatory Rights (UC-19 5.1.)
             var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
@@ -1308,6 +1307,7 @@ namespace Linko.LinkoExchange.Services.Report
             var reportRepudiatedDays = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.ReportRepudiatedDays));
 
             var reportPackage = _dbContext.ReportPackages
+                .Include(rep => rep.OrganizationRegulatoryProgram)
                 .Single(rep => rep.ReportPackageId == reportPackageId);
 
             if (reportPackage.PeriodEndDateTimeUtc < DateTime.UtcNow.AddDays(-reportRepudiatedDays))
@@ -1351,32 +1351,59 @@ namespace Linko.LinkoExchange.Services.Report
                 .Where(orpu => orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId
                     && orpu.IsSignatory
                     && !orpu.IsRemoved
-                    && !orpu.IsRegistrationDenied);
+                    && !orpu.IsRegistrationDenied
+                    && orpu.IsRegistrationApproved);
 
             var corHash = _dbContext.CopyOfRecords
                 .Single(cor => cor.ReportPackageId == reportPackageId);
 
             //Use the same contentReplacement dictionary for both emails and Cromerr audit logging
             var contentReplacements = new Dictionary<string, string>();
+
+            //Report Details:
             contentReplacements.Add("reportPackageName", reportPackage.Name);
-            contentReplacements.Add("reportPeriodStart", reportPackage.PeriodStartDateTimeUtc.DateTime.ToShortDateString());
-            contentReplacements.Add("reportPeriodEnd", reportPackage.PeriodEndDateTimeUtc.DateTime.ToShortDateString());
-            contentReplacements.Add("submissionDateTime", reportPackage.SubmissionDateTimeUtc.Value.DateTime.ToShortDateString());
-            contentReplacements.Add("corHash", corHash.Hash);
-            contentReplacements.Add("reportPeriodEnd", reportPackage.PeriodEndDateTimeUtc.DateTime.ToShortDateString());
-            contentReplacements.Add("firstName", currentUser.FirstName);
-            contentReplacements.Add("lastName", currentUser.LastName);
-            contentReplacements.Add("titleRole", currentUser.TitleRole);
-            contentReplacements.Add("repudiationDateTime", reportPackage.RepudiationDateTimeUtc.Value.DateTime.ToShortDateString());
-            contentReplacements.Add("organizationName", reportPackage.OrganizationName);
-            contentReplacements.Add("addressLine1", reportPackage.OrganizationAddressLine1);
-            contentReplacements.Add("addressLine2", reportPackage.OrganizationAddressLine2);
-            contentReplacements.Add("organizationName", reportPackage.OrganizationName);
-            contentReplacements.Add("recipientOrganizationName", reportPackage.RecipientOrganizationName);
-            contentReplacements.Add("reportPackageName", reportPackage.Name);
-            contentReplacements.Add("reportPeriodStart", reportPackage.PeriodStartDateTimeUtc.DateTime.ToShortDateString());
-            contentReplacements.Add("reportPeriodEnd", reportPackage.PeriodEndDateTimeUtc.DateTime.ToShortDateString());
-            contentReplacements.Add("corHash", corHash.Hash);
+            contentReplacements.Add("periodStartDate", reportPackage.PeriodStartDateTimeUtc.DateTime.ToShortDateString());
+            contentReplacements.Add("periodEndDate", reportPackage.PeriodEndDateTimeUtc.DateTime.ToShortDateString());
+            contentReplacements.Add("submissionDateTime", reportPackage.SubmissionDateTimeUtc.Value.DateTime.ToShortDateString() + 
+                $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.SubmissionDateTimeUtc.Value.DateTime, true)}");
+            contentReplacements.Add("corSignature", corHash.Hash);
+            contentReplacements.Add("repudiatedDateTime", reportPackage.RepudiationDateTimeUtc.Value.DateTime.ToShortDateString() +
+                $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.RepudiationDateTimeUtc.Value.DateTime, true)}");
+            contentReplacements.Add("repudiationReason", repudiationReasonName);
+            contentReplacements.Add("repudiationReasonComments", comments ?? "");
+
+            //Repudiated to:
+            contentReplacements.Add("authOrganizationName", reportPackage.RecipientOrganizationName);
+            contentReplacements.Add("authOrganizationAddressLine1", reportPackage.RecipientOrganizationAddressLine1);
+            contentReplacements.Add("authOrganizationAddressLine2", reportPackage.RecipientOrganizationAddressLine2);
+            contentReplacements.Add("authOrganizationCityName", reportPackage.RecipientOrganizationCityName);
+            contentReplacements.Add("authOrganizationJurisdictionName", reportPackage.RecipientOrganizationJurisdictionName);
+            contentReplacements.Add("authOrganizationZipCode", reportPackage.RecipientOrganizationZipCode);
+
+            //Repudiated by:
+            contentReplacements.Add("submitterFirstName", currentUser.FirstName);
+            contentReplacements.Add("submitterLastName", currentUser.LastName);
+            contentReplacements.Add("submitterTitle", currentUser.TitleRole);
+            contentReplacements.Add("iuOrganizationName", reportPackage.OrganizationName);
+            contentReplacements.Add("permitNumber", reportPackage.OrganizationRegulatoryProgram.ReferenceNumber);
+            contentReplacements.Add("organizationAddressLine1", reportPackage.OrganizationAddressLine1);
+            contentReplacements.Add("organizationAddressLine2", reportPackage.OrganizationAddressLine2);
+            contentReplacements.Add("organizationCityName", reportPackage.OrganizationCityName);
+            contentReplacements.Add("organizationJurisdictionName", reportPackage.OrganizationJurisdictionName);
+            contentReplacements.Add("organizationZipCode", reportPackage.OrganizationZipCode);
+
+            contentReplacements.Add("userName", currentUser.UserName);
+            contentReplacements.Add("corViewLink", $"/reportPackage/{reportPackage.ReportPackageId}/cor");
+
+            var authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+            var authorityEmail = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+            var authorityPhone = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+
+            contentReplacements.Add("authorityName", authorityName);
+            contentReplacements.Add("supportEmail", authorityEmail);
+            contentReplacements.Add("supportPhoneNumber", authorityPhone);
+
+            //For Cromerr
             contentReplacements.Add("firstName", currentUser.FirstName);
             contentReplacements.Add("lastName", currentUser.LastName);
             contentReplacements.Add("userName", currentUser.UserName);
@@ -1391,7 +1418,21 @@ namespace Linko.LinkoExchange.Services.Report
             }
 
             //System sends Submission Receipt to all Standard Users for the Authority (UC-19 8.4.)
+            var standardUsersOfAuthority = _dbContext.OrganizationRegulatoryProgramUsers
+                .Include(orpu => orpu.PermissionGroup)
+                .Where(orpu => orpu.OrganizationRegulatoryProgramId == authorityOrganization.OrganizationRegulatoryProgramId
+                    && !orpu.IsRemoved
+                    && !orpu.IsRegistrationDenied
+                    && orpu.IsRegistrationApproved
+                    && orpu.PermissionGroup.Name == PermissionGroupName.Standard.ToString());
 
+            foreach (var standardUserOfAuthority in standardUsersOfAuthority)
+            {
+                var standardUserOfAuthorityUser = _dbContext.Users
+                    .Single(user => user.UserProfileId == standardUserOfAuthority.UserProfileId);
+
+                _emailService.SendEmail(new[] { standardUserOfAuthorityUser.Email }, EmailType.Report_Repudiation_AU, contentReplacements);
+            }
 
             //Cromerr Log (UC-19 8.6.)
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
@@ -1409,7 +1450,6 @@ namespace Linko.LinkoExchange.Services.Report
 
             _crommerAuditLogService.Log(CromerrEvent.Report_Repudiated, cromerrAuditLogEntryDto,
                                         contentReplacements);
-
 
             _logger.Info($"Leave ReportPackageService.RepudiateReport. reportPackageId={reportPackageId}, repudiationReasonId={repudiationReasonId}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
 
