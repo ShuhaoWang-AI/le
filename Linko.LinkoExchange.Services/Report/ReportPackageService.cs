@@ -514,7 +514,8 @@ namespace Linko.LinkoExchange.Services.Report
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
             cromerrAuditLogEntryDto.RegulatoryProgramId = reportPackageDto.OrganizationRegulatoryProgramId;
             cromerrAuditLogEntryDto.OrganizationId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationId));
-
+            var autorityOrg = _orgService.GetAuthority(reportPackageDto.OrganizationRegulatoryProgramId);
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = autorityOrg.OrganizationId;
             cromerrAuditLogEntryDto.UserProfileId = reportPackageDto.SubmitterUserId;
             cromerrAuditLogEntryDto.UserName = reportPackageDto.SubmitterUserName;
             cromerrAuditLogEntryDto.UserFirstName = reportPackageDto.SubmitterFirstName;
