@@ -117,7 +117,8 @@ namespace Linko.LinkoExchange.Services.Report
             reportPackageTemp.CreationDateTimeUtc = DateTime.UtcNow;
 
             _dbContext.ReportPackages.Add(reportPackageTemp);
-            reportPackageId = _dbContext.SaveChanges();
+            _dbContext.SaveChanges();
+            reportPackageId = reportPackageTemp.ReportPackageId;
 
             //TODO: end of temporary code
 
@@ -127,7 +128,9 @@ namespace Linko.LinkoExchange.Services.Report
                 {
                     List<RuleViolation> validationIssues = new List<RuleViolation>();
 
-                    var reportPackage = _dbContext.ReportPackages.Single(i => i.ReportPackageId == reportPackageId);
+                    var reportPackage = _dbContext.ReportPackages.Include(i => i.ReportStatus)
+                        .Single(i => i.ReportPackageId == reportPackageId);
+
                     if (reportPackage.ReportStatus.Name != ReportStatusName.ReadyToSubmit.ToString())
                     {
                         string message = "Report Package is not ready to submit.";
@@ -143,7 +146,7 @@ namespace Linko.LinkoExchange.Services.Report
                     var submitterUserName = _httpContextService.GetClaimValue(CacheKey.UserName);
 
                     reportPackage.SubmissionDateTimeUtc = DateTimeOffset.Now;
-                    reportPackage.SubmissionReviewerUserId = submitterUserId;
+                    reportPackage.SubmitterUserId = submitterUserId;
                     reportPackage.SubmitterFirstName = submitterFirstName;
                     reportPackage.SubmitterLastName = submitterLastName;
                     reportPackage.SubmitterTitleRole = submitterTitleRole;
@@ -510,6 +513,8 @@ namespace Linko.LinkoExchange.Services.Report
         {
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
             cromerrAuditLogEntryDto.RegulatoryProgramId = reportPackageDto.OrganizationRegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationId));
+
             cromerrAuditLogEntryDto.UserProfileId = reportPackageDto.SubmitterUserId;
             cromerrAuditLogEntryDto.UserName = reportPackageDto.SubmitterUserName;
             cromerrAuditLogEntryDto.UserFirstName = reportPackageDto.SubmitterFirstName;
