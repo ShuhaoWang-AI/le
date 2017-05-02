@@ -38,7 +38,6 @@ namespace Linko.LinkoExchange.Test
         Mock<IEmailService> _emailService = new Mock<IEmailService>();
         Mock<ISettingService> _settingService = new Mock<ISettingService>();
         Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
-        Mock<IConfigSettingService> _configService = new Mock<IConfigSettingService>();
         Mock<ICromerrAuditLogService> _cromerrService = new Mock<ICromerrAuditLogService>();
 
         public ReportPackageServiceTests()
@@ -60,6 +59,7 @@ namespace Linko.LinkoExchange.Test
 
             var authorityOrgRegProgramDto = new OrganizationRegulatoryProgramDto();
             authorityOrgRegProgramDto.OrganizationDto = new OrganizationDto();
+            authorityOrgRegProgramDto.OrganizationRegulatoryProgramId = 1;
             authorityOrgRegProgramDto.OrganizationDto.OrganizationId = 1000;
             authorityOrgRegProgramDto.OrganizationDto.OrganizationName = "Axys Chemicals";
             authorityOrgRegProgramDto.OrganizationDto.AddressLine1 = "1232 Johnson St.";
@@ -71,7 +71,12 @@ namespace Linko.LinkoExchange.Test
 
             _timeZoneService.Setup(s => s.GetUTCDateTimeUsingThisTimeZoneId(It.IsAny<DateTime>(), It.IsAny<int>())).Returns(DateTimeOffset.UtcNow);
 
-            _configService.Setup(s => s.GetConfigValue(It.IsAny<string>())).Returns("16");
+            _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.ReportRepudiatedDays)).Returns("180");
+            _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.TimeZone)).Returns("6");
+
+            _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoName)).Returns("Email C Name");
+            _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoEmailAddress)).Returns("contactemail@auth.com");
+            _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoPhone)).Returns("(555) 555-5555");
 
             var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, actualSettingService);
             var actualSampleService = new SampleService(connection, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService);
@@ -85,7 +90,7 @@ namespace Linko.LinkoExchange.Test
                 _httpContext.Object,
                 _userService.Object,
                 _emailService.Object,
-                actualSettingService,
+                _settingService.Object,
                 _orgService.Object,
                 actualSampleService,
                 new MapHelper(),
@@ -133,7 +138,7 @@ namespace Linko.LinkoExchange.Test
             existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
             existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 35, ReportPackageElementTypeId = 1 });
 
-            var existingId = _reportPackageService.SaveReportPackage(existingReportPackage);
+            var existingId = _reportPackageService.SaveReportPackage(existingReportPackage, true);
         }
 
         [TestMethod]
@@ -146,15 +151,15 @@ namespace Linko.LinkoExchange.Test
 
             //Add sample associations
             existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
-            //existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 36, ReportPackageElementTypeId = 13 });
+            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 36, ReportPackageElementTypeId = 13 });
             existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 38, ReportPackageElementTypeId = 13 });
 
             //Add file associations
             existingReportPackage.AssociatedFiles = new List<ReportFileDto>();
-            //existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 14 });
-            //existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 14 });
+            existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 14 });
+            existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 14 });
 
-            var existingId = _reportPackageService.SaveReportPackage(existingReportPackage);
+            var existingId = _reportPackageService.SaveReportPackage(existingReportPackage, true);
         }
 
 
@@ -162,7 +167,7 @@ namespace Linko.LinkoExchange.Test
         public void UpdateStatus()
         {
             //Change status
-            _reportPackageService.UpdateStatus(2, ReportStatusName.Submitted, false);
+            _reportPackageService.UpdateStatus(8, ReportStatusName.Submitted, false);
 
         }
 
@@ -180,11 +185,25 @@ namespace Linko.LinkoExchange.Test
 
         }
 
-        //
         [TestMethod]
         public void GetReportPackagesByStatusName_Draft()
         {
             var filteredReportPackages = _reportPackageService.GetReportPackagesByStatusName(ReportStatusName.Draft);
+        }
+
+        [TestMethod]
+        public void RepudiateReport()
+        {
+            //RepudiationReasonId     Name
+            //1                       I did not submit this report
+            //2                       Report is missing a sample
+            //3                       Report is missing a parameter
+            //4                       Report has errors
+            //5                       A hold time was exceeded
+            //6                       Other(please comment)
+
+            _reportPackageService.RepudiateReport(8, 6, "Other(please comment)", "Technical error");
+
         }
 
     }

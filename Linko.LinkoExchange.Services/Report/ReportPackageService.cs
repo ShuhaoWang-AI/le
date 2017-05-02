@@ -866,8 +866,9 @@ namespace Linko.LinkoExchange.Services.Report
         /// reportPackageDto.ReportPackageId must exist or exception thrown
         /// </summary>
         /// <param name="reportPackageDto">Existing Report Package to update</param>
+        /// <param name="isUseTransaction">If true, runs within transaction object</param>
         /// <returns>Existing ReportPackage.ReportPackageId</returns>
-        public int SaveReportPackage(ReportPackageDto reportPackageDto)
+        public int SaveReportPackage(ReportPackageDto reportPackageDto, bool isUseTransaction)
         {
             //Report Package will have already been saved before this call and therefore exists
             if (reportPackageDto.ReportPackageId < 1)
@@ -877,163 +878,179 @@ namespace Linko.LinkoExchange.Services.Report
 
             _logger.Info($"Enter ReportPackageService.SaveReportPackage. reportPackageDto.ReportPackageId={reportPackageDto.ReportPackageId}");
 
-            using (var transaction = _dbContext.BeginTransaction())
+            DbContextTransaction transaction = null;
+            if (isUseTransaction)
             {
-                try
+                transaction = _dbContext.BeginTransaction();
+            }
+
+            try
+            {
+
+                var reportPackage = _dbContext.ReportPackages
+                    .Include(rp => rp.ReportPackageElementCategories)
+                    .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportElementCategory))
+                    .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes))
+                    .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes.Select(rt => rt.ReportSamples)))
+                    .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes.Select(rt => rt.ReportFiles)))
+                    .Single(rp => rp.ReportPackageId == reportPackageDto.ReportPackageId);
+
+                //Comments
+                reportPackage.Comments = reportPackageDto.Comments;
+
+                //
+                //Add/remove report package elements 
+                // 1. Samples
+                // 2. Files
+                //
+
+                //SAMPLES
+                //===================
+
+                //Find entry in tReportPackageElementType for this reportPackage associated with Samples category
+                var samplesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
+                    .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.SamplesAndResults.ToString());
+
+                if (samplesReportPackageElementCategory == null)
                 {
+                    //throw Exception
+                    throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.SamplesAndResults}', reportPackageDto.ReportPackageId={reportPackageDto.ReportPackageId}");
+                }
 
-                    var reportPackage = _dbContext.ReportPackages
-                        .Include(rp => rp.ReportPackageElementCategories)
-                        .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportElementCategory))
-                        .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes))
-                        .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes.Select(rt => rt.ReportSamples)))
-                        .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes.Select(rt => rt.ReportFiles)))
-                        .Single(rp => rp.ReportPackageId == reportPackageDto.ReportPackageId);
+                //Handle deletions first
+                // - Iterate through all SampleAndResult rows in ReportSample and delete ones that cannot be matched with an item in reportPackageDto.AssociatedSamples
+                foreach (var existingSamplesReportPackageElementType in samplesReportPackageElementCategory.ReportPackageElementTypes)
+                {
+                    //Should just be one iteration through this loop for the current phase, but in the future
+                    //we might have more than one "Sample and Results" section in a Report Package
 
-                    //Comments
-                    reportPackage.Comments = reportPackageDto.Comments;
-
-                    //
-                    //Add/remove report package elements 
-                    // 1. Samples
-                    // 2. Files
-                    //
-
-                    //SAMPLES
-                    //===================
-
-                    //Find entry in tReportPackageElementType for this reportPackage associated with Samples category
-                    var samplesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
-                        .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.SamplesAndResults.ToString());
-
-                    if (samplesReportPackageElementCategory == null)
+                    var existingReportSamples = existingSamplesReportPackageElementType.ReportSamples.ToArray();
+                    for (var i = 0; i < existingReportSamples.Length; i++)
                     {
-                        //throw Exception
-                        throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.SamplesAndResults}', reportPackageDto.ReportPackageId={reportPackageDto.ReportPackageId}");
+                        var existingReportSample = existingReportSamples[i];
+                        //Find match in dto samples
+                        var matchedSampleAssociation = reportPackageDto.AssociatedSamples
+                        .SingleOrDefault(sa => sa.ReportPackageElementTypeId == existingReportSample.ReportPackageElementTypeId
+                            && sa.SampleId == existingReportSample.SampleId);
+
+                        if (matchedSampleAssociation == null)
+                        {
+                            //existing association must have been deleted -- remove
+                            _dbContext.ReportSamples.Remove(existingReportSample);
+                        }
+                    }
+                }
+
+                //Now handle additions
+                // - Iteration through all requested sample associations (in dto) and add ones that do not already exist
+                foreach (var requestedSampleAssociation in reportPackageDto.AssociatedSamples)
+                {
+                    var foundReportSample = _dbContext.ReportSamples
+                        .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedSampleAssociation.ReportPackageElementTypeId
+                            && rs.SampleId == requestedSampleAssociation.SampleId);
+
+                    if (foundReportSample == null)
+                    {
+                        //Need to add association
+                        _dbContext.ReportSamples.Add(new ReportSample()
+                        {
+                            SampleId = requestedSampleAssociation.SampleId,
+                            ReportPackageElementTypeId = requestedSampleAssociation.ReportPackageElementTypeId
+                        });
                     }
 
-                    //Handle deletions first
-                    // - Iterate through all SampleAndResult rows in ReportSample and delete ones that cannot be matched with an item in reportPackageDto.AssociatedSamples
-                    foreach (var existingSamplesReportPackageElementType in samplesReportPackageElementCategory.ReportPackageElementTypes)
+                }
+
+                //FILES
+                //===================
+
+                //Find entry in tReportPackageElementType for this reportPackage associated with Files category
+                var filesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
+                    .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.Attachments.ToString());
+
+                if (filesReportPackageElementCategory == null)
+                {
+                    //throw Exception
+                    throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.Attachments}', reportPackageDto.ReportPackageId={reportPackageDto.ReportPackageId}");
+                }
+
+                //Handle deletions first
+                // - Iterate through all Attachment rows in ReportFile and delete ones that cannot be matched with an item in reportPackageDto.AssociatedSamples
+                foreach (var existingFilesReportPackageElementType in filesReportPackageElementCategory.ReportPackageElementTypes)
+                {
+                    var existingReportFiles = existingFilesReportPackageElementType.ReportFiles.ToArray();
+                    for (var i = 0; i < existingReportFiles.Length; i++)
                     {
-                        //Should just be one iteration through this loop for the current phase, but in the future
-                        //we might have more than one "Sample and Results" section in a Report Package
+                        var existingReportFile = existingReportFiles[i];
+                        //Find match in dto files
+                        var matchedFileAssociation = reportPackageDto.AssociatedFiles
+                        .SingleOrDefault(sa => sa.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId
+                            && sa.FileStoreId == existingReportFile.FileStoreId);
 
-                        var existingReportSamples = existingSamplesReportPackageElementType.ReportSamples.ToArray();
-                        for (var i = 0; i < existingReportSamples.Length; i++)
+                        if (matchedFileAssociation == null)
                         {
-                            var existingReportSample = existingReportSamples[i];
-                            //Find match in dto samples
-                            var matchedSampleAssociation = reportPackageDto.AssociatedSamples
-                            .SingleOrDefault(sa => sa.ReportPackageElementTypeId == existingReportSample.ReportPackageElementTypeId
-                                && sa.SampleId == existingReportSample.SampleId);
-
-                            if (matchedSampleAssociation == null)
-                            {
-                                //existing association must have been deleted -- remove
-                                _dbContext.ReportSamples.Remove(existingReportSample);
-                            }
+                            //existing association must have been deleted -- remove
+                            _dbContext.ReportFiles.Remove(existingReportFile);
                         }
                     }
 
-                    //Now handle additions
-                    // - Iteration through all requested sample associations (in dto) and add ones that do not already exist
-                    foreach (var requestedSampleAssociation in reportPackageDto.AssociatedSamples)
-                    {
-                        var foundReportSample = _dbContext.ReportSamples
-                            .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedSampleAssociation.ReportPackageElementTypeId
-                                && rs.SampleId == requestedSampleAssociation.SampleId);
+                }
 
-                        if (foundReportSample == null)
+                //Now handle additions
+                // - Iteration through all requested file associations (in dto) and add ones that do not already exist
+                foreach (var requestedFileAssociation in reportPackageDto.AssociatedFiles)
+                {
+                    var foundReportFile = _dbContext.ReportFiles
+                        .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedFileAssociation.ReportPackageElementTypeId
+                            && rs.FileStoreId == requestedFileAssociation.FileStoreId);
+
+                    if (foundReportFile == null)
+                    {
+                        //Need to add association
+                        _dbContext.ReportFiles.Add(new ReportFile()
                         {
-                            //Need to add association
-                            _dbContext.ReportSamples.Add(new ReportSample()
-                            {
-                                SampleId = requestedSampleAssociation.SampleId,
-                                ReportPackageElementTypeId = requestedSampleAssociation.ReportPackageElementTypeId
-                            });
-                        }
-
+                            FileStoreId = requestedFileAssociation.FileStoreId,
+                            ReportPackageElementTypeId = requestedFileAssociation.ReportPackageElementTypeId
+                        });
                     }
 
-                    //FILES
-                    //===================
+                }
 
-                    //Find entry in tReportPackageElementType for this reportPackage associated with Files category
-                    var filesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
-                        .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.Attachments.ToString());
+                _dbContext.SaveChanges();
 
-                    if (filesReportPackageElementCategory == null)
-                    {
-                        //throw Exception
-                        throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.Attachments}', reportPackageDto.ReportPackageId={reportPackageDto.ReportPackageId}");
-                    }
-
-                    //Handle deletions first
-                    // - Iterate through all Attachment rows in ReportFile and delete ones that cannot be matched with an item in reportPackageDto.AssociatedSamples
-                    foreach (var existingFilesReportPackageElementType in filesReportPackageElementCategory.ReportPackageElementTypes)
-                    {
-                        var existingReportFiles = existingFilesReportPackageElementType.ReportFiles.ToArray();
-                        for (var i = 0; i < existingReportFiles.Length; i++)
-                        {
-                            var existingReportFile = existingReportFiles[i];
-                            //Find match in dto files
-                            var matchedFileAssociation = reportPackageDto.AssociatedFiles
-                            .SingleOrDefault(sa => sa.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId
-                                && sa.FileStoreId == existingReportFile.FileStoreId);
-
-                            if (matchedFileAssociation == null)
-                            {
-                                //existing association must have been deleted -- remove
-                                _dbContext.ReportFiles.Remove(existingReportFile);
-                            }
-                        }
-
-                    }
-
-                    //Now handle additions
-                    // - Iteration through all requested file associations (in dto) and add ones that do not already exist
-                    foreach (var requestedFileAssociation in reportPackageDto.AssociatedFiles)
-                    {
-                        var foundReportFile = _dbContext.ReportFiles
-                            .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedFileAssociation.ReportPackageElementTypeId
-                                && rs.FileStoreId == requestedFileAssociation.FileStoreId);
-
-                        if (foundReportFile == null)
-                        {
-                            //Need to add association
-                            _dbContext.ReportFiles.Add(new ReportFile()
-                            {
-                                FileStoreId = requestedFileAssociation.FileStoreId,
-                                ReportPackageElementTypeId = requestedFileAssociation.ReportPackageElementTypeId
-                            });
-                        }
-
-                    }
-
-                    _dbContext.SaveChanges();
-
+                if (isUseTransaction)
+                {
                     transaction.Commit();
-
-                    _logger.Info($"Leave ReportPackageService.SaveReportPackage. reportPackageDto.ReportPackageId={reportPackageDto.ReportPackageId}");
-
-                    return reportPackage.ReportPackageId;
-
                 }
-                catch
+
+                _logger.Info($"Leave ReportPackageService.SaveReportPackage. reportPackageDto.ReportPackageId={reportPackageDto.ReportPackageId}");
+
+                return reportPackage.ReportPackageId;
+
+            }
+            catch
+            {
+                if (isUseTransaction)
                 {
-
                     transaction.Rollback();
-
-                    throw;
                 }
+
+                throw;
+            }
+            finally
+            {
+                if (isUseTransaction)
+                {
+                    transaction.Dispose();
+                }
+
             }
 
         }
 
         /// <summary>
         /// Performs validation to ensure only allowed state transitions are occur,
-        /// throw RuleViolationException otherwise
+        /// throw RuleViolationException otherwise. Does NOT enter any corrsponding values into the Report Package row.
         /// </summary>
         /// <param name="reportStatus">Intended target state</param>
         /// <param name="isUseTransaction">If true, runs within transaction object</param>
@@ -1276,7 +1293,7 @@ namespace Linko.LinkoExchange.Services.Report
         }
 
         /// <summary>
-        /// Performs various validation checks before putting a report package into a virtual state of "Repudiated".
+        /// Performs various validation checks before putting a report package into "Repudiated" status.
         /// Also logs action and emails stakeholders.
         /// </summary>
         /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
@@ -1289,167 +1306,189 @@ namespace Linko.LinkoExchange.Services.Report
             var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
             _logger.Info($"Enter ReportPackageService.RepudiateReport. reportPackageId={reportPackageId}, repudiationReasonId={repudiationReasonId}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
 
-            var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
-            var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
-            var timeZone = _dbContext.TimeZones.Single(tz => tz.TimeZoneId == timeZoneId);
-
-            //Check has Signatory Rights (UC-19 5.1.)
-            var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                .Single(orpu => orpu.UserProfileId == currentUserId
-                    && orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
-
-            if (!orgRegProgramUser.IsSignatory)
+            using (var transaction = _dbContext.BeginTransaction())
             {
-                ThrowSimpleException("User not authorized to repudiate report packages.");
+                try
+                {
+                    var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
+                    var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
+                    var timeZone = _dbContext.TimeZones.Single(tz => tz.TimeZoneId == timeZoneId);
+
+                    //Check has Signatory Rights (UC-19 5.1.)
+                    var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                        .Single(orpu => orpu.UserProfileId == currentUserId
+                            && orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                    if (!orgRegProgramUser.IsSignatory)
+                    {
+                        ThrowSimpleException("User not authorized to repudiate report packages.");
+                    }
+
+                    //Check ARP config "Max days after report period end date to repudiate" has not passed (UC-19 5.2.)
+                    var reportRepudiatedDays = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.ReportRepudiatedDays));
+
+                    var reportPackage = _dbContext.ReportPackages
+                        .Include(rep => rep.OrganizationRegulatoryProgram)
+                        .Single(rep => rep.ReportPackageId == reportPackageId);
+
+                    if (reportPackage.PeriodEndDateTimeUtc < DateTime.UtcNow.AddDays(-reportRepudiatedDays))
+                    {
+                        ThrowSimpleException($"Report repudiation time period of {reportRepudiatedDays} days has expired.");
+                    }
+
+                    //Check valid reason (UC-19 7.a.)
+                    if (repudiationReasonId < 1)
+                    {
+                        ThrowSimpleException($"Reason is required.");
+                    }
+
+                    //=========
+                    //Repudiate
+                    //=========
+                    var currentUser = _dbContext.Users
+                        .Single(user => user.UserProfileId == currentUserId);
+
+                    reportPackage.RepudiationDateTimeUtc = _timeZoneService.GetLocalizedDateTimeOffsetUsingThisTimeZoneId(DateTime.UtcNow, timeZoneId);
+                    reportPackage.RepudiatorUserId = currentUserId;
+                    reportPackage.RepudiatorFirstName = currentUser.FirstName;
+                    reportPackage.RepudiatorLastName = currentUser.LastName;
+                    reportPackage.RepudiatorTitleRole = currentUser.TitleRole;
+                    reportPackage.RepudiationReasonId = repudiationReasonId;
+                    reportPackage.RepudiationReasonName = repudiationReasonName;
+                    if (!String.IsNullOrEmpty(comments))
+                    {
+                        reportPackage.RepudiationComments = comments;
+                    }
+
+                    reportPackage.LastModificationDateTimeUtc = reportPackage.RepudiationDateTimeUtc;
+                    reportPackage.LastModifierUserId = currentUserId;
+
+                    //Change status
+                    this.UpdateStatus(reportPackageId, ReportStatusName.Repudiated, false);
+
+                    //===========
+                    //Send emails
+                    //===========
+
+                    //System sends Repudiation Receipt email to all Signatories for Industry (UC-19 8.3.)
+                    var industrySignatories = _dbContext.OrganizationRegulatoryProgramUsers
+                        .Where(orpu => orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId
+                            && orpu.IsSignatory
+                            && !orpu.IsRemoved
+                            && !orpu.IsRegistrationDenied
+                            && orpu.IsRegistrationApproved)
+                         .ToList();
+
+                    var corHash = _dbContext.CopyOfRecords
+                        .Single(cor => cor.ReportPackageId == reportPackageId);
+
+                    //Use the same contentReplacement dictionary for both emails and Cromerr audit logging
+                    var contentReplacements = new Dictionary<string, string>();
+
+                    //Report Details:
+                    contentReplacements.Add("reportPackageName", reportPackage.Name);
+                    contentReplacements.Add("periodStartDate", reportPackage.PeriodStartDateTimeUtc.DateTime.ToString("MMM d, yyyy"));
+                    contentReplacements.Add("periodEndDate", reportPackage.PeriodEndDateTimeUtc.DateTime.ToString("MMM d, yyyy"));
+                    contentReplacements.Add("submissionDateTime", reportPackage.SubmissionDateTimeUtc.Value.DateTime.ToString("MMM d, yyyy h:mmtt") +
+                        $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.SubmissionDateTimeUtc.Value.DateTime, true)}");
+                    contentReplacements.Add("corSignature", corHash.Hash);
+                    contentReplacements.Add("repudiatedDateTime", reportPackage.RepudiationDateTimeUtc.Value.DateTime.ToString("MMM d, yyyy h:mmtt") +
+                        $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.RepudiationDateTimeUtc.Value.DateTime, true)}");
+                    contentReplacements.Add("repudiationReason", repudiationReasonName);
+                    contentReplacements.Add("repudiationReasonComments", comments ?? "");
+
+                    //Repudiated to:
+                    contentReplacements.Add("authOrganizationName", reportPackage.RecipientOrganizationName);
+                    contentReplacements.Add("authOrganizationAddressLine1", reportPackage.RecipientOrganizationAddressLine1);
+                    contentReplacements.Add("authOrganizationAddressLine2", reportPackage.RecipientOrganizationAddressLine2);
+                    contentReplacements.Add("authOrganizationCityName", reportPackage.RecipientOrganizationCityName);
+                    contentReplacements.Add("authOrganizationJurisdictionName", reportPackage.RecipientOrganizationJurisdictionName);
+                    contentReplacements.Add("authOrganizationZipCode", reportPackage.RecipientOrganizationZipCode);
+
+                    //Repudiated by:
+                    contentReplacements.Add("submitterFirstName", currentUser.FirstName);
+                    contentReplacements.Add("submitterLastName", currentUser.LastName);
+                    contentReplacements.Add("submitterTitle", currentUser.TitleRole);
+                    contentReplacements.Add("iuOrganizationName", reportPackage.OrganizationName);
+                    contentReplacements.Add("permitNumber", reportPackage.OrganizationRegulatoryProgram.ReferenceNumber);
+                    contentReplacements.Add("organizationAddressLine1", reportPackage.OrganizationAddressLine1);
+                    contentReplacements.Add("organizationAddressLine2", reportPackage.OrganizationAddressLine2);
+                    contentReplacements.Add("organizationCityName", reportPackage.OrganizationCityName);
+                    contentReplacements.Add("organizationJurisdictionName", reportPackage.OrganizationJurisdictionName);
+                    contentReplacements.Add("organizationZipCode", reportPackage.OrganizationZipCode);
+
+                    contentReplacements.Add("userName", currentUser.UserName);
+                    contentReplacements.Add("corViewLink", $"/reportPackage/{reportPackage.ReportPackageId}/cor");
+
+                    var authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+                    var authorityEmail = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+                    var authorityPhone = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+
+                    contentReplacements.Add("authorityName", authorityName);
+                    contentReplacements.Add("supportEmail", authorityEmail);
+                    contentReplacements.Add("supportPhoneNumber", authorityPhone);
+
+                    //For Cromerr
+                    contentReplacements.Add("firstName", currentUser.FirstName);
+                    contentReplacements.Add("lastName", currentUser.LastName);
+                    contentReplacements.Add("emailAddress", currentUser.Email);
+
+                    foreach (var industrySignatory in industrySignatories)
+                    {
+                        var industrySignatoryUser = _dbContext.Users
+                            .Single(user => user.UserProfileId == industrySignatory.UserProfileId);
+
+                        _emailService.SendEmail(new[] { industrySignatoryUser.Email }, EmailType.Report_Repudiation_IU, contentReplacements);
+                    }
+
+                    //System sends Submission Receipt to all Standard Users for the Authority (UC-19 8.4.)
+                    var standardUsersOfAuthority = _dbContext.OrganizationRegulatoryProgramUsers
+                        .Include(orpu => orpu.PermissionGroup)
+                        .Where(orpu => orpu.OrganizationRegulatoryProgramId == authorityOrganization.OrganizationRegulatoryProgramId
+                            && !orpu.IsRemoved
+                            && !orpu.IsRegistrationDenied
+                            && orpu.IsRegistrationApproved
+                            && orpu.PermissionGroup.Name == PermissionGroupName.Standard.ToString())
+                        .ToList();
+
+                    foreach (var standardUserOfAuthority in standardUsersOfAuthority)
+                    {
+                        var standardUserOfAuthorityUser = _dbContext.Users
+                            .Single(user => user.UserProfileId == standardUserOfAuthority.UserProfileId);
+
+                        _emailService.SendEmail(new[] { standardUserOfAuthorityUser.Email }, EmailType.Report_Repudiation_AU, contentReplacements);
+                    }
+
+                    //Cromerr Log (UC-19 8.6.)
+                    var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+                    cromerrAuditLogEntryDto.RegulatoryProgramId = reportPackage.OrganizationRegulatoryProgram.RegulatoryProgramId;
+                    cromerrAuditLogEntryDto.OrganizationId = reportPackage.OrganizationRegulatoryProgram.OrganizationId;
+                    cromerrAuditLogEntryDto.RegulatorOrganizationId = reportPackage.OrganizationRegulatoryProgram.RegulatorOrganizationId ??
+                                                                      cromerrAuditLogEntryDto.OrganizationId;
+                    cromerrAuditLogEntryDto.UserProfileId = currentUser.UserProfileId;
+                    cromerrAuditLogEntryDto.UserName = currentUser.UserName;
+                    cromerrAuditLogEntryDto.UserFirstName = currentUser.FirstName;
+                    cromerrAuditLogEntryDto.UserLastName = currentUser.LastName;
+                    cromerrAuditLogEntryDto.UserEmailAddress = currentUser.Email;
+                    cromerrAuditLogEntryDto.IPAddress = _httpContextService.CurrentUserIPAddress();
+                    cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
+
+                    _crommerAuditLogService.Log(CromerrEvent.Report_Repudiated, cromerrAuditLogEntryDto,
+                                                contentReplacements);
+
+                    _dbContext.SaveChanges();
+
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+
+                    throw;
+                }
+
             }
 
-            //Check ARP config "Max days after report period end date to repudiate" has not passed (UC-19 5.2.)
-            var reportRepudiatedDays = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.ReportRepudiatedDays));
-
-            var reportPackage = _dbContext.ReportPackages
-                .Include(rep => rep.OrganizationRegulatoryProgram)
-                .Single(rep => rep.ReportPackageId == reportPackageId);
-
-            if (reportPackage.PeriodEndDateTimeUtc < DateTime.UtcNow.AddDays(-reportRepudiatedDays))
-            {
-                ThrowSimpleException($"Report repudiation time period of {reportRepudiatedDays} days has expired.");
-            }
-
-            //Check valid reason (UC-19 7.a.)
-            if (repudiationReasonId < 1)
-            {
-                ThrowSimpleException($"Reason is required.");
-            }
-
-            //=========
-            //Repudiate
-            //=========
-            var currentUser = _dbContext.Users
-                .Single(user => user.UserProfileId == currentUserId);
-
-            reportPackage.RepudiationDateTimeUtc = _timeZoneService.GetLocalizedDateTimeOffsetUsingThisTimeZoneId(DateTime.UtcNow, timeZoneId);
-            reportPackage.RepudiatorUserId = currentUserId;
-            reportPackage.RepudiatorFirstName = currentUser.FirstName;
-            reportPackage.RepudiatorLastName = currentUser.LastName;
-            reportPackage.RepudiatorTitleRole = currentUser.TitleRole;
-            reportPackage.RepudiationReasonId = repudiationReasonId;
-            reportPackage.RepudiationReasonName = repudiationReasonName;
-            if (!String.IsNullOrEmpty(comments))
-            {
-                reportPackage.RepudiationComments = comments;
-            }
-
-            reportPackage.LastModificationDateTimeUtc = reportPackage.RepudiationDateTimeUtc;
-            reportPackage.LastModifierUserId = currentUserId;
-
-            //===========
-            //Send emails
-            //===========
-
-            //System sends Repudiation Receipt email to all Signatories for Industry (UC-19 8.3.)
-            var industrySignatories = _dbContext.OrganizationRegulatoryProgramUsers
-                .Where(orpu => orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId
-                    && orpu.IsSignatory
-                    && !orpu.IsRemoved
-                    && !orpu.IsRegistrationDenied
-                    && orpu.IsRegistrationApproved);
-
-            var corHash = _dbContext.CopyOfRecords
-                .Single(cor => cor.ReportPackageId == reportPackageId);
-
-            //Use the same contentReplacement dictionary for both emails and Cromerr audit logging
-            var contentReplacements = new Dictionary<string, string>();
-
-            //Report Details:
-            contentReplacements.Add("reportPackageName", reportPackage.Name);
-            contentReplacements.Add("periodStartDate", reportPackage.PeriodStartDateTimeUtc.DateTime.ToShortDateString());
-            contentReplacements.Add("periodEndDate", reportPackage.PeriodEndDateTimeUtc.DateTime.ToShortDateString());
-            contentReplacements.Add("submissionDateTime", reportPackage.SubmissionDateTimeUtc.Value.DateTime.ToShortDateString() +
-                $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.SubmissionDateTimeUtc.Value.DateTime, true)}");
-            contentReplacements.Add("corSignature", corHash.Hash);
-            contentReplacements.Add("repudiatedDateTime", reportPackage.RepudiationDateTimeUtc.Value.DateTime.ToShortDateString() +
-                $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.RepudiationDateTimeUtc.Value.DateTime, true)}");
-            contentReplacements.Add("repudiationReason", repudiationReasonName);
-            contentReplacements.Add("repudiationReasonComments", comments ?? "");
-
-            //Repudiated to:
-            contentReplacements.Add("authOrganizationName", reportPackage.RecipientOrganizationName);
-            contentReplacements.Add("authOrganizationAddressLine1", reportPackage.RecipientOrganizationAddressLine1);
-            contentReplacements.Add("authOrganizationAddressLine2", reportPackage.RecipientOrganizationAddressLine2);
-            contentReplacements.Add("authOrganizationCityName", reportPackage.RecipientOrganizationCityName);
-            contentReplacements.Add("authOrganizationJurisdictionName", reportPackage.RecipientOrganizationJurisdictionName);
-            contentReplacements.Add("authOrganizationZipCode", reportPackage.RecipientOrganizationZipCode);
-
-            //Repudiated by:
-            contentReplacements.Add("submitterFirstName", currentUser.FirstName);
-            contentReplacements.Add("submitterLastName", currentUser.LastName);
-            contentReplacements.Add("submitterTitle", currentUser.TitleRole);
-            contentReplacements.Add("iuOrganizationName", reportPackage.OrganizationName);
-            contentReplacements.Add("permitNumber", reportPackage.OrganizationRegulatoryProgram.ReferenceNumber);
-            contentReplacements.Add("organizationAddressLine1", reportPackage.OrganizationAddressLine1);
-            contentReplacements.Add("organizationAddressLine2", reportPackage.OrganizationAddressLine2);
-            contentReplacements.Add("organizationCityName", reportPackage.OrganizationCityName);
-            contentReplacements.Add("organizationJurisdictionName", reportPackage.OrganizationJurisdictionName);
-            contentReplacements.Add("organizationZipCode", reportPackage.OrganizationZipCode);
-
-            contentReplacements.Add("userName", currentUser.UserName);
-            contentReplacements.Add("corViewLink", $"/reportPackage/{reportPackage.ReportPackageId}/cor");
-
-            var authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
-            var authorityEmail = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
-            var authorityPhone = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
-
-            contentReplacements.Add("authorityName", authorityName);
-            contentReplacements.Add("supportEmail", authorityEmail);
-            contentReplacements.Add("supportPhoneNumber", authorityPhone);
-
-            //For Cromerr
-            contentReplacements.Add("firstName", currentUser.FirstName);
-            contentReplacements.Add("lastName", currentUser.LastName);
-            contentReplacements.Add("userName", currentUser.UserName);
-            contentReplacements.Add("emailAddress", currentUser.Email);
-
-            foreach (var industrySignatory in industrySignatories)
-            {
-                var industrySignatoryUser = _dbContext.Users
-                    .Single(user => user.UserProfileId == industrySignatory.UserProfileId);
-
-                _emailService.SendEmail(new[] { industrySignatoryUser.Email }, EmailType.Report_Repudiation_IU, contentReplacements);
-            }
-
-            //System sends Submission Receipt to all Standard Users for the Authority (UC-19 8.4.)
-            var standardUsersOfAuthority = _dbContext.OrganizationRegulatoryProgramUsers
-                .Include(orpu => orpu.PermissionGroup)
-                .Where(orpu => orpu.OrganizationRegulatoryProgramId == authorityOrganization.OrganizationRegulatoryProgramId
-                    && !orpu.IsRemoved
-                    && !orpu.IsRegistrationDenied
-                    && orpu.IsRegistrationApproved
-                    && orpu.PermissionGroup.Name == PermissionGroupName.Standard.ToString());
-
-            foreach (var standardUserOfAuthority in standardUsersOfAuthority)
-            {
-                var standardUserOfAuthorityUser = _dbContext.Users
-                    .Single(user => user.UserProfileId == standardUserOfAuthority.UserProfileId);
-
-                _emailService.SendEmail(new[] { standardUserOfAuthorityUser.Email }, EmailType.Report_Repudiation_AU, contentReplacements);
-            }
-
-            //Cromerr Log (UC-19 8.6.)
-            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-            cromerrAuditLogEntryDto.RegulatoryProgramId = reportPackage.OrganizationRegulatoryProgram.RegulatoryProgramId;
-            cromerrAuditLogEntryDto.OrganizationId = reportPackage.OrganizationRegulatoryProgram.OrganizationId;
-            cromerrAuditLogEntryDto.RegulatorOrganizationId = reportPackage.OrganizationRegulatoryProgram.RegulatorOrganizationId ??
-                                                              cromerrAuditLogEntryDto.OrganizationId;
-            cromerrAuditLogEntryDto.UserProfileId = currentUser.UserProfileId;
-            cromerrAuditLogEntryDto.UserName = currentUser.UserName;
-            cromerrAuditLogEntryDto.UserFirstName = currentUser.FirstName;
-            cromerrAuditLogEntryDto.UserLastName = currentUser.LastName;
-            cromerrAuditLogEntryDto.UserEmailAddress = currentUser.Email;
-            cromerrAuditLogEntryDto.IPAddress = _httpContextService.CurrentUserIPAddress();
-            cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
-
-            _crommerAuditLogService.Log(CromerrEvent.Report_Repudiated, cromerrAuditLogEntryDto,
-                                        contentReplacements);
 
             _logger.Info($"Leave ReportPackageService.RepudiateReport. reportPackageId={reportPackageId}, repudiationReasonId={repudiationReasonId}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
 

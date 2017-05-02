@@ -69,12 +69,13 @@ namespace Linko.LinkoExchange.Services.Report
         /// reportPackageDto.ReportPackageId must exist or exception thrown
         /// </summary>
         /// <param name="reportPackageDto">Existing Report Package to update</param>
+        /// <param name="isUseTransaction">If true, runs within transaction object</param>
         /// <returns>Existing ReportPackage.ReportPackageId</returns>
-        int SaveReportPackage(ReportPackageDto reportPackageDto);
+        int SaveReportPackage(ReportPackageDto reportPackageDto, bool isUseTransaction);
 
         /// <summary>
         /// Performs validation to ensure only allowed state transitions are occur,
-        /// throw RuleViolationException otherwise
+        /// throw RuleViolationException otherwise. Does NOT enter any corrsponding values into the Report Package row.
         /// </summary>
         /// <param name="reportStatus">Intended target state</param>
         /// <param name="isUseTransaction">If true, runs within transaction object</param>
@@ -109,7 +110,7 @@ namespace Linko.LinkoExchange.Services.Report
         IEnumerable<RepudiationReasonDto> GetRepudiationReasons();
 
         /// <summary>
-        /// Performs various validation checks before putting a report package into a virtual state of "Repudiated".
+        /// Performs various validation checks before putting a report package into "Repudiated" status.
         /// Also logs action and emails stakeholders.
         /// </summary>
         /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
