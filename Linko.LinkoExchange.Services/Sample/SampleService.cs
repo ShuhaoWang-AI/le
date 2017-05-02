@@ -805,7 +805,16 @@ namespace Linko.LinkoExchange.Services.Sample
 
             var dto = this.GetSampleDetails(sample);
 
-            if (sample.ReportSamples != null && sample.ReportSamples.Count() > 0)
+            if (sample != null && sample.IsReadyToReport)
+            {
+                dto.SampleStatusName = SampleStatusName.ReadyToReport;
+            }
+            else
+            {
+                dto.SampleStatusName = SampleStatusName.Draft;
+            }
+
+            if (sample?.ReportSamples != null && sample.ReportSamples.Count() > 0)
             {
                 dto.SampleStatusName = SampleStatusName.Reported;
             }

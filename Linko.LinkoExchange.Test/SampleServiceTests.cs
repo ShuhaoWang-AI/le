@@ -77,8 +77,8 @@ namespace Linko.LinkoExchange.Test
         {
             var sampleDto = new SampleDto();
             //sampleDto.Name = "Sample XYZ"; //THIS IS NOT SET FROM UI
-            sampleDto.MonitoringPointId = 1;
-            sampleDto.MonitoringPointName = "0002-Retired";
+            sampleDto.MonitoringPointId = 135;
+            sampleDto.MonitoringPointName = "Process";
             sampleDto.CollectionMethodId = 1;
             sampleDto.CollectionMethodName = "24";
             sampleDto.CtsEventTypeId = 1;

@@ -1197,6 +1197,30 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             throw new NotImplementedException();
         }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        public ActionResult EnableSample(bool isReadyToReport, SampleViewModel model)
+        {
+            try {
+                if (model.Id != null)
+                {
+                    var vm = _sampleService.GetSampleDetails(sampleId:model.Id.Value);
+                    vm.IsReadyToReport = isReadyToReport;
+                    _sampleService.SaveSample(sample:vm);
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            TempData[key:"ShowSuccessMessage"] = true;
+            TempData[key:"SuccessMessage"] = "Sample updated successfully!";
+
+            ModelState.Clear();
+            return RedirectToAction(actionName:"SampleDetails", controllerName:"Industry", routeValues:new {model.Id});
+        }
         
         [Route(template:"Sample/{id:int}/Delete")]
         public ActionResult DeleteSample(int id)

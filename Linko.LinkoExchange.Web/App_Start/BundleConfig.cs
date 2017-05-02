@@ -35,8 +35,8 @@ namespace Linko.LinkoExchange.Web
                             //.Include(virtualPath: "~/Scripts/moment.js")
                             .Include(virtualPath:"~/Scripts/AdminLTE/bootstrap-datepicker.js")
                             .Include(virtualPath:"~/Scripts/jquery.icheck.js")
+                            .Include(virtualPath:"~/Scripts/AdminLTE/jquery.dataTables.js") // jquery.dataTables.js needs to be include before dataTables.bootstrap.js
                             .Include(virtualPath:"~/Scripts/AdminLTE/dataTables.bootstrap.js")
-                            .Include(virtualPath:"~/Scripts/AdminLTE/jquery.dataTables.js")
                             .Include(virtualPath:"~/Scripts/AdminLTE/dataTables.responsive.js")
                             .Include(virtualPath:"~/Scripts/AdminLTE/app.js")
                             .Include(virtualPath:"~/Scripts/AdminLTE/init.js")
