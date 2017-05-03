@@ -1505,6 +1505,104 @@ namespace Linko.LinkoExchange.Services.Report
 
         }
 
+        /// <summary>
+        /// Meant to be called when user has reviewed a report submission. Updates the corresponding fields in the Report Package row.
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <param name="comments">Optional field</param>
+        public void ReviewSubmission(int reportPackageId, string comments = null)
+        {
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+            _logger.Info($"Enter ReportPackageService.ReviewSubmission. reportPackageId={reportPackageId}, comments={comments}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+
+            //Comments are optional here (UC-10 6.)
+
+            using (var transaction = _dbContext.BeginTransaction())
+            {
+                try
+                {
+                    var user = _dbContext.Users
+                        .Single(u => u.UserProfileId == currentUserId);
+
+                    var reportPackage = _dbContext.ReportPackages
+                        .Single(rep => rep.ReportPackageId == reportPackageId);
+
+                    reportPackage.SubmissionReviewDateTimeUtc = DateTime.UtcNow;
+                    reportPackage.SubmissionReviewerUserId = currentUserId;
+                    reportPackage.SubmissionReviewerFirstName = user.FirstName;
+                    reportPackage.SubmissionReviewerLastName = user.LastName;
+                    reportPackage.SubmissionReviewerTitleRole = user.TitleRole;
+
+                    if (!String.IsNullOrEmpty(comments))
+                        reportPackage.SubmissionReviewComments = comments;
+
+                    _dbContext.SaveChanges();
+
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+
+                    throw;
+                }
+            }
+
+            _logger.Info($"Leave ReportPackageService.ReviewSubmission. reportPackageId={reportPackageId}, comments={comments}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+
+        }
+
+        /// <summary>
+        /// Meant to be called when user has reviewed a report repudiation. Updates the corresponding fields in the Report Package row.
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <param name="comments">Required field</param>
+        public void ReviewRepudiation(int reportPackageId, string comments)
+        {
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+            _logger.Info($"Enter ReportPackageService.ReviewRepudiation. reportPackageId={reportPackageId}, comments={comments}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+
+            if (String.IsNullOrEmpty(comments))
+            {
+                //UC-56 (6.a.) "Required"
+                ThrowSimpleException($"Comments are required.");
+            }
+
+            using (var transaction = _dbContext.BeginTransaction())
+            {
+                try
+                {
+                    var user = _dbContext.Users
+                        .Single(u => u.UserProfileId == currentUserId);
+
+                    var reportPackage = _dbContext.ReportPackages
+                        .Single(rep => rep.ReportPackageId == reportPackageId);
+
+                    reportPackage.RepudiationReviewDateTimeUtc = DateTime.UtcNow;
+                    reportPackage.RepudiationReviewerUserId = currentUserId;
+                    reportPackage.RepudiationReviewerFirstName = user.FirstName;
+                    reportPackage.RepudiationReviewerLastName = user.LastName;
+                    reportPackage.RepudiationReviewerTitleRole = user.TitleRole;
+                    reportPackage.RepudiationReviewComments = comments;
+
+                    _dbContext.SaveChanges();
+
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+
+                    throw;
+                }
+            }
+
+            _logger.Info($"Leave ReportPackageService.ReviewRepudiation. reportPackageId={reportPackageId}, comments={comments}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
+
+        }
+
         private string EmtpyStringIfNull(string value)
         {
             return string.IsNullOrWhiteSpace(value) ? "" : value;

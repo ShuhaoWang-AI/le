@@ -118,5 +118,21 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="repudiationReasonName">Snapshot of tRepudiationReason.Name</param>
         /// <param name="comments">Optional field to accompany "other reason"</param>
         void RepudiateReport(int reportPackageId, int repudiationReasonId, string repudiationReasonName, string comments = null);
+
+        /// <summary>
+        /// Meant to be called when user has reviewed a report submission. Updates the corresponding fields in the Report Package row.
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <param name="comments">Optional field</param>
+        void ReviewSubmission(int reportPackageId, string comments = null);
+
+        /// <summary>
+        /// Meant to be called when user has reviewed a report repudiation. Updates the corresponding fields in the Report Package row.
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <param name="comments">Required field</param>
+        void ReviewRepudiation(int reportPackageId, string comments);
+
+
     }
 }

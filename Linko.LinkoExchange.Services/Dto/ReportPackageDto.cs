@@ -14,6 +14,9 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTimeOffset PeriodEndDateTime { get; set; }
         public DateTime PeriodStartDateTimeLocal { get; internal set; }
         public DateTime PeriodEndDateTimeLocal { get; internal set; }
+        public int? CtsEventTypeId { get; set; }
+        public string CtsEventTypeName { get; set; }
+        public string CtsEventCategoryName { get; set; }
         public string Comments { get; set; }
         public bool IsSubmissionBySignatoryRequired { get; internal set; }
         public int ReportStatusId { get; internal set; }

@@ -1075,6 +1075,9 @@ namespace Linko.LinkoExchange.Services.Mapping
             reportPackageDto.Name = rpt.Name;
             reportPackageDto.PeriodStartDateTimeLocal = rpt.PeriodStartDateTimeUtc.DateTime;
             reportPackageDto.PeriodEndDateTimeLocal = rpt.PeriodEndDateTimeUtc.DateTime;
+            reportPackageDto.CtsEventTypeId = rpt.CtsEventTypeId;
+            reportPackageDto.CtsEventTypeName = rpt.CtsEventTypeName;
+            reportPackageDto.CtsEventCategoryName = rpt.CtsEventCategoryName;
             reportPackageDto.Comments = rpt.Comments;
             reportPackageDto.IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired;
             reportPackageDto.ReportStatusId = rpt.ReportStatusId;
