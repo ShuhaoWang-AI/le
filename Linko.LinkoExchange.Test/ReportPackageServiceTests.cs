@@ -206,5 +206,17 @@ namespace Linko.LinkoExchange.Test
 
         }
 
+        [TestMethod]
+        public void ReviewSubmission()
+        {
+            _reportPackageService.ReviewSubmission(8);
+        }
+
+        [TestMethod]
+        public void ReviewRepudiation()
+        {
+            _reportPackageService.ReviewRepudiation(8, "This repudiation has been reviewed!");
+        }
+
     }
 }
