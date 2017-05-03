@@ -83,37 +83,36 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info("Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
 
+            List<RuleViolation> validationIssues = new List<RuleViolation>();
+            var reportPackage = _dbContext.ReportPackages.Include(i => i.ReportStatus)
+                .Single(i => i.ReportPackageId == reportPackageId);
+
+            if (reportPackage.ReportStatus.Name != ReportStatusName.ReadyToSubmit.ToString())
+            {
+                string message = "Report Package is not ready to submit.";
+                validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+            }
+
+            var submitterUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+            var submitterFirstName = _httpContextService.GetClaimValue(CacheKey.FirstName);
+            var submitterLastName = _httpContextService.GetClaimValue(CacheKey.LastName);
+            var submitterTitleRole = _httpContextService.GetClaimValue(CacheKey.UserRole);
+            var submitterIpAddress = _httpContextService.CurrentUserIPAddress();
+            var submitterUserName = _httpContextService.GetClaimValue(CacheKey.UserName);
+
+            reportPackage.SubmissionDateTimeUtc = DateTimeOffset.Now;
+            reportPackage.SubmitterUserId = submitterUserId;
+            reportPackage.SubmitterFirstName = submitterFirstName;
+            reportPackage.SubmitterLastName = submitterLastName;
+            reportPackage.SubmitterTitleRole = submitterTitleRole;
+            reportPackage.SubmitterIPAddress = submitterIpAddress;
+            reportPackage.SubmitterUserName = submitterUserName;
+
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try
                 {
-                    List<RuleViolation> validationIssues = new List<RuleViolation>();
-
-                    var reportPackage = _dbContext.ReportPackages.Include(i => i.ReportStatus)
-                        .Single(i => i.ReportPackageId == reportPackageId);
-
-                    if (reportPackage.ReportStatus.Name != ReportStatusName.ReadyToSubmit.ToString())
-                    {
-                        string message = "Report Package is not ready to submit.";
-                        validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
-                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
-                    }
-
-                    var submitterUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
-                    var submitterFirstName = _httpContextService.GetClaimValue(CacheKey.FirstName);
-                    var submitterLastName = _httpContextService.GetClaimValue(CacheKey.LastName);
-                    var submitterTitleRole = _httpContextService.GetClaimValue(CacheKey.UserRole);
-                    var submitterIpAddress = _httpContextService.CurrentUserIPAddress();
-                    var submitterUserName = _httpContextService.GetClaimValue(CacheKey.UserName);
-
-                    reportPackage.SubmissionDateTimeUtc = DateTimeOffset.Now;
-                    reportPackage.SubmitterUserId = submitterUserId;
-                    reportPackage.SubmitterFirstName = submitterFirstName;
-                    reportPackage.SubmitterLastName = submitterLastName;
-                    reportPackage.SubmitterTitleRole = submitterTitleRole;
-                    reportPackage.SubmitterIPAddress = submitterIpAddress;
-                    reportPackage.SubmitterUserName = submitterUserName;
-
                     UpdateStatus(reportPackageId, ReportStatusName.Submitted, false);
                     _dbContext.SaveChanges();
 
