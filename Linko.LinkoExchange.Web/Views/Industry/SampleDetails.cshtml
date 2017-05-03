@@ -265,7 +265,7 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <strong>Parameter Groups</strong>
+                <h3 class="box-title">Parameter Groups</h3>
                 <div class="box-tools pull-right">
                     <button class="btn btn-box-tool" data-widget="collapse">
                         <i class="fa fa-minus"></i>
@@ -294,7 +294,7 @@
                                 <td>@parameterGroup.Description</td>
                                 <td>@parameterGroup.ParameterIds</td>
                                 <td>
-                                    <button class="btn btn-primary btn-sm" data-title="btnAddParamsFromGroup" name="btnAddParamsFromGroup">
+                                    <button class="btn btn-primary btn-sm" name="btnAddParamsFromGroup" type="button">
                                         <i class="fa fa-lg fa-plus"></i>
                                     </button>
                                 </td>
@@ -310,7 +310,7 @@
 
     <div class="box box-primary">
         <div class="box-header with-border">
-            <strong>Results</strong>
+            <h3 class="box-title">Results</h3>
             <div class="box-tools pull-right">
                 @if (!ViewBag.Readonly)
                 {
@@ -332,7 +332,7 @@
                         <th> Parameter Name</th>
                         <th style="width: 50px"> Qualifier </th>
                         <th> Result </th>
-                        <th style="width: 80px"> MDL </th>
+                        <th> MDL </th>
                         <th> Analysis Method </th>
                         <th> Analysis Date & Time </th>
                         <th style="width: 50px"> EPA Method </th>
@@ -366,19 +366,17 @@
                                 </select>
                             </td>
                             <td>
-                                <div class="input-group input-group-sm">
-                                    <input class="form-control input-sm" id="Result_@sampleResult.ParameterId" type="text" value=@sampleResult.Value>
-                                    <input id="UnitId_@sampleResult.ParameterId" type="hidden" value=@sampleResult.UnitId>
+                                <div class="input-group input-group-sm" style="min-width:125px">
+                                    <input class="form-control input-sm" id="Result_@sampleResult.ParameterId" type="text" value="@sampleResult.Value">
+                                    <input id="UnitId_@sampleResult.ParameterId" type="hidden" value="@sampleResult.UnitId">
                                     <span class="input-group-addon">@sampleResult.UnitName</span>
                                 </div>
                             </td>
                             <td>
-                                <input class="form-control input-sm" id="MDL_@sampleResult.ParameterId" type="text" value=@sampleResult.EnteredMethodDetectionLimit>
+                                <input class="form-control input-sm" id="MDL_@sampleResult.ParameterId" type="text" style="width: 80px" value="@sampleResult.EnteredMethodDetectionLimit">
                             </td>
                             <td>
-                                <div class="input-group input-group-sm">
-                                    <input class="form-control input-sm" id="AnalysisMethod_@sampleResult.ParameterId" type="text" value=@sampleResult.AnalysisMethod>
-                                </div>
+                                <input class="form-control input-sm" id="AnalysisMethod_@sampleResult.ParameterId" type="text" value="@sampleResult.AnalysisMethod">
                             </td>
                             <td>
                                 @if (ViewBag.Readonly)
@@ -429,7 +427,7 @@
                                 <strong id="MassResult_@sampleResult.ParameterId"> @sampleResult.MassLoadingQualifier @sampleResult.MassLoadingValue @sampleResult.MassLoadingUnitName </strong>
                             </td>
                             <td>
-                                <button class="btn btn-danger btn-sm" data-title="Delete Parameter" id="btnDeleteParam" name="btnDeleteParam">
+                                <button class="btn btn-danger btn-sm" name="btnDeleteParam" type="button">
                                     <i class="fa fa-lg fa-trash"></i>
                                 </button>
                             </td>
@@ -486,7 +484,7 @@
                             "columnDefs": [
                                 {
                                     "defaultContent":
-                                        "<button class='btn btn-primary btn-sm' data-title='btnAddParamsFromGroup' name='btnAddParamsFromGroup'><i class='fa fa-lg fa-plus'></i></button>"
+                                        "<button class='btn btn-primary btn-sm' name='btnAddParamsFromGroup' type='button'><i class='fa fa-lg fa-plus'></i></button>"
                                     , "targets": 4
                                 }
                             ]
@@ -508,12 +506,12 @@
                             "columnDefs": [
                                 {
                                     "defaultContent":
-                                        "<button class='btn btn-danger btn-sm' name='btnDeleteParam' id='btnDeleteParam'><i class='fa fa-plus'></i></button>"
+                                        '<button class="btn btn-danger btn-sm" name="btnDeleteParam" type="button"><i class="fa fa-lg fa-trash"></i></button>'
                                     , "targets": 10
                                 }
                             ]
                             , "searching": false
-                            , "ordering": false
+                            , "ordering": true
                             , "order": [[1, 'asc']]
                             , "paging": false
                             , "info": false
@@ -614,7 +612,8 @@
                                             .toFixed(massLoadingCalculationDecimalPlaces)
                                             + " "
                                             + massLoadingUnit)
-                                        .fadeIn(2000).css('color', 'green');
+                                        .fadeIn(2000)
+                                        .css('color', 'green');
                                 });
                     }
                 }
@@ -640,7 +639,8 @@
                                             .toFixed(massLoadingCalculationDecimalPlaces)
                                             + " "
                                             + massLoadingUnit)
-                                        .fadeIn(2000).css('color', 'green');
+                                        .fadeIn(2000)
+                                        .css('color', 'green');
                                 });
                     }
                 }
@@ -705,7 +705,7 @@
 
         $(document)
             .on('click'
-                , "button[id^='btnDeleteParam']"
+                , "button[name='btnDeleteParam']"
                 , function()
                 {
                     var table = $('#ParameterTable').DataTable();
@@ -715,41 +715,223 @@
                         .draw();
                 });
 
+        $("#btnDeleteEmptyParameters")
+            .click(function()
+            {
+                var table = $('#ParameterTable').DataTable();
+                table
+                    .rows()
+                    .every(function()
+                    {
+                        var d = this.data();
+                        var cell = d[0];
+                        var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
+                        var qualifier = $("#Qualifier_" + paramId).val();
+                        var result = parseFloat($("#Result_" + paramId).val());
+
+                        console.debug($('input', cell)['prevObject'][0].id
+                            + ' : '
+                            + paramId
+                            + ' : '
+                            + qualifier
+                            + ' : '
+                            + result);
+
+                        if ((qualifier === 'NUMERIC' || qualifier === '<' || qualifier === '>') && isNaN(result))
+                        {
+                            this.nodes().to$().addClass('selected');
+                        }
+                    });
+
+                table.rows('.selected')
+                    .remove()
+                    .draw();
+
+                console.debug($('#ParameterTable >tbody >tr').length);
+            });
+
+        $("#btnAddParameter")
+            .click(function()
+            {
+                var allParameters = @Html.Raw(Json.Encode(Model.AllParameters));
+
+                var alreadyAddedParameterIds = [];
+
+                $('#ParameterTable')
+                    .DataTable()
+                    .rows()
+                    .every(function()
+                    {
+                        var d = this.data();
+                        var cell = d[0];
+                        var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
+                        alreadyAddedParameterIds.push(parseInt(paramId));
+                    });
+
+                console.debug(alreadyAddedParameterIds);
+
+                var availableParameters = $.grep(allParameters
+                    , function(obj)
+                    {
+                        //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
+                        return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1);
+                    });
+
+                console.debug(allParameters);
+                console.debug(availableParameters);
+            });
+
         $(document)
             .on('click'
-                , "button[id^='btnDeleteEmptyParameters']"
+                , "button[name='btnAddParamsFromGroup']"
                 , function()
                 {
-                    var table = $('#ParameterTable').DataTable();
-                    table
+                    var allParameters = @Html.Raw(Json.Encode(Model.AllParameters));
+
+                    var alreadyAddedParameterIds = [];
+
+                    var parameterTable = $('#ParameterTable').DataTable();
+                    parameterTable
                         .rows()
                         .every(function()
                         {
                             var d = this.data();
+                            console.debug(d);
                             var cell = d[0];
                             var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
-                            var qualifier = $("#Qualifier_" + paramId).val();
-                            var result = parseFloat($("#Result_" + paramId).val());
-
-                            console.debug($('input', cell)['prevObject'][0].id
-                                + ' : '
-                                + paramId
-                                + ' : '
-                                + qualifier
-                                + ' : '
-                                + result);
-
-                            if ((qualifier === 'NUMERIC' || qualifier === '<' || qualifier === '>') && isNaN(result))
-                            {
-                                this.nodes().to$().addClass('selected');
-                            }
+                            alreadyAddedParameterIds.push(parseInt(paramId));
                         });
 
-                    table.rows('.selected')
-                        .remove()
-                        .draw();
+                    console.debug(alreadyAddedParameterIds);
 
-                    console.debug($('#ParameterTable >tbody >tr').length);
+                    var strGroupParameterIds = $('#ParameterGroupTable').DataTable().row($(this).parents('tr')).data();
+                    var groupParameterIds = [];
+
+                    $.each(strGroupParameterIds[3].split(',')
+                        , function(index, value)
+                        {
+                            groupParameterIds.push(parseInt(value));
+                        });
+
+                    console.debug(groupParameterIds);
+
+                    var availableParameters = $.grep(allParameters
+                        , function(obj)
+                        {
+                            //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
+                            return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1)
+                                && ($.inArray(obj.Id, groupParameterIds) !== -1);
+                        });
+
+                    console.debug(allParameters);
+                    console.debug(availableParameters);
+
+                    $.each(availableParameters
+                        , function(index, value)
+                        {
+                            console.debug(value.Id + " : " + value.Name);
+                            var data = {};
+                            data[0] = "<input id='sampleResultId_" + value.Id + "' type='hidden' value=''>";
+                            data[1] = value.Name;
+
+                            var availableResultQualifierValidValues =
+                                @Html.Raw(Json.Encode(Model.AvailableResultQualifierValidValues));
+
+                            var qualifierCtrl =
+                                '<select class="form-control input-sm no-margin no-padding" id="Qualifier_'
+                                    + value.Id
+                                    + '" style="width: 100%">';
+
+                            $.each(availableResultQualifierValidValues
+                                , function(i, v)
+                                {
+                                    if (v.Value === "NUMERIC")
+                                    {
+                                        qualifierCtrl += '<option value="'
+                                            + v.Value
+                                            + '" selected="">'
+                                            + v.Text
+                                            + '</option>';
+                                    }
+                                    else
+                                    {
+                                        qualifierCtrl += '<option value="' + v.Value + '">' + v.Text + '</option>';
+                                    }
+                                });
+                            qualifierCtrl += '</select>';
+                            
+                            data[2] = qualifierCtrl;
+                            data[3] =
+                                '<div class="input-group input-group-sm" style="min-width:125px">'
+                                + '<input class="form-control input-sm" id="Result_'
+                                + value.Id
+                                + '" type="text" value=""><input id="UnitId_'
+                                + value.Id
+                                + '" type="hidden" value="'
+                                + value.DefaultUnitId
+                                + '"><span class="input-group-addon">'
+                                + value.DefaultUnitName
+                                + '</span></div>';
+                            data[4] = '<input class="form-control input-sm" id="MDL_'
+                                + value.Id
+                                + '" type="text" style="width: 80px" value="">';
+                            data[5] = '<input class="form-control input-sm" id="AnalysisMethod_'
+                                + value.Id
+                                + '" type="text" value="">';
+                            data[6] =
+                                '<span class="k-widget k-datetimepicker k-header" style="width: 200px; font-size: 12px;">'
+                                + '<span class="k-picker-wrap k-state-default"><input id="AnalysisDateTime_'
+                                + value.Id
+                                + '" name="AnalysisDateTime_'
+                                + value.Id
+                                + '" style="width: 100%; font-size: 12px;" type="text" value="@Html.Raw(DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt"))'
+                                + '" data-role="datetimepicker" class="k-input" '
+                                + 'role="combobox" aria-expanded="false" aria-disabled="false"><span unselectable="on" class="k-select">'
+                                + '<span class="k-link k-link-date" aria-label="Open the date view"><span unselectable="on" class="k-icon k-i-calendar" '
+                                + 'aria-controls="AnalysisDateTime_'
+                                + value.Id
+                                + '_dateview"></span></span><span class="k-link k-link-time" aria-label="Open the time view">'
+                                + '<span unselectable="on" class="k-icon k-i-clock" aria-controls="AnalysisDateTime_'
+                                + value.Id
+                                + '_timeview"></span></span></span></span></span><script>'
+                                + 'kendo.syncReady(function(){jQuery("#AnalysisDateTime_'
+                                + value.Id
+                                + '").kendoDateTimePicker({"format":"MM/dd/yyyy hh:mm:ss tt","min":new Date(1900,0,1,0,0,0,0),"max":new Date(2099,11,31,0,0,0,0),"interval":30});});'
+                                + '</' + 'script>';
+                            data[7] =
+                                '<div class="icheckbox_minimal-blue" style="position: relative;"><input type="checkbox" class="checkbox" id="EPAMethod_'
+                                + value.Id
+                                + '" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; '
+                                + 'height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div>';
+
+                            if (value.IsCalcMassLoading)
+                            {
+                                data[8] =
+                                    '<div class="icheckbox_minimal-blue checked" style="position: relative;"><input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
+                                    + value.Id
+                                    + '" checked="" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; '
+                                    + 'height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div>';
+                            }
+                            else
+                            {
+                                data[8] =
+                                    '<div class="icheckbox_minimal-blue" style="position: relative;"><input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
+                                    + value.Id
+                                    + '" checked="" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; '
+                                    + 'height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div>';
+                            }
+                            data[9] = '<strong id="MassResult_' + value.Id + '"></strong>';
+                            data[10] = null;
+
+                            console.debug(data);
+
+                            var rowNode = parameterTable
+                                .row.add(data)
+                                .draw()
+                                .node();
+
+                            $(rowNode).css('color', 'green');
+                        });
                 });
     </script>
 }}

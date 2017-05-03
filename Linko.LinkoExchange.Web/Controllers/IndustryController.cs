@@ -1111,8 +1111,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                         AvailableCollectionMethods = new List<SelectListItem>(),
                                         AvailableCtsEventTypes = new List<SelectListItem>(),
                                         SampleResults = new List<SampleResultViewModel>(),
-                                        ParameterGroups = new List<ParameterGroupViewModel>()
-                                        //AllParameters = new List<ParameterViewModel>()
+                                        ParameterGroups = new List<ParameterGroupViewModel>(),
+                                        AllParameters = new List<ParameterViewModel>()
                                     };
 
                     viewModel.ResultQualifierValidValues = programSettings.Settings.Where(s => s.TemplateName.Equals(obj:SettingType.ResultQualifierValidValues)).Select(s => s.Value).First();
@@ -1132,15 +1132,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                         .First()
                                                         .IfNullOrWhiteSpace(defaultValue:"true"));
 
-                    //viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:monitoringPoint.MonitoringPointId, sampleEndDateTimeUtc:newSampleStep1ViewModel.EndDateTimeLocal)
-                    //                                           .Select(c => new ParameterViewModel
-                    //                                                        {
-                    //                                                            Id = c.ParameterId,
-                    //                                                            Name = c.Name,
-                    //                                                            DefaultUnitId = c.DefaultUnit.UnitId,
-                    //                                                            DefaultUnitName = c.DefaultUnit.Name,
-                    //                                                            IsCalcMassLoading = c.IsCalcMassLoading
-                    //                                                        }).OrderBy(c => c.Name).ToList();
+                    viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId: monitoringPoint.MonitoringPointId, sampleEndDateTimeUtc: newSampleStep1ViewModel.EndDateTimeLocal)
+                                                               .Select(c => new ParameterViewModel
+                                                               {
+                                                                   Id = c.ParameterId,
+                                                                   Name = c.Name,
+                                                                   DefaultUnitId = c.DefaultUnit.UnitId,
+                                                                   DefaultUnitName = c.DefaultUnit.Name,
+                                                                   IsCalcMassLoading = c.IsCalcMassLoading
+                                                               }).OrderBy(c => c.Name).ToList();
 
                     viewModel.ParameterGroups =
                         _parameterService.GetAllParameterGroups(monitoringPointId:monitoringPoint.MonitoringPointId, sampleEndDateTimeLocal:newSampleStep1ViewModel.EndDateTimeLocal)
@@ -1285,8 +1285,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 ResultQualifierValidValues = vm.ResultQualifierValidValues,
                                 SampleResults = new List<SampleResultViewModel>(),
                                 SampleStatusName = vm.SampleStatusName,
-                                StartDateTimeLocal = vm.StartDateTimeLocal
-                                //AllParameters = new List<ParameterViewModel>()
+                                StartDateTimeLocal = vm.StartDateTimeLocal,
+                                AllParameters = new List<ParameterViewModel>()
                             };
 
                 viewModel.SampleResults = vm.SampleResults.Select(c => new SampleResultViewModel
@@ -1332,6 +1332,16 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                              Value = c.CtsEventTypeId.ToString(),
                                                                                                                              Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
                                                                                                                          }).OrderBy(c => c.Text).ToList();
+
+                viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:viewModel.MonitoringPointId, sampleEndDateTimeUtc:viewModel.EndDateTimeLocal)
+                                                           .Select(c => new ParameterViewModel
+                                                                        {
+                                                                            Id = c.ParameterId,
+                                                                            Name = c.Name,
+                                                                            DefaultUnitId = c.DefaultUnit.UnitId,
+                                                                            DefaultUnitName = c.DefaultUnit.Name,
+                                                                            IsCalcMassLoading = c.IsCalcMassLoading
+                                                                        }).OrderBy(c => c.Name).ToList();
             }
             catch (RuleViolationException rve)
             {
