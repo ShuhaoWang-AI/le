@@ -103,6 +103,7 @@
                     @Html.HiddenFor(model => model.MassLoadingMassLoadingUnitName)
                     @Html.HiddenFor(model => model.ResultQualifierValidValues)
                     @Html.HiddenFor(model => model.SampleStatusName)
+                    @Html.Hidden(name:"AllParameters", value:Html.Raw(value:Json.Encode(value:Model.AllParameters)))
                 </div>
 
                 <div class="form-group">
@@ -332,9 +333,9 @@
                         <th> Parameter Name</th>
                         <th style="width: 50px"> Qualifier </th>
                         <th> Result </th>
-                        <th> MDL </th>
+                        <th style="width: 80px"> MDL </th>
                         <th> Analysis Method </th>
-                        <th> Analysis Date & Time </th>
+                        <th style="width: 180px"> Analysis Date & Time </th>
                         <th style="width: 50px"> EPA Method </th>
                         <th style="width: 50px"> Calculate Loading </th>
                         <th> Mass Loading Result</th>
@@ -388,7 +389,7 @@
                                           .HtmlAttributes(attributes:new
                                                                      {
                                                                          @readonly = true,
-                                                                         style = "width:200px; font-size:12px"
+                                                                         style = "width:100%; font-size:12px"
                                                                      }))
                                 }
                                 else
@@ -399,7 +400,7 @@
                                           .Format(format:"MM/dd/yyyy hh:mm:ss tt")
                                           .HtmlAttributes(attributes:new
                                                                      {
-                                                                         style = "width:200px; font-size:12px"
+                                                                         style = "width:100%; font-size:12px"
                                                                      }))
                                 }
                             </td>
@@ -729,13 +730,7 @@
                         var qualifier = $("#Qualifier_" + paramId).val();
                         var result = parseFloat($("#Result_" + paramId).val());
 
-                        console.debug($('input', cell)['prevObject'][0].id
-                            + ' : '
-                            + paramId
-                            + ' : '
-                            + qualifier
-                            + ' : '
-                            + result);
+                        //console.debug($('input', cell)['prevObject'][0].id + ' : ' + paramId + ' : ' + qualifier + ' : ' + result);
 
                         if ((qualifier === 'NUMERIC' || qualifier === '<' || qualifier === '>') && isNaN(result))
                         {
@@ -747,13 +742,13 @@
                     .remove()
                     .draw();
 
-                console.debug($('#ParameterTable >tbody >tr').length);
+                //console.debug($('#ParameterTable >tbody >tr').length);
             });
 
         $("#btnAddParameter")
             .click(function()
             {
-                var allParameters = @Html.Raw(Json.Encode(Model.AllParameters));
+                var allParameters = $.parseJSON($("#AllParameters").val());
 
                 var alreadyAddedParameterIds = [];
 
@@ -768,7 +763,7 @@
                         alreadyAddedParameterIds.push(parseInt(paramId));
                     });
 
-                console.debug(alreadyAddedParameterIds);
+                //console.debug(alreadyAddedParameterIds);
 
                 var availableParameters = $.grep(allParameters
                     , function(obj)
@@ -777,8 +772,8 @@
                         return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1);
                     });
 
-                console.debug(allParameters);
-                console.debug(availableParameters);
+                //console.debug(allParameters);
+                //console.debug(availableParameters);
             });
 
         $(document)
@@ -786,7 +781,7 @@
                 , "button[name='btnAddParamsFromGroup']"
                 , function()
                 {
-                    var allParameters = @Html.Raw(Json.Encode(Model.AllParameters));
+                    var allParameters = $.parseJSON($("#AllParameters").val());
 
                     var alreadyAddedParameterIds = [];
 
@@ -796,13 +791,13 @@
                         .every(function()
                         {
                             var d = this.data();
-                            console.debug(d);
+                            //console.debug(d);
                             var cell = d[0];
                             var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
                             alreadyAddedParameterIds.push(parseInt(paramId));
                         });
 
-                    console.debug(alreadyAddedParameterIds);
+                    //console.debug("alreadyAddedParameterIds : " + alreadyAddedParameterIds);
 
                     var strGroupParameterIds = $('#ParameterGroupTable').DataTable().row($(this).parents('tr')).data();
                     var groupParameterIds = [];
@@ -813,7 +808,7 @@
                             groupParameterIds.push(parseInt(value));
                         });
 
-                    console.debug(groupParameterIds);
+                    //console.debug(groupParameterIds);
 
                     var availableParameters = $.grep(allParameters
                         , function(obj)
@@ -823,19 +818,19 @@
                                 && ($.inArray(obj.Id, groupParameterIds) !== -1);
                         });
 
-                    console.debug(allParameters);
-                    console.debug(availableParameters);
+                    //console.debug("allParameters :" + allParameters);
+                    //console.debug("availableParameters :" + availableParameters);
 
                     $.each(availableParameters
                         , function(index, value)
                         {
-                            console.debug(value.Id + " : " + value.Name);
+                            //console.debug(value.Id + " : " + value.Name);
                             var data = {};
                             data[0] = "<input id='sampleResultId_" + value.Id + "' type='hidden' value=''>";
                             data[1] = value.Name;
 
                             var availableResultQualifierValidValues =
-                                @Html.Raw(Json.Encode(Model.AvailableResultQualifierValidValues));
+                                @Html.Raw(value:Json.Encode(value:Model.AvailableResultQualifierValidValues));
 
                             var qualifierCtrl =
                                 '<select class="form-control input-sm no-margin no-padding" id="Qualifier_'
@@ -879,12 +874,12 @@
                                 + value.Id
                                 + '" type="text" value="">';
                             data[6] =
-                                '<span class="k-widget k-datetimepicker k-header" style="width: 200px; font-size: 12px;">'
+                                '<span class="k-widget k-datetimepicker k-header" style="width: 100%; font-size: 12px;">'
                                 + '<span class="k-picker-wrap k-state-default"><input id="AnalysisDateTime_'
                                 + value.Id
                                 + '" name="AnalysisDateTime_'
                                 + value.Id
-                                + '" style="width: 100%; font-size: 12px;" type="text" value="@Html.Raw(DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt"))'
+                                + '" style="width: 100%; font-size: 12px;" type="text" value="@Html.Raw(value:DateTime.Now.ToString(format:"MM/dd/yyyy hh:mm:ss tt"))'
                                 + '" data-role="datetimepicker" class="k-input" '
                                 + 'role="combobox" aria-expanded="false" aria-disabled="false"><span unselectable="on" class="k-select">'
                                 + '<span class="k-link k-link-date" aria-label="Open the date view"><span unselectable="on" class="k-icon k-i-calendar" '
@@ -923,7 +918,7 @@
                             data[9] = '<strong id="MassResult_' + value.Id + '"></strong>';
                             data[10] = null;
 
-                            console.debug(data);
+                            //console.debug("data : " + data);
 
                             var rowNode = parameterTable
                                 .row.add(data)

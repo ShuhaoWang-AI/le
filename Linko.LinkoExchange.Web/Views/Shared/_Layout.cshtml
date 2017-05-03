@@ -80,7 +80,15 @@
     @if(Request.IsAuthenticated && (ViewBag.PortalName != null))
     {
         <script type="text/javascript">
-            $('body').addClass('sidebar-mini');
+            if (Boolean(sessionStorage.getItem('sidebar-toggle-collapsed')))
+            {
+                var body = document.getElementsByTagName('body')[0];
+                body.className = body.className + ' sidebar-mini sidebar-collapse';
+            }
+            else
+            {
+                $('body').addClass('sidebar-mini');
+            }
         </script>
     }
     else
@@ -89,5 +97,17 @@
             $('body').removeClass('sidebar-mini').addClass('sidebar-collapse');
         </script>
     }
+
+    <script>
+        // Click handler can be added latter, after jQuery is loaded...
+        $('.sidebar-toggle').click(function(event) {
+            event.preventDefault();
+            if (Boolean(sessionStorage.getItem('sidebar-toggle-collapsed'))) {
+                sessionStorage.setItem('sidebar-toggle-collapsed', '');
+            } else {
+                sessionStorage.setItem('sidebar-toggle-collapsed', '1');
+            }
+        });
+    </script>
 </body>
 </html>
