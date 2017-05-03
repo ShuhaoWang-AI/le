@@ -83,45 +83,6 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info("Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
 
-            //TODO to add reportPakcage data temporary
-            // To be removed once saving reportPackage is done 
-            var reportPackageTemp = new ReportPackage();
-            reportPackageTemp.Name = "1st Quarter PCR";
-            reportPackageTemp.PeriodStartDateTimeUtc = DateTime.UtcNow;
-            reportPackageTemp.PeriodStartDateTimeUtc = DateTime.UtcNow.AddMonths(10);
-            reportPackageTemp.IsSubmissionBySignatoryRequired = true;
-            reportPackageTemp.ReportStatusId = 2;  // readyToSubmit
-
-            // organizationid = 1012, organizationTypeId =2 
-            // name:Valley City Plating
-            // OrganizationRegulatoryProgramId = 11  
-            // It has two users. 
-            // userProfileId:4  David Pelletier  //signatory
-            //               7  Jon Rasche 
-
-            reportPackageTemp.OrganizationRegulatoryProgramId = 11;
-            reportPackageTemp.OrganizationName = "Valley City Plating";
-            reportPackageTemp.OrganizationAddressLine1 = "3353 Eastern, S.E.";
-            reportPackageTemp.OrganizationAddressLine2 = "";
-            reportPackageTemp.OrganizationCityName = "Grand Rapids";
-            reportPackageTemp.OrganizationJurisdictionName = "Michigan";
-            reportPackageTemp.OrganizationZipCode = "49508";
-
-            reportPackageTemp.RecipientOrganizationName = "City of Grand Rapids";
-            reportPackageTemp.RecipientOrganizationAddressLine1 = "1300 Market Ave., S.W.";
-            reportPackageTemp.RecipientOrganizationAddressLine2 = "";
-            reportPackageTemp.RecipientOrganizationCityName = "Grand Rapids";
-            reportPackageTemp.RecipientOrganizationJurisdictionName = "Michigan";
-            reportPackageTemp.RecipientOrganizationZipCode = "49503";
-
-            reportPackageTemp.CreationDateTimeUtc = DateTime.UtcNow;
-
-            _dbContext.ReportPackages.Add(reportPackageTemp);
-            _dbContext.SaveChanges();
-            reportPackageId = reportPackageTemp.ReportPackageId;
-
-            //TODO: end of temporary code
-
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try
@@ -157,16 +118,7 @@ namespace Linko.LinkoExchange.Services.Report
                     _dbContext.SaveChanges();
 
                     var reportPackageDto = GetReportPackage(reportPackageId, true);
-
-                    //// TODO:
-                    //// Comment out temporary, using hard code temporary 
-                    //// var copyOfRecordDto = CreateCopyOfRecordForReportPackage(reportPackageDto);
-
-                    //// TODO: to remove below line for hard code testing purpose 
-                    var temp = reportPackageDto.ReportPackageId;
-                    reportPackageDto.ReportPackageId = 1370983575;
-                    var copyOfRecordDto = GetCopyOfRecordByReportPackageId(1370983575, reportPackageDto);
-                    reportPackageDto.ReportPackageId = temp;
+                    var copyOfRecordDto = CreateCopyOfRecordForReportPackage(reportPackageDto);
 
                     //// Send emails 
                     SendSignAndSubmitEmail(reportPackageDto, copyOfRecordDto);
@@ -602,7 +554,6 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
             emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
 
-            //TODO: use the real cor view path
             emailContentReplacements.Add("corViewLink", $"/reportPackage/{reportPackage.ReportPackageId}/cor");
 
             // Send emails to all IU signatories 
