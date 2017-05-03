@@ -230,6 +230,8 @@ namespace Linko.LinkoExchange.Services.Email
                 case EmailType.Registration_IndustryUserRegistrationPendingToApprovers:
                 case EmailType.Report_Submission_IU:
                 case EmailType.Report_Submission_AU:
+                case EmailType.Report_Repudiation_IU:
+                case EmailType.Report_Repudiation_AU:
                     emailAuditLogs.AddRange(PopulateSingleRecipientProgramData(receipientEmail));
                     break;
 

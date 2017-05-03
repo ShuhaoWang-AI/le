@@ -22,6 +22,7 @@ using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.Config;
 using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -39,6 +40,8 @@ namespace Linko.LinkoExchange.Test
         Mock<ISettingService> _settingService = new Mock<ISettingService>();
         Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
         Mock<ICromerrAuditLogService> _cromerrService = new Mock<ICromerrAuditLogService>();
+        Mock<IRequestCache> _requestCache = new Mock<IRequestCache>();
+        Mock<IAuditLogService> _auditLogService = new Mock<IAuditLogService>();
 
         public ReportPackageServiceTests()
         {
@@ -74,12 +77,26 @@ namespace Linko.LinkoExchange.Test
             _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.ReportRepudiatedDays)).Returns("180");
             _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.TimeZone)).Returns("6");
 
-            _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoName)).Returns("Email C Name");
-            _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoEmailAddress)).Returns("contactemail@auth.com");
-            _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoPhone)).Returns("(555) 555-5555");
+            _settingService.Setup(s => s.GetOrgRegProgramSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoName)).Returns("Email C Name");
+            _settingService.Setup(s => s.GetOrgRegProgramSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoEmailAddress)).Returns("contactemail@auth.com");
+            _settingService.Setup(s => s.GetOrgRegProgramSettingValue(It.IsAny<int>(), SettingType.EmailContactInfoPhone)).Returns("(555) 555-5555");
+
+            var systemSettingLookup = new Dictionary<SystemSettingType, string>();
+            systemSettingLookup.Add(SystemSettingType.SystemEmailEmailAddress, "donteventrytoreply@linkotechnology.com");
+            systemSettingLookup.Add(SystemSettingType.SystemEmailFirstName, "Adam");
+            systemSettingLookup.Add(SystemSettingType.SystemEmailLastName, "Adminsky");
+            //systemSettingLookup.Add(SystemSettingType.EmailServer, "wtraxadc2.watertrax.local");
+            systemSettingLookup.Add(SystemSettingType.EmailServer, "192.168.5.51"); 
+            _settingService.Setup(s => s.GetGlobalSettings()).Returns(systemSettingLookup);
+
+            _requestCache.Setup(s => s.GetValue(CacheKey.Token)).Returns("some_token_string");
 
             var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, actualSettingService);
             var actualSampleService = new SampleService(connection, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService);
+
+            var actualAuditLogService = new EmailAuditLogService(connection, _requestCache.Object, new MapHelper());
+            var actualEmailService = new LinkoExchangeEmailService(connection, actualAuditLogService, _programService.Object, _settingService.Object, _requestCache.Object);
+            var actualCromerrService = new CromerrAuditLogService(connection, _requestCache.Object, new MapHelper(), _httpContext.Object, _logger.Object);
 
             _reportPackageService = new ReportPackageService(
                 _programService.Object,
@@ -89,12 +106,12 @@ namespace Linko.LinkoExchange.Test
                 connection,
                 _httpContext.Object,
                 _userService.Object,
-                _emailService.Object,
+                actualEmailService,
                 _settingService.Object,
                 _orgService.Object,
                 actualSampleService,
                 new MapHelper(),
-                _cromerrService.Object
+                actualCromerrService
             );
         }
 
