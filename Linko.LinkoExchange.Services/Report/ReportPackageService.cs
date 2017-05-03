@@ -1370,7 +1370,7 @@ namespace Linko.LinkoExchange.Services.Report
                     //Repudiated by:
                     contentReplacements.Add("submitterFirstName", currentUser.FirstName);
                     contentReplacements.Add("submitterLastName", currentUser.LastName);
-                    contentReplacements.Add("submitterTitle", currentUser.TitleRole ?? "");
+                    contentReplacements.Add("submitterTitle", currentUser.TitleRole);
                     contentReplacements.Add("iuOrganizationName", reportPackage.OrganizationName);
                     contentReplacements.Add("permitNumber", reportPackage.OrganizationRegulatoryProgram.ReferenceNumber);
                     contentReplacements.Add("organizationAddressLine1", reportPackage.OrganizationAddressLine1);

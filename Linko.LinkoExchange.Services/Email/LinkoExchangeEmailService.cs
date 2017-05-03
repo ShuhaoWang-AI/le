@@ -102,7 +102,7 @@ namespace Linko.LinkoExchange.Services.Email
 
             var keyValues = replacements.Select(i =>
             {
-                return new KeyValuePair<string, string>("{" + i.Key + "}", i.Value);
+                return new KeyValuePair<string, string>("{" + i.Key + "}", i.Value ?? "");
             });
 
             replacements = keyValues.ToDictionary(i => i.Key, i => i.Value);
