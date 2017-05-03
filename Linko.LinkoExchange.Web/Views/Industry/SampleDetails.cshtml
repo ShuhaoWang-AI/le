@@ -260,61 +260,62 @@
     </div>
 
     if (!ViewBag.Readonly)
-     {
-         //parameter Groups
+    {
+        //parameter Groups
 
-         <div class="box box-primary">
-             <div class="box-header with-border" data-target="#step2" data-toggle="collapse">
-                 <strong>Parameter Groups</strong>
-                 <div class="box-tools pull-right">
-                     <button class="btn btn-box-tool" data-widget="collapse">
-                         <i class="fa fa-minus"></i>
-                     </button>
-                 </div>
-             </div>
-             <div class="box-body box-collapse collapse in" id="step2">
-                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="ParameterGroupTable">
-                     <thead>
-                         <tr>
-                             <th class="never">Id</th>
-                             <th>Parameter Group</th>
-                             <th>Description</th>
-                             <th class="never">ParameterIds</th>
-                             <th style="width: 50px">Add</th>
-                         </tr>
-                     </thead>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <strong>Parameter Groups</strong>
+                <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body box-collapse collapse in">
+                <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="ParameterGroupTable">
+                    <thead>
+                        <tr>
+                            @*if you add or reorder any column then need to update the JavaScripts bellow*@
+                            <th class="never">Id</th>
+                            <th>Parameter Group</th>
+                            <th>Description</th>
+                            <th class="never">ParameterIds</th>
+                            <th style="width: 50px">Add</th>
+                        </tr>
+                    </thead>
 
-                     <tbody>
-                         @foreach (var parameterGroup in Model.ParameterGroups)
-                         {
-                             <tr>
-                                 <td>@parameterGroup.Id</td>
-                                 <td>@parameterGroup.Name</td>
-                                 <td>@parameterGroup.Description</td>
-                                 <td>@parameterGroup.ParameterIds</td>
-                                 <td>
-                                     <button class="btn btn-primary btn-sm" data-title="btnAddParamsFromGroup" name="btnAddParamsFromGroup">
-                                         <i class="fa fa-lg fa-plus"></i>
-                                     </button>
-                                 </td>
-                             </tr>
-                         }
-                     </tbody>
-                 </table>
-             </div>
-         </div>
-     }
+                    <tbody>
+                        @foreach (var parameterGroup in Model.ParameterGroups)
+                        {
+                            <tr>
+                                <td>@parameterGroup.Id</td>
+                                <td>@parameterGroup.Name</td>
+                                <td>@parameterGroup.Description</td>
+                                <td>@parameterGroup.ParameterIds</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" data-title="btnAddParamsFromGroup" name="btnAddParamsFromGroup">
+                                        <i class="fa fa-lg fa-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
 
     // Results
 
     <div class="box box-primary">
-        <div class="box-header with-border" data-target="#step3" data-toggle="collapse">
+        <div class="box-header with-border">
             <strong>Results</strong>
             <div class="box-tools pull-right">
                 @if (!ViewBag.Readonly)
                 {
-                    <button class="btn btn-primary btn-sm">Add Parameter</button>
-                    <button class="btn btn-primary btn-sm">Delete Empty Parameters</button>
+                    <button class="btn btn-primary btn-sm" id="btnAddParameter" type="button">Add Parameter</button>
+                    <button class="btn btn-primary btn-sm" id="btnDeleteEmptyParameters" type="button">Delete Empty Parameters</button>
                 }
                 <button class="btn btn-box-tool" data-widget="collapse">
                     <i class="fa fa-minus"></i>
@@ -322,10 +323,11 @@
             </div>
         </div>
 
-        <div class="box-body box-collapse collapse in" id="step3">
+        <div class="box-body box-collapse collapse in">
             <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="ParameterTable">
                 <thead>
                     <tr>
+                        @*if you add or reorder any column then need to update the JavaScripts bellow*@
                         <th class="never"> Id </th>
                         <th> Parameter Name</th>
                         <th style="width: 50px"> Qualifier </th>
@@ -424,7 +426,7 @@
                                 }
                             </td>
                             <td>
-                                <strong id="MassResult_@sampleResult.ParameterId"> @sampleResult.MassLoadingValue </strong>
+                                <strong id="MassResult_@sampleResult.ParameterId"> @sampleResult.MassLoadingQualifier @sampleResult.MassLoadingValue @sampleResult.MassLoadingUnitName </strong>
                             </td>
                             <td>
                                 <button class="btn btn-danger btn-sm" data-title="Delete Parameter" id="btnDeleteParam" name="btnDeleteParam">
@@ -526,12 +528,12 @@
                         }
                     );
 
-                $("input[id^='CalcLoading_']:checkbox:checked")
-                    .each(function()
-                    {
-                        var paramId = this.id.replace('CalcLoading_', '');
-                        displayMassLoading(paramId);
-                    });
+                //$("input[id^='CalcLoading_']:checkbox:checked")
+                //    .each(function()
+                //    {
+                //        var paramId = this.id.replace('CalcLoading_', '');
+                //        displayMassLoading(paramId);
+                //    });
 
                 var isReadOnly = "@ViewBag.Readonly".toLowerCase() === "true";
 
@@ -543,6 +545,36 @@
                     $("[name='btnAddParamsFromGroup']").prop('disabled', true);
                     $("[name='btnDeleteParam']").prop('disabled', true);
                 }
+
+                $(document)
+                    .on('keypress'
+                        , "input[id^='Result_']"
+                        , function(e)
+                        {
+                            //if the letter is not digit then don't type anything
+                            if (e.which !== 8 && e.which !== 0 && e.which !== 46 && (e.which < 48 || e.which > 57))
+                            {
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        });
+
+                $("#FlowValue")
+                    .keypress(function(e)
+                    {
+                        //if the letter is not digit then don't type anything
+                        if (e.which !== 8 && e.which !== 0 && e.which !== 46 && (e.which < 48 || e.which > 57))
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            return true;
+                        }
+                    });
             });
 
         function displayMassLoading(paramId)
@@ -582,7 +614,7 @@
                                             .toFixed(massLoadingCalculationDecimalPlaces)
                                             + " "
                                             + massLoadingUnit)
-                                        .fadeIn(2000);
+                                        .fadeIn(2000).css('color', 'green');
                                 });
                     }
                 }
@@ -608,7 +640,7 @@
                                             .toFixed(massLoadingCalculationDecimalPlaces)
                                             + " "
                                             + massLoadingUnit)
-                                        .fadeIn(2000);
+                                        .fadeIn(2000).css('color', 'green');
                                 });
                     }
                 }
@@ -671,14 +703,53 @@
                     displayMassLoading(paramId);
                 });
 
-        $("button[id^='btnDeleteParam']")
-            .click(function()
-            {
-                var table = $('#ParameterTable').DataTable();
-                table
-                    .row($(this).parents('tr'))
-                    .remove()
-                    .draw();
-            });
+        $(document)
+            .on('click'
+                , "button[id^='btnDeleteParam']"
+                , function()
+                {
+                    var table = $('#ParameterTable').DataTable();
+                    table
+                        .row($(this).parents('tr'))
+                        .remove()
+                        .draw();
+                });
+
+        $(document)
+            .on('click'
+                , "button[id^='btnDeleteEmptyParameters']"
+                , function()
+                {
+                    var table = $('#ParameterTable').DataTable();
+                    table
+                        .rows()
+                        .every(function()
+                        {
+                            var d = this.data();
+                            var cell = d[0];
+                            var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
+                            var qualifier = $("#Qualifier_" + paramId).val();
+                            var result = parseFloat($("#Result_" + paramId).val());
+
+                            console.debug($('input', cell)['prevObject'][0].id
+                                + ' : '
+                                + paramId
+                                + ' : '
+                                + qualifier
+                                + ' : '
+                                + result);
+
+                            if ((qualifier === 'NUMERIC' || qualifier === '<' || qualifier === '>') && isNaN(result))
+                            {
+                                this.nodes().to$().addClass('selected');
+                            }
+                        });
+
+                    table.rows('.selected')
+                        .remove()
+                        .draw();
+
+                    console.debug($('#ParameterTable >tbody >tr').length);
+                });
     </script>
 }}

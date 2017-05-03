@@ -41,7 +41,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         // GET: Industry
         public ActionResult Index()
         {
-            return RedirectToAction(actionName:"PendingUserApprovals", controllerName:"Industry");
+            return RedirectToAction(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.Draft});
         }
 
         #endregion
@@ -1111,7 +1111,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                         AvailableCollectionMethods = new List<SelectListItem>(),
                                         AvailableCtsEventTypes = new List<SelectListItem>(),
                                         SampleResults = new List<SampleResultViewModel>(),
-                                        ParameterGroups = new List<ParameterGroupViewModel>(),
+                                        ParameterGroups = new List<ParameterGroupViewModel>()
                                         //AllParameters = new List<ParameterViewModel>()
                                     };
 
@@ -1178,7 +1178,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             throw new NotImplementedException();
         }
-        
+
         [Route(template:"Sample/{id:int}/Details")]
         public ActionResult SampleDetails(int id)
         {
@@ -1202,7 +1202,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult EnableSample(bool isReadyToReport, SampleViewModel model)
         {
-            try {
+            try
+            {
                 if (model.Id != null)
                 {
                     var vm = _sampleService.GetSampleDetails(sampleId:model.Id.Value);
@@ -1221,7 +1222,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             ModelState.Clear();
             return RedirectToAction(actionName:"SampleDetails", controllerName:"Industry", routeValues:new {model.Id});
         }
-        
+
         [Route(template:"Sample/{id:int}/Delete")]
         public ActionResult DeleteSample(int id)
         {

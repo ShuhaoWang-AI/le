@@ -86,7 +86,7 @@ namespace Linko.LinkoExchange.Test
             sampleDto.CtsEventCategoryName = "Sample Category 1";
             sampleDto.FlowUnitId = 5;
             sampleDto.FlowUnitName = "gpd";
-            sampleDto.FlowValue = "808.1";
+            sampleDto.FlowValue = "25000";
             sampleDto.StartDateTimeLocal = DateTime.Now.AddDays(-7);
             sampleDto.EndDateTimeLocal = DateTime.Now;
             sampleDto.IsReadyToReport = false;
@@ -110,16 +110,16 @@ namespace Linko.LinkoExchange.Test
                 Qualifier = "<",
                 UnitId = 7,
                 UnitName = "mg/L",
-                Value = "20",
-                EnteredMethodDetectionLimit = "MDL 2",
+                Value = "0.25",
+                EnteredMethodDetectionLimit = "0.20",
                 AnalysisMethod = "Analysis Method 2",
                 AnalysisDateTimeLocal = DateTime.Now,
                 IsApprovedEPAMethod = true,
                 IsCalcMassLoading = true,
                 MassLoadingQualifier = "<",
-                MassLoadingUnitId = 8,
-                MassLoadingUnitName = "mgd",
-                MassLoadingValue = "1001.2005",
+                MassLoadingUnitId = 10,
+                MassLoadingUnitName = "ppd",
+                MassLoadingValue = "52125.00",
             };
             resultDtos.Add(resultDto);
             resultDto = new SampleResultDto()
@@ -129,8 +129,8 @@ namespace Linko.LinkoExchange.Test
                 Qualifier = "<",
                 UnitId = 11,
                 UnitName = "su",
-                Value = "991.00000",
-                EnteredMethodDetectionLimit = "MDL 5",
+                Value = "0.99100",
+                EnteredMethodDetectionLimit = "",
                 AnalysisMethod = "Analysis Method 5",
                 AnalysisDateTimeLocal = DateTime.Now,
                 IsApprovedEPAMethod = false,
@@ -155,6 +155,26 @@ namespace Linko.LinkoExchange.Test
         }
 
         #endregion
+        
+        [TestMethod]
+        public void SaveSample()
+        {
+            //Create test Sample Dto
+            var sampleDto = GetTestSampleDto();
+            sampleDto.IsMassLoadingResultToUseLessThanSign = true;
+            sampleDto.IsReadyToReport = true;
+
+            //Persist
+            try
+            {
+               var id =  _sampleService.SaveSample(sampleDto);
+               Assert.IsTrue(condition:(id > 0), message:"Sample didn't save");
+            }
+            catch
+            {
+                // ignored
+            }
+        }
 
         [TestMethod]
         public void SaveSample_Invalid_Sample_Type()

@@ -133,7 +133,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
         <section class="sidebar">
             @* BEGIN Menu *@
             <ul class="sidebar-menu">
-                <li class="treeview @Html.IsActive(actions:"Samples", controllers:"Industry")">
+                <li class="treeview @Html.IsActive(actions:"Samples,SampleDetails", controllers:"Industry")">
                     <a href="#">
                         <i class="fa fa-fw fa-th-list"></i>
                         <span>Samples</span>

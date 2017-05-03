@@ -210,6 +210,7 @@
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="availableSamplesAndResultsTable">
                     <thead>
                         <tr>
+                            @*if you add or reorder any column then need to update the JavaScripts bellow*@
                             <th class="never">Id</th>
                             <th>Name</th>
                             <th>Description</th>
@@ -241,6 +242,7 @@
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="selectedSamplesAndResultsTable">
                     <thead>
                         <tr>
+                            @*if you add or reorder any column then need to update the JavaScripts bellow*@
                             <th style="width: 30px"></th>
                             <th class="never">Id</th>
                             <th>Name</th>
@@ -300,6 +302,7 @@
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="availableAttachmentTable">
                     <thead>
                         <tr>
+                            @*if you add or reorder any column then need to update the JavaScripts bellow*@
                             <th class="never">Id</th>
                             <th>Name</th>
                             <th>Description</th>
@@ -331,6 +334,7 @@
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="selectedAttachmentTable">
                     <thead>
                         <tr>
+                            @*if you add or reorder any column then need to update the JavaScripts bellow*@
                             <th style="width: 30px"></th>
                             <th class="never">Id</th>
                             <th>Name</th>
@@ -390,6 +394,7 @@
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="availableCertificationTable">
                     <thead>
                         <tr>
+                            @*if you add or reorder any column then need to update the JavaScripts bellow*@
                             <th class="never">Id</th>
                             <th>Name</th>
                             <th>Description</th>
@@ -421,6 +426,7 @@
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="selectedCertificationTable">
                     <thead>
                         <tr>
+                            @*if you add or reorder any column then need to update the JavaScripts bellow*@
                             <th style="width: 30px"></th>
                             <th class="never">Id</th>
                             <th>Name</th>
@@ -481,6 +487,7 @@
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="availableIndustryTable">
                     <thead>
                         <tr>
+                            @*if you add or reorder any column then need to update the JavaScripts bellow*@
                             <th class="never">Id</th>
                             <th>No</th>
                             <th>Name</th>
@@ -516,6 +523,7 @@
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="selectedIndustryTable">
                     <thead>
                         <tr>
+                            @*if you add or reorder any column then need to update the JavaScripts bellow*@
                             <th class="never">Id</th>
                             <th>No</th>
                             <th>Name</th>
@@ -818,7 +826,7 @@
                         .draw()
                         .node();
 
-                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+                    $(rowNode).css('color', 'green');
 
                     tableMoveFrom
                         .row($(this).parents('tr'))
@@ -841,7 +849,7 @@
                         .draw()
                         .node();
 
-                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+                    $(rowNode).css('color', 'green');
 
                     tableMoveFrom
                         .row($(this).parents('tr'))
@@ -864,7 +872,7 @@
                         .draw()
                         .node();
 
-                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+                    $(rowNode).css('color', 'green');
 
                     tableMoveFrom
                         .row($(this).parents('tr'))
@@ -887,7 +895,7 @@
                         .draw()
                         .node();
 
-                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+                    $(rowNode).css('color', 'green');
 
                     tableMoveFrom
                         .row($(this).parents('tr'))
@@ -910,7 +918,7 @@
                         .draw()
                         .node();
 
-                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+                    $(rowNode).css('color', 'green');
 
                     tableMoveFrom
                         .row($(this).parents('tr'))
@@ -933,7 +941,7 @@
                         .draw()
                         .node();
 
-                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+                    $(rowNode).css('color', 'green');
 
                     tableMoveFrom
                         .row($(this).parents('tr'))
@@ -956,7 +964,7 @@
                         .draw()
                         .node();
 
-                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+                    $(rowNode).css('color', 'green');
 
                     tableMoveFrom
                         .row($(this).parents('tr'))
@@ -979,7 +987,7 @@
                         .draw()
                         .node();
 
-                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+                    $(rowNode).css('color', 'green');
 
                     tableMoveFrom
                         .row($(this).parents('tr'))
@@ -1002,7 +1010,7 @@
                             reportElementTypeViewModel.Id = value[1];
                             reportElementTypeViewModel.Name = value[2];
                             selectedSamplesAndResults.push(reportElementTypeViewModel);
-                            console.log('Data in index: ' + index + ' is: ' + value);
+                            console.debug('Data in index: ' + index + ' is: ' + value);
                         });
 
                     var selectedAttachments = [];
@@ -1016,7 +1024,7 @@
                             reportElementTypeViewModel.Id = value[1];
                             reportElementTypeViewModel.Name = value[2];
                             selectedAttachments.push(reportElementTypeViewModel);
-                            console.log('Data in index: ' + index + ' is: ' + value);
+                            console.debug('Data in index: ' + index + ' is: ' + value);
                         });
 
                     var selectedCertifications = [];
@@ -1030,7 +1038,7 @@
                             reportElementTypeViewModel.Id = value[1];
                             reportElementTypeViewModel.Name = value[2];
                             selectedCertifications.push(reportElementTypeViewModel);
-                            console.log('Data in index: ' + index + ' is: ' + value);
+                            console.debug('Data in index: ' + index + ' is: ' + value);
                         });
 
                     var selectedIndustries = [];
@@ -1061,7 +1069,7 @@
                     viewModel.CertificationTypes = selectedCertifications;
                     viewModel.ReportPackageTemplateAssignments = selectedIndustries;
 
-                    console.log('----', viewModel);
+                    console.debug('----', viewModel);
 
                     var postUrl = "@ViewBag.PostURL";
                     var token = $("[name='__RequestVerificationToken']").val();

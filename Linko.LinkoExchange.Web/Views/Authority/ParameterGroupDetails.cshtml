@@ -149,6 +149,7 @@
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="availableParameterTable">
                     <thead>
                         <tr>
+                            @*if you add or reorder any column then need to update the JavaScripts bellow*@
                             <th class="never">Id</th>
                             <th>Parameter</th>
                             <th style="width: 60px">Add</th>
@@ -178,6 +179,7 @@
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="selectedParameterTable">
                     <thead>
                         <tr>
+                            @*if you add or reorder any column then need to update the JavaScripts bellow*@
                             <th class="never">Id</th>
                             <th>Parameter</th>
                             <th style="width: 60px">Remove</th>
@@ -287,7 +289,7 @@
                         .remove()
                         .draw();
 
-                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+                    $(rowNode).css('color', 'green');
                 });
 
         $(document)
@@ -310,7 +312,7 @@
                         .remove()
                         .draw();
 
-                    $(rowNode).css('color', 'green').animate({ color: 'black' });
+                    $(rowNode).css('color', 'green');
                 });
 
         $("#btnSave")
@@ -329,7 +331,7 @@
                             parameterViewModel.Name = d[1];
                             selectedParameters.push(parameterViewModel);
                         });
-                    console.log(selectedParameters.length);
+                    console.debug(selectedParameters.length);
 
                     var viewModel = {};
                     viewModel.Id = $('#Id').val();
