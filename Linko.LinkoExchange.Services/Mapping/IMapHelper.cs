@@ -58,8 +58,8 @@ namespace Linko.LinkoExchange.Services.Mapping
         SampleDto GetSampleDtoFromSample(Core.Domain.Sample sample);
         Core.Domain.Sample GetSampleFromSampleDto(SampleDto sampleDto, Core.Domain.Sample existingSample = null);
         SampleResultDto GetSampleResultDtoFromSampleResult(SampleResult sampleResult);
-        SampleResult GetConcentrationSampleResultFromSampleResultDto(SampleResultDto dto);
-        SampleResult GetMassSampleResultFromSampleResultDto(SampleResultDto dto);
+        SampleResult GetConcentrationSampleResultFromSampleResultDto(SampleResultDto dto, SampleResult existingSampleResult);
+        SampleResult GetMassSampleResultFromSampleResultDto(SampleResultDto dto, SampleResult existingSampleResult);
         ReportPackageDto GetReportPackageDtoFromReportPackage(ReportPackage rpt);
         ReportPackage GetReportPackageFromReportPackageTemplate(ReportPackageTemplate rpt);
         RepudiationReasonDto GetRepudiationReasonDtoFromRepudiationReason(RepudiationReason repudiationReason);

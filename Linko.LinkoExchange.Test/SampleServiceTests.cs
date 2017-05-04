@@ -574,5 +574,17 @@ namespace Linko.LinkoExchange.Test
             }
 
         }
+
+
+        [TestMethod]
+        public void Update_Existing_Sample()
+        {
+            var sampleDto = _sampleService.GetSampleDetails(40);
+
+            sampleDto.FlowValue = "21";
+
+            var sampleDtos = _sampleService.SaveSample(sampleDto);
+
+        }
     }
 }

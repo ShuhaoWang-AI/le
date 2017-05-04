@@ -577,7 +577,7 @@ namespace Linko.LinkoExchange.Test
                                     new SampleResultDto
                                     {
                                          SampleId = 1,
-                                         SampleResultId = 1,
+                                         ConcentrationSampleResultId = 1,
                                          ParameterId = 1,
                                          ParameterName = "1,1,1,2-Tetrachloroethane",
                                          Qualifier = "<",
@@ -601,7 +601,7 @@ namespace Linko.LinkoExchange.Test
                                     new SampleResultDto
                                     {
                                          SampleId = 1,
-                                         SampleResultId = 2,
+                                         ConcentrationSampleResultId = 2,
                                          ParameterId = 2,
                                          ParameterName = "1,1,1-Trichloroethane",
                                          Qualifier = "<",
@@ -670,7 +670,7 @@ namespace Linko.LinkoExchange.Test
                                     new SampleResultDto
                                     {
                                          SampleId = 2,
-                                         SampleResultId = 3,
+                                         ConcentrationSampleResultId = 3,
                                          ParameterId = 1,
                                          ParameterName = "1,1,1,2-Tetrachloroethane",
                                          Qualifier = "<",
@@ -694,7 +694,7 @@ namespace Linko.LinkoExchange.Test
                                     new SampleResultDto
                                     {
                                          SampleId = 3,
-                                         SampleResultId = 4,
+                                         ConcentrationSampleResultId = 4,
                                          ParameterId = 2,
                                          ParameterName = "1,1,1-Trichloroethane",
                                          Qualifier = "<",

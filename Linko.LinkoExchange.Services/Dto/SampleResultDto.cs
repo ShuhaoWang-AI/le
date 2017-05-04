@@ -11,7 +11,7 @@ namespace Linko.LinkoExchange.Services.Dto
 {
     public class SampleResultDto
     {
-        public int? SampleResultId { get; set; }
+        public int? ConcentrationSampleResultId { get; set; }
         public int SampleId { get; set; }
         public int ParameterId { get; set; }
         public string ParameterName { get; set; }
@@ -27,6 +27,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTime LastModificationDateTimeLocal { get; set; }
         public string LastModifierFullName { get; set; }
         public bool IsCalcMassLoading { get; set; }
+        public int? MassLoadingSampleResultId { get; set; }
         public string MassLoadingQualifier { get; set; }
         public string MassLoadingValue { get; set; }
         public int MassLoadingUnitId { get; set; }

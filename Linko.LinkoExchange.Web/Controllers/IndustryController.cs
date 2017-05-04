@@ -1294,7 +1294,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                            AnalysisDateTimeLocal = c.AnalysisDateTimeLocal,
                                                                            AnalysisMethod = c.AnalysisMethod,
                                                                            EnteredMethodDetectionLimit = c.EnteredMethodDetectionLimit,
-                                                                           Id = c.SampleResultId,
+                                                                           Id = c.ConcentrationSampleResultId,
                                                                            IsApprovedEPAMethod = c.IsApprovedEPAMethod,
                                                                            IsCalcMassLoading = c.IsCalcMassLoading,
                                                                            MassLoadingQualifier = c.MassLoadingQualifier,

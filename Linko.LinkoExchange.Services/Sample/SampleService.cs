@@ -75,188 +75,238 @@ namespace Linko.LinkoExchange.Services.Sample
             var sampleIdToReturn = -1;
             var sampleStartDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId);
             var sampleEndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId);
+            var massLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.MassLoading.ToString()).LimitBasisId;
+            var concentrationLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Concentration.ToString()).LimitBasisId;
+            var dailyLimitTypeId = _dbContext.LimitTypes.Single(lt => lt.Name == LimitTypeName.Daily.ToString()).LimitTypeId;
 
-            try
+            Core.Domain.Sample sampleToPersist = null;
+            if (sampleDto.SampleId.HasValue && sampleDto.SampleId.Value > 0)
             {
-                Core.Domain.Sample sampleToPersist = null;
 
-                if (sampleDto.SampleId.HasValue && sampleDto.SampleId.Value > 0)
+                if (IsSampleIncludedInReportPackage(sampleDto.SampleId.Value))
                 {
+                    //Sample is in use in a Report Package (draft or otherwise)...  
+                    //Actor can not perform any actions of any kind except view all details.
+                    ThrowSimpleException("Sample is included in a Report Package and therefore cannot be updated.");
+                }
 
-                    if (IsSampleIncludedInReportPackage(sampleDto.SampleId.Value))
+                //Update existing
+                sampleToPersist = _dbContext.Samples
+                    .Include(c => c.SampleResults)
+                    .Include(c => c.SampleResults.Select(sr => sr.LimitBasis))
+                    .Single(c => c.SampleId == sampleDto.SampleId);
+                sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto, sampleToPersist);
+
+                //Handle Sample Result "Deletions"
+                //(Remove items from the database that cannot be found in the dto collection)
+                //
+                var existingSampleResults = sampleToPersist.SampleResults
+                    .Where(sr => sr.LimitBasis.Name == LimitBasisName.Concentration.ToString()
+                        || sr.LimitBasis.Name == LimitBasisName.MassLoading.ToString())
+                    .ToArray();
+
+                for (var i = 0; i < existingSampleResults.Length; i++)
+                {
+                    var existingSampleResult = existingSampleResults[i];
+                    //Find match in sample dto results
+                    var matchedSampleResult = sampleDto.SampleResults
+                        .SingleOrDefault(sr => (sr.ConcentrationSampleResultId.HasValue && sr.ConcentrationSampleResultId.Value == existingSampleResult.SampleResultId)
+                                        || (sr.MassLoadingSampleResultId.HasValue && sr.MassLoadingSampleResultId.Value == existingSampleResult.SampleResultId));
+
+                    if (matchedSampleResult == null)
                     {
-                        //Sample is in use in a Report Package (draft or otherwise)...  
-                        //Actor can not perform any actions of any kind except view all details.
-                        return sampleDto.SampleId.Value;
+                        //existing sample result must have been deleted -- remove
+                        _dbContext.SampleResults.Remove(existingSampleResult);
                     }
+                }
+            }
+            else
+            {
+                //Get new
+                sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto);
+                sampleToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+                _dbContext.Samples.Add(sampleToPersist);
+            }
 
-                    //Update existing
-                    sampleToPersist = _dbContext.Samples.Single(c => c.SampleId == sampleDto.SampleId);
-                    sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto, sampleToPersist);
 
-                    //Delete existing results
-                    var existingSampleResults = _dbContext.SampleResults
-                        .Where(sr => sr.SampleId == sampleDto.SampleId);
-                    _dbContext.SampleResults.RemoveRange(existingSampleResults);
+            //Handle Sample Results "Updates and/or Additions"
+            foreach (var sampleResultDto in sampleDto.SampleResults)
+            {
+                //Each SampleResultDto has at least a Concentration component
+                SampleResult concentrationResultRowToUpdate = null;
+                if (!sampleResultDto.ConcentrationSampleResultId.HasValue)
+                {
+                    concentrationResultRowToUpdate = new SampleResult();
+                    _dbContext.SampleResults.Add(concentrationResultRowToUpdate);
                 }
                 else
                 {
-                    //Get new
-                    sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto);
-                    sampleToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
-                    _dbContext.Samples.Add(sampleToPersist);
-                }
-                
-                //Set Name auto-generated using settings format
-                string sampleName;
-                string nameCreationRule = _settings.GetOrgRegProgramSettingValue(currentOrgRegProgramId, SettingType.SampleNameCreationRule);
-                if (nameCreationRule == SampleNameCreationRuleOption.SampleEventType.ToString())
-                {
-                    sampleName = sampleToPersist.CtsEventTypeName;
-                }
-                else if (nameCreationRule == SampleNameCreationRuleOption.SampleEventTypeCollectionMethod.ToString())
-                {
-                    sampleName = $"{sampleToPersist.CtsEventTypeName} {sampleToPersist.CollectionMethodName}";
-                }
-                else {
-                    throw new Exception($"ERROR: Unknown SampleNameCreationRuleOption={nameCreationRule}, currentOrgRegProgramId={currentOrgRegProgramId}");
+                    concentrationResultRowToUpdate = sampleToPersist.SampleResults
+                        .Single(sr => sr.SampleResultId == sampleResultDto.ConcentrationSampleResultId.Value);
                 }
 
-                sampleToPersist.Name = sampleName;
-                sampleToPersist.ByOrganizationRegulatoryProgramId = currentOrgRegProgramId; //these are the same only per current workflow
-                sampleToPersist.ForOrganizationRegulatoryProgramId = currentOrgRegProgramId; //these are the same only per current workflow
-                sampleToPersist.StartDateTimeUtc = sampleStartDateTimeUtc;
-                sampleToPersist.EndDateTimeUtc = sampleEndDateTimeUtc;
-                sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
-                sampleToPersist.LastModifierUserId = currentUserId;
-
-                //Handle FlowUnitValidValues
-                if (sampleDto.FlowUnitValidValues != null)
+                //Update Concentation Result
+                concentrationResultRowToUpdate = _mapHelper.GetConcentrationSampleResultFromSampleResultDto(sampleResultDto, concentrationResultRowToUpdate);
+                Double valueAsDouble;
+                if (!Double.TryParse(concentrationResultRowToUpdate.EnteredValue, out valueAsDouble))
                 {
-                    var flowUnitValidValues = "";
-                    var commaString = "";
-                    foreach (var unitDto in sampleDto.FlowUnitValidValues)
+                    //Could not convert -- throw exception
+                    ThrowSimpleException($"Could not convert entered concentration value to double: \"{concentrationResultRowToUpdate.EnteredValue}\"");
+                }
+                concentrationResultRowToUpdate.Value = valueAsDouble;
+                if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
+                {
+                    concentrationResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
+                        .GetUTCDateTimeUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                }
+                concentrationResultRowToUpdate.LimitBasisId = concentrationLimitBasisId;
+                concentrationResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
+                concentrationResultRowToUpdate.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+                concentrationResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                concentrationResultRowToUpdate.LastModifierUserId = currentUserId;
+
+
+                //... the SampleResultDto MAY ALSO have a Mass Loading component
+                if (sampleResultDto.IsCalcMassLoading)
+                {
+                    SampleResult massResultRowToUpdate = null;
+                    if (!sampleResultDto.MassLoadingSampleResultId.HasValue)
                     {
-                        flowUnitValidValues += commaString + unitDto.Name;
-                        commaString = ",";
+                        massResultRowToUpdate = new SampleResult();
+                        _dbContext.SampleResults.Add(massResultRowToUpdate);
+                    }
+                    else
+                    {
+                        massResultRowToUpdate = sampleToPersist.SampleResults
+                            .Single(sr => sr.SampleResultId == sampleResultDto.MassLoadingSampleResultId.Value);
                     }
 
-                    sampleToPersist.FlowUnitValidValues = flowUnitValidValues;
-                }
-
-                _dbContext.SaveChanges(); //Need to Save before getting new SampleId
-
-                sampleIdToReturn = sampleToPersist.SampleId;
-
-                //Add results
-                sampleToPersist.SampleResults = new Collection<SampleResult>();
-                //
-                //Add flow result first (if exists)
-                //  - this is only required if there is at least 1 mass loading result
-
-                if (sampleDto.FlowValue != null && sampleDto.FlowUnitId != null && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
-                {
-                    //Check flow unit id is within valid values
-                    if (sampleDto.FlowUnitValidValues == null || !sampleDto.FlowUnitValidValues.Select(fu => fu.UnitId).Contains(sampleDto.FlowUnitId.Value))
-                    {
-                        ThrowSimpleException($"ERROR: Selected flow unit (id={sampleDto.FlowUnitId.Value}, name={sampleDto.FlowUnitName}) could not be found within passed in FlowUnitValidValues collection.");
-                    }
-
-                    var flowParameter = _dbContext.Parameters
-                        .First(p => p.IsFlowForMassLoadingCalculation == true); //Chris: "Should be one but just get first".
-
-                    var flowLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.VolumeFlowRate.ToString()).LimitBasisId;
-
-                    var flowResult = new SampleResult()
-                    {
-                        SampleId = sampleIdToReturn,
-                        ParameterId = flowParameter.ParameterId,
-                        ParameterName = flowParameter.Name,
-                        Qualifier = "",
-                        EnteredValue = sampleDto.FlowValue,
-                        //Value = Convert.ToDouble(sampleDto.FlowValue), //handle this below
-                        UnitId = sampleDto.FlowUnitId.Value,
-                        UnitName = sampleDto.FlowUnitName,
-                        EnteredMethodDetectionLimit = "",
-                        LimitTypeId = null,
-                        LimitBasisId = flowLimitBasisId,
-                        IsCalculated = false
-                    };
-                    Double valueAsDouble;
-                    if (!Double.TryParse(flowResult.EnteredValue, out valueAsDouble))
+                    //Update Mass Loading Result
+                    massResultRowToUpdate = _mapHelper.GetMassSampleResultFromSampleResultDto(sampleResultDto, massResultRowToUpdate);
+                    massResultRowToUpdate.IsMassLoadingCalculationRequired = true;
+                    Double massValueAsDouble;
+                    if (!Double.TryParse(massResultRowToUpdate.EnteredValue, out massValueAsDouble))
                     {
                         //Could not convert -- throw exception
-                        ThrowSimpleException($"Could not convert entered flow value to double: \"{flowResult.EnteredValue}\"");
+                        ThrowSimpleException($"Could not convert entered mass value to double: \"{massResultRowToUpdate.EnteredValue}\"");
                     }
-                    flowResult.Value = valueAsDouble;
-                    sampleToPersist.SampleResults.Add(flowResult);
+                    massResultRowToUpdate.Value = massValueAsDouble;
+                    if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
+                    {
+                        massResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
+                            .GetUTCDateTimeUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                    }
+                    massResultRowToUpdate.LimitBasisId = massLimitBasisId;
+                    massResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
+                    massResultRowToUpdate.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+                    massResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                    massResultRowToUpdate.LastModifierUserId = currentUserId;
 
                 }
-
-                //Add "regular" sample results
-                var massLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.MassLoading.ToString()).LimitBasisId;
-                var concentrationLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Concentration.ToString()).LimitBasisId;
-                var dailyLimitTypeId = _dbContext.LimitTypes.Single(lt => lt.Name == LimitTypeName.Daily.ToString()).LimitTypeId;
-                foreach (var resultDto in sampleDto.SampleResults)
-                {
-
-                    //Concentration result
-                    var sampleResult = _mapHelper.GetConcentrationSampleResultFromSampleResultDto(resultDto);
-                    Double valueAsDouble;
-                    if (!Double.TryParse(sampleResult.EnteredValue, out valueAsDouble))
-                    {
-                        //Could not convert -- throw exception
-                        ThrowSimpleException($"Could not convert entered concentration value to double: \"{sampleResult.EnteredValue}\"");
-                    }
-                    sampleResult.Value = valueAsDouble;
-                    if (resultDto.AnalysisDateTimeLocal.HasValue)
-                    {
-                        sampleResult.AnalysisDateTimeUtc = _timeZoneService
-                            .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
-                    }
-                    sampleResult.LimitBasisId = concentrationLimitBasisId;
-                    sampleResult.LimitTypeId = dailyLimitTypeId;
-                    sampleResult.CreationDateTimeUtc = DateTimeOffset.UtcNow;
-                    sampleResult.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
-                    sampleResult.LastModifierUserId = currentUserId;
-
-                    sampleToPersist.SampleResults.Add(sampleResult);
-
-                    //Mass result (if calculated)
-                    if (resultDto.IsCalcMassLoading)
-                    {
-                        sampleResult.IsMassLoadingCalculationRequired = true;
-
-                        var sampleMassResult = _mapHelper.GetMassSampleResultFromSampleResultDto(resultDto);
-                        Double massValueAsDouble;
-                        if (!Double.TryParse(sampleMassResult.EnteredValue, out massValueAsDouble))
-                        {
-                            //Could not convert -- throw exception
-                            ThrowSimpleException($"Could not convert entered mass value to double: \"{sampleMassResult.EnteredValue}\"");
-                        }
-                        sampleMassResult.Value = massValueAsDouble;
-                        if (resultDto.AnalysisDateTimeLocal.HasValue)
-                        {
-                            sampleMassResult.AnalysisDateTimeUtc = _timeZoneService
-                                .GetUTCDateTimeUsingThisTimeZoneId(resultDto.AnalysisDateTimeLocal.Value, timeZoneId);
-                        }
-                        sampleMassResult.LimitBasisId = massLimitBasisId;
-                        sampleMassResult.LimitTypeId = dailyLimitTypeId;
-                        sampleMassResult.CreationDateTimeUtc = DateTimeOffset.UtcNow;
-                        sampleMassResult.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
-                        sampleMassResult.LastModifierUserId = currentUserId;
-
-                        sampleToPersist.SampleResults.Add(sampleMassResult);
-                    }
-                }
-
-                _dbContext.SaveChanges();
 
             }
-            catch (RuleViolationException)
+
+            //Set Name auto-generated using settings format
+            string sampleName;
+            string nameCreationRule = _settings.GetOrgRegProgramSettingValue(currentOrgRegProgramId, SettingType.SampleNameCreationRule);
+            if (nameCreationRule == SampleNameCreationRuleOption.SampleEventType.ToString())
             {
-                throw;
+                sampleName = sampleToPersist.CtsEventTypeName;
             }
+            else if (nameCreationRule == SampleNameCreationRuleOption.SampleEventTypeCollectionMethod.ToString())
+            {
+                sampleName = $"{sampleToPersist.CtsEventTypeName} {sampleToPersist.CollectionMethodName}";
+            }
+            else
+            {
+                throw new Exception($"ERROR: Unknown SampleNameCreationRuleOption={nameCreationRule}, currentOrgRegProgramId={currentOrgRegProgramId}");
+            }
+
+            sampleToPersist.Name = sampleName;
+            sampleToPersist.ByOrganizationRegulatoryProgramId = currentOrgRegProgramId; //these are the same only per current workflow
+            sampleToPersist.ForOrganizationRegulatoryProgramId = currentOrgRegProgramId; //these are the same only per current workflow
+            sampleToPersist.StartDateTimeUtc = sampleStartDateTimeUtc;
+            sampleToPersist.EndDateTimeUtc = sampleEndDateTimeUtc;
+            sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+            sampleToPersist.LastModifierUserId = currentUserId;
+
+            //Handle FlowUnitValidValues
+            if (sampleDto.FlowUnitValidValues != null)
+            {
+                var flowUnitValidValues = "";
+                var commaString = "";
+                foreach (var unitDto in sampleDto.FlowUnitValidValues)
+                {
+                    flowUnitValidValues += commaString + unitDto.Name;
+                    commaString = ",";
+                }
+
+                sampleToPersist.FlowUnitValidValues = flowUnitValidValues;
+            }
+
+            _dbContext.SaveChanges(); //Need to Save before getting new SampleId
+
+            sampleIdToReturn = sampleToPersist.SampleId;
+
+
+            //
+            //Handle Flow Result
+            //
+            var existingFlowResultRow = sampleToPersist.SampleResults
+                    .SingleOrDefault(sr => sr.LimitBasis.Name == LimitBasisName.VolumeFlowRate.ToString());
+
+            if (sampleDto.FlowValue != null && sampleDto.FlowUnitId != null && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
+            {
+                //Check flow unit id is within valid values
+                if (sampleDto.FlowUnitValidValues == null || !sampleDto.FlowUnitValidValues.Select(fu => fu.UnitId).Contains(sampleDto.FlowUnitId.Value))
+                {
+                    ThrowSimpleException($"ERROR: Selected flow unit (id={sampleDto.FlowUnitId.Value}, name={sampleDto.FlowUnitName}) could not be found within passed in FlowUnitValidValues collection.");
+                }
+
+                if (existingFlowResultRow == null)
+                {
+                    existingFlowResultRow = new SampleResult();
+                    sampleToPersist.SampleResults.Add(existingFlowResultRow);
+                }
+
+                var flowParameter = _dbContext.Parameters
+                    .First(p => p.IsFlowForMassLoadingCalculation == true); //Chris: "Should be one but just get first".
+
+                var flowLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.VolumeFlowRate.ToString()).LimitBasisId;
+
+                existingFlowResultRow.SampleId = sampleIdToReturn;
+                existingFlowResultRow.ParameterId = flowParameter.ParameterId;
+                existingFlowResultRow.ParameterName = flowParameter.Name;
+                existingFlowResultRow.Qualifier = "";
+                existingFlowResultRow.EnteredValue = sampleDto.FlowValue;
+                //existingFlowResultRow.Value = Convert.ToDouble(sampleDto.FlowValue); //handle this below
+                existingFlowResultRow.UnitId = sampleDto.FlowUnitId.Value;
+                existingFlowResultRow.UnitName = sampleDto.FlowUnitName;
+                existingFlowResultRow.EnteredMethodDetectionLimit = "";
+                existingFlowResultRow.LimitTypeId = null;
+                existingFlowResultRow.LimitBasisId = flowLimitBasisId;
+                existingFlowResultRow.IsCalculated = false;
+
+                Double valueAsDouble;
+                if (!Double.TryParse(existingFlowResultRow.EnteredValue, out valueAsDouble))
+                {
+                    //Could not convert -- throw exception
+                    ThrowSimpleException($"Could not convert entered flow value to double: \"{existingFlowResultRow.EnteredValue}\"");
+                }
+                existingFlowResultRow.Value = valueAsDouble;
+
+            }
+            else
+            {
+                if (existingFlowResultRow != null)
+                {
+                    //Flow value must have been deleted -- must remove
+                    _dbContext.SampleResults.Remove(existingFlowResultRow);
+                }
+            }
+
+
+            _dbContext.SaveChanges();
 
             _logger.Info($"Leaving SampleService.SimplePersist. sampleIdToReturn={sampleIdToReturn}");
 
@@ -715,7 +765,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
                         if (sampleResult.LimitBasis.Name == LimitBasisName.Concentration.ToString())
                         {
-                            resultDto.SampleResultId = sampleResult.SampleResultId;
+                            resultDto.ConcentrationSampleResultId = sampleResult.SampleResultId;
                             resultDto.SampleId = sampleResult.SampleId;
                             resultDto.ParameterId = sampleResult.ParameterId;
                             resultDto.ParameterName = sampleResult.ParameterName;
@@ -735,6 +785,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         else
                         {
                             //Mass Result -- must be included with a resultDto where LimitBasisName = LimitBasisName.Concentration
+                            resultDto.MassLoadingSampleResultId = sampleResult.SampleResultId;
                             resultDto.MassLoadingQualifier = sampleResult.Qualifier;
                             resultDto.MassLoadingValue = sampleResult.EnteredValue;
                             resultDto.MassLoadingUnitId = sampleResult.UnitId;

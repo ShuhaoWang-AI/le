@@ -987,7 +987,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 return null;
 
             var dto = new SampleResultDto();
-            dto.SampleResultId = sampleResult.SampleResultId;
+            dto.ConcentrationSampleResultId = sampleResult.SampleResultId;
             dto.SampleId = sampleResult.SampleId;
             dto.ParameterId = sampleResult.ParameterId;
             dto.ParameterName = sampleResult.ParameterName;
@@ -1009,59 +1009,62 @@ namespace Linko.LinkoExchange.Services.Mapping
             return dto;
         }
 
-        public SampleResult GetConcentrationSampleResultFromSampleResultDto(SampleResultDto dto)
+        public SampleResult GetConcentrationSampleResultFromSampleResultDto(SampleResultDto dto, SampleResult existingSampleResult)
         {
-            var concentrationResult = new SampleResult()
+            if (existingSampleResult == null)
             {
-                SampleId = dto.SampleId,
-                ParameterId = dto.ParameterId,
-                ParameterName = dto.ParameterName,
-                Qualifier = dto.Qualifier,
-                EnteredValue = dto.Value,
-                //Value = Convert.ToDouble(dto.Value), //set outside after calling line
-                UnitId = dto.UnitId,
-                UnitName = dto.UnitName,
-                EnteredMethodDetectionLimit = dto.EnteredMethodDetectionLimit,
-                AnalysisMethod = dto.AnalysisMethod,
-                //AnalysisDateTimeUtc = set outside after calling line
-                IsApprovedEPAMethod = dto.IsApprovedEPAMethod,
-                IsCalculated = false
-                //LimitTypeId = set outside after calling line
-                //LimitBasisId = set outside after calling line
-                //CreationDateTimeUtc = set outside after calling line
-                //LastModificationDateTimeUtc = set outside after calling line
-                //LastModifierUserId = set outside after calling line
+                existingSampleResult = new SampleResult();
+            }
 
-            };
+            existingSampleResult.SampleId = dto.SampleId;
+            existingSampleResult.ParameterId = dto.ParameterId;
+            existingSampleResult.ParameterName = dto.ParameterName;
+            existingSampleResult.Qualifier = dto.Qualifier;
+            existingSampleResult.EnteredValue = dto.Value;
+            //existingSampleResult.Value = Convert.ToDouble(dto.Value), //set outside after calling line
+            existingSampleResult.UnitId = dto.UnitId;
+            existingSampleResult.UnitName = dto.UnitName;
+            existingSampleResult.EnteredMethodDetectionLimit = dto.EnteredMethodDetectionLimit;
+            existingSampleResult.AnalysisMethod = dto.AnalysisMethod;
+            //existingSampleResult.AnalysisDateTimeUtc = set outside after calling line
+            existingSampleResult.IsApprovedEPAMethod = dto.IsApprovedEPAMethod;
+            existingSampleResult.IsCalculated = false;
+            //existingSampleResult.LimitTypeId = set outside after calling line
+            //existingSampleResult.LimitBasisId = set outside after calling line
+            //existingSampleResult.CreationDateTimeUtc = set outside after calling line
+            //existingSampleResult.LastModificationDateTimeUtc = set outside after calling line
+            //existingSampleResult.LastModifierUserId = set outside after calling line
 
-            return concentrationResult;
+            return existingSampleResult;
         }
 
-        public SampleResult GetMassSampleResultFromSampleResultDto(SampleResultDto dto)
+        public SampleResult GetMassSampleResultFromSampleResultDto(SampleResultDto dto, SampleResult existingSampleResult)
         {
-            var massResult = new SampleResult()
+            if (existingSampleResult == null)
             {
-                SampleId = dto.SampleId,
-                ParameterId = dto.ParameterId,
-                ParameterName = dto.ParameterName,
-                Qualifier = dto.MassLoadingQualifier,
-                EnteredValue = dto.MassLoadingValue,
-                //Value = Convert.ToDouble(dto.MassLoadingValue), //set outside after calling line
-                UnitId = dto.MassLoadingUnitId,
-                UnitName = dto.MassLoadingUnitName,
-                EnteredMethodDetectionLimit = dto.EnteredMethodDetectionLimit,
-                AnalysisMethod = dto.AnalysisMethod,
-                //AnalysisDateTimeUtc = set outside after calling line
-                IsApprovedEPAMethod = dto.IsApprovedEPAMethod,
-                IsCalculated = false
-                //LimitTypeId = set outside after calling line
-                //LimitBasisId = set outside after calling line
-                //CreationDateTimeUtc = set outside after calling line
-                //LastModificationDateTimeUtc = set outside after calling line
-                //LastModifierUserId = set outside after calling line
-            };
+                existingSampleResult = new SampleResult();
+            }
 
-            return massResult;
+            existingSampleResult.SampleId = dto.SampleId;
+            existingSampleResult.ParameterId = dto.ParameterId;
+            existingSampleResult.ParameterName = dto.ParameterName;
+            existingSampleResult.Qualifier = dto.MassLoadingQualifier;
+            existingSampleResult.EnteredValue = dto.MassLoadingValue;
+            //existingSampleResult.Value = Convert.ToDouble(dto.MassLoadingValue), //set outside after calling line
+            existingSampleResult.UnitId = dto.MassLoadingUnitId;
+            existingSampleResult.UnitName = dto.MassLoadingUnitName;
+            existingSampleResult.EnteredMethodDetectionLimit = dto.EnteredMethodDetectionLimit;
+            existingSampleResult.AnalysisMethod = dto.AnalysisMethod;
+            //existingSampleResult.AnalysisDateTimeUtc = set outside after calling line
+            existingSampleResult.IsApprovedEPAMethod = dto.IsApprovedEPAMethod;
+            existingSampleResult.IsCalculated = false;
+            //existingSampleResult.LimitTypeId = set outside after calling line
+            //existingSampleResult.LimitBasisId = set outside after calling line
+            //existingSampleResult.CreationDateTimeUtc = set outside after calling line
+            //existingSampleResult.LastModificationDateTimeUtc = set outside after calling line
+            //existingSampleResult.LastModifierUserId = set outside after calling line
+
+            return existingSampleResult;
         }
 
         public ReportPackageDto GetReportPackageDtoFromReportPackage(ReportPackage rpt)
