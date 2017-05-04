@@ -715,6 +715,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
                         if (sampleResult.LimitBasis.Name == LimitBasisName.Concentration.ToString())
                         {
+                            resultDto.SampleResultId = sampleResult.SampleResultId;
                             resultDto.SampleId = sampleResult.SampleId;
                             resultDto.ParameterId = sampleResult.ParameterId;
                             resultDto.ParameterName = sampleResult.ParameterName;
