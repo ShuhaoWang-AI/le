@@ -469,12 +469,13 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Persist_And_Read_Back_SampleDto_And_Compare_Fields()
         {
-            Remove_All_Samples_From_Db();
+            //Remove_All_Samples_From_Db();
 
             //Create test Sample Dto
             var sampleDto = GetTestSampleDto();
             sampleDto.IsMassLoadingResultToUseLessThanSign = true;
             sampleDto.IsReadyToReport = true;
+            sampleDto.SampleStatusName = SampleStatusName.ReadyToReport;
 
             //Persist
             int sampleId = _sampleService.SaveSample(sampleDto);
@@ -483,14 +484,41 @@ namespace Linko.LinkoExchange.Test
             var fetchedSampleDto = _sampleService.GetSampleDetails(sampleId);
 
             //Compare
-            Type type = sampleDto.GetType();
+            CompareSampleDtos(sampleDto, fetchedSampleDto, false);
+
+        }
+
+        [TestMethod]
+        public void Update_Existing_Sample()
+        {
+            int sampleId = 45;
+            //Fetch
+            var sampleDto = _sampleService.GetSampleDetails(sampleId);
+
+            //Change
+            sampleDto.FlowValue = "21";
+
+            //Persist
+            _sampleService.SaveSample(sampleDto);
+
+            //Fetch
+            var sampleDto2 = _sampleService.GetSampleDetails(sampleId);
+
+            //Compare
+            CompareSampleDtos(sampleDto, sampleDto2, true);
+        }
+
+
+        private void CompareSampleDtos(SampleDto dto1, SampleDto dto2, bool isAfterUpdate)
+        {
+            Type type = dto1.GetType();
             PropertyInfo[] properties = type.GetProperties();
 
             foreach (PropertyInfo property in properties)
             {
                 var fieldName = property.Name;
-                var beforeValue = property.GetValue(sampleDto, null);
-                var afterValue = property.GetValue(fetchedSampleDto, null);
+                var beforeValue = property.GetValue(dto1, null);
+                var afterValue = property.GetValue(dto2, null);
 
                 Console.WriteLine($"Name: {fieldName}, Before Value: {beforeValue}, After Value: {afterValue}");
 
@@ -498,10 +526,10 @@ namespace Linko.LinkoExchange.Test
                 {
 
                 }
-                else if (fieldName == "Name") //set within service code
+                else if (fieldName == "Name" && !isAfterUpdate) //set within service code
                 {
                     Assert.IsNull(beforeValue);
-                    Assert.AreEqual(sampleDto.CtsEventTypeName, afterValue);
+                    Assert.AreEqual(dto1.CtsEventTypeName, afterValue);
                 }
                 else if (fieldName == "LastModificationDateTimeLocal") //set within service code
                 {
@@ -517,8 +545,8 @@ namespace Linko.LinkoExchange.Test
                 }
                 else if (fieldName == "FlowUnitValidValues")
                 {
-                    var fetchedFlowUnitsEnumerator = fetchedSampleDto.FlowUnitValidValues.GetEnumerator();
-                    foreach (var unitDto in sampleDto.FlowUnitValidValues)
+                    var fetchedFlowUnitsEnumerator = dto2.FlowUnitValidValues.GetEnumerator();
+                    foreach (var unitDto in dto1.FlowUnitValidValues)
                     {
                         fetchedFlowUnitsEnumerator.MoveNext();
                         var fetchedFlowUnit = fetchedFlowUnitsEnumerator.Current;
@@ -530,8 +558,8 @@ namespace Linko.LinkoExchange.Test
                 }
                 else if (fieldName == "SampleResults")
                 {
-                    var fetchedResultsEnumerator = fetchedSampleDto.SampleResults.GetEnumerator();
-                    foreach (var resultDto in sampleDto.SampleResults)
+                    var fetchedResultsEnumerator = dto2.SampleResults.GetEnumerator();
+                    foreach (var resultDto in dto1.SampleResults)
                     {
                         fetchedResultsEnumerator.MoveNext();
                         var fetchedSampleResult = fetchedResultsEnumerator.Current;
@@ -545,9 +573,12 @@ namespace Linko.LinkoExchange.Test
                             var resultBeforeValue = resultProperty.GetValue(resultDto, null);
                             var resultAfterValue = resultProperty.GetValue(fetchedSampleResult, null);
 
-                            if (resultFieldName == "SampleId")
+                            if (!isAfterUpdate)
                             {
-                                //ignore
+                                if (resultFieldName == "SampleId" || resultFieldName == "ConcentrationSampleResultId" || resultFieldName == "MassLoadingSampleResultId")
+                                {
+                                    //ignore
+                                }
                             }
                             else if (resultFieldName == "LastModifierFullName")
                             {
@@ -564,27 +595,15 @@ namespace Linko.LinkoExchange.Test
                         }
 
                     }
-                   
+
                 }
-                else {
+                else
+                {
 
                     Assert.AreEqual(beforeValue, afterValue);
                 }
-                
+
             }
-
-        }
-
-
-        [TestMethod]
-        public void Update_Existing_Sample()
-        {
-            var sampleDto = _sampleService.GetSampleDetails(40);
-
-            sampleDto.FlowValue = "21";
-
-            var sampleDtos = _sampleService.SaveSample(sampleDto);
-
         }
     }
 }

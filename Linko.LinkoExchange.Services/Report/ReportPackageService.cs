@@ -1165,15 +1165,16 @@ namespace Linko.LinkoExchange.Services.Report
             var eligibleSampleList = new List<SampleDto>();
 
             var existingEligibleSamples = _dbContext.Samples
-                        .Include(s => s.ByOrganizationRegulatoryProgram.Organization.OrganizationType)
+                        .Include(s => s.SampleResults)
                         .Where(s => s.ForOrganizationRegulatoryProgramId == reportPackage.OrganizationRegulatoryProgramId
                             && s.IsReadyToReport
                             && ((s.StartDateTimeUtc <= reportPackage.PeriodEndDateTimeUtc && s.StartDateTimeUtc >= reportPackage.PeriodStartDateTimeUtc) ||
-                                (s.EndDateTimeUtc <= reportPackage.PeriodEndDateTimeUtc && s.EndDateTimeUtc >= reportPackage.PeriodStartDateTimeUtc)));
+                                (s.EndDateTimeUtc <= reportPackage.PeriodEndDateTimeUtc && s.EndDateTimeUtc >= reportPackage.PeriodStartDateTimeUtc)))
+                         .ToList();
 
             foreach (var existingEligibleSample in existingEligibleSamples)
             {
-                var sampleDto = _mapHelper.GetSampleDtoFromSample(existingEligibleSample);
+                var sampleDto = _sampleService.GetSampleDetails(existingEligibleSample);
                 eligibleSampleList.Add(sampleDto);
             }
 

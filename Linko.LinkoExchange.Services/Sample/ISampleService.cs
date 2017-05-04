@@ -44,6 +44,14 @@ namespace Linko.LinkoExchange.Services.Sample
         SampleDto GetSampleDetails(int sampleId);
 
         /// <summary>
+        /// Converts a Sample POCO into the complete details of a single Sample (Dto)
+        /// </summary>
+        /// <param name="sample">POCO</param>
+        /// <param name="isIncludeChildObjects">Switch to load result list or not (for display in grid)</param>
+        /// <returns></returns>
+        SampleDto GetSampleDetails(Core.Domain.Sample sample, bool isIncludeChildObjects = true);
+
+        /// <summary>
         /// Test to see if a Sample is included in at least 1 report package
         /// </summary>
         /// <param name="sampleId">SampleId associated with the object in the tSample table</param>

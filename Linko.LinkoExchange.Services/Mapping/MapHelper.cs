@@ -975,7 +975,6 @@ namespace Linko.LinkoExchange.Services.Mapping
                 existingSample.IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign;
             }
 
-            //existingSample.OrganizationTypeId = sampleDto.OrganizationTypeId; //set after we exit this method
             //existingSample.OrganizationRegulatoryProgramId = sampleDto.OrganizationRegulatoryProgramId; //set after we exit this method
 
             return existingSample;

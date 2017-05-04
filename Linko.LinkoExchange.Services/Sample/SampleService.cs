@@ -128,7 +128,6 @@ namespace Linko.LinkoExchange.Services.Sample
                 _dbContext.Samples.Add(sampleToPersist);
             }
 
-
             //Handle Sample Results "Updates and/or Additions"
             foreach (var sampleResultDto in sampleDto.SampleResults)
             {
@@ -679,12 +678,12 @@ namespace Linko.LinkoExchange.Services.Sample
         }
 
         /// <summary>
-        /// Helper method to map a passed in Sample object to a Sample Dto.
+        /// Converts a Sample POCO into the complete details of a single Sample (Dto)
         /// </summary>
-        /// <param name="sample"></param>
-        /// <param name="isIncludeChildObjects"></param>
+        /// <param name="sample">POCO</param>
+        /// <param name="isIncludeChildObjects">Switch to load result list or not (for display in grid)</param>
         /// <returns></returns>
-        private SampleDto GetSampleDetails(Core.Domain.Sample sample, bool isIncludeChildObjects = true)
+        public SampleDto GetSampleDetails(Core.Domain.Sample sample, bool isIncludeChildObjects = true)
         {
             _logger.Info($"Enter SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
@@ -720,6 +719,19 @@ namespace Linko.LinkoExchange.Services.Sample
                 dto.LastModifierFullName = "N/A";
             }
 
+            if (sample != null && sample.IsReadyToReport)
+            {
+                dto.SampleStatusName = SampleStatusName.ReadyToReport;
+            }
+            else
+            {
+                dto.SampleStatusName = SampleStatusName.Draft;
+            }
+
+            if (sample?.ReportSamples != null && sample.ReportSamples.Count() > 0)
+            {
+                dto.SampleStatusName = SampleStatusName.Reported;
+            }
 
             var resultDtoList = new Dictionary<int, SampleResultDto>();
 
@@ -861,20 +873,6 @@ namespace Linko.LinkoExchange.Services.Sample
             }
 
             var dto = this.GetSampleDetails(sample);
-
-            if (sample != null && sample.IsReadyToReport)
-            {
-                dto.SampleStatusName = SampleStatusName.ReadyToReport;
-            }
-            else
-            {
-                dto.SampleStatusName = SampleStatusName.Draft;
-            }
-
-            if (sample?.ReportSamples != null && sample.ReportSamples.Count() > 0)
-            {
-                dto.SampleStatusName = SampleStatusName.Reported;
-            }
 
             _logger.Info($"Leaving SampleService.GetSampleDetails. sampleId={sampleId}");
 
