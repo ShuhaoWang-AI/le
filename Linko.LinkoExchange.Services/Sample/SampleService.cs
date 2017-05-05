@@ -263,9 +263,11 @@ namespace Linko.LinkoExchange.Services.Sample
                 concentrationResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                 concentrationResultRowToUpdate.LastModifierUserId = currentUserId;
 
+                //this is always persisted with the concentration result NOT the mass loading result
+                concentrationResultRowToUpdate.IsMassLoadingCalculationRequired = sampleResultDto.IsCalcMassLoading; 
 
                 //... the SampleResultDto MAY ALSO have a Mass Loading component
-                if (sampleResultDto.IsCalcMassLoading)
+                if (!string.IsNullOrEmpty(sampleResultDto.MassLoadingValue))
                 {
                     SampleResult massResultRowToUpdate = null;
                     if (!sampleResultDto.MassLoadingSampleResultId.HasValue)
@@ -281,7 +283,6 @@ namespace Linko.LinkoExchange.Services.Sample
 
                     //Update Mass Loading Result
                     massResultRowToUpdate = _mapHelper.GetMassSampleResultFromSampleResultDto(sampleResultDto, massResultRowToUpdate);
-                    concentrationResultRowToUpdate.IsMassLoadingCalculationRequired = true; //this is always persisted with the concentration result NOT the mass loading result
                     massResultRowToUpdate.IsMassLoadingCalculationRequired = false; //always FALSE for mass loading result
                     if (!String.IsNullOrEmpty(massResultRowToUpdate.EnteredValue))
                     {
@@ -561,14 +562,14 @@ namespace Linko.LinkoExchange.Services.Sample
                         }
                     }
 
-                    if (resultDto.IsCalcMassLoading && resultDto.MassLoadingUnitId < 1)
-                    {
-                        isValid = false;
-                        if (!isSuppressExceptions)
-                        {
-                            this.ThrowSimpleException("All mass loading calculations must be associated with a valid unit.");
-                        }
-                    }
+                    //if (resultDto.IsCalcMassLoading && resultDto.MassLoadingUnitId < 1)
+                    //{
+                    //    isValid = false;
+                    //    if (!isSuppressExceptions)
+                    //    {
+                    //        this.ThrowSimpleException("All mass loading calculations must be associated with a valid unit.");
+                    //    }
+                    //}
 
                     if (sampleDto.IsReadyToReport)
                     {
@@ -602,14 +603,14 @@ namespace Linko.LinkoExchange.Services.Sample
                             //ReadyToReport Validation For Mass Calculations
                             // 
 
-                            if (!isValidFlowValueExists)
-                            {
-                                isValid = false;
-                                if (!isSuppressExceptions)
-                                {
-                                    this.ThrowSimpleException("You must provide valid a flow value to calculate mass loading results.");
-                                }
-                            }
+                            //if (!isValidFlowValueExists)
+                            //{
+                            //    isValid = false;
+                            //    if (!isSuppressExceptions)
+                            //    {
+                            //        this.ThrowSimpleException("You must provide valid a flow value to calculate mass loading results.");
+                            //    }
+                            //}
 
                             if (!string.IsNullOrEmpty(resultDto.MassLoadingQualifier))
                             {

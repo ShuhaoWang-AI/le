@@ -497,7 +497,7 @@ namespace Linko.LinkoExchange.Test
             var sampleDto = _sampleService.GetSampleDetails(sampleId);
 
             //Change (just increment by 1)
-            //sampleDto.FlowValue = (Convert.ToInt32(sampleDto.FlowValue) + 1).ToString();
+            sampleDto.FlowValue = (Convert.ToInt32(sampleDto.FlowValue) + 1).ToString();
 
             //Remove 1 result
             var newList = new List<SampleResultDto>();
@@ -505,30 +505,28 @@ namespace Linko.LinkoExchange.Test
             {
                 newList.Add(item);
             }
+            newList.RemoveAt(1);
 
-
-            //newList.RemoveAt(1);
-
-            //Add a result
-            var resultDto = new SampleResultDto()
-            {
-                ParameterId = 43,
-                ParameterName = "2-Hexanone",
-                Qualifier = "<",
-                UnitId = 7,
-                UnitName = "mg/L",
-                Value = "5",
-                EnteredMethodDetectionLimit = "0.66",
-                AnalysisMethod = "Analysis Method 66",
-                AnalysisDateTimeLocal = DateTime.Now,
-                IsApprovedEPAMethod = true,
-                IsCalcMassLoading = true,
-                MassLoadingQualifier = "<",
-                MassLoadingUnitId = 10,
-                MassLoadingUnitName = "ppd",
-                MassLoadingValue = "22.11",
-            };
-            newList.Add(resultDto);
+            ////Add a result
+            //var resultDto = new SampleResultDto()
+            //{
+            //    ParameterId = 43,
+            //    ParameterName = "2-Hexanone",
+            //    Qualifier = "<",
+            //    UnitId = 7,
+            //    UnitName = "mg/L",
+            //    Value = "5",
+            //    EnteredMethodDetectionLimit = "0.66",
+            //    AnalysisMethod = "Analysis Method 66",
+            //    AnalysisDateTimeLocal = DateTime.Now,
+            //    IsApprovedEPAMethod = true,
+            //    IsCalcMassLoading = true,
+            //    MassLoadingQualifier = "<",
+            //    MassLoadingUnitId = 10,
+            //    MassLoadingUnitName = "ppd",
+            //    MassLoadingValue = "22.11",
+            //};
+            //newList.Add(resultDto);
 
             sampleDto.SampleResults = newList;
 
