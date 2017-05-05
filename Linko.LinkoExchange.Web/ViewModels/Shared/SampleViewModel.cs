@@ -105,6 +105,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public IEnumerable<SampleResultViewModel> SampleResults { get; set; }
         public IList<ParameterGroupViewModel> ParameterGroups { get; set; }
         public IList<ParameterViewModel> AllParameters { get; set; }
+        public string CtsEventCategoryName { get; set; }
     }
 
     public class SampleViewModelValidator:AbstractValidator<SampleViewModel> {}

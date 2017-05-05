@@ -7,11 +7,12 @@
     ViewBag.Readonly = Model.SampleStatusName != SampleStatusName.Draft;
 }
 
-@using (Html.BeginForm())
+@using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new {id = "sampleDetailsForm"}))
 {
     @Html.AntiForgeryToken()
 
     <section>
+
         <ol class="breadcrumb">
             <li>
                 <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
@@ -96,14 +97,23 @@
             <div class="form-horizontal">
                 <div class="form-group">
                     @Html.HiddenFor(model => model.Id)
+                    @Html.HiddenFor(model => model.Name)
+                    @Html.HiddenFor(model => model.MonitoringPointId)
+                    @Html.HiddenFor(model => model.MonitoringPointName)
+                    @Html.HiddenFor(model => model.CtsEventCategoryName)
                     @Html.HiddenFor(model => model.MassLoadingConversionFactorPounds)
                     @Html.HiddenFor(model => model.MassLoadingCalculationDecimalPlaces)
                     @Html.HiddenFor(model => model.IsMassLoadingResultToUseLessThanSign)
                     @Html.HiddenFor(model => model.MassLoadingMassLoadingUnitId)
                     @Html.HiddenFor(model => model.MassLoadingMassLoadingUnitName)
+                    @Html.Hidden(name:"FlowUnitValidValues", value:Html.Raw(value:Json.Encode(value:Model.FlowUnitValidValues)))
+                    @Html.HiddenFor(model => model.CtsEventTypeName)
+                    @Html.HiddenFor(model => model.CollectionMethodName)
+                    @Html.HiddenFor(model => model.FlowUnitName)
                     @Html.HiddenFor(model => model.ResultQualifierValidValues)
                     @Html.HiddenFor(model => model.SampleStatusName)
                     @Html.Hidden(name:"AllParameters", value:Html.Raw(value:Json.Encode(value:Model.AllParameters)))
+                    @Html.Hidden(name:"SampleResults", value:Html.Raw(value:Json.Encode(value:Model.SampleResults)))
                 </div>
 
                 <div class="form-group">
@@ -119,6 +129,7 @@
                                                                                                                                           @class = "form-control input-sm"
                                                                                                                                       })
 
+                            @Html.HiddenFor(model => model.CollectionMethodId)
                             @Html.ValidationMessageFor(model => model.CollectionMethodId, validationMessage:"", htmlAttributes:new
                                                                                                                                {
                                                                                                                                    @class = "text-danger"
@@ -137,6 +148,7 @@
                                                                                                                                   @class = "form-control input-sm"
                                                                                                                               })
 
+                            @Html.HiddenFor(model => model.CtsEventTypeId)
                             @Html.ValidationMessageFor(model => model.CtsEventTypeId, validationMessage:"", htmlAttributes:new
                                                                                                                            {
                                                                                                                                @class = "text-danger"
@@ -216,6 +228,7 @@
                                                                                                                           })
 
 
+                                @Html.HiddenFor(model => model.FlowUnitId)
                                 @Html.ValidationMessageFor(model => model.FlowUnitId, validationMessage:"", htmlAttributes:new
                                                                                                                            {
                                                                                                                                @class = "text-danger"
@@ -367,10 +380,10 @@
                                 </select>
                             </td>
                             <td>
-                                <div class="input-group input-group-sm" style="min-width:125px">
+                                <div class="input-group input-group-sm" style="min-width: 125px">
                                     <input class="form-control input-sm" id="Result_@sampleResult.ParameterId" type="text" value="@sampleResult.Value">
                                     <input id="UnitId_@sampleResult.ParameterId" type="hidden" value="@sampleResult.UnitId">
-                                    <span class="input-group-addon">@sampleResult.UnitName</span>
+                                    <span id="UnitName_@sampleResult.ParameterId" class="input-group-addon">@sampleResult.UnitName</span>
                                 </div>
                             </td>
                             <td>
@@ -425,7 +438,14 @@
                                 }
                             </td>
                             <td>
-                                <strong id="MassResult_@sampleResult.ParameterId"> @sampleResult.MassLoadingQualifier @sampleResult.MassLoadingValue @sampleResult.MassLoadingUnitName </strong>
+                                @if (sampleResult.MassLoadingValue.IfNullOrWhiteSpace(defaultValue:"").Length == 0)
+                                {
+                                    <strong id="MassResult_@sampleResult.ParameterId"></strong>
+                                }
+                                else
+                                {
+                                    <strong id="MassResult_@sampleResult.ParameterId">@sampleResult.MassLoadingQualifier @sampleResult.MassLoadingValue @sampleResult.MassLoadingUnitName</strong>
+                                }
                             </td>
                             <td>
                                 <button class="btn btn-danger btn-sm" name="btnDeleteParam" type="button">
@@ -561,6 +581,22 @@
                             }
                         });
 
+                $(document)
+                    .on('keypress'
+                        , "input[id^='MDL_']"
+                        , function(e)
+                        {
+                            //if the letter is not digit then don't type anything
+                            if (e.which !== 8 && e.which !== 0 && e.which !== 46 && (e.which < 48 || e.which > 57))
+                            {
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        });
+
                 $("#FlowValue")
                     .keypress(function(e)
                     {
@@ -574,7 +610,76 @@
                             return true;
                         }
                     });
+
+
+                $("#sampleDetailsForm")
+                    .submit(function(e)
+                    {
+                        //if (e.originalEvent.explicitOriginalTarget.id == "myButton")
+                        //{
+                        //    return true;
+                        //}
+
+                        try
+                        {
+                            // add Results to hidden field    
+                            var sampleResults = [];
+
+                            var parameterTable = $('#ParameterTable').DataTable();
+                            parameterTable
+                                .rows()
+                                .every(function()
+                                {
+                                    var d = this.data();
+                                    var sampleResult = {};
+                                    //console.debug(d);
+                                    var cell = d[0];
+                                    var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
+
+                                    sampleResult.Id = $('input', cell)['prevObject'][0].value;
+                                    sampleResult.ParameterId = paramId;
+                                    sampleResult.ParameterName = d[1];
+                                    var qualifier = $("#Qualifier_" + paramId).val();
+                                    sampleResult.Qualifier = ((qualifier === "NUMERIC") ? "" : qualifier);
+                                    sampleResult.Value = parseFloat($("#Result_" + paramId).val());
+                                    sampleResult.UnitId = $("#UnitId_" + paramId).val();
+                                    sampleResult.UnitName = $("#UnitName_" + paramId).html();
+                                    sampleResult
+                                        .IsCalcMassLoading = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
+                                    sampleResult
+                                        .IsApprovedEPAMethod = $("#EPAMethod_" + paramId).iCheck('update')[0].checked;
+                                    sampleResult.AnalysisDateTimeLocal = $("#AnalysisDateTime_" + paramId).val();
+                                    sampleResult.AnalysisMethod = $("#AnalysisMethod_" + paramId).val();
+                                    sampleResult.EnteredMethodDetectionLimit = $("#MDL_" + paramId).val();
+
+                                    var massLoadingResult = $("#MassResult_" + paramId).html().split(' ');
+                                    if (massLoadingResult.length === 3)
+                                    {
+                                        var massLoadingQualifier = massLoadingResult[0];
+                                        sampleResult.MassLoadingQualifier = massLoadingQualifier;
+                                        sampleResult.MassLoadingValue = massLoadingResult[1];
+                                        sampleResult.MassLoadingUnitId = $("#MassLoadingMassLoadingUnitId").val();
+                                        sampleResult.MassLoadingUnitName = $("#MassLoadingMassLoadingUnitName").val();
+                                    }
+
+                                    sampleResults.push(sampleResult);
+                                });
+                            $("#SampleResults").val(JSON.stringify(sampleResults));
+
+                            $("#CtsEventTypeName").val($("#CtsEventTypeId option:selected").text());
+                            $("#CollectionMethodName").val($("#CollectionMethodId option:selected").text());
+                            $("#FlowUnitName").val($("#FlowUnitId option:selected").text());
+
+                            return true;
+                        }
+                        catch (err)
+                        {
+                            alert(err);
+                            return false;
+                        }
+                    });
             });
+
 
         function displayMassLoading(paramId)
         {
@@ -609,7 +714,8 @@
                                 , function()
                                 {
                                     $("#MassResult_" + paramId)
-                                        .html((result * sampleFlowResult * massLoadingMultiplier)
+                                        .html(" "
+                                            + (result * sampleFlowResult * massLoadingMultiplier)
                                             .toFixed(massLoadingCalculationDecimalPlaces)
                                             + " "
                                             + massLoadingUnit)
@@ -663,41 +769,50 @@
                     });
             });
 
-        $("select[id^='Qualifier_']")
-            .change(function()
-            {
-                var paramId = this.id.replace('Qualifier_', '');
-                var qualifier = $("#Qualifier_" + paramId).val();
 
-                if (qualifier == "ND" || qualifier == "NF")
+        $(document)
+            .on('change'
+                , "select[id^='Qualifier_']"
+                , function()
                 {
-                    $("#Result_" + paramId).val("").attr("readonly", "readonly");
-                }
-                else
+                    var paramId = this.id.replace('Qualifier_', '');
+                    var qualifier = $("#Qualifier_" + paramId).val();
+
+                    if (qualifier == "ND" || qualifier == "NF")
+                    {
+                        $("#Result_" + paramId).val("").attr("readonly", "readonly");
+                    }
+                    else
+                    {
+                        $("#Result_" + paramId).removeAttr("readonly");
+                    }
+
+                    displayMassLoading(paramId);
+                });
+
+
+        $(document)
+            .on('blur'
+                , "input[id^='Result_']"
+                , function()
                 {
-                    $("#Result_" + paramId).removeAttr("readonly");
-                }
+                    var paramId = this.id.replace('Result_', '');
+                    displayMassLoading(paramId);
+                });
 
-                displayMassLoading(paramId);
-            });
-
-        $("input[id^='Result_']")
-            .blur(function()
-            {
-                var paramId = this.id.replace('Result_', '');
-                displayMassLoading(paramId);
-            });
-
-        $("input[id^='CalcLoading_']")
+        $(document)
             .on('ifChecked'
+                , "input[id^='CalcLoading_']"
                 , function(event)
                 {
                     var paramId = this.id.replace('CalcLoading_', '');
                     displayMassLoading(paramId);
                 });
 
-        $("input[id^='CalcLoading_']")
+
+        $(document)
             .on('ifUnchecked'
+                , "input[id^='CalcLoading_']"
                 , function(event)
                 {
                     var paramId = this.id.replace('CalcLoading_', '');
@@ -854,7 +969,7 @@
                                     }
                                 });
                             qualifierCtrl += '</select>';
-                            
+
                             data[2] = qualifierCtrl;
                             data[3] =
                                 '<div class="input-group input-group-sm" style="min-width:125px">'
@@ -864,7 +979,9 @@
                                 + value.Id
                                 + '" type="hidden" value="'
                                 + value.DefaultUnitId
-                                + '"><span class="input-group-addon">'
+                                + '"><span id="UnitName_'
+                                + value.Id
+                                + '" class="input-group-addon">'
                                 + value.DefaultUnitName
                                 + '</span></div>';
                             data[4] = '<input class="form-control input-sm" id="MDL_'
@@ -892,7 +1009,8 @@
                                 + 'kendo.syncReady(function(){jQuery("#AnalysisDateTime_'
                                 + value.Id
                                 + '").kendoDateTimePicker({"format":"MM/dd/yyyy hh:mm:ss tt","min":new Date(1900,0,1,0,0,0,0),"max":new Date(2099,11,31,0,0,0,0),"interval":30});});'
-                                + '</' + 'script>';
+                                + '</'
+                                + 'script>';
                             data[7] =
                                 '<div class="icheckbox_minimal-blue" style="position: relative;"><input type="checkbox" class="checkbox" id="EPAMethod_'
                                 + value.Id
@@ -902,18 +1020,16 @@
                             if (value.IsCalcMassLoading)
                             {
                                 data[8] =
-                                    '<div class="icheckbox_minimal-blue checked" style="position: relative;"><input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
+                                    '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
                                     + value.Id
-                                    + '" checked="" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; '
-                                    + 'height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div>';
+                                    + '" checked />';
                             }
                             else
                             {
                                 data[8] =
-                                    '<div class="icheckbox_minimal-blue" style="position: relative;"><input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
+                                    '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
                                     + value.Id
-                                    + '" checked="" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; '
-                                    + 'height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div>';
+                                    + '"/>';
                             }
                             data[9] = '<strong id="MassResult_' + value.Id + '"></strong>';
                             data[10] = null;
@@ -926,6 +1042,12 @@
                                 .node();
 
                             $(rowNode).css('color', 'green');
+                        });
+
+                    // need to reinitialize iCheck otherwise newly added checkbox doesn't work
+                    $("input[id^='CalcLoading_']")
+                        .iCheck({
+                            checkboxClass: "icheckbox_minimal-blue"
                         });
                 });
     </script>

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Enum;
@@ -1132,39 +1133,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                         .First()
                                                         .IfNullOrWhiteSpace(defaultValue:"true"));
 
-                    viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId: monitoringPoint.MonitoringPointId, sampleEndDateTimeUtc: newSampleStep1ViewModel.EndDateTimeLocal)
-                                                               .Select(c => new ParameterViewModel
-                                                               {
-                                                                   Id = c.ParameterId,
-                                                                   Name = c.Name,
-                                                                   DefaultUnitId = c.DefaultUnit.UnitId,
-                                                                   DefaultUnitName = c.DefaultUnit.Name,
-                                                                   IsCalcMassLoading = c.IsCalcMassLoading
-                                                               }).OrderBy(c => c.Name).ToList();
-
-                    viewModel.ParameterGroups =
-                        _parameterService.GetAllParameterGroups(monitoringPointId:monitoringPoint.MonitoringPointId, sampleEndDateTimeLocal:newSampleStep1ViewModel.EndDateTimeLocal)
-                                         .Select(c => new ParameterGroupViewModel
-                                                      {
-                                                          Id = c.ParameterGroupId,
-                                                          Name = c.Name,
-                                                          Description = c.Description,
-                                                          ParameterIds = string.Join(separator:",", values:c.Parameters.Select(p => p.ParameterId).ToList())
-                                                      }).OrderBy(c => c.Name).ToList();
-                    viewModel.AvailableCollectionMethods = _sampleService.GetCollectionMethods().Select(c => new SelectListItem
-                                                                                                             {
-                                                                                                                 Text = c.Name,
-                                                                                                                 Value = c.CollectionMethodId.ToString(),
-                                                                                                                 Selected = c.CollectionMethodId.Equals(obj:viewModel.CollectionMethodId)
-                                                                                                             }).OrderBy(c => c.Text).ToList();
-
-                    viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample:true).Select(c => new SelectListItem
-                                                                                                                             {
-                                                                                                                                 Text = c.Name,
-                                                                                                                                 Value = c.CtsEventTypeId.ToString(),
-                                                                                                                                 Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
-                                                                                                                             }).OrderBy(c => c.Text).ToList();
                     viewModel.FlowUnitValidValues = _unitService.GetFlowUnitValidValues();
+
+                    AddAdditionalPropertyToSampleDetails(viewModel:viewModel);
 
                     return View(viewName:"SampleDetails", model:viewModel);
                 }
@@ -1174,9 +1145,34 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"Sample/New/Step2")]
-        public ActionResult NewSampleDetailsStep2(SampleViewModel model)
+        public ActionResult NewSampleDetailsStep2(SampleViewModel model, FormCollection collection)
         {
-            throw new NotImplementedException();
+            var id = 0;
+            try
+            {
+                var objJavascript = new JavaScriptSerializer();
+
+                model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input:collection[name:"FlowUnitValidValues"]);
+                model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input:HttpUtility.HtmlDecode(s:collection[name:"SampleResults"]));
+
+                var vm = ConvertSampleViewModelToDto(model:model);
+
+                id = _sampleService.SaveSample(sample:vm);
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+
+                ViewBag.Satus = "New";
+                AddAdditionalPropertyToSampleDetails(viewModel:model);
+                return View(viewName:"SampleDetails", model:model);
+            }
+
+            TempData[key:"ShowSuccessMessage"] = true;
+            TempData[key:"SuccessMessage"] = "Sample updated successfully!";
+
+            ModelState.Clear();
+            return RedirectToAction(actionName:"SampleDetails", controllerName:"Industry", routeValues:new {id});
         }
 
         [Route(template:"Sample/{id:int}/Details")]
@@ -1193,27 +1189,69 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"Sample/{id:int}/Details")]
-        public ActionResult SampleDetails(int id, SampleViewModel model)
-        {
-            throw new NotImplementedException();
-        }
-
-        [AcceptVerbs(verbs:HttpVerbs.Post)]
-        [ValidateAntiForgeryToken]
-        public ActionResult EnableSample(bool isReadyToReport, SampleViewModel model)
+        public ActionResult SampleDetails(int id, SampleViewModel model, FormCollection collection)
         {
             try
             {
                 if (model.Id != null)
                 {
-                    var vm = _sampleService.GetSampleDetails(sampleId:model.Id.Value);
-                    vm.IsReadyToReport = isReadyToReport;
+                    var objJavascript = new JavaScriptSerializer();
+
+                    model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input:collection[name:"FlowUnitValidValues"]);
+                    model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input:HttpUtility.HtmlDecode(s:collection[name:"SampleResults"]));
+
+                    var vm = ConvertSampleViewModelToDto(model:model);
+
                     _sampleService.SaveSample(sample:vm);
                 }
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+
+                ViewBag.Satus = "Edit";
+                AddAdditionalPropertyToSampleDetails(viewModel:model);
+                return View(viewName:"SampleDetails", model:model);
+            }
+
+            TempData[key:"ShowSuccessMessage"] = true;
+            TempData[key:"SuccessMessage"] = "Sample updated successfully!";
+
+            ModelState.Clear();
+            return RedirectToAction(actionName:"SampleDetails", controllerName:"Industry", routeValues:new {model.Id});
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        public ActionResult EnableSample(bool isReadyToReport, SampleViewModel model, FormCollection collection)
+        {
+            try
+            {
+                if (model.Id != null)
+                {
+                    var objJavascript = new JavaScriptSerializer();
+
+                    model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input:collection[name:"FlowUnitValidValues"]);
+                    model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input:HttpUtility.HtmlDecode(s:collection[name:"SampleResults"]));
+
+                    if (isReadyToReport)
+                    {
+                        // do validation
+                    }
+
+                    var vm = ConvertSampleViewModelToDto(model:model); // _sampleService.GetSampleDetails(sampleId:model.Id.Value);
+                    vm.IsReadyToReport = isReadyToReport;
+
+                    _sampleService.SaveSample(sample:vm);
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+
+                ViewBag.Satus = "Edit";
+                AddAdditionalPropertyToSampleDetails(viewModel:model);
+                return View(viewName:"SampleDetails", model:model);
             }
 
             TempData[key:"ShowSuccessMessage"] = true;
@@ -1242,6 +1280,62 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             return View(viewName:"SampleDetails", model:PrepareSampleDetails(id:id));
+        }
+
+        private SampleDto ConvertSampleViewModelToDto(SampleViewModel model)
+        {
+            var dto = new SampleDto
+                      {
+                          SampleId = model.Id,
+                          Name = model.Name,
+                          MonitoringPointId = model.MonitoringPointId,
+                          MonitoringPointName = model.MonitoringPointName,
+                          CtsEventTypeId = model.CtsEventTypeId,
+                          CtsEventTypeName = model.CtsEventTypeName,
+                          CtsEventCategoryName = model.CtsEventCategoryName,
+                          CollectionMethodId = model.CollectionMethodId,
+                          CollectionMethodName = model.CollectionMethodName,
+                          IsReadyToReport = model.IsReadyToReport,
+                          SampleStatusName = model.SampleStatusName,
+                          LabSampleIdentifier = model.LabSampleIdentifier,
+                          FlowUnitValidValues = model.FlowUnitValidValues,
+                          ResultQualifierValidValues = model.ResultQualifierValidValues,
+                          MassLoadingConversionFactorPounds = model.MassLoadingConversionFactorPounds,
+                          MassLoadingCalculationDecimalPlaces = model.MassLoadingCalculationDecimalPlaces,
+                          IsMassLoadingResultToUseLessThanSign = model.IsMassLoadingResultToUseLessThanSign,
+                          SampleResults = model.SampleResults.Select(c => new SampleResultDto
+                                                                          {
+                                                                              SampleId = model.Id ?? 0,
+                                                                              AnalysisDateTimeLocal = c.AnalysisDateTimeLocal,
+                                                                              AnalysisMethod = c.AnalysisMethod,
+                                                                              EnteredMethodDetectionLimit = c.EnteredMethodDetectionLimit,
+                                                                              ConcentrationSampleResultId = c.Id,
+                                                                              IsApprovedEPAMethod = c.IsApprovedEPAMethod,
+                                                                              IsCalcMassLoading = c.IsCalcMassLoading,
+                                                                              MassLoadingQualifier = c.MassLoadingQualifier,
+                                                                              MassLoadingUnitId = c.MassLoadingUnitId,
+                                                                              MassLoadingUnitName = c.MassLoadingUnitName,
+                                                                              MassLoadingValue = string.IsNullOrWhiteSpace(value:c.MassLoadingValue) ? string.Empty : c.MassLoadingValue,
+                                                                              ParameterId = c.ParameterId,
+                                                                              ParameterName = c.ParameterName,
+                                                                              Qualifier = c.Qualifier,
+                                                                              UnitId = c.UnitId,
+                                                                              Value = string.IsNullOrWhiteSpace(value:c.Value) ? string.Empty : c.Value,
+                                                                              UnitName = c.UnitName
+                                                                          }),
+                          FlowUnitId = model.FlowUnitId,
+                          FlowUnitName = model.FlowUnitName,
+                          FlowValue = string.IsNullOrWhiteSpace(value:model.FlowValue) ? string.Empty : model.FlowValue,
+                          StartDateTimeLocal = model.StartDateTimeLocal,
+                          EndDateTimeLocal = model.EndDateTimeLocal
+                          //LastModificationDateTimeLocal = 
+                          //StartDateTime = 
+                          //ByOrganizationTypeName = 
+                          //EndDateTime = 
+                          //LastModifierFullName = 
+                      };
+
+            return dto;
         }
 
         private SampleViewModel PrepareSampleDetails(int id)
@@ -1279,7 +1373,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 MassLoadingMassLoadingUnitId = viewModelMassLoadingMassLoadingUnitId.UnitId,
                                 MassLoadingMassLoadingUnitName = viewModelMassLoadingMassLoadingUnitId.Name,
                                 MonitoringPointId = vm.MonitoringPointId,
-                                MonitoringPointName = vm.Name,
+                                MonitoringPointName = vm.MonitoringPointName,
                                 Name = vm.Name,
                                 ParameterGroups = new List<ParameterGroupViewModel>(),
                                 ResultQualifierValidValues = vm.ResultQualifierValidValues,
@@ -1309,45 +1403,53 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                            UnitName = c.UnitName
                                                                        });
 
-                viewModel.ParameterGroups =
-                    _parameterService.GetAllParameterGroups(monitoringPointId:vm.MonitoringPointId, sampleEndDateTimeLocal:vm.EndDateTimeLocal)
-                                     .Select(c => new ParameterGroupViewModel
-                                                  {
-                                                      Id = c.ParameterGroupId,
-                                                      Name = c.Name,
-                                                      Description = c.Description,
-                                                      ParameterIds = string.Join(separator:",", values:c.Parameters.Select(p => p.ParameterId).ToList())
-                                                  }).OrderBy(c => c.Name).ToList();
-
-                viewModel.AvailableCollectionMethods = _sampleService.GetCollectionMethods().Select(c => new SelectListItem
-                                                                                                         {
-                                                                                                             Text = c.Name,
-                                                                                                             Value = c.CollectionMethodId.ToString(),
-                                                                                                             Selected = c.CollectionMethodId.Equals(obj:viewModel.CollectionMethodId)
-                                                                                                         }).OrderBy(c => c.Text).ToList();
-
-                viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample:true).Select(c => new SelectListItem
-                                                                                                                         {
-                                                                                                                             Text = c.Name,
-                                                                                                                             Value = c.CtsEventTypeId.ToString(),
-                                                                                                                             Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
-                                                                                                                         }).OrderBy(c => c.Text).ToList();
-
-                viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:viewModel.MonitoringPointId, sampleEndDateTimeUtc:viewModel.EndDateTimeLocal)
-                                                           .Select(c => new ParameterViewModel
-                                                                        {
-                                                                            Id = c.ParameterId,
-                                                                            Name = c.Name,
-                                                                            DefaultUnitId = c.DefaultUnit.UnitId,
-                                                                            DefaultUnitName = c.DefaultUnit.Name,
-                                                                            IsCalcMassLoading = c.IsCalcMassLoading
-                                                                        }).OrderBy(c => c.Name).ToList();
+                AddAdditionalPropertyToSampleDetails(viewModel:viewModel);
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
             return viewModel;
+        }
+
+        private void AddAdditionalPropertyToSampleDetails(SampleViewModel viewModel)
+        {
+            viewModel.ParameterGroups =
+                _parameterService.GetAllParameterGroups(monitoringPointId:viewModel.MonitoringPointId, sampleEndDateTimeLocal:viewModel.EndDateTimeLocal)
+                                 .Select(c => new ParameterGroupViewModel
+                                              {
+                                                  Id = c.ParameterGroupId,
+                                                  Name = c.Name,
+                                                  Description = c.Description,
+                                                  ParameterIds = string.Join(separator:",", values:c.Parameters.Select(p => p.ParameterId).ToList())
+                                              }).OrderBy(c => c.Name).ToList();
+
+            viewModel.AvailableCollectionMethods = _sampleService.GetCollectionMethods().Select(c => new SelectListItem
+                                                                                                     {
+                                                                                                         Text = c.Name,
+                                                                                                         Value = c.CollectionMethodId.ToString(),
+                                                                                                         Selected = c.CollectionMethodId.Equals(obj:viewModel.CollectionMethodId)
+                                                                                                     }).OrderBy(c => c.Text).ToList();
+
+            var ctsEventTypeDtos = _reportTemplateService.GetCtsEventTypes(isForSample:true);
+            var sampleTypes = ctsEventTypeDtos as IList<CtsEventTypeDto> ?? ctsEventTypeDtos.ToList();
+            viewModel.CtsEventCategoryName = sampleTypes.First().CtsEventCategoryName;
+            viewModel.AvailableCtsEventTypes = sampleTypes.Select(c => new SelectListItem
+                                                                       {
+                                                                           Text = c.Name,
+                                                                           Value = c.CtsEventTypeId.ToString(),
+                                                                           Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
+                                                                       }).OrderBy(c => c.Text).ToList();
+
+            viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:viewModel.MonitoringPointId, sampleEndDateTimeUtc:viewModel.EndDateTimeLocal)
+                                                       .Select(c => new ParameterViewModel
+                                                                    {
+                                                                        Id = c.ParameterId,
+                                                                        Name = c.Name,
+                                                                        DefaultUnitId = c.DefaultUnit.UnitId,
+                                                                        DefaultUnitName = c.DefaultUnit.Name,
+                                                                        IsCalcMassLoading = c.IsCalcMassLoading
+                                                                    }).OrderBy(c => c.Name).ToList();
         }
 
         #endregion
