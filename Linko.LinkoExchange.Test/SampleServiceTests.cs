@@ -18,6 +18,7 @@ using Linko.LinkoExchange.Services.Sample;
 using System.Reflection;
 using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.Config;
+using System.Diagnostics;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -469,7 +470,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Persist_And_Read_Back_SampleDto_And_Compare_Fields()
         {
-            //Remove_All_Samples_From_Db();
+            Remove_All_Samples_From_Db();
 
             //Create test Sample Dto
             var sampleDto = GetTestSampleDto();
@@ -491,12 +492,46 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Update_Existing_Sample()
         {
-            int sampleId = 45;
+            int sampleId = 52;
             //Fetch
             var sampleDto = _sampleService.GetSampleDetails(sampleId);
 
-            //Change
-            sampleDto.FlowValue = "21";
+            //Change (just increment by 1)
+            //sampleDto.FlowValue = (Convert.ToInt32(sampleDto.FlowValue) + 1).ToString();
+
+            //Remove 1 result
+            var newList = new List<SampleResultDto>();
+            foreach (var item in sampleDto.SampleResults)
+            {
+                newList.Add(item);
+            }
+
+
+            //newList.RemoveAt(1);
+
+            //Add a result
+            var resultDto = new SampleResultDto()
+            {
+                ParameterId = 43,
+                ParameterName = "2-Hexanone",
+                Qualifier = "<",
+                UnitId = 7,
+                UnitName = "mg/L",
+                Value = "5",
+                EnteredMethodDetectionLimit = "0.66",
+                AnalysisMethod = "Analysis Method 66",
+                AnalysisDateTimeLocal = DateTime.Now,
+                IsApprovedEPAMethod = true,
+                IsCalcMassLoading = true,
+                MassLoadingQualifier = "<",
+                MassLoadingUnitId = 10,
+                MassLoadingUnitName = "ppd",
+                MassLoadingValue = "22.11",
+            };
+            newList.Add(resultDto);
+
+            sampleDto.SampleResults = newList;
+
 
             //Persist
             _sampleService.SaveSample(sampleDto);
@@ -520,11 +555,14 @@ namespace Linko.LinkoExchange.Test
                 var beforeValue = property.GetValue(dto1, null);
                 var afterValue = property.GetValue(dto2, null);
 
-                Console.WriteLine($"Name: {fieldName}, Before Value: {beforeValue}, After Value: {afterValue}");
+                Debug.WriteLine($"Name: {fieldName}, Before Value: {beforeValue}, After Value: {afterValue}");
 
-                if (fieldName == "SampleId") //set within service code
+                if (fieldName == "SampleId" && !isAfterUpdate) //set within service code
                 {
-
+                    //Not passed in for Create New
+                    Assert.IsNull(beforeValue);
+                    int newId;
+                    Assert.IsTrue(afterValue != null && Int32.TryParse(afterValue.ToString(), out newId) && newId > 0);
                 }
                 else if (fieldName == "Name" && !isAfterUpdate) //set within service code
                 {
@@ -539,7 +577,7 @@ namespace Linko.LinkoExchange.Test
                 {
 
                 }
-                else if (fieldName == "ByOrganizationTypeName")
+                else if (fieldName == "ByOrganizationTypeName") //set within service code 
                 {
 
                 }
@@ -573,12 +611,12 @@ namespace Linko.LinkoExchange.Test
                             var resultBeforeValue = resultProperty.GetValue(resultDto, null);
                             var resultAfterValue = resultProperty.GetValue(fetchedSampleResult, null);
 
-                            if (!isAfterUpdate)
+                            Debug.WriteLine($"Name: {resultFieldName}, Before Value: {resultBeforeValue}, After Value: {resultAfterValue}");
+
+                            if (resultFieldName == "ConcentrationSampleResultId" || resultFieldName == "MassLoadingSampleResultId")
                             {
-                                if (resultFieldName == "SampleId" || resultFieldName == "ConcentrationSampleResultId" || resultFieldName == "MassLoadingSampleResultId")
-                                {
-                                    //ignore
-                                }
+                                //Some results are updates and some are new
+                                string setBreakPointHereToManuallyInspec = "";
                             }
                             else if (resultFieldName == "LastModifierFullName")
                             {

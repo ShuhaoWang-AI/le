@@ -17,6 +17,8 @@ using Linko.LinkoExchange.Services.Cache;
 using System.Collections.ObjectModel;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Unit;
+using System.Data.Entity.Validation;
+using System.Data.Entity.Infrastructure;
 
 namespace Linko.LinkoExchange.Services.Sample
 {
@@ -72,7 +74,6 @@ namespace Linko.LinkoExchange.Services.Sample
             var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
-            var sampleIdToReturn = -1;
             var sampleStartDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId);
             var sampleEndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId);
             var massLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.MassLoading.ToString()).LimitBasisId;
@@ -117,92 +118,8 @@ namespace Linko.LinkoExchange.Services.Sample
                 //Get new
                 sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto);
                 sampleToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+                sampleToPersist.SampleResults = new List<SampleResult>();
                 _dbContext.Samples.Add(sampleToPersist);
-            }
-
-            //Handle Sample Results "Updates and/or Additions"
-            foreach (var sampleResultDto in sampleDto.SampleResults)
-            {
-                //Each SampleResultDto has at least a Concentration component
-                SampleResult concentrationResultRowToUpdate = null;
-                if (!sampleResultDto.ConcentrationSampleResultId.HasValue)
-                {
-                    concentrationResultRowToUpdate = new SampleResult() { CreationDateTimeUtc = DateTimeOffset.UtcNow };
-                    _dbContext.SampleResults.Add(concentrationResultRowToUpdate);
-                }
-                else
-                {
-                    concentrationResultRowToUpdate = sampleToPersist.SampleResults
-                        .Single(sr => sr.SampleResultId == sampleResultDto.ConcentrationSampleResultId.Value);
-                }
-
-                //Update Concentation Result
-                concentrationResultRowToUpdate = _mapHelper.GetConcentrationSampleResultFromSampleResultDto(sampleResultDto, concentrationResultRowToUpdate);
-
-                if (!String.IsNullOrEmpty(concentrationResultRowToUpdate.EnteredValue))
-                {
-                    Double valueAsDouble;
-                    if (!Double.TryParse(concentrationResultRowToUpdate.EnteredValue, out valueAsDouble))
-                    {
-                        //Could not convert
-                        return -1;
-                    }
-                    concentrationResultRowToUpdate.Value = valueAsDouble;
-
-                }
-                if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
-                {
-                    concentrationResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
-                        .GetUTCDateTimeUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
-                }
-                concentrationResultRowToUpdate.LimitBasisId = concentrationLimitBasisId;
-                concentrationResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
-                concentrationResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
-                concentrationResultRowToUpdate.LastModifierUserId = currentUserId;
-
-
-                //... the SampleResultDto MAY ALSO have a Mass Loading component
-                if (sampleResultDto.IsCalcMassLoading)
-                {
-                    SampleResult massResultRowToUpdate = null;
-                    if (!sampleResultDto.MassLoadingSampleResultId.HasValue)
-                    {
-                        massResultRowToUpdate = new SampleResult() { CreationDateTimeUtc = DateTimeOffset.UtcNow };
-                        _dbContext.SampleResults.Add(massResultRowToUpdate);
-                    }
-                    else
-                    {
-                        massResultRowToUpdate = sampleToPersist.SampleResults
-                            .Single(sr => sr.SampleResultId == sampleResultDto.MassLoadingSampleResultId.Value);
-                    }
-
-                    //Update Mass Loading Result
-                    massResultRowToUpdate = _mapHelper.GetMassSampleResultFromSampleResultDto(sampleResultDto, massResultRowToUpdate);
-                    concentrationResultRowToUpdate.IsMassLoadingCalculationRequired = true; //this is always persisted with the concentration result NOT the mass loading result
-                    massResultRowToUpdate.IsMassLoadingCalculationRequired = false; //always FALSE for mass loading result
-                    if (!String.IsNullOrEmpty(massResultRowToUpdate.EnteredValue))
-                    {
-                        Double massValueAsDouble;
-                        if (!Double.TryParse(massResultRowToUpdate.EnteredValue, out massValueAsDouble))
-                        {
-                            //Could not convert
-                            return -1;
-                        }
-                        massResultRowToUpdate.Value = massValueAsDouble;
-
-                    }
-                    if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
-                    {
-                        massResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
-                            .GetUTCDateTimeUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
-                    }
-                    massResultRowToUpdate.LimitBasisId = massLimitBasisId;
-                    massResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
-                    massResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
-                    massResultRowToUpdate.LastModifierUserId = currentUserId;
-
-                }
-
             }
 
             //Set Name auto-generated using settings format
@@ -243,10 +160,8 @@ namespace Linko.LinkoExchange.Services.Sample
                 sampleToPersist.FlowUnitValidValues = flowUnitValidValues;
             }
 
-            _dbContext.SaveChanges(); //Need to Save before getting new SampleId
-
-            sampleIdToReturn = sampleToPersist.SampleId;
-
+            //Need to Save to get new SampleId and to load LimitBasis navigation property for next query (only LimitBasisId was set up to this point for new Results!)
+            _dbContext.SaveChanges();
 
             //
             //Handle Flow Result
@@ -264,7 +179,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
                 if (existingFlowResultRow == null)
                 {
-                    existingFlowResultRow = new SampleResult() { CreationDateTimeUtc = DateTimeOffset.UtcNow };
+                    existingFlowResultRow = new SampleResult() { CreationDateTimeUtc = DateTimeOffset.UtcNow, SampleId = sampleToPersist.SampleId };
                     sampleToPersist.SampleResults.Add(existingFlowResultRow);
                 }
 
@@ -273,7 +188,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
                 var flowLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.VolumeFlowRate.ToString()).LimitBasisId;
 
-                existingFlowResultRow.SampleId = sampleIdToReturn;
+                existingFlowResultRow.SampleId = sampleToPersist.SampleId;
                 existingFlowResultRow.ParameterId = flowParameter.ParameterId;
                 existingFlowResultRow.ParameterName = flowParameter.Name;
                 existingFlowResultRow.Qualifier = "";
@@ -306,12 +221,99 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
             }
 
+            
 
+            //Handle Sample Results "Updates and/or Additions"
+            foreach (var sampleResultDto in sampleDto.SampleResults)
+            {
+                //Each SampleResultDto has at least a Concentration component
+                SampleResult concentrationResultRowToUpdate = null;
+                if (!sampleResultDto.ConcentrationSampleResultId.HasValue)
+                {
+                    concentrationResultRowToUpdate = new SampleResult() { CreationDateTimeUtc = DateTimeOffset.UtcNow, SampleId = sampleToPersist.SampleId };
+                    _dbContext.SampleResults.Add(concentrationResultRowToUpdate);
+                }
+                else
+                {
+                    concentrationResultRowToUpdate = sampleToPersist.SampleResults
+                        .Single(sr => sr.SampleResultId == sampleResultDto.ConcentrationSampleResultId.Value);
+                }
+
+                //Update Concentation Result
+                concentrationResultRowToUpdate = _mapHelper.GetConcentrationSampleResultFromSampleResultDto(sampleResultDto, concentrationResultRowToUpdate);
+
+                if (!String.IsNullOrEmpty(concentrationResultRowToUpdate.EnteredValue))
+                {
+                    Double valueAsDouble;
+                    if (!Double.TryParse(concentrationResultRowToUpdate.EnteredValue, out valueAsDouble))
+                    {
+                        //Could not convert
+                        return -1;
+                    }
+                    concentrationResultRowToUpdate.Value = valueAsDouble;
+
+                }
+                if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
+                {
+                    concentrationResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
+                        .GetUTCDateTimeUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                }
+                concentrationResultRowToUpdate.LimitBasisId = concentrationLimitBasisId;
+                concentrationResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
+                concentrationResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                concentrationResultRowToUpdate.LastModifierUserId = currentUserId;
+
+
+                //... the SampleResultDto MAY ALSO have a Mass Loading component
+                if (sampleResultDto.IsCalcMassLoading)
+                {
+                    SampleResult massResultRowToUpdate = null;
+                    if (!sampleResultDto.MassLoadingSampleResultId.HasValue)
+                    {
+                        massResultRowToUpdate = new SampleResult() { CreationDateTimeUtc = DateTimeOffset.UtcNow, SampleId = sampleToPersist.SampleId };
+                        _dbContext.SampleResults.Add(massResultRowToUpdate);
+                    }
+                    else
+                    {
+                        massResultRowToUpdate = sampleToPersist.SampleResults
+                            .Single(sr => sr.SampleResultId == sampleResultDto.MassLoadingSampleResultId.Value);
+                    }
+
+                    //Update Mass Loading Result
+                    massResultRowToUpdate = _mapHelper.GetMassSampleResultFromSampleResultDto(sampleResultDto, massResultRowToUpdate);
+                    concentrationResultRowToUpdate.IsMassLoadingCalculationRequired = true; //this is always persisted with the concentration result NOT the mass loading result
+                    massResultRowToUpdate.IsMassLoadingCalculationRequired = false; //always FALSE for mass loading result
+                    if (!String.IsNullOrEmpty(massResultRowToUpdate.EnteredValue))
+                    {
+                        Double massValueAsDouble;
+                        if (!Double.TryParse(massResultRowToUpdate.EnteredValue, out massValueAsDouble))
+                        {
+                            //Could not convert
+                            return -1;
+                        }
+                        massResultRowToUpdate.Value = massValueAsDouble;
+
+                    }
+                    if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
+                    {
+                        massResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
+                            .GetUTCDateTimeUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                    }
+                    massResultRowToUpdate.LimitBasisId = massLimitBasisId;
+                    massResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
+                    massResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                    massResultRowToUpdate.LastModifierUserId = currentUserId;
+
+                }
+
+            }
+
+            
             _dbContext.SaveChanges();
 
-            _logger.Info($"Leaving SampleService.SimplePersist. sampleIdToReturn={sampleIdToReturn}");
+            _logger.Info($"Leaving SampleService.SimplePersist. sampleIdToReturn={sampleToPersist.SampleId}");
 
-            return sampleIdToReturn;
+            return sampleToPersist.SampleId;
 
         }
 
@@ -357,6 +359,28 @@ namespace Linko.LinkoExchange.Services.Sample
                 {
                     transaction.Rollback();
                     throw;
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    transaction.Rollback();
+                    var errors = new List<string>() { ex.Message };
+
+                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                    {
+                        DbEntityEntry entry = item.Entry;
+                        string entityTypeName = entry.Entity.GetType().Name;
+
+                        foreach (DbValidationError subItem in item.ValidationErrors)
+                        {
+                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            errors.Add(message);
+                        }
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+                    transaction.Rollback();
+                    throw;
+
                 }
                 catch (Exception ex)
                 {
@@ -684,10 +708,32 @@ namespace Linko.LinkoExchange.Services.Sample
                     _logger.Info($"Leaving SampleService.DeleteSample. sampleId={sampleId}");
 
                 }
-                catch (RuleViolationException ex)
+                catch (RuleViolationException)
                 {
                     transaction.Rollback();
                     throw;
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    transaction.Rollback();
+                    var errors = new List<string>() { ex.Message };
+
+                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                    {
+                        DbEntityEntry entry = item.Entry;
+                        string entityTypeName = entry.Entity.GetType().Name;
+
+                        foreach (DbValidationError subItem in item.ValidationErrors)
+                        {
+                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            errors.Add(message);
+                        }
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+                    transaction.Rollback();
+                    throw;
+
                 }
                 catch (Exception ex)
                 {

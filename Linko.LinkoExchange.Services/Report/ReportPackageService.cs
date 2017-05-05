@@ -24,6 +24,8 @@ using Linko.LinkoExchange.Services.Report.DataXML;
 using FileInfo = Linko.LinkoExchange.Services.Report.DataXML.FileInfo;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Sample;
+using System.Data.Entity.Validation;
+using System.Data.Entity.Infrastructure;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -128,6 +130,29 @@ namespace Linko.LinkoExchange.Services.Report
                     _dbContext.SaveChanges();
                     transaction.Commit();
                     _logger.Info("Leave ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+
+                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                    {
+                        DbEntityEntry entry = item.Entry;
+                        string entityTypeName = entry.Entity.GetType().Name;
+
+                        foreach (DbValidationError subItem in item.ValidationErrors)
+                        {
+                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            errors.Add(message);
+                        }
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+                    
+                    throw;
+
                 }
                 catch (Exception ex)
                 {
@@ -621,6 +646,29 @@ namespace Linko.LinkoExchange.Services.Report
 
                     transaction.Commit();
                 }
+                catch (DbEntityValidationException ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+
+                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                    {
+                        DbEntityEntry entry = item.Entry;
+                        string entityTypeName = entry.Entity.GetType().Name;
+
+                        foreach (DbValidationError subItem in item.ValidationErrors)
+                        {
+                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            errors.Add(message);
+                        }
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+                    
+                    throw;
+
+                }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
@@ -796,6 +844,29 @@ namespace Linko.LinkoExchange.Services.Report
                     transaction.Commit();
 
                     newReportPackageId = newReportPackage.ReportPackageId;
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+
+                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                    {
+                        DbEntityEntry entry = item.Entry;
+                        string entityTypeName = entry.Entity.GetType().Name;
+
+                        foreach (DbValidationError subItem in item.ValidationErrors)
+                        {
+                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            errors.Add(message);
+                        }
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+                    
+                    throw;
+
                 }
                 catch (Exception ex)
                 {
@@ -989,6 +1060,32 @@ namespace Linko.LinkoExchange.Services.Report
                 return reportPackage.ReportPackageId;
 
             }
+            catch (DbEntityValidationException ex)
+            {
+                if (isUseTransaction)
+                {
+                    transaction.Rollback();
+                }
+
+                var errors = new List<string>() { ex.Message };
+
+                foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                {
+                    DbEntityEntry entry = item.Entry;
+                    string entityTypeName = entry.Entity.GetType().Name;
+
+                    foreach (DbValidationError subItem in item.ValidationErrors)
+                    {
+                        string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                        errors.Add(message);
+                    }
+                }
+
+                _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                throw;
+
+            }
             catch
             {
                 if (isUseTransaction)
@@ -1070,6 +1167,32 @@ namespace Linko.LinkoExchange.Services.Report
                 {
                     transaction.Commit();
                 }
+            }
+            catch (DbEntityValidationException ex)
+            {
+                if (isUseTransaction)
+                {
+                    transaction.Rollback();
+                }
+
+                var errors = new List<string>() { ex.Message };
+
+                foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                {
+                    DbEntityEntry entry = item.Entry;
+                    string entityTypeName = entry.Entity.GetType().Name;
+
+                    foreach (DbValidationError subItem in item.ValidationErrors)
+                    {
+                        string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                        errors.Add(message);
+                    }
+                }
+
+                _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                throw;
+
             }
             catch (Exception ex)
             {
@@ -1443,6 +1566,29 @@ namespace Linko.LinkoExchange.Services.Report
 
                     transaction.Commit();
                 }
+                catch (DbEntityValidationException ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+
+                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                    {
+                        DbEntityEntry entry = item.Entry;
+                        string entityTypeName = entry.Entity.GetType().Name;
+
+                        foreach (DbValidationError subItem in item.ValidationErrors)
+                        {
+                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            errors.Add(message);
+                        }
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                    throw;
+
+                }
                 catch
                 {
                     transaction.Rollback();
@@ -1493,6 +1639,29 @@ namespace Linko.LinkoExchange.Services.Report
 
                     transaction.Commit();
                 }
+                catch (DbEntityValidationException ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+
+                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                    {
+                        DbEntityEntry entry = item.Entry;
+                        string entityTypeName = entry.Entity.GetType().Name;
+
+                        foreach (DbValidationError subItem in item.ValidationErrors)
+                        {
+                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            errors.Add(message);
+                        }
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                    throw;
+
+                }
                 catch
                 {
                     transaction.Rollback();
@@ -1542,6 +1711,29 @@ namespace Linko.LinkoExchange.Services.Report
                     _dbContext.SaveChanges();
 
                     transaction.Commit();
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    transaction.Rollback();
+
+                    var errors = new List<string>() { ex.Message };
+
+                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                    {
+                        DbEntityEntry entry = item.Entry;
+                        string entityTypeName = entry.Entity.GetType().Name;
+
+                        foreach (DbValidationError subItem in item.ValidationErrors)
+                        {
+                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            errors.Add(message);
+                        }
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                    throw;
+
                 }
                 catch
                 {

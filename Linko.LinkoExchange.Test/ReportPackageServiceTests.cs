@@ -168,8 +168,8 @@ namespace Linko.LinkoExchange.Test
 
             //Add sample associations
             existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
-            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 36, ReportPackageElementTypeId = 13 });
-            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 38, ReportPackageElementTypeId = 13 });
+            //existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 48, ReportPackageElementTypeId = 13 });
+            //existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 38, ReportPackageElementTypeId = 13 });
 
             //Add file associations
             existingReportPackage.AssociatedFiles = new List<ReportFileDto>();
