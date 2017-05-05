@@ -94,6 +94,30 @@
                 </div>
             </div>
 
+            <div aria-labelledby="AddParameterModalLabel" class="col-md-12 fade modal modal-info" id="AddParameterModal" role="dialog" tabindex="-1">
+                <div class="modal-dialog" role="document">
+                    <div class="alert alert-dismissible alert-info modal-content">
+                        <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
+                        <h4 class="box-title">Add Parameter</h4>
+
+                        <div>
+                            <p>
+                                Select Parameter to Add<br />
+                                <input id="AddParameterDropdown" style="width: 275px" />
+                            </p>
+                            <div class="form-group">
+                                <div class="pull-right">
+                                    <button class="btn btn-primary btn-sm" id="btnAddParameterInsideModal" name="btnAddParameterInsideModal" type="button">
+                                        Add
+                                    </button>
+                                    <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-horizontal">
                 <div class="form-group">
                     @Html.HiddenFor(model => model.Id)
@@ -168,6 +192,7 @@
                                       .Name(componentName:"StartDateTimeLocal")
                                       .Value(date:Model.StartDateTimeLocal)
                                       .Format(format:"MM/dd/yyyy hh:mm:ss tt")
+                                      .Max(date:DateTime.Now)
                                       .HtmlAttributes(attributes:new
                                                                  {
                                                                      @readonly = true,
@@ -180,6 +205,7 @@
                                       .Name(componentName:"StartDateTimeLocal")
                                       .Value(date:Model.StartDateTimeLocal)
                                       .Format(format:"MM/dd/yyyy hh:mm:ss tt")
+                                      .Max(date:DateTime.Now)
                                       .HtmlAttributes(attributes:new
                                                                  {
                                                                      style = "width:210px;"
@@ -249,6 +275,7 @@
                                       .Name(componentName:"EndDateTimeLocal")
                                       .Value(date:Model.EndDateTimeLocal)
                                       .Format(format:"MM/dd/yyyy hh:mm:ss tt")
+                                      .Max(date:DateTime.Now)
                                       .HtmlAttributes(attributes:new
                                                                  {
                                                                      @readonly = true,
@@ -261,6 +288,7 @@
                                       .Name(componentName:"EndDateTimeLocal")
                                       .Value(date:Model.EndDateTimeLocal)
                                       .Format(format:"MM/dd/yyyy hh:mm:ss tt")
+                                      .Max(date:DateTime.Now)
                                       .HtmlAttributes(attributes:new
                                                                  {
                                                                      style = "width:210px;"
@@ -356,7 +384,7 @@
                     </tr>
                 </thead>
 
-                <tbody class="input-sm">
+                <tbody class="input-sm" style="min-height: 200px;">
                     @foreach (var sampleResult in Model.SampleResults)
                     {
                         <tr>
@@ -399,6 +427,7 @@
                                           .Name(componentName:"AnalysisDateTime_" + sampleResult.ParameterId)
                                           .Value(date:sampleResult.AnalysisDateTimeLocal)
                                           .Format(format:"MM/dd/yyyy hh:mm:ss tt")
+                                          .Max(date:DateTime.Now)
                                           .HtmlAttributes(attributes:new
                                                                      {
                                                                          @readonly = true,
@@ -411,6 +440,7 @@
                                           .Name(componentName:"AnalysisDateTime_" + sampleResult.ParameterId)
                                           .Value(date:sampleResult.AnalysisDateTimeLocal)
                                           .Format(format:"MM/dd/yyyy hh:mm:ss tt")
+                                          .Max(date:DateTime.Now)
                                           .HtmlAttributes(attributes:new
                                                                      {
                                                                          style = "width:100%; font-size:12px"
@@ -610,7 +640,6 @@
                             return true;
                         }
                     });
-
 
                 $("#sampleDetailsForm")
                     .submit(function(e)
@@ -889,19 +918,46 @@
 
                 //console.debug(allParameters);
                 //console.debug(availableParameters);
+
+                $("#AddParameterDropdown")
+                    .kendoDropDownList({
+                        dataSource: availableParameters
+                        , dataTextField: "Name"
+                        , dataValueField: "Id"
+                        , autoWidth: true
+                        , noDataTemplate: 'No Parameter Available!'
+                    });
+
+                $('#AddParameterModal').modal('show');
             });
+
+        $(document)
+            .on('click'
+                , "button[id='btnAddParameterInsideModal']"
+                , function()
+                {
+                    var allParameters = $.parseJSON($("#AllParameters").val());
+
+                    var availableParameters = $.grep(allParameters
+                        , function(obj)
+                        {
+                            return (obj.Id === parseInt($("#AddParameterDropdown").val()));
+                        });
+
+                    $('#AddParameterModal').modal('hide');
+                    console.debug(availableParameters);
+                    AddParamtersToParameterTable(availableParameters);
+                });
 
         $(document)
             .on('click'
                 , "button[name='btnAddParamsFromGroup']"
                 , function()
                 {
-                    var allParameters = $.parseJSON($("#AllParameters").val());
-
                     var alreadyAddedParameterIds = [];
 
-                    var parameterTable = $('#ParameterTable').DataTable();
-                    parameterTable
+                    $('#ParameterTable')
+                        .DataTable()
                         .rows()
                         .every(function()
                         {
@@ -924,6 +980,7 @@
                         });
 
                     //console.debug(groupParameterIds);
+                    var allParameters = $.parseJSON($("#AllParameters").val());
 
                     var availableParameters = $.grep(allParameters
                         , function(obj)
@@ -936,119 +993,116 @@
                     //console.debug("allParameters :" + allParameters);
                     //console.debug("availableParameters :" + availableParameters);
 
-                    $.each(availableParameters
-                        , function(index, value)
+                    AddParamtersToParameterTable(availableParameters);
+                });
+
+        AddParamtersToParameterTable = function(availableParameters)
+        {
+            var parameterTable = $('#ParameterTable').DataTable();
+
+            $.each(availableParameters
+                , function(index, value)
+                {
+                    //console.debug(value.Id + " : " + value.Name);
+                    var data = {};
+                    data[0] = "<input id='sampleResultId_" + value.Id + "' type='hidden' value=''>";
+                    data[1] = value.Name;
+
+                    var availableResultQualifierValidValues =
+                        @Html.Raw(value:Json.Encode(value:Model.AvailableResultQualifierValidValues));
+
+                    var qualifierCtrl =
+                        '<select class="form-control input-sm no-margin no-padding" id="Qualifier_'
+                            + value.Id
+                            + '" style="width: 100%">';
+
+                    $.each(availableResultQualifierValidValues
+                        , function(i, v)
                         {
-                            //console.debug(value.Id + " : " + value.Name);
-                            var data = {};
-                            data[0] = "<input id='sampleResultId_" + value.Id + "' type='hidden' value=''>";
-                            data[1] = value.Name;
-
-                            var availableResultQualifierValidValues =
-                                @Html.Raw(value:Json.Encode(value:Model.AvailableResultQualifierValidValues));
-
-                            var qualifierCtrl =
-                                '<select class="form-control input-sm no-margin no-padding" id="Qualifier_'
-                                    + value.Id
-                                    + '" style="width: 100%">';
-
-                            $.each(availableResultQualifierValidValues
-                                , function(i, v)
-                                {
-                                    if (v.Value === "NUMERIC")
-                                    {
-                                        qualifierCtrl += '<option value="'
-                                            + v.Value
-                                            + '" selected="">'
-                                            + v.Text
-                                            + '</option>';
-                                    }
-                                    else
-                                    {
-                                        qualifierCtrl += '<option value="' + v.Value + '">' + v.Text + '</option>';
-                                    }
-                                });
-                            qualifierCtrl += '</select>';
-
-                            data[2] = qualifierCtrl;
-                            data[3] =
-                                '<div class="input-group input-group-sm" style="min-width:125px">'
-                                + '<input class="form-control input-sm" id="Result_'
-                                + value.Id
-                                + '" type="text" value=""><input id="UnitId_'
-                                + value.Id
-                                + '" type="hidden" value="'
-                                + value.DefaultUnitId
-                                + '"><span id="UnitName_'
-                                + value.Id
-                                + '" class="input-group-addon">'
-                                + value.DefaultUnitName
-                                + '</span></div>';
-                            data[4] = '<input class="form-control input-sm" id="MDL_'
-                                + value.Id
-                                + '" type="text" style="width: 80px" value="">';
-                            data[5] = '<input class="form-control input-sm" id="AnalysisMethod_'
-                                + value.Id
-                                + '" type="text" value="">';
-                            data[6] =
-                                '<span class="k-widget k-datetimepicker k-header" style="width: 100%; font-size: 12px;">'
-                                + '<span class="k-picker-wrap k-state-default"><input id="AnalysisDateTime_'
-                                + value.Id
-                                + '" name="AnalysisDateTime_'
-                                + value.Id
-                                + '" style="width: 100%; font-size: 12px;" type="text" value="@Html.Raw(value:DateTime.Now.ToString(format:"MM/dd/yyyy hh:mm:ss tt"))'
-                                + '" data-role="datetimepicker" class="k-input" '
-                                + 'role="combobox" aria-expanded="false" aria-disabled="false"><span unselectable="on" class="k-select">'
-                                + '<span class="k-link k-link-date" aria-label="Open the date view"><span unselectable="on" class="k-icon k-i-calendar" '
-                                + 'aria-controls="AnalysisDateTime_'
-                                + value.Id
-                                + '_dateview"></span></span><span class="k-link k-link-time" aria-label="Open the time view">'
-                                + '<span unselectable="on" class="k-icon k-i-clock" aria-controls="AnalysisDateTime_'
-                                + value.Id
-                                + '_timeview"></span></span></span></span></span><script>'
-                                + 'kendo.syncReady(function(){jQuery("#AnalysisDateTime_'
-                                + value.Id
-                                + '").kendoDateTimePicker({"format":"MM/dd/yyyy hh:mm:ss tt","min":new Date(1900,0,1,0,0,0,0),"max":new Date(2099,11,31,0,0,0,0),"interval":30});});'
-                                + '</'
-                                + 'script>';
-                            data[7] =
-                                '<div class="icheckbox_minimal-blue" style="position: relative;"><input type="checkbox" class="checkbox" id="EPAMethod_'
-                                + value.Id
-                                + '" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; '
-                                + 'height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div>';
-
-                            if (value.IsCalcMassLoading)
+                            if (v.Value === "NUMERIC")
                             {
-                                data[8] =
-                                    '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
-                                    + value.Id
-                                    + '" checked />';
+                                qualifierCtrl += '<option value="'
+                                    + v.Value
+                                    + '" selected="">'
+                                    + v.Text
+                                    + '</option>';
                             }
                             else
                             {
-                                data[8] =
-                                    '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
-                                    + value.Id
-                                    + '"/>';
+                                qualifierCtrl += '<option value="' + v.Value + '">' + v.Text + '</option>';
                             }
-                            data[9] = '<strong id="MassResult_' + value.Id + '"></strong>';
-                            data[10] = null;
-
-                            //console.debug("data : " + data);
-
-                            var rowNode = parameterTable
-                                .row.add(data)
-                                .draw()
-                                .node();
-
-                            $(rowNode).css('color', 'green');
                         });
+                    qualifierCtrl += '</select>';
 
-                    // need to reinitialize iCheck otherwise newly added checkbox doesn't work
-                    $("input[id^='CalcLoading_']")
-                        .iCheck({
-                            checkboxClass: "icheckbox_minimal-blue"
-                        });
+                    data[2] = qualifierCtrl;
+                    data[3] =
+                        '<div class="input-group input-group-sm" style="min-width:125px">'
+                        + '<input class="form-control input-sm" id="Result_'
+                        + value.Id
+                        + '" type="text" value=""><input id="UnitId_'
+                        + value.Id
+                        + '" type="hidden" value="'
+                        + value.DefaultUnitId
+                        + '"><span id="UnitName_'
+                        + value.Id
+                        + '" class="input-group-addon">'
+                        + value.DefaultUnitName
+                        + '</span></div>';
+                    data[4] = '<input class="form-control input-sm" id="MDL_'
+                        + value.Id
+                        + '" type="text" style="width: 80px" value="">';
+                    data[5] = '<input class="form-control input-sm" id="AnalysisMethod_'
+                        + value.Id
+                        + '" type="text" value="">';
+                    data[6] = '<input id="AnalysisDateTime_'
+                        + value.Id
+                        + '" style="width: 100%; font-size: 12px;"'
+                        + ' />';
+                    data[7] =
+                        '<input type="checkbox" class="checkbox" id="EPAMethod_'
+                        + value.Id
+                        + '"/>';
+
+                    if (value.IsCalcMassLoading)
+                    {
+                        data[8] =
+                            '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
+                            + value.Id
+                            + '" checked />';
+                    }
+                    else
+                    {
+                        data[8] =
+                            '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
+                            + value.Id
+                            + '"/>';
+                    }
+                    data[9] = '<strong id="MassResult_' + value.Id + '"></strong>';
+                    data[10] = null;
+
+                    //console.debug("data : " + data);
+
+                    var rowNode = parameterTable
+                        .row.add(data)
+                        .draw()
+                        .node();
+
+                    $(rowNode).css('color', 'green');
                 });
+
+            // need to reinitialize iCheck otherwise newly added checkbox doesn't work
+            $("input[id^='EPAMethod_']")
+                .iCheck({
+                    checkboxClass: "icheckbox_minimal-blue"
+                });
+
+            $("input[id^='CalcLoading_']")
+                .iCheck({
+                    checkboxClass: "icheckbox_minimal-blue"
+                });
+
+            $("input[id^='AnalysisDateTime_']")
+                .kendoDateTimePicker({ format: "MM/dd/yyyy hh:mm:ss tt", max: new Date($.now()) });
+        };
     </script>
 }}
