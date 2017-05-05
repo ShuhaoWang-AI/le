@@ -507,26 +507,41 @@ namespace Linko.LinkoExchange.Test
             }
             newList.RemoveAt(1);
 
-            ////Add a result
-            //var resultDto = new SampleResultDto()
-            //{
-            //    ParameterId = 43,
-            //    ParameterName = "2-Hexanone",
-            //    Qualifier = "<",
-            //    UnitId = 7,
-            //    UnitName = "mg/L",
-            //    Value = "5",
-            //    EnteredMethodDetectionLimit = "0.66",
-            //    AnalysisMethod = "Analysis Method 66",
-            //    AnalysisDateTimeLocal = DateTime.Now,
-            //    IsApprovedEPAMethod = true,
-            //    IsCalcMassLoading = true,
-            //    MassLoadingQualifier = "<",
-            //    MassLoadingUnitId = 10,
-            //    MassLoadingUnitName = "ppd",
-            //    MassLoadingValue = "22.11",
-            //};
-            //newList.Add(resultDto);
+            //Add a result
+            var resultDto = new SampleResultDto()
+            {
+                ParameterId = 44,
+                ParameterName = "2-Methoxy-2-Methylpropane",
+                Qualifier = "<",
+                UnitId = 7,
+                UnitName = "mg/L",
+                Value = "5",
+                EnteredMethodDetectionLimit = "0.66",
+                AnalysisMethod = "Analysis Method 66",
+                AnalysisDateTimeLocal = DateTime.Now,
+                IsApprovedEPAMethod = true,
+                IsCalcMassLoading = true,
+                MassLoadingQualifier = "<",
+                MassLoadingUnitId = 10,
+                MassLoadingUnitName = "ppd",
+                MassLoadingValue = "22.11",
+            };
+            newList.Add(resultDto);
+            resultDto = new SampleResultDto()
+            {
+                ParameterId = 45,
+                ParameterName = "2-Methyl-4,6-dinitrophenol",
+                Qualifier = "<",
+                UnitId = 7,
+                UnitName = "mg/L",
+                Value = "5",
+                EnteredMethodDetectionLimit = "0.66",
+                AnalysisMethod = "Analysis Method 66",
+                AnalysisDateTimeLocal = DateTime.Now,
+                IsApprovedEPAMethod = true,
+                IsCalcMassLoading = true
+            };
+            newList.Add(resultDto);
 
             sampleDto.SampleResults = newList;
 
