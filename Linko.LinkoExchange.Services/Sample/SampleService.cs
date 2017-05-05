@@ -82,14 +82,6 @@ namespace Linko.LinkoExchange.Services.Sample
             Core.Domain.Sample sampleToPersist = null;
             if (sampleDto.SampleId.HasValue && sampleDto.SampleId.Value > 0)
             {
-                if (IsSampleIncludedInReportPackage(sampleDto.SampleId.Value))
-                {
-                    //Sample is in use in a Report Package (draft or otherwise)...  
-                    //Actor can not perform any actions of any kind except view all details.
-                    //This method does NOT validate and throw exceptions -- this needs to be handled in calling code.
-                    return sampleDto.SampleId.Value;
-                }
-
                 //Update existing
                 sampleToPersist = _dbContext.Samples
                     .Include(c => c.SampleResults)
@@ -346,12 +338,13 @@ namespace Linko.LinkoExchange.Services.Sample
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try {
-                    //If attempting to save as Draft, check if included report
+                    //Cannot save if included in a report
+                    //      (UC-15-1.2(*.a.) - System identifies Sample is in use in a Report Package (draft or otherwise) an displays the "REPORTED" Status.  
+                    //      Actor can not perform any actions of any kind except view all details.)
                     if (sampleDto.SampleId.HasValue && 
-                        !sampleDto.IsReadyToReport && 
                         this.IsSampleIncludedInReportPackage(sampleDto.SampleId.Value))
                     {
-                        ThrowSimpleException("You cannot save a Sample as Draft if it's been included in a Report Package.");
+                        ThrowSimpleException("Sample is in use in a Report Package and is therefore READ-ONLY.");
                     }
 
                     if (this.IsValidSample(sampleDto, isSuppressExceptions: false))
