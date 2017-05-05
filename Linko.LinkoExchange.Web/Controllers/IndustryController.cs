@@ -1305,7 +1305,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                           IsMassLoadingResultToUseLessThanSign = model.IsMassLoadingResultToUseLessThanSign,
                           SampleResults = model.SampleResults.Select(c => new SampleResultDto
                                                                           {
-                                                                              SampleId = model.Id ?? 0,
                                                                               AnalysisDateTimeLocal = c.AnalysisDateTimeLocal,
                                                                               AnalysisMethod = c.AnalysisMethod,
                                                                               EnteredMethodDetectionLimit = c.EnteredMethodDetectionLimit,

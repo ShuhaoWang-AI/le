@@ -987,7 +987,6 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             var dto = new SampleResultDto();
             dto.ConcentrationSampleResultId = sampleResult.SampleResultId;
-            dto.SampleId = sampleResult.SampleId;
             dto.ParameterId = sampleResult.ParameterId;
             dto.ParameterName = sampleResult.ParameterName;
             dto.Qualifier = sampleResult.Qualifier;
@@ -1015,7 +1014,6 @@ namespace Linko.LinkoExchange.Services.Mapping
                 existingSampleResult = new SampleResult();
             }
 
-            existingSampleResult.SampleId = dto.SampleId;
             existingSampleResult.ParameterId = dto.ParameterId;
             existingSampleResult.ParameterName = dto.ParameterName;
             existingSampleResult.Qualifier = dto.Qualifier;
@@ -1044,7 +1042,6 @@ namespace Linko.LinkoExchange.Services.Mapping
                 existingSampleResult = new SampleResult();
             }
 
-            existingSampleResult.SampleId = dto.SampleId;
             existingSampleResult.ParameterId = dto.ParameterId;
             existingSampleResult.ParameterName = dto.ParameterName;
             existingSampleResult.Qualifier = dto.MassLoadingQualifier;

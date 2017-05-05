@@ -12,7 +12,6 @@ namespace Linko.LinkoExchange.Services.Dto
     public class SampleResultDto
     {
         public int? ConcentrationSampleResultId { get; set; }
-        public int SampleId { get; set; }
         public int ParameterId { get; set; }
         public string ParameterName { get; set; }
         public string Qualifier { get; set; }

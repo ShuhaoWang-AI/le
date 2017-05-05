@@ -82,12 +82,12 @@ namespace Linko.LinkoExchange.Services.Sample
             Core.Domain.Sample sampleToPersist = null;
             if (sampleDto.SampleId.HasValue && sampleDto.SampleId.Value > 0)
             {
-
                 if (IsSampleIncludedInReportPackage(sampleDto.SampleId.Value))
                 {
                     //Sample is in use in a Report Package (draft or otherwise)...  
                     //Actor can not perform any actions of any kind except view all details.
-                    ThrowSimpleException("Sample is included in a Report Package and therefore cannot be updated.");
+                    //This method does NOT validate and throw exceptions -- this needs to be handled in calling code.
+                    return sampleDto.SampleId.Value;
                 }
 
                 //Update existing
@@ -135,7 +135,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 SampleResult concentrationResultRowToUpdate = null;
                 if (!sampleResultDto.ConcentrationSampleResultId.HasValue)
                 {
-                    concentrationResultRowToUpdate = new SampleResult();
+                    concentrationResultRowToUpdate = new SampleResult() { CreationDateTimeUtc = DateTimeOffset.UtcNow };
                     _dbContext.SampleResults.Add(concentrationResultRowToUpdate);
                 }
                 else
@@ -146,13 +146,18 @@ namespace Linko.LinkoExchange.Services.Sample
 
                 //Update Concentation Result
                 concentrationResultRowToUpdate = _mapHelper.GetConcentrationSampleResultFromSampleResultDto(sampleResultDto, concentrationResultRowToUpdate);
-                Double valueAsDouble;
-                if (!Double.TryParse(concentrationResultRowToUpdate.EnteredValue, out valueAsDouble))
+
+                if (!String.IsNullOrEmpty(concentrationResultRowToUpdate.EnteredValue))
                 {
-                    //Could not convert -- throw exception
-                    ThrowSimpleException($"Could not convert entered concentration value to double: \"{concentrationResultRowToUpdate.EnteredValue}\"");
+                    Double valueAsDouble;
+                    if (!Double.TryParse(concentrationResultRowToUpdate.EnteredValue, out valueAsDouble))
+                    {
+                        //Could not convert
+                        return -1;
+                    }
+                    concentrationResultRowToUpdate.Value = valueAsDouble;
+
                 }
-                concentrationResultRowToUpdate.Value = valueAsDouble;
                 if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
                 {
                     concentrationResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
@@ -160,7 +165,6 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
                 concentrationResultRowToUpdate.LimitBasisId = concentrationLimitBasisId;
                 concentrationResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
-                concentrationResultRowToUpdate.CreationDateTimeUtc = DateTimeOffset.UtcNow;
                 concentrationResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                 concentrationResultRowToUpdate.LastModifierUserId = currentUserId;
 
@@ -171,7 +175,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     SampleResult massResultRowToUpdate = null;
                     if (!sampleResultDto.MassLoadingSampleResultId.HasValue)
                     {
-                        massResultRowToUpdate = new SampleResult();
+                        massResultRowToUpdate = new SampleResult() { CreationDateTimeUtc = DateTimeOffset.UtcNow };
                         _dbContext.SampleResults.Add(massResultRowToUpdate);
                     }
                     else
@@ -182,14 +186,19 @@ namespace Linko.LinkoExchange.Services.Sample
 
                     //Update Mass Loading Result
                     massResultRowToUpdate = _mapHelper.GetMassSampleResultFromSampleResultDto(sampleResultDto, massResultRowToUpdate);
-                    massResultRowToUpdate.IsMassLoadingCalculationRequired = true;
-                    Double massValueAsDouble;
-                    if (!Double.TryParse(massResultRowToUpdate.EnteredValue, out massValueAsDouble))
+                    concentrationResultRowToUpdate.IsMassLoadingCalculationRequired = true; //this is always persisted with the concentration result NOT the mass loading result
+                    massResultRowToUpdate.IsMassLoadingCalculationRequired = false; //always FALSE for mass loading result
+                    if (!String.IsNullOrEmpty(massResultRowToUpdate.EnteredValue))
                     {
-                        //Could not convert -- throw exception
-                        ThrowSimpleException($"Could not convert entered mass value to double: \"{massResultRowToUpdate.EnteredValue}\"");
+                        Double massValueAsDouble;
+                        if (!Double.TryParse(massResultRowToUpdate.EnteredValue, out massValueAsDouble))
+                        {
+                            //Could not convert
+                            return -1;
+                        }
+                        massResultRowToUpdate.Value = massValueAsDouble;
+
                     }
-                    massResultRowToUpdate.Value = massValueAsDouble;
                     if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
                     {
                         massResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
@@ -197,7 +206,6 @@ namespace Linko.LinkoExchange.Services.Sample
                     }
                     massResultRowToUpdate.LimitBasisId = massLimitBasisId;
                     massResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
-                    massResultRowToUpdate.CreationDateTimeUtc = DateTimeOffset.UtcNow;
                     massResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                     massResultRowToUpdate.LastModifierUserId = currentUserId;
 
@@ -264,7 +272,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
                 if (existingFlowResultRow == null)
                 {
-                    existingFlowResultRow = new SampleResult();
+                    existingFlowResultRow = new SampleResult() { CreationDateTimeUtc = DateTimeOffset.UtcNow };
                     sampleToPersist.SampleResults.Add(existingFlowResultRow);
                 }
 
@@ -284,13 +292,15 @@ namespace Linko.LinkoExchange.Services.Sample
                 existingFlowResultRow.EnteredMethodDetectionLimit = "";
                 existingFlowResultRow.LimitTypeId = null;
                 existingFlowResultRow.LimitBasisId = flowLimitBasisId;
-                existingFlowResultRow.IsCalculated = false;
+                existingFlowResultRow.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                existingFlowResultRow.LastModifierUserId = currentUserId;
+
 
                 Double valueAsDouble;
                 if (!Double.TryParse(existingFlowResultRow.EnteredValue, out valueAsDouble))
                 {
-                    //Could not convert -- throw exception
-                    ThrowSimpleException($"Could not convert entered flow value to double: \"{existingFlowResultRow.EnteredValue}\"");
+                    //Could not convert
+                    return -1;
                 }
                 existingFlowResultRow.Value = valueAsDouble;
 
@@ -477,6 +487,13 @@ namespace Linko.LinkoExchange.Services.Sample
                 sampleDto.FlowUnitId.Value > 0 && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
             {
                 isValidFlowValueExists = true;
+
+                Double flowValueAsDouble;
+                if (!Double.TryParse(sampleDto.FlowValue, out flowValueAsDouble))
+                {
+                    //Could not convert -- throw exception
+                    ThrowSimpleException($"Could not convert provided flow value '{sampleDto.FlowValue}' to double.");
+                }
             }
             else if ((!string.IsNullOrEmpty(sampleDto.FlowValue) && !sampleDto.FlowUnitId.HasValue) ||
                             (string.IsNullOrEmpty(sampleDto.FlowValue) && sampleDto.FlowUnitId.HasValue))
@@ -495,6 +512,28 @@ namespace Linko.LinkoExchange.Services.Sample
             {
                 foreach (var resultDto in sampleDto.SampleResults)
                 {
+                    //Check if concentration entered value is numeric and can be converted to double.
+                    if (!String.IsNullOrEmpty(resultDto.Value))
+                    {
+                        Double concentrationValueAsDouble;
+                        if (!Double.TryParse(resultDto.Value, out concentrationValueAsDouble))
+                        {
+                            //Could not convert -- throw exception
+                            ThrowSimpleException($"Could not convert provided concentration value '{resultDto.Value}' to double.");
+                        }
+                    }
+
+                    //Check if mass loading entered value is numeric and can be converted to double.
+                    if (!String.IsNullOrEmpty(resultDto.MassLoadingValue))
+                    {
+                        Double massLoadingValueAsDouble;
+                        if (!Double.TryParse(resultDto.MassLoadingValue, out massLoadingValueAsDouble))
+                        {
+                            //Could not convert -- throw exception
+                            ThrowSimpleException($"Could not convert provided mass loading value '{resultDto.MassLoadingValue}' to double.");
+                        }
+                    }
+
                     //All results must have a unit if provided (applied to both Draft or ReadyToReport)
                     if (resultDto.UnitId < 1)
                     {
@@ -778,7 +817,6 @@ namespace Linko.LinkoExchange.Services.Sample
                         if (sampleResult.LimitBasis.Name == LimitBasisName.Concentration.ToString())
                         {
                             resultDto.ConcentrationSampleResultId = sampleResult.SampleResultId;
-                            resultDto.SampleId = sampleResult.SampleId;
                             resultDto.ParameterId = sampleResult.ParameterId;
                             resultDto.ParameterName = sampleResult.ParameterName;
                             resultDto.EnteredMethodDetectionLimit = sampleResult.EnteredMethodDetectionLimit;

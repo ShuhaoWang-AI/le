@@ -576,7 +576,6 @@ namespace Linko.LinkoExchange.Test
                                 {
                                     new SampleResultDto
                                     {
-                                         SampleId = 1,
                                          ConcentrationSampleResultId = 1,
                                          ParameterId = 1,
                                          ParameterName = "1,1,1,2-Tetrachloroethane",
@@ -600,7 +599,6 @@ namespace Linko.LinkoExchange.Test
 
                                     new SampleResultDto
                                     {
-                                         SampleId = 1,
                                          ConcentrationSampleResultId = 2,
                                          ParameterId = 2,
                                          ParameterName = "1,1,1-Trichloroethane",
@@ -669,7 +667,6 @@ namespace Linko.LinkoExchange.Test
                                 {
                                     new SampleResultDto
                                     {
-                                         SampleId = 2,
                                          ConcentrationSampleResultId = 3,
                                          ParameterId = 1,
                                          ParameterName = "1,1,1,2-Tetrachloroethane",
@@ -693,7 +690,6 @@ namespace Linko.LinkoExchange.Test
 
                                     new SampleResultDto
                                     {
-                                         SampleId = 3,
                                          ConcentrationSampleResultId = 4,
                                          ParameterId = 2,
                                          ParameterName = "1,1,1-Trichloroethane",
