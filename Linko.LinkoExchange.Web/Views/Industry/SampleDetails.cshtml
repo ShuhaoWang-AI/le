@@ -102,7 +102,7 @@
 
                         <div>
                             <p>
-                                Select Parameter to Add<br />
+                                Select a parameter to add<br />
                                 <input id="AddParameterDropdown" style="width: 275px" />
                             </p>
                             <div class="form-group">
@@ -1104,5 +1104,61 @@
             $("input[id^='AnalysisDateTime_']")
                 .kendoDateTimePicker({ format: "MM/dd/yyyy hh:mm:ss tt", max: new Date($.now()) });
         };
+
+        $("#EndDateTimeLocal")
+            .change(function()
+            {
+                var viewModel = {};
+                viewModel.monitoringPointId = $('#MonitoringPointId').val();
+                viewModel.endDateTime = $('#EndDateTimeLocal').val();
+
+                var postUrl = "@Url.Action(actionName:"GetParameterGroupsForSample", controllerName:"Industry")";
+
+                $.ajax({
+                    type: "POST"
+                    , url: postUrl
+                    , data: viewModel
+                    , success: function(response)
+                    {
+                        if (response.hasError != null && response.hasError)
+                        {
+                            alert(response.message);
+                        }
+                        else
+                        {
+                            $("#AllParameters").val(JSON.stringify(response.allParameters));
+                            var parameterGroups = response.parameterGroups;
+
+                            var table = $('#ParameterGroupTable').DataTable();
+
+                            table
+                                .clear()
+                                .draw();
+
+                            $.each(parameterGroups
+                                , function(index, value)
+                                {
+                                    var data = {};
+                                    data[0] = value.Id;
+                                    data[1] = value.Name;
+                                    data[2] = value.Description;
+                                    data[3] = value.ParameterIds;
+                                    data[4] = null;
+
+                                    console.debug("data : " + data);
+
+                                    var rowNode = table
+                                        .row.add(data)
+                                        .draw()
+                                        .node();
+
+                                    $(rowNode).css('color', 'green');
+                                });
+                        }
+                    }
+                    //, error: function()
+                    //    {}
+                });
+            });
     </script>
 }}

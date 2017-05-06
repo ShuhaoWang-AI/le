@@ -7,17 +7,17 @@ using FluentValidation.Attributes;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
-    [Validator(typeof(ParameterGroupViewModelValidator))]
+    [Validator(validatorType:typeof(ParameterGroupViewModelValidator))]
     public class ParameterGroupViewModel
     {
-        [ScaffoldColumn(scaffold: false)]
+        [ScaffoldColumn(scaffold:false)]
         public int? Id { get; set; }
 
         [Display(Name = "Name")]
         public string Name { get; set; }
 
         [Display(Name = "Description")]
-        [DataType(dataType: DataType.MultilineText)]
+        [DataType(dataType:DataType.MultilineText)]
         public string Description { get; set; }
 
         [Display(Name = "Active")]
@@ -34,12 +34,26 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         public ICollection<ParameterViewModel> Parameters { get; set; }
         public List<ParameterViewModel> AllParameters { private get; set; }
-        public List<ParameterViewModel> AvailableParameters => AllParameters.Where(a => Parameters.All(b => a.Id != b.Id)).ToList();
-        
+
+        public List<ParameterViewModel> AvailableParameters
+        {
+            get
+            {
+                if (AllParameters != null && Parameters != null)
+                {
+                    return AllParameters.Where(a => Parameters.All(b => a.Id != b.Id)).ToList();
+                }
+                else
+                {
+                    return new List<ParameterViewModel>();
+                }
+            }
+        }
+
         public string ParameterIds { get; set; }
     }
 
-    public partial class ParameterGroupViewModelValidator:AbstractValidator<ParameterGroupViewModel>
+    public class ParameterGroupViewModelValidator:AbstractValidator<ParameterGroupViewModel>
     {
         public ParameterGroupViewModelValidator()
         {
@@ -47,7 +61,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
             RuleFor(x => x.Name).NotEmpty().WithMessage(errorMessage:"Parameter Group Name is required.");
 
             //Parameters
-            RuleFor(x => x).Must(x => (x.Parameters != null) && (x.Parameters.Count > 0)).WithName(overridePropertyName:".").WithMessage(errorMessage:"At least 1 parameter must be added to the group");
+            RuleFor(x => x).Must(x => x.Parameters != null && x.Parameters.Count > 0).WithName(overridePropertyName:".").WithMessage(errorMessage:"At least 1 parameter must be added to the group");
         }
     }
 }

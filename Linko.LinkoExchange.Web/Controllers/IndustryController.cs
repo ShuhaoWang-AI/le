@@ -1261,6 +1261,47 @@ namespace Linko.LinkoExchange.Web.Controllers
             return RedirectToAction(actionName:"SampleDetails", controllerName:"Industry", routeValues:new {model.Id});
         }
 
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        public ActionResult GetParameterGroupsForSample(int monitoringPointId, DateTime endDateTime)
+        {
+            try
+            {
+                var parameterGroups =
+                    _parameterService.GetAllParameterGroups(monitoringPointId:monitoringPointId, sampleEndDateTimeLocal:endDateTime)
+                                     .Select(c => new ParameterGroupViewModel
+                                                  {
+                                                      Id = c.ParameterGroupId,
+                                                      Name = c.Name,
+                                                      Description = c.Description,
+                                                      ParameterIds = string.Join(separator:",", values:c.Parameters.Select(p => p.ParameterId).ToList())
+                                                  }).OrderBy(c => c.Name).ToList();
+
+                var allParameters = _parameterService.GetGlobalParameters(monitoringPointId:monitoringPointId, sampleEndDateTimeUtc:endDateTime)
+                                                     .Select(c => new ParameterViewModel
+                                                                  {
+                                                                      Id = c.ParameterId,
+                                                                      Name = c.Name,
+                                                                      DefaultUnitId = c.DefaultUnit.UnitId,
+                                                                      DefaultUnitName = c.DefaultUnit.Name,
+                                                                      IsCalcMassLoading = c.IsCalcMassLoading
+                                                                  }).OrderBy(c => c.Name).ToList();
+                return Json(data:new
+                                 {
+                                     hasError = false,
+                                     parameterGroups,
+                                     allParameters
+                                 });
+            }
+            catch (RuleViolationException rve)
+            {
+                return Json(data:new
+                                 {
+                                     hasError = true,
+                                     message = MvcValidationExtensions.GetViolationMessages(ruleViolationException:rve)
+                                 });
+            }
+        }
+
         [Route(template:"Sample/{id:int}/Delete")]
         public ActionResult DeleteSample(int id)
         {
