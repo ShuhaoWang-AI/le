@@ -139,6 +139,15 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
+        [ExpectedException(typeof(UnauthorizedAccessException))]
+        public void GetReportPackage_UnauthorizedAccessException()
+        {
+            //Fetch existing
+            _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("4");
+            var existingReportPackage = _reportPackageService.GetReportPackage(8, false);
+        }
+
+        [TestMethod]
         public void GetReportPackage_With_Associated_Element_Children()
         {
             //Fetch existing
@@ -164,12 +173,12 @@ namespace Linko.LinkoExchange.Test
             //Fetch existing
             var existingReportPackage = _reportPackageService.GetReportPackage(8, false);
 
-            existingReportPackage.Comments = "TESTING COMMENTS!";
+            existingReportPackage.Comments = "Comments .. test.";
 
             //Add sample associations
             existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
-            //existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 48, ReportPackageElementTypeId = 13 });
-            //existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 38, ReportPackageElementTypeId = 13 });
+            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 52, ReportPackageElementTypeId = 13 });
+            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 53, ReportPackageElementTypeId = 13 });
 
             //Add file associations
             existingReportPackage.AssociatedFiles = new List<ReportFileDto>();

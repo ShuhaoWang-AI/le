@@ -506,28 +506,28 @@ namespace Linko.LinkoExchange.Test
             {
                 newList.Add(item);
             }
-            //newList.RemoveAt(1);
+            newList.RemoveAt(1);
 
-            //Add a result
-            var resultDto = new SampleResultDto()
-            {
-                ParameterId = -99,
-                ParameterName = "2-Nitrophenol",
-                Qualifier = "<",
-                UnitId = 7,
-                UnitName = "mg/L",
-                Value = "5",
-                EnteredMethodDetectionLimit = "0.66",
-                AnalysisMethod = "Analysis Method 66",
-                AnalysisDateTimeLocal = DateTime.Now,
-                IsApprovedEPAMethod = true,
-                IsCalcMassLoading = true,
-                MassLoadingQualifier = "<",
-                MassLoadingUnitId = 10,
-                MassLoadingUnitName = "ppd",
-                MassLoadingValue = "1.01",
-            };
-            newList.Add(resultDto);
+            ////Add a result
+            //var resultDto = new SampleResultDto()
+            //{
+            //    ParameterId = 47,
+            //    ParameterName = "2-Nitrophenol",
+            //    Qualifier = "<",
+            //    UnitId = 7,
+            //    UnitName = "mg/L",
+            //    Value = "5",
+            //    EnteredMethodDetectionLimit = "0.66",
+            //    AnalysisMethod = "Analysis Method 66",
+            //    AnalysisDateTimeLocal = DateTime.Now,
+            //    IsApprovedEPAMethod = true,
+            //    IsCalcMassLoading = true,
+            //    MassLoadingQualifier = "<",
+            //    MassLoadingUnitId = 10,
+            //    MassLoadingUnitName = "ppd",
+            //    MassLoadingValue = "1.01",
+            //};
+            //newList.Add(resultDto);
             //resultDto = new SampleResultDto()
             //{
             //    ParameterId = 45,

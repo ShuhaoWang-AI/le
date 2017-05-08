@@ -380,6 +380,21 @@ namespace Linko.LinkoExchange.Services.Report
                 throw new Exception($"ERROR: Could not find Report Package associated with reportPackageId={reportPackageId}");
             }
 
+            //Check authorized access as either one of:
+            //1) Industry - currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId
+            //2) Authority - currentOrgRegProgramId == Id of authority of reportPackage.OrganizationRegulatoryProgram
+            if (currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId)
+            {
+                //Industry accessing their own report package => OK
+            }
+            else if (currentOrgRegProgramId == _orgService.GetAuthority(reportPackage.OrganizationRegulatoryProgramId).OrganizationRegulatoryProgramId)
+            {
+                //Authority accessing an IU under their control => OK
+            }
+            else {
+                throw new UnauthorizedAccessException($"Unauthorized access of Report Package Id = {reportPackageId} by Org Reg Program Id = {currentOrgRegProgramId}");
+            }
+
             var reportPackagegDto = GetReportPackageDtoFromReportPackage(reportPackage, timeZoneId);
 
             //
