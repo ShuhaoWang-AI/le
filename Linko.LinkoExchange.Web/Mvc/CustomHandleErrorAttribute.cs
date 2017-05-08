@@ -1,5 +1,9 @@
 ﻿using System.Web.Mvc;
 using NLog;
+using System.Data.Entity.Validation;
+using System.Data.Entity.Infrastructure;
+using System.Collections.Generic;
+using System;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {
@@ -72,7 +76,32 @@ namespace Linko.LinkoExchange.Web.Mvc
             }
 
             // log the error
-            _logger.Error(filterContext.Exception, filterContext.Exception.Message);
+            string errorMessage;
+            if (filterContext.Exception is DbEntityValidationException)
+            {
+                var ex = (DbEntityValidationException)filterContext.Exception;
+                var errors = new List<string>() { ex.Message };
+
+                foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                {
+                    DbEntityEntry entry = item.Entry;
+                    string entityTypeName = entry.Entity.GetType().Name;
+
+                    foreach (DbValidationError subItem in item.ValidationErrors)
+                    {
+                        string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                        errors.Add(message);
+                    }
+                }
+
+                errorMessage = String.Join("," + Environment.NewLine, errors);
+            }
+            else
+            {
+                errorMessage = filterContext.Exception.Message;
+            }
+
+            _logger.Error(filterContext.Exception, errorMessage);
 
             filterContext.ExceptionHandled = true;
             filterContext.HttpContext.Response.Clear();

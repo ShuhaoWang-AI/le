@@ -19,6 +19,7 @@ using System.Reflection;
 using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.Config;
 using System.Diagnostics;
+using Linko.LinkoExchange.Web;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -470,7 +471,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void Persist_And_Read_Back_SampleDto_And_Compare_Fields()
         {
-            Remove_All_Samples_From_Db();
+            //Remove_All_Samples_From_Db();
 
             //Create test Sample Dto
             var sampleDto = GetTestSampleDto();
@@ -505,13 +506,13 @@ namespace Linko.LinkoExchange.Test
             {
                 newList.Add(item);
             }
-            newList.RemoveAt(1);
+            //newList.RemoveAt(1);
 
             //Add a result
             var resultDto = new SampleResultDto()
             {
-                ParameterId = 44,
-                ParameterName = "2-Methoxy-2-Methylpropane",
+                ParameterId = -99,
+                ParameterName = "2-Nitrophenol",
                 Qualifier = "<",
                 UnitId = 7,
                 UnitName = "mg/L",
@@ -524,24 +525,24 @@ namespace Linko.LinkoExchange.Test
                 MassLoadingQualifier = "<",
                 MassLoadingUnitId = 10,
                 MassLoadingUnitName = "ppd",
-                MassLoadingValue = "22.11",
+                MassLoadingValue = "1.01",
             };
             newList.Add(resultDto);
-            resultDto = new SampleResultDto()
-            {
-                ParameterId = 45,
-                ParameterName = "2-Methyl-4,6-dinitrophenol",
-                Qualifier = "<",
-                UnitId = 7,
-                UnitName = "mg/L",
-                Value = "5",
-                EnteredMethodDetectionLimit = "0.66",
-                AnalysisMethod = "Analysis Method 66",
-                AnalysisDateTimeLocal = DateTime.Now,
-                IsApprovedEPAMethod = true,
-                IsCalcMassLoading = true
-            };
-            newList.Add(resultDto);
+            //resultDto = new SampleResultDto()
+            //{
+            //    ParameterId = 45,
+            //    ParameterName = "2-Methyl-4,6-dinitrophenol",
+            //    Qualifier = "<",
+            //    UnitId = 7,
+            //    UnitName = "mg/L",
+            //    Value = "5",
+            //    EnteredMethodDetectionLimit = "0.66",
+            //    AnalysisMethod = "Analysis Method 66",
+            //    AnalysisDateTimeLocal = DateTime.Now,
+            //    IsApprovedEPAMethod = true,
+            //    IsCalcMassLoading = true
+            //};
+            //newList.Add(resultDto);
 
             sampleDto.SampleResults = newList;
 
@@ -586,11 +587,11 @@ namespace Linko.LinkoExchange.Test
                 {
 
                 }
-                else if (fieldName == "LastModifierFullName") //set within service code
+                else if (fieldName == "LastModifierFullName" && !isAfterUpdate) //set within service code
                 {
 
                 }
-                else if (fieldName == "ByOrganizationTypeName") //set within service code 
+                else if (fieldName == "ByOrganizationTypeName" && !isAfterUpdate) //set within service code 
                 {
 
                 }
