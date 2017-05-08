@@ -1471,6 +1471,17 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                          Selected = c.CollectionMethodId.Equals(obj:viewModel.CollectionMethodId)
                                                                                                      }).OrderBy(c => c.Text).ToList();
 
+            if (viewModel.Id.HasValue && !viewModel.AvailableCollectionMethods.Any(c => c.Value.Equals(value:viewModel.CollectionMethodId.ToString())))
+            {
+                // If previously selected one is not in the list then add that
+                viewModel.AvailableCollectionMethods.Add(item:new SelectListItem
+                                                              {
+                                                                  Text = viewModel.CollectionMethodName,
+                                                                  Value = viewModel.CollectionMethodId.ToString(),
+                                                                  Selected = true
+                                                              });
+            }
+
             var ctsEventTypeDtos = _reportTemplateService.GetCtsEventTypes(isForSample:true);
             var sampleTypes = ctsEventTypeDtos as IList<CtsEventTypeDto> ?? ctsEventTypeDtos.ToList();
             viewModel.CtsEventCategoryName = sampleTypes.First().CtsEventCategoryName;
@@ -1480,6 +1491,17 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                            Value = c.CtsEventTypeId.ToString(),
                                                                            Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
                                                                        }).OrderBy(c => c.Text).ToList();
+
+            if (viewModel.Id.HasValue && !viewModel.AvailableCtsEventTypes.Any(c => c.Value.Equals(value:viewModel.CtsEventTypeId.ToString())))
+            {
+                // If previously selected one is not in the list then add that
+                viewModel.AvailableCtsEventTypes.Add(item:new SelectListItem
+                                                          {
+                                                              Text = viewModel.CtsEventTypeName,
+                                                              Value = viewModel.CtsEventTypeId.ToString(),
+                                                              Selected = true
+                                                          });
+            }
 
             viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:viewModel.MonitoringPointId, sampleEndDateTimeUtc:viewModel.EndDateTimeLocal)
                                                        .Select(c => new ParameterViewModel
