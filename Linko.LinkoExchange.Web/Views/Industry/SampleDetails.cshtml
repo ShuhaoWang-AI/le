@@ -595,6 +595,8 @@
                     $("[name='btnDeleteParam']").prop('disabled', true);
                 }
 
+                updateResultTextBoxState();
+
                 $(document)
                     .on('keypress'
                         , "input[id^='Result_']"
@@ -709,6 +711,28 @@
                     });
             });
 
+        updateResultTextBoxState = function()
+        {
+            var parameterTable = $('#ParameterTable').DataTable();
+            parameterTable
+                .rows()
+                .every(function()
+                {
+                    var d = this.data();
+                    var cell = d[0];
+                    var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
+                    var qualifier = $("#Qualifier_" + paramId).val();
+
+                    if (qualifier == "ND" || qualifier == "NF")
+                    {
+                        $("#Result_" + paramId).val("").attr("readonly", "readonly");
+                    }
+                    else
+                    {
+                        $("#Result_" + paramId).removeAttr("readonly");
+                    }
+                });
+        }
 
         function displayMassLoading(paramId)
         {
