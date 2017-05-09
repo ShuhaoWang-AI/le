@@ -428,6 +428,15 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
+        [ExpectedException(typeof(UnauthorizedAccessException))]
+        public void GetSampleDetails_UnauthorizedAccessException()
+        {
+            var sampleId = 52;
+            _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("4");
+            var firstSampleDto = _sampleService.GetSampleDetails(sampleId);
+        }
+
+        [TestMethod]
         public void Delete_Sample_With_Results_Valid()
         {
             var sampleId = -1;

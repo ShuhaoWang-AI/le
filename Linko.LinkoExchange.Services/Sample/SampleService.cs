@@ -873,7 +873,8 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <returns>Sample Dto associated with the passed in Id</returns>
         public SampleDto GetSampleDetails(int sampleId)
         {
-            _logger.Info($"Enter SampleService.GetSampleDetails. sampleId={sampleId}");
+            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            _logger.Info($"Enter SampleService.GetSampleDetails. sampleId={sampleId}, currentOrgRegProgramId={currentOrgRegProgramId}");
 
             var sample = _dbContext.Samples
                 .Include(s => s.ReportSamples)
@@ -884,6 +885,18 @@ namespace Linko.LinkoExchange.Services.Sample
             if (sample == null)
             {
                 throw new Exception($"ERROR: Could not find Sample associated with sampleId={sampleId}");
+            }
+
+            //Check authorized access as either one of:
+            //1) Industry - currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId
+            //2) Authority - currentOrgRegProgramId == Id of authority of reportPackage.OrganizationRegulatoryProgram
+            if (currentOrgRegProgramId == sample.ForOrganizationRegulatoryProgramId || currentOrgRegProgramId == sample.ByOrganizationRegulatoryProgramId)
+            {
+                //Industry accessing their own sample or this IU's Authority accessing the IU's sample  => OK
+            }
+            else
+            {
+                throw new UnauthorizedAccessException($"Unauthorized access of Sample Id = {sampleId} by Org Reg Program Id = {currentOrgRegProgramId}");
             }
 
             var dto = this.GetSampleDetails(sample);
@@ -963,14 +976,6 @@ namespace Linko.LinkoExchange.Services.Sample
                 case SampleStatusName.DraftOrReadyToReport:
                     foundSamples = foundSamples.Where(s => s.ReportSamples.Count() < 1);
                     break;
-                //case SampleStatusName.DraftOrReported:
-                //    foundSamples = foundSamples.Where(s => s.SampleStatus.Name == SampleStatusName.Draft.ToString()
-                //            || s.SampleStatus.Name == SampleStatusName.Reported.ToString());
-                //    break;
-                //case SampleStatusName.ReadyToReportOrReported:
-                //    foundSamples = foundSamples.Where(s => s.SampleStatus.Name == SampleStatusName.ReadyToReport.ToString()
-                //            || s.SampleStatus.Name == SampleStatusName.Reported.ToString());
-                //    break;
                 default:
                     throw new Exception($"Unhandled SampleStatusName = {status}");
             }
