@@ -513,14 +513,6 @@ namespace Linko.LinkoExchange.Services.Sample
                     ThrowSimpleException($"Could not convert provided flow value '{sampleDto.FlowValue}' to double.");
                 }
             }
-            else if ((!string.IsNullOrEmpty(sampleDto.FlowValue) && !sampleDto.FlowUnitId.HasValue) ||
-                            (string.IsNullOrEmpty(sampleDto.FlowValue) && sampleDto.FlowUnitId.HasValue))
-            {
-                if (!isSuppressExceptions)
-                {
-                    this.ThrowSimpleException("Flow value and flow unit must be provided together.");
-                }
-            }
 
             //
             //Validation for Sample Results
