@@ -33,6 +33,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Is Submission By Signatory Required")]
         public bool IsSubmissionBySignatoryRequired => true;
 
+        [Display(Name = "CTS Event Type")]
         public int CtsEventTypeId { get; set; }
 
         [Display(Name = "CTS Event Type")]
