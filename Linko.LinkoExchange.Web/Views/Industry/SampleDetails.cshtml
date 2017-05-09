@@ -723,7 +723,7 @@
                     var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
                     var qualifier = $("#Qualifier_" + paramId).val();
 
-                    if (qualifier == "ND" || qualifier == "NF")
+                    if (qualifier === "ND" || qualifier === "NF")
                     {
                         $("#Result_" + paramId).val("").attr("readonly", "readonly");
                     }
@@ -743,7 +743,7 @@
                 var qualifier = $("#Qualifier_" + paramId).val();
                 var massLoadingMultiplier = parseFloat($("#MassLoadingConversionFactorPounds").val());
                 var massLoadingUnit = $("#MassLoadingMassLoadingUnitName").val();
-                var isMassLoadingResultToUseLessThanSign = $("#IsMassLoadingResultToUseLessThanSign").val();
+                var isMassLoadingResultToUseLessThanSign = ($("#IsMassLoadingResultToUseLessThanSign").val().toLowerCase() == "true");
                 var massLoadingCalculationDecimalPlaces = parseInt($("#MassLoadingCalculationDecimalPlaces").val());
 
                 if (qualifier === "ND" || qualifier === "NF")
@@ -831,7 +831,7 @@
                     var paramId = this.id.replace('Qualifier_', '');
                     var qualifier = $("#Qualifier_" + paramId).val();
 
-                    if (qualifier == "ND" || qualifier == "NF")
+                    if (qualifier === "ND" || qualifier === "NF")
                     {
                         $("#Result_" + paramId).val("").attr("readonly", "readonly");
                     }
