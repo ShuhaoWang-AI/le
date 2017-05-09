@@ -753,7 +753,7 @@
 
                 if (qualifier === "ND" || qualifier === "NF")
                 {
-                    $("#MassResult_" + paramId).html("").fadeOut(2000);
+                    $("#MassResult_" + paramId).html("").fadeOut(1000);
                 }
                 else if (qualifier === "NUMERIC" || qualifier === ">")
                 {
@@ -762,13 +762,13 @@
 
                     if (isNaN(result) || isNaN(sampleFlowResult))
                     {
-                        $("#MassResult_" + paramId).html("").fadeOut(2000);
+                        $("#MassResult_" + paramId).html("").fadeOut(1000);
                     }
                     else
                     {
                         $("#MassResult_" + paramId)
                             .html("")
-                            .fadeOut(1000
+                            .fadeOut(500
                                 , function()
                                 {
                                     $("#MassResult_" + paramId)
@@ -777,7 +777,7 @@
                                             .toFixed(massLoadingCalculationDecimalPlaces)
                                             + " "
                                             + massLoadingUnit)
-                                        .fadeIn(2000)
+                                        .fadeIn(1000)
                                         .css('color', 'green');
                                 });
                     }
@@ -789,13 +789,13 @@
 
                     if (isNaN(result) || isNaN(sampleFlowResult))
                     {
-                        $("#MassResult_" + paramId).html("").fadeOut(2000);
+                        $("#MassResult_" + paramId).html("").fadeOut(1000);
                     }
                     else
                     {
                         $("#MassResult_" + paramId)
                             .html("")
-                            .fadeOut(1000
+                            .fadeOut(500
                                 , function()
                                 {
                                     $("#MassResult_" + paramId)
@@ -804,7 +804,7 @@
                                             .toFixed(massLoadingCalculationDecimalPlaces)
                                             + " "
                                             + massLoadingUnit)
-                                        .fadeIn(2000)
+                                        .fadeIn(1000)
                                         .css('color', 'green');
                                 });
                     }
@@ -812,7 +812,7 @@
             }
             else
             {
-                $("#MassResult_" + paramId).html("").fadeOut(2000);
+                $("#MassResult_" + paramId).html("").fadeOut(1000);
             }
         }
 
