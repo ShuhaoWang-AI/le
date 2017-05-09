@@ -44,7 +44,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = "Calculate Loading")]
         public bool IsCalcMassLoading { get; set; }
-
+        
+        [ScaffoldColumn(scaffold:false)]
+        [Display(Name = "Mass Loading Sample Result Id")]
+        public int? MassLoadingSampleResultId { get; set; }
         public string MassLoadingQualifier { get; set; }
 
         [Display(Name = "Mass Loading Result")]

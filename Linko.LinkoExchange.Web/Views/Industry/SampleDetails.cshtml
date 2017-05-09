@@ -379,6 +379,7 @@
                         <th style="width: 180px"> Analysis Date & Time </th>
                         <th style="width: 50px"> EPA Method </th>
                         <th style="width: 50px"> Calculate Loading </th>
+                        <th class="never"> Mass Loading Id </th>
                         <th> Mass Loading Result</th>
                         <th style="width: 50px"> Remove</th>
                     </tr>
@@ -466,6 +467,9 @@
                                 {
                                     <input type='checkbox' class='checkbox' name="CkCalcLoading" id="CalcLoading_@sampleResult.ParameterId" />
                                 }
+                            </td>
+                            <td>
+                                <input id="MassResultId_@sampleResult.ParameterId" type="hidden" value=@(sampleResult.MassLoadingSampleResultId.HasValue ? sampleResult.MassLoadingSampleResultId.Value.ToString() : "")>
                             </td>
                             <td>
                                 @if (sampleResult.MassLoadingValue.IfNullOrWhiteSpace(defaultValue:"").Length == 0)
@@ -686,6 +690,7 @@
                                     var massLoadingResult = $("#MassResult_" + paramId).html().split(' ');
                                     if (massLoadingResult.length === 3)
                                     {
+                                        sampleResult.MassLoadingSampleResultId = $("#MassResultId_" + paramId).val();
                                         var massLoadingQualifier = massLoadingResult[0];
                                         sampleResult.MassLoadingQualifier = massLoadingQualifier;
                                         sampleResult.MassLoadingValue = massLoadingResult[1];
@@ -743,7 +748,7 @@
                 var qualifier = $("#Qualifier_" + paramId).val();
                 var massLoadingMultiplier = parseFloat($("#MassLoadingConversionFactorPounds").val());
                 var massLoadingUnit = $("#MassLoadingMassLoadingUnitName").val();
-                var isMassLoadingResultToUseLessThanSign = ($("#IsMassLoadingResultToUseLessThanSign").val().toLowerCase() == "true");
+                var isMassLoadingResultToUseLessThanSign = ($("#IsMassLoadingResultToUseLessThanSign").val().toLowerCase() === "true");
                 var massLoadingCalculationDecimalPlaces = parseInt($("#MassLoadingCalculationDecimalPlaces").val());
 
                 if (qualifier === "ND" || qualifier === "NF")
@@ -1101,8 +1106,9 @@
                             + value.Id
                             + '"/>';
                     }
-                    data[9] = '<strong id="MassResult_' + value.Id + '"></strong>';
-                    data[10] = null;
+                    data[9] = '<input id="MassResultId_' + value.Id + '" type="hidden" value="")>';
+                    data[10] = '<strong id="MassResult_' + value.Id + '"></strong>';
+                    data[11] = null;
 
                     //console.debug("data : " + data);
 
