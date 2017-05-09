@@ -1989,7 +1989,6 @@ BEGIN
     CREATE TABLE dbo.tMonitoringPointParameter 
     (
         MonitoringPointParameterId          int IDENTITY(1,1) NOT NULL
-        , OrganizationRegulatoryProgramId   int NOT NULL
         , MonitoringPointId                 int NOT NULL
         , ParameterId                       int NOT NULL
         , DefaultUnitId                     int NULL
@@ -2000,17 +1999,12 @@ BEGIN
         (
 	        MonitoringPointParameterId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tMonitoringPointParameter_OrganizationRegulatoryProgramId_MonitoringPointId_ParameterId_EffectiveDateTimeUtc UNIQUE 
+        , CONSTRAINT AK_tMonitoringPointParameter_MonitoringPointId_ParameterId_EffectiveDateTimeUtc UNIQUE 
         (
-            OrganizationRegulatoryProgramId ASC
-            , MonitoringPointId ASC
+            MonitoringPointId ASC
             , ParameterId ASC
             , EffectiveDateTimeUtc ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-		, CONSTRAINT FK_tMonitoringPointParameter_tOrganizationRegulatoryProgram FOREIGN KEY 
-		(
-			OrganizationRegulatoryProgramId
-		) REFERENCES dbo.tOrganizationRegulatoryProgram(OrganizationRegulatoryProgramId)
         , CONSTRAINT FK_tMonitoringPointParameter_tMonitoringPoint FOREIGN KEY 
 		(
 			MonitoringPointId
@@ -2025,11 +2019,6 @@ BEGIN
 		) REFERENCES dbo.tUnit(UnitId)
     ) ON [LinkoExchange_FG1_Data]
     
-	CREATE NONCLUSTERED INDEX IX_tMonitoringPointParameter_OrganizationRegulatoryProgramId ON dbo.tMonitoringPointParameter
-	(
-		OrganizationRegulatoryProgramId ASC
-	) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-
     CREATE NONCLUSTERED INDEX IX_tMonitoringPointParameter_MonitoringPointId ON dbo.tMonitoringPointParameter
 	(
 		MonitoringPointId ASC
