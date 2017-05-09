@@ -196,16 +196,14 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <param name="sampleEndDateTimeUtc"></param>
         private void UpdateParameterForMonitoringPoint(ref ParameterDto paramDto, int monitoringPointId, DateTimeOffset sampleEndDateTimeUtc)
         {
-            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var parameterId = paramDto.ParameterId;
 
-            _logger.Info($"Enter ParameterService.UpdateParameterForMonitoringPoint. orgRegProgramId={currentOrgRegProgramId}, parameterId={parameterId}");
+            _logger.Info($"Enter ParameterService.UpdateParameterForMonitoringPoint. monitoringPointId={monitoringPointId}, parameterId={parameterId}");
 
             //Check MonitoringPointParameter table
             var foundMonitoringPointParameter = _dbContext.MonitoringPointParameters
                 .Include(mppl => mppl.DefaultUnit)
-                .FirstOrDefault(mppl => mppl.OrganizationRegulatoryProgramId == currentOrgRegProgramId 
-                    && mppl.MonitoringPointId == monitoringPointId
+                .FirstOrDefault(mppl => mppl.MonitoringPointId == monitoringPointId
                     && mppl.ParameterId == parameterId
                     && mppl.EffectiveDateTimeUtc <= sampleEndDateTimeUtc
                     && mppl.RetirementDateTimeUtc >= sampleEndDateTimeUtc);
@@ -221,7 +219,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 
             }
 
-            _logger.Info($"Leaving ParameterService.UpdateParameterForMonitoringPoint. orgRegProgramId={currentOrgRegProgramId}, parameterId={parameterId}");
+            _logger.Info($"Leaving ParameterService.UpdateParameterForMonitoringPoint. monitoringPointId={monitoringPointId}, parameterId={parameterId}");
 
         }
 

@@ -66,8 +66,6 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public virtual ICollection<MonitoringPoint> MonitoringPoints { get; set; }
 
-        public virtual ICollection<MonitoringPointParameter> MonitoringPointParameters { get; set; }
-
         public virtual ICollection<Parameter> Parameters { get; set; }
 
         public virtual ICollection<ParameterGroup> ParameterGroups { get; set; }

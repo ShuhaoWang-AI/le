@@ -21,7 +21,7 @@ namespace Linko.LinkoExchange.Core.Domain
         public string Description { get; set; }
 
         /// <summary>
-        /// Typical value: Authority Regulatory Program id.
+        /// Typical value: Industry Regulatory Program id.
         /// </summary>
         public int OrganizationRegulatoryProgramId { get; set; }
         public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }

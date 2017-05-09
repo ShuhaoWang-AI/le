@@ -13,12 +13,6 @@ namespace Linko.LinkoExchange.Core.Domain
         /// </summary>
         public int MonitoringPointParameterId { get; set; }
 
-        /// <summary>
-        /// Typical value: Industry Regulatory Program id.
-        /// </summary>
-        public int OrganizationRegulatoryProgramId { get; set; }
-        public virtual OrganizationRegulatoryProgram OrganizationRegulatoryProgram { get; set; }
-
         public int MonitoringPointId { get; set; }
         public virtual MonitoringPoint MonitoringPoint { get; set; }
 

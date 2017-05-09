@@ -16,11 +16,6 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasKey(x => x.MonitoringPointParameterId);
 
-            HasRequired(a => a.OrganizationRegulatoryProgram)
-                .WithMany(b => b.MonitoringPointParameters)
-                .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
-                .WillCascadeOnDelete(false);
-
             HasRequired(a => a.MonitoringPoint)
                 .WithMany(b => b.MonitoringPointParameters)
                 .HasForeignKey(c => c.MonitoringPointId)
