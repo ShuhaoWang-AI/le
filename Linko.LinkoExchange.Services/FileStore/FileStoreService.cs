@@ -78,7 +78,6 @@ namespace Linko.LinkoExchange.Services.FileStore
             return new List<string>(fileTypes);
         }
 
-        // TODO to get from table tFileType
         // Here should validate data from tFileType table
         public bool IsValidFileExtension(string ext)
         {
@@ -91,8 +90,8 @@ namespace Linko.LinkoExchange.Services.FileStore
             {
                 ext = $".{ext}";
             }
-            var fileTypes = _dbContext.FileTypes.Select(i => i.Extension);
-            return fileTypes.Contains(ext);
+            var fileTypes = _dbContext.FileTypes.Select(i => i.Extension).Select(i => i.ToLower());
+            return fileTypes.Contains(ext.ToLower());
         }
 
         public List<FileStoreDto> GetFileStores()
