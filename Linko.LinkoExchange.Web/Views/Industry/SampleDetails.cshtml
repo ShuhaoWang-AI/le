@@ -56,7 +56,7 @@
         </div>
 
         <section class="box-body form-horizontal">
-            @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
+            @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
                                                                                                                             {
                                                                                                                                 @class = "alert alert-danger"
                                                                                                                             })
