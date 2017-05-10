@@ -134,9 +134,9 @@ namespace Linko.LinkoExchange.Services.FileStore
                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
             }
 
-            var extension = Path.GetExtension(fileStoreDto.OriginalFileName);
+            var extension = Path.GetExtension(fileStoreDto.OriginalFileName).ToLower();
             var validFileTypes = _dbContext.FileTypes.ToList();
-            var validFileExtensions = validFileTypes.Select(i => i.Extension);
+            var validFileExtensions = validFileTypes.Select(i => i.Extension).Select(i => i.ToLower());
 
             if (!validFileExtensions.Contains(extension))
             {
@@ -379,7 +379,7 @@ namespace Linko.LinkoExchange.Services.FileStore
 
                 // transfer newImage into byte;  
                 var extension = Path.GetExtension(fileStoreDto.OriginalFileName);
-                var format = GetNormalizedFormat(extension);
+                var format = GetNormalizedImageFormat(extension);
                 var newImageData = ImageToByte(newImage, format);
                 if (newImageData.Length < fileStoreDto.Data.Length)
                 {
@@ -389,7 +389,7 @@ namespace Linko.LinkoExchange.Services.FileStore
             }
         }
 
-        private ImageFormat GetNormalizedFormat(string extension)
+        private ImageFormat GetNormalizedImageFormat(string extension)
         {
             if (!extension.StartsWith("."))
             {
@@ -417,14 +417,14 @@ namespace Linko.LinkoExchange.Services.FileStore
 
         private bool IsImageFile(string extension)
         {
-            string[] validImageFormats = { ".tif", ".jpg", ".jpeg", ".bmp", ".png" };
+            string[] validImageFormats = { ".tiff", ".tif", ".jpg", ".jpeg", ".bmp", ".png" };
 
             if (!extension.StartsWith("."))
             {
                 extension = $".{extension}";
             }
 
-            return validImageFormats.Contains(extension);
+            return validImageFormats.Contains(extension.ToLower());
         }
 
         private byte[] ImageToByte(Image img, ImageFormat format)
