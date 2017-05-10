@@ -562,7 +562,7 @@
                                 {
                                     "defaultContent":
                                         '<button class="btn btn-danger btn-sm" name="btnDeleteParam" type="button"><i class="fa fa-lg fa-trash"></i></button>'
-                                    , "targets": 10
+                                    , "targets": 11
                                 }
                             ]
                             , "searching": false
@@ -750,36 +750,33 @@
                 var massLoadingUnit = $("#MassLoadingMassLoadingUnitName").val();
                 var isMassLoadingResultToUseLessThanSign = ($("#IsMassLoadingResultToUseLessThanSign").val().toLowerCase() === "true");
                 var massLoadingCalculationDecimalPlaces = parseInt($("#MassLoadingCalculationDecimalPlaces").val());
+                var flowUnitName = $("#FlowUnitId option:selected").text().toLowerCase();
+                var flowUnitConversionFactor = flowUnitName === "mgd" ? 1 : 0.000001;
+                var resultUnitName = $("#UnitName_" + paramId).html().toLowerCase();
+                var resultUnitConversionFactor = resultUnitName === "mg/l" ? 1 : 0.001;
 
                 if (qualifier === "ND" || qualifier === "NF")
                 {
-                    $("#MassResult_" + paramId).html("").fadeOut(1000);
+                    $("#MassResult_" + paramId).html("");
                 }
                 else if (qualifier === "NUMERIC" || qualifier === ">")
                 {
                     var result = parseFloat($("#Result_" + paramId).val());
                     var sampleFlowResult = parseFloat($("#FlowValue").val());
 
-                    if (isNaN(result) || isNaN(sampleFlowResult))
+                    if (isNaN(result) || isNaN(sampleFlowResult) || ((flowUnitName !== "mgd") && (flowUnitName !== "gpd")) || ((resultUnitName !== "mg/l") && (resultUnitName !== "ug/l")))
                     {
-                        $("#MassResult_" + paramId).html("").fadeOut(1000);
+                        $("#MassResult_" + paramId).html("");
                     }
                     else
                     {
                         $("#MassResult_" + paramId)
-                            .html("")
-                            .fadeOut(500
-                                , function()
-                                {
-                                    $("#MassResult_" + paramId)
-                                        .html(" "
-                                            + (result * sampleFlowResult * massLoadingMultiplier)
-                                            .toFixed(massLoadingCalculationDecimalPlaces)
-                                            + " "
-                                            + massLoadingUnit)
-                                        .fadeIn(1000)
-                                        .css('color', 'green');
-                                });
+                            .html(" "
+                                + (result * sampleFlowResult * massLoadingMultiplier * flowUnitConversionFactor * resultUnitConversionFactor)
+                                .toFixed(massLoadingCalculationDecimalPlaces)
+                                + " "
+                                + massLoadingUnit)
+                            .css('color', 'green');
                     }
                 }
                 else if (qualifier === "<")
@@ -787,37 +784,41 @@
                     var result = parseFloat($("#Result_" + paramId).val());
                     var sampleFlowResult = parseFloat($("#FlowValue").val());
 
-                    if (isNaN(result) || isNaN(sampleFlowResult))
+                    if (isNaN(result) || isNaN(sampleFlowResult) || ((flowUnitName !== "mgd") && (flowUnitName !== "gpd")) || ((resultUnitName !== "mg/l") && (resultUnitName !== "ug/l")))
                     {
-                        $("#MassResult_" + paramId).html("").fadeOut(1000);
+                        $("#MassResult_" + paramId).html("");
                     }
                     else
                     {
                         $("#MassResult_" + paramId)
-                            .html("")
-                            .fadeOut(500
-                                , function()
-                                {
-                                    $("#MassResult_" + paramId)
-                                        .html((isMassLoadingResultToUseLessThanSign ? qualifier + " " : "")
-                                            + (result * sampleFlowResult * massLoadingMultiplier)
-                                            .toFixed(massLoadingCalculationDecimalPlaces)
-                                            + " "
-                                            + massLoadingUnit)
-                                        .fadeIn(1000)
-                                        .css('color', 'green');
-                                });
+                            .html((isMassLoadingResultToUseLessThanSign ? qualifier + " " : "")
+                                + (result * sampleFlowResult * massLoadingMultiplier * flowUnitConversionFactor * resultUnitConversionFactor)
+                                .toFixed(massLoadingCalculationDecimalPlaces)
+                                + " "
+                                + massLoadingUnit)
+                            .css('color', 'green');
                     }
                 }
             }
             else
             {
-                $("#MassResult_" + paramId).html("").fadeOut(1000);
+                $("#MassResult_" + paramId).html("");
             }
         }
 
         $("#FlowValue")
             .blur(function()
+            {
+                $("input[id^='CalcLoading_']:checkbox:checked")
+                    .each(function()
+                    {
+                        var paramId = this.id.replace('CalcLoading_', '');
+                        displayMassLoading(paramId);
+                    });
+            });
+
+        $("select[name='FlowUnitId']")
+            .change(function()
             {
                 $("input[id^='CalcLoading_']:checkbox:checked")
                     .each(function()
@@ -974,7 +975,7 @@
                         });
 
                     $('#AddParameterModal').modal('hide');
-                    console.debug(availableParameters);
+                    //console.debug(availableParameters);
                     AddParamtersToParameterTable(availableParameters);
                 });
 
@@ -1175,7 +1176,7 @@
                                     data[3] = value.ParameterIds;
                                     data[4] = null;
 
-                                    console.debug("data : " + data);
+                                    //console.debug("data : " + data);
 
                                     var rowNode = table
                                         .row.add(data)
