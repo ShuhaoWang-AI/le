@@ -169,7 +169,7 @@ namespace Linko.LinkoExchange.Services.Sample
             var existingFlowResultRow = sampleToPersist.SampleResults
                     .SingleOrDefault(sr => sr.LimitBasis.Name == LimitBasisName.VolumeFlowRate.ToString());
 
-            if (sampleDto.FlowValue != null && sampleDto.FlowUnitId != null && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
+            if (!string.IsNullOrEmpty(sampleDto.FlowValue) && sampleDto.FlowUnitId != null && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
             {
                 //Check flow unit id is within valid values
                 if (sampleDto.FlowUnitValidValues == null || !sampleDto.FlowUnitValidValues.Select(fu => fu.UnitId).Contains(sampleDto.FlowUnitId.Value))
@@ -207,7 +207,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 if (!Double.TryParse(existingFlowResultRow.EnteredValue, out valueAsDouble))
                 {
                     //Could not convert
-                    return -1;
+                    return -1; // throw exception than -1 as that will wrongly treat as sample ID
                 }
                 existingFlowResultRow.Value = valueAsDouble;
 
@@ -239,7 +239,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         .Single(sr => sr.SampleResultId == sampleResultDto.ConcentrationSampleResultId.Value);
                 }
 
-                //Update Concentation Result
+                //Update Concentration Result
                 concentrationResultRowToUpdate = _mapHelper.GetConcentrationSampleResultFromSampleResultDto(sampleResultDto, concentrationResultRowToUpdate);
 
                 if (!String.IsNullOrEmpty(concentrationResultRowToUpdate.EnteredValue))
@@ -248,7 +248,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     if (!Double.TryParse(concentrationResultRowToUpdate.EnteredValue, out valueAsDouble))
                     {
                         //Could not convert
-                        return -1;
+                        return -1; // throw exception than -1 as that will wrongly treat as sample ID
                     }
                     concentrationResultRowToUpdate.Value = valueAsDouble;
 
@@ -290,7 +290,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         if (!Double.TryParse(massResultRowToUpdate.EnteredValue, out massValueAsDouble))
                         {
                             //Could not convert
-                            return -1;
+                            return -1; // throw exception than -1 as that will wrongly treat as sample ID
                         }
                         massResultRowToUpdate.Value = massValueAsDouble;
 
