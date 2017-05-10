@@ -5829,6 +5829,8 @@ BEGIN
 		VALUES ('.pdf', 'application/pdf')
     INSERT INTO dbo.tFileType (Extension, Description)
 		VALUES ('.tif', 'image/tiff')
+	INSERT INTO dbo.tFileType (Extension, Description)
+		VALUES ('.tiff', 'image/tiff')
     INSERT INTO dbo.tFileType (Extension, Description)
 		VALUES ('.jpg', 'image/jpeg')
     INSERT INTO dbo.tFileType (Extension, Description)
