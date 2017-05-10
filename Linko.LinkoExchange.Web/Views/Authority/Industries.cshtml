@@ -37,7 +37,7 @@
                         .Name(componentName: "grid")
                         .Columns(columns =>
                         {
-                            columns.Bound(c => c.IndustryNoText)
+                            columns.Bound(c => c.ReferenceNumber)
                                     .HtmlAttributes(new { @class = "col-sm-1" })
                                     .HeaderHtmlAttributes(new { @class = "col-sm-1" })
                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));

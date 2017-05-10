@@ -36,14 +36,15 @@
                     }
                 })
             </div>
-
-            @Html.LabelFor(model => model.IndustryNo, htmlAttributes: new
+            
+            @Html.HiddenFor(model => model.IndustryNo)
+            @Html.LabelFor(model => model.ReferenceNumber, htmlAttributes: new
             {
                 @class = "control-label col-md-2"
             })
 
             <div class="col-md-4">
-                @Html.EditorFor(model => model.IndustryNo, new
+                @Html.EditorFor(model => model.ReferenceNumber, new
                 {
                     htmlAttributes = new
                     {

@@ -20,6 +20,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         }
 
         [Editable(false)]
+        [Display(Name = "Industry No.")]
+        public string ReferenceNumber { get; set; }
+
+        [Editable(false)]
         [Display(Name = "Industry Name")]
         public string IndustryName
         {

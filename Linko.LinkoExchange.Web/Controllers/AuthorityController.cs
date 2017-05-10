@@ -997,6 +997,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                      {
                                                          Id = vm.OrganizationRegulatoryProgramId,
                                                          IndustryNo = vm.OrganizationDto.OrganizationId,
+                                                         ReferenceNumber = vm.ReferenceNumber,
                                                          IndustryName = vm.OrganizationDto.OrganizationName,
                                                          AddressLine1 = vm.OrganizationDto.AddressLine1,
                                                          AddressLine2 = vm.OrganizationDto.AddressLine2,
@@ -1017,7 +1018,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                        {
                                                                                            vm.Id,
                                                                                            vm.IndustryNo,
-                                                                                           vm.IndustryNoText,
+                                                                                           vm.ReferenceNumber,
                                                                                            vm.IndustryName,
                                                                                            vm.Address,
                                                                                            vm.Classification,
@@ -1120,6 +1121,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                             {
                                 Id = industry.OrganizationRegulatoryProgramId,
                                 IndustryNo = industry.OrganizationDto.OrganizationId,
+                                ReferenceNumber = industry.ReferenceNumber,
                                 IndustryName = industry.OrganizationDto.OrganizationName,
                                 AddressLine1 = industry.OrganizationDto.AddressLine1,
                                 AddressLine2 = industry.OrganizationDto.AddressLine2,
@@ -2337,6 +2339,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                                        {
                                                                                                                                            Id = vm.OrganizationRegulatoryProgramId,
                                                                                                                                            IndustryNo = vm.OrganizationDto.OrganizationId,
+                                                                                                                                           ReferenceNumber = vm.ReferenceNumber,
                                                                                                                                            IndustryName = vm.OrganizationDto.OrganizationName,
                                                                                                                                            AddressLine1 = vm.OrganizationDto.AddressLine1,
                                                                                                                                            AddressLine2 = vm.OrganizationDto.AddressLine2,
@@ -2388,6 +2391,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                     {
                                                                                         Id = vm.OrganizationRegulatoryProgramId,
                                                                                         IndustryNo = vm.OrganizationDto.OrganizationId,
+                                                                                        ReferenceNumber = vm.ReferenceNumber,
                                                                                         IndustryName = vm.OrganizationDto.OrganizationName,
                                                                                         AddressLine1 = vm.OrganizationDto.AddressLine1,
                                                                                         AddressLine2 = vm.OrganizationDto.AddressLine2,

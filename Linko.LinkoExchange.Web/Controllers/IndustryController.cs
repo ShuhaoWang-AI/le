@@ -104,6 +104,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                             {
                                 Id = industry.OrganizationRegulatoryProgramId,
                                 IndustryNo = industry.OrganizationDto.OrganizationId,
+                                ReferenceNumber = industry.ReferenceNumber,
                                 IndustryName = industry.OrganizationDto.OrganizationName,
                                 AddressLine1 = industry.OrganizationDto.AddressLine1,
                                 AddressLine2 = industry.OrganizationDto.AddressLine2,
