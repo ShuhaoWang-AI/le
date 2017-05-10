@@ -74,8 +74,8 @@ namespace Linko.LinkoExchange.Services.Sample
             var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
-            var sampleStartDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId);
-            var sampleEndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId);
+            var sampleStartDateTimeUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId);
+            var sampleEndDateTimeUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId);
             var massLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.MassLoading.ToString()).LimitBasisId;
             var concentrationLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Concentration.ToString()).LimitBasisId;
             var dailyLimitTypeId = _dbContext.LimitTypes.Single(lt => lt.Name == LimitTypeName.Daily.ToString()).LimitTypeId;
@@ -256,7 +256,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
                 {
                     concentrationResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
-                        .GetUTCDateTimeUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                        .GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
                 }
                 concentrationResultRowToUpdate.LimitBasisId = concentrationLimitBasisId;
                 concentrationResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
@@ -298,7 +298,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
                     {
                         massResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
-                            .GetUTCDateTimeUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                            .GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
                     }
                     massResultRowToUpdate.LimitBasisId = massLimitBasisId;
                     massResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
@@ -487,8 +487,8 @@ namespace Linko.LinkoExchange.Services.Sample
 
             //Check sample start/end dates are not in the future (UC-15-1.2.9.1.b)
             
-            if (_timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId) > DateTime.UtcNow ||
-                _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId) > DateTime.UtcNow)
+            if (_timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId) > DateTimeOffset.Now ||
+                _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId) > DateTimeOffset.Now)
             {
                 isValid = false;
                 if (!isSuppressExceptions)
@@ -941,12 +941,12 @@ namespace Linko.LinkoExchange.Services.Sample
 
             if (startDate.HasValue)
             {
-                var startDateUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(startDate.Value, timeZoneId);
+                var startDateUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(startDate.Value, timeZoneId);
                 foundSamples = foundSamples.Where(s => s.StartDateTimeUtc >= startDateUtc);
             }
             if (endDate.HasValue)
             {
-                var endDateUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(endDate.Value, timeZoneId);
+                var endDateUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(endDate.Value, timeZoneId);
                 foundSamples = foundSamples.Where(s => s.EndDateTimeUtc <= endDateUtc);
             }
 

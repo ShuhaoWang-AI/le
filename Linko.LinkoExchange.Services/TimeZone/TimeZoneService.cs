@@ -96,33 +96,56 @@ namespace Linko.LinkoExchange.Services.TimeZone
             return (TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, authorityLocalZone));
         }
 
-        public DateTimeOffset GetUTCDateTimeUsingSettingForThisOrg(DateTime localDateTime, int orgRegProgramId)
+        public DateTimeOffset GetLocalDateTimeOffsetFromUtcUsingSettingForThisOrg(DateTime utcDateTime, int orgRegProgramId)
         {
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
-            TimeZoneInfo orgRegProgramLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
-            return (TimeZoneInfo.ConvertTimeToUtc(localDateTime, orgRegProgramLocalZone));
+            return (GetLocalDateTimeOffsetFromUtcUsingThisTimeZoneId(utcDateTime, timeZoneId));
         }
 
-        public DateTimeOffset GetUTCDateTimeUsingThisTimeZoneId(DateTime localDateTime, int timeZoneId)
+        public DateTimeOffset GetLocalDateTimeOffsetFromUtcUsingThisTimeZoneId(DateTime utcDateTime, int timeZoneId)
         {
-            localDateTime = DateTime.SpecifyKind(localDateTime, DateTimeKind.Unspecified);
-            TimeZoneInfo orgRegProgramLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
-            return (TimeZoneInfo.ConvertTimeToUtc(localDateTime, orgRegProgramLocalZone));
-        }
-
-        public DateTimeOffset GetLocalizedDateTimeOffsetUsingSettingForThisOrg(DateTime utcDateTime, int orgRegProgramId)
-        {
-            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
             TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
-
             return (new DateTimeOffset(utcDateTime).ToOffset(authorityLocalZone.GetUtcOffset(utcDateTime)));
         }
 
-        public DateTimeOffset GetLocalizedDateTimeOffsetUsingThisTimeZoneId(DateTime utcDateTime, int timeZoneId)
+        public DateTimeOffset GetLocalDateTimeOffsetFromLocalUsingSettingForThisOrg(DateTime localDateTime, int orgRegProgramId)
+        {
+            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
+            return (GetLocalDateTimeOffsetFromLocalUsingThisTimeZoneId(localDateTime, timeZoneId));
+        }
+
+        public DateTimeOffset GetLocalDateTimeOffsetFromLocalUsingThisTimeZoneId(DateTime localDateTime, int timeZoneId)
         {
             TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
 
+            while (authorityLocalZone.IsAmbiguousTime(localDateTime) || authorityLocalZone.IsInvalidTime(localDateTime))
+            {
+                localDateTime = localDateTime.AddHours(1);
+            }
+
+            var utcDateTime = TimeZoneInfo.ConvertTimeToUtc(localDateTime, authorityLocalZone);
             return (new DateTimeOffset(utcDateTime).ToOffset(authorityLocalZone.GetUtcOffset(utcDateTime)));
+        }
+
+        public DateTimeOffset GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(DateTime localDateTime, int timeZoneId)
+        {
+            TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
+            TimeZoneInfo serverTimeZone = TimeZoneInfo.Local;
+
+            while (authorityLocalZone.IsAmbiguousTime(localDateTime) || authorityLocalZone.IsInvalidTime(localDateTime))
+            {
+                localDateTime = localDateTime.AddHours(1);
+            }
+
+            var utcDateTime = TimeZoneInfo.ConvertTimeToUtc(localDateTime, authorityLocalZone);
+            return (new DateTimeOffset(utcDateTime).ToOffset(serverTimeZone.GetUtcOffset(utcDateTime)));
+
+        }
+
+        public DateTimeOffset GetServerDateTimeOffsetFromLocalUsingThisOrg(DateTime localDateTime, int orgRegProgramId)
+        {
+            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
+            return (GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(localDateTime, timeZoneId));
         }
 
     }

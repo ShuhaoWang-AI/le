@@ -218,12 +218,12 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     var effectiveDateTimeUtc =
-                        _timeZoneService.GetUTCDateTimeUsingSettingForThisOrg(rpt.EffectiveDateTimeLocal,
+                        _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisOrg(rpt.EffectiveDateTimeLocal,
                             currentRegulatoryProgramId);
 
                     if (rpt.RetirementDateTimeLocal.HasValue)
                     {
-                        rpt.RetirementDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingSettingForThisOrg(rpt.RetirementDateTimeLocal.Value, currentRegulatoryProgramId);
+                        rpt.RetirementDateTimeUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisOrg(rpt.RetirementDateTimeLocal.Value, currentRegulatoryProgramId);
                     }
 
                     //// Check if Name and EffectiveDateTimeUtc combination is unique or not 

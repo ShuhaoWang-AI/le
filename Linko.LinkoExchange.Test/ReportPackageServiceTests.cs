@@ -72,7 +72,7 @@ namespace Linko.LinkoExchange.Test
 
             _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(authorityOrgRegProgramDto);
 
-            _timeZoneService.Setup(s => s.GetUTCDateTimeUsingThisTimeZoneId(It.IsAny<DateTime>(), It.IsAny<int>())).Returns(DateTimeOffset.UtcNow);
+            _timeZoneService.Setup(s => s.GetLocalDateTimeOffsetFromLocalUsingThisTimeZoneId(It.IsAny<DateTime>(), It.IsAny<int>())).Returns(DateTimeOffset.Now);
 
             _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.ReportRepudiatedDays)).Returns("180");
             _settingService.Setup(s => s.GetOrganizationSettingValue(It.IsAny<int>(), SettingType.TimeZone)).Returns("6");
@@ -214,7 +214,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetReportPackagesByStatusName_Draft()
         {
-            var filteredReportPackages = _reportPackageService.GetReportPackagesByStatusName(ReportStatusName.Draft);
+            var filteredReportPackages = _reportPackageService.GetReportPackagesByStatusName(ReportStatusName.Repudiated, false);
         }
 
         [TestMethod]

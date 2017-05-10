@@ -468,7 +468,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
-            var sampleEndDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(sampleEndDateTimeLocal, timeZoneId);
+            var sampleEndDateTimeUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleEndDateTimeLocal, timeZoneId);
             string monitoringPointAbbrv = _dbContext.MonitoringPoints
                                         .Single(mp => mp.MonitoringPointId == monitoringPointId).Name; //TO-DO: Is this the same as Abbreviation? Or do we take Id?
             //Static Groups

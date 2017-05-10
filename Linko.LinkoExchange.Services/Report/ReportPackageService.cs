@@ -744,13 +744,13 @@ namespace Linko.LinkoExchange.Services.Report
 
                     var newReportPackage = _mapHelper.GetReportPackageFromReportPackageTemplate(reportPackageTemplate);
 
-                    var startDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(startDateTimeLocal, timeZoneId);
-                    var endDateTimeUtc = _timeZoneService.GetUTCDateTimeUsingThisTimeZoneId(endDateTimeLocal, timeZoneId);
+                    var startDateTimeUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(startDateTimeLocal, timeZoneId);
+                    var endDateTimeUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(endDateTimeLocal, timeZoneId);
                     newReportPackage.PeriodStartDateTimeUtc = startDateTimeUtc;
                     newReportPackage.PeriodEndDateTimeUtc = endDateTimeUtc;
                     newReportPackage.ReportStatusId = _dbContext.ReportStatuses
                         .Single(rs => rs.Name == ReportStatusName.Draft.ToString()).ReportStatusId;
-                    newReportPackage.CreationDateTimeUtc = DateTime.UtcNow;
+                    newReportPackage.CreationDateTimeUtc = DateTimeOffset.Now;
 
                     //Need to populate with Authority fields
                     newReportPackage.RecipientOrganizationName = authorityOrganization.OrganizationDto.OrganizationName;
@@ -1325,23 +1325,38 @@ namespace Linko.LinkoExchange.Services.Report
         /// Gets Report Package information (without children element data) for displaying in a grid.
         /// </summary>
         /// <param name="reportStatusName">Fetches report packages of this status only</param>
+        /// <param name="isAuthorityViewing">True is User is Authority</param>
         /// <returns>Collection of ReportPackageDto objects (without children element data)</returns>
-        public IEnumerable<ReportPackageDto> GetReportPackagesByStatusName(ReportStatusName reportStatusName)
+        public IEnumerable<ReportPackageDto> GetReportPackagesByStatusName(ReportStatusName reportStatusName, bool isAuthorityViewing)
         {
             _logger.Info($"Enter ReportPackageService.GetReportPackagesByStatusName. reportStatusName={reportStatusName}");
 
             var reportPackageDtoList = new List<ReportPackageDto>();
 
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var currentOrganizationId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationId));
+            var currentRegulatoryProgramId = _dbContext.OrganizationRegulatoryPrograms
+                .Single(orp => orp.OrganizationRegulatoryProgramId == currentOrgRegProgramId)
+                .RegulatoryProgramId;
             var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
 
             var reportPackages = _dbContext.ReportPackages
                 .Include(rp => rp.ReportStatus)
-                .Where(rp => rp.OrganizationRegulatoryProgramId == currentOrgRegProgramId
-                    && rp.ReportStatus.Name == reportStatusName.ToString())
-                .ToList();
+                .Include(rp => rp.OrganizationRegulatoryProgram)
+                .Where(rp => rp.ReportStatus.Name == reportStatusName.ToString());
 
-            foreach (var reportPackage in reportPackages)
+            if (isAuthorityViewing)
+            {
+                reportPackages = reportPackages
+                    .Where(rp => rp.OrganizationRegulatoryProgram.RegulatorOrganizationId == currentOrganizationId
+                    && rp.OrganizationRegulatoryProgram.RegulatoryProgramId == currentRegulatoryProgramId);
+            }
+            else {
+                reportPackages = reportPackages
+                    .Where(rp => rp.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+            }
+
+            foreach (var reportPackage in reportPackages.ToList())
             {
                 var reportPackagegDto = GetReportPackageDtoFromReportPackage(reportPackage, timeZoneId);
                 reportPackageDtoList.Add(reportPackagegDto);
@@ -1448,7 +1463,7 @@ namespace Linko.LinkoExchange.Services.Report
                     var currentUser = _dbContext.Users
                         .Single(user => user.UserProfileId == currentUserId);
 
-                    reportPackage.RepudiationDateTimeUtc = _timeZoneService.GetLocalizedDateTimeOffsetUsingThisTimeZoneId(DateTime.UtcNow, timeZoneId);
+                    reportPackage.RepudiationDateTimeUtc = DateTimeOffset.Now;
                     reportPackage.RepudiatorUserId = currentUserId;
                     reportPackage.RepudiatorFirstName = currentUser.FirstName;
                     reportPackage.RepudiatorLastName = currentUser.LastName;
