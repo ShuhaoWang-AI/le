@@ -214,7 +214,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetReportPackagesByStatusName_Draft()
         {
-            var filteredReportPackages = _reportPackageService.GetReportPackagesByStatusName(ReportStatusName.Repudiated, false);
+            var filteredReportPackages = _reportPackageService.GetReportPackagesByStatusName(ReportStatusName.RepudiatedPendingReview, true);
         }
 
         [TestMethod]

@@ -11,6 +11,9 @@ namespace Linko.LinkoExchange.Core.Enum
         Draft,
         ReadyToSubmit,
         Submitted,
-        Repudiated
+        Repudiated,
+        SubmittedPendingReview,
+        RepudiatedPendingReview,
+        All
     }
 }

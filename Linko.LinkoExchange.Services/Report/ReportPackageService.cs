@@ -1340,10 +1340,34 @@ namespace Linko.LinkoExchange.Services.Report
                 .RegulatoryProgramId;
             var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
 
+
             var reportPackages = _dbContext.ReportPackages
                 .Include(rp => rp.ReportStatus)
-                .Include(rp => rp.OrganizationRegulatoryProgram)
-                .Where(rp => rp.ReportStatus.Name == reportStatusName.ToString());
+                .Include(rp => rp.OrganizationRegulatoryProgram);
+
+            if (reportStatusName == ReportStatusName.SubmittedPendingReview)
+            {
+                reportPackages = reportPackages
+                    .Where(rp => rp.ReportStatus.Name == ReportStatusName.Submitted.ToString()
+                        && rp.SubmissionReviewDateTimeUtc == null);
+            }
+            else if (reportStatusName == ReportStatusName.RepudiatedPendingReview)
+            {
+                reportPackages = reportPackages
+                    .Where(rp => rp.ReportStatus.Name == ReportStatusName.Repudiated.ToString()
+                        && rp.RepudiationReviewDateTimeUtc == null);
+            }
+            else if (reportStatusName == ReportStatusName.All)
+            {
+                reportPackages = reportPackages
+                    .Where(rp => rp.ReportStatus.Name == ReportStatusName.Submitted.ToString()
+                        || rp.ReportStatus.Name == ReportStatusName.Repudiated.ToString());
+            }
+            else {
+                reportPackages = reportPackages
+                    .Where(rp => rp.ReportStatus.Name == reportStatusName.ToString());
+            }
+
 
             if (isAuthorityViewing)
             {
