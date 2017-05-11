@@ -62,58 +62,6 @@ namespace Linko.LinkoExchange.Test
 
         }
 
-        [TestMethod]
-        public void Convert_Current_UTC_To_Local_And_Back_To_UTC_Test()
-        {
-            DateTime now = DateTime.UtcNow;
-
-            var localTime = _tZservice.GetLocalizedDateTimeUsingSettingForThisOrg(now, 1);
-            var convertedBackToUTC = _tZservice.GetLocalDateTimeOffsetFromLocalUsingSettingForThisOrg(localTime, 1);
-
-            Assert.AreEqual(now, convertedBackToUTC);
-        }
-
-        [TestMethod]
-        public void GetLocalizedDateTimeOffsetUsingSettingForThisOrg()
-        {
-            DateTime dateTimeUtcNow = DateTime.UtcNow;
-
-            var localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromUtcUsingSettingForThisOrg(dateTimeUtcNow, 1);
-            var convertedBackToDateTimeUtc = localizedDateTimeOffset.UtcDateTime;
-
-            Assert.AreEqual(dateTimeUtcNow, convertedBackToDateTimeUtc);
-        }
-
-        [TestMethod]
-        public void GetLocalizedDateTimeOffsetUsingSettingForThisOrg_WinterTime()
-        {
-            // return Pacific time;
-            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("3");
-
-            DateTime dateTimeUtcNow = new DateTime(2016, 12, 9, 16, 5, 7, 123);
-
-            var localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromUtcUsingSettingForThisOrg(dateTimeUtcNow, 1);
-
-            //offset is UTC-8
-            Assert.AreEqual(-8, localizedDateTimeOffset.Offset.Hours);
-        }
-
-        [TestMethod]
-        public void GetLocalizedDateTimeOffsetUsingSettingForThisOrg_SummarTime()
-        {
-            // return Pacific time;
-            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("3");
-            DateTime dateTimeUtcNow = new DateTime(2016, 6, 9, 16, 5, 7, 123);
-
-            var localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromUtcUsingSettingForThisOrg(dateTimeUtcNow, 1);
-            var ft = localizedDateTimeOffset.ToString("MM/dd/yyyyThh:mm:ss zzzz");
-
-            // DaylingSaving, offset is UTC-7
-            Assert.AreEqual(-7, localizedDateTimeOffset.Offset.Hours);
-
-        }
-
-
         //=========================================================================
         //
         //  Daylight saving time 2016 in Canada (PST) began at:
@@ -123,97 +71,97 @@ namespace Linko.LinkoExchange.Test
         //
         //=========================================================================
 
-        [TestMethod]
-        public void GetLocalizedDateTimeOffsetUsingSettingForThisOrg_Daylight_Savings_Start_Cusp()
-        {
-            //  Daylight saving time 2016 in Canada (PST) began at:
-            //    2:00am (PST) on Sunday, March 13 (10:00am UTC)
+        //[TestMethod]
+        //public void GetLocalizedDateTimeOffsetUsingSettingForThisOrg_Daylight_Savings_Start_Cusp()
+        //{
+        //    //  Daylight saving time 2016 in Canada (PST) began at:
+        //    //    2:00am (PST) on Sunday, March 13 (10:00am UTC)
 
-            //Return "Pacific Standard Time", "(GMT-08:00) Pacific Time (US & Canada)"
-            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("3");
+        //    //Return "Pacific Standard Time", "(GMT-08:00) Pacific Time (US & Canada)"
+        //    _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("3");
 
-            //Normal / Non-daylight saving time (PST)
-            DateTime dateTimeUtcNow = new DateTime(2016, 3, 13, 9, 59, 59, 999, DateTimeKind.Utc);
-            var localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromUtcUsingSettingForThisOrg(dateTimeUtcNow, 1);
-            Assert.AreEqual(-8, localizedDateTimeOffset.Offset.Hours);
+        //    //Normal / Non-daylight saving time (PST)
+        //    DateTime dateTimeUtcNow = new DateTime(2016, 3, 13, 9, 59, 59, 999, DateTimeKind.Utc);
+        //    var localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromUtcUsingSettingForThisOrg(dateTimeUtcNow, 1);
+        //    Assert.AreEqual(-8, localizedDateTimeOffset.Offset.Hours);
 
-            //Start Daylight saving time ("Spring ahead" and add 1 hour to our local time) PST -> PDT
+        //    //Start Daylight saving time ("Spring ahead" and add 1 hour to our local time) PST -> PDT
 
-            //PDT
-            dateTimeUtcNow = new DateTime(2016, 3, 13, 10, 0, 0, 1, DateTimeKind.Utc);
-            localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromUtcUsingSettingForThisOrg(dateTimeUtcNow, 1);
-            Assert.AreEqual(-7, localizedDateTimeOffset.Offset.Hours);
-        }
+        //    //PDT
+        //    dateTimeUtcNow = new DateTime(2016, 3, 13, 10, 0, 0, 1, DateTimeKind.Utc);
+        //    localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromUtcUsingSettingForThisOrg(dateTimeUtcNow, 1);
+        //    Assert.AreEqual(-7, localizedDateTimeOffset.Offset.Hours);
+        //}
 
-        [TestMethod]
-        public void GetLocalizedDateTimeOffsetUsingSettingForThisOrg_Daylight_Savings_End_Cusp()
-        {
-            //  Daylight saving time 2016 in Canada (PST) ended at:
-            //    2:00am (PDT) on Sunday, November 6 (9:00am UTC)
+        //[TestMethod]
+        //public void GetLocalizedDateTimeOffsetUsingSettingForThisOrg_Daylight_Savings_End_Cusp()
+        //{
+        //    //  Daylight saving time 2016 in Canada (PST) ended at:
+        //    //    2:00am (PDT) on Sunday, November 6 (9:00am UTC)
 
-            //Return "Pacific Standard Time", "(GMT-08:00) Pacific Time (US & Canada)"
-            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("3");
+        //    //Return "Pacific Standard Time", "(GMT-08:00) Pacific Time (US & Canada)"
+        //    _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("3");
 
-            //Daylight saving time (PDT)
-            DateTime dateTimeUtcNow = new DateTime(2016, 11, 6, 8, 59, 59, 999, DateTimeKind.Utc);
-            var localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromUtcUsingSettingForThisOrg(dateTimeUtcNow, 1);
-            Assert.AreEqual(-7, localizedDateTimeOffset.Offset.Hours);
+        //    //Daylight saving time (PDT)
+        //    DateTime dateTimeUtcNow = new DateTime(2016, 11, 6, 8, 59, 59, 999, DateTimeKind.Utc);
+        //    var localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromUtcUsingSettingForThisOrg(dateTimeUtcNow, 1);
+        //    Assert.AreEqual(-7, localizedDateTimeOffset.Offset.Hours);
 
-            //End Daylight saving time ("Fall back" and subtract 1 hour to our local time) PDT -> PST
+        //    //End Daylight saving time ("Fall back" and subtract 1 hour to our local time) PDT -> PST
 
-            //PST
-            dateTimeUtcNow = new DateTime(2016, 11, 6, 9, 0, 0, 1, DateTimeKind.Utc);
-            localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromUtcUsingSettingForThisOrg(dateTimeUtcNow, 1);
-            Assert.AreEqual(-8, localizedDateTimeOffset.Offset.Hours);
+        //    //PST
+        //    dateTimeUtcNow = new DateTime(2016, 11, 6, 9, 0, 0, 1, DateTimeKind.Utc);
+        //    localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromUtcUsingSettingForThisOrg(dateTimeUtcNow, 1);
+        //    Assert.AreEqual(-8, localizedDateTimeOffset.Offset.Hours);
 
-        }
+        //}
 
-        //======== Test methods without converting from UTC
+        ////======== Test methods without converting from UTC
 
-        [TestMethod]
-        public void GetDateTimeOffsetFromLocalUsingSettingForThisOrg_Daylight_Savings_Start_Cusp_LOCAL()
-        {
-            //  Daylight saving time 2016 in Canada (PST) began at:
-            //    2:00am (PST) on Sunday, March 13 (10:00am UTC)
+        //[TestMethod]
+        //public void GetDateTimeOffsetFromLocalUsingSettingForThisOrg_Daylight_Savings_Start_Cusp_LOCAL()
+        //{
+        //    //  Daylight saving time 2016 in Canada (PST) began at:
+        //    //    2:00am (PST) on Sunday, March 13 (10:00am UTC)
 
-            //Return "Pacific Standard Time", "(GMT-08:00) Pacific Time (US & Canada)"
-            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("3");
+        //    //Return "Pacific Standard Time", "(GMT-08:00) Pacific Time (US & Canada)"
+        //    _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("3");
 
-            //Normal / Non-daylight saving time (PST)
-            DateTime dateTimeNow = new DateTime(2016, 3, 13, 1, 59, 59, 999, DateTimeKind.Unspecified);
-            var localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromLocalUsingSettingForThisOrg(dateTimeNow, 1);
-            Assert.AreEqual(-8, localizedDateTimeOffset.Offset.Hours);
+        //    //Normal / Non-daylight saving time (PST)
+        //    DateTime dateTimeNow = new DateTime(2016, 3, 13, 1, 59, 59, 999, DateTimeKind.Unspecified);
+        //    var localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromLocalUsingSettingForThisOrg(dateTimeNow, 1);
+        //    Assert.AreEqual(-8, localizedDateTimeOffset.Offset.Hours);
 
-            //Start Daylight saving time ("Spring ahead" and add 1 hour to our local time) PST -> PDT
+        //    //Start Daylight saving time ("Spring ahead" and add 1 hour to our local time) PST -> PDT
 
-            //PDT
-            dateTimeNow = new DateTime(2016, 3, 13, 2, 0, 0, 1, DateTimeKind.Unspecified);
-            localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromLocalUsingSettingForThisOrg(dateTimeNow, 1);
-            Assert.AreEqual(-7, localizedDateTimeOffset.Offset.Hours);
-        }
+        //    //PDT
+        //    dateTimeNow = new DateTime(2016, 3, 13, 2, 0, 0, 1, DateTimeKind.Unspecified);
+        //    localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromLocalUsingSettingForThisOrg(dateTimeNow, 1);
+        //    Assert.AreEqual(-7, localizedDateTimeOffset.Offset.Hours);
+        //}
 
-        [TestMethod]
-        public void GetDateTimeOffsetFromLocalUsingSettingForThisOrg_Daylight_Savings_End_Cusp_LOCAL()
-        {
-            //  Daylight saving time 2016 in Canada (PST) ended at:
-            //    2:00am (PDT) on Sunday, November 6 (9:00am UTC)
+        //[TestMethod]
+        //public void GetDateTimeOffsetFromLocalUsingSettingForThisOrg_Daylight_Savings_End_Cusp_LOCAL()
+        //{
+        //    //  Daylight saving time 2016 in Canada (PST) ended at:
+        //    //    2:00am (PDT) on Sunday, November 6 (9:00am UTC)
 
-            //Return "Pacific Standard Time", "(GMT-08:00) Pacific Time (US & Canada)"
-            _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("3");
+        //    //Return "Pacific Standard Time", "(GMT-08:00) Pacific Time (US & Canada)"
+        //    _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("3");
 
-            //Daylight saving time (PDT)
-            DateTime dateTimeUtcNow = new DateTime(2016, 11, 6, 1, 59, 59, 999, DateTimeKind.Unspecified);
-            var localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromLocalUsingSettingForThisOrg(dateTimeUtcNow, 1);
-            Assert.AreEqual(-7, localizedDateTimeOffset.Offset.Hours);
+        //    //Daylight saving time (PDT)
+        //    DateTime dateTimeUtcNow = new DateTime(2016, 11, 6, 1, 59, 59, 999, DateTimeKind.Unspecified);
+        //    var localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromLocalUsingSettingForThisOrg(dateTimeUtcNow, 1);
+        //    Assert.AreEqual(-7, localizedDateTimeOffset.Offset.Hours);
 
-            //End Daylight saving time ("Fall back" and subtract 1 hour to our local time) PDT -> PST
+        //    //End Daylight saving time ("Fall back" and subtract 1 hour to our local time) PDT -> PST
 
-            //PST
-            dateTimeUtcNow = new DateTime(2016, 11, 6, 2, 0, 0, 1, DateTimeKind.Unspecified);
-            localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromLocalUsingSettingForThisOrg(dateTimeUtcNow, 1);
-            Assert.AreEqual(-8, localizedDateTimeOffset.Offset.Hours);
+        //    //PST
+        //    dateTimeUtcNow = new DateTime(2016, 11, 6, 2, 0, 0, 1, DateTimeKind.Unspecified);
+        //    localizedDateTimeOffset = _tZservice.GetLocalDateTimeOffsetFromLocalUsingSettingForThisOrg(dateTimeUtcNow, 1);
+        //    Assert.AreEqual(-8, localizedDateTimeOffset.Offset.Hours);
 
-        }
+        //}
 
         [TestMethod]
         public void GetDateTimeOffsetFromLocalUsingServerTimeZone()
@@ -223,7 +171,7 @@ namespace Linko.LinkoExchange.Test
 
             //8pm EST
             DateTime dateTimeEST = new DateTime(2016, 11, 6, 20, 0, 0, 0, DateTimeKind.Unspecified);
-            var dateTimeOffsetLocalizedToServer = _tZservice.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(dateTimeEST, localTimeZoneId);
+            var dateTimeOffsetLocalizedToServer = _tZservice.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(dateTimeEST, localTimeZoneId);
 
             //8pm EST = 5pm (17:00) PST (server time)
             Assert.AreEqual(17, dateTimeOffsetLocalizedToServer.Hour);

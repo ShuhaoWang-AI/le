@@ -274,7 +274,7 @@ namespace Linko.LinkoExchange.Services.Email
                 log.Body = body;
                 log.Subject = subject;
                 log.RecipientEmailAddress = receipientEmail;
-                log.SentDateTimeUtc = DateTimeOffset.UtcNow;
+                log.SentDateTimeUtc = DateTimeOffset.Now;
             }
 
             return emailAuditLogs;

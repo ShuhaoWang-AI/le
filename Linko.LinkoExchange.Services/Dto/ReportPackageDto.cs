@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Linko.LinkoExchange.Core.Enum;
+using System;
 using System.Collections.Generic;
 
 namespace Linko.LinkoExchange.Services.Dto
@@ -19,7 +20,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string CtsEventCategoryName { get; set; }
         public string Comments { get; set; }
         public bool IsSubmissionBySignatoryRequired { get; internal set; }
-        public int ReportStatusId { get; internal set; }
+        public ReportStatusName ReportStatusName { get; internal set; }
         public int OrganizationRegulatoryProgramId { get; set; }
         public string OrganizationName { get; internal set; }
         public string OrganizationAddressLine1 { get; internal set; }

@@ -222,7 +222,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 UserPasswordHistory history = _dbContext.UserPasswordHistories.Create();
                 history.UserProfileId = applicationUser.UserProfileId;
                 history.PasswordHash = _passwordHasher.HashPassword(newPassword);
-                history.LastModificationDateTimeUtc = DateTime.UtcNow;
+                history.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 _dbContext.UserPasswordHistories.Add(history);
                 _dbContext.SaveChanges();
 
@@ -416,7 +416,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                         applicationUser.EmailConfirmed = true;
                         applicationUser.IsInternalAccount = false;
                         applicationUser.IsIdentityProofed = false;
-                        applicationUser.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+                        applicationUser.CreationDateTimeUtc = DateTimeOffset.Now;
 
                         #endregion
 
@@ -802,7 +802,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 UserPasswordHistory history = _dbContext.UserPasswordHistories.Create();
                 history.UserProfileId = userProfileId;
                 history.PasswordHash = passwordHash;
-                history.LastModificationDateTimeUtc = DateTime.UtcNow;
+                history.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 _dbContext.UserPasswordHistories.Add(history);
                 _dbContext.SaveChanges();
 

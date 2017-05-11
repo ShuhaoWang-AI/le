@@ -726,7 +726,10 @@ namespace Linko.LinkoExchange.Services.Report
                 try
                 {
                     var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-                    var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
+                    var currentOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms
+                                            .Include(orp => orp.Organization)
+                                            .Include(orp => orp.Organization.Jurisdiction)
+                                            .Single(orp => orp.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
                     var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
                     var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
 
@@ -738,29 +741,35 @@ namespace Linko.LinkoExchange.Services.Report
                         .Include(rpt => rpt.OrganizationRegulatoryProgram)
                         .Include(rpt => rpt.OrganizationRegulatoryProgram.Organization)
                         .Include(rpt => rpt.OrganizationRegulatoryProgram.Organization.Jurisdiction)
-                        .Include(rpt => rpt.OrganizationRegulatoryProgram.RegulatorOrganization)
-                        .Include(rpt => rpt.OrganizationRegulatoryProgram.RegulatorOrganization.Jurisdiction)
+                        .Include(rpt => rpt.ReportPackageTemplateAssignments)
                         .Single(rpt => rpt.ReportPackageTemplateId == reportPackageTemplateId);
+
+                    //Check if current IU is assigned to (and has access to) template
+                    var hasAccessViaAssignment = reportPackageTemplate.ReportPackageTemplateAssignments
+                        .Any(rpta => rpta.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+                    if (!hasAccessViaAssignment)
+                    {
+                        throw new Exception($"The current Org Reg Program Id (= {currentOrgRegProgram}) is not assigned to Report Template Id = {reportPackageTemplateId}");
+                    }
 
                     var newReportPackage = _mapHelper.GetReportPackageFromReportPackageTemplate(reportPackageTemplate);
 
-                    var startDateTimeUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(startDateTimeLocal, timeZoneId);
-                    var endDateTimeUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(endDateTimeLocal, timeZoneId);
+                    var startDateTimeUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(startDateTimeLocal, timeZoneId);
+                    var endDateTimeUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(endDateTimeLocal, timeZoneId);
                     newReportPackage.PeriodStartDateTimeUtc = startDateTimeUtc;
                     newReportPackage.PeriodEndDateTimeUtc = endDateTimeUtc;
                     newReportPackage.ReportStatusId = _dbContext.ReportStatuses
                         .Single(rs => rs.Name == ReportStatusName.Draft.ToString()).ReportStatusId;
                     newReportPackage.CreationDateTimeUtc = DateTimeOffset.Now;
 
-                    //Need to populate with Authority fields
-                    newReportPackage.RecipientOrganizationName = authorityOrganization.OrganizationDto.OrganizationName;
-                    newReportPackage.RecipientOrganizationAddressLine1 = authorityOrganization.OrganizationDto.AddressLine1;
-                    newReportPackage.RecipientOrganizationAddressLine2 = authorityOrganization.OrganizationDto.AddressLine2;
-                    newReportPackage.RecipientOrganizationCityName = authorityOrganization.OrganizationDto.CityName;
-                    newReportPackage.RecipientOrganizationJurisdictionName = _dbContext.Organizations
-                        .Include(o => o.Jurisdiction)
-                        .Single(o => o.OrganizationId == authorityOrganization.OrganizationDto.OrganizationId).Jurisdiction.Name;
-                    newReportPackage.RecipientOrganizationZipCode = authorityOrganization.OrganizationDto.ZipCode;
+                    //Need to populate IU fields
+                    newReportPackage.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
+                    newReportPackage.OrganizationName = currentOrgRegProgram.Organization.Name;
+                    newReportPackage.OrganizationAddressLine1 = currentOrgRegProgram.Organization.AddressLine1;
+                    newReportPackage.OrganizationAddressLine2 = currentOrgRegProgram.Organization.AddressLine2;
+                    newReportPackage.OrganizationCityName = currentOrgRegProgram.Organization.CityName;
+                    newReportPackage.OrganizationJurisdictionName = currentOrgRegProgram.Organization.Jurisdiction.Name;
+                    newReportPackage.OrganizationZipCode = currentOrgRegProgram.Organization.ZipCode;
 
                     //Step 2 - create a row in tReportPackageElementCategory for each row in tReportPackageTemplateElementCategory (where ReportPackageTemplateId="n")
 
@@ -1415,12 +1424,12 @@ namespace Linko.LinkoExchange.Services.Report
             {
                 var repudiationReasonDto = _mapHelper.GetRepudiationReasonDtoFromRepudiationReason(repudiationReason);
                 repudiationReasonDto.CreationLocalDateTime = _timeZoneService
-                    .GetLocalizedDateTimeUsingThisTimeZoneId(repudiationReason.CreationDateTimeUtc.DateTime, timeZoneId);
+                    .GetLocalizedDateTimeUsingThisTimeZoneId(repudiationReason.CreationDateTimeUtc.UtcDateTime, timeZoneId);
 
                 if (repudiationReason.LastModificationDateTimeUtc.HasValue)
                 {
                     repudiationReasonDto.LastModificationLocalDateTime = _timeZoneService
-                        .GetLocalizedDateTimeUsingThisTimeZoneId(repudiationReason.LastModificationDateTimeUtc.Value.DateTime, timeZoneId);
+                        .GetLocalizedDateTimeUsingThisTimeZoneId(repudiationReason.LastModificationDateTimeUtc.Value.UtcDateTime, timeZoneId);
                 }
 
                 repudiationReasonDtos.Add(repudiationReasonDto);
@@ -1526,13 +1535,13 @@ namespace Linko.LinkoExchange.Services.Report
 
                     //Report Details:
                     contentReplacements.Add("reportPackageName", reportPackage.Name);
-                    contentReplacements.Add("periodStartDate", reportPackage.PeriodStartDateTimeUtc.DateTime.ToString("MMM d, yyyy"));
-                    contentReplacements.Add("periodEndDate", reportPackage.PeriodEndDateTimeUtc.DateTime.ToString("MMM d, yyyy"));
-                    contentReplacements.Add("submissionDateTime", reportPackage.SubmissionDateTimeUtc.Value.DateTime.ToString("MMM d, yyyy h:mmtt") +
-                        $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.SubmissionDateTimeUtc.Value.DateTime, true)}");
+                    contentReplacements.Add("periodStartDate", reportPackage.PeriodStartDateTimeUtc.UtcDateTime.ToString("MMM d, yyyy"));
+                    contentReplacements.Add("periodEndDate", reportPackage.PeriodEndDateTimeUtc.UtcDateTime.ToString("MMM d, yyyy"));
+                    contentReplacements.Add("submissionDateTime", reportPackage.SubmissionDateTimeUtc.Value.UtcDateTime.ToString("MMM d, yyyy h:mmtt") +
+                        $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.SubmissionDateTimeUtc.Value.UtcDateTime, true)}");
                     contentReplacements.Add("corSignature", corHash.Hash);
-                    contentReplacements.Add("repudiatedDateTime", reportPackage.RepudiationDateTimeUtc.Value.DateTime.ToString("MMM d, yyyy h:mmtt") +
-                        $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.RepudiationDateTimeUtc.Value.DateTime, true)}");
+                    contentReplacements.Add("repudiatedDateTime", reportPackage.RepudiationDateTimeUtc.Value.UtcDateTime.ToString("MMM d, yyyy h:mmtt") +
+                        $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.RepudiationDateTimeUtc.Value.UtcDateTime, true)}");
                     contentReplacements.Add("repudiationReason", repudiationReasonName);
                     contentReplacements.Add("repudiationReasonComments", comments ?? "");
 
@@ -1680,7 +1689,7 @@ namespace Linko.LinkoExchange.Services.Report
                     var reportPackage = _dbContext.ReportPackages
                         .Single(rep => rep.ReportPackageId == reportPackageId);
 
-                    reportPackage.SubmissionReviewDateTimeUtc = DateTime.UtcNow;
+                    reportPackage.SubmissionReviewDateTimeUtc = DateTimeOffset.Now;
                     reportPackage.SubmissionReviewerUserId = currentUserId;
                     reportPackage.SubmissionReviewerFirstName = user.FirstName;
                     reportPackage.SubmissionReviewerLastName = user.LastName;
@@ -1755,7 +1764,7 @@ namespace Linko.LinkoExchange.Services.Report
                     var reportPackage = _dbContext.ReportPackages
                         .Single(rep => rep.ReportPackageId == reportPackageId);
 
-                    reportPackage.RepudiationReviewDateTimeUtc = DateTime.UtcNow;
+                    reportPackage.RepudiationReviewDateTimeUtc = DateTimeOffset.Now;
                     reportPackage.RepudiationReviewerUserId = currentUserId;
                     reportPackage.RepudiationReviewerFirstName = user.FirstName;
                     reportPackage.RepudiationReviewerLastName = user.LastName;
@@ -1810,6 +1819,14 @@ namespace Linko.LinkoExchange.Services.Report
             public override Encoding Encoding { get { return Encoding.UTF8; } }
         }
 
+        private ReportStatusName GetReportStatusName(ReportPackage reportPackage)
+        {
+            var reportStatusName = _dbContext.ReportStatuses
+                .Single(rs => rs.ReportStatusId == reportPackage.ReportStatusId).Name;
+
+            return (ReportStatusName)Enum.Parse(typeof(ReportStatusName), reportStatusName);
+        }
+
         /// <summary>
         /// Helper function used by both "GetReportPackagesByStatusName" and "GetReportPackage" methods
         /// </summary>
@@ -1820,35 +1837,37 @@ namespace Linko.LinkoExchange.Services.Report
         {
             var reportPackagegDto = _mapHelper.GetReportPackageDtoFromReportPackage(reportPackage);
 
+            reportPackagegDto.ReportStatusName = GetReportStatusName(reportPackage);
+
             reportPackagegDto.OrganizationRegulatoryProgramDto =
                     _programService.GetOrganizationRegulatoryProgram(reportPackage.OrganizationRegulatoryProgramId);
 
             if (reportPackage.SubmissionDateTimeUtc.HasValue)
             {
                 reportPackagegDto.SubmissionDateTimeLocal = _timeZoneService
-                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.SubmissionDateTimeUtc.Value.DateTime, timeZoneId);
+                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.SubmissionDateTimeUtc.Value.UtcDateTime, timeZoneId);
             }
 
             if (reportPackage.RepudiationDateTimeUtc.HasValue)
             {
                 reportPackagegDto.RepudiationDateTimeLocal = _timeZoneService
-                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.RepudiationDateTimeUtc.Value.DateTime, timeZoneId);
+                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.RepudiationDateTimeUtc.Value.UtcDateTime, timeZoneId);
             }
 
             if (reportPackage.RepudiationReviewDateTimeUtc.HasValue)
             {
                 reportPackagegDto.RepudiationReviewDateTimeLocal = _timeZoneService
-                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.RepudiationReviewDateTimeUtc.Value.DateTime, timeZoneId);
+                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.RepudiationReviewDateTimeUtc.Value.UtcDateTime, timeZoneId);
             }
 
             reportPackagegDto.PeriodEndDateTimeLocal = _timeZoneService
-                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.PeriodEndDateTimeUtc.DateTime, timeZoneId);
+                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.PeriodEndDateTimeUtc.UtcDateTime, timeZoneId);
 
             reportPackagegDto.PeriodStartDateTimeLocal = _timeZoneService
-                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.PeriodStartDateTimeUtc.DateTime, timeZoneId);
+                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.PeriodStartDateTimeUtc.UtcDateTime, timeZoneId);
 
             reportPackagegDto.CreationDateTimeLocal = _timeZoneService
-                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.CreationDateTimeUtc.DateTime, timeZoneId);
+                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.CreationDateTimeUtc.UtcDateTime, timeZoneId);
 
             return reportPackagegDto;
         }

@@ -131,8 +131,8 @@ namespace Linko.LinkoExchange.Services.User
                 var userProfileDto = GetUserProfileById(user.UserProfileId);
 
                 //Need to modify datetime to local
-                dto.RegistrationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(dto.RegistrationDateTimeUtc.Value.DateTime, orgRegProgramId);
-                userProfileDto.CreationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userProfileDto.CreationDateTimeUtc.Value.DateTime, orgRegProgramId);
+                dto.RegistrationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(dto.RegistrationDateTimeUtc.Value.UtcDateTime, orgRegProgramId);
+                userProfileDto.CreationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userProfileDto.CreationDateTimeUtc.Value.UtcDateTime, orgRegProgramId);
 
                 dto.UserProfileDto = userProfileDto;
                 dtos.Add(dto);
@@ -166,8 +166,8 @@ namespace Linko.LinkoExchange.Services.User
                 var userProfileDto = GetUserProfileById(user.UserProfileId);
 
                 //Need to modify datetime to local
-                dto.RegistrationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(dto.RegistrationDateTimeUtc.Value.DateTime, orgRegProgramId);
-                userProfileDto.CreationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userProfileDto.CreationDateTimeUtc.Value.DateTime, orgRegProgramId);
+                dto.RegistrationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(dto.RegistrationDateTimeUtc.Value.UtcDateTime, orgRegProgramId);
+                userProfileDto.CreationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userProfileDto.CreationDateTimeUtc.Value.UtcDateTime, orgRegProgramId);
 
                 dto.UserProfileDto = userProfileDto;
                 dtos.Add(dto);
@@ -208,7 +208,7 @@ namespace Linko.LinkoExchange.Services.User
                     user.IsRemoved = isRemoved.Value;
 
                 //Persist modification date and modifier actor
-                user.LastModificationDateTimeUtc = DateTime.UtcNow;
+                user.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 user.LastModifierUserId = Convert.ToInt32(_httpContext.CurrentUserProfileId());
                 _dbContext.SaveChanges();
             }
@@ -287,7 +287,7 @@ namespace Linko.LinkoExchange.Services.User
                 return;
             }
             programUser.IsSignatory = isSignatory;
-            programUser.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+            programUser.LastModificationDateTimeUtc = DateTimeOffset.Now;
             programUser.LastModifierUserId = _httpContext.CurrentUserProfileId();
             _dbContext.SaveChanges();
 
@@ -875,7 +875,7 @@ namespace Linko.LinkoExchange.Services.User
 
             user.IsRemoved = true;
             //Persist modification date and modifier actor
-            user.LastModificationDateTimeUtc = DateTime.UtcNow;
+            user.LastModificationDateTimeUtc = DateTimeOffset.Now;
             user.LastModifierUserId = Convert.ToInt32(_httpContext.CurrentUserProfileId());
             _dbContext.SaveChanges();
 
@@ -1144,8 +1144,8 @@ namespace Linko.LinkoExchange.Services.User
             userDto.UserProfileDto.Jurisdiction = _mapHelper.GetJurisdictionDtoFromJurisdiction(jurisdiction);
 
             //Need to modify datetime to local
-            userDto.UserProfileDto.CreationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userDto.UserProfileDto.CreationDateTimeUtc.Value.DateTime, orgRegProgUserId);
-            userDto.RegistrationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userDto.RegistrationDateTimeUtc.Value.DateTime, orgRegProgUserId);
+            userDto.UserProfileDto.CreationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userDto.UserProfileDto.CreationDateTimeUtc.Value.UtcDateTime, orgRegProgUserId);
+            userDto.RegistrationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userDto.RegistrationDateTimeUtc.Value.UtcDateTime, orgRegProgUserId);
 
             return userDto;
         }

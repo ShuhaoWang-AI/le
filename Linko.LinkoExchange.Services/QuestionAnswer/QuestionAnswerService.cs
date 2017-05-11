@@ -75,12 +75,12 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 UserQuestionAnswer newAnswer = _dbContext.UserQuestionAnswers.Create();
                 newAnswer.Content = answer.Content;
                 newAnswer.UserProfileId = userProfileId;
-                newAnswer.CreationDateTimeUtc = DateTime.UtcNow;
+                newAnswer.CreationDateTimeUtc = DateTimeOffset.Now;
                 newAnswer.LastModificationDateTimeUtc = null;
                 newAnswer.QuestionId = answer.QuestionId;
                 newAnswer.UserProfileId = userProfileId;
-                newAnswer.CreationDateTimeUtc = DateTime.UtcNow;
-                newAnswer.LastModificationDateTimeUtc = DateTime.UtcNow;
+                newAnswer.CreationDateTimeUtc = DateTimeOffset.Now;
+                newAnswer.LastModificationDateTimeUtc = DateTimeOffset.Now;
 
 
                 _dbContext.UserQuestionAnswers.Add(newAnswer);
@@ -130,7 +130,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                     .Include(a => a.Question)
                     .Single(a => a.UserQuestionAnswerId == answerDto.UserQuestionAnswerId.Value);
 
-                answer.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                answer.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 answer.Content = answerDto.Content;
                 answer.QuestionId = answerDto.QuestionId;
             }
@@ -138,7 +138,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             {
                 answer = _dbContext.UserQuestionAnswers.Create();
                 answer.Content = answerDto.Content;
-                answer.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+                answer.CreationDateTimeUtc = DateTimeOffset.Now;
                 answer.UserProfileId = userProfileId;
                 answer.QuestionId = answerDto.QuestionId;
                 _dbContext.UserQuestionAnswers.Add(answer);
@@ -346,7 +346,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 questionToUpdate.Content = question.Content;
                 questionToUpdate.QuestionTypeId = _dbContext.QuestionTypes.Single(q => q.Name == question.QuestionType.ToString()).QuestionTypeId;
                 questionToUpdate.IsActive = question.IsActive;
-                questionToUpdate.LastModificationDateTimeUtc = DateTime.UtcNow;
+                questionToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 questionToUpdate.LastModifierUserId = Convert.ToInt32(_httpContext.CurrentUserProfileId());
 
                 try
@@ -403,7 +403,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 }
 
                 answerToUpdate.Content = answer.Content;
-                answerToUpdate.LastModificationDateTimeUtc = DateTime.UtcNow;
+                answerToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
 
                 try
                 {

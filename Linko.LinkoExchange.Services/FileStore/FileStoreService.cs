@@ -171,7 +171,7 @@ namespace Linko.LinkoExchange.Services.FileStore
 
                     var fileStore = _mapHelper.GetFileStoreFromFileStoreDto(fileStoreDto);
 
-                    fileStore.UploadDateTimeUtc = DateTimeOffset.UtcNow;
+                    fileStore.UploadDateTimeUtc = DateTimeOffset.Now;
 
                     fileStore = _dbContext.FileStores.Add(fileStore);
                     _dbContext.SaveChanges();
@@ -251,7 +251,7 @@ namespace Linko.LinkoExchange.Services.FileStore
                 {
                     var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
                     fileStoreToUpdate.LastModifierUserId = currentUserId;
-                    fileStoreToUpdate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                    fileStoreToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
 
                     fileStoreToUpdate.Description = fileStoreDto.Description;
                     fileStoreToUpdate.ReportElementTypeName = fileStoreDto.ReportElementTypeName;

@@ -59,7 +59,7 @@ namespace Linko.LinkoExchange.Services.MonitoringPoint
 
                 //Set LastModificationDateTimeLocal
                 dto.LastModificationDateTimeLocal = _timeZoneService
-                        .GetLocalizedDateTimeUsingThisTimeZoneId(mp.LastModificationDateTimeUtc?.DateTime ?? mp.CreationDateTimeUtc.DateTime, timeZoneId);
+                        .GetLocalizedDateTimeUsingThisTimeZoneId(mp.LastModificationDateTimeUtc?.UtcDateTime ?? mp.CreationDateTimeUtc.UtcDateTime, timeZoneId);
 
                 if (mp.LastModifierUserId.HasValue)
                 {
@@ -88,7 +88,7 @@ namespace Linko.LinkoExchange.Services.MonitoringPoint
 
             //Set LastModificationDateTimeLocal
             dto.LastModificationDateTimeLocal = _timeZoneService
-                    .GetLocalizedDateTimeUsingThisTimeZoneId(foundMonPoint.LastModificationDateTimeUtc?.DateTime ?? foundMonPoint.CreationDateTimeUtc.DateTime, timeZoneId);
+                    .GetLocalizedDateTimeUsingThisTimeZoneId(foundMonPoint.LastModificationDateTimeUtc?.UtcDateTime ?? foundMonPoint.CreationDateTimeUtc.UtcDateTime, timeZoneId);
 
             if (foundMonPoint.LastModifierUserId.HasValue)
             {

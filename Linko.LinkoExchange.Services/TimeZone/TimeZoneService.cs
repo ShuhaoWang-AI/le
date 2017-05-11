@@ -96,38 +96,7 @@ namespace Linko.LinkoExchange.Services.TimeZone
             return (TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, authorityLocalZone));
         }
 
-        public DateTimeOffset GetLocalDateTimeOffsetFromUtcUsingSettingForThisOrg(DateTime utcDateTime, int orgRegProgramId)
-        {
-            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
-            return (GetLocalDateTimeOffsetFromUtcUsingThisTimeZoneId(utcDateTime, timeZoneId));
-        }
-
-        public DateTimeOffset GetLocalDateTimeOffsetFromUtcUsingThisTimeZoneId(DateTime utcDateTime, int timeZoneId)
-        {
-            TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
-            return (new DateTimeOffset(utcDateTime).ToOffset(authorityLocalZone.GetUtcOffset(utcDateTime)));
-        }
-
-        public DateTimeOffset GetLocalDateTimeOffsetFromLocalUsingSettingForThisOrg(DateTime localDateTime, int orgRegProgramId)
-        {
-            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
-            return (GetLocalDateTimeOffsetFromLocalUsingThisTimeZoneId(localDateTime, timeZoneId));
-        }
-
-        public DateTimeOffset GetLocalDateTimeOffsetFromLocalUsingThisTimeZoneId(DateTime localDateTime, int timeZoneId)
-        {
-            TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
-
-            while (authorityLocalZone.IsAmbiguousTime(localDateTime) || authorityLocalZone.IsInvalidTime(localDateTime))
-            {
-                localDateTime = localDateTime.AddHours(1);
-            }
-
-            var utcDateTime = TimeZoneInfo.ConvertTimeToUtc(localDateTime, authorityLocalZone);
-            return (new DateTimeOffset(utcDateTime).ToOffset(authorityLocalZone.GetUtcOffset(utcDateTime)));
-        }
-
-        public DateTimeOffset GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(DateTime localDateTime, int timeZoneId)
+        public DateTimeOffset GetDateTimeOffsetFromLocalUsingThisTimeZoneId(DateTime localDateTime, int timeZoneId)
         {
             TimeZoneInfo authorityLocalZone = TimeZoneInfo.FindSystemTimeZoneById(this.GetTimeZoneName(timeZoneId));
             TimeZoneInfo serverTimeZone = TimeZoneInfo.Local;
@@ -142,10 +111,10 @@ namespace Linko.LinkoExchange.Services.TimeZone
 
         }
 
-        public DateTimeOffset GetServerDateTimeOffsetFromLocalUsingThisOrg(DateTime localDateTime, int orgRegProgramId)
+        public DateTimeOffset GetDateTimeOffsetFromLocalUsingThisOrg(DateTime localDateTime, int orgRegProgramId)
         {
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(orgRegProgramId, SettingType.TimeZone));
-            return (GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(localDateTime, timeZoneId));
+            return (GetDateTimeOffsetFromLocalUsingThisTimeZoneId(localDateTime, timeZoneId));
         }
 
     }

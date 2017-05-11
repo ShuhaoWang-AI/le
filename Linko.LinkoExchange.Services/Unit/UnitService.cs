@@ -182,8 +182,8 @@ namespace Linko.LinkoExchange.Services.Unit
                 unitDto.LastModificationDateTimeLocal = _timeZoneService
                     .GetLocalizedDateTimeUsingSettingForThisOrg(
                     (unit.LastModificationDateTimeUtc.HasValue
-                        ? unit.LastModificationDateTimeUtc.Value.DateTime
-                        : unit.CreationDateTimeUtc.DateTime), currentOrgRegProgramId);
+                        ? unit.LastModificationDateTimeUtc.Value.UtcDateTime
+                        : unit.CreationDateTimeUtc.UtcDateTime), currentOrgRegProgramId);
 
                 if (unit.LastModifierUserId.HasValue)
                 {

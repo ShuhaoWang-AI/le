@@ -92,10 +92,10 @@ namespace Linko.LinkoExchange.Services.Program
                 orpu.IsRegistrationDenied = false;
                 orpu.IsSignatory = false;
                 orpu.UserProfileId = userProfileId;
-                //orpu.LastModificationDateTimeUtc = DateTime.UtcNow;
+                //orpu.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 orpu.IsRemoved = false;
-                orpu.CreationDateTimeUtc = DateTimeOffset.UtcNow;
-                orpu.RegistrationDateTimeUtc = DateTimeOffset.UtcNow;
+                orpu.CreationDateTimeUtc = DateTimeOffset.Now;
+                orpu.RegistrationDateTimeUtc = DateTimeOffset.Now;
                 orpu.OrganizationRegulatoryProgramId = organizationRegulatoryProgramId;
                 orpu.InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgramId;
 
@@ -109,7 +109,7 @@ namespace Linko.LinkoExchange.Services.Program
                 orpu.IsRemoved = false;
 
                 //Update to new re-reg time-stamp
-                orpu.RegistrationDateTimeUtc = DateTimeOffset.UtcNow;
+                orpu.RegistrationDateTimeUtc = DateTimeOffset.Now;
 
                 //Update because the new "Inviter" is now the Authority
                 //(need to do this so that this pending registration show up under the Authority)

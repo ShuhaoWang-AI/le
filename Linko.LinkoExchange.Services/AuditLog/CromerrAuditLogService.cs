@@ -41,7 +41,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
             CromerrAuditLog cromerrAuditLogEntry = _mapHelper.GetCromerrAuditLogFromCromerrAuditLogEntryDto(dto);
             cromerrAuditLogEntry.AuditLogTemplateId = auditLogTemplate.AuditLogTemplateId;
             cromerrAuditLogEntry.Comment = comment;
-            cromerrAuditLogEntry.LogDateTimeUtc = DateTime.UtcNow;
+            cromerrAuditLogEntry.LogDateTimeUtc = DateTimeOffset.Now;
 
             this._dbContext.CromerrAuditLogs.Add(cromerrAuditLogEntry);
 
@@ -86,7 +86,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
             CromerrAuditLog cromerrAuditLogEntry = _mapHelper.GetCromerrAuditLogFromCromerrAuditLogEntryDto(cromerrAuditLogEntryDto);
             cromerrAuditLogEntry.AuditLogTemplateId = auditLogTemplate.AuditLogTemplateId;
             cromerrAuditLogEntry.Comment = comment;
-            cromerrAuditLogEntry.LogDateTimeUtc = DateTime.UtcNow;
+            cromerrAuditLogEntry.LogDateTimeUtc = DateTimeOffset.Now;
 
             this._dbContext.CromerrAuditLogs.Add(cromerrAuditLogEntry);
             this._dbContext.SaveChanges();

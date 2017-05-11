@@ -65,8 +65,8 @@ namespace Linko.LinkoExchange.Services.Report
             {
                 var dto = _mapHelper.GetReportElementTypeDtoFromReportElementType(reportElementType);
                 dto.LastModificationDateTimeLocal = _timeZoneService
-                    .GetLocalizedDateTimeUsingSettingForThisOrg((reportElementType.LastModificationDateTimeUtc.HasValue ? reportElementType.LastModificationDateTimeUtc.Value.DateTime 
-                                                                    : reportElementType.CreationDateTimeUtc.DateTime), currentOrgRegProgramId);
+                    .GetLocalizedDateTimeUsingSettingForThisOrg((reportElementType.LastModificationDateTimeUtc.HasValue ? reportElementType.LastModificationDateTimeUtc.Value.UtcDateTime 
+                                                                    : reportElementType.CreationDateTimeUtc.UtcDateTime), currentOrgRegProgramId);
 
                 if (reportElementType.LastModifierUserId.HasValue)
                 {
@@ -108,8 +108,8 @@ namespace Linko.LinkoExchange.Services.Report
 
             //Set LastModificationDateTimeLocal
             dto.LastModificationDateTimeLocal = _timeZoneService
-                    .GetLocalizedDateTimeUsingSettingForThisOrg((foundREType.LastModificationDateTimeUtc.HasValue ? foundREType.LastModificationDateTimeUtc.Value.DateTime
-                        : foundREType.CreationDateTimeUtc.DateTime), currentOrgRegProgramId);
+                    .GetLocalizedDateTimeUsingSettingForThisOrg((foundREType.LastModificationDateTimeUtc.HasValue ? foundREType.LastModificationDateTimeUtc.Value.UtcDateTime
+                        : foundREType.CreationDateTimeUtc.UtcDateTime), currentOrgRegProgramId);
 
             if (foundREType.LastModifierUserId.HasValue)
             {
@@ -203,7 +203,7 @@ namespace Linko.LinkoExchange.Services.Report
                         reportElementTypeToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
                         reportElementTypeToPersist.ReportElementCategoryId = _dbContext.ReportElementCategories
                                                 .Single(cat => cat.Name == reportElementType.ReportElementCategory.ToString()).ReportElementCategoryId;
-                        reportElementTypeToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                        reportElementTypeToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
                         reportElementTypeToPersist.LastModifierUserId = currentUserId;
 
                         if (isChangingName)
@@ -246,8 +246,8 @@ namespace Linko.LinkoExchange.Services.Report
                         reportElementTypeToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
                         reportElementTypeToPersist.ReportElementCategoryId = _dbContext.ReportElementCategories
                                                 .Single(cat => cat.Name == reportElementType.ReportElementCategory.ToString()).ReportElementCategoryId;
-                        reportElementTypeToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
-                        reportElementTypeToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                        reportElementTypeToPersist.CreationDateTimeUtc = DateTimeOffset.Now;
+                        reportElementTypeToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
                         reportElementTypeToPersist.LastModifierUserId = currentUserId;
                         _dbContext.ReportElementTypes.Add(reportElementTypeToPersist);
                     }

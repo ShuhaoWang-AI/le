@@ -96,8 +96,8 @@ namespace Linko.LinkoExchange.Services.Parameter
                 }
 
                 dto.LastModificationDateTimeLocal = _timeZoneService
-                                        .GetLocalizedDateTimeUsingThisTimeZoneId((parameter.LastModificationDateTimeUtc.HasValue ? parameter.LastModificationDateTimeUtc.Value.DateTime
-                                         : parameter.CreationDateTimeUtc.DateTime), timeZoneId);
+                                        .GetLocalizedDateTimeUsingThisTimeZoneId((parameter.LastModificationDateTimeUtc.HasValue ? parameter.LastModificationDateTimeUtc.Value.UtcDateTime
+                                         : parameter.CreationDateTimeUtc.UtcDateTime), timeZoneId);
 
                 if (parameter.LastModifierUserId.HasValue)
                 {
@@ -166,8 +166,8 @@ namespace Linko.LinkoExchange.Services.Parameter
 
                 //Set LastModificationDateTimeLocal
                 paramGroupDto.LastModificationDateTimeLocal = _timeZoneService
-                        .GetLocalizedDateTimeUsingThisTimeZoneId((paramGroup.LastModificationDateTimeUtc.HasValue ? paramGroup.LastModificationDateTimeUtc.Value.DateTime
-                         : paramGroup.CreationDateTimeUtc.DateTime), timeZoneId);
+                        .GetLocalizedDateTimeUsingThisTimeZoneId((paramGroup.LastModificationDateTimeUtc.HasValue ? paramGroup.LastModificationDateTimeUtc.Value.UtcDateTime
+                         : paramGroup.CreationDateTimeUtc.UtcDateTime), timeZoneId);
 
                 if (paramGroup.LastModifierUserId.HasValue)
                 {
@@ -242,8 +242,8 @@ namespace Linko.LinkoExchange.Services.Parameter
             
             //Set LastModificationDateTimeLocal
             parameterGroupDto.LastModificationDateTimeLocal = _timeZoneService
-                    .GetLocalizedDateTimeUsingSettingForThisOrg((foundParamGroup.LastModificationDateTimeUtc.HasValue ? foundParamGroup.LastModificationDateTimeUtc.Value.DateTime
-                        : foundParamGroup.CreationDateTimeUtc.DateTime), currentOrgRegProgramId);
+                    .GetLocalizedDateTimeUsingSettingForThisOrg((foundParamGroup.LastModificationDateTimeUtc.HasValue ? foundParamGroup.LastModificationDateTimeUtc.Value.UtcDateTime
+                        : foundParamGroup.CreationDateTimeUtc.UtcDateTime), currentOrgRegProgramId);
 
             if (foundParamGroup.LastModifierUserId.HasValue)
             {
@@ -343,7 +343,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 
                         paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup, paramGroupToPersist);
                         paramGroupToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
-                        paramGroupToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                        paramGroupToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
                         paramGroupToPersist.LastModifierUserId = currentUserProfileId;
                         
                     }
@@ -360,8 +360,8 @@ namespace Linko.LinkoExchange.Services.Parameter
                         //Get new
                         paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup);
                         paramGroupToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
-                        paramGroupToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
-                        paramGroupToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                        paramGroupToPersist.CreationDateTimeUtc = DateTimeOffset.Now;
+                        paramGroupToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
                         paramGroupToPersist.LastModifierUserId = currentUserProfileId;
                         _dbContext.ParameterGroups.Add(paramGroupToPersist);
                     }
@@ -468,7 +468,7 @@ namespace Linko.LinkoExchange.Services.Parameter
 
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
-            var sampleEndDateTimeUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleEndDateTimeLocal, timeZoneId);
+            var sampleEndDateTimeUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleEndDateTimeLocal, timeZoneId);
             string monitoringPointAbbrv = _dbContext.MonitoringPoints
                                         .Single(mp => mp.MonitoringPointId == monitoringPointId).Name; //TO-DO: Is this the same as Abbreviation? Or do we take Id?
             //Static Groups

@@ -486,7 +486,7 @@ namespace Linko.LinkoExchange.Test
                 PeriodStartDateTime = DateTimeOffset.UtcNow,
                 PeriodEndDateTimeLocal = DateTime.UtcNow.ToLocalTime(),
                 PeriodStartDateTimeLocal = DateTime.UtcNow.ToLocalTime(),
-                ReportStatusId = (int)ReportStatusName.ReadyToSubmit,
+                ReportStatusName = ReportStatusName.ReadyToSubmit,
 
                 OrganizationName = orgRegProgram.Organization.Name,
                 OrganizationAddressLine1 = orgRegProgram.Organization.AddressLine1,

@@ -855,7 +855,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 ReportElementTypeName = fileStore.ReportElementTypeName,
                 OrganizationRegulatoryProgramId = fileStore.OrganizationRegulatoryProgramId,
                 OrganizationRegulatoryProgram = GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(fileStore.OrganizationRegulatoryProgram),
-                UploadDateTimeLocal = fileStore.UploadDateTimeUtc.DateTime,
+                UploadDateTimeLocal = fileStore.UploadDateTimeUtc.UtcDateTime,
                 UploaderUserId = fileStore.UploaderUserId
             };
         }
@@ -1072,14 +1072,14 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             reportPackageDto.ReportPackageId = rpt.ReportPackageId;
             reportPackageDto.Name = rpt.Name;
-            reportPackageDto.PeriodStartDateTimeLocal = rpt.PeriodStartDateTimeUtc.DateTime;
-            reportPackageDto.PeriodEndDateTimeLocal = rpt.PeriodEndDateTimeUtc.DateTime;
+            reportPackageDto.PeriodStartDateTimeLocal = rpt.PeriodStartDateTimeUtc.UtcDateTime;
+            reportPackageDto.PeriodEndDateTimeLocal = rpt.PeriodEndDateTimeUtc.UtcDateTime;
             reportPackageDto.CtsEventTypeId = rpt.CtsEventTypeId;
             reportPackageDto.CtsEventTypeName = rpt.CtsEventTypeName;
             reportPackageDto.CtsEventCategoryName = rpt.CtsEventCategoryName;
             reportPackageDto.Comments = rpt.Comments;
             reportPackageDto.IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired;
-            reportPackageDto.ReportStatusId = rpt.ReportStatusId;
+            //reportPackageDto.ReportStatusName = set outside after calling line
             reportPackageDto.OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId;
             reportPackageDto.OrganizationName = rpt.OrganizationName;
             reportPackageDto.OrganizationAddressLine1 = rpt.OrganizationAddressLine1;
@@ -1092,7 +1092,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             reportPackageDto.RecipientOrganizationCityName = rpt.RecipientOrganizationCityName;
             reportPackageDto.RecipientOrganizationJurisdictionName = rpt.RecipientOrganizationJurisdictionName;
             reportPackageDto.RecipientOrganizationZipCode = rpt.RecipientOrganizationZipCode;
-            reportPackageDto.CreationDateTimeLocal = rpt.CreationDateTimeUtc.DateTime;
+            reportPackageDto.CreationDateTimeLocal = rpt.CreationDateTimeUtc.UtcDateTime;
             reportPackageDto.SubmitterUserId = rpt.SubmitterUserId.HasValue ? rpt.SubmitterUserId.Value : -1;
             reportPackageDto.SubmitterUserName = rpt.SubmitterUserName;
             reportPackageDto.SubmitterFirstName = rpt.SubmitterFirstName;
@@ -1148,19 +1148,19 @@ namespace Linko.LinkoExchange.Services.Mapping
                 IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired,
                 ReportPackageTemplateId = rpt.ReportPackageTemplateId,
                 //ReportStatusId = set outside after calling line
-                OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId,
-                OrganizationName = rpt.OrganizationRegulatoryProgram.Organization.Name,
-                OrganizationAddressLine1 = rpt.OrganizationRegulatoryProgram.Organization.AddressLine1,
-                OrganizationAddressLine2 = rpt.OrganizationRegulatoryProgram.Organization.AddressLine2,
-                OrganizationCityName = rpt.OrganizationRegulatoryProgram.Organization.CityName,
-                OrganizationJurisdictionName = rpt.OrganizationRegulatoryProgram.Organization.Jurisdiction.Name,
-                OrganizationZipCode = rpt.OrganizationRegulatoryProgram.Organization.ZipCode,
-                //RecipientOrganizationName = set outside after calling line
-                //RecipientOrganizationAddressLine1 = set outside after calling line
-                //RecipientOrganizationAddressLine2 = set outside after calling line
-                //RecipientOrganizationCityName = set outside after calling line
-                //RecipientOrganizationJurisdictionName = set outside after calling line
-                //RecipientOrganizationZipCode = set outside after calling line
+                //OrganizationRegulatoryProgramId = set outside after calling line
+                //OrganizationName = set outside after calling line
+                //OrganizationAddressLine1 = set outside after calling line
+                //OrganizationAddressLine2 = set outside after calling line
+                //OrganizationCityName = set outside after calling line
+                //OrganizationJurisdictionName = set outside after calling line
+                //OrganizationZipCode = set outside after calling line
+                RecipientOrganizationName = rpt.OrganizationRegulatoryProgram.Organization.Name,
+                RecipientOrganizationAddressLine1 = rpt.OrganizationRegulatoryProgram.Organization.AddressLine1,
+                RecipientOrganizationAddressLine2 = rpt.OrganizationRegulatoryProgram.Organization.AddressLine2,
+                RecipientOrganizationCityName = rpt.OrganizationRegulatoryProgram.Organization.CityName,
+                RecipientOrganizationJurisdictionName = rpt.OrganizationRegulatoryProgram.Organization.Jurisdiction.Name,
+                RecipientOrganizationZipCode = rpt.OrganizationRegulatoryProgram.Organization.ZipCode,
                 //CreationDateTimeUtc = set outside after calling line
                 ReportPackageElementCategories = new List<ReportPackageElementCategory>()
             };

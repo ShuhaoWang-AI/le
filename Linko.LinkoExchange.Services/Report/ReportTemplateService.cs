@@ -218,12 +218,12 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     var effectiveDateTimeUtc =
-                        _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisOrg(rpt.EffectiveDateTimeLocal,
+                        _timeZoneService.GetDateTimeOffsetFromLocalUsingThisOrg(rpt.EffectiveDateTimeLocal,
                             currentRegulatoryProgramId);
 
                     if (rpt.RetirementDateTimeLocal.HasValue)
                     {
-                        rpt.RetirementDateTimeUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisOrg(rpt.RetirementDateTimeLocal.Value, currentRegulatoryProgramId);
+                        rpt.RetirementDateTimeUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisOrg(rpt.RetirementDateTimeLocal.Value, currentRegulatoryProgramId);
                     }
 
                     //// Check if Name and EffectiveDateTimeUtc combination is unique or not 
@@ -262,7 +262,7 @@ namespace Linko.LinkoExchange.Services.Report
                         currentReportPackageTempalte.CtsEventTypeId = rpt.CtsEventTypeId;
                         currentReportPackageTempalte.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
                         currentReportPackageTempalte.IsActive = rpt.IsActive;
-                        currentReportPackageTempalte.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                        currentReportPackageTempalte.LastModificationDateTimeUtc = DateTimeOffset.Now;
                         currentReportPackageTempalte.LastModifierUserId = currentUserId;
 
                         //  1 Delete from tReprotPackageTemplateAssignment table,
@@ -275,7 +275,7 @@ namespace Linko.LinkoExchange.Services.Report
                         // Create new in tReportPackageTempate table
                         reportPackageTemplate.OrganizationRegulatoryProgramId = currentRegulatoryProgramId;
                         reportPackageTemplate.IsActive = rpt.IsActive;
-                        reportPackageTemplate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                        reportPackageTemplate.LastModificationDateTimeUtc = DateTimeOffset.Now;
                         reportPackageTemplate.EffectiveDateTimeUtc = effectiveDateTimeUtc;
                         reportPackageTemplate.LastModifierUserId = currentUserId;
 
@@ -418,7 +418,7 @@ namespace Linko.LinkoExchange.Services.Report
                 var reportElementTypeDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(rpt);
                 if (rpt.LastModificationDateTimeUtc.HasValue)
                 {
-                    reportElementTypeDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(rpt.LastModificationDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
+                    reportElementTypeDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(rpt.LastModificationDateTimeUtc.Value.UtcDateTime, currentOrgRegProgramId);
                     var lastModifierUser = _dbContext.Users.Single(user => user.UserProfileId == rpt.LastModifierUserId.Value);
                     reportElementTypeDto.LastModifierFullName = $"{lastModifierUser.FirstName} {lastModifierUser.LastName}";
                 }
@@ -475,13 +475,13 @@ namespace Linko.LinkoExchange.Services.Report
             var rptDto = _mapHelper.GetReportPackageTemplateDtoFromReportPackageTemplate(rpt);
 
             rptDto.LastModificationDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(
-                rpt.LastModificationDateTimeUtc?.DateTime ?? rpt.CreationDateTimeUtc.DateTime, currentOrgRegProgramId);
+                rpt.LastModificationDateTimeUtc?.UtcDateTime ?? rpt.CreationDateTimeUtc.UtcDateTime, currentOrgRegProgramId);
 
             rptDto.EffectiveDateTimeLocal =
-                _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(rpt.EffectiveDateTimeUtc.DateTime, currentOrgRegProgramId);
+                _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(rpt.EffectiveDateTimeUtc.UtcDateTime, currentOrgRegProgramId);
             if (rpt.RetirementDateTimeUtc.HasValue)
             {
-                rptDto.RetirementDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(rpt.RetirementDateTimeUtc.Value.DateTime, currentOrgRegProgramId);
+                rptDto.RetirementDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingSettingForThisOrg(rpt.RetirementDateTimeUtc.Value.UtcDateTime, currentOrgRegProgramId);
             }
 
             if (includeChildObjects)
@@ -528,7 +528,7 @@ namespace Linko.LinkoExchange.Services.Report
                     var retDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(reportElementType);
                     //Set LastModificationDateTimeLocal
                     retDto.LastModificationDateTimeLocal = _timeZoneService
-                        .GetLocalizedDateTimeUsingSettingForThisOrg(reportElementType.LastModificationDateTimeUtc?.DateTime ?? reportElementType.CreationDateTimeUtc.DateTime, currentOrgRegProgramId);
+                        .GetLocalizedDateTimeUsingSettingForThisOrg(reportElementType.LastModificationDateTimeUtc?.UtcDateTime ?? reportElementType.CreationDateTimeUtc.UtcDateTime, currentOrgRegProgramId);
 
                     if (reportElementType.LastModifierUserId.HasValue)
                     {
@@ -616,8 +616,8 @@ namespace Linko.LinkoExchange.Services.Report
 
             //Set LastModificationDateTimeLocal
             dto.LastModificationDateTimeLocal = _timeZoneService
-                    .GetLocalizedDateTimeUsingSettingForThisOrg((ctsEventType.LastModificationDateTimeUtc.HasValue ? ctsEventType.LastModificationDateTimeUtc.Value.DateTime
-                        : ctsEventType.CreationDateTimeUtc.DateTime), currentOrgRegProgramId);
+                    .GetLocalizedDateTimeUsingSettingForThisOrg((ctsEventType.LastModificationDateTimeUtc.HasValue ? ctsEventType.LastModificationDateTimeUtc.Value.UtcDateTime
+                        : ctsEventType.CreationDateTimeUtc.UtcDateTime), currentOrgRegProgramId);
 
             if (ctsEventType.LastModifierUserId.HasValue)
             {

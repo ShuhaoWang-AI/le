@@ -74,8 +74,8 @@ namespace Linko.LinkoExchange.Services.Sample
             var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
-            var sampleStartDateTimeUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId);
-            var sampleEndDateTimeUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId);
+            var sampleStartDateTimeUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId);
+            var sampleEndDateTimeUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId);
             var massLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.MassLoading.ToString()).LimitBasisId;
             var concentrationLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Concentration.ToString()).LimitBasisId;
             var dailyLimitTypeId = _dbContext.LimitTypes.Single(lt => lt.Name == LimitTypeName.Daily.ToString()).LimitTypeId;
@@ -117,7 +117,7 @@ namespace Linko.LinkoExchange.Services.Sample
             {
                 //Get new
                 sampleToPersist = _mapHelper.GetSampleFromSampleDto(sampleDto);
-                sampleToPersist.CreationDateTimeUtc = DateTimeOffset.UtcNow;
+                sampleToPersist.CreationDateTimeUtc = DateTimeOffset.Now;
                 sampleToPersist.SampleResults = new List<SampleResult>();
                 _dbContext.Samples.Add(sampleToPersist);
             }
@@ -143,7 +143,7 @@ namespace Linko.LinkoExchange.Services.Sample
             sampleToPersist.ForOrganizationRegulatoryProgramId = currentOrgRegProgramId; //these are the same only per current workflow
             sampleToPersist.StartDateTimeUtc = sampleStartDateTimeUtc;
             sampleToPersist.EndDateTimeUtc = sampleEndDateTimeUtc;
-            sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+            sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
             sampleToPersist.LastModifierUserId = currentUserId;
 
             //Handle FlowUnitValidValues
@@ -199,7 +199,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 existingFlowResultRow.EnteredMethodDetectionLimit = "";
                 existingFlowResultRow.LimitTypeId = null;
                 existingFlowResultRow.LimitBasisId = flowLimitBasisId;
-                existingFlowResultRow.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                existingFlowResultRow.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 existingFlowResultRow.LastModifierUserId = currentUserId;
 
 
@@ -256,11 +256,11 @@ namespace Linko.LinkoExchange.Services.Sample
                 if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
                 {
                     concentrationResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
-                        .GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                        .GetDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
                 }
                 concentrationResultRowToUpdate.LimitBasisId = concentrationLimitBasisId;
                 concentrationResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
-                concentrationResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                concentrationResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 concentrationResultRowToUpdate.LastModifierUserId = currentUserId;
 
                 //this is always persisted with the concentration result NOT the mass loading result
@@ -298,11 +298,11 @@ namespace Linko.LinkoExchange.Services.Sample
                     if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
                     {
                         massResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
-                            .GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
+                            .GetDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
                     }
                     massResultRowToUpdate.LimitBasisId = massLimitBasisId;
                     massResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
-                    massResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
+                    massResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
                     massResultRowToUpdate.LastModifierUserId = currentUserId;
 
                 }
@@ -487,8 +487,8 @@ namespace Linko.LinkoExchange.Services.Sample
 
             //Check sample start/end dates are not in the future (UC-15-1.2.9.1.b)
             
-            if (_timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId) > DateTimeOffset.Now ||
-                _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId) > DateTimeOffset.Now)
+            if (_timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId) > DateTimeOffset.Now ||
+                _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId) > DateTimeOffset.Now)
             {
                 isValid = false;
                 if (!isSuppressExceptions)
@@ -705,16 +705,16 @@ namespace Linko.LinkoExchange.Services.Sample
 
             //Set Sample Start Local Timestamp
             dto.StartDateTimeLocal = _timeZoneService
-                    .GetLocalizedDateTimeUsingThisTimeZoneId(sample.StartDateTimeUtc.DateTime, timeZoneId);
+                    .GetLocalizedDateTimeUsingThisTimeZoneId(sample.StartDateTimeUtc.UtcDateTime, timeZoneId);
 
             //Set Sample End Local Timestamp
             dto.EndDateTimeLocal = _timeZoneService
-                    .GetLocalizedDateTimeUsingThisTimeZoneId(sample.EndDateTimeUtc.DateTime, timeZoneId);
+                    .GetLocalizedDateTimeUsingThisTimeZoneId(sample.EndDateTimeUtc.UtcDateTime, timeZoneId);
 
             //Set LastModificationDateTimeLocal
             dto.LastModificationDateTimeLocal = _timeZoneService
-                    .GetLocalizedDateTimeUsingThisTimeZoneId((sample.LastModificationDateTimeUtc.HasValue ? sample.LastModificationDateTimeUtc.Value.DateTime
-                        : sample.CreationDateTimeUtc.DateTime), timeZoneId);
+                    .GetLocalizedDateTimeUsingThisTimeZoneId((sample.LastModificationDateTimeUtc.HasValue ? sample.LastModificationDateTimeUtc.Value.UtcDateTime
+                        : sample.CreationDateTimeUtc.UtcDateTime), timeZoneId);
 
             if (sample.LastModifierUserId.HasValue)
             {
@@ -837,13 +837,13 @@ namespace Linko.LinkoExchange.Services.Sample
             //Need to set localized time stamps for SampleResults
             if (sampleResult.AnalysisDateTimeUtc.HasValue)
             {
-                resultDto.AnalysisDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(sampleResult.AnalysisDateTimeUtc.Value.DateTime, timeZoneId);
+                resultDto.AnalysisDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(sampleResult.AnalysisDateTimeUtc.Value.UtcDateTime, timeZoneId);
             }
 
             //Set LastModificationDateTimeLocal
             resultDto.LastModificationDateTimeLocal = _timeZoneService
-                    .GetLocalizedDateTimeUsingThisTimeZoneId((sampleResult.LastModificationDateTimeUtc.HasValue ? sampleResult.LastModificationDateTimeUtc.Value.DateTime
-                        : sampleResult.CreationDateTimeUtc.DateTime), timeZoneId);
+                    .GetLocalizedDateTimeUsingThisTimeZoneId((sampleResult.LastModificationDateTimeUtc.HasValue ? sampleResult.LastModificationDateTimeUtc.Value.UtcDateTime
+                        : sampleResult.CreationDateTimeUtc.UtcDateTime), timeZoneId);
 
             if (sampleResult.LastModifierUserId.HasValue)
             {
@@ -941,12 +941,12 @@ namespace Linko.LinkoExchange.Services.Sample
 
             if (startDate.HasValue)
             {
-                var startDateUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(startDate.Value, timeZoneId);
+                var startDateUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(startDate.Value, timeZoneId);
                 foundSamples = foundSamples.Where(s => s.StartDateTimeUtc >= startDateUtc);
             }
             if (endDate.HasValue)
             {
-                var endDateUtc = _timeZoneService.GetServerDateTimeOffsetFromLocalUsingThisTimeZoneId(endDate.Value, timeZoneId);
+                var endDateUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(endDate.Value, timeZoneId);
                 foundSamples = foundSamples.Where(s => s.EndDateTimeUtc <= endDateUtc);
             }
 

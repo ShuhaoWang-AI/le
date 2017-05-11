@@ -192,7 +192,7 @@ namespace Linko.LinkoExchange.Services.Invitation
 
                     //Need to modify datetime to local
                     dto.InvitationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(
-                        dto.InvitationDateTimeUtc.DateTime, authority.OrganizationId, org.RegulatoryProgramId);
+                        dto.InvitationDateTimeUtc.UtcDateTime, authority.OrganizationId, org.RegulatoryProgramId);
                     dto.ExpiryDateTimeUtc = dto.InvitationDateTimeUtc.AddHours(addExpiryHours);
 
                     dtos.Add(dto);
@@ -414,7 +414,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             {
                 var newInvitation = _dbContext.Invitations.Create();
                 newInvitation.InvitationId = dto.InvitationId;
-                newInvitation.InvitationDateTimeUtc = DateTimeOffset.UtcNow;
+                newInvitation.InvitationDateTimeUtc = DateTimeOffset.Now;
                 newInvitation.EmailAddress = dto.EmailAddress;
                 newInvitation.FirstName = dto.FirstName;
                 newInvitation.LastName = dto.LastName;
