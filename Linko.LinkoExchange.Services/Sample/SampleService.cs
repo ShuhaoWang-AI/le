@@ -197,7 +197,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 existingFlowResultRow.UnitId = sampleDto.FlowUnitId.Value;
                 existingFlowResultRow.UnitName = sampleDto.FlowUnitName;
                 existingFlowResultRow.EnteredMethodDetectionLimit = "";
-                existingFlowResultRow.LimitTypeId = dailyLimitTypeId;
+                existingFlowResultRow.LimitTypeId = null;
                 existingFlowResultRow.LimitBasisId = flowLimitBasisId;
                 existingFlowResultRow.LastModificationDateTimeUtc = DateTimeOffset.UtcNow;
                 existingFlowResultRow.LastModifierUserId = currentUserId;
