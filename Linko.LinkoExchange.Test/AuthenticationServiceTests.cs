@@ -645,7 +645,7 @@ namespace Linko.LinkoExchange.Test
             var sqQuestions = CreateQuestions(QuestionTypeName.SQ, 3);
 
             var invitServiceMock = Mock.Get(invitService);
-            invitServiceMock.Setup(i => i.GetInvitation(It.IsAny<string>())).Returns((InvitationDto) null);
+            invitServiceMock.Setup(i => i.GetInvitation(It.IsAny<string>())).Returns((InvitationDto)null);
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
@@ -714,7 +714,7 @@ namespace Linko.LinkoExchange.Test
 
             SetRegistrations(out sqQuestions, out kbqQuestions);
 
-            userManagerObj.Setup(i => i.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult((UserProfile) null));
+            userManagerObj.Setup(i => i.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult((UserProfile)null));
 
             IdentityResult createUserResult = IdentityResult.Success;
 
@@ -766,12 +766,12 @@ namespace Linko.LinkoExchange.Test
             SetRegistrations(out sqQuestions, out kbqQuestions);
 
             // To test new user fails   
-            userManagerObj.Setup(i => i.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult((UserProfile) null));
+            userManagerObj.Setup(i => i.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult((UserProfile)null));
 
             IdentityResult createUserResult = null;
 
             userManagerObj.Setup(i => i.CreateAsync(It.IsAny<UserProfile>(), It.IsAny<string>())).
-                Returns(Task.FromResult((IdentityResult) createUserResult));
+                Returns(Task.FromResult((IdentityResult)createUserResult));
 
             var ret = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration).Result;
         }
@@ -1107,5 +1107,10 @@ public class HttpContextServiceMock : IHttpContextService
     public string GetClaimValue(string claimType)
     {
         throw new NotImplementedException();
+    }
+
+    public string GetCurrentWebSiteRootUrl()
+    {
+        return "http://localhost";
     }
 }
