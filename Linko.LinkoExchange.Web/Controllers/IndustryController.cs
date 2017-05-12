@@ -859,7 +859,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"AttachmentDetails", model:viewModel);
         }
 
-        [Route(template:"Attachment/{id:int}/Download")]
+        [Route(template:"Attachment/{id:int}/Details/Download")]
         public ActionResult DownloadAttachment(int id)
         {
             var fileStore = _fileStoreService.GetFileStoreById(fileStoreId:id, includingFileData:true);
@@ -869,7 +869,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return File(fileStream:fileStream, contentType:contentType, fileDownloadName:fileDownloadName);
         }
-
+        
+        [Route(template:"Attachment/{id:int}/Details/Delete")]
         public ActionResult DeleteAttachment(int id)
         {
             try
@@ -1224,6 +1225,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
+        [Route(template:"Sample/{id:int}/Details/ReadyToReport/{isReadyToReport:bool}")]
         public ActionResult EnableSample(bool isReadyToReport, SampleViewModel model, FormCollection collection)
         {
             try
@@ -1303,7 +1305,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
         }
 
-        [Route(template:"Sample/{id:int}/Delete")]
+        [Route(template:"Sample/{id:int}/Details/Delete")]
         public ActionResult DeleteSample(int id)
         {
             try

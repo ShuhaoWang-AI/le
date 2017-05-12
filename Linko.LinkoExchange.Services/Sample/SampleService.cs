@@ -379,7 +379,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     }
 
                     _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
-                    transaction.Rollback();
+                    
                     throw;
 
                 }

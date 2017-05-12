@@ -178,7 +178,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info("Enter ReportPackageService.CopyOfRecordDataXmlFileDto. reportPackageId={0}", reportPackageDto.ReportPackageId);
 
-            var dateTimeFormat = "MM/dd/yyyyThh:mm:ss zzzz";
+            var dateTimeFormat = "MM/dd/yyyyThh:mm:ss zzzz"; // TODO:  i think format should also include tt (am/pm) as it is 12 hour format. Should be "MM/dd/yyyyThh:mm tt zzzz"
             var timeZoneName = _timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(reportPackageDto.OrganizationRegulatoryProgramId,
                                 reportPackageDto.SubmissionDateTimeLocal.Value, false);
 
@@ -233,7 +233,7 @@ namespace Linko.LinkoExchange.Services.Report
                     {
                         OriginalFileName = i.OriginalFileName,
                         SystemGeneratedUniqueFileName = i.Name,
-                        AttachmentType = i.FileType
+                        AttachmentType = i.FileType //TODO: it should be i.ReportElementTypeName
                     }).ToList()
                 }
             };
@@ -243,7 +243,7 @@ namespace Linko.LinkoExchange.Services.Report
                 {
                     OriginalFileName = "Copy Of Record Data.xml",
                     SystemGeneratedUniqueFileName = "Copy Of Record Data.xml",
-                    AttachmentType = "Xml Raw Data"
+                    AttachmentType = "XML Raw Data"
                 });
 
             dataXmlObj.FileManifest.Files.Add(
@@ -520,7 +520,7 @@ namespace Linko.LinkoExchange.Services.Report
             crommerContentReplacements.Add("organizationName", reportPackageDto.OrganizationName);
             crommerContentReplacements.Add("reportPackageName", reportPackageDto.Name);
 
-            var dateTimeFormat = "MM/dd/yyyyThh:mm:ss zzzz";
+            var dateTimeFormat = "MM/dd/yyyyThh:mm:ss zzzz"; // TODO:  i think format should also include tt (am/pm) as it is 12 hour format. Should be "MM/dd/yyyyThh:mm tt zzzz"
             crommerContentReplacements.Add("periodStart", reportPackageDto.PeriodStartDateTimeLocal.ToString(dateTimeFormat));
             crommerContentReplacements.Add("periodEnd", reportPackageDto.PeriodEndDateTimeLocal.ToString(dateTimeFormat));
             crommerContentReplacements.Add("corSignature", copyOfRecordDto.Signature);
@@ -547,7 +547,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             var timeZoneNameAbbreviation = _timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(reportPackage.OrganizationRegulatoryProgramId, reportPackage.SubmissionDateTimeLocal.Value, true);
             var submissionDateTime =
-                $"{reportPackage.SubmissionDateTimeLocal.Value.ToString("MMM dd, yyyy HHtt ")}{timeZoneNameAbbreviation}";
+                $"{reportPackage.SubmissionDateTimeLocal.Value.ToString("MMM dd, yyyy HHtt ")}{timeZoneNameAbbreviation}"; // TODO: i think format should be "MM/dd/yyyyThh:mm tt"
 
             emailContentReplacements.Add("submissionDateTime", submissionDateTime);
             emailContentReplacements.Add("corSignature", copyOfRecordDto.Signature);
@@ -593,7 +593,7 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
             emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
 
-            emailContentReplacements.Add("corViewLink", $"/reportPackage/{reportPackage.ReportPackageId}/cor");
+            emailContentReplacements.Add("corViewLink", $"/reportPackage/{reportPackage.ReportPackageId}/cor"); // TODO: I think also need to include website full path
 
             // Send emails to all IU signatories 
             var signatoriesEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();

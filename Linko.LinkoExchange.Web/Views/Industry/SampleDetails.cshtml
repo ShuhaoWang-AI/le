@@ -57,9 +57,9 @@
 
         <section class="box-body form-horizontal">
             @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
-                                                                                                                            {
-                                                                                                                                @class = "alert alert-danger"
-                                                                                                                            })
+                                                                                                                             {
+                                                                                                                                 @class = "alert alert-danger"
+                                                                                                                             })
             @if (ViewBag.ShowSuccessMessage != null && ViewBag.ShowSuccessMessage)
             {
                 <div class="alert alert-dismissible alert-success">
@@ -581,72 +581,6 @@
                         }
                     );
 
-                //$("input[id^='CalcLoading_']:checkbox:checked")
-                //    .each(function()
-                //    {
-                //        var paramId = this.id.replace('CalcLoading_', '');
-                //        displayMassLoading(paramId);
-                //    });
-
-                var isReadOnly = "@ViewBag.Readonly".toLowerCase() === "true";
-
-                if (isReadOnly)
-                {
-                    $("input[type=text]").prop('readonly', true);
-                    $("input[type=checkbox]").prop('disabled', true);
-                    $("select").prop('disabled', true);
-                    $("[name='btnAddParamsFromGroup']").prop('disabled', true);
-                    $("[name='btnDeleteParam']").prop('disabled', true);
-                }
-
-                updateResultTextBoxState();
-
-                $(document)
-                    .on('keypress'
-                        , "input[id^='Result_']"
-                        , function(e)
-                        {
-                            //if the letter is not digit then don't type anything
-                            if (e.which !== 8 && e.which !== 0 && e.which !== 46 && (e.which < 48 || e.which > 57))
-                            {
-                                return false;
-                            }
-                            else
-                            {
-                                return true;
-                            }
-                        });
-
-                $(document)
-                    .on('keypress'
-                        , "input[id^='MDL_']"
-                        , function(e)
-                        {
-                            //if the letter is not digit then don't type anything
-                            if (e.which !== 8 && e.which !== 0 && e.which !== 46 && (e.which < 48 || e.which > 57))
-                            {
-                                return false;
-                            }
-                            else
-                            {
-                                return true;
-                            }
-                        });
-
-                $("#FlowValue")
-                    .keypress(function(e)
-                    {
-                        //if the letter is not digit then don't type anything
-                        if (e.which !== 8 && e.which !== 0 && e.which !== 46 && (e.which < 48 || e.which > 57))
-                        {
-                            return false;
-                        }
-                        else
-                        {
-                            return true;
-                        }
-                    });
-
                 $("#sampleDetailsForm")
                     .submit(function(e)
                     {
@@ -657,7 +591,7 @@
 
                         try
                         {
-                            // add Results to hidden field    
+                            // add Results to hidden field
                             var sampleResults = [];
 
                             var parameterTable = $('#ParameterTable').DataTable();
@@ -715,187 +649,89 @@
                         }
                     });
             });
+    </script>
 
-        updateResultTextBoxState = function()
-        {
-            var parameterTable = $('#ParameterTable').DataTable();
-            parameterTable
-                .rows()
-                .every(function()
+    @if (ViewBag.Readonly)
+    {
+        <script>
+            $(document)
+                .ready(function()
                 {
-                    var d = this.data();
-                    var cell = d[0];
-                    var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
-                    var qualifier = $("#Qualifier_" + paramId).val();
-
-                    if (qualifier === "ND" || qualifier === "NF")
-                    {
-                        $("#Result_" + paramId).val("").attr("readonly", "readonly");
-                    }
-                    else
-                    {
-                        $("#Result_" + paramId).removeAttr("readonly");
-                    }
+                    $("input[type=text]").prop('readonly', true);
+                    $("input[type=checkbox]").prop('disabled', true);
+                    $("select").prop('disabled', true);
+                    $("[name='btnAddParamsFromGroup']").prop('disabled', true);
+                    $("[name='btnDeleteParam']").prop('disabled', true);
                 });
-        }
+        </script>
+    }
+    else
+    {
+        <script>
+            $(document)
+                .ready(function()
+                {
+                    updateResultTextBoxState();
 
-        function displayMassLoading(paramId)
-        {
-            var clChecked = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
+                    $(document)
+                        .on('keypress'
+                            , "input[id^='Result_']"
+                            , function(e)
+                            {
+                                //if the letter is not digit then don't type anything
+                                if (e.which !== 8
+                                    && e.which !== 0
+                                    && e.which !== 46
+                                    && (e.which < 48 || e.which > 57))
+                                {
+                                    return false;
+                                }
+                                else
+                                {
+                                    return true;
+                                }
+                            });
 
-            if (clChecked)
+                    $(document)
+                        .on('keypress'
+                            , "input[id^='MDL_']"
+                            , function(e)
+                            {
+                                //if the letter is not digit then don't type anything
+                                if (e.which !== 8
+                                    && e.which !== 0
+                                    && e.which !== 46
+                                    && (e.which < 48 || e.which > 57))
+                                {
+                                    return false;
+                                }
+                                else
+                                {
+                                    return true;
+                                }
+                            });
+
+                    $("#FlowValue")
+                        .keypress(function(e)
+                        {
+                            //if the letter is not digit then don't type anything
+                            if (e.which !== 8
+                                && e.which !== 0
+                                && e.which !== 46
+                                && (e.which < 48 || e.which > 57))
+                            {
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        });
+                });
+            updateResultTextBoxState = function()
             {
-                var qualifier = $("#Qualifier_" + paramId).val();
-                var massLoadingMultiplier = parseFloat($("#MassLoadingConversionFactorPounds").val());
-                var massLoadingUnit = $("#MassLoadingMassLoadingUnitName").val();
-                var isMassLoadingResultToUseLessThanSign = ($("#IsMassLoadingResultToUseLessThanSign").val().toLowerCase() === "true");
-                var massLoadingCalculationDecimalPlaces = parseInt($("#MassLoadingCalculationDecimalPlaces").val());
-                var flowUnitName = $("#FlowUnitId option:selected").text().toLowerCase();
-                var flowUnitConversionFactor = flowUnitName === "mgd" ? 1 : 0.000001;
-                var resultUnitName = $("#UnitName_" + paramId).html().toLowerCase();
-                var resultUnitConversionFactor = resultUnitName === "mg/l" ? 1 : 0.001;
-
-                if (qualifier === "ND" || qualifier === "NF")
-                {
-                    $("#MassResult_" + paramId).html("");
-                }
-                else if (qualifier === "NUMERIC" || qualifier === ">")
-                {
-                    var result = parseFloat($("#Result_" + paramId).val());
-                    var sampleFlowResult = parseFloat($("#FlowValue").val());
-
-                    if (isNaN(result) || isNaN(sampleFlowResult) || ((flowUnitName !== "mgd") && (flowUnitName !== "gpd")) || ((resultUnitName !== "mg/l") && (resultUnitName !== "ug/l")))
-                    {
-                        $("#MassResult_" + paramId).html("");
-                    }
-                    else
-                    {
-                        $("#MassResult_" + paramId)
-                            .html(" "
-                                + (result * sampleFlowResult * massLoadingMultiplier * flowUnitConversionFactor * resultUnitConversionFactor)
-                                .toFixed(massLoadingCalculationDecimalPlaces)
-                                + " "
-                                + massLoadingUnit)
-                            .css('color', 'green');
-                    }
-                }
-                else if (qualifier === "<")
-                {
-                    var result = parseFloat($("#Result_" + paramId).val());
-                    var sampleFlowResult = parseFloat($("#FlowValue").val());
-
-                    if (isNaN(result) || isNaN(sampleFlowResult) || ((flowUnitName !== "mgd") && (flowUnitName !== "gpd")) || ((resultUnitName !== "mg/l") && (resultUnitName !== "ug/l")))
-                    {
-                        $("#MassResult_" + paramId).html("");
-                    }
-                    else
-                    {
-                        $("#MassResult_" + paramId)
-                            .html((isMassLoadingResultToUseLessThanSign ? qualifier : "")
-                                + " "
-                                + (result * sampleFlowResult * massLoadingMultiplier * flowUnitConversionFactor * resultUnitConversionFactor)
-                                .toFixed(massLoadingCalculationDecimalPlaces)
-                                + " "
-                                + massLoadingUnit)
-                            .css('color', 'green');
-                    }
-                }
-            }
-            else
-            {
-                $("#MassResult_" + paramId).html("");
-            }
-        }
-
-        $("#FlowValue")
-            .blur(function()
-            {
-                $("input[id^='CalcLoading_']:checkbox:checked")
-                    .each(function()
-                    {
-                        var paramId = this.id.replace('CalcLoading_', '');
-                        displayMassLoading(paramId);
-                    });
-            });
-
-        $("select[name='FlowUnitId']")
-            .change(function()
-            {
-                $("input[id^='CalcLoading_']:checkbox:checked")
-                    .each(function()
-                    {
-                        var paramId = this.id.replace('CalcLoading_', '');
-                        displayMassLoading(paramId);
-                    });
-            });
-
-
-        $(document)
-            .on('change'
-                , "select[id^='Qualifier_']"
-                , function()
-                {
-                    var paramId = this.id.replace('Qualifier_', '');
-                    var qualifier = $("#Qualifier_" + paramId).val();
-
-                    if (qualifier === "ND" || qualifier === "NF")
-                    {
-                        $("#Result_" + paramId).val("").attr("readonly", "readonly");
-                    }
-                    else
-                    {
-                        $("#Result_" + paramId).removeAttr("readonly");
-                    }
-
-                    displayMassLoading(paramId);
-                });
-
-
-        $(document)
-            .on('blur'
-                , "input[id^='Result_']"
-                , function()
-                {
-                    var paramId = this.id.replace('Result_', '');
-                    displayMassLoading(paramId);
-                });
-
-        $(document)
-            .on('ifChecked'
-                , "input[id^='CalcLoading_']"
-                , function(event)
-                {
-                    var paramId = this.id.replace('CalcLoading_', '');
-                    displayMassLoading(paramId);
-                });
-
-
-        $(document)
-            .on('ifUnchecked'
-                , "input[id^='CalcLoading_']"
-                , function(event)
-                {
-                    var paramId = this.id.replace('CalcLoading_', '');
-                    displayMassLoading(paramId);
-                });
-
-        $(document)
-            .on('click'
-                , "button[name='btnDeleteParam']"
-                , function()
-                {
-                    var table = $('#ParameterTable').DataTable();
-                    table
-                        .row($(this).parents('tr'))
-                        .remove()
-                        .draw();
-                });
-
-        $("#btnDeleteEmptyParameters")
-            .click(function()
-            {
-                var table = $('#ParameterTable').DataTable();
-                table
+                var parameterTable = $('#ParameterTable').DataTable();
+                parameterTable
                     .rows()
                     .every(function()
                     {
@@ -903,88 +739,223 @@
                         var cell = d[0];
                         var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
                         var qualifier = $("#Qualifier_" + paramId).val();
-                        var result = parseFloat($("#Result_" + paramId).val());
 
-                        //console.debug($('input', cell)['prevObject'][0].id + ' : ' + paramId + ' : ' + qualifier + ' : ' + result);
-
-                        if ((qualifier === 'NUMERIC' || qualifier === '<' || qualifier === '>') && isNaN(result))
+                        if (qualifier === "ND" || qualifier === "NF")
                         {
-                            this.nodes().to$().addClass('selected');
+                            $("#Result_" + paramId).val("").attr("readonly", "readonly");
+                        }
+                        else
+                        {
+                            $("#Result_" + paramId).removeAttr("readonly");
                         }
                     });
+            }
 
-                table.rows('.selected')
-                    .remove()
-                    .draw();
-
-                //console.debug($('#ParameterTable >tbody >tr').length);
-            });
-
-        $("#btnAddParameter")
-            .click(function()
+            function displayMassLoading(paramId)
             {
-                var allParameters = $.parseJSON($("#AllParameters").val());
+                var clChecked = $("#CalcLoading_" + paramId).iCheck('update')[0].checked;
 
-                var alreadyAddedParameterIds = [];
+                if (clChecked)
+                {
+                    var qualifier = $("#Qualifier_" + paramId).val();
+                    var massLoadingMultiplier = parseFloat($("#MassLoadingConversionFactorPounds").val());
+                    var massLoadingUnit = $("#MassLoadingMassLoadingUnitName").val();
+                    var isMassLoadingResultToUseLessThanSign = (
+                        $("#IsMassLoadingResultToUseLessThanSign").val().toLowerCase() === "true");
+                    var massLoadingCalculationDecimalPlaces =
+                        parseInt($("#MassLoadingCalculationDecimalPlaces").val());
+                    var flowUnitName = $("#FlowUnitId option:selected").text().toLowerCase();
+                    var flowUnitConversionFactor = flowUnitName === "mgd" ? 1 : 0.000001;
+                    var resultUnitName = $("#UnitName_" + paramId).html().toLowerCase();
+                    var resultUnitConversionFactor = resultUnitName === "mg/l" ? 1 : 0.001;
 
-                $('#ParameterTable')
-                    .DataTable()
-                    .rows()
-                    .every(function()
+                    if (qualifier === "ND" || qualifier === "NF")
                     {
-                        var d = this.data();
-                        var cell = d[0];
-                        var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
-                        alreadyAddedParameterIds.push(parseInt(paramId));
-                    });
-
-                //console.debug(alreadyAddedParameterIds);
-
-                var availableParameters = $.grep(allParameters
-                    , function(obj)
+                        $("#MassResult_" + paramId).html("");
+                    }
+                    else if (qualifier === "NUMERIC" || qualifier === ">")
                     {
-                        //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
-                        return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1);
+                        var result = parseFloat($("#Result_" + paramId).val());
+                        var sampleFlowResult = parseFloat($("#FlowValue").val());
+
+                        if (isNaN(result)
+                            || isNaN(sampleFlowResult)
+                            || ((flowUnitName !== "mgd") && (flowUnitName !== "gpd"))
+                            || ((resultUnitName !== "mg/l") && (resultUnitName !== "ug/l")))
+                        {
+                            $("#MassResult_" + paramId).html("");
+                        }
+                        else
+                        {
+                            $("#MassResult_" + paramId)
+                                .html(" "
+                                    + (result
+                                        * sampleFlowResult
+                                        * massLoadingMultiplier
+                                        * flowUnitConversionFactor
+                                        * resultUnitConversionFactor)
+                                    .toFixed(massLoadingCalculationDecimalPlaces)
+                                    + " "
+                                    + massLoadingUnit)
+                                .css('color', 'green');
+                        }
+                    }
+                    else if (qualifier === "<")
+                    {
+                        var result = parseFloat($("#Result_" + paramId).val());
+                        var sampleFlowResult = parseFloat($("#FlowValue").val());
+
+                        if (isNaN(result)
+                            || isNaN(sampleFlowResult)
+                            || ((flowUnitName !== "mgd") && (flowUnitName !== "gpd"))
+                            || ((resultUnitName !== "mg/l") && (resultUnitName !== "ug/l")))
+                        {
+                            $("#MassResult_" + paramId).html("");
+                        }
+                        else
+                        {
+                            $("#MassResult_" + paramId)
+                                .html((isMassLoadingResultToUseLessThanSign ? qualifier : "")
+                                    + " "
+                                    + (result
+                                        * sampleFlowResult
+                                        * massLoadingMultiplier
+                                        * flowUnitConversionFactor
+                                        * resultUnitConversionFactor)
+                                    .toFixed(massLoadingCalculationDecimalPlaces)
+                                    + " "
+                                    + massLoadingUnit)
+                                .css('color', 'green');
+                        }
+                    }
+                }
+                else
+                {
+                    $("#MassResult_" + paramId).html("");
+                }
+            }
+
+            $("#FlowValue")
+                .blur(function()
+                {
+                    $("input[id^='CalcLoading_']:checkbox:checked")
+                        .each(function()
+                        {
+                            var paramId = this.id.replace('CalcLoading_', '');
+                            displayMassLoading(paramId);
+                        });
+                });
+
+            $("select[name='FlowUnitId']")
+                .change(function()
+                {
+                    $("input[id^='CalcLoading_']:checkbox:checked")
+                        .each(function()
+                        {
+                            var paramId = this.id.replace('CalcLoading_', '');
+                            displayMassLoading(paramId);
+                        });
+                });
+
+
+            $(document)
+                .on('change'
+                    , "select[id^='Qualifier_']"
+                    , function()
+                    {
+                        var paramId = this.id.replace('Qualifier_', '');
+                        var qualifier = $("#Qualifier_" + paramId).val();
+
+                        if (qualifier === "ND" || qualifier === "NF")
+                        {
+                            $("#Result_" + paramId).val("").attr("readonly", "readonly");
+                        }
+                        else
+                        {
+                            $("#Result_" + paramId).removeAttr("readonly");
+                        }
+
+                        displayMassLoading(paramId);
                     });
 
-                //console.debug(allParameters);
-                //console.debug(availableParameters);
 
-                $("#AddParameterDropdown")
-                    .kendoDropDownList({
-                        dataSource: availableParameters
-                        , dataTextField: "Name"
-                        , dataValueField: "Id"
-                        , autoWidth: true
-                        , noDataTemplate: 'No Parameter Available!'
+            $(document)
+                .on('blur'
+                    , "input[id^='Result_']"
+                    , function()
+                    {
+                        var paramId = this.id.replace('Result_', '');
+                        displayMassLoading(paramId);
                     });
 
-                $('#AddParameterModal').modal('show');
-            });
+            $(document)
+                .on('ifChecked'
+                    , "input[id^='CalcLoading_']"
+                    , function(event)
+                    {
+                        var paramId = this.id.replace('CalcLoading_', '');
+                        displayMassLoading(paramId);
+                    });
 
-        $(document)
-            .on('click'
-                , "button[id='btnAddParameterInsideModal']"
-                , function()
+
+            $(document)
+                .on('ifUnchecked'
+                    , "input[id^='CalcLoading_']"
+                    , function(event)
+                    {
+                        var paramId = this.id.replace('CalcLoading_', '');
+                        displayMassLoading(paramId);
+                    });
+
+            $(document)
+                .on('click'
+                    , "button[name='btnDeleteParam']"
+                    , function()
+                    {
+                        var table = $('#ParameterTable').DataTable();
+                        table
+                            .row($(this).parents('tr'))
+                            .remove()
+                            .draw();
+                    });
+
+            $("#btnDeleteEmptyParameters")
+                .click(function()
+                {
+                    var table = $('#ParameterTable').DataTable();
+                    table
+                        .rows()
+                        .every(function()
+                        {
+                            var d = this.data();
+                            var cell = d[0];
+                            var paramId = $('input', cell)['prevObject'][0].id
+                                .replace('sampleResultId_', '');
+                            var qualifier = $("#Qualifier_" + paramId).val();
+                            var result = parseFloat($("#Result_" + paramId).val());
+
+                            //console.debug($('input', cell)['prevObject'][0].id + ' : ' + paramId + ' : ' + qualifier + ' : ' + result);
+
+                            if ((qualifier === 'NUMERIC' || qualifier === '<' || qualifier === '>')
+                                && isNaN(result)
+                            )
+                            {
+                                this.nodes().to$().addClass('selected');
+                            }
+                        });
+
+                    table.rows('.selected')
+                        .remove()
+                        .draw();
+
+                    //console.debug($('#ParameterTable >tbody >tr').length);
+                });
+
+            $("#btnAddParameter")
+                .click(function()
                 {
                     var allParameters = $.parseJSON($("#AllParameters").val());
 
-                    var availableParameters = $.grep(allParameters
-                        , function(obj)
-                        {
-                            return (obj.Id === parseInt($("#AddParameterDropdown").val()));
-                        });
-
-                    $('#AddParameterModal').modal('hide');
-                    //console.debug(availableParameters);
-                    AddParamtersToParameterTable(availableParameters);
-                });
-
-        $(document)
-            .on('click'
-                , "button[name='btnAddParamsFromGroup']"
-                , function()
-                {
                     var alreadyAddedParameterIds = [];
 
                     $('#ParameterTable')
@@ -993,204 +964,272 @@
                         .every(function()
                         {
                             var d = this.data();
-                            //console.debug(d);
                             var cell = d[0];
-                            var paramId = $('input', cell)['prevObject'][0].id.replace('sampleResultId_', '');
+                            var paramId = $('input', cell)['prevObject'][0].id
+                                .replace('sampleResultId_', '');
                             alreadyAddedParameterIds.push(parseInt(paramId));
                         });
 
-                    //console.debug("alreadyAddedParameterIds : " + alreadyAddedParameterIds);
-
-                    var strGroupParameterIds = $('#ParameterGroupTable').DataTable().row($(this).parents('tr')).data();
-                    var groupParameterIds = [];
-
-                    $.each(strGroupParameterIds[3].split(',')
-                        , function(index, value)
-                        {
-                            groupParameterIds.push(parseInt(value));
-                        });
-
-                    //console.debug(groupParameterIds);
-                    var allParameters = $.parseJSON($("#AllParameters").val());
+                    //console.debug(alreadyAddedParameterIds);
 
                     var availableParameters = $.grep(allParameters
                         , function(obj)
                         {
                             //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
-                            return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1)
-                                && ($.inArray(obj.Id, groupParameterIds) !== -1);
+                            return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1);
                         });
 
-                    //console.debug("allParameters :" + allParameters);
-                    //console.debug("availableParameters :" + availableParameters);
+                    //console.debug(allParameters);
+                    //console.debug(availableParameters);
 
-                    AddParamtersToParameterTable(availableParameters);
+                    $("#AddParameterDropdown")
+                        .kendoDropDownList({
+                            dataSource: availableParameters
+                            , dataTextField: "Name"
+                            , dataValueField: "Id"
+                            , autoWidth: true
+                            , noDataTemplate: 'No Parameter Available!'
+                        });
+
+                    $('#AddParameterModal').modal('show');
                 });
 
-        AddParamtersToParameterTable = function(availableParameters)
-        {
-            var parameterTable = $('#ParameterTable').DataTable();
-
-            $.each(availableParameters
-                , function(index, value)
-                {
-                    //console.debug(value.Id + " : " + value.Name);
-                    var data = {};
-                    data[0] = "<input id='sampleResultId_" + value.Id + "' type='hidden' value=''>";
-                    data[1] = value.Name;
-
-                    var availableResultQualifierValidValues =
-                        @Html.Raw(value:Json.Encode(value:Model.AvailableResultQualifierValidValues));
-
-                    var qualifierCtrl =
-                        '<select class="form-control input-sm no-margin no-padding" id="Qualifier_'
-                            + value.Id
-                            + '" style="width: 100%">';
-
-                    $.each(availableResultQualifierValidValues
-                        , function(i, v)
-                        {
-                            if (v.Value === "NUMERIC")
-                            {
-                                qualifierCtrl += '<option value="'
-                                    + v.Value
-                                    + '" selected="">'
-                                    + v.Text
-                                    + '</option>';
-                            }
-                            else
-                            {
-                                qualifierCtrl += '<option value="' + v.Value + '">' + v.Text + '</option>';
-                            }
-                        });
-                    qualifierCtrl += '</select>';
-
-                    data[2] = qualifierCtrl;
-                    data[3] =
-                        '<div class="input-group input-group-sm" style="min-width:125px">'
-                        + '<input class="form-control input-sm" id="Result_'
-                        + value.Id
-                        + '" type="text" value=""><input id="UnitId_'
-                        + value.Id
-                        + '" type="hidden" value="'
-                        + value.DefaultUnitId
-                        + '"><span id="UnitName_'
-                        + value.Id
-                        + '" class="input-group-addon">'
-                        + value.DefaultUnitName
-                        + '</span></div>';
-                    data[4] = '<input class="form-control input-sm" id="MDL_'
-                        + value.Id
-                        + '" type="text" style="width: 80px" value="">';
-                    data[5] = '<input class="form-control input-sm" id="AnalysisMethod_'
-                        + value.Id
-                        + '" type="text" value="">';
-                    data[6] = '<input id="AnalysisDateTime_'
-                        + value.Id
-                        + '" style="width: 100%; font-size: 12px;"'
-                        + ' />';
-                    data[7] =
-                        '<input type="checkbox" class="checkbox" id="EPAMethod_'
-                        + value.Id
-                        + '"/>';
-
-                    if (value.IsCalcMassLoading)
+            $(document)
+                .on('click'
+                    , "button[id='btnAddParameterInsideModal']"
+                    , function()
                     {
-                        data[8] =
-                            '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
-                            + value.Id
-                            + '" checked />';
-                    }
-                    else
+                        var allParameters = $.parseJSON($("#AllParameters").val());
+
+                        var availableParameters = $.grep(allParameters
+                            , function(obj)
+                            {
+                                return (obj.Id === parseInt($("#AddParameterDropdown").val()));
+                            });
+
+                        $('#AddParameterModal').modal('hide');
+                        //console.debug(availableParameters);
+                        AddParamtersToParameterTable(availableParameters);
+                    });
+
+            $(document)
+                .on('click'
+                    , "button[name='btnAddParamsFromGroup']"
+                    , function()
                     {
-                        data[8] =
-                            '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
+                        var alreadyAddedParameterIds = [];
+
+                        $('#ParameterTable')
+                            .DataTable()
+                            .rows()
+                            .every(function()
+                            {
+                                var d = this.data();
+                                //console.debug(d);
+                                var cell = d[0];
+                                var paramId = $('input', cell)['prevObject'][0].id
+                                    .replace('sampleResultId_', '');
+                                alreadyAddedParameterIds.push(parseInt(paramId));
+                            });
+
+                        //console.debug("alreadyAddedParameterIds : " + alreadyAddedParameterIds);
+
+                        var strGroupParameterIds = $('#ParameterGroupTable')
+                            .DataTable()
+                            .row($(this).parents('tr'))
+                            .data();
+                        var groupParameterIds = [];
+
+                        $.each(strGroupParameterIds[3].split(',')
+                            , function(index, value)
+                            {
+                                groupParameterIds.push(parseInt(value));
+                            });
+
+                        //console.debug(groupParameterIds);
+                        var allParameters = $.parseJSON($("#AllParameters").val());
+
+                        var availableParameters = $.grep(allParameters
+                            , function(obj)
+                            {
+                                //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
+                                return ($.inArray(obj.Id, alreadyAddedParameterIds) === -1)
+                                    && ($.inArray(obj.Id, groupParameterIds) !== -1);
+                            });
+
+                        //console.debug("allParameters :" + allParameters);
+                        //console.debug("availableParameters :" + availableParameters);
+
+                        AddParamtersToParameterTable(availableParameters);
+                    });
+
+            AddParamtersToParameterTable = function(availableParameters)
+            {
+                var parameterTable = $('#ParameterTable').DataTable();
+
+                $.each(availableParameters
+                    , function(index, value)
+                    {
+                        //console.debug(value.Id + " : " + value.Name);
+                        var data = {};
+                        data[0] = "<input id='sampleResultId_" + value.Id + "' type='hidden' value=''>";
+                        data[1] = value.Name;
+
+                        var availableResultQualifierValidValues =
+                            @Html.Raw(value:Json.Encode(value:Model.AvailableResultQualifierValidValues));
+
+                        var qualifierCtrl =
+                            '<select class="form-control input-sm no-margin no-padding" id="Qualifier_'
+                                + value.Id
+                                + '" style="width: 100%">';
+
+                        $.each(availableResultQualifierValidValues
+                            , function(i, v)
+                            {
+                                if (v.Value === "NUMERIC")
+                                {
+                                    qualifierCtrl += '<option value="'
+                                        + v.Value
+                                        + '" selected="">'
+                                        + v.Text
+                                        + '</option>';
+                                }
+                                else
+                                {
+                                    qualifierCtrl +=
+                                        '<option value="' + v.Value + '">' + v.Text + '</option>';
+                                }
+                            });
+                        qualifierCtrl += '</select>';
+
+                        data[2] = qualifierCtrl;
+                        data[3] =
+                            '<div class="input-group input-group-sm" style="min-width:125px">'
+                            + '<input class="form-control input-sm" id="Result_'
+                            + value.Id
+                            + '" type="text" value=""><input id="UnitId_'
+                            + value.Id
+                            + '" type="hidden" value="'
+                            + value.DefaultUnitId
+                            + '"><span id="UnitName_'
+                            + value.Id
+                            + '" class="input-group-addon">'
+                            + value.DefaultUnitName
+                            + '</span></div>';
+                        data[4] = '<input class="form-control input-sm" id="MDL_'
+                            + value.Id
+                            + '" type="text" style="width: 80px" value="">';
+                        data[5] = '<input class="form-control input-sm" id="AnalysisMethod_'
+                            + value.Id
+                            + '" type="text" value="">';
+                        data[6] = '<input id="AnalysisDateTime_'
+                            + value.Id
+                            + '" style="width: 100%; font-size: 12px;"'
+                            + ' />';
+                        data[7] =
+                            '<input type="checkbox" class="checkbox" id="EPAMethod_'
                             + value.Id
                             + '"/>';
-                    }
-                    data[9] = '<input id="MassResultId_' + value.Id + '" type="hidden" value="")>';
-                    data[10] = '<strong id="MassResult_' + value.Id + '"></strong>';
-                    data[11] = null;
 
-                    //console.debug("data : " + data);
-
-                    var rowNode = parameterTable
-                        .row.add(data)
-                        .draw()
-                        .node();
-
-                    $(rowNode).css('color', 'green');
-                });
-
-            // need to reinitialize iCheck otherwise newly added checkbox doesn't work
-            $("input[id^='EPAMethod_']")
-                .iCheck({
-                    checkboxClass: "icheckbox_minimal-blue"
-                });
-
-            $("input[id^='CalcLoading_']")
-                .iCheck({
-                    checkboxClass: "icheckbox_minimal-blue"
-                });
-
-            $("input[id^='AnalysisDateTime_']")
-                .kendoDateTimePicker({ format: "MM/dd/yyyy hh:mm:ss tt", max: new Date($.now()) });
-        };
-
-        $("#EndDateTimeLocal")
-            .change(function()
-            {
-                var viewModel = {};
-                viewModel.monitoringPointId = $('#MonitoringPointId').val();
-                viewModel.endDateTime = $('#EndDateTimeLocal').val();
-
-                var postUrl = "@Url.Action(actionName:"GetParameterGroupsForSample", controllerName:"Industry")";
-
-                $.ajax({
-                    type: "POST"
-                    , url: postUrl
-                    , data: viewModel
-                    , success: function(response)
-                    {
-                        if (response.hasError != null && response.hasError)
+                        if (value.IsCalcMassLoading)
                         {
-                            alert(response.message);
+                            data[8] =
+                                '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
+                                + value.Id
+                                + '" checked />';
                         }
                         else
                         {
-                            $("#AllParameters").val(JSON.stringify(response.allParameters));
-                            var parameterGroups = response.parameterGroups;
-
-                            var table = $('#ParameterGroupTable').DataTable();
-
-                            table
-                                .clear()
-                                .draw();
-
-                            $.each(parameterGroups
-                                , function(index, value)
-                                {
-                                    var data = {};
-                                    data[0] = value.Id;
-                                    data[1] = value.Name;
-                                    data[2] = value.Description;
-                                    data[3] = value.ParameterIds;
-                                    data[4] = null;
-
-                                    //console.debug("data : " + data);
-
-                                    var rowNode = table
-                                        .row.add(data)
-                                        .draw()
-                                        .node();
-
-                                    $(rowNode).css('color', 'green');
-                                });
+                            data[8] =
+                                '<input type="checkbox" class="checkbox" name="CkCalcLoading" id="CalcLoading_'
+                                + value.Id
+                                + '"/>';
                         }
-                    }
-                    //, error: function()
-                    //    {}
+                        data[9] = '<input id="MassResultId_' + value.Id + '" type="hidden" value="")>';
+                        data[10] = '<strong id="MassResult_' + value.Id + '"></strong>';
+                        data[11] = null;
+
+                        //console.debug("data : " + data);
+
+                        var rowNode = parameterTable
+                            .row.add(data)
+                            .draw()
+                            .node();
+
+                        $(rowNode).css('color', 'green');
+                    });
+
+                // need to reinitialize iCheck otherwise newly added checkbox doesn't work
+                $("input[id^='EPAMethod_']")
+                    .iCheck({
+                        checkboxClass: "icheckbox_minimal-blue"
+                    });
+
+                $("input[id^='CalcLoading_']")
+                    .iCheck({
+                        checkboxClass: "icheckbox_minimal-blue"
+                    });
+
+                $("input[id^='AnalysisDateTime_']")
+                    .kendoDateTimePicker({ format: "MM/dd/yyyy hh:mm:ss tt", max: new Date($.now()) });
+            };
+
+            $("#EndDateTimeLocal")
+                .change(function()
+                {
+                    var viewModel = {};
+                    viewModel.monitoringPointId = $('#MonitoringPointId').val();
+                    viewModel.endDateTime = $('#EndDateTimeLocal').val();
+
+                    var postUrl =
+                        "@Url.Action(actionName:"GetParameterGroupsForSample", controllerName:"Industry")";
+
+                    $.ajax({
+                        type: "POST"
+                        , url: postUrl
+                        , data: viewModel
+                        , success: function(response)
+                        {
+                            if (response.hasError != null && response.hasError)
+                            {
+                                alert(response.message);
+                            }
+                            else
+                            {
+                                $("#AllParameters").val(JSON.stringify(response.allParameters));
+                                var parameterGroups = response.parameterGroups;
+
+                                var table = $('#ParameterGroupTable').DataTable();
+
+                                table
+                                    .clear()
+                                    .draw();
+
+                                $.each(parameterGroups
+                                    , function(index, value)
+                                    {
+                                        var data = {};
+                                        data[0] = value.Id;
+                                        data[1] = value.Name;
+                                        data[2] = value.Description;
+                                        data[3] = value.ParameterIds;
+                                        data[4] = null;
+
+                                        //console.debug("data : " + data);
+
+                                        var rowNode = table
+                                            .row.add(data)
+                                            .draw()
+                                            .node();
+
+                                        $(rowNode).css('color', 'green');
+                                    });
+                            }
+                        }
+                        //, error: function()
+                        //    {}
+                    });
                 });
-            });
-    </script>
+        </script>
+    }
 }}
