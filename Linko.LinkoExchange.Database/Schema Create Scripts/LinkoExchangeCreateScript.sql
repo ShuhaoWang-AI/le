@@ -274,11 +274,11 @@ BEGIN
         OrganizationId                  int IDENTITY(1000,1) NOT NULL  
         , OrganizationTypeId            int NOT NULL  
         , Name                          varchar(254) NOT NULL  
-        , AddressLine1                  varchar(100) NOT NULL  
+        , AddressLine1                  varchar(100) NULL  
         , AddressLine2                  varchar(100) NULL  
-        , CityName                      varchar(100) NOT NULL  
-        , ZipCode                       varchar(50) NOT NULL  
-        , JurisdictionId                int NOT NULL  
+        , CityName                      varchar(100) NULL  
+        , ZipCode                       varchar(50) NULL  
+        , JurisdictionId                int NULL  
         , PhoneNumber                   varchar(25) NULL  
         , PhoneExt                      int NULL  
         , FaxNumber                     varchar(25) NULL  
@@ -2047,7 +2047,7 @@ BEGIN
     (
         MonitoringPointParameterLimitId     int IDENTITY(1,1) NOT NULL
         , MonitoringPointParameterId        int NOT NULL
-        , Name                              varchar(100) NOT NULL
+        , Name                              varchar(350) NOT NULL
         , Description                       varchar(500) NULL
         , MinimumValue                      float NULL
         , MaximumValue                      float NOT NULL
@@ -2061,11 +2061,10 @@ BEGIN
         (
 	        MonitoringPointParameterLimitId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tMonitoringPointParameterLimit_MonitoringPointParameterId_LimitTypeId_LimitBasisId UNIQUE 
+        , CONSTRAINT AK_tMonitoringPointParameterLimit_MonitoringPointParameterId_Name UNIQUE 
         (
             MonitoringPointParameterId ASC
-            , LimitTypeId ASC
-            , LimitBasisId ASC
+            , Name ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
 		, CONSTRAINT FK_tMonitoringPointParameterLimit_tMonitoringPointParameter FOREIGN KEY 
 		(
@@ -2308,10 +2307,10 @@ BEGIN
         (
 	        SampleResultId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tSampleResult_SampleId_ParameterName_LimitBasisId UNIQUE 
+        , CONSTRAINT AK_tSampleResult_SampleId_ParameterId_LimitBasisId UNIQUE 
         (
             SampleId ASC
-            , ParameterName ASC
+            , ParameterId ASC
             , LimitBasisId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tSampleResult_tSample FOREIGN KEY 
@@ -2857,18 +2856,19 @@ BEGIN
         , ReportStatusId                        int NOT NULL
         
         , OrganizationRegulatoryProgramId       int NOT NULL
+        , OrganizationReferenceNumber           varchar(50) NULL
         , OrganizationName                      varchar(254) NOT NULL
-        , OrganizationAddressLine1              varchar(100) NOT NULL
+        , OrganizationAddressLine1              varchar(100) NULL
         , OrganizationAddressLine2              varchar(100) NULL
-        , OrganizationCityName                  varchar(100) NOT NULL
-        , OrganizationJurisdictionName          varchar(100) NOT NULL
-        , OrganizationZipCode                   varchar(50) NOT NULL
+        , OrganizationCityName                  varchar(100) NULL
+        , OrganizationJurisdictionName          varchar(100) NULL
+        , OrganizationZipCode                   varchar(50) NULL
         , RecipientOrganizationName             varchar(254) NOT NULL
-        , RecipientOrganizationAddressLine1     varchar(100) NOT NULL
+        , RecipientOrganizationAddressLine1     varchar(100) NULL
         , RecipientOrganizationAddressLine2     varchar(100) NULL
-        , RecipientOrganizationCityName         varchar(100) NOT NULL
-        , RecipientOrganizationJurisdictionName varchar(100) NOT NULL
-        , RecipientOrganizationZipCode          varchar(50) NOT NULL
+        , RecipientOrganizationCityName         varchar(100) NULL
+        , RecipientOrganizationJurisdictionName varchar(100) NULL
+        , RecipientOrganizationZipCode          varchar(50) NULL
         
         , SubmissionDateTimeUtc                 datetimeoffset(0) NULL
         , SubmitterUserId                       int NULL
