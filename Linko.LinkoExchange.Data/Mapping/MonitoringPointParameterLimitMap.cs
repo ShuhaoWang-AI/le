@@ -16,7 +16,7 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .HasForeignKey(c => c.MonitoringPointParameterId)
                 .WillCascadeOnDelete(false);
 
-            Property(x => x.Name).IsRequired().HasMaxLength(350);
+            Property(x => x.Name).IsRequired().HasMaxLength(200);
 
             Property(x => x.Description).IsOptional().HasMaxLength(500);
 

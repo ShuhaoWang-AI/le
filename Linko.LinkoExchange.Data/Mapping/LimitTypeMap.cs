@@ -11,9 +11,9 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasKey(x => x.LimitTypeId);
 
-            Property(x => x.Name).IsRequired().HasMaxLength(100);
+            Property(x => x.Name).IsRequired().HasMaxLength(25);
 
-            Property(x => x.Description).IsOptional().HasMaxLength(500);
+            Property(x => x.Description).IsOptional().HasMaxLength(30);
 
             Property(x => x.CreationDateTimeUtc).IsRequired();
 
