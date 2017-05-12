@@ -133,7 +133,7 @@ namespace Linko.LinkoExchange.Test
         public void GetReportPackage()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(8, false);
+            var existingReportPackage = _reportPackageService.GetReportPackage(10, false);
         }
 
         [TestMethod]
@@ -159,9 +159,12 @@ namespace Linko.LinkoExchange.Test
             var existingReportPackage = _reportPackageService.GetReportPackage(2, false);
 
             //Add sample associations
-            existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
-            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 35, ReportPackageElementTypeId = 1 });
-
+            existingReportPackage.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
+            var sampleReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 13 };
+            sampleReportPackageElementType.ReportSamples = new List<ReportSampleDto>();
+            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 52, ReportPackageElementTypeId = 13 });
+            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 53, ReportPackageElementTypeId = 13 });
+            existingReportPackage.SamplesAndResultsTypes.Add(sampleReportPackageElementType);
             var existingId = _reportPackageService.SaveReportPackage(existingReportPackage, true);
         }
 
@@ -169,20 +172,25 @@ namespace Linko.LinkoExchange.Test
         public void SaveReportPackage_Add_Files()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(8, false);
+            var existingReportPackage = _reportPackageService.GetReportPackage(10, true);
 
             existingReportPackage.Comments = "Comments .. test.";
 
             //Add sample associations
-            existingReportPackage.AssociatedSamples = new List<ReportSampleDto>();
-            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 52, ReportPackageElementTypeId = 13 });
-            existingReportPackage.AssociatedSamples.Add(new ReportSampleDto { SampleId = 53, ReportPackageElementTypeId = 13 });
+            existingReportPackage.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
+            var sampleReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 21 };
+            sampleReportPackageElementType.ReportSamples = new List<ReportSampleDto>();
+            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 52, ReportPackageElementTypeId = 21 });
+            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 53, ReportPackageElementTypeId = 21 });
+            existingReportPackage.SamplesAndResultsTypes.Add(sampleReportPackageElementType);
 
             //Add file associations
-            existingReportPackage.AssociatedFiles = new List<ReportFileDto>();
-            existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 14 });
-            existingReportPackage.AssociatedFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 14 });
-
+            existingReportPackage.AttachmentTypes = new List<ReportPackageElementTypeDto>();
+            var filesReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 22 };
+            filesReportPackageElementType.ReportFiles = new List<ReportFileDto>();
+            filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 22 });
+            filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 22 });
+            existingReportPackage.AttachmentTypes.Add(filesReportPackageElementType);
             var existingId = _reportPackageService.SaveReportPackage(existingReportPackage, true);
         }
 

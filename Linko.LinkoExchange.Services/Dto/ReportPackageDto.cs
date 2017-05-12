@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
-    //TODO: to add more, 
-    // Here is just for Cor usage
     public class ReportPackageDto
     {
         public int ReportPackageId { get; set; }
@@ -22,6 +20,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool IsSubmissionBySignatoryRequired { get; internal set; }
         public ReportStatusName ReportStatusName { get; internal set; }
         public int OrganizationRegulatoryProgramId { get; set; }
+        public string OrganizationReferenceNumber { get; set; }
         public string OrganizationName { get; internal set; }
         public string OrganizationAddressLine1 { get; internal set; }
         public string OrganizationAddressLine2 { get; internal set; }
@@ -64,9 +63,12 @@ namespace Linko.LinkoExchange.Services.Dto
 
         public string PermitNumber { get; set; }
         public DateTime CreationDateTimeLocal { get; internal set; }
-        public List<ReportFileDto> AssociatedFiles { get; set; }
-        public List<ReportSampleDto> AssociatedSamples { get; set; }
-        public List<ReportPackageElementTypeDto> CertificationDtos { get; set; }
+
+        public List<ReportPackageElementTypeDto> SamplesAndResultsTypes { get; set; }
+        public List<ReportPackageElementTypeDto> AttachmentTypes { get; set; }
+        public List<ReportPackageElementTypeDto> CertificationTypes { get; set; }
+        public List<ReportElementCategoryName> ReportPackageTemplateElementCategories { get; set; }
+        public string LastModifierFullName { get; set; }
 
     }
 }

@@ -408,7 +408,16 @@ namespace Linko.LinkoExchange.Test
             var copyOfRecordDataXmlFileInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
             //var copyOfRecordPdfInfo = _reprotPackageService.Object.GetReportPackageCopyOfRecordPdfFile(reportPackageDto);
 
-            _copyOrRecordService.CreateCopyOfRecordForReportPackage(rptId, reportPackageDto.AssociatedFiles.Select(af => af.FileStore), copyOfRecordPdfFile, copyOfRecordDataXmlFileInfo);
+            var fileStores = new List<FileStoreDto>();
+            foreach (var rpet in reportPackageDto.AttachmentTypes)
+            {
+                foreach (var rf in rpet.ReportFiles)
+                {
+                    fileStores.Add(rf.FileStore);
+                }
+            }
+
+            _copyOrRecordService.CreateCopyOfRecordForReportPackage(rptId, fileStores, copyOfRecordPdfFile, copyOfRecordDataXmlFileInfo);
         }
 
         private ReportPackageDto GetReportPackage(int reportPackageId)
@@ -497,9 +506,9 @@ namespace Linko.LinkoExchange.Test
                 PermitNumber = "Test---Permit---Number",
                 Comments = "Test comments",
 
-                AssociatedFiles = GetMockReportFiles(GetMockAttachmentFiles()),
-                AssociatedSamples = GetMockReportSamples(GetMockSampleDtos()),
-                CertificationDtos = GetMockCertifications(),
+                //AssociatedFiles = GetMockReportFiles(GetMockAttachmentFiles()),
+                //AssociatedSamples = GetMockReportSamples(GetMockSampleDtos()),
+                CertificationTypes = GetMockCertifications(),
             };
 
         }

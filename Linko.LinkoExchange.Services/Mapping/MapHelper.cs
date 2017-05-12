@@ -1081,6 +1081,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             reportPackageDto.IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired;
             //reportPackageDto.ReportStatusName = set outside after calling line
             reportPackageDto.OrganizationRegulatoryProgramId = rpt.OrganizationRegulatoryProgramId;
+            reportPackageDto.OrganizationReferenceNumber = rpt.OrganizationReferenceNumber;
             reportPackageDto.OrganizationName = rpt.OrganizationName;
             reportPackageDto.OrganizationAddressLine1 = rpt.OrganizationAddressLine1;
             reportPackageDto.OrganizationAddressLine2 = rpt.OrganizationAddressLine2;
@@ -1130,6 +1131,18 @@ namespace Linko.LinkoExchange.Services.Mapping
                 reportPackageDto.RepudiationReviewComments = rpt.RepudiationReviewComments;
             }
 
+            reportPackageDto.ReportPackageTemplateElementCategories = new List<ReportElementCategoryName>();
+            var sortedCategories = new SortedList<int, ReportPackageElementCategory>();
+            foreach (var rpec in rpt.ReportPackageElementCategories)
+            {
+                sortedCategories.Add(rpec.SortOrder, rpec);
+            }
+
+            foreach (var sortedCategoryValue in sortedCategories.Values)
+            {
+                reportPackageDto.ReportPackageTemplateElementCategories.Add((ReportElementCategoryName)Enum.Parse(typeof(ReportElementCategoryName), sortedCategoryValue.ReportElementCategory.Name));
+            }
+
             return reportPackageDto;
         }
 
@@ -1176,6 +1189,25 @@ namespace Linko.LinkoExchange.Services.Mapping
                 Description = repudiationReason.Description
                 //CreationLocalDateTime = set outside after calling line
                 //LastModificationLocalDateTime = set outside after calling line
+            };
+        }
+
+        public ReportPackageElementTypeDto GetReportPackageElementTypeDtoFromReportPackageElementType(ReportPackageElementType reportPackageElementType)
+        {
+            if (reportPackageElementType == null) return null;
+            return new ReportPackageElementTypeDto
+            {
+                ReportPackageElementTypeId = reportPackageElementType.ReportPackageElementTypeId,
+                ReportPackageElementCategoryId = reportPackageElementType.ReportPackageElementCategoryId,
+                ReportElementTypeId = reportPackageElementType.ReportElementTypeId,
+                ReportElementTypeName = reportPackageElementType.ReportElementTypeName,
+                ReportElementTypeContent = reportPackageElementType.ReportElementTypeContent,
+                ReportElementTypeIsContentProvided = reportPackageElementType.ReportElementTypeIsContentProvided,
+                CtsEventTypeId = reportPackageElementType.CtsEventTypeId,
+                CtsEventTypeName = reportPackageElementType.CtsEventTypeName,
+                CtsEventCategoryName = reportPackageElementType.CtsEventCategoryName,
+                IsRequired = reportPackageElementType.IsRequired,
+                SortOrder = reportPackageElementType.SortOrder
             };
         }
 

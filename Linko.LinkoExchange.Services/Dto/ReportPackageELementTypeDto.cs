@@ -1,9 +1,24 @@
-﻿namespace Linko.LinkoExchange.Services.Dto
+﻿using Linko.LinkoExchange.Core.Domain;
+using System.Collections.Generic;
+
+namespace Linko.LinkoExchange.Services.Dto
 {
     public class ReportPackageElementTypeDto
     {
-        public int ReportPackageELementTypeId { get; set; }
+        public int ReportPackageElementTypeId { get; set; }
+        public int ReportPackageElementCategoryId { get; set; }
+        public int ReportElementTypeId { get; set; }
         public string ReportElementTypeName { get; set; }
         public string ReportElementTypeContent { get; set; }
+        
+        public bool ReportElementTypeIsContentProvided { get; set; }
+        public int? CtsEventTypeId { get; set; }
+        public string CtsEventTypeName { get; set; }
+        public string CtsEventCategoryName { get; set; }
+        public bool IsRequired { get; set; }
+        public int SortOrder { get; set; }
+
+        public List<ReportSampleDto> ReportSamples { get; set; }
+        public List<ReportFileDto> ReportFiles { get; set; }
     }
 }

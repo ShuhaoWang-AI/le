@@ -227,16 +227,22 @@ namespace Linko.LinkoExchange.Services.Report
                     UserName = EmtpyStringIfNull(reportPackageDto.SubmitterUserName),
                     ReportSubmissionFromIP = EmtpyStringIfNull(reportPackageDto.SubmitterIPAddress)
                 },
-                FileManifest = new FileManifest
-                {
-                    Files = reportPackageDto.AssociatedFiles.Select(af => af.FileStore).Select(i => new FileInfo
-                    {
-                        OriginalFileName = i.OriginalFileName,
-                        SystemGeneratedUniqueFileName = i.Name,
-                        AttachmentType = i.FileType //TODO: it should be i.ReportElementTypeName
-                    }).ToList()
-                }
+                FileManifest = new FileManifest() //populated below
             };
+
+            foreach (var attachmentReportPackageElementType in reportPackageDto.AttachmentTypes)
+            {
+                foreach (var reportFile in attachmentReportPackageElementType.ReportFiles)
+                {
+                    dataXmlObj.FileManifest.Files.Add(new FileInfo()
+                    {
+                        OriginalFileName = reportFile.FileStore.OriginalFileName,
+                        SystemGeneratedUniqueFileName = reportFile.FileStore.Name,
+                        AttachmentType = reportFile.FileStore.FileType
+                    });
+                        
+                }
+            }
 
             dataXmlObj.FileManifest.Files.Add(
                 new FileInfo
@@ -255,7 +261,7 @@ namespace Linko.LinkoExchange.Services.Report
                 });
 
             dataXmlObj.Certifications = new List<Certification>();
-            dataXmlObj.Certifications = reportPackageDto.CertificationDtos.Select(i => new Certification
+            dataXmlObj.Certifications = reportPackageDto.CertificationTypes.Select(i => new Certification
             {
                 CertificationType = i.ReportElementTypeName,
                 CertificationText = string.IsNullOrWhiteSpace(i.ReportElementTypeContent) ? "" : i.ReportElementTypeContent
@@ -265,71 +271,74 @@ namespace Linko.LinkoExchange.Services.Report
 
             // SampleResults part 
             dataXmlObj.Samples = new List<SampleNode>();
-            foreach (var sampleAssociation in reportPackageDto.AssociatedSamples)
+            foreach (var sampleElementType in reportPackageDto.SamplesAndResultsTypes)
             {
-                var sampleDto = sampleAssociation.Sample;
-                var sampleNode = new SampleNode
+                foreach (var reportSample in sampleElementType.ReportSamples)
                 {
-                    SampleName = sampleDto.Name,
-                    MonitoringPointName = sampleDto.MonitoringPointName,
-                    CtsEventTypeCategoryName = sampleDto.CtsEventCategoryName,
-                    CtsEventTypeName = sampleDto.CtsEventTypeName,
-                    CollectionMethodName = sampleDto.CollectionMethodName,
-                    LabSampleIdentifier = EmtpyStringIfNull(sampleDto.LabSampleIdentifier),
-
-                    StartDateTimeUtc = sampleDto.StartDateTimeLocal.ToString(dateTimeFormat),
-                    EndDateTimeUtc = sampleDto.EndDateTimeLocal.ToString(dateTimeFormat),
-
-                    SampleFlowForMassCalcs = EmtpyStringIfNull(sampleDto.FlowValue),
-                    SampleFlowForMassCalcsUnitName = EmtpyStringIfNull(sampleDto.FlowUnitName),
-
-                    MassLoadingsConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds?.ToString(),
-                    MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces?.ToString(),
-                    IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign.ToString(),
-
-                    SampledBy = sampleDto.ByOrganizationTypeName,
-                    SampleResults = new List<SampleResultNode>(),
-                };
-
-                dataXmlObj.Samples.Add(sampleNode);
-
-                foreach (var sampleResultDto in sampleDto.SampleResults)
-                {
-                    var sampleResultValue = "";
-                    var limitBasisValue = "";
-
-                    if (string.IsNullOrEmpty(sampleResultDto.MassLoadingValue))
+                    var sampleDto = reportSample.Sample;
+                    var sampleNode = new SampleNode
                     {
-                        limitBasisValue = LimitBasisName.Concentration.ToString();
-                        sampleResultValue = sampleResultDto.Value;
-                    }
-                    else
-                    {
-                        limitBasisValue = LimitBasisName.MassLoading.ToString();
-                        sampleResultValue = sampleResultDto.MassLoadingValue;
-                    }
+                        SampleName = sampleDto.Name,
+                        MonitoringPointName = sampleDto.MonitoringPointName,
+                        CtsEventTypeCategoryName = sampleDto.CtsEventCategoryName,
+                        CtsEventTypeName = sampleDto.CtsEventTypeName,
+                        CollectionMethodName = sampleDto.CollectionMethodName,
+                        LabSampleIdentifier = EmtpyStringIfNull(sampleDto.LabSampleIdentifier),
 
-                    var analysisDateTime = "";
-                    if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
-                    {
-                        analysisDateTime = sampleResultDto.AnalysisDateTimeLocal.Value.ToString(dateTimeFormat);
-                    }
+                        StartDateTimeUtc = sampleDto.StartDateTimeLocal.ToString(dateTimeFormat),
+                        EndDateTimeUtc = sampleDto.EndDateTimeLocal.ToString(dateTimeFormat),
 
-                    var sampleResultNode = new SampleResultNode
-                    {
-                        ParameterName = sampleResultDto.ParameterName,
-                        Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier),
-                        Value = sampleResultValue,
-                        UnitName = sampleResultDto.UnitName,
-                        EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit,
-                        MethodDetectionLimit = sampleResultDto.MethodDetectionLimit.ToString(),
-                        AnalysisMethod = sampleResultDto.AnalysisMethod,
-                        AnalysisDateTimeUtc = analysisDateTime,
-                        IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
-                        LimitBasis = limitBasisValue
+                        SampleFlowForMassCalcs = EmtpyStringIfNull(sampleDto.FlowValue),
+                        SampleFlowForMassCalcsUnitName = EmtpyStringIfNull(sampleDto.FlowUnitName),
+
+                        MassLoadingsConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds?.ToString(),
+                        MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces?.ToString(),
+                        IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign.ToString(),
+
+                        SampledBy = sampleDto.ByOrganizationTypeName,
+                        SampleResults = new List<SampleResultNode>(),
                     };
 
-                    sampleNode.SampleResults.Add(sampleResultNode);
+                    dataXmlObj.Samples.Add(sampleNode);
+
+                    foreach (var sampleResultDto in sampleDto.SampleResults)
+                    {
+                        var sampleResultValue = "";
+                        var limitBasisValue = "";
+
+                        if (string.IsNullOrEmpty(sampleResultDto.MassLoadingValue))
+                        {
+                            limitBasisValue = LimitBasisName.Concentration.ToString();
+                            sampleResultValue = sampleResultDto.Value;
+                        }
+                        else
+                        {
+                            limitBasisValue = LimitBasisName.MassLoading.ToString();
+                            sampleResultValue = sampleResultDto.MassLoadingValue;
+                        }
+
+                        var analysisDateTime = "";
+                        if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
+                        {
+                            analysisDateTime = sampleResultDto.AnalysisDateTimeLocal.Value.ToString(dateTimeFormat);
+                        }
+
+                        var sampleResultNode = new SampleResultNode
+                        {
+                            ParameterName = sampleResultDto.ParameterName,
+                            Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier),
+                            Value = sampleResultValue,
+                            UnitName = sampleResultDto.UnitName,
+                            EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit,
+                            MethodDetectionLimit = sampleResultDto.MethodDetectionLimit.ToString(),
+                            AnalysisMethod = sampleResultDto.AnalysisMethod,
+                            AnalysisDateTimeUtc = analysisDateTime,
+                            IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
+                            LimitBasis = limitBasisValue
+                        };
+
+                        sampleNode.SampleResults.Add(sampleResultNode);
+                    }
                 }
             }
 
@@ -411,9 +420,12 @@ namespace Linko.LinkoExchange.Services.Report
                 throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.SamplesAndResults}', reportPackageId={reportPackageId}");
             }
 
-            reportPackagegDto.AssociatedSamples = new List<ReportSampleDto>();
+            
+            var sortedSamplesAndResultsTypes = new SortedList<int, ReportPackageElementTypeDto>();
             foreach (var existingSamplesReportPackageElementType in samplesReportPackageElementCategory.ReportPackageElementTypes)
             {
+                var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingSamplesReportPackageElementType);
+                reportPackageElementTypeDto.ReportSamples = new List<ReportSampleDto>();
                 //Should just be one iteration through this loop for the current phase, but in the future
                 //we might have more than one "Sample and Results" section in a Report Package
 
@@ -429,10 +441,13 @@ namespace Linko.LinkoExchange.Services.Report
                     {
                         reportSampleDto.Sample = _sampleService.GetSampleDetails(reportSampleAssociated.SampleId);
                     }
-                    reportPackagegDto.AssociatedSamples.Add(reportSampleDto);
+                    reportPackageElementTypeDto.ReportSamples.Add(reportSampleDto);
 
                 }
+
+                sortedSamplesAndResultsTypes.Add(reportPackageElementTypeDto.SortOrder, reportPackageElementTypeDto);
             }
+            reportPackagegDto.SamplesAndResultsTypes = sortedSamplesAndResultsTypes.Values.ToList();
 
             //
             //ADD FILE ASSOCIATIONS (AND OPTIONALLY FILE DATA)
@@ -448,9 +463,12 @@ namespace Linko.LinkoExchange.Services.Report
                 throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.Attachments}', reportPackageId={reportPackageId}");
             }
 
-            reportPackagegDto.AssociatedFiles = new List<ReportFileDto>();
+            var sortedAttachmentTypes = new SortedList<int, ReportPackageElementTypeDto>();
             foreach (var existingFilesReportPackageElementType in filesReportPackageElementCategory.ReportPackageElementTypes)
             {
+                var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingFilesReportPackageElementType);
+                reportPackageElementTypeDto.ReportFiles = new List<ReportFileDto>();
+
                 foreach (var reportFileAssociated in existingFilesReportPackageElementType.ReportFiles)
                 {
                     var reportFileDto = new ReportFileDto()
@@ -463,10 +481,33 @@ namespace Linko.LinkoExchange.Services.Report
                     {
                         reportFileDto.FileStore = _mapHelper.GetFileStoreDtoFromFileStore(_dbContext.FileStores.Single(s => s.FileStoreId == reportFileAssociated.FileStoreId));
                     }
-                    reportPackagegDto.AssociatedFiles.Add(reportFileDto);
+                    reportPackageElementTypeDto.ReportFiles.Add(reportFileDto);
 
                 }
+                sortedAttachmentTypes.Add(reportPackageElementTypeDto.SortOrder, reportPackageElementTypeDto);
             }
+            reportPackagegDto.AttachmentTypes = sortedAttachmentTypes.Values.ToList();
+
+            //
+            //ADD CERTIFICATIONS
+            //
+            var certificationReportPackageElementCategory = reportPackage.ReportPackageElementCategories
+                .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.Certifications.ToString());
+
+            if (certificationReportPackageElementCategory == null)
+            {
+                //throw Exception
+                throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.Certifications}', reportPackageId={reportPackageId}");
+            }
+
+            var sortedCertificationTypes = new SortedList<int, ReportPackageElementTypeDto>();
+            foreach (var existingCertsReportPackageElementType in certificationReportPackageElementCategory.ReportPackageElementTypes)
+            {
+                var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingCertsReportPackageElementType);
+                sortedCertificationTypes.Add(reportPackageElementTypeDto.SortOrder, reportPackageElementTypeDto);
+            }
+            reportPackagegDto.CertificationTypes = sortedCertificationTypes.Values.ToList();
+
             _logger.Info("Leave ReportPackageService.GetReportPackage. reportPackageId={0}", reportPackageId);
             return reportPackagegDto;
         }
@@ -490,7 +531,16 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info("Enter ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={0}", reportPackageDto.ReportPackageId);
             int reportPackageId = reportPackageDto.ReportPackageId;
-            var attachments = reportPackageDto.AssociatedFiles.Select(af => af.FileStore);
+
+            var attachments = new List<FileStoreDto>();
+            foreach (var attachmentReportPackageElementType in reportPackageDto.AttachmentTypes)
+            {
+                foreach (var reportFile in attachmentReportPackageElementType.ReportFiles)
+                {
+                    attachments.Add(reportFile.FileStore);
+                }
+            }
+
             var copyOfRecordPdfFile = GetReportPackageCopyOfRecordPdfFile(reportPackageDto);
             var copyOfRecordDataXmlFile = GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
             var copyOfRecordDto = _copyOfRecordService.CreateCopyOfRecordForReportPackage(reportPackageId, attachments, copyOfRecordPdfFile, copyOfRecordDataXmlFile);
@@ -764,6 +814,7 @@ namespace Linko.LinkoExchange.Services.Report
 
                     //Need to populate IU fields
                     newReportPackage.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
+                    newReportPackage.OrganizationReferenceNumber = currentOrgRegProgram.ReferenceNumber;
                     newReportPackage.OrganizationName = currentOrgRegProgram.Organization.Name;
                     newReportPackage.OrganizationAddressLine1 = currentOrgRegProgram.Organization.AddressLine1;
                     newReportPackage.OrganizationAddressLine2 = currentOrgRegProgram.Organization.AddressLine2;
@@ -985,9 +1036,10 @@ namespace Linko.LinkoExchange.Services.Report
                     {
                         var existingReportSample = existingReportSamples[i];
                         //Find match in dto samples
-                        var matchedSampleAssociation = reportPackageDto.AssociatedSamples
-                        .SingleOrDefault(sa => sa.ReportPackageElementTypeId == existingReportSample.ReportPackageElementTypeId
-                            && sa.SampleId == existingReportSample.SampleId);
+                        var matchedSampleAssociation = reportPackageDto.SamplesAndResultsTypes
+                                                        .Single(rpet => rpet.ReportPackageElementTypeId == existingReportSample.ReportPackageElementTypeId)
+                                                        .ReportSamples
+                                                            .SingleOrDefault(rs => rs.SampleId == existingReportSample.SampleId);
 
                         if (matchedSampleAssociation == null)
                         {
@@ -999,20 +1051,23 @@ namespace Linko.LinkoExchange.Services.Report
 
                 //Now handle additions
                 // - Iteration through all requested sample associations (in dto) and add ones that do not already exist
-                foreach (var requestedSampleAssociation in reportPackageDto.AssociatedSamples)
+                foreach (var requestedSampleAssociation in reportPackageDto.SamplesAndResultsTypes)
                 {
-                    var foundReportSample = _dbContext.ReportSamples
-                        .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedSampleAssociation.ReportPackageElementTypeId
-                            && rs.SampleId == requestedSampleAssociation.SampleId);
-
-                    if (foundReportSample == null)
+                    foreach (var reportSample in requestedSampleAssociation.ReportSamples)
                     {
-                        //Need to add association
-                        _dbContext.ReportSamples.Add(new ReportSample()
+                        var foundReportSample = _dbContext.ReportSamples
+                       .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedSampleAssociation.ReportPackageElementTypeId
+                           && rs.SampleId == reportSample.SampleId);
+
+                        if (foundReportSample == null)
                         {
-                            SampleId = requestedSampleAssociation.SampleId,
-                            ReportPackageElementTypeId = requestedSampleAssociation.ReportPackageElementTypeId
-                        });
+                            //Need to add association
+                            _dbContext.ReportSamples.Add(new ReportSample()
+                            {
+                                SampleId = reportSample.SampleId,
+                                ReportPackageElementTypeId = requestedSampleAssociation.ReportPackageElementTypeId
+                            });
+                        }
                     }
 
                 }
@@ -1039,9 +1094,10 @@ namespace Linko.LinkoExchange.Services.Report
                     {
                         var existingReportFile = existingReportFiles[i];
                         //Find match in dto files
-                        var matchedFileAssociation = reportPackageDto.AssociatedFiles
-                        .SingleOrDefault(sa => sa.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId
-                            && sa.FileStoreId == existingReportFile.FileStoreId);
+                        var matchedFileAssociation = reportPackageDto.AttachmentTypes
+                                                    .Single(rpet => rpet.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId)
+                                                    .ReportFiles
+                                                        .SingleOrDefault(rf => rf.ReportFileId == existingReportFile.ReportFileId);
 
                         if (matchedFileAssociation == null)
                         {
@@ -1054,20 +1110,23 @@ namespace Linko.LinkoExchange.Services.Report
 
                 //Now handle additions
                 // - Iteration through all requested file associations (in dto) and add ones that do not already exist
-                foreach (var requestedFileAssociation in reportPackageDto.AssociatedFiles)
+                foreach (var requestedFileAssociation in reportPackageDto.AttachmentTypes)
                 {
-                    var foundReportFile = _dbContext.ReportFiles
-                        .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedFileAssociation.ReportPackageElementTypeId
-                            && rs.FileStoreId == requestedFileAssociation.FileStoreId);
-
-                    if (foundReportFile == null)
+                    foreach (var reportFile in requestedFileAssociation.ReportFiles)
                     {
-                        //Need to add association
-                        _dbContext.ReportFiles.Add(new ReportFile()
+                        var foundReportFile = _dbContext.ReportFiles
+                                        .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedFileAssociation.ReportPackageElementTypeId
+                                            && rs.FileStoreId == reportFile.FileStoreId);
+
+                        if (foundReportFile == null)
                         {
-                            FileStoreId = requestedFileAssociation.FileStoreId,
-                            ReportPackageElementTypeId = requestedFileAssociation.ReportPackageElementTypeId
-                        });
+                            //Need to add association
+                            _dbContext.ReportFiles.Add(new ReportFile()
+                            {
+                                FileStoreId = reportFile.FileStoreId,
+                                ReportPackageElementTypeId = requestedFileAssociation.ReportPackageElementTypeId
+                            });
+                        }
                     }
 
                 }
@@ -1869,6 +1928,13 @@ namespace Linko.LinkoExchange.Services.Report
 
             reportPackagegDto.CreationDateTimeLocal = _timeZoneService
                 .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.CreationDateTimeUtc.UtcDateTime, timeZoneId);
+
+            if (reportPackage.LastModifierUserId != null)
+            {
+                var lastModifier = _dbContext.Users
+                    .Single(u => u.UserProfileId == reportPackage.LastModifierUserId);
+                reportPackagegDto.LastModifierFullName = $"{lastModifier.FirstName} {lastModifier.LastName}";
+            }
 
             return reportPackagegDto;
         }
