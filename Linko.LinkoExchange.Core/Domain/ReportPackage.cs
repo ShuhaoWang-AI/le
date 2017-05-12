@@ -52,6 +52,11 @@ namespace Linko.LinkoExchange.Core.Domain
         /// <summary>
         /// Denormalized data.
         /// </summary>
+        public string OrganizationReferenceNumber { get; set; }
+
+        /// <summary>
+        /// Denormalized data.
+        /// </summary>
         public string OrganizationName { get; set; }
 
         /// <summary>

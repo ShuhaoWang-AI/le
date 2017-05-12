@@ -322,7 +322,8 @@ namespace Linko.LinkoExchange.Services.Invitation
                 contentReplacements.Add("organizationName", targetOrgRegProgram.Organization.Name);
                 contentReplacements.Add("addressLine1", targetOrgRegProgram.Organization.AddressLine1);
                 contentReplacements.Add("cityName", targetOrgRegProgram.Organization.CityName);
-                contentReplacements.Add("stateName", _dbContext.Jurisdictions.Single(j => j.JurisdictionId == targetOrgRegProgram.Organization.JurisdictionId).Code);
+                contentReplacements.Add("stateName", targetOrgRegProgram.Organization.JurisdictionId.HasValue ? 
+                                                    _dbContext.Jurisdictions.Single(j => j.JurisdictionId == targetOrgRegProgram.Organization.JurisdictionId.Value).Code : "");
             }
 
             string baseUrl = _httpContextService.GetRequestBaseUrl();

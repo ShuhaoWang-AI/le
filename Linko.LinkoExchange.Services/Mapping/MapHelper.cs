@@ -23,7 +23,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.AddressLine1 = organization.AddressLine1;
             dto.AddressLine2 = organization.AddressLine2;
             dto.CityName = organization.CityName;
-            dto.State = organization.Jurisdiction.Code;
+            dto.State = organization.Jurisdiction?.Code;
             dto.OrganizationId = organization.OrganizationId;
             dto.OrganizationTypeId = organization.OrganizationTypeId;
 
@@ -1159,7 +1159,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 RecipientOrganizationAddressLine1 = rpt.OrganizationRegulatoryProgram.Organization.AddressLine1,
                 RecipientOrganizationAddressLine2 = rpt.OrganizationRegulatoryProgram.Organization.AddressLine2,
                 RecipientOrganizationCityName = rpt.OrganizationRegulatoryProgram.Organization.CityName,
-                RecipientOrganizationJurisdictionName = rpt.OrganizationRegulatoryProgram.Organization.Jurisdiction.Name,
+                RecipientOrganizationJurisdictionName = rpt.OrganizationRegulatoryProgram.Organization.Jurisdiction?.Name,
                 RecipientOrganizationZipCode = rpt.OrganizationRegulatoryProgram.Organization.ZipCode,
                 //CreationDateTimeUtc = set outside after calling line
                 ReportPackageElementCategories = new List<ReportPackageElementCategory>()

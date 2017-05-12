@@ -42,29 +42,31 @@ namespace Linko.LinkoExchange.Data.Mapping
                 .HasForeignKey(c => c.OrganizationRegulatoryProgramId)
                 .WillCascadeOnDelete(false);
 
+            Property(x => x.OrganizationReferenceNumber).IsOptional().HasMaxLength(50);
+
             Property(x => x.OrganizationName).IsRequired().HasMaxLength(254);
 
-            Property(x => x.OrganizationAddressLine1).IsRequired().HasMaxLength(100);
+            Property(x => x.OrganizationAddressLine1).IsOptional().HasMaxLength(100);
 
             Property(x => x.OrganizationAddressLine2).IsOptional().HasMaxLength(100);
 
-            Property(x => x.OrganizationCityName).IsRequired().HasMaxLength(100);
+            Property(x => x.OrganizationCityName).IsOptional().HasMaxLength(100);
 
-            Property(x => x.OrganizationJurisdictionName).IsRequired().HasMaxLength(100);
+            Property(x => x.OrganizationJurisdictionName).IsOptional().HasMaxLength(100);
 
-            Property(x => x.OrganizationZipCode).IsRequired().HasMaxLength(50);
+            Property(x => x.OrganizationZipCode).IsOptional().HasMaxLength(50);
 
             Property(x => x.RecipientOrganizationName).IsRequired().HasMaxLength(254);
 
-            Property(x => x.RecipientOrganizationAddressLine1).IsRequired().HasMaxLength(100);
+            Property(x => x.RecipientOrganizationAddressLine1).IsOptional().HasMaxLength(100);
 
             Property(x => x.RecipientOrganizationAddressLine2).IsOptional().HasMaxLength(100);
 
-            Property(x => x.RecipientOrganizationCityName).IsRequired().HasMaxLength(100);
+            Property(x => x.RecipientOrganizationCityName).IsOptional().HasMaxLength(100);
 
-            Property(x => x.RecipientOrganizationJurisdictionName).IsRequired().HasMaxLength(100);
+            Property(x => x.RecipientOrganizationJurisdictionName).IsOptional().HasMaxLength(100);
 
-            Property(x => x.RecipientOrganizationZipCode).IsRequired().HasMaxLength(50);
+            Property(x => x.RecipientOrganizationZipCode).IsOptional().HasMaxLength(50);
 
 
             Property(x => x.SubmissionDateTimeUtc).IsOptional();

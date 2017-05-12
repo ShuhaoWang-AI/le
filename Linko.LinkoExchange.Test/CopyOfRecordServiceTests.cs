@@ -473,7 +473,7 @@ namespace Linko.LinkoExchange.Test
                 RecipientOrganizationAddressLine1 = recipientOrg.AddressLine1,
                 RecipientOrganizationAddressLine2 = recipientOrg.AddressLine2,
                 RecipientOrganizationCityName = recipientOrg.CityName,
-                RecipientOrganizationJurisdictionName = recipientOrg.Jurisdiction.Name,
+                RecipientOrganizationJurisdictionName = recipientOrg.Jurisdiction?.Name,
                 RecipientOrganizationZipCode = recipientOrg.ZipCode,
                 SubmitterUserId = userProfile.UserProfileId,
                 SubmitterFirstName = userProfile.FirstName,
@@ -492,7 +492,7 @@ namespace Linko.LinkoExchange.Test
                 OrganizationAddressLine1 = orgRegProgram.Organization.AddressLine1,
                 OrganizationAddressLine2 = orgRegProgram.Organization.AddressLine2,
                 OrganizationCityName = orgRegProgram.Organization.CityName,
-                OrganizationJurisdictionName = orgRegProgram.Organization.Jurisdiction.Name,
+                OrganizationJurisdictionName = orgRegProgram.Organization.Jurisdiction?.Name,
 
                 PermitNumber = "Test---Permit---Number",
                 Comments = "Test comments",

@@ -18,15 +18,15 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.Name).IsRequired().HasMaxLength(254);
 
-            Property(x => x.AddressLine1).IsRequired().HasMaxLength(100);
+            Property(x => x.AddressLine1).IsOptional().HasMaxLength(100);
 
             Property(x => x.AddressLine2).IsOptional().HasMaxLength(100);
 
-            Property(x => x.CityName).IsRequired().HasMaxLength(100);
+            Property(x => x.CityName).IsOptional().HasMaxLength(100);
 
-            Property(x => x.ZipCode).IsRequired().HasMaxLength(50);
+            Property(x => x.ZipCode).IsOptional().HasMaxLength(50);
 
-            HasRequired(a => a.Jurisdiction)
+            HasOptional(a => a.Jurisdiction)
                 .WithMany()
                 .HasForeignKey(c => c.JurisdictionId)
                 .WillCascadeOnDelete(false);

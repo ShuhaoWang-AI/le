@@ -768,7 +768,7 @@ namespace Linko.LinkoExchange.Services.Report
                     newReportPackage.OrganizationAddressLine1 = currentOrgRegProgram.Organization.AddressLine1;
                     newReportPackage.OrganizationAddressLine2 = currentOrgRegProgram.Organization.AddressLine2;
                     newReportPackage.OrganizationCityName = currentOrgRegProgram.Organization.CityName;
-                    newReportPackage.OrganizationJurisdictionName = currentOrgRegProgram.Organization.Jurisdiction.Name;
+                    newReportPackage.OrganizationJurisdictionName = currentOrgRegProgram.Organization.Jurisdiction?.Name;
                     newReportPackage.OrganizationZipCode = currentOrgRegProgram.Organization.ZipCode;
 
                     //Step 2 - create a row in tReportPackageElementCategory for each row in tReportPackageTemplateElementCategory (where ReportPackageTemplateId="n")

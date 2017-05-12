@@ -26,7 +26,7 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public string ZipCode { get; set; }
 
-        public int JurisdictionId { get; set; }
+        public int? JurisdictionId { get; set; }
         public virtual Jurisdiction Jurisdiction { get; set; }
 
         public string PhoneNumber { get; set; }

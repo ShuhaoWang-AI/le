@@ -22,10 +22,6 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.SamplesRequired).IsRequired();
 
-            Property(x => x.LimitEffectiveDateTimeUtc).IsRequired();
-
-            Property(x => x.LimitRetirementDateTimeUtc).IsOptional();
-
             HasRequired(a => a.ByOrganizationRegulatoryProgram)
                 .WithMany(b => b.SampleRequirements)
                 .HasForeignKey(c => c.ByOrganizationRegulatoryProgramId)
