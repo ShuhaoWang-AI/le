@@ -184,7 +184,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
 
                 var flowParameter = _dbContext.Parameters
-                    .First(p => p.IsFlowForMassLoadingCalculation == true); //Chris: "Should be one but just get first".
+                    .First(p => p.IsFlowForMassLoadingCalculation == true); //Chris: "Should be one but just get first". // TODO: Need to check OrganizationRegulatoryProgramId
 
                 var flowLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.VolumeFlowRate.ToString()).LimitBasisId;
 

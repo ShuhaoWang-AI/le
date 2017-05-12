@@ -78,7 +78,7 @@ namespace Linko.LinkoExchange.Services.Report
 
 
         /// <summary>
-        /// Note:  before call this function,  make sure to update draf first.
+        /// Note:  before call this function,  make sure to update draft first.
         /// </summary>
         /// <param name="reportPackageId"></param>
         public void SignAndSubmitReportPackage(int reportPackageId)
@@ -1260,7 +1260,6 @@ namespace Linko.LinkoExchange.Services.Report
 
             var fileStoreList = new List<FileStoreDto>();
             var ageInMonthsSinceFileUploaded = Int32.Parse(_settingService.GetGlobalSettings()[SystemSettingType.FileAvailableToAttachMaxAgeMonths]);
-            var xMonthsAgo = DateTimeOffset.UtcNow.AddMonths(-ageInMonthsSinceFileUploaded);
 
             var reportPackage = _dbContext.ReportPackages
                 .Include(rp => rp.ReportPackageElementCategories)
@@ -1268,6 +1267,7 @@ namespace Linko.LinkoExchange.Services.Report
                 .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes))
                 .Single(rp => rp.ReportPackageId == reportPackageId);
 
+            var xMonthsAgo = reportPackage.CreationDateTimeUtc.AddMonths(-ageInMonthsSinceFileUploaded);
             var filesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
                .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.Attachments.ToString());
 
@@ -1280,8 +1280,9 @@ namespace Linko.LinkoExchange.Services.Report
             foreach (var existingFilesReportPackageElementType in filesReportPackageElementCategory.ReportPackageElementTypes)
             {
                 var filesOfThisReportElementType = _dbContext.FileStores
-                    .Where(fs => fs.ReportElementTypeId == existingFilesReportPackageElementType.ReportElementTypeId
-                        && fs.UploadDateTimeUtc >= xMonthsAgo)
+                    .Where(fs => fs.OrganizationRegulatoryProgramId == reportPackage.OrganizationRegulatoryProgramId
+                            && fs.ReportElementTypeId == existingFilesReportPackageElementType.ReportElementTypeId
+                            && fs.UploadDateTimeUtc >= xMonthsAgo)
                     .ToList();
 
                 foreach (var eligibleFile in filesOfThisReportElementType)
