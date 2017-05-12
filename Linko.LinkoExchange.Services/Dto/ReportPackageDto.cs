@@ -63,6 +63,7 @@ namespace Linko.LinkoExchange.Services.Dto
 
         public string PermitNumber { get; set; }
         public DateTime CreationDateTimeLocal { get; internal set; }
+        public DateTime LastModificationDateTimeLocal { get; internal set; }
 
         public List<ReportPackageElementTypeDto> SamplesAndResultsTypes { get; set; }
         public List<ReportPackageElementTypeDto> AttachmentTypes { get; set; }

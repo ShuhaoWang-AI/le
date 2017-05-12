@@ -1050,8 +1050,8 @@ namespace Linko.LinkoExchange.Services.Report
                         var existingReportSample = existingReportSamples[i];
                         //Find match in dto samples
                         var matchedSampleAssociation = reportPackageDto.SamplesAndResultsTypes
-                                                        .Single(rpet => rpet.ReportPackageElementTypeId == existingReportSample.ReportPackageElementTypeId)
-                                                        .ReportSamples
+                                                        .SingleOrDefault(rpet => rpet.ReportPackageElementTypeId == existingReportSample.ReportPackageElementTypeId)
+                                                        ?.ReportSamples
                                                             .SingleOrDefault(rs => rs.SampleId == existingReportSample.SampleId);
 
                         if (matchedSampleAssociation == null)
@@ -1108,9 +1108,9 @@ namespace Linko.LinkoExchange.Services.Report
                         var existingReportFile = existingReportFiles[i];
                         //Find match in dto files
                         var matchedFileAssociation = reportPackageDto.AttachmentTypes
-                                                    .Single(rpet => rpet.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId)
-                                                    .ReportFiles
-                                                        .SingleOrDefault(rf => rf.ReportFileId == existingReportFile.ReportFileId);
+                                                    .SingleOrDefault(rpet => rpet.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId)
+                                                    ?.ReportFiles
+                                                        .SingleOrDefault(rf => rf.FileStoreId == existingReportFile.FileStoreId);
 
                         if (matchedFileAssociation == null)
                         {
@@ -1322,65 +1322,75 @@ namespace Linko.LinkoExchange.Services.Report
         }
 
         /// <summary>
-        /// Gets a collection of FileStoreDto's that are eligible to be added this Report Package
+        /// Gets a collection of FileStoreDto's that are eligible to be added this Report Package -- also indicate which are already associated.
         /// </summary>
         /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
         /// <returns>Collection of FileStoreDto objects</returns>
-        public ICollection<FileStoreDto> GetFilesForSelection(int reportPackageId)
+        public ICollection<FileStoreDto> GetFilesForSelection(int reportPackageElementTypeId)
         {
-            _logger.Info($"Enter ReportPackageService.GetFilesForSelection. reportPackageId={reportPackageId}");
+            var existingFilesReportPackageElementType = _dbContext.ReportPackageElementTypes
+                                .Include(rp => rp.ReportPackageElementCategory.ReportPackage)
+                                .Include(rp => rp.ReportPackageElementCategory.ReportElementCategory)
+                                .Include(rp => rp.ReportFiles)
+                                .Single(rp => rp.ReportPackageElementTypeId == reportPackageElementTypeId);
+
+            var reportPackage = existingFilesReportPackageElementType.ReportPackageElementCategory.ReportPackage;
+
+            _logger.Info($"Enter ReportPackageService.GetFilesForSelection. reportPackageElementTypeId={reportPackageElementTypeId}");
 
             var fileStoreList = new List<FileStoreDto>();
             var ageInMonthsSinceFileUploaded = Int32.Parse(_settingService.GetGlobalSettings()[SystemSettingType.FileAvailableToAttachMaxAgeMonths]);
 
-            var reportPackage = _dbContext.ReportPackages
-                .Include(rp => rp.ReportPackageElementCategories)
-                .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportElementCategory))
-                .Include(rp => rp.ReportPackageElementCategories.Select(rc => rc.ReportPackageElementTypes))
-                .Single(rp => rp.ReportPackageId == reportPackageId);
-
             var xMonthsAgo = reportPackage.CreationDateTimeUtc.AddMonths(-ageInMonthsSinceFileUploaded);
-            var filesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
-               .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.Attachments.ToString());
 
-            if (filesReportPackageElementCategory == null)
+            if (existingFilesReportPackageElementType.ReportPackageElementCategory.ReportElementCategory.Name != ReportElementCategoryName.Attachments.ToString())
             {
                 //throw Exception
-                throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.Attachments}', reportPackageId={reportPackageId}");
+                throw new Exception($"ERROR: Passed in reportPackageElementTypeId={reportPackageElementTypeId} does not correspond with a Attachments.");
             }
 
-            foreach (var existingFilesReportPackageElementType in filesReportPackageElementCategory.ReportPackageElementTypes)
+            var filesOfThisReportElementType = _dbContext.FileStores
+                .Where(fs => fs.OrganizationRegulatoryProgramId == reportPackage.OrganizationRegulatoryProgramId
+                        && fs.ReportElementTypeId == existingFilesReportPackageElementType.ReportElementTypeId
+                        && fs.UploadDateTimeUtc >= xMonthsAgo)
+                .ToList();
+
+            foreach (var eligibleFile in filesOfThisReportElementType)
             {
-                var filesOfThisReportElementType = _dbContext.FileStores
-                    .Where(fs => fs.OrganizationRegulatoryProgramId == reportPackage.OrganizationRegulatoryProgramId
-                            && fs.ReportElementTypeId == existingFilesReportPackageElementType.ReportElementTypeId
-                            && fs.UploadDateTimeUtc >= xMonthsAgo)
-                    .ToList();
-
-                foreach (var eligibleFile in filesOfThisReportElementType)
-                {
-                    var fileStoreDto = _mapHelper.GetFileStoreDtoFromFileStore(eligibleFile);
-                    fileStoreDto.ReportPackageElementTypeId = existingFilesReportPackageElementType.ReportPackageElementTypeId;
-                    fileStoreList.Add(fileStoreDto);
-                }
+                var fileStoreDto = _mapHelper.GetFileStoreDtoFromFileStore(eligibleFile);
+                fileStoreDto.ReportPackageElementTypeId = existingFilesReportPackageElementType.ReportPackageElementTypeId;
+                fileStoreDto.IsAssociatedWithReportPackage = existingFilesReportPackageElementType
+                                                            .ReportFiles.Any(rf => rf.FileStoreId == eligibleFile.FileStoreId);
+                fileStoreList.Add(fileStoreDto);
             }
+          
 
-            _logger.Info($"Leave ReportPackageService.GetFilesForSelection. reportPackageId={reportPackageId}, fileStoreList.Count={fileStoreList.Count}");
+            _logger.Info($"Leave ReportPackageService.GetFilesForSelection. reportPackageElementTypeId={reportPackageElementTypeId}, fileStoreList.Count={fileStoreList.Count}");
 
             return fileStoreList;
         }
 
         /// <summary>
-        /// Gets a collection of SampleDto's that are eligible to be added this Report Package
+        /// Gets a collection of SampleDto's that are eligible to be added this Report Package -- also indicate which are already associated.
         /// </summary>
         /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
         /// <returns>Collection of SampleDto objects</returns>
-        public ICollection<SampleDto> GetSamplesForSelection(int reportPackageId)
+        public ICollection<SampleDto> GetSamplesForSelection(int reportPackageElementTypeId)
         {
-            _logger.Info($"Enter ReportPackageService.GetSamplesForSelection. reportPackageId={reportPackageId}");
+            _logger.Info($"Enter ReportPackageService.GetSamplesForSelection. reportPackageElementTypeId={reportPackageElementTypeId}");
 
-            var reportPackage = _dbContext.ReportPackages
-                .Single(rp => rp.ReportPackageId == reportPackageId);
+            var existingSamplesReportPackageElementType = _dbContext.ReportPackageElementTypes
+                                .Include(rp => rp.ReportPackageElementCategory.ReportPackage)
+                                .Include(rp => rp.ReportPackageElementCategory.ReportElementCategory)
+                                .Include(rp => rp.ReportSamples)
+                                .Single(rp => rp.ReportPackageElementTypeId == reportPackageElementTypeId);
+
+            if (existingSamplesReportPackageElementType.ReportPackageElementCategory.ReportElementCategory.Name != ReportElementCategoryName.SamplesAndResults.ToString())
+            {
+                throw new Exception($"ERROR: Passed in reportPackageElementTypeId={reportPackageElementTypeId} does not correspond with a Samples and Results.");
+            }
+
+            var reportPackage = existingSamplesReportPackageElementType.ReportPackageElementCategory.ReportPackage;
 
             var eligibleSampleList = new List<SampleDto>();
 
@@ -1395,12 +1405,24 @@ namespace Linko.LinkoExchange.Services.Report
             foreach (var existingEligibleSample in existingEligibleSamples)
             {
                 var sampleDto = _sampleService.GetSampleDetails(existingEligibleSample);
+                sampleDto.IsAssociatedWithReportPackage = existingSamplesReportPackageElementType
+                                                            .ReportSamples.Any(rs => rs.SampleId == existingEligibleSample.SampleId);
                 eligibleSampleList.Add(sampleDto);
             }
 
-            _logger.Info($"Leave ReportPackageService.GetSamplesForSelection. reportPackageId={reportPackageId}, eligibleSampleList.Count={eligibleSampleList.Count}");
+            _logger.Info($"Leave ReportPackageService.GetSamplesForSelection. reportPackageElementTypeId={reportPackageElementTypeId}, eligibleSampleList.Count={eligibleSampleList.Count}");
 
             return eligibleSampleList;
+        }
+
+        public ReportPackageElementTypeDto GetReportReportPackageElementType(int reportPackageElementTypeId)
+        {
+            var reportPackageElementType = _dbContext.ReportPackageElementTypes
+                .Single(rpet => rpet.ReportPackageElementTypeId == reportPackageElementTypeId);
+
+            var dto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(reportPackageElementType);
+
+            return dto;
         }
 
         /// <summary>
@@ -1944,6 +1966,9 @@ namespace Linko.LinkoExchange.Services.Report
             reportPackagegDto.CreationDateTimeLocal = _timeZoneService
                 .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.CreationDateTimeUtc.UtcDateTime, timeZoneId);
 
+            reportPackagegDto.LastModificationDateTimeLocal = _timeZoneService
+                    .GetLocalizedDateTimeUsingThisTimeZoneId((reportPackage.LastModificationDateTimeUtc.HasValue ? reportPackage.LastModificationDateTimeUtc.Value.UtcDateTime
+                                                                    : reportPackage.CreationDateTimeUtc.UtcDateTime), timeZoneId);
             if (reportPackage.LastModifierUserId != null)
             {
                 var lastModifier = _dbContext.Users

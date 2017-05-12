@@ -24,7 +24,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public byte[] Data { get; set; }
         public string MediaType { get; set; }
         public bool UsedByReports { get; set; }
-
-        public int ReportPackageElementTypeId { get; set; } //only to be used when fetching files for possible inclusion in Report Packageg
+        public int ReportPackageElementTypeId { get; internal set; } //only to be used when fetching files for possible inclusion in Report Package
+        public bool IsAssociatedWithReportPackage { get; internal set; } // only to be used when displaying report package to show which samples are included
     }
 }

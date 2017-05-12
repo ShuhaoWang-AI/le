@@ -82,18 +82,26 @@ namespace Linko.LinkoExchange.Services.Report
         void UpdateStatus(int reportPackageId, ReportStatusName reportStatus, bool isUseTransaction);
 
         /// <summary>
-        ///     Gets a collection of FileStoreDto's that are eligible to be added this Report Package
+        ///     Gets a collection of FileStoreDto's that are eligible to be added this Report Package -- also indicate which are already associated.
         /// </summary>
         /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
         /// <returns>Collection of FileStoreDto objects</returns>
-        ICollection<FileStoreDto> GetFilesForSelection(int reportPackageId);
+        ICollection<FileStoreDto> GetFilesForSelection(int reportPackageElementTypeId);
 
         /// <summary>
-        ///     Gets a collection of SampleDto's that are eligible to be added this Report Package
+        ///     Gets a collection of SampleDto's that are eligible to be added this Report Package -- also indicate which are already associated.
         /// </summary>
         /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
         /// <returns>Collection of SampleDto objects</returns>
-        ICollection<SampleDto> GetSamplesForSelection(int reportPackageId);
+        ICollection<SampleDto> GetSamplesForSelection(int reportPackageElementTypeId);
+
+        /// <summary>
+        /// Used to generically fetch a ReportPackageElementType object from the database. Can be used to fetch "content elements" (such as certifications)
+        /// from the database.
+        /// </summary>
+        /// <param name="reportPackageElementTypeId">tReportPackageElementType.ReportPackageElementTypeId</param>
+        /// <returns></returns>
+        ReportPackageElementTypeDto GetReportReportPackageElementType(int reportPackageElementTypeId);
 
         /// <summary>
         ///     Gets Report Package information (without children element data) for displaying in a grid.

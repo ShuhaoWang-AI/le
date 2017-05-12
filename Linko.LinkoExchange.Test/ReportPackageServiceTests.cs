@@ -84,7 +84,8 @@ namespace Linko.LinkoExchange.Test
             systemSettingLookup.Add(SystemSettingType.SystemEmailFirstName, "Adam");
             systemSettingLookup.Add(SystemSettingType.SystemEmailLastName, "Adminsky");
             //systemSettingLookup.Add(SystemSettingType.EmailServer, "wtraxadc2.watertrax.local");
-            systemSettingLookup.Add(SystemSettingType.EmailServer, "192.168.5.51"); 
+            systemSettingLookup.Add(SystemSettingType.EmailServer, "192.168.5.51");
+            systemSettingLookup.Add(SystemSettingType.FileAvailableToAttachMaxAgeMonths, "999");
             _settingService.Setup(s => s.GetGlobalSettings()).Returns(systemSettingLookup);
 
             _requestCache.Setup(s => s.GetValue(CacheKey.Token)).Returns("some_token_string");
@@ -116,8 +117,9 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void DeleteReportPackage()
         {
-            var reportPackageId = 7;
-            _reportPackageService.DeleteReportPackage(reportPackageId);
+            _reportPackageService.DeleteReportPackage(8);
+            _reportPackageService.DeleteReportPackage(9);
+            _reportPackageService.DeleteReportPackage(10);
         }
 
         [TestMethod]
@@ -156,14 +158,14 @@ namespace Linko.LinkoExchange.Test
         public void SaveReportPackage_Add_Samples()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(2, false);
+            var existingReportPackage = _reportPackageService.GetReportPackage(11, false);
 
             //Add sample associations
             existingReportPackage.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
-            var sampleReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 13 };
+            var sampleReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 25 };
             sampleReportPackageElementType.ReportSamples = new List<ReportSampleDto>();
-            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 52, ReportPackageElementTypeId = 13 });
-            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 53, ReportPackageElementTypeId = 13 });
+            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 52, ReportPackageElementTypeId = 25 });
+            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 53, ReportPackageElementTypeId = 25 });
             existingReportPackage.SamplesAndResultsTypes.Add(sampleReportPackageElementType);
             var existingId = _reportPackageService.SaveReportPackage(existingReportPackage, true);
         }
@@ -172,24 +174,24 @@ namespace Linko.LinkoExchange.Test
         public void SaveReportPackage_Add_Files()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(10, true);
+            var existingReportPackage = _reportPackageService.GetReportPackage(11, true);
 
             existingReportPackage.Comments = "Comments .. test.";
 
             //Add sample associations
             existingReportPackage.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
-            var sampleReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 21 };
+            var sampleReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 25 };
             sampleReportPackageElementType.ReportSamples = new List<ReportSampleDto>();
-            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 52, ReportPackageElementTypeId = 21 });
-            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 53, ReportPackageElementTypeId = 21 });
+            //sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 52, ReportPackageElementTypeId = 17 });
+            //sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 53, ReportPackageElementTypeId = 17 });
             existingReportPackage.SamplesAndResultsTypes.Add(sampleReportPackageElementType);
 
             //Add file associations
             existingReportPackage.AttachmentTypes = new List<ReportPackageElementTypeDto>();
-            var filesReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 22 };
+            var filesReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 26 };
             filesReportPackageElementType.ReportFiles = new List<ReportFileDto>();
-            filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 22 });
-            filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 22 });
+            //filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 26 });
+            //filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 26 });
             existingReportPackage.AttachmentTypes.Add(filesReportPackageElementType);
             var existingId = _reportPackageService.SaveReportPackage(existingReportPackage, true);
         }
@@ -206,14 +208,14 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetFilesForSelection()
         {
-            var eligibleFiles = _reportPackageService.GetFilesForSelection(8);
+            var eligibleFiles = _reportPackageService.GetFilesForSelection(26);
 
         }
 
         [TestMethod]
         public void GetSamplesForSelection()
         {
-            var eligibleSamples = _reportPackageService.GetSamplesForSelection(8);
+            var eligibleSamples = _reportPackageService.GetSamplesForSelection(25);
 
         }
 
