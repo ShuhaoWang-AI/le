@@ -1053,7 +1053,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             existingSampleResult.AnalysisMethod = dto.AnalysisMethod;
             //existingSampleResult.AnalysisDateTimeUtc = set outside after calling line
             existingSampleResult.IsApprovedEPAMethod = dto.IsApprovedEPAMethod;
-            existingSampleResult.IsCalculated = false;
+            existingSampleResult.IsCalculated = true;
             //existingSampleResult.LimitTypeId = set outside after calling line
             //existingSampleResult.LimitBasisId = set outside after calling line
             //existingSampleResult.CreationDateTimeUtc = set outside after calling line
