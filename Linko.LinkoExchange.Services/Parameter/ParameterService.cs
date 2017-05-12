@@ -144,7 +144,8 @@ namespace Linko.LinkoExchange.Services.Parameter
             var parameterGroupDtos = new List<ParameterGroupDto>();
             var foundParamGroups = _dbContext.ParameterGroups
                 .Include(param => param.ParameterGroupParameters)
-                .Where(param => param.OrganizationRegulatoryProgramId == authOrgRegProgramId)
+                .Where(param => param.OrganizationRegulatoryProgramId == authOrgRegProgramId
+                    && param.IsActive)
                 .ToList();
 
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
