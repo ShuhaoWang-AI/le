@@ -1929,8 +1929,8 @@ BEGIN
     CREATE TABLE dbo.tLimitType 
     (
         LimitTypeId                     int IDENTITY(1,1) NOT NULL
-        , Name                          varchar(100) NOT NULL
-        , Description                   varchar(500) NULL
+        , Name                          varchar(25) NOT NULL
+        , Description                   varchar(30) NULL
         , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
         , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
         , LastModifierUserId            int NULL  
@@ -1959,8 +1959,8 @@ BEGIN
     CREATE TABLE dbo.tLimitBasis 
     (
         LimitBasisId                    int IDENTITY(1,1) NOT NULL
-        , Name                          varchar(100) NOT NULL
-        , Description                   varchar(500) NULL
+        , Name                          varchar(25) NOT NULL
+        , Description                   varchar(30) NULL
         , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
         , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
         , LastModifierUserId            int NULL  
@@ -2047,7 +2047,7 @@ BEGIN
     (
         MonitoringPointParameterLimitId     int IDENTITY(1,1) NOT NULL
         , MonitoringPointParameterId        int NOT NULL
-        , Name                              varchar(350) NOT NULL
+        , Name                              varchar(200) NOT NULL
         , Description                       varchar(500) NULL
         , MinimumValue                      float NULL
         , MaximumValue                      float NOT NULL
@@ -2131,8 +2131,6 @@ BEGIN
         , PeriodStartDateTimeUtc			datetimeoffset(0) NOT NULL  
         , PeriodEndDateTimeUtc				datetimeoffset(0) NOT NULL
         , SamplesRequired					int NOT NULL
-        , LimitEffectiveDateTimeUtc			datetimeoffset(0) NOT NULL
-        , LimitRetirementDateTimeUtc		datetimeoffset(0) NULL
         , ByOrganizationRegulatoryProgramId	int NOT NULL
     
         CONSTRAINT PK_tSampleRequirement PRIMARY KEY CLUSTERED 
