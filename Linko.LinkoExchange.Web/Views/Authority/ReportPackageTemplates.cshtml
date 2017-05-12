@@ -47,7 +47,7 @@
                                  .HtmlAttributes(attributes:new {style = "width:80px;"})
                                  .HeaderHtmlAttributes(attributes:new {style = "width:80px;"})
                                  .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm:ss tt}")
+                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
                                  .HtmlAttributes(attributes:new {style = "width:135px;"})
                                  .HeaderHtmlAttributes(attributes:new {style = "width:135px;"})
                                  .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));

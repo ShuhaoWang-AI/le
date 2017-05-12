@@ -43,7 +43,7 @@
                           columns.Bound(c => c.Description)
                                  .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
                                                                          .SuggestionOperator(filterType: FilterType.Contains)));
-                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm:ss tt}")
+                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
                                  .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
                           columns.Bound(c => c.LastModifierUserName)
                                  .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
@@ -123,7 +123,7 @@
                           columns.Bound(c => c.Description)
                                  .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
                                                                          .SuggestionOperator(filterType: FilterType.Contains)));
-                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm:ss tt}")
+                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
                                  .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
                           columns.Bound(c => c.LastModifierUserName)
                                  .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")

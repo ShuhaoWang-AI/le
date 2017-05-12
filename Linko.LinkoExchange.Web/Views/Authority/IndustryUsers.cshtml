@@ -107,8 +107,8 @@
                         columns.Bound(c => c.FirstName);
                         columns.Bound(c => c.LastName);
                         columns.Bound(c => c.Email);
-                        columns.Bound(c => c.DateInvited).Format(value: "{0:MM/dd/yyyy hh:mm:ss tt}");
-                        columns.Bound(c => c.InviteExpires).Format(value: "{0:MM/dd/yyyy hh:mm:ss tt}");
+                        columns.Bound(c => c.DateInvited).Format(value: "{0:MM/dd/yyyy hh:mm tt}");
+                        columns.Bound(c => c.InviteExpires).Format(value: "{0:MM/dd/yyyy hh:mm tt}");
                         columns.Command(c =>
                         {
                             c.Destroy().Text(text: " ");

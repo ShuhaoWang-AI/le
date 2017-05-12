@@ -15,7 +15,7 @@
 
 <div class="box box-primary">
     <div class="box-header with-border">
-        <h3 class="box-title">Samples - @Label.ResourceManager.GetString(name: ViewBag.SampleStatusName.ToString())</h3>
+        <h3 class="box-title">Samples - @Label.ResourceManager.GetString(name:ViewBag.SampleStatusName.ToString())</h3>
         <div class="box-tools pull-right">
             @if (ViewBag.SampleStatusName == SampleStatusName.Draft)
             {
@@ -46,11 +46,11 @@
                                    columns.Bound(c => c.CollectionMethodName)
                                           .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
                                                                                   .SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.StartDateTimeLocal).Format(value:"{0:MM/dd/yyyy}")
+                                   columns.Bound(c => c.StartDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
                                           .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                   columns.Bound(c => c.EndDateTimeLocal).Format(value:"{0:MM/dd/yyyy}")
+                                   columns.Bound(c => c.EndDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
                                           .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                   columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm:ss tt}")
+                                   columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
                                           .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
                                    columns.Bound(c => c.LastModifierUserName)
                                           .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")

@@ -191,7 +191,7 @@
                                 @(Html.Kendo().DateTimePicker()
                                       .Name(componentName:"StartDateTimeLocal")
                                       .Value(date:Model.StartDateTimeLocal)
-                                      .Format(format:"MM/dd/yyyy hh:mm:ss tt")
+                                      .Format(format:"MM/dd/yyyy hh:mm tt")
                                       .Max(date:DateTime.Now)
                                       .HtmlAttributes(attributes:new
                                                                  {
@@ -204,7 +204,7 @@
                                 @(Html.Kendo().DateTimePicker()
                                       .Name(componentName:"StartDateTimeLocal")
                                       .Value(date:Model.StartDateTimeLocal)
-                                      .Format(format:"MM/dd/yyyy hh:mm:ss tt")
+                                      .Format(format:"MM/dd/yyyy hh:mm tt")
                                       .Max(date:DateTime.Now)
                                       .HtmlAttributes(attributes:new
                                                                  {
@@ -274,7 +274,7 @@
                                 @(Html.Kendo().DateTimePicker()
                                       .Name(componentName:"EndDateTimeLocal")
                                       .Value(date:Model.EndDateTimeLocal)
-                                      .Format(format:"MM/dd/yyyy hh:mm:ss tt")
+                                      .Format(format:"MM/dd/yyyy hh:mm tt")
                                       .Max(date:DateTime.Now)
                                       .HtmlAttributes(attributes:new
                                                                  {
@@ -287,7 +287,7 @@
                                 @(Html.Kendo().DateTimePicker()
                                       .Name(componentName:"EndDateTimeLocal")
                                       .Value(date:Model.EndDateTimeLocal)
-                                      .Format(format:"MM/dd/yyyy hh:mm:ss tt")
+                                      .Format(format:"MM/dd/yyyy hh:mm tt")
                                       .Max(date:DateTime.Now)
                                       .HtmlAttributes(attributes:new
                                                                  {
@@ -427,7 +427,7 @@
                                     @(Html.Kendo().DateTimePicker()
                                           .Name(componentName:"AnalysisDateTime_" + sampleResult.ParameterId)
                                           .Value(date:sampleResult.AnalysisDateTimeLocal)
-                                          .Format(format:"MM/dd/yyyy hh:mm:ss tt")
+                                          .Format(format:"MM/dd/yyyy hh:mm tt")
                                           .Max(date:DateTime.Now)
                                           .HtmlAttributes(attributes:new
                                                                      {
@@ -440,7 +440,7 @@
                                     @(Html.Kendo().DateTimePicker()
                                           .Name(componentName:"AnalysisDateTime_" + sampleResult.ParameterId)
                                           .Value(date:sampleResult.AnalysisDateTimeLocal)
-                                          .Format(format:"MM/dd/yyyy hh:mm:ss tt")
+                                          .Format(format:"MM/dd/yyyy hh:mm tt")
                                           .Max(date:DateTime.Now)
                                           .HtmlAttributes(attributes:new
                                                                      {
@@ -1171,7 +1171,7 @@
                     });
 
                 $("input[id^='AnalysisDateTime_']")
-                    .kendoDateTimePicker({ format: "MM/dd/yyyy hh:mm:ss tt", max: new Date($.now()) });
+                    .kendoDateTimePicker({ format: "MM/dd/yyyy hh:mm tt", max: new Date($.now()) });
             };
 
             $("#EndDateTimeLocal")
