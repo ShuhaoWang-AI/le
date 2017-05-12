@@ -150,7 +150,7 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
-                    
+
                     throw;
 
                 }
@@ -178,7 +178,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info("Enter ReportPackageService.CopyOfRecordDataXmlFileDto. reportPackageId={0}", reportPackageDto.ReportPackageId);
 
-            var dateTimeFormat = "MM/dd/yyyyThh:mm:ss zzzz"; // TODO:  i think format should also include tt (am/pm) as it is 12 hour format. Should be "MM/dd/yyyyThh:mm tt zzzz"
+            var dateTimeFormat = "MM/dd/yyyyThh:mm tt zzzz";
             var timeZoneName = _timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(reportPackageDto.OrganizationRegulatoryProgramId,
                                 reportPackageDto.SubmissionDateTimeLocal.Value, false);
 
@@ -212,7 +212,7 @@ namespace Linko.LinkoExchange.Services.Report
                 SubmittedOnBehalfOf = new SubmittedOnBehalfOf
                 {
                     OrganizationName = reportPackageDto.OrganizationName,
-                    ReferenceNumber = reportPackageDto.OrganizationRegulatoryProgramDto.ReferenceNumber,
+                    ReferenceNumber = reportPackageDto.OrganizationReferenceNumber,
                     Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
                     Address2 = EmtpyStringIfNull(reportPackageDto.RecipientOrganizationAddressLine2),
                     City = reportPackageDto.RecipientOrganizationCityName,
@@ -238,9 +238,9 @@ namespace Linko.LinkoExchange.Services.Report
                     {
                         OriginalFileName = reportFile.FileStore.OriginalFileName,
                         SystemGeneratedUniqueFileName = reportFile.FileStore.Name,
-                        AttachmentType = reportFile.FileStore.FileType
+                        AttachmentType = reportFile.FileStore.ReportElementTypeName
                     });
-                        
+
                 }
             }
 
@@ -400,7 +400,8 @@ namespace Linko.LinkoExchange.Services.Report
             {
                 //Authority accessing an IU under their control => OK
             }
-            else {
+            else
+            {
                 throw new UnauthorizedAccessException($"Unauthorized access of Report Package Id = {reportPackageId} by Org Reg Program Id = {currentOrgRegProgramId}");
             }
 
@@ -420,7 +421,7 @@ namespace Linko.LinkoExchange.Services.Report
                 throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.SamplesAndResults}', reportPackageId={reportPackageId}");
             }
 
-            
+
             var sortedSamplesAndResultsTypes = new SortedList<int, ReportPackageElementTypeDto>();
             foreach (var existingSamplesReportPackageElementType in samplesReportPackageElementCategory.ReportPackageElementTypes)
             {
@@ -570,7 +571,7 @@ namespace Linko.LinkoExchange.Services.Report
             crommerContentReplacements.Add("organizationName", reportPackageDto.OrganizationName);
             crommerContentReplacements.Add("reportPackageName", reportPackageDto.Name);
 
-            var dateTimeFormat = "MM/dd/yyyyThh:mm:ss zzzz"; // TODO:  i think format should also include tt (am/pm) as it is 12 hour format. Should be "MM/dd/yyyyThh:mm tt zzzz"
+            var dateTimeFormat = "MM/dd/yyyyThh:mm tt zzzz";
             crommerContentReplacements.Add("periodStart", reportPackageDto.PeriodStartDateTimeLocal.ToString(dateTimeFormat));
             crommerContentReplacements.Add("periodEnd", reportPackageDto.PeriodEndDateTimeLocal.ToString(dateTimeFormat));
             crommerContentReplacements.Add("corSignature", copyOfRecordDto.Signature);
@@ -589,7 +590,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             var emailContentReplacements = new Dictionary<string, string>();
 
-            emailContentReplacements.Add("iuOrganizationName", reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
+            emailContentReplacements.Add("iuOrganizationName", reportPackage.OrganizationName);
             emailContentReplacements.Add("reportPackageName", reportPackage.Name);
 
             emailContentReplacements.Add("periodStartDate", reportPackage.PeriodStartDateTimeLocal.ToString("MMM dd, yyyy"));
@@ -597,7 +598,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             var timeZoneNameAbbreviation = _timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(reportPackage.OrganizationRegulatoryProgramId, reportPackage.SubmissionDateTimeLocal.Value, true);
             var submissionDateTime =
-                $"{reportPackage.SubmissionDateTimeLocal.Value.ToString("MMM dd, yyyy HHtt ")}{timeZoneNameAbbreviation}"; // TODO: i think format should be "MM/dd/yyyyThh:mm tt"
+                $"{reportPackage.SubmissionDateTimeLocal.Value.ToString("MMM dd, yyyy hh:mm tt ")}{timeZoneNameAbbreviation}";
 
             emailContentReplacements.Add("submissionDateTime", submissionDateTime);
             emailContentReplacements.Add("corSignature", copyOfRecordDto.Signature);
@@ -605,20 +606,20 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("submitterLastName", _httpContextService.GetClaimValue(CacheKey.LastName));
             emailContentReplacements.Add("submitterTitle", _httpContextService.GetClaimValue(CacheKey.UserRole));
 
-            emailContentReplacements.Add("permitNumber", reportPackage.OrganizationRegulatoryProgramDto.ReferenceNumber);
+            emailContentReplacements.Add("permitNumber", reportPackage.OrganizationReferenceNumber);
 
-            emailContentReplacements.Add("organizationAddressLine1", reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.AddressLine1);
+            emailContentReplacements.Add("organizationAddressLine1", reportPackage.OrganizationAddressLine1);
             var organizationAddressLine2 = "";
-            if (!string.IsNullOrWhiteSpace(reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.AddressLine2))
+            if (!string.IsNullOrWhiteSpace(reportPackage.OrganizationAddressLine2))
             {
                 organizationAddressLine2 = reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.AddressLine2;
             }
 
             emailContentReplacements.Add("organizationAddressLine2", organizationAddressLine2);
 
-            emailContentReplacements.Add("organizationCityName", reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.CityName);
-            emailContentReplacements.Add("organizationJurisdictionName", reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.State);
-            emailContentReplacements.Add("organizationZipCode", reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.ZipCode);
+            emailContentReplacements.Add("organizationCityName", reportPackage.OrganizationCityName);
+            emailContentReplacements.Add("organizationJurisdictionName", reportPackage.OrganizationJurisdictionName);
+            emailContentReplacements.Add("organizationZipCode", reportPackage.OrganizationZipCode);
 
             emailContentReplacements.Add("userName", _httpContextService.GetClaimValue(CacheKey.UserName));
 
@@ -643,7 +644,7 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
             emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
 
-            emailContentReplacements.Add("corViewLink", $"/reportPackage/{reportPackage.ReportPackageId}/cor"); // TODO: I think also need to include website full path
+            emailContentReplacements.Add("corViewLink", $"{ _httpContextService.GetCurrentWebSiteRootUrl() }/reportPackage/{reportPackage.ReportPackageId}/cor");
 
             // Send emails to all IU signatories 
             var signatoriesEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
@@ -730,7 +731,7 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
-                    
+
                     throw;
 
                 }
@@ -939,7 +940,7 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
-                    
+
                     throw;
 
                 }
@@ -1432,7 +1433,8 @@ namespace Linko.LinkoExchange.Services.Report
                     .Where(rp => rp.ReportStatus.Name == ReportStatusName.Submitted.ToString()
                         || rp.ReportStatus.Name == ReportStatusName.Repudiated.ToString());
             }
-            else {
+            else
+            {
                 reportPackages = reportPackages
                     .Where(rp => rp.ReportStatus.Name == reportStatusName.ToString());
             }
@@ -1444,7 +1446,8 @@ namespace Linko.LinkoExchange.Services.Report
                     .Where(rp => rp.OrganizationRegulatoryProgram.RegulatorOrganizationId == currentOrganizationId
                     && rp.OrganizationRegulatoryProgram.RegulatoryProgramId == currentRegulatoryProgramId);
             }
-            else {
+            else
+            {
                 reportPackages = reportPackages
                     .Where(rp => rp.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
             }
