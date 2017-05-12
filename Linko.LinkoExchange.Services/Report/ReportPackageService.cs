@@ -656,7 +656,7 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
             emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
 
-            emailContentReplacements.Add("corViewLink", $"{_httpContextService.GetCurrentWebSiteRootUrl()}/reportPackage/{reportPackage.ReportPackageId}/cor");
+            emailContentReplacements.Add("corViewLink", $"{_httpContextService.GetRequestBaseUrl()}reportPackage/{reportPackage.ReportPackageId}/cor");
 
             // Send emails to all IU signatories 
             var signatoriesEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();

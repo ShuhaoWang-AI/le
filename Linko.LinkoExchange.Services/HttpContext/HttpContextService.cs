@@ -92,15 +92,5 @@ namespace Linko.LinkoExchange.Services
 
             return "";
         }
-
-        public string GetCurrentWebSiteRootUrl()
-        {
-            if (System.Web.HttpContext.Current?.Request?.UserHostName != null)
-            {
-                var request = System.Web.HttpContext.Current.Request;
-                return request.Url.Scheme + System.Uri.SchemeDelimiter + request.Url.Host + (request.Url.IsDefaultPort ? "" : ":" + request.Url.Port);
-            }
-            return "";
-        }
     }
 }

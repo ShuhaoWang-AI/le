@@ -1108,9 +1108,4 @@ public class HttpContextServiceMock : IHttpContextService
     {
         throw new NotImplementedException();
     }
-
-    public string GetCurrentWebSiteRootUrl()
-    {
-        return "http://localhost";
-    }
 }

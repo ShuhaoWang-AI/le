@@ -11,6 +11,5 @@
         int CurrentUserProfileId();
         string CurrentUserIPAddress();
         string CurrentUserHostName();
-        string GetCurrentWebSiteRootUrl();
     }
 }
