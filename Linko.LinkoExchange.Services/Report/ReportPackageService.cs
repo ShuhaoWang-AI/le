@@ -238,7 +238,7 @@ namespace Linko.LinkoExchange.Services.Report
                     {
                         OriginalFileName = reportFile.FileStore.OriginalFileName,
                         SystemGeneratedUniqueFileName = reportFile.FileStore.Name,
-                        AttachmentType = reportFile.FileStore.ReportElementTypeName
+                        AttachmentType = reportFile.FileStore.FileType
                     });
 
                 }
@@ -598,7 +598,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             var timeZoneNameAbbreviation = _timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(reportPackage.OrganizationRegulatoryProgramId, reportPackage.SubmissionDateTimeLocal.Value, true);
             var submissionDateTime =
-                $"{reportPackage.SubmissionDateTimeLocal.Value.ToString("MMM dd, yyyy hh:mm tt ")}{timeZoneNameAbbreviation}";
+                $"{reportPackage.SubmissionDateTimeLocal.Value.ToString("MMM dd, yyyy HH:tt tt ")}{timeZoneNameAbbreviation}";
 
             emailContentReplacements.Add("submissionDateTime", submissionDateTime);
             emailContentReplacements.Add("corSignature", copyOfRecordDto.Signature);
@@ -612,14 +612,26 @@ namespace Linko.LinkoExchange.Services.Report
             var organizationAddressLine2 = "";
             if (!string.IsNullOrWhiteSpace(reportPackage.OrganizationAddressLine2))
             {
-                organizationAddressLine2 = reportPackage.OrganizationRegulatoryProgramDto.OrganizationDto.AddressLine2;
+                organizationAddressLine2 = reportPackage.OrganizationAddressLine2;
             }
 
             emailContentReplacements.Add("organizationAddressLine2", organizationAddressLine2);
 
             emailContentReplacements.Add("organizationCityName", reportPackage.OrganizationCityName);
-            emailContentReplacements.Add("organizationJurisdictionName", reportPackage.OrganizationJurisdictionName);
-            emailContentReplacements.Add("organizationZipCode", reportPackage.OrganizationZipCode);
+
+            var juridicationName = "";
+            if (!string.IsNullOrWhiteSpace(reportPackage.OrganizationJurisdictionName))
+            {
+                juridicationName = reportPackage.OrganizationJurisdictionName;
+            }
+            emailContentReplacements.Add("organizationJurisdictionName", juridicationName);
+
+            var zipCode = "";
+            if (!string.IsNullOrWhiteSpace(reportPackage.OrganizationZipCode))
+            {
+                zipCode = reportPackage.OrganizationZipCode;
+            }
+            emailContentReplacements.Add("organizationZipCode", zipCode);
 
             emailContentReplacements.Add("userName", _httpContextService.GetClaimValue(CacheKey.UserName));
 
@@ -644,7 +656,7 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
             emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
 
-            emailContentReplacements.Add("corViewLink", $"{ _httpContextService.GetCurrentWebSiteRootUrl() }/reportPackage/{reportPackage.ReportPackageId}/cor");
+            emailContentReplacements.Add("corViewLink", $"{_httpContextService.GetCurrentWebSiteRootUrl()}/reportPackage/{reportPackage.ReportPackageId}/cor");
 
             // Send emails to all IU signatories 
             var signatoriesEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
