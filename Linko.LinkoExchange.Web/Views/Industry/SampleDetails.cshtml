@@ -608,7 +608,7 @@
                                     sampleResult.ParameterName = d[1];
                                     var qualifier = $("#Qualifier_" + paramId).val();
                                     sampleResult.Qualifier = ((qualifier === "NUMERIC") ? "" : qualifier);
-                                    sampleResult.Value = parseFloat($("#Result_" + paramId).val());
+                                    sampleResult.Value = $("#Result_" + paramId).val();
                                     sampleResult.UnitId = $("#UnitId_" + paramId).val();
                                     sampleResult.UnitName = $("#UnitName_" + paramId).html();
                                     sampleResult
