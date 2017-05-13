@@ -930,6 +930,18 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                           Value = c.ReportElementTypeId.ToString(),
                                                                                           Selected = c.ReportElementTypeId.Equals(other:viewModel.ReportElementTypeId)
                                                                                       }).ToList();
+            
+
+            if (viewModel.Id.HasValue && !viewModel.AvailableReportElementTypes.Any(c => c.Value.Equals(value:viewModel.ReportElementTypeId.ToString())))
+            {
+                // If previously selected one is not in the list then add that
+                viewModel.AvailableReportElementTypes.Add(item:new SelectListItem
+                                                              {
+                                                                  Text = viewModel.ReportElementTypeName,
+                                                                  Value = viewModel.ReportElementTypeId.ToString(),
+                                                                  Selected = true
+                                                              });
+            }
 
             viewModel.AvailableReportElementTypes.Insert(index:0, item:new SelectListItem {Text = @"Select Attachment Type", Value = "0"});
 
