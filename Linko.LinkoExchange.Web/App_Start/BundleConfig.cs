@@ -49,6 +49,9 @@ namespace Linko.LinkoExchange.Web
             bundles.Add(bundle:new ScriptBundle(virtualPath:"~/bundles/jqueryval")
                             .Include(virtualPath:"~/Scripts/jquery.validate*"));
 
+            bundles.Add(bundle:new ScriptBundle(virtualPath:"~/bundles/inputmask")
+                            .Include(virtualPath:"~/Scripts/jquery.inputmask/jquery.inputmask.bundle.js"));
+
             bundles.Add(bundle:new ScriptBundle(virtualPath:"~/bundles/profile")
                             .Include(virtualPath:"~/Scripts/profile.js"));
 

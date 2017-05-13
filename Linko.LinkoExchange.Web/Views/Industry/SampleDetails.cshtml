@@ -527,8 +527,6 @@
     </div>
 
 @section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-
     <script>
         $(document)
             .ready(function()
@@ -667,66 +665,21 @@
     }
     else
     {
+        @Scripts.Render("~/bundles/jqueryval")
+        @Scripts.Render("~/bundles/inputmask")
+
         <script>
             $(document)
                 .ready(function()
                 {
                     updateResultTextBoxState();
 
-                    $(document)
-                        .on('keypress'
-                            , "input[id^='Result_']"
-                            , function(e)
-                            {
-                                //if the letter is not digit then don't type anything
-                                if (e.which !== 8
-                                    && e.which !== 0
-                                    && e.which !== 46
-                                    && (e.which < 48 || e.which > 57))
-                                {
-                                    return false;
-                                }
-                                else
-                                {
-                                    return true;
-                                }
-                            });
-
-                    $(document)
-                        .on('keypress'
-                            , "input[id^='MDL_']"
-                            , function(e)
-                            {
-                                //if the letter is not digit then don't type anything
-                                if (e.which !== 8
-                                    && e.which !== 0
-                                    && e.which !== 46
-                                    && (e.which < 48 || e.which > 57))
-                                {
-                                    return false;
-                                }
-                                else
-                                {
-                                    return true;
-                                }
-                            });
-
-                    $("#FlowValue")
-                        .keypress(function(e)
-                        {
-                            //if the letter is not digit then don't type anything
-                            if (e.which !== 8
-                                && e.which !== 0
-                                && e.which !== 46
-                                && (e.which < 48 || e.which > 57))
-                            {
-                                return false;
-                            }
-                            else
-                            {
-                                return true;
-                            }
-                        });
+                    $("input[id^='Result_']").inputmask('decimal', { digits: '16', rightAlign: true });
+                    $("input[id^='MDL_']").inputmask('decimal', { digits: '16', rightAlign: true });
+                    $("#FlowValue").inputmask('decimal', { digits: '16', rightAlign: true });
+                    $("#StartDateTimeLocal").inputmask('mm/dd/yyyy hh:mm xm', { clearIncomplete: true });
+                    $("#EndDateTimeLocal").inputmask('mm/dd/yyyy hh:mm xm', { clearIncomplete: true });
+                    $("input[id^='AnalysisDateTime_']").inputmask('mm/dd/yyyy hh:mm xm', { clearIncomplete: true });
                 });
             updateResultTextBoxState = function()
             {
@@ -749,7 +702,7 @@
                             $("#Result_" + paramId).removeAttr("readonly");
                         }
                     });
-            }
+            };
 
             function displayMassLoading(paramId)
             {
@@ -1172,6 +1125,10 @@
 
                 $("input[id^='AnalysisDateTime_']")
                     .kendoDateTimePicker({ format: "MM/dd/yyyy hh:mm tt", max: new Date($.now()) });
+
+                $("input[id^='Result_']").inputmask('decimal', { digits: '16', rightAlign: true });
+                $("input[id^='MDL_']").inputmask('decimal', { digits: '16', rightAlign: true });
+                $("input[id^='AnalysisDateTime_']").inputmask('mm/dd/yyyy hh:mm xm', { clearIncomplete: true });
             };
 
             $("#EndDateTimeLocal")
