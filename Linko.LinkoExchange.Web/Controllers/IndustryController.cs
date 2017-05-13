@@ -869,7 +869,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return File(fileStream:fileStream, contentType:contentType, fileDownloadName:fileDownloadName);
         }
-        
+
         [Route(template:"Attachment/{id:int}/Details/Delete")]
         public ActionResult DeleteAttachment(int id)
         {
@@ -926,21 +926,22 @@ namespace Linko.LinkoExchange.Web.Controllers
             viewModel.AvailableReportElementTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments)
                                                                          .Select(c => new SelectListItem
                                                                                       {
-                                                                                          Text = c.Name,
+                                                                                          Text = c.ReportElementTypeId.Equals(other:viewModel.ReportElementTypeId) && viewModel.UsedByReports
+                                                                                                     ? viewModel.ReportElementTypeName
+                                                                                                     : c.Name,
                                                                                           Value = c.ReportElementTypeId.ToString(),
                                                                                           Selected = c.ReportElementTypeId.Equals(other:viewModel.ReportElementTypeId)
                                                                                       }).ToList();
-            
 
             if (viewModel.Id.HasValue && !viewModel.AvailableReportElementTypes.Any(c => c.Value.Equals(value:viewModel.ReportElementTypeId.ToString())))
             {
                 // If previously selected one is not in the list then add that
                 viewModel.AvailableReportElementTypes.Add(item:new SelectListItem
-                                                              {
-                                                                  Text = viewModel.ReportElementTypeName,
-                                                                  Value = viewModel.ReportElementTypeId.ToString(),
-                                                                  Selected = true
-                                                              });
+                                                               {
+                                                                   Text = viewModel.ReportElementTypeName,
+                                                                   Value = viewModel.ReportElementTypeId.ToString(),
+                                                                   Selected = true
+                                                               });
             }
 
             viewModel.AvailableReportElementTypes.Insert(index:0, item:new SelectListItem {Text = @"Select Attachment Type", Value = "0"});
@@ -1483,7 +1484,10 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             viewModel.AvailableCollectionMethods = _sampleService.GetCollectionMethods().Select(c => new SelectListItem
                                                                                                      {
-                                                                                                         Text = c.Name,
+                                                                                                         Text = c.CollectionMethodId.Equals(obj:viewModel.CollectionMethodId)
+                                                                                                                && viewModel.SampleStatusName != SampleStatusName.Draft
+                                                                                                                    ? viewModel.CollectionMethodName
+                                                                                                                    : c.Name,
                                                                                                          Value = c.CollectionMethodId.ToString(),
                                                                                                          Selected = c.CollectionMethodId.Equals(obj:viewModel.CollectionMethodId)
                                                                                                      }).OrderBy(c => c.Text).ToList();
@@ -1504,7 +1508,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             viewModel.CtsEventCategoryName = sampleTypes.First().CtsEventCategoryName;
             viewModel.AvailableCtsEventTypes = sampleTypes.Select(c => new SelectListItem
                                                                        {
-                                                                           Text = c.Name,
+                                                                           Text = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId) && viewModel.SampleStatusName != SampleStatusName.Draft
+                                                                                      ? viewModel.CtsEventTypeName
+                                                                                      : c.Name,
                                                                            Value = c.CtsEventTypeId.ToString(),
                                                                            Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
                                                                        }).OrderBy(c => c.Text).ToList();
