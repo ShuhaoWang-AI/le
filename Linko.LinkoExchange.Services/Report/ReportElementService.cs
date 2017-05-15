@@ -153,7 +153,7 @@ namespace Linko.LinkoExchange.Services.Report
             List<RuleViolation> validationIssues = new List<RuleViolation>();
 
             //Check required fields (Name and Certification Text as per UC-53.3 4.b.)
-            if (string.IsNullOrEmpty(reportElementType.Name))
+            if (string.IsNullOrWhiteSpace(reportElementType.Name))
             {
                 string message = "Name is required.";
                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
@@ -161,7 +161,7 @@ namespace Linko.LinkoExchange.Services.Report
             }
             
             if (reportElementType.ReportElementCategory == ReportElementCategoryName.Certifications
-                && string.IsNullOrEmpty(reportElementType.Content))
+                && string.IsNullOrWhiteSpace(reportElementType.Content))
             {
                 string message = "Certification Text is required.";
                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
@@ -195,7 +195,7 @@ namespace Linko.LinkoExchange.Services.Report
                         //Update existing
                         bool isChangingName = false;
                         reportElementTypeToPersist = _dbContext.ReportElementTypes.Single(c => c.ReportElementTypeId == reportElementType.ReportElementTypeId);
-                        if (reportElementTypeToPersist.Name != reportElementType.Name)
+                        if (reportElementTypeToPersist.Name != reportElementType.Name.Trim())
                         {
                             isChangingName = true;
                         }

@@ -778,7 +778,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 reportElementType = new ReportElementType();
             }
 
-            reportElementType.Name = reportElementTypeDto.Name;
+            reportElementType.Name = reportElementTypeDto.Name.Trim();
             reportElementType.Description = reportElementTypeDto.Description;
             reportElementType.Content = reportElementTypeDto.Content;
             reportElementType.IsContentProvided = reportElementTypeDto.IsContentProvided;
