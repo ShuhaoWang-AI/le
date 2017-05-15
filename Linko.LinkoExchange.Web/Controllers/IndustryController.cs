@@ -834,10 +834,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     var fileStoreDto = _fileStoreService.GetFileStoreById(fileStoreId:id);
 
                     fileStoreDto.ReportElementTypeId = model.ReportElementTypeId;
-                    fileStoreDto.ReportElementTypeName = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments)
-                                                                              .Where(c => c.ReportElementTypeId == model.ReportElementTypeId)
-                                                                              .Select(c => c.Name)
-                                                                              .FirstOrDefault();
+                    fileStoreDto.ReportElementTypeName = model.ReportElementTypeName;
                     fileStoreDto.Description = model.Description;
 
                     _fileStoreService.UpdateFileStore(fileStoreDto:fileStoreDto);
@@ -926,14 +923,13 @@ namespace Linko.LinkoExchange.Web.Controllers
             viewModel.AvailableReportElementTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments)
                                                                          .Select(c => new SelectListItem
                                                                                       {
-                                                                                          Text = c.ReportElementTypeId.Equals(other:viewModel.ReportElementTypeId) && viewModel.UsedByReports
-                                                                                                     ? viewModel.ReportElementTypeName
-                                                                                                     : c.Name,
+                                                                                          Text = c.Name,
                                                                                           Value = c.ReportElementTypeId.ToString(),
-                                                                                          Selected = c.ReportElementTypeId.Equals(other:viewModel.ReportElementTypeId)
+                                                                                          Selected = c.ReportElementTypeId.Equals(other:viewModel.ReportElementTypeId) &&
+                                                                                                     c.Name.Equals(value:viewModel.ReportElementTypeName)
                                                                                       }).ToList();
 
-            if (viewModel.Id.HasValue && !viewModel.AvailableReportElementTypes.Any(c => c.Value.Equals(value:viewModel.ReportElementTypeId.ToString())))
+            if (viewModel.Id.HasValue && !viewModel.AvailableReportElementTypes.Any(c => c.Selected))
             {
                 // If previously selected one is not in the list then add that
                 viewModel.AvailableReportElementTypes.Add(item:new SelectListItem
@@ -1484,15 +1480,13 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             viewModel.AvailableCollectionMethods = _sampleService.GetCollectionMethods().Select(c => new SelectListItem
                                                                                                      {
-                                                                                                         Text = c.CollectionMethodId.Equals(obj:viewModel.CollectionMethodId)
-                                                                                                                && viewModel.SampleStatusName != SampleStatusName.Draft
-                                                                                                                    ? viewModel.CollectionMethodName
-                                                                                                                    : c.Name,
+                                                                                                         Text = c.Name,
                                                                                                          Value = c.CollectionMethodId.ToString(),
-                                                                                                         Selected = c.CollectionMethodId.Equals(obj:viewModel.CollectionMethodId)
+                                                                                                         Selected = c.CollectionMethodId.Equals(obj:viewModel.CollectionMethodId) &&
+                                                                                                                    c.Name.Equals(obj:viewModel.CollectionMethodName)
                                                                                                      }).OrderBy(c => c.Text).ToList();
 
-            if (viewModel.Id.HasValue && !viewModel.AvailableCollectionMethods.Any(c => c.Value.Equals(value:viewModel.CollectionMethodId.ToString())))
+            if (viewModel.Id.HasValue && !viewModel.AvailableCollectionMethods.Any(c => c.Selected))
             {
                 // If previously selected one is not in the list then add that
                 viewModel.AvailableCollectionMethods.Add(item:new SelectListItem
@@ -1508,14 +1502,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             viewModel.CtsEventCategoryName = sampleTypes.First().CtsEventCategoryName;
             viewModel.AvailableCtsEventTypes = sampleTypes.Select(c => new SelectListItem
                                                                        {
-                                                                           Text = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId) && viewModel.SampleStatusName != SampleStatusName.Draft
-                                                                                      ? viewModel.CtsEventTypeName
-                                                                                      : c.Name,
+                                                                           Text = c.Name,
                                                                            Value = c.CtsEventTypeId.ToString(),
-                                                                           Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
+                                                                           Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId) && c.Name.Equals(obj:viewModel.CtsEventTypeName)
                                                                        }).OrderBy(c => c.Text).ToList();
 
-            if (viewModel.Id.HasValue && !viewModel.AvailableCtsEventTypes.Any(c => c.Value.Equals(value:viewModel.CtsEventTypeId.ToString())))
+            if (viewModel.Id.HasValue && !viewModel.AvailableCtsEventTypes.Any(c => c.Selected))
             {
                 // If previously selected one is not in the list then add that
                 viewModel.AvailableCtsEventTypes.Add(item:new SelectListItem
