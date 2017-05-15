@@ -86,6 +86,11 @@
                                                     .Ajax()
                                                     .ServerOperation(enabled:false)
                                                     .Batch(enabled:true)
+                                                    .Sort(sort =>
+                                                    {
+                                                        sort.Add(memberName: "Name").Ascending();
+                                                        sort.Add(memberName: "EffectiveDateTimeLocal").Ascending();
+                                                    }) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"ReportPackageTemplates_Read", controllerName:"Authority"))
                                                     .PageSize(pageSize:15)
                                                     .Events(events => events.Error(handler:"error_handler"))

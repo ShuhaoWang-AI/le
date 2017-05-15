@@ -71,6 +71,11 @@
                         .Ajax()
                         .ServerOperation(enabled: false)
                         .Batch(enabled: true)
+                        .Sort(sort =>
+                        {
+                            sort.Add(memberName: "FirstName").Ascending();
+                            sort.Add(memberName: "LastName").Ascending();
+                        }) // <-- initial sort expression
                         .Group(g=>g.Add(c=>c.Type))
                         .Read(read => read.Action(actionName: "PendingUserApprovals_Read", controllerName: "Authority"))
                         .PageSize(pageSize: 10)

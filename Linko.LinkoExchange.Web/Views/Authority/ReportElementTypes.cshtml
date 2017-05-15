@@ -81,6 +81,7 @@
                                                     .Ajax()
                                                     .ServerOperation(enabled: false)
                                                     .Batch(enabled: true)
+                                                    .Sort(sort => sort.Add("Name").Ascending()) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName: "ReportElementTypes_Read", controllerName: "Authority", routeValues: new {
                                                         categoryName = ReportElementCategoryName.Attachments
                                                     }))

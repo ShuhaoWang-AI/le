@@ -7,7 +7,7 @@
     ViewBag.Readonly = Model.SampleStatusName != SampleStatusName.Draft;
 }
 
-@using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new {id = "sampleDetailsForm"}))
+@using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new {id = "SampleDetailsForm"}))
 {
     @Html.AntiForgeryToken()
 
@@ -579,7 +579,7 @@
                         }
                     );
 
-                $("#sampleDetailsForm")
+                $("#SampleDetailsForm")
                     .submit(function(e)
                     {
                         //if (e.originalEvent.explicitOriginalTarget.id == "myButton")
@@ -1189,4 +1189,5 @@
                 });
         </script>
     }
-}}
+}
+}

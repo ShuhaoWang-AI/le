@@ -74,6 +74,7 @@
                                                     .Ajax()
                                                     .ServerOperation(enabled:false)
                                                     .Batch(enabled:true)
+                                                    .Sort(sort => sort.Add("Name").Ascending()) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"ParameterGroups_Read", controllerName:"Authority"))
                                                     .PageSize(pageSize:15)
                                                     .Events(events => events.Error(handler:"error_handler"))

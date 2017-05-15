@@ -8,6 +8,7 @@
 @using (Html.BeginForm(actionName:"NewAttachmentDetails", controllerName:"Industry", routeValues:null, method:FormMethod.Post, htmlAttributes:new
                                                                                                                                               {
                                                                                                                                                   enctype = "multipart/form-data"
+                                                                                                                                                  , id = "AttachmentDetailsForm"
                                                                                                                                               }))
 {
     @Html.AntiForgeryToken()
@@ -142,33 +143,33 @@
                                                                                   {
                                                                                       @class = "control-label col-md-2 required"
                                                                                   })
-                     @if (Model.UsedByReports)
-                     {
-                         <div class="col-md-8">
-                             @Html.EditorFor(model => model.ReportElementTypeName, additionalViewData:new
-                                                                                                      {
-                                                                                                          htmlAttributes = new
-                                                                                                                           {
-                                                                                                                               @class = "form-control",
-                                                                                                                               @readonly = "readonly"
-                                                                                                                           }
-                                                                                                      })
-                         </div>
-
-                     }
-                     else
-                     {
-                         <div class="col-md-4">
-                             @Html.DropDownList(name:"ReportElementTypeId", selectList:Model.AvailableReportElementTypes, htmlAttributes:new
-                                                                                                                                         {
-                                                                                                                                             @class = "form-control"
-                                                                                                                                         })
-                             @Html.ValidationMessageFor(model => model.ReportElementTypeId, validationMessage:"", htmlAttributes:new
-                                                                                                                                 {
-                                                                                                                                     @class = "text-danger"
-                                                                                                                                 })
-                         </div>
-                     }
+                @if (Model.UsedByReports)
+                {
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.ReportElementTypeName, additionalViewData:new
+                                                                                                 {
+                                                                                                     htmlAttributes = new
+                                                                                                                      {
+                                                                                                                          @class = "form-control",
+                                                                                                                          @readonly = "readonly"
+                                                                                                                      }
+                                                                                                 })
+                    </div>
+                }
+                else
+                {
+                    <div class="col-md-4">
+                        @Html.HiddenFor(model => model.ReportElementTypeName)
+                        @Html.DropDownList(name:"ReportElementTypeId", selectList:Model.AvailableReportElementTypes, htmlAttributes:new
+                                                                                                                                    {
+                                                                                                                                        @class = "form-control"
+                                                                                                                                    })
+                        @Html.ValidationMessageFor(model => model.ReportElementTypeId, validationMessage:"", htmlAttributes:new
+                                                                                                                            {
+                                                                                                                                @class = "text-danger"
+                                                                                                                            })
+                    </div>
+                }
             </div>
 
             <div class="form-group">
@@ -189,4 +190,21 @@
             </div>
         </section>
     </div>
-}
+
+@section Scripts {
+    @if (!Model.UsedByReports)
+    {
+        <script>
+            $(document)
+                .ready(function()
+                {
+                    $("#AttachmentDetailsForm")
+                        .submit(function(e)
+                        {
+                            $("#ReportElementTypeName").val($("#ReportElementTypeId option:selected").text());
+                            return true;
+                        });
+                });
+        </script>
+    }
+}}

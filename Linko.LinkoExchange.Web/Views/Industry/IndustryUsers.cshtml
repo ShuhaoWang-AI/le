@@ -67,6 +67,11 @@
                         .Ajax()
                         .ServerOperation(enabled: false)
                         .Batch(enabled: true)
+                        .Sort(sort =>
+                        {
+                            sort.Add(memberName: "FirstName").Ascending();
+                            sort.Add(memberName: "LastName").Ascending();
+                        }) // <-- initial sort expression
                         .Read(read => read.Action(actionName: "IndustryUsers_Read", controllerName: "Industry"))
                         .PageSize(pageSize: 10)
                         .Events(events => events.Error(handler: "error_handler"))
@@ -136,6 +141,7 @@
                             model.Field(m => m.DateInvited);
                             model.Field(m => m.InviteExpires);
                         })
+                        .Sort(sort => sort.Add("DateInvited").Ascending()) // <-- initial sort expression
                         .Read(read => read.Action(actionName: "IndustryUsers_PendingInvitations_Read", controllerName: "Industry"))
                         .Destroy(d => d.Action(actionName: "IndustryUsers_PendingInvitations_Delete", controllerName: "Industry"))
                         .PageSize(pageSize: 10)

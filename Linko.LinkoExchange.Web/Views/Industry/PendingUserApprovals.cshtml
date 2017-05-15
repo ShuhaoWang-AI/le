@@ -72,6 +72,11 @@
                         .ServerOperation(enabled: false)
                         .Batch(enabled: true)
                         //.Group(g=>g.Add(c=>c.Type))
+                        .Sort(sort =>
+                        {
+                            sort.Add(memberName: "FirstName").Ascending();
+                            sort.Add(memberName: "LastName").Ascending();
+                        }) // <-- initial sort expression
                         .Read(read => read.Action(actionName: "PendingUserApprovals_Read", controllerName: "Industry"))
                         .PageSize(pageSize: 10)
                         .Events(events => events.Error(handler: "error_handler"))
