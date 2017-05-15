@@ -306,6 +306,16 @@ namespace Linko.LinkoExchange.Services.Authentication
                     registrationResult.Result = RegistrationResult.BadUserProfileData;
                     return registrationResult;
                 }
+                if (string.IsNullOrWhiteSpace(userInfo.UserName))
+                {
+                    var errText = $"Username cannot be null or whitespace.";
+                    _logger.Error(errText);
+                    throw new Exception(errText);
+                }
+                else
+                {
+                    userInfo.UserName = userInfo.UserName.Trim();
+                }
 
                 if (string.IsNullOrWhiteSpace(registrationToken))
                 {
