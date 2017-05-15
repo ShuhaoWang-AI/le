@@ -142,5 +142,13 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
         /// <param name="comments">Required field</param>
         void ReviewRepudiation(int reportPackageId, string comments);
+
+        /// <summary>
+        /// Iterates through all required element types for a given report package where content is not provided and 
+        /// ensures there is at least one "sample & results" or "file" associated with the report package
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <returns>True if there is an association for all required element types where content is not provided</returns>
+        bool IsRequiredReportPackageElementTypesIncluded(int reportPackageId);
     }
 }

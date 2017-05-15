@@ -85,15 +85,12 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info("Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
 
-            List<RuleViolation> validationIssues = new List<RuleViolation>();
             var reportPackage = _dbContext.ReportPackages.Include(i => i.ReportStatus)
                 .Single(i => i.ReportPackageId == reportPackageId);
 
             if (reportPackage.ReportStatus.Name != ReportStatusName.ReadyToSubmit.ToString())
             {
-                string message = "Report Package is not ready to submit.";
-                validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
-                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                ThrowSimpleException("Report Package is not ready to submit.");
             }
 
             var submitterUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
@@ -1228,16 +1225,25 @@ namespace Linko.LinkoExchange.Services.Report
 
                 if (previousStatus == reportStatus.ToString())
                 {
-                    //No transition -- allowed?
+                    //No transition
                 }
-                else if ((previousStatus == ReportStatusName.Draft.ToString() && reportStatus == ReportStatusName.ReadyToSubmit) ||
-                    (previousStatus == ReportStatusName.ReadyToSubmit.ToString() && reportStatus == ReportStatusName.Draft))
+                else if (previousStatus == ReportStatusName.Draft.ToString() && reportStatus == ReportStatusName.ReadyToSubmit)
+                {
+                    //allowed
+                }
+                else if (previousStatus == ReportStatusName.ReadyToSubmit.ToString() && reportStatus == ReportStatusName.Draft)
                 {
                     //allowed
                 }
                 else if (previousStatus == ReportStatusName.ReadyToSubmit.ToString() && reportStatus == ReportStatusName.Submitted)
                 {
                     //allowed
+
+                    //...but check to see if required Report Package Elememt Types are included.
+                    if (!IsRequiredReportPackageElementTypesIncluded(reportPackageId))
+                    {
+                        ThrowSimpleException("Minimum counts for required element types must be met before a Report Package can be submitted.");
+                    }
                 }
                 else if (previousStatus == ReportStatusName.Submitted.ToString() && reportStatus == ReportStatusName.Repudiated)
                 {
@@ -1246,10 +1252,7 @@ namespace Linko.LinkoExchange.Services.Report
                 else
                 {
                     //not allowed
-                    string message = $"Cannot change a Report Package status from '{previousStatus}' to '{reportStatus}'.";
-                    List<RuleViolation> validationIssues = new List<RuleViolation>();
-                    validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
-                    throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                    ThrowSimpleException($"Cannot change a Report Package status from '{previousStatus}' to '{reportStatus}'.");
                 }
 
                 string targetReportStatusName = reportStatus.ToString();
@@ -1906,6 +1909,33 @@ namespace Linko.LinkoExchange.Services.Report
             _logger.Info($"Leave ReportPackageService.ReviewRepudiation. reportPackageId={reportPackageId}, comments={comments}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
 
         }
+
+        /// <summary>
+        /// Iterates through all required element types for a given report package where content is not provided and 
+        /// ensures there is at least one "sample & results" or "file" associated with the report package
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <returns>True if there is an association for all required element types where content is not provided</returns>
+        public bool IsRequiredReportPackageElementTypesIncluded(int reportPackageId)
+        {
+            var requiredReportPackageElementTypes = _dbContext.ReportPackageElementTypes
+                                                        .Include(rpet => rpet.ReportPackageElementCategory.ReportElementCategory)
+                                                        .Where(rpet => rpet.ReportPackageElementCategory.ReportPackageId == reportPackageId
+                                                            && !rpet.ReportElementTypeIsContentProvided
+                                                            && rpet.IsRequired)
+                                                        .ToList();
+
+            foreach (var requiredRPET in requiredReportPackageElementTypes)
+            {
+                if (requiredRPET.ReportSamples.Count() < 1 && requiredRPET.ReportFiles.Count() < 1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
 
         private string EmtpyStringIfNull(string value)
         {

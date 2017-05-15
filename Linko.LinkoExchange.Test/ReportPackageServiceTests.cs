@@ -182,7 +182,7 @@ namespace Linko.LinkoExchange.Test
             existingReportPackage.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
             var sampleReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 25 };
             sampleReportPackageElementType.ReportSamples = new List<ReportSampleDto>();
-            //sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 52, ReportPackageElementTypeId = 17 });
+            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 52, ReportPackageElementTypeId = 17 });
             //sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 53, ReportPackageElementTypeId = 17 });
             existingReportPackage.SamplesAndResultsTypes.Add(sampleReportPackageElementType);
 
@@ -190,7 +190,7 @@ namespace Linko.LinkoExchange.Test
             existingReportPackage.AttachmentTypes = new List<ReportPackageElementTypeDto>();
             var filesReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 26 };
             filesReportPackageElementType.ReportFiles = new List<ReportFileDto>();
-            //filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 26 });
+            filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 26 });
             //filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 26 });
             existingReportPackage.AttachmentTypes.Add(filesReportPackageElementType);
             var existingId = _reportPackageService.SaveReportPackage(existingReportPackage, true);
@@ -250,6 +250,12 @@ namespace Linko.LinkoExchange.Test
         public void ReviewRepudiation()
         {
             _reportPackageService.ReviewRepudiation(8, "This repudiation has been reviewed!");
+        }
+
+        [TestMethod]
+        public void IsRequiredReportPackageElementTypesIncluded()
+        {
+            var isGood = _reportPackageService.IsRequiredReportPackageElementTypesIncluded(11);
         }
 
     }
