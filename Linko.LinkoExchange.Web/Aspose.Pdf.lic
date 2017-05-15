@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<License>
+  <Data>
+    <LicensedTo>Watertrax</LicensedTo>
+    <LicenseType>Developer OEM</LicenseType>
+    <LicenseNote>Limited to 2 developers.</LicenseNote>
+    <OrderID>140221151250</OrderID>
+    <OEM>This is a redistributable license</OEM>
+    <Products>
+      <Product>Aspose.Pdf for .NET</Product>
+    </Products>
+    <EditionType>Enterprise</EditionType>
+    <SerialNumber>fa0c7893-ddf9-442e-829d-49d1d3d13f4f</SerialNumber>
+    <SubscriptionExpiry>20150221</SubscriptionExpiry>
+    <LicenseVersion>2.2</LicenseVersion>
+  </Data>
+  <Signature>m6C8RXdlQqvcBl8F3vTHwvH7T69LNJqEaCp5yaxUghY+PDI23ivkMW4GrC1fGi8ZpYO2kuADZLTBCXmFo7mPFaneCby2RK7kH4cyVK9QxNp87JALVEDBz81AbWz7xsGTLoYWOS7VGP2BRLEUKbvcfGlOvdARtLKycPn8a/qOG1w=</Signature>
+</License>
