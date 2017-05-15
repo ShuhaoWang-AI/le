@@ -450,7 +450,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 parameterGroup.ParameterGroupParameters = new List<ParameterGroupParameter>();
             }
 
-            parameterGroup.Name = parameterGroupDto.Name;
+            parameterGroup.Name = parameterGroupDto.Name.Trim();
             parameterGroup.Description = parameterGroupDto.Description;
             parameterGroup.IsActive = parameterGroupDto.IsActive;
             foreach (var param in parameterGroupDto.Parameters)

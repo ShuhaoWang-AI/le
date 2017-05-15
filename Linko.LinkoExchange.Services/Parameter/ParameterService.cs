@@ -285,11 +285,12 @@ namespace Linko.LinkoExchange.Services.Parameter
             var parameterGroupIdToReturn = -1;
             var currentUserProfileId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
             List<RuleViolation> validationIssues = new List<RuleViolation>();
+
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try
                 {
-                    if (string.IsNullOrEmpty(parameterGroup.Name))
+                    if (string.IsNullOrWhiteSpace(parameterGroup.Name))
                     {
                         string message = "Name is required.";
                         validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
