@@ -72,7 +72,7 @@
                                     @if (ViewBag.PortalName != null && !string.IsNullOrWhiteSpace(value:ViewBag.PortalName))
                                     {
                                         <div class="pull-left">
-                                            <a href="#" onclick="location.href = '@Url.Action(actionName:"Profile", controllerName:"User")'" class="btn btn-primary btn-sm">@Label.ButtonProfile </a>
+                                            <a href="#" onclick="location.href = '@Url.Action(actionName:"UserProfile", controllerName:"User")'" class="btn btn-primary btn-sm">@Label.ButtonProfile </a>
                                         </div>
                                     }
                                     <div class="pull-right">

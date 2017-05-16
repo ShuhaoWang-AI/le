@@ -20,6 +20,7 @@ using Linko.LinkoExchange.Web.ViewModels.User;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
+    [RoutePrefix(prefix:"User")]
     public class UserController:Controller
     {
         private readonly IAuthenticationService _authenticateService;
@@ -58,7 +59,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         // GET: UserDto
         public ActionResult Index()
         {
-            return RedirectToAction(actionName:"Profile", controllerName:"User");
+            return RedirectToAction(actionName:"UserProfile", controllerName:"User");
         }
 
         public ActionResult DownloadSignatory()
@@ -80,7 +81,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         [Authorize]
         [AcceptVerbs(verbs:HttpVerbs.Get)]
-        public new ActionResult Profile()
+        [Route(template:"Profile")]
+        public ActionResult UserProfile()
         {
             ViewBag.profileCollapsed = false;
             ViewBag.kbqCollapsed = true;
@@ -115,7 +117,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Authorize]
         [AcceptVerbs(verbs: HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
-        public new ActionResult Profile(UserViewModel model, string part, FormCollection form)
+        [Route(template:"Profile")]
+        public ActionResult UserProfile(UserViewModel model, string part, FormCollection form)
         {
             ViewBag.inValidProfile = false;
             ViewBag.inValidKBQ = false;
@@ -160,7 +163,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (filterContext.RouteData.Values[key:"action"].ToString().ToLower() == "profile"
+            if (filterContext.RouteData.Values[key:"action"].ToString().ToLower() == "userprofile"
                 && Request.HttpMethod != "POST" && NeedToValidKbq())
             {
                 var kbqPass = TempData[key:"KbqPass"] as string;

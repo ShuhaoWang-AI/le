@@ -38,7 +38,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AllowAnonymous]
         public ActionResult Index()
         {
-            return Request.IsAuthenticated ? RedirectToAction(actionName:"Profile", controllerName:"User") : RedirectToAction(actionName:"SignIn");
+            return Request.IsAuthenticated ? RedirectToAction(actionName:"UserProfile", controllerName:"User") : RedirectToAction(actionName:"SignIn");
         }
 
         #endregion
