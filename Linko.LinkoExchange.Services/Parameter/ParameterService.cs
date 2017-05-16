@@ -124,8 +124,9 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <param name="sampleEndDateTimeUtc">If monitoring point and sample end date/time are passed in,
         ///default unit gets overidden with monitoring point specific unit and default "Calc Mass" boolean is set
         ///for each child parameter that is associated with the monitoring point and effective date range.</param>
+        /// <param name="isGetActiveOnly">True when being called by IU for use in Sample creation. False when being called by Authority</param>
         /// <returns>Collection of parameter groups with children parameters some with potentially overidden default units</returns>
-        public IEnumerable<ParameterGroupDto> GetStaticParameterGroups(int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null)
+        public IEnumerable<ParameterGroupDto> GetStaticParameterGroups(int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null, bool? isGetActiveOnly = null)
         {
             string monitoringPointIdString = string.Empty;
             if (monitoringPointId.HasValue)
@@ -144,9 +145,13 @@ namespace Linko.LinkoExchange.Services.Parameter
             var parameterGroupDtos = new List<ParameterGroupDto>();
             var foundParamGroups = _dbContext.ParameterGroups
                 .Include(param => param.ParameterGroupParameters)
-                .Where(param => param.OrganizationRegulatoryProgramId == authOrgRegProgramId
-                    && param.IsActive)
+                .Where(param => param.OrganizationRegulatoryProgramId == authOrgRegProgramId)
                 .ToList();
+
+            if (isGetActiveOnly.HasValue && isGetActiveOnly.Value)
+            {
+                foundParamGroups = foundParamGroups.Where(param => param.IsActive).ToList();
+            }
 
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
             foreach (var paramGroup in foundParamGroups)
@@ -500,7 +505,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                                         .Single(mp => mp.MonitoringPointId == monitoringPointId).Name; //TO-DO: Is this the same as Abbreviation? Or do we take Id?
             //Static Groups
             var parameterGroupDtos = new List<ParameterGroupDto>();
-            parameterGroupDtos = this.GetStaticParameterGroups(monitoringPointId, sampleEndDateTimeLocal).ToList();
+            parameterGroupDtos = this.GetStaticParameterGroups(monitoringPointId, sampleEndDateTimeLocal, true).ToList();
 
             //Add Dyanamic Groups
             var uniqueNonNullFrequencies = _dbContext.SampleFrequencies

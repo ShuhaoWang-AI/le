@@ -201,7 +201,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetStaticParameterGroups_Test()
         {
-            var staticParameterGroups = _paramService.GetStaticParameterGroups();
+            var staticParameterGroups = _paramService.GetStaticParameterGroups(isGetActiveOnly: false);
         }
 
         [TestMethod]

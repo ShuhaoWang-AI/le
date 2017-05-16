@@ -29,8 +29,9 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <param name="sampleEndDateTimeUtc">If monitoring point and sample end date/time are passed in,
         ///default unit gets overidden with monitoring point specific unit and default "Calc Mass" boolean is set
         ///for each child parameter that is associated with the monitoring point and effective date range.</param>
+        /// <param name="isGetActiveOnly">True when being called by IU for use in Sample creation. False when being called by Authority</param>
         /// <returns>Collection of parameter groups with children parameters some with potentially overidden default units</returns>
-        IEnumerable<ParameterGroupDto> GetStaticParameterGroups(int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null);
+        IEnumerable<ParameterGroupDto> GetStaticParameterGroups(int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null, bool? isGetActiveOnly = null);
 
         /// <summary>
         /// Used to read the details of a static ParameterGroup from the database along with
