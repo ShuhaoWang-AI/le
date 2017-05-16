@@ -133,6 +133,7 @@
     <Compile Include="SettingServiceTests.cs" />
     <Compile Include="CopyOfRecordServiceTests.cs" />
     <Compile Include="UnitServiceTests.cs" />
+    <Compile Include="PDFGeneratorTests.cs" />
     <Compile Include="UserServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +158,9 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Aspose.Pdf.lic">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
