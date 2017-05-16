@@ -283,7 +283,6 @@ BEGIN
         , PhoneExt                      int NULL  
         , FaxNumber                     varchar(25) NULL  
         , WebsiteURL                    varchar(256) NULL
-        , PermitNumber                  varchar(50) NULL    
         , Signer                        varchar(250) NULL
 		, Classification                varchar(50) NULL  
         , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
@@ -1788,7 +1787,7 @@ BEGIN
         ParameterId                         int IDENTITY(1,1) NOT NULL
         , Name                              varchar(254) NOT NULL
         , Description                       varchar(500) NULL
-        , DefaultUnitId                     int NULL
+        , DefaultUnitId                     int NOT NULL
         , TrcFactor                         float NULL
         , IsFlowForMassLoadingCalculation   bit NOT NULL
         , OrganizationRegulatoryProgramId   int NOT NULL  
@@ -3492,7 +3491,6 @@ BEGIN
         , PhoneNumber
         , FaxNumber
         , WebsiteURL
-        , PermitNumber
     )
 	VALUES 
 	(
@@ -3506,7 +3504,6 @@ BEGIN
 	    , '616-456-3261'
 	    , '616-456-3711'
         , NULL
-	    , 'MI0026069'
 	) 
 END
 

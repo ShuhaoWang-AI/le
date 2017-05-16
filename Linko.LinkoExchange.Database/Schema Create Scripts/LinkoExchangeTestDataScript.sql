@@ -662,6 +662,19 @@ SELECT @OrganizationTypeId_Industry = OrganizationTypeId
 FROM dbo.tOrganizationType 
 WHERE Name = 'Industry'
 
+-- Get the LE account
+DECLARE @LEAccountID int
+SET @LEAccountID = 1;
+
+-- Get the last time sync was done
+DECLARE @LELastSyncDateTimeUtc datetime
+SET @LELastSyncDateTimeUtc = '2017-01-01 00:00:00'
+
+-- Get the Linko user id
+DECLARE @LELinkoUserProfileId int
+SELECT @LELinkoUserProfileId = UserProfileId
+FROM LinkoExchange.dbo.tUserProfile
+WHERE UserName = 'Linko';
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tOrganization WHERE OrganizationTypeId = @OrganizationTypeId_Industry)
 BEGIN
@@ -671,2358 +684,79 @@ BEGIN
     PRINT '----------------------------'
     
 -- GRESD Industries
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'American Seating, North Bldg.'
-     , '401 American Seating Center'
-     , NULL
-     , 'Grand Rapids'
-     , '49504'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0004'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Spectrum Industries Wealthy'
-     , '700 Wealthy St., S.W.'
-     , NULL
-     , 'Grand Rapids'
-     , '49504'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0006'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Di-Anodic Finishing'
-     , '736 Ottawa Ave., N.W.'
-     , NULL
-     , 'Grand Rapids'
-     , '49503'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0007'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Grand Rapids Stripping Co.'
-     , '1933 Will Ave, N.W.'
-     , NULL
-     , 'Grand Rapids'
-     , '49504'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0012'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'H. R. Terryberry Company'
-     , '2033 Oak Industrial Dr., N.E.'
-     , NULL
-     , 'Grand Rapids'
-     , '49505'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0013'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Haviland Products Co (East)'
-     , '421 Ann St. NW'
-     , NULL
-     , 'Grand Rapids'
-     , '49504'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0015'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Knape & Vogt Manufacturing Co.'
-     , '2700 Oak Industrial Dr., N.E.'
-     , NULL
-     , 'Grand Rapids'
-     , '49505'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0021'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Lacks Enterprises, Inc.'
-     , '4260 Airlane, S.E.'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0022'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Master Finish Company'
-     , '1160 Burton St.'
-     , NULL
-     , 'Grand Rapids'
-     , '49507'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0025'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Midwest Plating Company, Inc.'
-     , '613 North Ave., N.E.'
-     , NULL
-     , 'Grand Rapids'
-     , '49503'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0028'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Lacks Enterprises, Inc.'
-     , '1648 Monroe Ave., N.W.'
-     , NULL
-     , 'Grand Rapids'
-     , '49505'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0032'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Valley City Plating'
-     , '3353 Eastern, S.E.'
-     , NULL
-     , 'Grand Rapids'
-     , '49508'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0040'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'The DECC Company'
-     , '1266 Wallen, S.W.'
-     , NULL
-     , 'Grand Rapids'
-     , '49507'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0052'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'CSX Transportation, Inc.'
-     , '945 Freeman St., S.W.'
-     , NULL
-     , 'Grand Rapids, MI'
-     , '49503'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0056'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Access Business Group L.L.C.'
-     , '7575 Fulton, E.'
-     , NULL
-     , 'Ada'
-     , '49355'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0062'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Dematic Corp. (0077)'
-     , '507 Plymouth,N.E.'
-     , NULL
-     , 'Grand Rapids'
-     , '49505'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0077'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Knoll, Inc.'
-     , '4300 36th St., S.E.'
-     , NULL
-     , 'Grand Rapids'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0107'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Irwin Seating'
-     , '3251 Fruitridge N.W.'
-     , NULL
-     , 'Grand Rapids'
-     , '49544'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0136'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Kentwood Powder Coat Inc.'
-     , '3900 Swank, S.E.'
-     , NULL
-     , 'Grand Rapids'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0458'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Lacks Enterprises, Inc.'
-     , '4375 52nd St. SE'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0469'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Steelcase Inc. (Kentwood West)'
-     , '4360 52nd St. SE'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0479'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Controlled Plating Tech.'
-     , '1100 Godfrey Ave., S.W.'
-     , NULL
-     , 'Grand Rapids'
-     , '49503'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0508'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Michigan Medical P.C.'
-     , '4069 Lake Dr. SE'
-     , 'Suite 313'
-     , 'Grand Rapids'
-     , '49546'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0605'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Midwest Plating Plant II'
-     , '738 Lafayette,  N.E.'
-     , NULL
-     , 'Grand Rapids'
-     , '49503'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0636'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Industrial Stripping Services'
-     , '2235 29th St. SE'
-     , NULL
-     , 'Grand Rapids'
-     , '49508'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0649'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Professional Metal Finishers'
-     , '2474 Turner St., N.W.'
-     , 'Section F'
-     , 'Grand Rapids'
-     , '49544'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0652'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Pro-Finish Powder Coating'
-     , '1000 Ken-O-Sha Industrial Dr.'
-     , NULL
-     , 'Grand Rapids'
-     , '49508'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0655'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Premier Finishing'
-     , '3180 Fruitridge Ave NW'
-     , NULL
-     , 'Walker'
-     , '49544'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0659'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'G.E. Aviation'
-     , '3290 Patterson Ave., S.E.'
-     , NULL
-     , 'Grand Rapids'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0660'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Haviland Products Co (West)'
-     , '525 Ann St. NW'
-     , NULL
-     , 'Grand Rapids'
-     , '49504'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0670'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'West Michigan Coating'
-     , '3150 Fruitridge Ave., N.W.'
-     , NULL
-     , 'Walker'
-     , '49544'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0672'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'El Matador Tortilla Factory'
-     , '45 Franklin, S.W.'
-     , NULL
-     , 'Grand Rapids'
-     , '49507'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8277'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Keebler Company'
-     , '310 28th St. SE'
-     , NULL
-     , 'Grand Rapids'
-     , '49548'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8283'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Eurasia Feather'
-     , '655 Evergreen, S.E.'
-     , NULL
-     , 'Grand Rapids'
-     , '49507'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8290'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Valley City Linen'
-     , '10 Diamond SE'
-     , NULL
-     , 'Grand Rapids'
-     , '49506'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8292'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Arnie''s Bakery, Div of Arnie''s Inc'
-     , '815 Leonard St., N.W.'
-     , NULL
-     , 'Grand Rapids'
-     , '49504'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8293'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Spectrum Cubic McConnell'
-     , '13 McConnell, S.W.'
-     , NULL
-     , 'Grand Rapids'
-     , '49504'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0642'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Arkema Coating Resins'
-     , '1415 Steele Ave., S.W.'
-     , NULL
-     , 'Grand Rapids'
-     , '49507'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0260'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Southern Lithoplate DBA American Litho, Inc.'
-     , '4150 Danvers Ct., S.E.'
-     , NULL
-     , 'Grand Rapids'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0697'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Costco Wholesale  #784'
-     , '5100 28th St. SE'
-     , NULL
-     , 'Grand Rapids'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0708'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Lacks Enterprises, Inc.'
-     , '4090 Barden S.E.'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0711'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Cintas 301'
-     , '3149 Wilson Dr. NW'
-     , NULL
-     , 'Walker'
-     , '49544'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8294'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Kerry, Inc.'
-     , '4444 52nd St. SE'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8296'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Keeler Brass Company - Kentwood'
-     , '2929 32nd St.'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0714'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Model Coverall Services Inc.'
-     , '100 28th St. SE'
-     , NULL
-     , 'Grand Rapids'
-     , '49548'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8289'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Advance Plating and Finishing'
-     , '840 Cottage Grove St. SE'
-     , NULL
-     , 'Grand Rapids'
-     , '49507'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0718'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Accurate Coating Inc.'
-     , '955 Godfrey Ave SW'
-     , 'Unit A'
-     , 'Grand Rapids'
-     , '49503'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0726'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Hearthside Food Solutions LLC'
-     , '3061 Shaffer Ave'
-     , 'P.O. Box H'
-     , 'Kentwood'
-     , '49502'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8297'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Yamaha Corporation of America'
-     , '3050 Breton Ave SE'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0753'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Ventra Grand Rapids 29, LLC'
-     , '2890 29th st. SE'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0755'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Cheeze Kurls'
-     , '2915 Walkent Dr. N.W.'
-     , NULL
-     , 'Grand Rapids'
-     , '49544'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8298'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Roskam Broadmoor'
-     , '5353 Broadmoor Ave.'
-     , 'P.O. 202'
-     , 'Grand Rapids'
-     , '49501'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8299'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Hearthside Oak Industrial'
-     , '2455 Oak Industrial Dr'
-     , NULL
-     , 'Grand Rapids'
-     , '49505'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8300'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Hearthside 44th St.'
-     , '4185 44th St.'
-     , NULL
-     , 'Grand Rapids'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8301'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Roskam 4855 52nd St'
-     , '4855 52nd St.'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8304'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Hearthside 3225 32nd St'
-     , '3225 32nd St.'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8305'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Roskam 3035 32nd St.'
-     , '3035 32nd St.'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8306'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Haviland Products Co (North)'
-     , '2168 Avastar Parkway'
-     , NULL
-     , 'Grand Rapids'
-     , '49544'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0760'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Roskam 2600 29th'
-     , '2600 29th St.'
-     , NULL
-     , 'Grand Rapids'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8303'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Advanced Food Technologies'
-     , '1140 Butterworth S.W.'
-     , NULL
-     , 'Grand Rapids'
-     , '49504'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8310'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Festida Foods Ltd'
-     , '219 Canton SW'
-     , NULL
-     , 'Grand Rapids'
-     , '49507'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8308'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Coatings Plus, Inc.'
-     , '675 Chestnut St. SW'
-     , NULL
-     , 'Grand Rapids'
-     , '49503'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0762'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Lacks Enterprises, Inc.'
-     , '4245 52nd St.'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0764'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Surefil'
-     , '4560 Danvers Dr.'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8309'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Autocam Medical, LLC.'
-     , '4162 East Paris Ave, SE'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0767'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Jedco, Inc.'
-     , '1615 Broadway, NW'
-     , NULL
-     , 'Grand Rapids'
-     , '49504'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0768'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Allied Finishing Inc'
-     , '4100 Broadmoor Ave SE'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0002'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Kent County Waste to Energy Facility'
-     , '950 Market Ave SW'
-     , NULL
-     , 'Grand Rapids'
-     , '49503'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0769'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Coca-Cola Refreshments USA, Inc.'
-     , '1440 Butterworth'
-     , NULL
-     , 'Grand Rapids'
-     , '49504'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8311'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Ottery Brothers, LLC'
-     , '4647 50th st SE'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8312'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Lacks Enterprises, Inc.'
-     , '5675 Kraft Ave SE'
-     , NULL
-     , 'Kentwood'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0770'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Scott Group Custom Carpets, LLC'
-     , '3232 Kraft Ave. SE'
-     , NULL
-     , 'Grand Rapids'
-     , '49512'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0771'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Access Business Group LLC'
-     , '5101 Spaulding Plaza SE'
-     , NULL
-     , 'Ada'
-     , '49355'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8313'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Butterball Farms, Inc.'
-     , '1435 Buchanan SW'
-     , NULL
-     , 'Grand Rapids'
-     , '49507'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8317'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'SET Environmental, Inc.'
-     , '1040 Market Ave'
-     , NULL
-     , 'Grand Rapids'
-     , '49503'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0772'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Bimbo Bakeries USA, Inc'
-     , '210 28th St. S.E.'
-     , NULL
-     , 'Grand Rapids'
-     , '49548'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8315'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Founders Brewing'
-     , '235 Grandville'
-     , NULL
-     , 'Grand Rapids'
-     , '49503'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8316'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Spectrum Health Medical Group Urology Physicians'
-     , '4069 Lake Drive SE'
-     , 'Suite 313'
-     , 'Grand Rapids'
-     , '49546'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0773'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Premier Finishing, Inc.'
-     , '3682 Northridge Dr NW ste 10'
-     , NULL
-     , 'Walker'
-     , '49544'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '0774'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Bissell Homecare, Inc.'
-     , '2345 Walker Ave NW'
-     , NULL
-     , 'Grand Rapids'
-     , '49544'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8318'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Kent Quality Foods'
-     , '703 Leonard'
-     , NULL
-     , 'Grand Rapids'
-     , '49504'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , '8319'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Baker Tent Rental'
-     , '201 Matilda ST NE'
-     , NULL
-     , 'Grand Rapids'
-     , '49503'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , 'PTWDAHW101'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Chris Test IU'
-     , '100 E. 26th Street'
-     , NULL
-     , 'Grand Rapids'
-     , '80000'
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , 'IPP-TEST-01'
- ) 
- INSERT INTO dbo.tOrganization 
-    (
-        OrganizationTypeId
-        , Name
-        , AddressLine1
-        , AddressLine2
-        , CityName
-        , ZipCode
-        , JurisdictionId
-        , PhoneNumber
-        , FaxNumber
-        , WebsiteURL
-        , PermitNumber
-    )
- VALUES 
- (
-    @OrganizationTypeId_Industry
-     , 'Central Land Fill Test by Chris'
-     , ''
-     , NULL
-     , ''
-     , ''
-     , @JurisdictionId_MI
-     , NULL
-     , NULL
-     , NULL
-     , 'PTX-01330-04'
- ) 
+-- Sync: tOrganization AND ts_LE_CTSOrganizations
+
+    -- Create temp table to hold merge rslts
+    CREATE TABLE #OrganizationMergeResult
+    (
+        Action      nvarchar(10) NOT NULL
+        , CTSId     int NOT NULL
+        , LEId      int NOT NULL
+    );
+
+    -- Merge LE table with staging table
+    WITH src 
+    AS
+    (
+        SELECT ot.OrganizationTypeId AS LEOrganizationTypeID
+                , j.JurisdictionId AS LEJurisdictionID
+                , stgo.*
+        FROM dbo.ts_LE_CTSOrganizations stgo
+            INNER JOIN LinkoExchange.dbo.tOrganizationType ot ON ot.Name = stgo.CTSOrgType
+            LEFT JOIN LinkoExchange.dbo.tJurisdiction j ON j.Code = stgo.CTSSiteState
+        WHERE stgo.LEOrganizationRegulatoryProgramID = @LEAccountID
+    )
+    MERGE LinkoExchange.dbo.tOrganization AS tgt
+    USING src
+    ON (tgt.OrganizationId = src.LEOrganizationID)
+    WHEN MATCHED AND (src.LastUpdatedDateTimeUtc > @LELastSyncDateTimeUtc OR src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc) THEN
+        -- Update or soft-delete
+        UPDATE 
+        SET tgt.OrganizationTypeId              = src.LEOrganizationTypeID
+            , tgt.Name                          = src.CTSPermittee
+            , tgt.AddressLine1                  = src.CTSSiteAddr1
+            , tgt.AddressLine2                  = src.CTSSiteAddr2
+            , tgt.CityName                      = src.CTSSiteCity
+            , tgt.ZipCode                       = src.CTSSiteZipCode
+            , tgt.JurisdictionId                = src.LEJurisdictionID
+            , tgt.Classification                = src.CTSClassCode
+            , tgt.LastModificationDateTimeUtc   = SYSDATETIMEOFFSET()
+            , tgt.LastModifierUserId            = @LELinkoUserProfileId
+    WHEN NOT MATCHED AND src.InsertedDateTimeUtc > @LELastSyncDateTimeUtc THEN
+        -- New
+        INSERT  (OrganizationTypeId
+                , Name
+                , AddressLine1
+                , AddressLine2
+                , CityName
+                , ZipCode
+                , JurisdictionId
+                , Classification
+                , LastModifierUserId)
+        VALUES 
+                (src.LEOrganizationTypeID
+                , src.CTSPermittee
+                , src.CTSSiteAddr1
+                , src.CTSSiteAddr2
+                , src.CTSSiteCity
+                , src.CTSSiteZipCode
+                , src.LEJurisdictionID
+                , src.CTSClassCode
+                , @LELinkoUserProfileId)
+    OUTPUT $action 
+            , src.CTSPermitID
+            , INSERTED.OrganizationId
+    INTO #OrganizationMergeResult;
+
+    -- Update the staging table with the new LE table Ids
+    UPDATE stg
+    SET LEOrganizationID = rslt.LEId
+    FROM #OrganizationMergeResult rslt
+        INNER JOIN dbo.ts_LE_CTSOrganizations stg ON stg.CTSPermitID = rslt.CTSId
+    WHERE rslt.Action = 'INSERT';
+
+    DROP TABLE #OrganizationMergeResult;
+
 END
 
 
@@ -3039,13 +773,75 @@ BEGIN
     PRINT 'Add records to tOrganizationRegulatoryProgram'
     PRINT '---------------------------------------------'
     
+    -- Sync: tOrganizationRegulatoryProgram AND ts_LE_CTSOrganizations
+
+    -- Create temp table to hold merge rslts
+    CREATE TABLE #OrganizationRegulatoryProgramMergeResult
+    (
+        Action      nvarchar(10) NOT NULL
+        , CTSId     int NOT NULL
+        , LEId      int NOT NULL
+    );
+
+    -- Merge LE table with staging table
+    WITH src 
+    AS
+    (
+        SELECT  authorp.OrganizationId AS LERegulatorOrganizationID
+                , rp.RegulatoryProgramId AS LERegulatoryProgramID
+                , stgo.*
+        FROM dbo.ts_LE_CTSOrganizations stgo
+            INNER JOIN LinkoExchange.dbo.tRegulatoryProgram rp ON rp.Name = stgo.CTSRegulatoryProgram
+            INNER JOIN LinkoExchange.dbo.tOrganizationRegulatoryProgram authorp ON authorp.OrganizationRegulatoryProgramId = stgo.LEOrganizationRegulatoryProgramID
+        WHERE stgo.LEOrganizationRegulatoryProgramID = @LEAccountID
+    )
+    MERGE LinkoExchange.dbo.tOrganizationRegulatoryProgram WITH (HOLDLOCK) AS tgt
+    USING src
+    ON (tgt.OrganizationId = src.LEOrganizationID AND tgt.RegulatoryProgramId = src.LERegulatoryProgramID)
+    WHEN MATCHED AND (src.LastUpdatedDateTimeUtc > @LELastSyncDateTimeUtc OR src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc) THEN
+        -- Update or soft-delete
+        UPDATE 
+        SET tgt.RegulatoryProgramId             = src.LERegulatoryProgramID
+            , tgt.OrganizationId                = src.LEOrganizationID
+            , tgt.RegulatorOrganizationId       = src.LERegulatorOrganizationID
+            , tgt.AssignedTo                    = src.CTSUserAbbrv
+            , tgt.ReferenceNumber               = src.CTSPermitNo
+            , tgt.IsEnabled                     = ~src.CTSRemoved
+            , tgt.IsRemoved                     = IIF(src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc, 1, 0)
+            , tgt.LastModificationDateTimeUtc   = SYSDATETIMEOFFSET()
+            , tgt.LastModifierUserId            = @LELinkoUserProfileId
+    WHEN NOT MATCHED AND src.InsertedDateTimeUtc > @LELastSyncDateTimeUtc THEN
+        -- New
+        INSERT  (RegulatoryProgramId
+                , OrganizationId
+                , RegulatorOrganizationId
+                , AssignedTo
+                , ReferenceNumber
+                , IsEnabled
+                , IsRemoved
+                , LastModifierUserId)
+        VALUES 
+                (src.LERegulatoryProgramID
+                , src.LEOrganizationID
+                , src.LERegulatorOrganizationID
+                , src.CTSUserAbbrv
+                , src.CTSPermitNo
+                , ~src.CTSRemoved
+                , IIF(src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc, 1, 0)
+                , @LELinkoUserProfileId)
+    OUTPUT $action 
+            , src.CTSPermitID
+            , INSERTED.OrganizationRegulatoryProgramId
+    INTO #OrganizationRegulatoryProgramMergeResult;
+
+    DROP TABLE #OrganizationRegulatoryProgramMergeResult;
+
+
     -- GRESD Industries
     -- AssignedTo: TM
-    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, ReferenceNumber, IsEnabled)
-	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'TM', PermitNumber, 1 
-    FROM dbo.tOrganization
-    WHERE OrganizationTypeId = @OrganizationTypeId_Industry
-        AND PermitNumber IN 
+    UPDATE dbo.tOrganizationRegulatoryProgram
+	SET AssignedTo = 'TM'
+    WHERE ReferenceNumber IN 
         (
             '0006'
             , '0007'
@@ -3082,11 +878,9 @@ BEGIN
         )
 
     -- AssignedTo: HB
-    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, ReferenceNumber, IsEnabled)
-	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'HB', PermitNumber, 1 
-    FROM dbo.tOrganization
-    WHERE OrganizationTypeId = @OrganizationTypeId_Industry
-        AND PermitNumber IN 
+    UPDATE dbo.tOrganizationRegulatoryProgram
+	SET AssignedTo = 'HB'
+    WHERE ReferenceNumber IN 
         (
             '0021'
             , '0508'
@@ -3095,80 +889,27 @@ BEGIN
         )
 
     -- AssignedTo: KA
-    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, ReferenceNumber, IsEnabled)
-	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'KA', PermitNumber, 1 
-    FROM dbo.tOrganization
-    WHERE OrganizationTypeId = @OrganizationTypeId_Industry
-        AND PermitNumber IN 
+    UPDATE dbo.tOrganizationRegulatoryProgram
+	SET AssignedTo = 'KA'
+    WHERE ReferenceNumber IN 
         (
             'IPP-TEST-01'
         )
 
     -- AssignedTo: MB
-    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, ReferenceNumber, IsEnabled)
-	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'KA', PermitNumber, 1 
-    FROM dbo.tOrganization
-    WHERE OrganizationTypeId = @OrganizationTypeId_Industry
-        AND PermitNumber IN 
+    UPDATE dbo.tOrganizationRegulatoryProgram
+	SET AssignedTo = 'MB'
+    WHERE ReferenceNumber IN 
         (
             '0697'
         )
 
     -- AssignedTo: PK
-    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, AssignedTo, ReferenceNumber, IsEnabled)
-	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, 'PK', PermitNumber, 1 
-    FROM dbo.tOrganization
-    WHERE OrganizationTypeId = @OrganizationTypeId_Industry
-        AND PermitNumber IN 
+    UPDATE dbo.tOrganizationRegulatoryProgram
+	SET AssignedTo = 'PK'
+    WHERE ReferenceNumber IN 
         (
             '8315'
-        )
-
-    INSERT INTO dbo.tOrganizationRegulatoryProgram (RegulatoryProgramId, OrganizationId, RegulatorOrganizationId, ReferenceNumber, IsEnabled)
-	SELECT @RegulatoryProgramId_IPP, OrganizationId, @OrganizationId_GRESD, PermitNumber, 1 
-    FROM dbo.tOrganization
-    WHERE OrganizationTypeId = @OrganizationTypeId_Industry
-        AND PermitNumber NOT IN
-        (
-            '0006'
-            , '0007'
-            , '0012'
-            , '0013'
-            , '0015'
-            , '0022'
-            , '0025'
-            , '0028'
-            , '0032'
-            , '0040'
-            , '0052'
-            , '0056'
-            , '0062'
-            , '0077'
-            , '0107'
-            , '0136'
-            , '0458'
-            , '0469'
-            , '0479'
-            , '0605'
-            , '0636'
-            , '0649'
-            , '0655'
-            , '0659'
-            , '0660'
-            , '0670'
-            , '8277'
-            , '8283'
-            , '8290'
-            , '8292'
-            , '8293'
-            , '0002'
-            , '0021'
-            , '0508'
-            , '0652'
-            , '0672'
-            , 'IPP-TEST-01'
-            , '0697'
-            , '8315'
         )
 END
 
@@ -3529,21 +1270,70 @@ BEGIN
     PRINT '-------------------------------'
     
   
-	UPDATE dbo.ts_LE_CTSOrganizations
-	   SET LEOrganizationRegulatoryProgramID = orp.OrganizationRegulatoryProgramId
-	   FROM dbo.ts_LE_CTSOrganizations ctsOrg
-	   INNER JOIN dbo.tOrganizationRegulatoryProgram orp on orp.ReferenceNumber like ctsOrg.CTSPermitNo
-  
-	UPDATE dbo.ts_LE_CTSMonitoringPoints
-	   SET LEOrganizationRegulatoryProgramID = ctsOrg.LEOrganizationRegulatoryProgramID
-	   FROM dbo.ts_LE_CTSMonitoringPoints mp
-	   INNER JOIN dbo.ts_LE_CTSOrganizations ctsOrg on ctsOrg.CTSPermitID = mp.CTSPermitID
-	
-    INSERT INTO dbo.tMonitoringPoint (Name, Description, OrganizationRegulatoryProgramId)
-		SELECT CTSMonPointAbbrv
-            , CTSMonPointDesc
-            , LEOrganizationRegulatoryProgramID
-        FROM dbo.ts_LE_CTSMonitoringPoints
+	-- Sync: tMonitoringPoint AND ts_LE_CTSMonitoringPoints
+
+    -- Create temp table to hold merge rslts
+    CREATE TABLE #MonitoringPointMergeResult
+    (
+        Action      nvarchar(10) NOT NULL
+        , CTSId     int NOT NULL
+        , LEId      int NOT NULL
+    );
+
+    -- Merge LE table with staging table
+    WITH src
+    AS
+    (
+        SELECT iuorp.OrganizationRegulatoryProgramId AS LEIUOrganizationRegulatoryProgramID
+                , stgmp.* 
+        FROM dbo.ts_LE_CTSMonitoringPoints stgmp
+            INNER JOIN ts_LE_CTSOrganizations stgorg ON stgorg.CTSPermitID = stgmp.CTSPermitID
+            INNER JOIN LinkoExchange.dbo.tOrganizationRegulatoryProgram regorp ON regorp.OrganizationRegulatoryProgramId = stgmp.LEOrganizationRegulatoryProgramID
+            INNER JOIN LinkoExchange.dbo.tOrganizationRegulatoryProgram iuorp ON iuorp.RegulatorOrganizationId = regorp.OrganizationId
+                                                                                        AND iuorp.RegulatoryProgramId = regorp.RegulatoryProgramId
+                                                                                        AND iuorp.ReferenceNumber = stgorg.CTSPermitNo
+        WHERE stgmp.LEOrganizationRegulatoryProgramID = @LEAccountID
+    )
+    MERGE LinkoExchange.dbo.tMonitoringPoint WITH (HOLDLOCK) AS tgt
+    USING src
+    ON (tgt.MonitoringPointId = src.LEMonitoringPointID)
+    WHEN MATCHED AND (src.LastUpdatedDateTimeUtc > @LELastSyncDateTimeUtc OR src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc) THEN
+        -- Update or soft-delete
+        UPDATE 
+        SET tgt.Name                            = src.CTSMonPointAbbrv
+            , tgt.Description                   = src.CTSMonPointDesc
+            , tgt.IsEnabled                     = ~src.CTSRemoved
+            , tgt.IsRemoved                     = IIF(src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc, 1, 0)
+            , tgt.LastModificationDateTimeUtc   = SYSDATETIMEOFFSET()
+            , tgt.LastModifierUserId            = @LELinkoUserProfileId
+    WHEN NOT MATCHED AND src.InsertedDateTimeUtc > @LELastSyncDateTimeUtc THEN
+        -- New
+        INSERT  (Name
+                , Description
+                , OrganizationRegulatoryProgramId
+                , IsEnabled
+                , IsRemoved
+                , LastModifierUserId)
+        VALUES 
+                (src.CTSMonPointAbbrv
+                , src.CTSMonPointDesc
+                , src.LEIUOrganizationRegulatoryProgramID
+                , ~src.CTSRemoved
+                , IIF(src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc, 1, 0)
+                , @LELinkoUserProfileId)
+    OUTPUT $action 
+            , src.CTSMonPointID
+            , INSERTED.MonitoringPointId
+    INTO #MonitoringPointMergeResult;
+
+    -- Update the staging table with the new LE table Ids
+    UPDATE stg
+    SET LEMonitoringPointID = rslt.LEId
+    FROM #MonitoringPointMergeResult rslt
+        INNER JOIN dbo.ts_LE_CTSMonitoringPoints stg ON stg.CTSMonPointID = rslt.CTSId
+    WHERE rslt.Action = 'INSERT';
+
+    DROP TABLE #MonitoringPointMergeResult;
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tCtsEventType)
@@ -3553,11 +1343,64 @@ BEGIN
     PRINT 'Add records to tCtsEventType'
     PRINT '----------------------------'
     
-    INSERT INTO dbo.tCtsEventType (Name, CtsEventCategoryName, OrganizationRegulatoryProgramId)
-		SELECT CTSEventTypeAbbrv
-            , CTSEventCatCode
-            , LEOrganizationRegulatoryProgramID
-        FROM dbo.ts_LE_CTSEventTypes
+    -- Sync: tCtsEventType AND ts_LE_CTSEventTypes
+
+    -- Create temp table to hold merge rslts
+    CREATE TABLE #EventTypeMergeResult
+    (
+        Action      nvarchar(10) NOT NULL
+        , CTSId     int NOT NULL
+        , LEId      int NOT NULL
+    );
+
+    -- Merge LE table with staging table
+    WITH src 
+    AS
+    (
+        SELECT stgct.*
+        FROM dbo.ts_LE_CTSEventTypes stgct
+        WHERE stgct.LEOrganizationRegulatoryProgramID = @LEAccountID
+    )
+    MERGE LinkoExchange.dbo.tCtsEventType WITH (HOLDLOCK) AS tgt
+    USING src
+    ON (tgt.CtsEventTypeId = src.LEEventTypeID)
+    WHEN MATCHED AND (src.LastUpdatedDateTimeUtc > @LELastSyncDateTimeUtc OR src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc) THEN
+        -- Update or soft-delete
+        UPDATE 
+        SET tgt.Name                            = src.CTSEventTypeAbbrv
+            , tgt.CtsEventCategoryName          = src.CTSEventCatCode
+            , tgt.IsEnabled                     = ~src.CTSRemoved
+            , tgt.IsRemoved                     = IIF(src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc, 1, 0)
+            , tgt.LastModificationDateTimeUtc   = SYSDATETIMEOFFSET()
+            , tgt.LastModifierUserId            = @LELinkoUserProfileId
+    WHEN NOT MATCHED AND src.InsertedDateTimeUtc > @LELastSyncDateTimeUtc THEN
+        -- New
+        INSERT  (Name
+                , CtsEventCategoryName
+                , OrganizationRegulatoryProgramId
+                , IsEnabled
+                , IsRemoved
+                , LastModifierUserId)
+        VALUES 
+                (src.CTSEventTypeAbbrv
+                , src.CTSEventCatCode
+                , src.LEOrganizationRegulatoryProgramID
+                , ~src.CTSRemoved
+                , IIF(src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc, 1, 0)
+                , @LELinkoUserProfileId)
+    OUTPUT $action 
+            , src.CTSEventTypeID
+            , INSERTED.CtsEventTypeId
+    INTO #EventTypeMergeResult;
+
+    -- Update the staging table with the new LE table Ids
+    UPDATE stg
+    SET LEEventTypeID = rslt.LEId
+    FROM #EventTypeMergeResult rslt
+        INNER JOIN dbo.ts_LE_CTSEventTypes stg ON stg.CTSEventTypeID = rslt.CTSId
+    WHERE rslt.Action = 'INSERT';
+
+    DROP TABLE #EventTypeMergeResult;
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tCollectionMethod)
@@ -3567,21 +1410,67 @@ BEGIN
     PRINT 'Add records to tCollectionMethod'
     PRINT '--------------------------------'
     
-    INSERT INTO dbo.tCollectionMethod (Name, OrganizationId, CollectionMethodTypeId)
-		SELECT CTSCollectMethCode
-            , @OrganizationId_GRESD
-            , 2
-        FROM dbo.ts_LE_CTSCollectionMethods
-        WHERE CTSCollectMethCode <> 'GRAB'
+    -- Sync: tCollectionMethod AND ts_LE_CTSCollectionMethods
 
-    INSERT INTO dbo.tCollectionMethod (Name, OrganizationId, CollectionMethodTypeId)
-		SELECT CTSCollectMethCode
-            , @OrganizationId_GRESD
-            , 1
-        FROM dbo.ts_LE_CTSCollectionMethods
-        WHERE CTSCollectMethCode = 'GRAB'
-    INSERT dbo.tCollectionMethod (Name, OrganizationId, CollectionMethodTypeId)
-        VALUES ('Sample Flow', @OrganizationId_GRESD, 3)
+    -- Create temp table to hold merge rslts
+    CREATE TABLE #CollectionMethodMergeResult
+    (
+        Action                  nvarchar(10) NOT NULL
+        , CTSCollectMethCode    varchar(50) NOT NULL
+        , LEId                  int NOT NULL
+    );
+
+    -- Merge LE table with staging table
+    WITH src
+    AS
+    (
+        SELECT orp.OrganizationId AS LEOrganizationID
+                , cmt.CollectionMethodTypeId AS LECollectionMethodTypeID
+                , stgcm.*
+        FROM dbo.ts_LE_CTSCollectionMethods stgcm
+            INNER JOIN LinkoExchange.dbo.tOrganizationRegulatoryProgram orp ON orp.OrganizationRegulatoryProgramId = stgcm.LEOrganizationRegulatoryProgramID
+            INNER JOIN LinkoExchange.dbo.tCollectionMethodType cmt ON cmt.Name = stgcm.CTSCollectMethType
+        WHERE stgcm.LEOrganizationRegulatoryProgramID = @LEAccountID
+    )
+    MERGE LinkoExchange.dbo.tCollectionMethod WITH (HOLDLOCK) AS tgt
+    USING src
+    ON (tgt.CollectionMethodId = src.LECollectionMethodID)
+    WHEN MATCHED AND (src.LastUpdatedDateTimeUtc > @LELastSyncDateTimeUtc OR src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc) THEN
+        -- Update or soft-delete
+        UPDATE 
+        SET tgt.CollectionMethodTypeId          = src.LECollectionMethodTypeID
+            , tgt.IsEnabled                     = ~src.CTSRemoved
+            , tgt.IsRemoved                     = IIF(src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc, 1, 0)
+            , tgt.LastModificationDateTimeUtc   = SYSDATETIMEOFFSET()
+            , tgt.LastModifierUserId            = @LELinkoUserProfileId
+    WHEN NOT MATCHED AND src.InsertedDateTimeUtc > @LELastSyncDateTimeUtc THEN
+        -- New
+        INSERT (Name
+                , OrganizationId
+                , CollectionMethodTypeId
+                , IsEnabled
+                , IsRemoved
+                , LastModifierUserId)
+        VALUES 
+                (src.CTSCollectMethCode
+                , src.LEOrganizationID
+                , src.LECollectionMethodTypeID
+                , ~src.CTSRemoved
+                , IIF(src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc, 1, 0)
+                , @LELinkoUserProfileId)
+    OUTPUT $action 
+            , src.CTSCollectMethCode
+            , INSERTED.CollectionMethodId
+    INTO #CollectionMethodMergeResult;
+
+    -- Update the staging table with the new LE table Ids
+    UPDATE stg
+    SET LECollectionMethodID = rslt.LEId
+    FROM #CollectionMethodMergeResult rslt
+        INNER JOIN dbo.ts_LE_CTSCollectionMethods stg ON stg.CTSCollectMethCode = rslt.CTSCollectMethCode
+    WHERE rslt.Action = 'INSERT';
+     
+    DROP TABLE #CollectionMethodMergeResult;
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tUnit)
@@ -3591,11 +1480,65 @@ BEGIN
     PRINT 'Add records to tUnit'
     PRINT '--------------------'
     
-    INSERT INTO dbo.tUnit (Name, IsFlowUnit, OrganizationId)
-		SELECT CTSUnitCode
-            , CTSIsFlowUnit
-            , @OrganizationId_GRESD
-        FROM dbo.ts_LE_CTSUnits
+    -- Sync: tUnit AND ts_LE_CTSUnits
+
+    -- Create temp table to hold merge rslts
+    CREATE TABLE #UnitMergeResult
+    (
+        Action          nvarchar(10) NOT NULL
+        , CTSUnitCode   varchar(50) NOT NULL
+        , LEId          int NOT NULL
+    );
+
+    -- Merge LE table with staging table
+    WITH src
+    AS
+    (
+        SELECT orp.OrganizationId AS LEOrganizationID
+                , stgu.*
+        FROM dbo.ts_LE_CTSUnits stgu
+            INNER JOIN LinkoExchange.dbo.tOrganizationRegulatoryProgram orp ON orp.OrganizationRegulatoryProgramId = stgu.LEOrganizationRegulatoryProgramID
+        WHERE stgu.LEOrganizationRegulatoryProgramID = @LEAccountID
+    )
+    MERGE LinkoExchange.dbo.tUnit WITH (HOLDLOCK) AS tgt
+    USING src
+    ON (tgt.UnitId = src.LEUnitID)
+    WHEN MATCHED AND (src.LastUpdatedDateTimeUtc > @LELastSyncDateTimeUtc OR src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc) THEN
+        -- Update or soft-delete
+        UPDATE 
+        SET tgt.Description                     = src.CTSUnitDesc
+            , tgt.IsFlowUnit                    = src.CTSIsFlowUnit
+            , tgt.IsRemoved                     = IIF(src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc, 1, 0)
+            , tgt.LastModificationDateTimeUtc   = SYSDATETIMEOFFSET()
+            , tgt.LastModifierUserId            = @LELinkoUserProfileId
+    WHEN NOT MATCHED AND src.InsertedDateTimeUtc > @LELastSyncDateTimeUtc THEN
+        -- New
+        INSERT (Name
+                , Description
+                , IsFlowUnit
+                , OrganizationId
+                , IsRemoved
+                , LastModifierUserId)
+        VALUES 
+                (src.CTSUnitCode
+                , src.CTSUnitDesc
+                , src.CTSIsFlowUnit
+                , src.LEOrganizationID
+                , IIF(src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc, 1, 0)
+                , @LELinkoUserProfileId)
+    OUTPUT $action 
+            , src.CTSUnitCode
+            , INSERTED.UnitId
+    INTO #UnitMergeResult;
+
+    -- Update the staging table with the new LE table Ids
+    UPDATE stg
+    SET LEUnitID = rslt.LEId
+    FROM #UnitMergeResult rslt
+        INNER JOIN dbo.ts_LE_CTSUnits stg ON stg.CTSUnitCode = rslt.CTSUnitCode
+    WHERE rslt.Action = 'INSERT';
+     
+    DROP TABLE #UnitMergeResult;
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tParameter)
@@ -3605,13 +1548,290 @@ BEGIN
     PRINT 'Add records to tParameter'
     PRINT '-------------------------'
     
-    INSERT INTO dbo.tParameter (Name, DefaultUnitId, TrcFactor, OrganizationRegulatoryProgramId)
-		SELECT CTSParamName
-            , (SELECT UnitId FROM dbo.tUnit WHERE Name = CTSDefaultUnitsCode)
-            , CTSTRCFactor
-            , LEOrganizationRegulatoryProgramID
-        FROM dbo.ts_LE_CTSParameters
+    -- Sync: tParameter AND ts_LE_CTSParameters
+
+    -- Create temp table to hold merge rslts
+    CREATE TABLE #ParameterMergeResult
+    (
+        Action      nvarchar(10) NOT NULL
+        , CTSId     int NOT NULL
+        , LEId      int NOT NULL
+    );
+
+    -- Merge LE table with staging table
+    WITH src
+    AS
+    (
+        SELECT stgu.LEUnitID
+                , stgp.*
+        FROM dbo.ts_LE_CTSParameters stgp
+            INNER JOIN dbo.ts_LE_CTSUnits stgu ON stgu.CTSUnitCode = stgp.CTSDefaultUnitsCode
+            INNER JOIN LinkoExchange.dbo.tOrganizationRegulatoryProgram orp ON orp.OrganizationRegulatoryProgramId = stgp.LEOrganizationRegulatoryProgramID
+        WHERE stgp.LEOrganizationRegulatoryProgramID = @LEAccountID
+    )
+    MERGE LinkoExchange.dbo.tParameter WITH (HOLDLOCK) AS tgt
+    USING src
+    ON (tgt.ParameterId = src.LEParameterID)
+    WHEN MATCHED AND (src.LastUpdatedDateTimeUtc > @LELastSyncDateTimeUtc OR src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc) THEN
+        -- Update or soft-delete
+        UPDATE 
+        SET tgt.Name                                = src.CTSParamName
+            , tgt.DefaultUnitId                     = src.LEUnitID
+            , tgt.TrcFactor                         = src.CTSTRCFactor
+            , tgt.IsFlowForMassLoadingCalculation   = src.IsFlowForMassCalcs
+            , tgt.IsRemoved                         = IIF(src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc, 1, 0)
+            , tgt.LastModificationDateTimeUtc       = SYSDATETIMEOFFSET()
+            , tgt.LastModifierUserId                = @LELinkoUserProfileId
+    WHEN NOT MATCHED AND src.InsertedDateTimeUtc > @LELastSyncDateTimeUtc THEN
+        -- New
+        INSERT  (Name
+                , DefaultUnitId
+                , TrcFactor
+                , IsFlowForMassLoadingCalculation
+                , OrganizationRegulatoryProgramId
+                , IsRemoved
+                , LastModifierUserId)
+        VALUES 
+                (src.CTSParamName
+                , src.LEUnitID
+                , src.CTSTRCFactor
+                , src.IsFlowForMassCalcs
+                , src.LEOrganizationRegulatoryProgramID
+                , IIF(src.DeletedDateTimeUtc > @LELastSyncDateTimeUtc, 1, 0)
+                , @LELinkoUserProfileId)
+    OUTPUT $action 
+            , src.CTSParamID
+            , INSERTED.ParameterId
+    INTO #ParameterMergeResult;
+
+    -- Update the staging table with the new LE table Ids
+    UPDATE stg
+    SET LEParameterID = rslt.LEId
+    FROM #ParameterMergeResult rslt
+        INNER JOIN dbo.ts_LE_CTSParameters stg ON stg.CTSParamID = rslt.CTSId
+    WHERE rslt.Action = 'INSERT';
+
+    DROP TABLE #ParameterMergeResult;
 END
+
+    -- Sync: tMonitoringPointParameter, tMonitoringPointParameterLimit, tSampleRequreirement, tSampleFrequency AND ts_LE_CTSMonPointLimits
+    -- No updates occur. Always delete and insert the data.
+
+    -- Save all MonitoringPointParameterId first before deleting them
+    SELECT MonitoringPointParameterId
+    INTO #DeletedMonitoringPointParameter
+    FROM LinkoExchange.dbo.tMonitoringPointParameter mpp
+        INNER JOIN LinkoExchange.dbo.tMonitoringPoint mp ON mp.MonitoringPointId = mpp.MonitoringPointId
+        INNER JOIN LinkoExchange.dbo.tOrganizationRegulatoryProgram iuorp ON iuorp.OrganizationRegulatoryProgramId = mp.OrganizationRegulatoryProgramId
+        INNER JOIN LinkoExchange.dbo.tOrganizationRegulatoryProgram authorp ON authorp.OrganizationId = iuorp.RegulatorOrganizationId
+                                                                                AND authorp.RegulatoryProgramId = iuorp.RegulatoryProgramId
+    WHERE authorp.OrganizationRegulatoryProgramId = @LEAccountID;
+
+    -- Delete data from tMonitoringPointParameter and related tables (tMonitoringPointParameterLimit, tSampleRequreirement, tSampleFrequency)
+    DELETE mppl
+    FROM LinkoExchange.dbo.tMonitoringPointParameterLimit mppl
+        INNER JOIN #DeletedMonitoringPointParameter dmpp ON dmpp.MonitoringPointParameterId = mppl.MonitoringPointParameterId;
+    
+    DELETE sr
+    FROM LinkoExchange.dbo.tSampleRequirement sr
+        INNER JOIN #DeletedMonitoringPointParameter dmpp ON dmpp.MonitoringPointParameterId = sr.MonitoringPointParameterId;
+
+    DELETE sf
+    FROM LinkoExchange.dbo.tSampleFrequency sf
+        INNER JOIN #DeletedMonitoringPointParameter dmpp ON dmpp.MonitoringPointParameterId = sf.MonitoringPointParameterId;
+
+    DELETE FROM LinkoExchange.dbo.tMonitoringPointParameter
+     FROM LinkoExchange.dbo.tMonitoringPointParameter mpp
+        INNER JOIN #DeletedMonitoringPointParameter dmpp ON dmpp.MonitoringPointParameterId = mpp.MonitoringPointParameterId;
+
+    DROP TABLE #DeletedMonitoringPointParameter
+
+
+    -- Insert data into tMonitoringPointParameter and related tables (tMonitoringPointParameterLimit, tSampleFrequency, tSampleRequirement)
+    
+    -- tMonitoringPointParameter
+    INSERT INTO LinkoExchange.dbo.tMonitoringPointParameter
+    (
+        MonitoringPointId
+        , ParameterId
+        , DefaultUnitId
+        , EffectiveDateTimeUtc
+        , RetirementDateTimeUtc
+    )
+    -- Monitoring point limits and sample frequencies
+    SELECT stgmp.LEMonitoringPointID
+            , stgp.LEParameterID
+            , stgu.LEUnitID
+            , stgmpl.CTSDateEffective
+            , stgmpl.CTSDateRetired
+    FROM dbo.ts_LE_CTSMonPointLimits stgmpl
+        INNER JOIN dbo.ts_LE_CTSMonitoringPoints stgmp ON stgmp.CTSMonPointID = stgmpl.CTSMonPointID
+        INNER JOIN dbo.ts_LE_CTSParameters stgp ON stgp.CTSParamName = stgmpl.CTSParamName 
+                                                    AND stgp.LEOrganizationRegulatoryProgramID = stgmpl.LEOrganizationRegulatoryProgramID
+        INNER JOIN dbo.ts_LE_CTSUnits stgu ON stgu.CTSUnitCode = stgmpl.CTSDailyLimitUnitsCode
+    WHERE stgmpl.CTSDateRetired IS NOT NULL -- testing data has some invalid values, i.e. null values
+        AND stgmpl.LEOrganizationRegulatoryProgramID = @LEAccountID
+        AND stgmpl.InsertedDateTimeUtc > @LELastSyncDateTimeUtc
+    UNION
+    -- IU sample requirements
+    SELECT stgmp.LEMonitoringPointID
+            , stgp.LEParameterID
+            , NULL
+            , stgsr.CTSLimitEffectiveDate
+            , stgsr.CTSLimitRetireDate
+    FROM dbo.ts_LE_CTSIUSampleRequirements stgsr
+        LEFT JOIN dbo.ts_LE_CTSMonPointLimits stgmpl ON stgmpl.CTSMonPointID = stgsr.CTSMonPointID
+                                                        AND stgmpl.CTSParamName = stgsr.CTSParamName
+                                                        AND stgmpl.CTSDateEffective = stgsr.CTSLimitEffectiveDate
+        INNER JOIN dbo.ts_LE_CTSMonitoringPoints stgmp ON stgmp.CTSMonPointID = stgsr.CTSMonPointID
+        INNER JOIN dbo.ts_LE_CTSParameters stgp ON stgp.CTSParamName = stgsr.CTSParamName 
+                                                    AND stgp.LEOrganizationRegulatoryProgramID = stgsr.LEOrganizationRegulatoryProgramID
+    WHERE stgsr.CTSLimitRetireDate IS NOT NULL -- testing data has some invalid values, i.e. null values
+        AND stgmpl.CTSMonPointLimID IS NULL
+        AND stgsr.LEOrganizationRegulatoryProgramID = @LEAccountID
+        AND stgsr.InsertedDateTimeUtc > @LELastSyncDateTimeUtc;
+
+    -- Assumption: no negative values allowed in LinkoCTS (confirmed by CW). Otherwise, a more sophisticated limit value parsing is required.
+    -- tMonitoringPointParameterLimit
+    WITH src
+    AS
+    (
+        -- Concentration Daily
+        SELECT stgmpl.*
+                , lb.LimitBasisId AS LELimitBasisID
+                , lb.Description AS LELimitBasisDescription
+                , lt.LimitTypeId AS LELimitTypeID
+                , lt.Description AS LELimitTypeDescription
+                , CASE
+                        WHEN  CHARINDEX('-', stgmpl.CTSDailyLimit) = 0 THEN
+                            NULL
+                        ELSE
+                            CONVERT(float, REPLACE(SUBSTRING(stgmpl.CTSDailyLimit, 1, CHARINDEX('-', stgmpl.CTSDailyLimit) - 1), ',', ''))
+                  END AS MinimumValue
+                , CONVERT(float, REPLACE(SUBSTRING(stgmpl.CTSDailyLimit, CHARINDEX('-', stgmpl.CTSDailyLimit) + 1, LEN(stgmpl.CTSDailyLimit) - CHARINDEX('-', stgmpl.CTSDailyLimit)), ',', '')) AS MaximumValue
+                , stgu.LEUnitID
+                , cmt.CollectionMethodTypeId AS LECollectionMethodTypeID
+        FROM dbo.ts_LE_CTSMonPointLimits stgmpl
+            INNER JOIN dbo.ts_LE_CTSUnits stgu ON stgu.CTSUnitCode = stgmpl.CTSDailyLimitUnitsCode
+            INNER JOIN dbo.ts_LE_CTSCollectionMethods stgcm ON stgcm.CTSCollectMethCode = stgmpl.CTSCollectMethCode
+            INNER JOIN LinkoExchange.dbo.tCollectionMethodType cmt ON cmt.Name = stgcm.CTSCollectMethType
+            INNER JOIN LinkoExchange.dbo.tLimitBasis lb ON lb.Name = 'Concentration'
+            INNER JOIN LinkoExchange.dbo.tLimitType lt ON lt.Name = 'Daily'
+        WHERE stgmpl.CTSDailyLimit IS NOT NULL
+            AND stgmpl.LEOrganizationRegulatoryProgramID = @LEAccountID
+            AND stgmpl.InsertedDateTimeUtc > @LELastSyncDateTimeUtc
+        UNION
+        -- MassLoading Daily
+        SELECT stgmpl.*
+                , lb.LimitBasisId AS LELimitBasisID
+                , lb.Description AS LELimitBasisDescription
+                , lt.LimitTypeId AS LELimitTypeID
+                , lt.Description AS LELimitTypeDescription
+                , CASE
+                        WHEN  CHARINDEX('-', stgmpl.CTSMassDailyLimit) = 0 THEN
+                            NULL
+                        ELSE
+                            CONVERT(float, REPLACE(SUBSTRING(stgmpl.CTSMassDailyLimit, 1, CHARINDEX('-', stgmpl.CTSMassDailyLimit) - 1), ',', ''))
+                  END AS MinimumValue
+                , CONVERT(float, REPLACE(SUBSTRING(stgmpl.CTSMassDailyLimit, CHARINDEX('-', stgmpl.CTSMassDailyLimit) + 1, LEN(stgmpl.CTSMassDailyLimit) - CHARINDEX('-', stgmpl.CTSMassDailyLimit)), ',', '')) AS MaximumValue
+                , stgu.LEUnitID
+                , cmt.CollectionMethodTypeId AS LECollectionMethodTypeID
+        FROM dbo.ts_LE_CTSMonPointLimits stgmpl
+            INNER JOIN dbo.ts_LE_CTSUnits stgu ON stgu.CTSUnitCode = stgmpl.CTSMassDailyLimitUnitsCode
+            INNER JOIN dbo.ts_LE_CTSCollectionMethods stgcm ON stgcm.CTSCollectMethCode = stgmpl.CTSCollectMethCode
+            INNER JOIN LinkoExchange.dbo.tCollectionMethodType cmt ON cmt.Name = stgcm.CTSCollectMethType
+            INNER JOIN LinkoExchange.dbo.tLimitBasis lb ON lb.Name = 'MassLoading'
+            INNER JOIN LinkoExchange.dbo.tLimitType lt ON lt.Name = 'Daily'
+        WHERE stgmpl.CTSMassDailyLimit IS NOT NULL
+            AND stgmpl.LEOrganizationRegulatoryProgramID = @LEAccountID
+            AND stgmpl.InsertedDateTimeUtc > @LELastSyncDateTimeUtc
+    )
+    INSERT INTO LinkoExchange.dbo.tMonitoringPointParameterLimit
+    (
+        MonitoringPointParameterId
+        , Name
+        , MinimumValue
+        , MaximumValue
+        , BaseUnitId
+        , CollectionMethodTypeId
+        , LimitTypeId
+        , LimitBasisId
+    )
+    SELECT mpp.MonitoringPointParameterId
+            , CONCAT(stgp.CTSParamName, ' ', src.LELimitBasisDescription, ' ', src.LELimitTypeDescription)
+            , src.MinimumValue
+            , src.MaximumValue
+            , src.LEUnitID
+            , src.LECollectionMethodTypeID
+            , src.LELimitTypeID
+            , src.LELimitBasisID
+    FROM src
+        INNER JOIN dbo.ts_LE_CTSMonitoringPoints stgmp ON stgmp.CTSMonPointID = src.CTSMonPointID
+        INNER JOIN dbo.ts_LE_CTSParameters stgp ON stgp.CTSParamName = src.CTSParamName
+                                                    AND stgp.LEOrganizationRegulatoryProgramID = src.LEOrganizationRegulatoryProgramID
+        INNER JOIN LinkoExchange.dbo.tMonitoringPointParameter mpp ON mpp.MonitoringPointId = stgmp.LEMonitoringPointID
+                                                                        AND mpp.ParameterId = stgp.LEParameterID
+                                                                        AND mpp.EffectiveDateTimeUtc = src.CTSDateEffective;
+
+    -- tSampleFrequency
+    INSERT INTO LinkoExchange.dbo.tSampleFrequency
+    (
+        MonitoringPointParameterId
+        , CollectionMethodId
+        , IUSampleFrequency
+        , AuthoritySampleFrequency
+    )
+    SELECT mpp.MonitoringPointParameterId
+            , cm.CollectionMethodId
+            , src.CTSIUSampleFrequency
+            , src.CTSAuthSampleFrequency
+    FROM dbo.ts_LE_CTSMonPointLimits src
+        INNER JOIN dbo.ts_LE_CTSMonitoringPoints stgmp ON stgmp.CTSMonPointID = src.CTSMonPointID
+        INNER JOIN dbo.ts_LE_CTSParameters stgp ON stgp.CTSParamName = src.CTSParamName
+                                                    AND stgp.LEOrganizationRegulatoryProgramID = src.LEOrganizationRegulatoryProgramID
+        INNER JOIN LinkoExchange.dbo.tMonitoringPointParameter mpp ON mpp.MonitoringPointId = stgmp.LEMonitoringPointID
+                                                                        AND mpp.ParameterId = stgp.LEParameterID
+                                                                        AND mpp.EffectiveDateTimeUtc = src.CTSDateEffective
+        INNER JOIN LinkoExchange.dbo.tCollectionMethod cm ON cm.Name = src.CTSCollectMethCode
+    WHERE src.LEOrganizationRegulatoryProgramID = @LEAccountID
+        AND src.InsertedDateTimeUtc > @LELastSyncDateTimeUtc;
+
+
+    -- tSampleRequirement
+    WITH src
+    AS
+    (
+        -- IU sample requirements
+        SELECT mp.OrganizationRegulatoryProgramId AS ByOrganizationRegulatoryProgramId
+                , stgmp.LEMonitoringPointID
+                , stgsr.*
+        FROM dbo.ts_LE_CTSIUSampleRequirements stgsr
+            INNER JOIN dbo.ts_LE_CTSMonitoringPoints stgmp ON stgmp.CTSMonPointID = stgsr.CTSMonPointID
+            INNER JOIN LinkoExchange.dbo.tMonitoringPoint mp ON mp.MonitoringPointId = stgmp.LEMonitoringPointID
+        WHERE stgsr.LEOrganizationRegulatoryProgramID = @LEAccountID
+            AND stgsr.InsertedDateTimeUtc > @LELastSyncDateTimeUtc
+        -- UNION
+        -- Future: Authority sample requirements
+    )
+    INSERT INTO LinkoExchange.dbo.tSampleRequirement
+    (
+        MonitoringPointParameterId
+        , PeriodStartDateTimeUtc
+        , PeriodEndDateTimeUtc
+        , SamplesRequired
+        , ByOrganizationRegulatoryProgramId
+    )
+    SELECT mpp.MonitoringPointParameterId
+            , src.CTSPeriodStart
+            , src.CTSPeriodEnd
+            , src.CTSSampsRequired
+            , src.ByOrganizationRegulatoryProgramId
+    FROM src
+        INNER JOIN dbo.ts_LE_CTSParameters stgp ON stgp.CTSParamName = src.CTSParamName
+                                                    AND stgp.LEOrganizationRegulatoryProgramID = src.LEOrganizationRegulatoryProgramID
+        INNER JOIN LinkoExchange.dbo.tMonitoringPointParameter mpp ON mpp.MonitoringPointId = src.LEMonitoringPointID
+                                                                        AND mpp.ParameterId = stgp.LEParameterID
+                                                                        AND mpp.EffectiveDateTimeUtc = src.CTSLimitEffectiveDate;
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tParameterGroup)
 BEGIN
@@ -3913,20 +2133,17 @@ BEGIN
     INSERT INTO dbo.tReportPackageTemplateAssignment (ReportPackageTemplateId, OrganizationRegulatoryProgramId)
 		SELECT 1, orp.OrganizationRegulatoryProgramId 
         FROM dbo.tOrganizationRegulatoryProgram orp 
-            INNER JOIN dbo.tOrganization o ON o.OrganizationId = orp.OrganizationId
-        WHERE o.PermitNumber IN ('0006', '0040', '0002', '0022', '0032', '0469', '0711', '0764', '0770')
+        WHERE orp.ReferenceNumber IN ('0006', '0040', '0002', '0022', '0032', '0469', '0711', '0764', '0770')
 
     INSERT INTO dbo.tReportPackageTemplateAssignment (ReportPackageTemplateId, OrganizationRegulatoryProgramId)
 		SELECT 2, orp.OrganizationRegulatoryProgramId 
         FROM dbo.tOrganizationRegulatoryProgram orp 
-            INNER JOIN dbo.tOrganization o ON o.OrganizationId = orp.OrganizationId
-        WHERE o.PermitNumber = '0006'
+        WHERE orp.ReferenceNumber = '0006'
     
     INSERT INTO dbo.tReportPackageTemplateAssignment (ReportPackageTemplateId, OrganizationRegulatoryProgramId)
 		SELECT 3, orp.OrganizationRegulatoryProgramId 
         FROM dbo.tOrganizationRegulatoryProgram orp 
-            INNER JOIN dbo.tOrganization o ON o.OrganizationId = orp.OrganizationId
-        WHERE o.PermitNumber = '0002'       
+        WHERE orp.ReferenceNumber = '0002'       
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tReportPackageTemplateElementCategory)
