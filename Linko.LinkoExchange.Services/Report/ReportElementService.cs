@@ -193,42 +193,13 @@ namespace Linko.LinkoExchange.Services.Report
                         }
 
                         //Update existing
-                        bool isChangingName = false;
                         reportElementTypeToPersist = _dbContext.ReportElementTypes.Single(c => c.ReportElementTypeId == reportElementType.ReportElementTypeId);
-                        if (reportElementTypeToPersist.Name != reportElementType.Name.Trim())
-                        {
-                            isChangingName = true;
-                        }
                         reportElementTypeToPersist = _mapHelper.GetReportElementTypeFromReportElementTypeDto(reportElementType, reportElementTypeToPersist);
                         reportElementTypeToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
                         reportElementTypeToPersist.ReportElementCategoryId = _dbContext.ReportElementCategories
                                                 .Single(cat => cat.Name == reportElementType.ReportElementCategory.ToString()).ReportElementCategoryId;
                         reportElementTypeToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
                         reportElementTypeToPersist.LastModifierUserId = currentUserId;
-
-                        if (isChangingName)
-                        {
-                            //Check for files (tFileStore) using this type.
-                            // - Change the name ONLY IF this file not included in any Report Package Element Type.
-                            var existingFileStores = _dbContext.FileStores
-                                .Where(fs => fs.ReportElementTypeId == reportElementTypeToPersist.ReportElementTypeId)
-                                .ToList();
-
-                            for (int i = 0; i < existingFileStores.Count(); i++)
-                            {
-                                var existingFileStore = existingFileStores[i];
-                                var isAssociatedWithRPET = _dbContext.ReportFiles
-                                    .Any(rf => rf.FileStoreId == existingFileStore.FileStoreId);
-
-                                if (!isAssociatedWithRPET)
-                                {
-                                    //Update Report Element Type Name
-                                    existingFileStore.ReportElementTypeName = reportElementTypeToPersist.Name;
-                                }
-
-                            }
-                           
-                        }
 
                     }
                     else
