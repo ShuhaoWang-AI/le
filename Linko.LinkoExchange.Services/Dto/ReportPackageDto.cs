@@ -44,6 +44,14 @@ namespace Linko.LinkoExchange.Services.Dto
         public string SubmitterIPAddress { get; set; }
         public string SubmitterUserName { get; set; }
 
+        //Submission Review
+        public DateTime? SubmissionReviewDateTimeLocal { get; internal set; }
+        public string SubmissionReviewerFirstName { get; internal set; }
+        public string SubmissionReviewerLastName { get; internal set; }
+        public string SubmissionReviewerTitleRole { get; internal set; }
+        public string SubmissionReviewComments { get; internal set; }
+
+
         public DateTime? RepudiationDateTimeLocal { get; set; }
         public int? RepudiatorUserId { get; set; }
         public string RepudiatorFirstName { get; set; }
@@ -59,6 +67,12 @@ namespace Linko.LinkoExchange.Services.Dto
         public string RepudiationReviewerLastName { get; set; }
         public string RepudiationReviewerTitleRole { get; set; }
         public string RepudiationReviewComments { get; set; }
+
+        //Last Sent
+        public DateTime? LastSentDateTimeLocal { get; internal set; }
+        public string LastSenderFirstName { get; internal set; }
+        public string LastSenderLastName { get; internal set; }
+
 
         public string PermitNumber { get; set; }
         public DateTime CreationDateTimeLocal { get; internal set; }

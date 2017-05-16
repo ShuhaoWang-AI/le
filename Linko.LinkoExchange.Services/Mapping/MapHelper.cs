@@ -1102,6 +1102,16 @@ namespace Linko.LinkoExchange.Services.Mapping
             reportPackageDto.SubmitterIPAddress = rpt.SubmitterIPAddress;
             reportPackageDto.SubmissionDateTimeOffset = rpt.SubmissionDateTimeUtc;
 
+            //Submission Review
+            if (rpt.SubmissionReviewDateTimeUtc.HasValue)
+            {
+                //reportPackageDto.SubmissionReviewDateTimeLocal = set outside after calling code
+                reportPackageDto.SubmissionReviewerFirstName = rpt.SubmissionReviewerFirstName;
+                reportPackageDto.SubmissionReviewerLastName = rpt.SubmissionReviewerLastName;
+                reportPackageDto.SubmissionReviewerTitleRole = rpt.SubmissionReviewerTitleRole;
+                reportPackageDto.SubmissionReviewComments = rpt.SubmissionReviewComments;
+            }
+
             if (rpt.RepudiationDateTimeUtc.HasValue 
                 && rpt.RepudiatorUserId.HasValue
                 && rpt.RepudiationReasonId.HasValue)
@@ -1129,6 +1139,14 @@ namespace Linko.LinkoExchange.Services.Mapping
                 reportPackageDto.RepudiationReviewerLastName = rpt.RepudiationReviewerLastName;
                 reportPackageDto.RepudiationReviewerTitleRole = rpt.RepudiationReviewerTitleRole;
                 reportPackageDto.RepudiationReviewComments = rpt.RepudiationReviewComments;
+            }
+
+            //Last Sent
+            if (rpt.LastSentDateTimeUtc.HasValue)
+            {
+                //reportPackageDto.LastSentDateTimeLocal = set outside after calling line
+                reportPackageDto.LastSenderFirstName = rpt.LastSenderFirstName;
+                reportPackageDto.LastSenderLastName = rpt.LastSenderLastName;
             }
 
             reportPackageDto.ReportPackageTemplateElementCategories = new List<ReportElementCategoryName>();

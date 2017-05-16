@@ -1981,6 +1981,12 @@ namespace Linko.LinkoExchange.Services.Report
                 .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.SubmissionDateTimeUtc.Value.UtcDateTime, timeZoneId);
             }
 
+            if (reportPackage.SubmissionReviewDateTimeUtc.HasValue)
+            {
+                reportPackagegDto.SubmissionReviewDateTimeLocal = _timeZoneService
+                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.SubmissionReviewDateTimeUtc.Value.UtcDateTime, timeZoneId);
+            }
+
             if (reportPackage.RepudiationDateTimeUtc.HasValue)
             {
                 reportPackagegDto.RepudiationDateTimeLocal = _timeZoneService
@@ -1991,6 +1997,12 @@ namespace Linko.LinkoExchange.Services.Report
             {
                 reportPackagegDto.RepudiationReviewDateTimeLocal = _timeZoneService
                 .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.RepudiationReviewDateTimeUtc.Value.UtcDateTime, timeZoneId);
+            }
+
+            if (reportPackage.LastSentDateTimeUtc.HasValue)
+            {
+                reportPackagegDto.LastSentDateTimeLocal = _timeZoneService
+                .GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.LastSentDateTimeUtc.Value.UtcDateTime, timeZoneId);
             }
 
             reportPackagegDto.PeriodEndDateTimeLocal = _timeZoneService
