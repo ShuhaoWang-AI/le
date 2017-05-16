@@ -1071,6 +1071,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             reportPackageDto.ReportPackageId = rpt.ReportPackageId;
             reportPackageDto.Name = rpt.Name;
+            reportPackageDto.Description = rpt.Description;
             reportPackageDto.PeriodStartDateTimeLocal = rpt.PeriodStartDateTimeUtc.UtcDateTime;
             reportPackageDto.PeriodEndDateTimeLocal = rpt.PeriodEndDateTimeUtc.UtcDateTime;
             reportPackageDto.CtsEventTypeId = rpt.CtsEventTypeId;

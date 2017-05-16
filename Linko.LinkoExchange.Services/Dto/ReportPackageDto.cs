@@ -37,7 +37,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public string RecipientOrganizationCityName { get; internal set; }
         public string RecipientOrganizationJurisdictionName { get; internal set; }
         public string RecipientOrganizationZipCode { get; internal set; }
-        public string SubmissionReviewerUserId { get; set; }
         public int SubmitterUserId { get; set; }
         public string SubmitterFirstName { get; set; }
         public string SubmitterLastName { get; set; }
