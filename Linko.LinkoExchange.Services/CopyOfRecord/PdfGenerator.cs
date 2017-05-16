@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
@@ -37,7 +38,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             _pdfPage = _pdfDocument.Pages.Add();
         }
 
-        public void CreateCopyOfRecordPdf()
+        public byte[] CreateCopyOfRecordPdf()
         {
             if (_reportPackage == null)
             {
@@ -68,12 +69,9 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 PrintPdfSections(elementCategory);
             }
 
-            // save to PDF here 
-            var tick = DateTime.Now.Ticks;
-            _pdfDocument.Save($"C:\\work\\temp\\reprot_LE_{tick}.pdf");
-
-            //TODO convert the pdf into binary data
-            //return new byte[] { };
+            var mStream = new MemoryStream();
+            _pdfDocument.Save(mStream, SaveFormat.Pdf);
+            return mStream.ToArray();
         }
 
         private void PrintPdfSections(ReportElementCategoryName reportEkeeCategoryName)

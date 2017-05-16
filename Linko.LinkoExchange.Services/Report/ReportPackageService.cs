@@ -44,22 +44,21 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly ISampleService _sampleService;
         private readonly IMapHelper _mapHelper;
         private readonly ICromerrAuditLogService _crommerAuditLogService;
-
         public ReportPackageService(
-            IProgramService programService,
-            ICopyOfRecordService copyOfRecordService,
-            ITimeZoneService timeZoneService,
-            ILogger logger,
-            LinkoExchangeContext linkoExchangeContext,
-            IHttpContextService httpContextService,
-            IUserService userService,
-            IEmailService emailService,
-            ISettingService settingService,
-            IOrganizationService orgService,
-            ISampleService sampleService,
-            IMapHelper mapHelper,
-            ICromerrAuditLogService crommerAuditLogService
-            )
+           IProgramService programService,
+           ICopyOfRecordService copyOfRecordService,
+           ITimeZoneService timeZoneService,
+           ILogger logger,
+           LinkoExchangeContext linkoExchangeContext,
+           IHttpContextService httpContextService,
+           IUserService userService,
+           IEmailService emailService,
+           ISettingService settingService,
+           IOrganizationService orgService,
+           ISampleService sampleService,
+           IMapHelper mapHelper,
+           ICromerrAuditLogService crommerAuditLogService
+           )
         {
             _programService = programService;
             _copyOfRecordService = copyOfRecordService;
@@ -168,7 +167,14 @@ namespace Linko.LinkoExchange.Services.Report
 
         public CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(ReportPackageDto reportPackageDto)
         {
-            throw new NotImplementedException();
+            var pdfGenerator = new PdfGenerator(reportPackageDto);
+            var pdfData = pdfGenerator.CreateCopyOfRecordPdf();
+
+            return new CopyOfRecordPdfFileDto
+            {
+                FileData = pdfData,
+                FileName = "Copy Of Record.pdf"
+            };
         }
 
         public CopyOfRecordDataXmlFileDto GetReportPackageCopyOfRecordDataXmlFile(ReportPackageDto reportPackageDto)
@@ -1366,7 +1372,7 @@ namespace Linko.LinkoExchange.Services.Report
                                                             .ReportFiles.Any(rf => rf.FileStoreId == eligibleFile.FileStoreId);
                 fileStoreList.Add(fileStoreDto);
             }
-          
+
 
             _logger.Info($"Leave ReportPackageService.GetFilesForSelection. reportPackageElementTypeId={reportPackageElementTypeId}, fileStoreList.Count={fileStoreList.Count}");
 
