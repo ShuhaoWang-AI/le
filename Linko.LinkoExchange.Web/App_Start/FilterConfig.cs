@@ -10,7 +10,7 @@ namespace Linko.LinkoExchange.Web
         {
             filters.Add(filter:UnityConfig.GetConfiguredContainer().Resolve<CustomHandleErrorAttribute>());
             filters.Add(filter:new AuthorizeAttribute());
-            filters.Add(filter:UnityConfig.GetConfiguredContainer().Resolve<CommonInfoAttribute>()); 
+            filters.Add(filter:UnityConfig.GetConfiguredContainer().Resolve<CommonInfoAttribute>());
             filters.Add(filter:UnityConfig.GetConfiguredContainer().Resolve<LogAttribute>());
             // filters.Add(new RequireHttpsAttribute());
         }

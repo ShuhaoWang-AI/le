@@ -44,7 +44,6 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly ITimeZoneService _timeZoneService;
         private readonly IPermissionService _permissionService;
-        private readonly ISessionCache _sessionCache;
         private readonly IHttpContextService _httpContextService;
         private readonly ILogger _logger;
         private readonly ICromerrAuditLogService _cromerrLogService;
@@ -55,7 +54,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public AuthorityController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService,
                                    ISettingService settingService, IQuestionAnswerService questionAnswerService, ITimeZoneService timeZoneService, IPermissionService permissionService,
-                                   ISessionCache sessionCache, ILogger logger, ICromerrAuditLogService cromerrLogService, IHttpContextService httpContextService, IParameterService parameterService,
+                                   ILogger logger, ICromerrAuditLogService cromerrLogService, IHttpContextService httpContextService, IParameterService parameterService,
                                    IReportElementService reportElementService, IReportTemplateService reportTemplateService, IUnitService unitService)
         {
             _organizationService = organizationService;
@@ -65,7 +64,6 @@ namespace Linko.LinkoExchange.Web.Controllers
             _questionAnswerService = questionAnswerService;
             _timeZoneService = timeZoneService;
             _permissionService = permissionService;
-            _sessionCache = sessionCache;
             _logger = logger;
             _cromerrLogService = cromerrLogService;
             _httpContextService = httpContextService;
@@ -322,9 +320,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             var selectedFlowUnits = viewModel.FlowUnitValidValues.Split(',').ToList();
             viewModel.AvailableFlowUnitValidValues = new List<SelectListItem>();
             var flowUnits = _unitService.GetFlowUnits();
-            if (flowUnits.Count() > 0)
+            var flowUnitDtos = flowUnits as IList<UnitDto> ?? flowUnits.ToList();
+            if (flowUnitDtos.Any())
             {
-                viewModel.AvailableFlowUnitValidValues = flowUnits.Select(x => new SelectListItem
+                viewModel.AvailableFlowUnitValidValues = flowUnitDtos.Select(x => new SelectListItem
                                                                      {
                                                                          Text = x.Name,
                                                                          Value = x.Name,
@@ -466,7 +465,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             var organizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(value:_settingService.GetOrganizationSettingValue(orgRegProgramId:organizationRegulatoryProgramId, settingType:SettingType.TimeZone));
-            var totalCount = 0;
+            int totalCount;
             var logEntries = _cromerrLogService.GetCromerrAuditLogEntries(organizationRegulatoryProgramId:organizationRegulatoryProgramId,
                                                                           page:page, pageSize:pageSize, sortColumn:sortColumn, isSortAscending:isSortAscending,
                                                                           dateRangeStart:dateRangeStart, dateRangeEnd:dateRangeEnd, dateToExclude:dateToExclude,
@@ -879,7 +878,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 else
                 {
                     var validationIssues = new List<RuleViolation>();
-                    var message = "";
+                    string message;
 
                     switch (result.FailureReason)
                     {
@@ -1413,7 +1412,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 else
                 {
                     var validationIssues = new List<RuleViolation>();
-                    var message = "";
+                    string message;
 
                     switch (result.FailureReason)
                     {
@@ -1576,7 +1575,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 try
                 {
-                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId:model.Id, permissionGroupId:model.Role.Value, isApproved:true);
+                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId:model.Id, permissionGroupId:model.Role ?? 0, isApproved:true);
                     switch (result.Result)
                     {
                         case RegistrationResult.Success:
@@ -1587,15 +1586,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                             break;
                         case RegistrationResult.NoMoreUserLicensesForIndustry:
                             _logger.Info(message:$"PendingUserApprove. User={model.UserName} - id={model.Id} No more user licenses");
-                            ModelState.AddModelError(key:"", errorMessage:"No more User Licenses are available for this Industry. Disable another User and try again");
+                            ModelState.AddModelError(key:"", errorMessage:@"No more User Licenses are available for this Industry. Disable another User and try again.");
                             break;
                         case RegistrationResult.NoMoreUserLicensesForAuthority:
                             _logger.Info(message:$"PendingUserApprove. User={model.UserName} - id={model.Id} No more user licenses");
-                            ModelState.AddModelError(key:"", errorMessage:"No more User Licenses are available for this Authority. Disable another User and try again");
+                            ModelState.AddModelError(key:"", errorMessage:@"No more User Licenses are available for this Authority. Disable another User and try again.");
                             break;
                         default:
                             _logger.Info(message:$"PendingUserApprove. User={model.UserName} - id={model.Id} Registration Approval Failed!");
-                            ModelState.AddModelError(key:"", errorMessage:"Registration Approval Failed");
+                            ModelState.AddModelError(key:"", errorMessage:@"Registration Approval Failed!");
                             break;
                     }
                 }
@@ -1618,7 +1617,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 try
                 {
-                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId:model.Id, permissionGroupId:model.Role.Value, isApproved:false);
+                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId:model.Id, permissionGroupId:model.Role ?? 0, isApproved:false);
                     switch (result.Result)
                     {
                         case RegistrationResult.Success:
@@ -1629,7 +1628,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                             break;
                         default:
                             _logger.Info(message:string.Format(format:"PendingUserDeny. User={0} - id={1} Registration Denial Failed!", arg0:model.UserName, arg1:model.Id));
-                            ModelState.AddModelError(key:"", errorMessage:"Registration Denial Failed");
+                            ModelState.AddModelError(key:"", errorMessage:@"Registration Denial Failed");
                             break;
                     }
                 }
@@ -1684,7 +1683,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                  Selected = Convert.ToInt32(value:r.PermissionGroupId) == viewModel.Role
                                                              }).ToList();
             }
-            viewModel.AvailableRoles.Insert(index:0, item:new SelectListItem {Text = "Select User Role", Value = "0"});
+            viewModel.AvailableRoles.Insert(index:0, item:new SelectListItem {Text = @"Select User Role", Value = "0"});
 
             var currentUserRole = _httpContextService.GetClaimValue(claimType:CacheKey.UserRole) ?? "";
             ViewBag.HasPermissionForApproveDeny = false;
@@ -2405,7 +2404,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
             viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample:false).OrderBy(c => c.CtsEventCategoryName).Select(c => new SelectListItem
                                                                                                                                           {
-                                                                                                                                              Text = $"({c.CtsEventCategoryName}) {c.Name}",
+                                                                                                                                              Text = $@"({c.CtsEventCategoryName}) {c.Name}",
                                                                                                                                               Value = c.CtsEventTypeId.ToString(),
                                                                                                                                               Selected =
                                                                                                                                                   c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)

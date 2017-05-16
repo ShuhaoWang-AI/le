@@ -7,34 +7,34 @@ namespace Linko.LinkoExchange.Web
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
-            routes.IgnoreRoute(url: "{resource}.axd/{*pathInfo}");
+            routes.IgnoreRoute(url:"{resource}.axd/{*pathInfo}");
 
             //Enable attribute routing.
             routes.MapMvcAttributeRoutes();
 
             routes.MapRoute(
-                name: "IndustryInvitesIndustryUser",
-                url: "Industry/Users/Invite",
-                defaults: new { controller = "Invite", action = "Invite", invitationType = "IndustryToIndustry" }
-            );
+                            name:"IndustryInvitesIndustryUser",
+                            url:"Industry/Users/Invite",
+                            defaults:new {controller = "Invite", action = "Invite", invitationType = "IndustryToIndustry"}
+                           );
 
             routes.MapRoute(
-                name: "AuthorityInvitesAuthorityUser",
-                url: "Authority/Users/Invite",
-                defaults: new { controller = "Invite", action = "Invite", invitationType = "AuthorityToAuthority" }
-            );
+                            name:"AuthorityInvitesAuthorityUser",
+                            url:"Authority/Users/Invite",
+                            defaults:new {controller = "Invite", action = "Invite", invitationType = "AuthorityToAuthority"}
+                           );
 
             routes.MapRoute(
-                name: "AuthorityInvitesIndustryUser",
-                url: "Authority/Industry/{industryOrgRegProgramId}/Users/Invite",
-                defaults: new { controller = "Invite", action = "Invite", invitationType = "AuthorityToIndustry" }
-            );
+                            name:"AuthorityInvitesIndustryUser",
+                            url:"Authority/Industry/{industryOrgRegProgramId}/Users/Invite",
+                            defaults:new {controller = "Invite", action = "Invite", invitationType = "AuthorityToIndustry"}
+                           );
 
             routes.MapRoute(
-                name: "Default",
-                url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
-            );
+                            name:"Default",
+                            url:"{controller}/{action}/{id}",
+                            defaults:new {controller = "Home", action = "Index", id = UrlParameter.Optional}
+                           );
         }
     }
 }

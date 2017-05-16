@@ -1,4 +1,5 @@
-﻿@{
+﻿@using Linko.LinkoExchange.Web.ViewModels.Authority
+@{
     ViewBag.Title = "Audit Logs";
 }
 
@@ -7,7 +8,9 @@
     @Html.AntiForgeryToken()
     <section class="">
         <ol class="breadcrumb">
-            <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Authority")'"><i class=""></i> Home </a>
+            </li>
             <li class="active">Audit Logs</li>
         </ol>
     </section>
@@ -23,182 +26,206 @@
             <div class="form-group">
                 <div class="col-md-12">
                     @* grid name should be start with grid for centralized error handling *@
-                    @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Authority.AuditLogViewModel>()
-                        .Name(componentName: "grid")
-                        .Columns(columns =>
-                        {
-                            columns.Bound(c => c.CromerrAuditLogId).Hidden()
-                                .HtmlAttributes(new { @class = "col-sm-1" })
-                                .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.EventCategory)
-                                    .HtmlAttributes(new { @class = "col-sm-1" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.EventType)
-                                    .HtmlAttributes(new { @class = "col-sm-2" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-2" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.LogDateTimeUtc)
-                                    .HtmlAttributes(new { @class = "col-sm-2" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-2" })
-                                    .Format(value:"{0:MM/dd/yyyy h:mm tt}");
-                            columns.Bound(c => c.AuditLogTemplateId).Hidden()
-                                    .HtmlAttributes(new { @class = "col-sm-1" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.OrganizationId).Hidden()
-                                    .HtmlAttributes(new { @class = "col-sm-1" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.RegulatorName).Hidden()
-                                    .HtmlAttributes(new { @class = "col-sm-2" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-2" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.OrganizationName).Hidden()
-                                    .HtmlAttributes(new { @class = "col-sm-2" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-2" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.RegulatoryProgramName).Hidden()
-                                    .HtmlAttributes(new { @class = "col-sm-2" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-2" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.UserProfileIdDisplay).Hidden()
-                                    .HtmlAttributes(new { @class = "col-sm-1" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.UserName).Hidden()
-                                    .HtmlAttributes(new { @class = "col-sm-1" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.FirstName).Hidden()
-                                    .HtmlAttributes(new { @class = "col-sm-1" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.LastName).Hidden()
-                                    .HtmlAttributes(new { @class = "col-sm-1" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-1" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.EmailAddress)
-                                    .HtmlAttributes(new { @class = "col-sm-2" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-2" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.IPAddress).Hidden()
-                                    .HtmlAttributes(new { @class = "col-sm-2" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-2" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.HostName).Hidden()
-                                    .HtmlAttributes(new { @class = "col-sm-2" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-2" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            columns.Bound(c => c.Comment).Hidden()
-                                    .HtmlAttributes(new { @class = "col-sm-2" })
-                                    .HeaderHtmlAttributes(new { @class = "col-sm-2" })
-                                    .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                            //columns.Template(m => { })
-                            //       .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
-                            //       .Width(pixelWidth: 60);
-                        })
-                        .ToolBar(tools => tools.Excel())
-                        .Pageable(pageable => pageable
-                                .PageSizes(new List<object> { "all", 15, 25, 50, 75})
-                                .Refresh(enabled: true)
-                                .Input(enabled: true)
-                                .Numeric(enabled: false)
-                        )
-                        .Selectable(selectable =>
-                        {
-                            selectable.Mode(GridSelectionMode.Single);
-                            selectable.Type(GridSelectionType.Row);
-                        })
-                        .Sortable(sortable =>
-                        {
-                            sortable.SortMode(GridSortMode.MultipleColumn);
-                        })
-                        .Filterable(filterable => filterable.Enabled(value: true).Mode(GridFilterMode.Row))
-                        .Resizable(resizable => resizable.Columns(value: true))
-                        .Scrollable(s => s.Height(value: "auto"))
-                        //.Groupable()
-                        .HtmlAttributes(new
-                        {
-                            style = "height:300px;"
-                        })
-                        .Excel(excel => excel
-                            .FileName(fileName: "Audit Logs Grid Export.xlsx")
-                            .Filterable(filterable:true)
-                            .ProxyURL(Url.Action(actionName: "AuditLogs_Excel_Export_Save", controllerName: "Authority"))
-                        )
-                        .Events(events =>
-                        {
-                            events.Change(handler: "getLogEntryDetails");
-                        })
-                        .DataSource(dataSource => dataSource
-                            .Ajax()
-                            .ServerOperation(enabled: true)
-                            .Batch(enabled: true)
-                            .Sort(sort => sort.Add(memberName: "LogDateTimeUtc").Descending()) // <-- initial sort expression
-                            .Read(read => read.Action(actionName: "AuditLogs_Read", controllerName: "Authority"))
-                            .PageSize(pageSize: 15)
-                            .Events(events => events.Error(handler: "error_handler"))
-                        )
-                    )
+                    @(Html.Kendo().Grid<AuditLogViewModel>()
+                          .Name(componentName:"grid")
+                          .Columns(columns =>
+                                   {
+                                       columns.Bound(c => c.CromerrAuditLogId).Hidden()
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.EventCategory)
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.EventType)
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.LogDateTimeUtc)
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .Format(value:"{0:MM/dd/yyyy h:mm tt}");
+                                       columns.Bound(c => c.AuditLogTemplateId).Hidden()
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.OrganizationId).Hidden()
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.RegulatorName).Hidden()
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.OrganizationName).Hidden()
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.RegulatoryProgramName).Hidden()
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.UserProfileIdDisplay).Hidden()
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.UserName).Hidden()
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.FirstName).Hidden()
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.LastName).Hidden()
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-1"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.EmailAddress)
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.IPAddress).Hidden()
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.HostName).Hidden()
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       columns.Bound(c => c.Comment).Hidden()
+                                              .HtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
+                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                       //columns.Template(m => { })
+                                       //       .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
+                                       //       .Width(pixelWidth: 60);
+                                   })
+                          .ToolBar(tools => tools.Excel())
+                          .Pageable(pageable => pageable
+                                                    .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
+                                                    .Refresh(enabled:true)
+                                                    .Input(enabled:true)
+                                                    .Numeric(enabled:false)
+                          )
+                          .Selectable(selectable =>
+                                      {
+                                          selectable.Mode(mode:GridSelectionMode.Single);
+                                          selectable.Type(type:GridSelectionType.Row);
+                                      })
+                          .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+                          .Filterable(filterable => filterable.Enabled(value:true).Mode(value:GridFilterMode.Row))
+                          .Resizable(resizable => resizable.Columns(value:true))
+                          .Scrollable(s => s.Height(value:"auto"))
+                          //.Groupable()
+                          .HtmlAttributes(attributes:new
+                                                     {
+                                                         style = "height:300px;"
+                                                     })
+                          .Excel(excel => excel
+                                              .FileName(fileName:"Audit Logs Grid Export.xlsx")
+                                              .Filterable(filterable:true)
+                                              .ProxyURL(url:Url.Action(actionName:"AuditLogs_Excel_Export_Save", controllerName:"Authority"))
+                          )
+                          .Events(events => { events.Change(handler:"getLogEntryDetails"); })
+                          .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .ServerOperation(enabled:true)
+                                                        .Batch(enabled:true)
+                                                        .Sort(sort => sort.Add(memberName:"LogDateTimeUtc").Descending()) // <-- initial sort expression
+                                                        .Read(read => read.Action(actionName:"AuditLogs_Read", controllerName:"Authority"))
+                                                        .PageSize(pageSize:15)
+                                                        .Events(events => events.Error(handler:"error_handler"))
+                          )
+                          )
                 </div>
             </div>
         </section>
     </div>
-    
+
     <div class="box box-primary">
         <div class="box-header with-border">
-           <h3 class="box-title">Log Details</h3> 
+            <h3 class="box-title">Log Details</h3>
             <div class="box-tools pull-right">
-                <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            </div><!-- /.box-tools -->
+                <button class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+            </div>
         </div>
-        <div id="div-log-details" class="box-body box-collapse collapse in">
-            <table class="table table-striped table-bordered table-condensed table-responsive">
+        <div class="box-body box-collapse collapse in" id="div-log-details">
+            <table class="table table-bordered table-condensed table-responsive table-striped">
                 <tbody>
                     <tr stlye="height:100px;">
-                        <th class="col-md-2"><span class="pull-right">Comment</span></th>
-                        <td class="col-md-10" colspan="3" style="white-space: pre;" id="details-cell-comment"></td>
+                        <th class="col-md-2">
+                            <span class="pull-right">Comment</span>
+                        </th>
+                        <td class="col-md-10" colspan="3" id="details-cell-comment" style="white-space: pre;"></td>
                     </tr>
                     <tr>
-                        <th class="col-md-2"><span class="pull-right">Event Category</span></th>
+                        <th class="col-md-2">
+                            <span class="pull-right">Event Category</span>
+                        </th>
                         <td class="col-md-4" id="details-cell-eventcategory"></td>
-                        <th class="col-md-2"><span class="pull-right">User ID</span></th>
+                        <th class="col-md-2">
+                            <span class="pull-right">User ID</span>
+                        </th>
                         <td class="col-md-4" id="details-cell-userid"></td>
                     </tr>
                     <tr>
-                        <th><span class="pull-right">Event Type</span></th>
+                        <th>
+                            <span class="pull-right">Event Type</span>
+                        </th>
                         <td id="details-cell-eventtype"></td>
-                        <th><span class="pull-right">User Name</span></th>
+                        <th>
+                            <span class="pull-right">User Name</span>
+                        </th>
                         <td id="details-cell-username"></td>
                     </tr>
                     <tr>
-                        <th><span class="pull-right">Event Code</span></th>
+                        <th>
+                            <span class="pull-right">Event Code</span>
+                        </th>
                         <td id="details-cell-eventcode"></td>
-                        <th><span class="pull-right">First and Last Name</span></th>
+                        <th>
+                            <span class="pull-right">First and Last Name</span>
+                        </th>
                         <td id="details-cell-fullname"></td>
                     </tr>
                     <tr>
-                        <th><span class="pull-right">Date and Time</span></th>
+                        <th>
+                            <span class="pull-right">Date and Time</span>
+                        </th>
                         <td id="details-cell-logdatetime"></td>
-                        <th><span class="pull-right">Email</span></th>
+                        <th>
+                            <span class="pull-right">Email</span>
+                        </th>
                         <td id="details-cell-emailaddress"></td>
                     </tr>
                     <tr>
-                        <th><span class="pull-right">Authority</span></th>
+                        <th>
+                            <span class="pull-right">Authority</span>
+                        </th>
                         <td id="details-cell-authority"></td>
-                        <th><span class="pull-right">IP Address</span></th>
+                        <th>
+                            <span class="pull-right">IP Address</span>
+                        </th>
                         <td id="details-cell-ipaddress"></td>
                     </tr>
                     <tr>
-                        <th><span class="pull-right">Facility</span></th>
+                        <th>
+                            <span class="pull-right">Facility</span>
+                        </th>
                         <td id="details-cell-facility"></td>
-                        <th><span class="pull-right">IP Name</span></th>
+                        <th>
+                            <span class="pull-right">IP Name</span>
+                        </th>
                         <td id="details-cell-ipname"></td>
                     </tr>
                     <tr>
-                        <th><span class="pull-right">Regulatory Program</span></th>
+                        <th>
+                            <span class="pull-right">Regulatory Program</span>
+                        </th>
                         <td colspan="3" id="details-cell-regulatoryprogramname"></td>
                     </tr>
                 </tbody>
@@ -208,5 +235,5 @@
 }
 
 @section Scripts {
-    @Scripts.Render(paths: "~/bundles/auditlogs")
+    @Scripts.Render(paths:"~/bundles/auditlogs")
 }

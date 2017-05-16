@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
-    public class CommonController : Controller
+    public class CommonController:Controller
     {
         private readonly ILogger _logger;
 
@@ -13,35 +11,38 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public CommonController(ILogger logger)
         {
-            this._logger = logger;
+            _logger = logger;
         }
 
         #endregion
 
-
         #region error handling
 
         /// <summary>
-        /// Custom error handler for 404 page not found.
+        ///     Custom error handler for 404 page not found.
         /// </summary>
         public ActionResult PageNotFound()
         {
-            this.Response.StatusCode = 404;
-            this.Response.TrySkipIisCustomErrors = true;
+            Response.StatusCode = 404;
+            Response.TrySkipIisCustomErrors = true;
 
-            return View ();
+            return View();
         }
 
         /// <summary>
-        /// Default error handler.
+        ///     Default error handler.
         /// </summary>
         public ActionResult DefaultError()
         {
-            HandleErrorInfo errorInfo = ViewData.Model as HandleErrorInfo;
-            _logger.Error (errorInfo.Exception, errorInfo.Exception.Message);
+            var errorInfo = ViewData.Model as HandleErrorInfo;
+            if (errorInfo != null)
+            {
+                _logger.Error(value:errorInfo.Exception);
+            }
 
-            return View (viewName: "Error");
+            return View(viewName:"Error");
         }
+
         #endregion
     }
 }

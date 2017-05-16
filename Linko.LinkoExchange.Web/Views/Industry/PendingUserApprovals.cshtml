@@ -1,10 +1,13 @@
-﻿@{
+﻿@using Linko.LinkoExchange.Web.ViewModels.Shared
+@{
     ViewBag.Title = "Pending Registrations";
     ViewBag.Description = "";
 }
 <section>
     <ol class="breadcrumb">
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Industry")'"><i class=""></i> Home </a></li>
+        <li>
+            <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
+        </li>
         <li class="active">Pending Registrations</li>
     </ol>
 </section>
@@ -16,95 +19,84 @@
         </div>
     </div>*@
     <section class="box-body form-horizontal">
-        @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new
-        {
-            @class = "alert alert-info"
-        })
+        @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
+                                                                                                                        {
+                                                                                                                            @class = "alert alert-info"
+                                                                                                                        })
         <div class="form-group">
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@
-                @(Html.Kendo().Grid<Linko.LinkoExchange.Web.ViewModels.Shared.PendingUserApprovalViewModel>()
-                    .Name(componentName: "gridUser")
-                    .Columns(columns =>
-                    {
-                        columns.Bound(c => c.FirstName)
-                                .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                        columns.Bound(c => c.LastName)
-                                .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                        columns.Bound(c => c.Email)
-                                .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                        columns.Bound(c => c.RegisteredOrgName)
-                                .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(FilterType.Contains)));
-                        columns.Bound(c => c.DateRegistered).Format(value: "{0:MM-dd-yyyy}")
-                               .Filterable(filterable => filterable.Enabled(value: true).Extra(value: true));
-                        columns.Template(m =>
-                        {
-                        })
-                                .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
-                                .Width(pixelWidth: 60);
-                    })
-                    .Pageable(pageable => pageable
-                            .PageSizes(enabled: true)
-                            .Refresh(enabled: true)
-                            .Input(enabled: true)
-                            .Numeric(enabled: false)
-                    )
-                    .Selectable(selectable =>
-                    {
-                        selectable.Mode(GridSelectionMode.Single);
-                        selectable.Type(GridSelectionType.Row);
-                    })
-                    .Sortable(sortable =>
-                    {
-                        sortable.SortMode(GridSortMode.MultipleColumn);
-                    })
-                    //.Groupable()
-                    //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
-                    .Resizable(resizable => resizable.Columns(value: true))
-                    .Scrollable(s => s.Height(value: "auto"))
-                    .NoRecords(text: "No pending registrations exist.")
-                    .Events(events =>
-                    {
-                        events.Change(handler: "gotoNextPage");
-                    })
-                    .DataSource(dataSource => dataSource
-                        .Ajax()
-                        .ServerOperation(enabled: false)
-                        .Batch(enabled: true)
-                        //.Group(g=>g.Add(c=>c.Type))
-                        .Sort(sort =>
-                        {
-                            sort.Add(memberName: "FirstName").Ascending();
-                            sort.Add(memberName: "LastName").Ascending();
-                        }) // <-- initial sort expression
-                        .Read(read => read.Action(actionName: "PendingUserApprovals_Read", controllerName: "Industry"))
-                        .PageSize(pageSize: 10)
-                        .Events(events => events.Error(handler: "error_handler"))
-                    )
-                )
+                @(Html.Kendo().Grid<PendingUserApprovalViewModel>()
+                      .Name(componentName:"gridUser")
+                      .Columns(columns =>
+                               {
+                                   columns.Bound(c => c.FirstName)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.LastName)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.Email)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.RegisteredOrgName)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.DateRegistered).Format(value:"{0:MM-dd-yyyy}")
+                                          .Filterable(filterable => filterable.Enabled(value:true).Extra(value:true));
+                                   columns.Template(m => { })
+                                          .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
+                                          .Width(pixelWidth:60);
+                               })
+                      .Pageable(pageable => pageable
+                                                .PageSizes(enabled:true)
+                                                .Refresh(enabled:true)
+                                                .Input(enabled:true)
+                                                .Numeric(enabled:false)
+                      )
+                      .Selectable(selectable =>
+                                  {
+                                      selectable.Mode(mode:GridSelectionMode.Single);
+                                      selectable.Type(type:GridSelectionType.Row);
+                                  })
+                      .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+                      //.Groupable()
+                      //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
+                      .Resizable(resizable => resizable.Columns(value:true))
+                      .Scrollable(s => s.Height(value:"auto"))
+                      .NoRecords(text:"No pending registrations exist.")
+                      .Events(events => { events.Change(handler:"gotoNextPage"); })
+                      .DataSource(dataSource => dataSource
+                                                    .Ajax()
+                                                    .ServerOperation(enabled:false)
+                                                    .Batch(enabled:true)
+                                                    //.Group(g=>g.Add(c=>c.Type))
+                                                    .Sort(sort =>
+                                                          {
+                                                              sort.Add(memberName:"FirstName").Ascending();
+                                                              sort.Add(memberName:"LastName").Ascending();
+                                                          }) // <-- initial sort expression
+                                                    .Read(read => read.Action(actionName:"PendingUserApprovals_Read", controllerName:"Industry"))
+                                                    .PageSize(pageSize:10)
+                                                    .Events(events => events.Error(handler:"error_handler"))
+                      )
+                      )
             </div>
         </div>
-    </section>@*.box-body*@
-</div><!-- /.box -->
+    </section>
+</div>
 
 @section Scripts {
     <script type="text/javascript">
-        gotoNextPage = function ()
+        gotoNextPage = function()
         {
             var grid = $("#gridUser").data("kendoGrid");
-            var postUrl = "/Industry/PendingUserApprovals_Select";
+            var postUrl = "@Url.Action(actionName:"PendingUserApprovals_Select", controllerName:"Industry")";
 
             doAjaxAction(grid, postUrl, "", "Select an user");
-        }
-
-        onRequestEnd = function (e)
+        };
+        onRequestEnd = function(e)
         {
-            if (e.type == "destroy" && !e.response.Errors)
+            if (e.type.toLowerCase() === "destroy" && !e.response.Errors)
             {
                 showPopupMessage("Invitation deleted!");
             }
-        }
-
+        };
     </script>
 }
-

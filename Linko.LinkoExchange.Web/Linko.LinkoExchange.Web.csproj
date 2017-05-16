@@ -414,7 +414,6 @@
     <Content Include="Scripts\linkoExchange.js" />
     <Content Include="Scripts\invite.js" />
     <Content Include="Scripts\Profile.js" />
-    <Content Include="Views\Account\ChangeAccountSucceed.cshtml" />
     <Content Include="Views\Account\ChangeEmail.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>

@@ -34,25 +34,25 @@
                 @(Html.Kendo().Grid<ParameterGroupViewModel>()
                       .Name(componentName:"gridParameterGroup")
                       .Columns(columns =>
-                      {
-                          columns.Bound(c => c.Name)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
-                          columns.Bound(c => c.Description)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
-                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
-                                 .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                          columns.Bound(c => c.LastModifierUserName)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
-                          columns.Bound(c => c.Status)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
-                          columns.Template(m => { })
-                                 .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
-                                 .Width(pixelWidth:60);
-                      })
+                               {
+                                   columns.Bound(c => c.Name)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.Description)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                          .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                                   columns.Bound(c => c.LastModifierUserName)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.Status)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Template(m => { })
+                                          .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
+                                          .Width(pixelWidth:60);
+                               })
                       .Pageable(pageable => pageable
                                                 .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
                                                 .Refresh(enabled:true)
@@ -60,10 +60,10 @@
                                                 .Numeric(enabled:false)
                       )
                       .Selectable(selectable =>
-                      {
-                          selectable.Mode(mode:GridSelectionMode.Single);
-                          selectable.Type(type:GridSelectionType.Row);
-                      })
+                                  {
+                                      selectable.Mode(mode:GridSelectionMode.Single);
+                                      selectable.Type(type:GridSelectionType.Row);
+                                  })
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                       //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value:true))
@@ -74,7 +74,7 @@
                                                     .Ajax()
                                                     .ServerOperation(enabled:false)
                                                     .Batch(enabled:true)
-                                                    .Sort(sort => sort.Add("Name").Ascending()) // <-- initial sort expression
+                                                    .Sort(sort => sort.Add(memberName:"Name").Ascending()) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"ParameterGroups_Read", controllerName:"Authority"))
                                                     .PageSize(pageSize:15)
                                                     .Events(events => events.Error(handler:"error_handler"))
@@ -90,11 +90,10 @@
         gotoNextPage = function()
         {
             var grid = $("#gridParameterGroup").data("kendoGrid");
-            var postUrl = "@Url.Action(actionName: "ParameterGroups_Select", controllerName:"Authority")";
+            var postUrl = "@Url.Action(actionName:"ParameterGroups_Select", controllerName:"Authority")";
 
             doAjaxAction(grid, postUrl, "", "Select a parameter group");
         }
 
     </script>
 }
-

@@ -4,10 +4,11 @@
     ViewBag.Title = "Settings";
 }
 
-
 <section class="">
     <ol class="breadcrumb">
-        <li><a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Authority")'"><i class=""></i> Home </a></li>
+        <li>
+            <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Authority")'"><i class=""></i> Home </a>
+        </li>
         <li class="active">Settings</li>
     </ol>
 </section>
@@ -16,239 +17,244 @@
     <div class="box-header with-border">
         <h3 class="box-title">Authority Information</h3>
         <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-        </div><!-- /.box-tools -->
-    </div>  @*.box-header*@
+            <button class="btn btn-box-tool" data-widget="collapse">
+                <i class="fa fa-minus"></i>
+            </button>
+        </div>
+    </div>
 
-    <section class="box-body form-horizontal">                
-                    
+    <section class="box-body form-horizontal">
+
         <div class="form-group">
-            @Html.LabelFor(model => model.AuthorityName, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
+            @Html.LabelFor(model => model.AuthorityName, htmlAttributes:new
+                                                                        {
+                                                                            @class = "control-label col-md-2"
+                                                                        })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.AuthorityName, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @readonly = "readonly"
-                    }
-                })
+                @Html.EditorFor(model => model.AuthorityName, additionalViewData:new
+                                                                                 {
+                                                                                     htmlAttributes = new
+                                                                                                      {
+                                                                                                          @class = "form-control",
+                                                                                                          @readonly = "readonly"
+                                                                                                      }
+                                                                                 })
             </div>
 
-            @Html.LabelFor(model => model.ExchangeAuthorityId, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
+            @Html.LabelFor(model => model.ExchangeAuthorityId, htmlAttributes:new
+                                                                              {
+                                                                                  @class = "control-label col-md-2"
+                                                                              })
 
             <div class="col-md-4">
-                @Html.EditorFor(model => model.ExchangeAuthorityId, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @readonly = "readonly"
-                    }
-                })
+                @Html.EditorFor(model => model.ExchangeAuthorityId, additionalViewData:new
+                                                                                       {
+                                                                                           htmlAttributes = new
+                                                                                                            {
+                                                                                                                @class = "form-control",
+                                                                                                                @readonly = "readonly"
+                                                                                                            }
+                                                                                       })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.AddressLine1, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
+            @Html.LabelFor(model => model.AddressLine1, htmlAttributes:new
+                                                                       {
+                                                                           @class = "control-label col-md-2"
+                                                                       })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.AddressLine1, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @readonly = "readonly"
-                    }
-                })
+                @Html.EditorFor(model => model.AddressLine1, additionalViewData:new
+                                                                                {
+                                                                                    htmlAttributes = new
+                                                                                                     {
+                                                                                                         @class = "form-control",
+                                                                                                         @readonly = "readonly"
+                                                                                                     }
+                                                                                })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.AddressLine2, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
+            @Html.LabelFor(model => model.AddressLine2, htmlAttributes:new
+                                                                       {
+                                                                           @class = "control-label col-md-2"
+                                                                       })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.AddressLine2, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @readonly = "readonly"
-                    }
-                })
-            </div>
-        </div>
-        
-        <div class="form-group">
-            @Html.LabelFor(model => model.CityName, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
-            <div class="col-md-4">
-                @Html.EditorFor(model => model.CityName, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @readonly = "readonly"
-                    }
-                })
+                @Html.EditorFor(model => model.AddressLine2, additionalViewData:new
+                                                                                {
+                                                                                    htmlAttributes = new
+                                                                                                     {
+                                                                                                         @class = "form-control",
+                                                                                                         @readonly = "readonly"
+                                                                                                     }
+                                                                                })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.State, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
+            @Html.LabelFor(model => model.CityName, htmlAttributes:new
+                                                                   {
+                                                                       @class = "control-label col-md-2"
+                                                                   })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.State, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @readonly = "readonly"
-                    }
-                })
+                @Html.EditorFor(model => model.CityName, additionalViewData:new
+                                                                            {
+                                                                                htmlAttributes = new
+                                                                                                 {
+                                                                                                     @class = "form-control",
+                                                                                                     @readonly = "readonly"
+                                                                                                 }
+                                                                            })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.ZipCode, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
+            @Html.LabelFor(model => model.State, htmlAttributes:new
+                                                                {
+                                                                    @class = "control-label col-md-2"
+                                                                })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.ZipCode, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @readonly = "readonly"
-                    }
-                })
+                @Html.EditorFor(model => model.State, additionalViewData:new
+                                                                         {
+                                                                             htmlAttributes = new
+                                                                                              {
+                                                                                                  @class = "form-control",
+                                                                                                  @readonly = "readonly"
+                                                                                              }
+                                                                         })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.PhoneNumber, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
+            @Html.LabelFor(model => model.ZipCode, htmlAttributes:new
+                                                                  {
+                                                                      @class = "control-label col-md-2"
+                                                                  })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.PhoneNumber, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @readonly = "readonly"
-                    }
-                })
+                @Html.EditorFor(model => model.ZipCode, additionalViewData:new
+                                                                           {
+                                                                               htmlAttributes = new
+                                                                                                {
+                                                                                                    @class = "form-control",
+                                                                                                    @readonly = "readonly"
+                                                                                                }
+                                                                           })
             </div>
-
-            @Html.LabelFor(model => model.PhoneExt, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
-            <div class="col-md-4">
-                @Html.EditorFor(model => model.PhoneExt, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @readonly = "readonly"
-                    }
-                })
-            </div>
-            
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.FaxNumber, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
+            @Html.LabelFor(model => model.PhoneNumber, htmlAttributes:new
+                                                                      {
+                                                                          @class = "control-label col-md-2"
+                                                                      })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.FaxNumber, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @readonly = "readonly"
-                    }
-                })
+                @Html.EditorFor(model => model.PhoneNumber, additionalViewData:new
+                                                                               {
+                                                                                   htmlAttributes = new
+                                                                                                    {
+                                                                                                        @class = "form-control",
+                                                                                                        @readonly = "readonly"
+                                                                                                    }
+                                                                               })
             </div>
 
-            @Html.LabelFor(model => model.WebsiteUrl, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
+            @Html.LabelFor(model => model.PhoneExt, htmlAttributes:new
+                                                                   {
+                                                                       @class = "control-label col-md-2"
+                                                                   })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.WebsiteUrl, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @readonly = "readonly"
-                    }
-                })
+                @Html.EditorFor(model => model.PhoneExt, additionalViewData:new
+                                                                            {
+                                                                                htmlAttributes = new
+                                                                                                 {
+                                                                                                     @class = "form-control",
+                                                                                                     @readonly = "readonly"
+                                                                                                 }
+                                                                            })
             </div>
+
         </div>
-        
-        <hr />    
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Npdes, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
-
+            @Html.LabelFor(model => model.FaxNumber, htmlAttributes:new
+                                                                    {
+                                                                        @class = "control-label col-md-2"
+                                                                    })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.Npdes, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @readonly = "readonly"
-                    }
-                })
+                @Html.EditorFor(model => model.FaxNumber, additionalViewData:new
+                                                                             {
+                                                                                 htmlAttributes = new
+                                                                                                  {
+                                                                                                      @class = "form-control",
+                                                                                                      @readonly = "readonly"
+                                                                                                  }
+                                                                             })
             </div>
 
-            @Html.LabelFor(model => model.Signer, htmlAttributes: new
-            {
-                @class = "control-label col-md-2"
-            })
+            @Html.LabelFor(model => model.WebsiteUrl, htmlAttributes:new
+                                                                     {
+                                                                         @class = "control-label col-md-2"
+                                                                     })
             <div class="col-md-4">
-                @Html.EditorFor(model => model.Signer, new
-                {
-                    htmlAttributes = new
-                    {
-                        @class = "form-control",
-                        @readonly = "readonly"
-                    }
-                })
+                @Html.EditorFor(model => model.WebsiteUrl, additionalViewData:new
+                                                                              {
+                                                                                  htmlAttributes = new
+                                                                                                   {
+                                                                                                       @class = "form-control",
+                                                                                                       @readonly = "readonly"
+                                                                                                   }
+                                                                              })
             </div>
         </div>
-    </section>@*.box-body*@
-</div><!-- /.box -->
 
-<div id="AuthoritySettings" class="box box-primary"> @*collapsed-box*@
+        <hr />
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Npdes, htmlAttributes:new
+                                                                {
+                                                                    @class = "control-label col-md-2"
+                                                                })
+
+            <div class="col-md-4">
+                @Html.EditorFor(model => model.Npdes, additionalViewData:new
+                                                                         {
+                                                                             htmlAttributes = new
+                                                                                              {
+                                                                                                  @class = "form-control",
+                                                                                                  @readonly = "readonly"
+                                                                                              }
+                                                                         })
+            </div>
+
+            @Html.LabelFor(model => model.Signer, htmlAttributes:new
+                                                                 {
+                                                                     @class = "control-label col-md-2"
+                                                                 })
+            <div class="col-md-4">
+                @Html.EditorFor(model => model.Signer, additionalViewData:new
+                                                                          {
+                                                                              htmlAttributes = new
+                                                                                               {
+                                                                                                   @class = "form-control",
+                                                                                                   @readonly = "readonly"
+                                                                                               }
+                                                                          })
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="box box-primary" id="AuthoritySettings">
+    @*collapsed-box*@
     <div class="box-header with-border">
         <h3 class="box-title">Authority Settings</h3>
         <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-        </div><!-- /.box-tools -->
-    </div>  @*.box-header*@
+            <button class="btn btn-box-tool" data-widget="collapse">
+                <i class="fa fa-minus"></i>
+            </button>
+        </div>
+    </div>
 
     @using (Html.BeginForm())
     {
@@ -257,483 +263,494 @@
         <section class="box-body form-horizontal">
             @if (ViewBag.ShowErrorMessageForAuthoritySettings != null && ViewBag.ShowErrorMessageForAuthoritySettings)
             {
-                @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new { @class = "alert alert-danger" })
+                @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-danger"})
             }
-            @if (ViewBag.ShowSuccessMessageForAuthoritySettings!= null && ViewBag.ShowSuccessMessageForAuthoritySettings)
+            @if (ViewBag.ShowSuccessMessageForAuthoritySettings != null && ViewBag.ShowSuccessMessageForAuthoritySettings)
             {
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <div class="alert alert-dismissible alert-success">
+                    <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
                     <h5>
-                        <i class="icon fa fa-check"></i>
+                        <i class="fa fa-check icon"></i>
                         @ViewBag.SuccessMessageForAuthoritySettings
                     </h5>
                 </div>
             }
 
             <div class="form-group">
-                @Html.LabelFor(model => model.FailedPasswordAttemptMaxCount, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.FailedPasswordAttemptMaxCount, htmlAttributes:new
+                                                                                            {
+                                                                                                @class = "control-label col-md-7 col-lg-6"
+                                                                                            })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.FailedPasswordAttemptMaxCount, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.FailedPasswordAttemptMaxCount, additionalViewData:new
+                                                                                                     {
+                                                                                                         htmlAttributes = new
+                                                                                                                          {
+                                                                                                                              @class = "form-control"
+                                                                                                                          }
+                                                                                                     })
                     @Html.HiddenFor(model => model.FailedPasswordAttemptMaxCountDefault)
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.FailedKbqAttemptMaxCount, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.FailedKbqAttemptMaxCount, htmlAttributes:new
+                                                                                       {
+                                                                                           @class = "control-label col-md-7 col-lg-6"
+                                                                                       })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.FailedKbqAttemptMaxCount, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.FailedKbqAttemptMaxCount, additionalViewData:new
+                                                                                                {
+                                                                                                    htmlAttributes = new
+                                                                                                                     {
+                                                                                                                         @class = "form-control"
+                                                                                                                     }
+                                                                                                })
                     @Html.HiddenFor(model => model.FailedKbqAttemptMaxCountDefault)
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.InvitationExpiredHours, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.InvitationExpiredHours, htmlAttributes:new
+                                                                                     {
+                                                                                         @class = "control-label col-md-7 col-lg-6"
+                                                                                     })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.InvitationExpiredHours, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.InvitationExpiredHours, additionalViewData:new
+                                                                                              {
+                                                                                                  htmlAttributes = new
+                                                                                                                   {
+                                                                                                                       @class = "form-control"
+                                                                                                                   }
+                                                                                              })
                     @Html.HiddenFor(model => model.InvitationExpiredHoursDefault)
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.PasswordChangeRequiredDays, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.PasswordChangeRequiredDays, htmlAttributes:new
+                                                                                         {
+                                                                                             @class = "control-label col-md-7 col-lg-6"
+                                                                                         })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.PasswordChangeRequiredDays, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.PasswordChangeRequiredDays, additionalViewData:new
+                                                                                                  {
+                                                                                                      htmlAttributes = new
+                                                                                                                       {
+                                                                                                                           @class = "form-control"
+                                                                                                                       }
+                                                                                                  })
                     @Html.HiddenFor(model => model.PasswordChangeRequiredDaysDefault)
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.PasswordHistoryMaxCount, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.PasswordHistoryMaxCount, htmlAttributes:new
+                                                                                      {
+                                                                                          @class = "control-label col-md-7 col-lg-6"
+                                                                                      })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.PasswordHistoryMaxCount, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.PasswordHistoryMaxCount, additionalViewData:new
+                                                                                               {
+                                                                                                   htmlAttributes = new
+                                                                                                                    {
+                                                                                                                        @class = "form-control"
+                                                                                                                    }
+                                                                                               })
                     @Html.HiddenFor(model => model.PasswordHistoryMaxCountDefault)
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.TimeZone, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.TimeZone, htmlAttributes:new
+                                                                       {
+                                                                           @class = "control-label col-md-7 col-lg-6"
+                                                                       })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.DropDownList("TimeZone", Model.AvailableTimeZones, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(model => model.TimeZone, "", new { @class = "text-red" })
+                <div class="col-lg-4 col-md-5">
+                    @Html.DropDownList(name:"TimeZone", selectList:Model.AvailableTimeZones, htmlAttributes:new {@class = "form-control"})
+                    @Html.ValidationMessageFor(model => model.TimeZone, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                 </div>
             </div>
 
-        </section>@*.box-body*@
+        </section>
 
         if (Model.HasPermissionForUpdate)
         {
             <div class="box-footer">
                 <div class="form-group">
-                    <input type="submit" value="Save" class="btn btn-sm btn-primary pull-right" formaction="@Url.Action(actionName: "Settings", controllerName: "Authority")#AuthoritySettings" formmethod="post" />
+                    <input type="submit" value="Save" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"Settings", controllerName:"Authority")#AuthoritySettings" formmethod="post" />
                 </div>
-            </div><!-- box-footer -->
+            </div>
         }
     }
-</div><!-- /.box -->
+</div>
 
-<div id="ProgramSettings" class="box box-primary"> 
+<div class="box box-primary" id="ProgramSettings">
     <div class="box-header with-border">
         <h3 class="box-title">Industrial Pretreatment Settings</h3>
         <div class="box-tools pull-right">
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-        </div><!-- /.box-tools -->
-    </div>  @*.box-header*@
+            <button class="btn btn-box-tool" data-widget="collapse">
+                <i class="fa fa-minus"></i>
+            </button>
+        </div>
+    </div>
 
     @using (Html.BeginForm())
     {
         @Html.AntiForgeryToken()
 
         <section class="box-body form-horizontal">
-            
+
             @if (ViewBag.ShowErrorMessageForProgramSettings != null && ViewBag.ShowErrorMessageForProgramSettings)
             {
-                @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new { @class = "alert alert-danger" })
+                @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-danger"})
             }
-            
+
             @if (ViewBag.ShowSuccessMessageForProgramSettings != null && ViewBag.ShowSuccessMessageForProgramSettings)
             {
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <div class="alert alert-dismissible alert-success">
+                    <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
                     <h5>
-                        <i class="icon fa fa-check"></i>
+                        <i class="fa fa-check icon"></i>
                         @ViewBag.SuccessMessageForProgramSettings
                     </h5>
                 </div>
             }
 
             <div class="form-group">
-                @Html.LabelFor(model => model.ReportRepudiatedDays, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.ReportRepudiatedDays, htmlAttributes:new
+                                                                                   {
+                                                                                       @class = "control-label col-md-7 col-lg-6"
+                                                                                   })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.ReportRepudiatedDays, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.ReportRepudiatedDays, additionalViewData:new
+                                                                                            {
+                                                                                                htmlAttributes = new
+                                                                                                                 {
+                                                                                                                     @class = "form-control"
+                                                                                                                 }
+                                                                                            })
                     @Html.HiddenFor(model => model.ReportRepudiatedDaysDefault)
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.ResultQualifierValidValues, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.ResultQualifierValidValues, htmlAttributes:new
+                                                                                         {
+                                                                                             @class = "control-label col-md-7 col-lg-6"
+                                                                                         })
 
-                <div class="col-md-5 col-lg-4">
-                    @for (int i = 0; i < Model.AvailableResultQualifierValidValues.Count; i++)
+                <div class="col-lg-4 col-md-5">
+                    @for (var i = 0; i < Model.AvailableResultQualifierValidValues.Count; i++)
                     {
                         <div class="checkbox-inline">
-                            @Html.CheckBoxFor(m => m.AvailableResultQualifierValidValues[i].Selected)
-                            @Html.HiddenFor(m => m.AvailableResultQualifierValidValues[i].Value)
-                            @Html.LabelFor(m => m.AvailableResultQualifierValidValues[i].Selected, Model.AvailableResultQualifierValidValues[i].Text)
+                            @Html.CheckBoxFor(m => m.AvailableResultQualifierValidValues[index:i].Selected)
+                            @Html.HiddenFor(m => m.AvailableResultQualifierValidValues[index:i].Value)
+                            @Html.LabelFor(m => m.AvailableResultQualifierValidValues[index:i].Selected, labelText:Model.AvailableResultQualifierValidValues[index:i].Text)
                         </div>
                     }
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.FlowUnitValidValues, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.FlowUnitValidValues, htmlAttributes:new
+                                                                                  {
+                                                                                      @class = "control-label col-md-7 col-lg-6"
+                                                                                  })
 
-                <div class="col-md-5 col-lg-4">
-                    @for (int i = 0; i < Model.AvailableFlowUnitValidValues.Count; i++)
+                <div class="col-lg-4 col-md-5">
+                    @for (var i = 0; i < Model.AvailableFlowUnitValidValues.Count; i++)
                     {
                         <div class="checkbox-inline">
-                            @Html.CheckBoxFor(m => m.AvailableFlowUnitValidValues[i].Selected)
-                            @Html.HiddenFor(m => m.AvailableFlowUnitValidValues[i].Value)
-                            @Html.LabelFor(m => m.AvailableFlowUnitValidValues[i].Selected, Model.AvailableFlowUnitValidValues[i].Text)
+                            @Html.CheckBoxFor(m => m.AvailableFlowUnitValidValues[index:i].Selected)
+                            @Html.HiddenFor(m => m.AvailableFlowUnitValidValues[index:i].Value)
+                            @Html.LabelFor(m => m.AvailableFlowUnitValidValues[index:i].Selected, labelText:Model.AvailableFlowUnitValidValues[index:i].Text)
                         </div>
                     }
                 </div>
             </div>
-    
-            <div class="form-group">
-                @Html.LabelFor(model => model.SampleNameCreationRule, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.DropDownList("SampleNameCreationRule", Model.AvailableSampleNameCreationRule, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(model => model.SampleNameCreationRule, "", new { @class = "text-red" })
+            <div class="form-group">
+                @Html.LabelFor(model => model.SampleNameCreationRule, htmlAttributes:new
+                                                                                     {
+                                                                                         @class = "control-label col-md-7 col-lg-6"
+                                                                                     })
+
+                <div class="col-lg-4 col-md-5">
+                    @Html.DropDownList(name:"SampleNameCreationRule", selectList:Model.AvailableSampleNameCreationRule, htmlAttributes:new {@class = "form-control"})
+                    @Html.ValidationMessageFor(model => model.SampleNameCreationRule, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.MassLoadingConversionFactorPounds, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.MassLoadingConversionFactorPounds, htmlAttributes:new
+                                                                                                {
+                                                                                                    @class = "control-label col-md-7 col-lg-6"
+                                                                                                })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.MassLoadingConversionFactorPounds, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @readonly = "readonly"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.MassLoadingConversionFactorPounds, additionalViewData:new
+                                                                                                         {
+                                                                                                             htmlAttributes = new
+                                                                                                                              {
+                                                                                                                                  @class = "form-control",
+                                                                                                                                  @readonly = "readonly"
+                                                                                                                              }
+                                                                                                         })
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.MassLoadingResultToUseLessThanSign, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.MassLoadingResultToUseLessThanSign, htmlAttributes:new
+                                                                                                 {
+                                                                                                     @class = "control-label col-md-7 col-lg-6"
+                                                                                                 })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.MassLoadingResultToUseLessThanSign, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @readonly = "readonly"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.MassLoadingResultToUseLessThanSign, additionalViewData:new
+                                                                                                          {
+                                                                                                              htmlAttributes = new
+                                                                                                                               {
+                                                                                                                                   @class = "form-control",
+                                                                                                                                   @readonly = "readonly"
+                                                                                                                               }
+                                                                                                          })
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.MassLoadingCalculationDecimalPlaces, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.MassLoadingCalculationDecimalPlaces, htmlAttributes:new
+                                                                                                  {
+                                                                                                      @class = "control-label col-md-7 col-lg-6"
+                                                                                                  })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.MassLoadingCalculationDecimalPlaces, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @readonly = "readonly"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.MassLoadingCalculationDecimalPlaces, additionalViewData:new
+                                                                                                           {
+                                                                                                               htmlAttributes = new
+                                                                                                                                {
+                                                                                                                                    @class = "form-control",
+                                                                                                                                    @readonly = "readonly"
+                                                                                                                                }
+                                                                                                           })
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.AuthorityUserLicenseTotalCount, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.AuthorityUserLicenseTotalCount, htmlAttributes:new
+                                                                                             {
+                                                                                                 @class = "control-label col-md-7 col-lg-6"
+                                                                                             })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.AuthorityUserLicenseTotalCount, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @readonly = "readonly"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.AuthorityUserLicenseTotalCount, additionalViewData:new
+                                                                                                      {
+                                                                                                          htmlAttributes = new
+                                                                                                                           {
+                                                                                                                               @class = "form-control",
+                                                                                                                               @readonly = "readonly"
+                                                                                                                           }
+                                                                                                      })
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.AuthorityUserLicenseUsedCount, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.AuthorityUserLicenseUsedCount, htmlAttributes:new
+                                                                                            {
+                                                                                                @class = "control-label col-md-7 col-lg-6"
+                                                                                            })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.AuthorityUserLicenseUsedCount, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @readonly = "readonly"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.AuthorityUserLicenseUsedCount, additionalViewData:new
+                                                                                                     {
+                                                                                                         htmlAttributes = new
+                                                                                                                          {
+                                                                                                                              @class = "form-control",
+                                                                                                                              @readonly = "readonly"
+                                                                                                                          }
+                                                                                                     })
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.IndustryLicenseTotalCount, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.IndustryLicenseTotalCount, htmlAttributes:new
+                                                                                        {
+                                                                                            @class = "control-label col-md-7 col-lg-6"
+                                                                                        })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.IndustryLicenseTotalCount, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @readonly = "readonly"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.IndustryLicenseTotalCount, additionalViewData:new
+                                                                                                 {
+                                                                                                     htmlAttributes = new
+                                                                                                                      {
+                                                                                                                          @class = "form-control",
+                                                                                                                          @readonly = "readonly"
+                                                                                                                      }
+                                                                                                 })
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.IndustryLicenseUsedCount, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.IndustryLicenseUsedCount, htmlAttributes:new
+                                                                                       {
+                                                                                           @class = "control-label col-md-7 col-lg-6"
+                                                                                       })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.IndustryLicenseUsedCount, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @readonly = "readonly"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.IndustryLicenseUsedCount, additionalViewData:new
+                                                                                                {
+                                                                                                    htmlAttributes = new
+                                                                                                                     {
+                                                                                                                         @class = "form-control",
+                                                                                                                         @readonly = "readonly"
+                                                                                                                     }
+                                                                                                })
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.UserPerIndustryMaxCount, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.UserPerIndustryMaxCount, htmlAttributes:new
+                                                                                      {
+                                                                                          @class = "control-label col-md-7 col-lg-6"
+                                                                                      })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.UserPerIndustryMaxCount, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control",
-                            @readonly = "readonly"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.UserPerIndustryMaxCount, additionalViewData:new
+                                                                                               {
+                                                                                                   htmlAttributes = new
+                                                                                                                    {
+                                                                                                                        @class = "form-control",
+                                                                                                                        @readonly = "readonly"
+                                                                                                                    }
+                                                                                               })
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.EmailContactInfoName, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.EmailContactInfoName, htmlAttributes:new
+                                                                                   {
+                                                                                       @class = "control-label col-md-7 col-lg-6"
+                                                                                   })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.EmailContactInfoName, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.EmailContactInfoName, additionalViewData:new
+                                                                                            {
+                                                                                                htmlAttributes = new
+                                                                                                                 {
+                                                                                                                     @class = "form-control"
+                                                                                                                 }
+                                                                                            })
                     @Html.HiddenFor(model => model.EmailContactInfoNameDefault)
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.EmailContactInfoPhone, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.EmailContactInfoPhone, htmlAttributes:new
+                                                                                    {
+                                                                                        @class = "control-label col-md-7 col-lg-6"
+                                                                                    })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.EmailContactInfoPhone, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control"
-                        }
-                    })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.EmailContactInfoPhone, additionalViewData:new
+                                                                                             {
+                                                                                                 htmlAttributes = new
+                                                                                                                  {
+                                                                                                                      @class = "form-control"
+                                                                                                                  }
+                                                                                             })
                     @Html.HiddenFor(model => model.EmailContactInfoPhoneDefault)
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.EmailContactInfoEmailAddress, htmlAttributes: new
-                {
-                    @class = "control-label col-md-7 col-lg-6"
-                })
+                @Html.LabelFor(model => model.EmailContactInfoEmailAddress, htmlAttributes:new
+                                                                                           {
+                                                                                               @class = "control-label col-md-7 col-lg-6"
+                                                                                           })
 
-                <div class="col-md-5 col-lg-4">
-                    @Html.EditorFor(model => model.EmailContactInfoEmailAddress, new
-                    {
-                        htmlAttributes = new
-                        {
-                            @class = "form-control"
-                        }
-                    })
-                    @Html.ValidationMessageFor(m => m.EmailContactInfoEmailAddress, "", new { @class = "text-red" })
+                <div class="col-lg-4 col-md-5">
+                    @Html.EditorFor(model => model.EmailContactInfoEmailAddress, additionalViewData:new
+                                                                                                    {
+                                                                                                        htmlAttributes = new
+                                                                                                                         {
+                                                                                                                             @class = "form-control"
+                                                                                                                         }
+                                                                                                    })
+                    @Html.ValidationMessageFor(m => m.EmailContactInfoEmailAddress, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                 </div>
             </div>
 
-        </section>@*.box-body*@
+        </section>
         if (Model.HasPermissionForUpdate)
         {
             <div class="box-footer">
                 <div class="form-group">
-                    <input type="submit" value="Save" class="btn btn-sm btn-primary pull-right" formaction="@Url.Action(actionName: "ProgramSettings", controllerName: "Authority")#ProgramSettings" formmethod="post" />
+                    <input type="submit" value="Save" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"ProgramSettings", controllerName:"Authority")#ProgramSettings" formmethod="post" />
                 </div>
-            </div><!-- box-footer -->
+            </div>
         }
     }
-</div><!-- /.box -->
+</div>
 
 @section Scripts {
-    @Scripts.Render(paths: "~/bundles/jqueryval")
+    @Scripts.Render(paths:"~/bundles/jqueryval")
 
     <script>
-        $(document).ready(function ()
+        $(document)
+            .ready(function()
+            {
+                var tbWithIntValue = {
+                    '#FailedPasswordAttemptMaxCount': '#FailedPasswordAttemptMaxCountDefault'
+                    , '#FailedKbqAttemptMaxCount': '#FailedKbqAttemptMaxCountDefault'
+                    , '#InvitationExpiredHours': '#InvitationExpiredHoursDefault'
+                    , '#PasswordChangeRequiredDays': '#PasswordChangeRequiredDaysDefault'
+                    , '#PasswordHistoryMaxCount': '#PasswordHistoryMaxCountDefault'
+                    , '#ReportRepudiatedDays': '#ReportRepudiatedDaysDefault'
+                };
+
+                $.each(tbWithIntValue
+                    , function(key, value)
+                    {
+                        $(key)
+                            .blur(function()
+                            {
+                                var tb = $(key);
+                                var hf = $(value);
+                                tb.val((isNaN(parseInt(tb.val())) || $.isBlank(tb.val()))
+                                       ? ((isNaN(parseInt(hf.val()))) ? 0 : parseInt(hf.val()))
+                                       : parseInt(tb.val()));
+                            });
+                    });
+
+                var tbWithStringValue = {
+                    '#EmailContactInfoName': '#EmailContactInfoNameDefault'
+                    , '#EmailContactInfoPhone': '#EmailContactInfoPhoneDefault'
+                };
+
+                $.each(tbWithStringValue
+                    , function(key, value)
+                    {
+                        $(key)
+                            .blur(function()
+                            {
+                                var tb = $(key);
+                                var hf = $(value);
+                                tb.val($.isBlank(tb.val()) ? hf.val() : tb.val());
+                            });
+                    });
+            });
+
+        (function($)
         {
-            var tbWithIntValue = {
-                  '#FailedPasswordAttemptMaxCount': '#FailedPasswordAttemptMaxCountDefault'
-                , '#FailedKbqAttemptMaxCount'     : '#FailedKbqAttemptMaxCountDefault'
-                , '#InvitationExpiredHours'       : '#InvitationExpiredHoursDefault'
-                , '#PasswordChangeRequiredDays'   : '#PasswordChangeRequiredDaysDefault'
-                , '#PasswordHistoryMaxCount'      : '#PasswordHistoryMaxCountDefault'
-                , '#ReportRepudiatedDays'         : '#ReportRepudiatedDaysDefault'
-            };
-
-            $.each(tbWithIntValue, function (key, value)
+            $.isBlank = function(obj)
             {
-                $(key).blur(function ()
-                {
-                    var tb = $(key);
-                    var hf = $(value);
-                    tb.val((isNaN(parseInt(tb.val())) ||$.isBlank(tb.val())) ? ((isNaN(parseInt(hf.val()))) ? 0 : parseInt(hf.val())) : parseInt(tb.val()));
-                });
-            });
-            
-            var tbWithStringValue = {
-                  '#EmailContactInfoName': '#EmailContactInfoNameDefault'
-                , '#EmailContactInfoPhone': '#EmailContactInfoPhoneDefault'
-            };
-
-            $.each(tbWithStringValue, function (key, value)
-            {
-                $(key).blur(function ()
-                {
-                    var tb = $(key);
-                    var hf = $(value);
-                    tb.val($.isBlank(tb.val()) ? hf.val() : tb.val());
-                });
-            });
-        });
-
-        (function($){
-            $.isBlank = function(obj){
                 return(!obj || $.trim(obj) === "" || $.trim(obj) === "0");
             };
         })(jQuery);

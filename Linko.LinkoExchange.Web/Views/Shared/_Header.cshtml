@@ -1,8 +1,9 @@
-﻿<header class="main-header">
-    @if(Request.IsAuthenticated)
+﻿@using System.Web.Configuration
+<header class="main-header">
+    @if (Request.IsAuthenticated)
     {
         @* BEGIN Logo *@
-        <a href="@Url.Action(actionName: "Index", controllerName: "Home")" class="logo">
+        <a href="@Url.Action(actionName:"Index", controllerName:"Home")" class="logo">
             <!-- mini logo for sidebar mini 50x50 pixels -->
             <span class="logo-mini">
                 <img title="LinkoExchange Logo" alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo-min.png")" width="35" height="35" />
@@ -16,16 +17,16 @@
 
         @* BEGIN Header *@
         <nav class="navbar navbar-static-top" role="navigation">
-            <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+            <a class="sidebar-toggle" data-toggle="offcanvas" href="#" role="button">
                 <span class="sr-only">Toggle navigation</span>
             </a>
             <span class="navbar-brand">
-                @if (!string.IsNullOrWhiteSpace(ViewBag.PortalName))
+                @if (!string.IsNullOrWhiteSpace(value:ViewBag.PortalName))
                 {
-                    <span>@string.Format(format: "{0} Portal", arg0: ViewBag.PortalName)</span>
+                    <span>@string.Format(format:"{0} Portal", arg0:ViewBag.PortalName)</span>
                 }
             </span>
-            @if(!string.IsNullOrWhiteSpace(ViewBag.OrganizationName))
+            @if (!string.IsNullOrWhiteSpace(value:ViewBag.OrganizationName))
             {
                 <span class="navbar-brand">-</span>
                 <span class="navbar-brand">
@@ -33,15 +34,15 @@
                 </span>
             }
             <div class="navbar-custom-menu">
-                @using(Html.BeginForm(actionName: "SignOut", controllerName: "Account", method: FormMethod.Post, htmlAttributes: new { id = "formSignOut", @class = "navbar-right" }))
+                @using (Html.BeginForm(actionName:"SignOut", controllerName:"Account", method:FormMethod.Post, htmlAttributes:new {id = "formSignOut", @class = "navbar-right"}))
                 {
                     <ul class="nav navbar-nav">
                         @* BEGIN User Account Menu *@
                         <li class="dropdown user user-menu">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                                 <i class="fa fa-user"></i>
                                 <span class="hidden-xs">
-                                    @if(!string.IsNullOrWhiteSpace(ViewBag.UserName))
+                                    @if (!string.IsNullOrWhiteSpace(value:ViewBag.UserName))
                                     {
                                         @ViewBag.UserName
                                     }
@@ -52,14 +53,14 @@
                                     <div class="row">
                                         <div class="col-xs-12 text-center">
 
-                                            @if(!string.IsNullOrWhiteSpace(ViewBag.UserName))
+                                            @if (!string.IsNullOrWhiteSpace(value:ViewBag.UserName))
                                             {
                                                 @ViewBag.UserName
                                             }
                                         </div>
                                         <div class="col-xs-12 text-center">
                                             <small>
-                                                @if(!string.IsNullOrWhiteSpace(ViewBag.UserRole))
+                                                @if (!string.IsNullOrWhiteSpace(value:ViewBag.UserRole))
                                                 {
                                                     @ViewBag.UserRole
                                                 }
@@ -68,14 +69,14 @@
                                     </div>
                                 </li>
                                 <li class="user-footer">
-                                    @if (ViewBag.PortalName != null && !string.IsNullOrWhiteSpace(ViewBag.PortalName))
+                                    @if (ViewBag.PortalName != null && !string.IsNullOrWhiteSpace(value:ViewBag.PortalName))
                                     {
                                         <div class="pull-left">
-                                            <a href="#" onclick="location.href='@Url.Action(actionName: "Profile", controllerName: "User")'" class="btn btn-sm btn-primary">@Label.ButtonProfile </a>
+                                            <a href="#" onclick="location.href = '@Url.Action(actionName:"Profile", controllerName:"User")'" class="btn btn-primary btn-sm">@Label.ButtonProfile </a>
                                         </div>
                                     }
                                     <div class="pull-right">
-                                        <a href="#" onclick="location.href='@Url.Action(actionName: "SignOut", controllerName: "Account")'" class="btn btn-sm btn-primary">@Label.ButtonSignOut</a>
+                                        <a href="#" onclick="location.href = '@Url.Action(actionName:"SignOut", controllerName:"Account")'" class="btn btn-primary btn-sm">@Label.ButtonSignOut</a>
                                     </div>
                                 </li>
                             </ul>
@@ -95,31 +96,42 @@
         @* BEGIN Pop-up for when session timeout *@
         <script>
 
-            $(document).ready(function () {
-                var timeOut = @System.Web.Configuration.WebConfigurationManager.AppSettings["CookieValidateInterval"] * 60 * 1000;
-                setTimeout("showPopup()", timeOut); // milliseconds
-            });
+            $(document)
+                .ready(function()
+                {
+                    var timeOut = @WebConfigurationManager.AppSettings[name:"CookieValidateInterval"] * 60 * 1000;
+                    setTimeout("showPopup()", timeOut); // milliseconds
+                });
 
-            function showPopup() {
+            function showPopup()
+            {
                 var message = "@Message.SessionTimeOutPopupMessage";
 
-                $('body').append('<div class="popup" data-popup="popup-1">' +
-                                    '<div class="popup-inner">' +
-                                        '<h4>' + message + '</h4>' +
-                                        '<a class="popup-close" data-popup-close="popup-1" href="#">x</a>' +
-                                    '</div>' +
-                                '</div>');
+                $('body')
+                    .append('<div class="popup" data-popup="popup-1">'
+                        + '<div class="popup-inner">'
+                        + '<h4>'
+                        + message
+                        + '</h4>'
+                        + '<a class="popup-close" data-popup-close="popup-1" href="#">x</a>'
+                        + '</div>'
+                        + '</div>');
 
                 $('[data-popup="popup-1"]').fadeIn(350);
 
-                $('[data-popup-close]').on('click', function () {
-                    $('[data-popup="popup-1"]').fadeOut(350);
-                    location.reload();
-                });
+                $('[data-popup-close]')
+                    .on('click'
+                        , function()
+                        {
+                            $('[data-popup="popup-1"]').fadeOut(350);
+                            location.reload();
+                        });
 
-                setTimeout(function () {
-                    location.reload();
-                }, 30 * 1000);
+                setTimeout(function()
+                    {
+                        location.reload();
+                    }
+                    , 30 * 1000);
             }
 
         </script>
@@ -127,11 +139,11 @@
     }
     else
     {
-        <div class="logo hidden-xs">&nbsp;</div>
+        <div class="hidden-xs logo">&nbsp;</div>
         <nav class="navbar navbar-static-top" role="navigation">
             @* BEGIN Logo *@
             <span class="logo">
-                <a href="@Url.Action(actionName: "Index", controllerName: "Home")">
+                <a href="@Url.Action(actionName:"Index", controllerName:"Home")">
                     <img title="LinkoExchange Logo" alt="LinkoExchange Logo" src="@Url.Content(contentPath:"/Content/images/logo.png")" width="150" height="35" />
                 </a>
             </span>

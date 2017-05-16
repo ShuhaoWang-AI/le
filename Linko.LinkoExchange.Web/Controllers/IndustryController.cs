@@ -62,12 +62,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IReportTemplateService _reportTemplateService;
         private readonly ISampleService _sampleService;
         private readonly ISettingService _settingService;
-        private readonly ISessionCache _sessionCache;
         private readonly IUnitService _unitService;
         private readonly IUserService _userService;
 
         public IndustryController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService, IQuestionAnswerService questionAnswerService,
-                                  IPermissionService permissionService, ISessionCache sessionCache, ILogger logger, IHttpContextService httpContextService, IFileStoreService fileStoreService,
+                                  IPermissionService permissionService, ILogger logger, IHttpContextService httpContextService, IFileStoreService fileStoreService,
                                   IReportElementService reportElementService, ISampleService sampleService, IUnitService unitService, IMonitoringPointService monitoringPointService,
                                   IReportTemplateService reportTemplateService, ISettingService settingService, IParameterService parameterService)
         {
@@ -84,7 +83,6 @@ namespace Linko.LinkoExchange.Web.Controllers
             _reportTemplateService = reportTemplateService;
             _sampleService = sampleService;
             _settingService = settingService;
-            _sessionCache = sessionCache;
             _unitService = unitService;
             _userService = userService;
         }
@@ -408,10 +406,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 PhoneExt = user.UserProfileDto.PhoneExt,
                                 Email = user.UserProfileDto.Email,
                                 ResetEmail = user.UserProfileDto.Email,
-                                DateRegistered = user.RegistrationDateTimeUtc.Value.DateTime,
+                                DateRegistered = user.RegistrationDateTimeUtc?.DateTime,
                                 Status = user.IsEnabled,
                                 AccountLocked = user.UserProfileDto.IsAccountLocked,
-                                Role = user.PermissionGroup.PermissionGroupId.Value,
+                                Role = user.PermissionGroup.PermissionGroupId ?? 0,
                                 RoleText = user.PermissionGroup.Name,
                                 IsSignatory = user.IsSignatory,
                                 SecurityQuestion1 = userQuesAns.Count > 0 && userQuesAns.ElementAt(index:0) != null ? userQuesAns.ElementAt(index:0).Question.Content : "",
@@ -422,9 +420,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             // Roles
             viewModel.AvailableRoles = new List<SelectListItem>();
             var roles = _permissionService.GetRoles(orgRegProgramId:user.OrganizationRegulatoryProgramId);
-            if (roles.Count() > 0)
+            var permissionGroupDtos = roles as IList<PermissionGroupDto> ?? roles.ToList();
+            if (permissionGroupDtos.Any())
             {
-                viewModel.AvailableRoles = roles.Select(r => new SelectListItem
+                viewModel.AvailableRoles = permissionGroupDtos.Select(r => new SelectListItem
                                                              {
                                                                  Text = r.Name,
                                                                  Value = r.PermissionGroupId.ToString(),
@@ -541,7 +540,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 try
                 {
-                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId:model.Id, permissionGroupId:model.Role.Value, isApproved:true);
+                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId:model.Id, permissionGroupId:model.Role ?? 0, isApproved:true);
                     switch (result.Result)
                     {
                         case RegistrationResult.Success:
@@ -552,11 +551,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                             break;
                         case RegistrationResult.NoMoreUserLicensesForIndustry:
                             _logger.Info(message:string.Format(format:"PendingUserApprove. User={0} - id={1} No more user licenses", arg0:model.UserName, arg1:model.Id));
-                            ModelState.AddModelError(key:"", errorMessage:"No more User Licenses are available for this Industry. Disable another User and try again");
+                            ModelState.AddModelError(key:"", errorMessage:@"No more User Licenses are available for this Industry. Disable another User and try again.");
                             break;
                         default:
                             _logger.Info(message:string.Format(format:"PendingUserApprove. User={0} - id={1} Registration Approval Failed!", arg0:model.UserName, arg1:model.Id));
-                            ModelState.AddModelError(key:"", errorMessage:"Registration Approval Failed");
+                            ModelState.AddModelError(key:"", errorMessage:@"Registration Approval Failed!");
                             break;
                     }
                 }
@@ -590,7 +589,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                             break;
                         default:
                             _logger.Info(message:string.Format(format:"PendingUserDeny. User={0} - id={1} Registration Denial Failed!", arg0:model.UserName, arg1:model.Id));
-                            ModelState.AddModelError(key:"", errorMessage:"Registration Denial Failed");
+                            ModelState.AddModelError(key:"", errorMessage:@"Registration Denial Failed!");
                             break;
                     }
                 }
@@ -627,7 +626,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 Email = result.UserProfileDto.Email,
                                 PhoneNumber = result.UserProfileDto.PhoneNumber,
                                 PhoneExt = result.UserProfileDto.PhoneExt,
-                                DateRegistered = result.RegistrationDateTimeUtc.Value.DateTime,
+                                DateRegistered = result.RegistrationDateTimeUtc?.DateTime,
                                 Role = result.PermissionGroup == null ? 0 : result.PermissionGroup.PermissionGroupId,
                                 RoleText = result.PermissionGroup == null ? "" : result.PermissionGroup.Name
                             };
@@ -635,16 +634,17 @@ namespace Linko.LinkoExchange.Web.Controllers
             viewModel.AvailableRoles = new List<SelectListItem>();
             var roles = _permissionService.GetRoles(orgRegProgramId:result.OrganizationRegulatoryProgramId);
 
-            if (roles.Count() > 0)
+            var permissionGroupDtos = roles as IList<PermissionGroupDto> ?? roles.ToList();
+            if (permissionGroupDtos.Any())
             {
-                viewModel.AvailableRoles = roles.Select(r => new SelectListItem
+                viewModel.AvailableRoles = permissionGroupDtos.Select(r => new SelectListItem
                                                              {
                                                                  Text = r.Name,
                                                                  Value = r.PermissionGroupId.ToString(),
                                                                  Selected = Convert.ToInt32(value:r.PermissionGroupId) == viewModel.Role
                                                              }).ToList();
             }
-            viewModel.AvailableRoles.Insert(index:0, item:new SelectListItem {Text = "Select User Role", Value = "0"});
+            viewModel.AvailableRoles.Insert(index:0, item:new SelectListItem {Text = @"Select User Role", Value = "0"});
 
             var currentUserRole = _httpContextService.GetClaimValue(claimType:CacheKey.UserRole) ?? "";
             ViewBag.HasPermissionForApproveDeny = currentUserRole.IsCaseInsensitiveEqual(comparing:UserRole.Administrator.ToString()); // TODO: call service when implement
@@ -1158,7 +1158,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route(template:"Sample/New/Step2")]
         public ActionResult NewSampleDetailsStep2(SampleViewModel model, FormCollection collection)
         {
-            var id = 0;
+            int id;
             try
             {
                 var objJavascript = new JavaScriptSerializer();

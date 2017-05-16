@@ -16,12 +16,10 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IHttpContextService _httpContextService;
         private readonly IInvitationService _invitationService;
         private readonly ILogger _logger;
-        private readonly ISessionCache _sessionCache;
 
-        public InviteController(IInvitationService invitationService, ISessionCache sessionCache, ILogger logger, IHttpContextService httpContextService)
+        public InviteController(IInvitationService invitationService, ILogger logger, IHttpContextService httpContextService)
         {
             _invitationService = invitationService;
-            _sessionCache = sessionCache;
             _logger = logger;
             _httpContextService = httpContextService;
         }

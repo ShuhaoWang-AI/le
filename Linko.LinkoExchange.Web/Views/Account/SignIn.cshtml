@@ -6,34 +6,34 @@
     ViewBag.SubTitle = Label.TitleLinkoExchangeSignIn;
 }
 
-<div class="col-md-offset-2 col-md-8 col-lg-offset-2 col-lg-7">
+<div class="col-lg-7 col-lg-offset-2 col-md-8 col-md-offset-2">
     <div>
         <h1 class="h3">@ViewBag.SubTitle</h1>
     </div>
     <div class="box box-primary">
-        <section id="SignInForm" class="box-body">
-            @using (Html.BeginForm(actionName: "SignIn", controllerName: "Account", routeValues: new { ReturnUrl = ViewBag.ReturnUrl }, method: FormMethod.Post, htmlAttributes: new { @class = "form-horizontal", role = "form" }))
+        <section class="box-body" id="SignInForm">
+            @using (Html.BeginForm(actionName:"SignIn", controllerName:"Account", routeValues:new {ViewBag.ReturnUrl}, method:FormMethod.Post, htmlAttributes:new {@class = "form-horizontal", role = "form"}))
             {
                 @Html.AntiForgeryToken()
-                @Html.ValidationSummary(excludePropertyErrors: true, message: Message.ValidationSummaryHeaderText, htmlAttributes: new { @class = "alert alert-danger" })
+                @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-danger"})
 
                 <div class="form-group">
-                    @Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })
+                    @Html.LabelFor(m => m.UserName, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-10">
-                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", autofocus = "autofocus", autocomplete = "off" })
-                        @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-red" })
+                        @Html.TextBoxFor(m => m.UserName, htmlAttributes:new {@class = "form-control", autofocus = "autofocus", autocomplete = "off"})
+                        @Html.ValidationMessageFor(m => m.UserName, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                     </div>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
+                    @Html.LabelFor(m => m.Password, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-10">
-                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", autocomplete = "off" })
-                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-red" })
+                        @Html.PasswordFor(m => m.Password, htmlAttributes:new {@class = "form-control", autocomplete = "off"})
+                        @Html.ValidationMessageFor(m => m.Password, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-12">
-                        <input type="submit" value="@Label.ButtonSignIn" class="btn btn-sm btn-primary pull-right" />
+                        <input type="submit" value="@Label.ButtonSignIn" class="btn btn-primary btn-sm pull-right" />
                     </div>
                 </div>
             }
@@ -41,16 +41,16 @@
         <div class="box-footer">
             <div class="form-group">
                 <div class="col-md-offset-2">
-                    @Html.ActionLink(linkText: @Label.ForgotUserName, actionName: "ForgotUserName")
+                    @Html.ActionLink(linkText:Label.ForgotUserName, actionName:"ForgotUserName")
                     <span class="col-xs-offset-1">
                     </span>
-                    @Html.ActionLink(linkText: @Label.ForgotPassword, actionName: "ForgotPassword")
+                    @Html.ActionLink(linkText:Label.ForgotPassword, actionName:"ForgotPassword")
                 </div>
             </div>
-        </div><!-- box-footer -->
-    </div><!-- /.box -->
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-    @Scripts.Render(paths: "~/bundles/jqueryval")
+    @Scripts.Render(paths:"~/bundles/jqueryval")
 }

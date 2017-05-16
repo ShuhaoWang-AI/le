@@ -142,7 +142,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                         </span>*@
                     </a>
                     <ul class="treeview-menu">
-                        <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag: "sampleStatus:" + SampleStatusName.Draft.ToString())">
+                        <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag:"sampleStatus:" + SampleStatusName.Draft)">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.Draft})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Drafts</span>
@@ -151,13 +151,13 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                                 </span>*@
                             </a>
                         </li>
-                        <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag: "sampleStatus:" + SampleStatusName.ReadyToReport.ToString())">
+                        <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag:"sampleStatus:" + SampleStatusName.ReadyToReport)">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.ReadyToReport})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Ready to Report</span>
                             </a>
                         </li>
-                        <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag: "sampleStatus:" + SampleStatusName.Reported.ToString())">
+                        <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag:"sampleStatus:" + SampleStatusName.Reported)">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.Reported})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Reported</span>

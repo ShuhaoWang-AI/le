@@ -81,11 +81,11 @@
                                                     .ServerOperation(enabled:false)
                                                     .Batch(enabled:true)
                                                     .Sort(sort =>
-                                                    {
-                                                        sort.Add(memberName: "StartDateTimeLocal").Descending();
-                                                        sort.Add(memberName: "MonitoringPointName").Ascending();
-                                                        sort.Add(memberName: "CollectionMethodName").Ascending();
-                                                    }) // <-- initial sort expression
+                                                          {
+                                                              sort.Add(memberName:"StartDateTimeLocal").Descending();
+                                                              sort.Add(memberName:"MonitoringPointName").Ascending();
+                                                              sort.Add(memberName:"CollectionMethodName").Ascending();
+                                                          }) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"Samples_Read", controllerName:"Industry", routeValues:new
                                                                                                                                                 {
                                                                                                                                                     sampleStatus = ViewBag.SampleStatusName

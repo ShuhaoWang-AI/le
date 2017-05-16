@@ -7,73 +7,69 @@ using System.Web.Hosting;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.User;
-using Linko.LinkoExchange.Web.ViewModels.User;
-using Linko.LinkoExchange.Web.shared;
 using Linko.LinkoExchange.Web.Mapping;
-using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Web.shared;
+using Linko.LinkoExchange.Web.ViewModels.User;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
-    public class UserController : Controller
+    public class UserController:Controller
     {
         private readonly IAuthenticationService _authenticateService;
-        private readonly ISessionCache _sessionCache;
-        private readonly IUserService _userService;
-        private readonly IQuestionAnswerService _questionAnswerService;
-        private readonly IJurisdictionService _jurisdictionService;
-        private readonly IHttpContextService _httpContextService;
-
-/*
-        private readonly string fakePassword = "********";
-*/
-        private readonly ProfileHelper _profileHelper;
         private readonly IMapHelper _mapHelper;
+        private readonly ProfileHelper _profileHelper;
+        private readonly IQuestionAnswerService _questionAnswerService;
+        private readonly IUserService _userService;
+
         public UserController(
             IAuthenticationService authenticateService,
             IQuestionAnswerService questAnswerService,
-            ISessionCache sessionCache,
             IUserService userService,
             IJurisdictionService jurisdictionService,
             IMapHelper mapHelper,
             IHttpContextService httpContextService
-            )
+        )
         {
-            if (authenticateService == null) throw new ArgumentNullException(paramName: "authenticateService");
-            if (sessionCache == null) throw new ArgumentNullException(paramName: "sessionCache");
-            if (questAnswerService == null) throw new ArgumentNullException(paramName: "questAnswerService");
+            if (authenticateService == null)
+            {
+                throw new ArgumentNullException(paramName:nameof(authenticateService));
+            }
+            if (questAnswerService == null)
+            {
+                throw new ArgumentNullException(paramName:nameof(questAnswerService));
+            }
 
             _authenticateService = authenticateService;
-            _sessionCache = sessionCache;
             _userService = userService;
-            _jurisdictionService = jurisdictionService;
             _questionAnswerService = questAnswerService;
             _mapHelper = mapHelper;
-            _httpContextService = httpContextService;
 
-            _profileHelper = new ProfileHelper(questAnswerService, sessionCache, userService, jurisdictionService, mapHelper, httpContextService);
+            _profileHelper = new ProfileHelper(questAnswerService:questAnswerService, userService:userService, jurisdictionService:jurisdictionService, mapHelper:mapHelper,
+                                               httpContextService:httpContextService);
         }
 
         // GET: UserDto
         public ActionResult Index()
         {
-            return View(viewName: "Profile");
+            return RedirectToAction(actionName:"Profile", controllerName:"User");
         }
 
         public ActionResult DownloadSignatory()
         {
-            var file = HostingEnvironment.MapPath(virtualPath: "~/Temp/GRESD Electronic Signature Agreement.pdf");
+            var file = HostingEnvironment.MapPath(virtualPath:"~/Temp/GRESD Electronic Signature Agreement.pdf");
             var fileDownloadName = "GRESD Electronic Signature Agreement.pdf";
             var contentType = "application/pdf";
 
-            var fileStream = System.IO.File.OpenRead(file);
+            var fileStream = System.IO.File.OpenRead(path:file);
             fileStream.Position = 0;
-            return File(fileStream, contentType, fileDownloadName);
+            return File(fileStream:fileStream, contentType:contentType, fileDownloadName:fileDownloadName);
         }
 
         [Authorize]
@@ -83,7 +79,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [Authorize]
-        [AcceptVerbs(HttpVerbs.Get)]
+        [AcceptVerbs(verbs:HttpVerbs.Get)]
         public new ActionResult Profile()
         {
             ViewBag.profileCollapsed = false;
@@ -92,32 +88,32 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.newRegistration = false;
 
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
-            var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
-            var userProfileId = int.Parse(profileIdStr);
+            var profileIdStr = claimsIdentity?.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
+            var userProfileId = int.Parse(s:profileIdStr ?? "0");
 
-            var userProfileViewModel = _profileHelper.GetUserProfileViewModel(userProfileId);
-            var userSQViewModel = _profileHelper.GetUserSecurityQuestionViewModel(userProfileId);
-            var userKbqViewModel = _profileHelper.GetUserKbqViewModel(userProfileId);
+            var userProfileViewModel = _profileHelper.GetUserProfileViewModel(userProfileId:userProfileId);
+            var userSqViewModel = _profileHelper.GetUserSecurityQuestionViewModel(userProfileId:userProfileId);
+            var userKbqViewModel = _profileHelper.GetUserKbqViewModel(userProfileId:userProfileId);
 
             //set the fake password, just make sure data validation pass
             userProfileViewModel.Password = "Tiger12345";
 
             var user = new UserViewModel
-            {
-                UserKBQ = userKbqViewModel,
-                UserProfile = userProfileViewModel,
-                UserSQ = userSQViewModel
-            };
+                       {
+                           UserKBQ = userKbqViewModel,
+                           UserProfile = userProfileViewModel,
+                           UserSQ = userSqViewModel
+                       };
 
             ViewBag.userKBQ = userKbqViewModel;
             ViewBag.userProfile = userProfileViewModel;
-            ViewBag.userSQ = userSQViewModel;
+            ViewBag.userSQ = userSqViewModel;
 
-            return View(user);
+            return View(model:user);
         }
 
         [Authorize]
-        [AcceptVerbs(HttpVerbs.Post)]
+        [AcceptVerbs(verbs: HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         public new ActionResult Profile(UserViewModel model, string part, FormCollection form)
         {
@@ -125,228 +121,214 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.inValidKBQ = false;
             ViewBag.inValidSQ = false;
 
-            ViewBag.profileCollapsed = Convert.ToString(form["profileCollapsed"]);
-            ViewBag.kbqCollapsed = Convert.ToString(form["kbqCollapsed"]);
-            ViewBag.sqCollapsed = Convert.ToString(form["sqCollapsed"]);
+            ViewBag.profileCollapsed = Convert.ToString(value: form[name: "profileCollapsed"]);
+            ViewBag.kbqCollapsed = Convert.ToString(value: form[name: "kbqCollapsed"]);
+            ViewBag.sqCollapsed = Convert.ToString(value: form[name: "sqCollapsed"]);
 
-            string portalName = _authenticateService.GetClaimsValue(CacheKey.PortalName);
-            portalName = string.IsNullOrWhiteSpace(portalName) ? "" : portalName.Trim().ToLower();
-            if (portalName.Equals(value: "authority"))
-            {
-                ViewBag.industryPortal = false;
-            }
-            else
-            {
-                ViewBag.industryPortal = true;
-            }
+            var portalName = _authenticateService.GetClaimsValue(claimType: CacheKey.PortalName);
+            portalName = string.IsNullOrWhiteSpace(value: portalName) ? "" : portalName.Trim().ToLower();
+            ViewBag.industryPortal = !portalName.Equals(value: "authority");
 
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
-            var profileIdStr = claimsIdentity.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
-            var userProfileId = int.Parse(profileIdStr);
+            var profileIdStr = claimsIdentity?.Claims.First(i => i.Type == CacheKey.UserProfileId).Value;
+            var userProfileId = int.Parse(s: profileIdStr ?? "0");
 
-            var pristineUser = _profileHelper.GetUserViewModel(userProfileId);
+            var pristineUser = _profileHelper.GetUserViewModel(userProfileId: userProfileId);
             pristineUser.UserProfile.StateList = _profileHelper.GetStateList();
 
             if (part == "Profile")
             {
-                return SaveUserProfile(model, pristineUser, userProfileId);
+                return SaveUserProfile(model: model, pristineUserModel: pristineUser, userProfileId: userProfileId);
             }
             else if (part == "KBQ")
             {
-                return SaveUserKbq(model, pristineUser, userProfileId);
+                return SaveUserKbq(model: model, pristineUserModel: pristineUser, userProfileId: userProfileId);
             }
             else if (part == "SQ")
             {
-                return SaveUserSQ(model, pristineUser, userProfileId);
+                return SaveUserSq(model: model, pristineUserModel: pristineUser, userProfileId: userProfileId);
             }
 
-            return View(pristineUser);
+            return View(model: pristineUser);
         }
 
         private bool NeedToValidKbq()
         {
             var previousUri = HttpContext.Request.UrlReferrer;
-            return (previousUri == null ||
-                   (previousUri.AbsolutePath.ToLower().IndexOf(value: "account/changeaccountsucceed") < 0) &&
-                   (previousUri.AbsolutePath.ToLower().IndexOf(value: "account/changeaccountsucceed") < 0));
+            return previousUri == null || previousUri.AbsolutePath.ToLower().IndexOf(value:"account/changeaccountsucceed", comparisonType:StringComparison.Ordinal) < 0;
         }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (filterContext.RouteData.Values["action"].ToString().ToLower() == "profile"
+            if (filterContext.RouteData.Values[key:"action"].ToString().ToLower() == "profile"
                 && Request.HttpMethod != "POST" && NeedToValidKbq())
             {
-                var kbqPass = TempData["KbqPass"] as string;
-                if (!string.IsNullOrWhiteSpace(kbqPass) &&
-                     kbqPass.ToLower() == "true")
+                var kbqPass = TempData[key:"KbqPass"] as string;
+                if (!string.IsNullOrWhiteSpace(value:kbqPass) &&
+                    kbqPass.ToLower() == "true")
                 {
-                    base.OnActionExecuting(filterContext);
+                    base.OnActionExecuting(filterContext:filterContext);
                 }
                 else
                 {
                     filterContext.Result = new RedirectToRouteResult(
-                        new RouteValueDictionary {
-                            { "action", "KbqChallenge" },
-                            { "controller", "Account" },
-                            { "returnUrl", filterContext.HttpContext.Request.Url }
-                        }
-                    );
+                                                                     routeValues:new RouteValueDictionary
+                                                                                 {
+                                                                                     {"action", "KbqChallenge"},
+                                                                                     {"controller", "Account"},
+                                                                                     {"returnUrl", filterContext.HttpContext.Request.Url}
+                                                                                 }
+                                                                    );
                 }
             }
             else
             {
-                base.OnActionExecuting(filterContext);
+                base.OnActionExecuting(filterContext:filterContext);
             }
         }
 
         private ActionResult SaveUserProfile(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)
         {
-            ValidationContext context = null;
             var validationResult = new List<ValidationResult>();
-            bool isValid = true;
 
-            context = new ValidationContext(model.UserProfile, serviceProvider: null, items: null);
-            isValid = Validator.TryValidateObject(model.UserProfile, context, validationResult, validateAllProperties: true);
+            var context = new ValidationContext(instance:model.UserProfile, serviceProvider:null, items:null);
+            var isValid = Validator.TryValidateObject(instance:model.UserProfile, validationContext:context, validationResults:validationResult, validateAllProperties:true);
 
             if (!isValid)
             {
                 ViewBag.inValidProfile = true;
-                return View(pristineUserModel);
+                return View(model:pristineUserModel);
             }
 
-            var userDto = _mapHelper.GetUserDtoFromUserProfileViewModel(model.UserProfile);
+            var userDto = _mapHelper.GetUserDtoFromUserProfileViewModel(viewModel:model.UserProfile);
             userDto.UserProfileId = userProfileId;
 
-            var validateResult = _userService.ValidateUserProfileData(userDto);
+            var validateResult = _userService.ValidateUserProfileData(userProfile:userDto);
             if (validateResult == RegistrationResult.Success)
             {
-                _userService.UpdateProfile(userDto);
+                _userService.UpdateProfile(dto:userDto);
                 ViewBag.SaveProfileSuccessfull = true;
-                ViewBag.SuccessMessage = String.Format(format: "Save Profile successfully.");
+                ViewBag.SuccessMessage = "Save Profile successfully.";
             }
             else
             {
-                ModelState.AddModelError(string.Empty, errorMessage: "User profile data is not correct.");
+                ModelState.AddModelError(key:string.Empty, errorMessage:@"User profile data is not correct.");
                 ViewBag.inValidKBQ = true;
             }
 
-            return View(pristineUserModel);
+            return View(model:pristineUserModel);
         }
 
         private ActionResult SaveUserKbq(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)
         {
-            pristineUserModel.UserKBQ.QuestionPool = _profileHelper.GetQuestionPool(QuestionTypeName.KBQ);
+            pristineUserModel.UserKBQ.QuestionPool = _profileHelper.GetQuestionPool(type:QuestionTypeName.KBQ);
 
-            ValidationContext context = null;
             var validationResult = new List<ValidationResult>();
-            bool isValid = true;
 
-            context = new ValidationContext(model.UserKBQ, serviceProvider: null, items: null);
-            isValid = Validator.TryValidateObject(model.UserKBQ, context, validationResult, validateAllProperties: true);
+            var context = new ValidationContext(instance:model.UserKBQ, serviceProvider:null, items:null);
+            var isValid = Validator.TryValidateObject(instance:model.UserKBQ, validationContext:context, validationResults:validationResult, validateAllProperties:true);
 
             if (!isValid)
             {
                 ViewBag.inValidKBQ = true;
-                return View(pristineUserModel);
+                return View(model:pristineUserModel);
             }
 
             pristineUserModel.UserKBQ.UserProfileId = userProfileId;
-            var kbqQuestionAnswers = GetPostedUserKbqQuestions(model.UserKBQ);
-            var validateResult = _questionAnswerService.ValidateUserKbqData(kbqQuestionAnswers);
+            var kbqQuestionAnswers = GetPostedUserKbqQuestions(model:model.UserKBQ);
+            var validateResult = _questionAnswerService.ValidateUserKbqData(kbqQuestions:kbqQuestionAnswers);
             switch (validateResult)
             {
                 case RegistrationResult.Success:
-                    _questionAnswerService.CreateOrUpdateUserQuestionAnswers(userProfileId, kbqQuestionAnswers);
+                    _questionAnswerService.CreateOrUpdateUserQuestionAnswers(userProfileId:userProfileId, questionAnswers:kbqQuestionAnswers);
                     ViewBag.SaveKBQSuccessfull = true;
-                    ViewBag.SuccessMessage = String.Format(format: "Save Knowledge Based Questions successfully.");
+                    ViewBag.SuccessMessage = "Save Knowledge Based Questions successfully.";
                     break;
                 case RegistrationResult.DuplicatedKBQ:
-                    ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Knowledge Based Questions");
+                    ModelState.AddModelError(key:string.Empty, errorMessage:@"Duplicated Knowledge Based Questions.");
                     ViewBag.inValidKBQ = true;
                     break;
                 case RegistrationResult.DuplicatedKBQAnswer:
-                    ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Knowledge Based Question Answers");
+                    ModelState.AddModelError(key:string.Empty, errorMessage:@"Duplicated Knowledge Based Question Answers.");
                     ViewBag.inValidKBQ = true;
                     break;
                 case RegistrationResult.MissingKBQ:
-                    ModelState.AddModelError(string.Empty, errorMessage: "Missing Knowledge Based Questions");
+                    ModelState.AddModelError(key:string.Empty, errorMessage:@"Missing Knowledge Based Questions.");
                     ViewBag.inValidKBQ = true;
                     break;
                 case RegistrationResult.MissingKBQAnswer:
-                    ModelState.AddModelError(string.Empty, errorMessage: "Missing Knowledge Based Question Answers");
+                    ModelState.AddModelError(key:string.Empty, errorMessage:@"Missing Knowledge Based Question Answers.");
                     ViewBag.inValidKBQ = true;
                     break;
             }
 
-            return View(pristineUserModel);
+            return View(model:pristineUserModel);
         }
 
-        private ActionResult SaveUserSQ(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)
+        private ActionResult SaveUserSq(UserViewModel model, UserViewModel pristineUserModel, int userProfileId)
         {
-            pristineUserModel.UserSQ.QuestionPool = _profileHelper.GetQuestionPool(QuestionTypeName.SQ);
+            pristineUserModel.UserSQ.QuestionPool = _profileHelper.GetQuestionPool(type:QuestionTypeName.SQ);
 
-            ValidationContext context = null;
             var validationResult = new List<ValidationResult>();
-            bool isValid = true;
 
-            context = new ValidationContext(model.UserSQ, serviceProvider: null, items: null);
-            isValid = Validator.TryValidateObject(model.UserSQ, context, validationResult, validateAllProperties: true);
+            var context = new ValidationContext(instance:model.UserSQ, serviceProvider:null, items:null);
+            var isValid = Validator.TryValidateObject(instance:model.UserSQ, validationContext:context, validationResults:validationResult, validateAllProperties:true);
 
             if (!isValid)
             {
                 ViewBag.inValidSQ = true;
-                return View(pristineUserModel);
+                return View(model:pristineUserModel);
             }
 
             pristineUserModel.UserSQ.UserProfileId = userProfileId;
 
-            var sqQuestionAnswers = GetPostedUserSQQuestionAnswers(model.UserSQ);
-            var result = _questionAnswerService.ValidateUserSqData(sqQuestionAnswers);
+            var sqQuestionAnswers = GetPostedUserSQQuestionAnswers(model:model.UserSQ);
+            var result = _questionAnswerService.ValidateUserSqData(securityQuestions:sqQuestionAnswers);
             switch (result)
             {
                 case RegistrationResult.Success:
-                    _questionAnswerService.CreateOrUpdateUserQuestionAnswers(userProfileId, sqQuestionAnswers);
+                    _questionAnswerService.CreateOrUpdateUserQuestionAnswers(userProfileId:userProfileId, questionAnswers:sqQuestionAnswers);
                     ViewBag.SaveSQSuccessfull = true;
-                    ViewBag.SuccessMessage = String.Format(format: "Save Security Questions successfully.");
+                    ViewBag.SuccessMessage = "Save Security Questions successfully.";
                     break;
                 case RegistrationResult.DuplicatedSecurityQuestion:
-                    ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Security Questions");
+                    ModelState.AddModelError(key:string.Empty, errorMessage:@"Duplicated Security Questions.");
                     ViewBag.inValidSQ = true;
                     break;
                 case RegistrationResult.DuplicatedSecurityQuestionAnswer:
-                    ModelState.AddModelError(string.Empty, errorMessage: "Duplicated Security Question Answers");
+                    ModelState.AddModelError(key:string.Empty, errorMessage:@"Duplicated Security Question Answers.");
                     ViewBag.inValidSQ = true;
                     break;
 
                 case RegistrationResult.MissingSecurityQuestion:
-                    ModelState.AddModelError(string.Empty, errorMessage: "Missing Security Questions");
+                    ModelState.AddModelError(key:string.Empty, errorMessage:@"Missing Security Questions.");
                     ViewBag.inValidSQ = true;
                     break;
                 case RegistrationResult.MissingSecurityQuestionAnswer:
-                    ModelState.AddModelError(string.Empty, errorMessage: "Missing Security Question Answers");
+                    ModelState.AddModelError(key:string.Empty, errorMessage:@"Missing Security Question Answers.");
                     ViewBag.inValidSQ = true;
                     break;
             }
 
-            return View(pristineUserModel);
+            return View(model:pristineUserModel);
         }
 
         private List<AnswerDto> GetPostedUserSQQuestionAnswers(UserSQViewModel model)
         {
             var sqQuestionAnswers = new List<AnswerDto>();
-            sqQuestionAnswers.Add(new AnswerDto
-            {
-                QuestionId = model.SecurityQuestion1,
-                Content = model.SecurityQuestionAnswer1,
-                UserQuestionAnswerId = model.UserQuestionAnserId_SQ1
-            });
+            sqQuestionAnswers.Add(item:new AnswerDto
+                                       {
+                                           QuestionId = model.SecurityQuestion1,
+                                           Content = model.SecurityQuestionAnswer1,
+                                           UserQuestionAnswerId = model.UserQuestionAnserId_SQ1
+                                       });
 
-            sqQuestionAnswers.Add(new AnswerDto
-            {
-                QuestionId = model.SecurityQuestion2,
-                Content = model.SecurityQuestionAnswer2,
-                UserQuestionAnswerId = model.UserQuestionAnserId_SQ2
-            });
+            sqQuestionAnswers.Add(item:new AnswerDto
+                                       {
+                                           QuestionId = model.SecurityQuestion2,
+                                           Content = model.SecurityQuestionAnswer2,
+                                           UserQuestionAnswerId = model.UserQuestionAnserId_SQ2
+                                       });
 
             return sqQuestionAnswers;
         }
@@ -355,44 +337,42 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var kbqQuestionAnswers = new List<AnswerDto>();
             kbqQuestionAnswers.AddRange(
-                new[] {
-                new AnswerDto
-                {
-                    QuestionId = model.KBQ1,
-                    Content = model.KBQAnswer1,
-                    UserQuestionAnswerId = model.UserQuestionAnserId_KBQ1
-                },
-                new AnswerDto
-                {
-                    QuestionId = model.KBQ2,
-                    Content = model.KBQAnswer2,
-                    UserQuestionAnswerId = model.UserQuestionAnserId_KBQ2
-                },
-                new AnswerDto
-                {
-                    QuestionId = model.KBQ3,
-                    Content = model.KBQAnswer3,
-                    UserQuestionAnswerId = model.UserQuestionAnserId_KBQ3
-                },
-                new AnswerDto
-                {
-                    QuestionId = model.KBQ4,
-                    Content = model.KBQAnswer4,
-                    UserQuestionAnswerId = model.UserQuestionAnserId_KBQ4
-                },
-                new AnswerDto
-                {
-                    QuestionId = model.KBQ5,
-                    Content = model.KBQAnswer5,
-                    UserQuestionAnswerId = model.UserQuestionAnserId_KBQ5
-                 }
-
-                }
-            );
+                                        collection:new[]
+                                                   {
+                                                       new AnswerDto
+                                                       {
+                                                           QuestionId = model.KBQ1,
+                                                           Content = model.KBQAnswer1,
+                                                           UserQuestionAnswerId = model.UserQuestionAnserId_KBQ1
+                                                       },
+                                                       new AnswerDto
+                                                       {
+                                                           QuestionId = model.KBQ2,
+                                                           Content = model.KBQAnswer2,
+                                                           UserQuestionAnswerId = model.UserQuestionAnserId_KBQ2
+                                                       },
+                                                       new AnswerDto
+                                                       {
+                                                           QuestionId = model.KBQ3,
+                                                           Content = model.KBQAnswer3,
+                                                           UserQuestionAnswerId = model.UserQuestionAnserId_KBQ3
+                                                       },
+                                                       new AnswerDto
+                                                       {
+                                                           QuestionId = model.KBQ4,
+                                                           Content = model.KBQAnswer4,
+                                                           UserQuestionAnswerId = model.UserQuestionAnserId_KBQ4
+                                                       },
+                                                       new AnswerDto
+                                                       {
+                                                           QuestionId = model.KBQ5,
+                                                           Content = model.KBQAnswer5,
+                                                           UserQuestionAnswerId = model.UserQuestionAnserId_KBQ5
+                                                       }
+                                                   }
+                                       );
 
             return kbqQuestionAnswers;
         }
-
-
     }
 }

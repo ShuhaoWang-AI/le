@@ -17,10 +17,10 @@
     <div class="box-header with-border">
         <h3 class="box-title">Attachments</h3>
         <div class="box-tools pull-right">
-            <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewReportElementTypeDetails", controllerName:"Authority", routeValues: new
-                                                    {
-                                                        categoryName = ReportElementCategoryName.Attachments
-                                                    })'">
+            <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewReportElementTypeDetails", controllerName:"Authority", routeValues:new
+                                                                                                                                                                           {
+                                                                                                                                                                               categoryName = ReportElementCategoryName.Attachments
+                                                                                                                                                                           })'">
                 Create New
             </button>
             <button class="btn btn-box-tool" data-widget="collapse">
@@ -34,61 +34,54 @@
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@
                 @(Html.Kendo().Grid<ReportElementTypeViewModel>()
-                      .Name(componentName: "gridAttachment")
+                      .Name(componentName:"gridAttachment")
                       .Columns(columns =>
-                      {
-                          columns.Bound(c => c.Name)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
-                          columns.Bound(c => c.Description)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
-                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
-                                 .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
-                          columns.Bound(c => c.LastModifierUserName)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
-                          columns.Template(m =>
-                          {
-                          })
-                                 .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
-                                 .Width(pixelWidth: 60);
-                      })
+                               {
+                                   columns.Bound(c => c.Name)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.Description)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                          .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                                   columns.Bound(c => c.LastModifierUserName)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Template(m => { })
+                                          .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
+                                          .Width(pixelWidth:60);
+                               })
                       .Pageable(pageable => pageable
-                                                .PageSizes(pageSizes: new List<object> { "all", 15, 25, 50, 75 })
-                                                .Refresh(enabled: true)
-                                                .Input(enabled: true)
-                                                .Numeric(enabled: false)
+                                                .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
+                                                .Refresh(enabled:true)
+                                                .Input(enabled:true)
+                                                .Numeric(enabled:false)
                       )
                       .Selectable(selectable =>
-                      {
-                          selectable.Mode(mode: GridSelectionMode.Single);
-                          selectable.Type(type: GridSelectionType.Row);
-                      })
-                      .Sortable(sortable =>
-                      {
-                          sortable.SortMode(value: GridSortMode.MultipleColumn);
-                      })
+                                  {
+                                      selectable.Mode(mode:GridSelectionMode.Single);
+                                      selectable.Type(type:GridSelectionType.Row);
+                                  })
+                      .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                       //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
-                      .Resizable(resizable => resizable.Columns(value: true))
-                      .Scrollable(s => s.Height(value: "auto"))
-                      .NoRecords(text: "No attachment element type exists.")
-                      .Events(events =>
-                      {
-                          events.Change(handler: "gotoNextPageAttachment");
-                      })
+                      .Resizable(resizable => resizable.Columns(value:true))
+                      .Scrollable(s => s.Height(value:"auto"))
+                      .NoRecords(text:"No attachment element type exists.")
+                      .Events(events => { events.Change(handler:"gotoNextPageAttachment"); })
                       .DataSource(dataSource => dataSource
                                                     .Ajax()
-                                                    .ServerOperation(enabled: false)
-                                                    .Batch(enabled: true)
-                                                    .Sort(sort => sort.Add("Name").Ascending()) // <-- initial sort expression
-                                                    .Read(read => read.Action(actionName: "ReportElementTypes_Read", controllerName: "Authority", routeValues: new {
-                                                        categoryName = ReportElementCategoryName.Attachments
-                                                    }))
-                                                    .PageSize(pageSize: 15)
-                                                    .Events(events => events.Error(handler: "error_handler"))
+                                                    .ServerOperation(enabled:false)
+                                                    .Batch(enabled:true)
+                                                    .Sort(sort => sort.Add(memberName:"Name").Ascending()) // <-- initial sort expression
+                                                    .Read(read => read.Action(actionName:"ReportElementTypes_Read", controllerName:"Authority", routeValues:new
+                                                                                                                                                            {
+                                                                                                                                                                categoryName = ReportElementCategoryName.Attachments
+                                                                                                                                                            }))
+                                                    .PageSize(pageSize:15)
+                                                    .Events(events => events.Error(handler:"error_handler"))
                       )
-                )
+                      )
             </div>
         </div>
     </section>
@@ -98,10 +91,10 @@
     <div class="box-header with-border">
         <h3 class="box-title">Certifications</h3>
         <div class="box-tools pull-right">
-            <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewReportElementTypeDetails", controllerName:"Authority", routeValues: new
-                                                                                                                                                                            {
-                                                                                                                                                                                categoryName = ReportElementCategoryName.Certifications
-                                                                                                                                                                            })'">
+            <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewReportElementTypeDetails", controllerName:"Authority", routeValues:new
+                                                                                                                                                                           {
+                                                                                                                                                                               categoryName = ReportElementCategoryName.Certifications
+                                                                                                                                                                           })'">
                 Create New
             </button>
             <button class="btn btn-box-tool" data-widget="collapse">
@@ -115,61 +108,53 @@
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@
                 @(Html.Kendo().Grid<ReportElementTypeViewModel>()
-                      .Name(componentName: "gridCertification")
+                      .Name(componentName:"gridCertification")
                       .Columns(columns =>
-                      {
-                          columns.Bound(c => c.Name)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
-                          columns.Bound(c => c.Description)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
-                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
-                                 .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
-                          columns.Bound(c => c.LastModifierUserName)
-                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                         .SuggestionOperator(filterType: FilterType.Contains)));
-                          columns.Template(m =>
-                          {
-                          })
-                                 .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
-                                 .Width(pixelWidth: 60);
-                      })
+                               {
+                                   columns.Bound(c => c.Name)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.Description)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                          .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                                   columns.Bound(c => c.LastModifierUserName)
+                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
+                                   columns.Template(m => { })
+                                          .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
+                                          .Width(pixelWidth:60);
+                               })
                       .Pageable(pageable => pageable
-                                                .PageSizes(pageSizes: new List<object> { "all", 15, 25, 50, 75 })
-                                                .Refresh(enabled: true)
-                                                .Input(enabled: true)
-                                                .Numeric(enabled: false)
+                                                .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
+                                                .Refresh(enabled:true)
+                                                .Input(enabled:true)
+                                                .Numeric(enabled:false)
                       )
                       .Selectable(selectable =>
-                      {
-                          selectable.Mode(mode: GridSelectionMode.Single);
-                          selectable.Type(type: GridSelectionType.Row);
-                      })
-                      .Sortable(sortable =>
-                      {
-                          sortable.SortMode(value: GridSortMode.MultipleColumn);
-                      })
+                                  {
+                                      selectable.Mode(mode:GridSelectionMode.Single);
+                                      selectable.Type(type:GridSelectionType.Row);
+                                  })
+                      .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                       //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
-                      .Resizable(resizable => resizable.Columns(value: true))
-                      .Scrollable(s => s.Height(value: "auto"))
-                      .NoRecords(text: "No certification element type exists.")
-                      .Events(events =>
-                      {
-                          events.Change(handler: "gotoNextPageCertification");
-                      })
+                      .Resizable(resizable => resizable.Columns(value:true))
+                      .Scrollable(s => s.Height(value:"auto"))
+                      .NoRecords(text:"No certification element type exists.")
+                      .Events(events => { events.Change(handler:"gotoNextPageCertification"); })
                       .DataSource(dataSource => dataSource
                                                     .Ajax()
-                                                    .ServerOperation(enabled: false)
-                                                    .Batch(enabled: true)
-                                                    .Read(read => read.Action(actionName: "ReportElementTypes_Read", controllerName: "Authority", routeValues: new
-                                                    {
-                                                        categoryName = ReportElementCategoryName.Certifications
-                                                    }))
-                                                    .PageSize(pageSize: 15)
-                                                    .Events(events => events.Error(handler: "error_handler"))
+                                                    .ServerOperation(enabled:false)
+                                                    .Batch(enabled:true)
+                                                    .Read(read => read.Action(actionName:"ReportElementTypes_Read", controllerName:"Authority", routeValues:new
+                                                                                                                                                            {
+                                                                                                                                                                categoryName = ReportElementCategoryName.Certifications
+                                                                                                                                                            }))
+                                                    .PageSize(pageSize:15)
+                                                    .Events(events => events.Error(handler:"error_handler"))
                       )
-                )
+                      )
             </div>
         </div>
     </section>
@@ -180,19 +165,16 @@
         gotoNextPageAttachment = function()
         {
             var grid = $("#gridAttachment").data("kendoGrid");
-            var postUrl = "@Url.Action(actionName: "ReportElementTypes_Select", controllerName:"Authority")";
+            var postUrl = "@Url.Action(actionName:"ReportElementTypes_Select", controllerName:"Authority")";
 
             doAjaxAction(grid, postUrl, "", "Select an attachment type");
-        }
-
+        };
         gotoNextPageCertification = function()
         {
             var grid = $("#gridCertification").data("kendoGrid");
-            var postUrl = "@Url.Action(actionName: "ReportElementTypes_Select", controllerName:"Authority")";
+            var postUrl = "@Url.Action(actionName:"ReportElementTypes_Select", controllerName:"Authority")";
 
             doAjaxAction(grid, postUrl, "", "Select a certification type");
-        }
-
+        };
     </script>
 }
-
