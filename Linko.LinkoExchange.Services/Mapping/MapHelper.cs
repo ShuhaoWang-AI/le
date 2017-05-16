@@ -412,10 +412,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             paramDto.ParameterId = parameter.ParameterId;
             paramDto.Name = parameter.Name;
             paramDto.Description = parameter.Description;
-            if (parameter.DefaultUnit != null)
-            {
-                paramDto.DefaultUnit = GetUnitDtoFromUnit(parameter.DefaultUnit);
-            }
+            paramDto.DefaultUnit = GetUnitDtoFromUnit(parameter.DefaultUnit);
             paramDto.TrcFactor = parameter.TrcFactor;
             paramDto.OrganizationRegulatoryProgramId = parameter.OrganizationRegulatoryProgramId;
             paramDto.IsRemoved = parameter.IsRemoved;

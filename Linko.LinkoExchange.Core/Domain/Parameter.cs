@@ -20,7 +20,7 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public string Description { get; set; }
 
-        public int? DefaultUnitId { get; set; }
+        public int DefaultUnitId { get; set; }
         public virtual Unit DefaultUnit { get; set; }
 
         public double? TrcFactor { get; set; }

@@ -15,7 +15,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.Description).IsOptional().HasMaxLength(500);
 
-            HasOptional(a => a.DefaultUnit)
+            HasRequired(a => a.DefaultUnit)
                 .WithMany()
                 .HasForeignKey(c => c.DefaultUnitId)
                 .WillCascadeOnDelete(false);
