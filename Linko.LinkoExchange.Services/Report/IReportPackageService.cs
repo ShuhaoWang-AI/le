@@ -9,7 +9,6 @@ namespace Linko.LinkoExchange.Services.Report
     {
         void SignAndSubmitReportPackage(int reportPackageId);
         CopyOfRecordDto GetCopyOfRecordByReportPackageId(int reportPackageId, ReportPackageDto reportPackageDto = null);
-        CopyOfRecordDto CreateCopyOfRecordForReportPackage(ReportPackageDto reportPackageDto);
         CopyOfRecordValidationResultDto VerififyCopyOfRecord(int reportPackageId);
 
         /// <summary>
@@ -39,6 +38,13 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageDto">The ReportPackageDto containing all detailed information </param>
         /// <returns>CopyOfRecordPdfFileDto</returns>
         CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(ReportPackageDto reportPackageDto);
+
+        /// <summary>
+        /// Get the pdf file for the Copy of Record
+        /// </summary>
+        /// <param name="reportPackageId">ReportPackageId</param>
+        /// <returns>CopyOfRecordPdfFileDto</returns>
+        CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(int reportPackageId);
 
         /// <summary>
         ///     *WARNING: NO VALIDATION CHECK -- CASCADE DELETE*

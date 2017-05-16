@@ -113,7 +113,6 @@ namespace Linko.LinkoExchange.Services.Report
                 {
                     UpdateStatus(reportPackageId, ReportStatusName.Submitted, false);
                     _dbContext.SaveChanges();
-
                     var reportPackageDto = GetReportPackage(reportPackageId, true);
                     var copyOfRecordDto = CreateCopyOfRecordForReportPackage(reportPackageDto);
 
@@ -163,6 +162,12 @@ namespace Linko.LinkoExchange.Services.Report
                     throw;
                 }
             }
+        }
+
+        public CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(int reportPackageId)
+        {
+            var reportPackageDto = this.GetReportPackage(reportPackageId, true);
+            return GetReportPackageCopyOfRecordPdfFile(reportPackageDto);
         }
 
         public CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(ReportPackageDto reportPackageDto)
