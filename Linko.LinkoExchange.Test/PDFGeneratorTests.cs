@@ -231,7 +231,7 @@ namespace Linko.LinkoExchange.Test
             var sampleDtos = new List<SampleDto>();
 
             var random = new Random();
-            var sampleResultCount = random.NextDouble() * 10;
+            var sampleResultCount = random.NextDouble() * 20;
 
             // sample results 
             for (var i = 0; i < sampleResultCount; i++)
@@ -317,10 +317,6 @@ namespace Linko.LinkoExchange.Test
                     MonitoringPointName = $"TestingMonitoringPoint_{i}",
                     SampleResults = sampleResults1
                 };
-
-                sample1.StartDateTimeLocal = sample1.StartDateTimeLocal.AddSeconds(sample1.StartDateTimeLocal.Second).AddMilliseconds(sample1.StartDateTimeLocal.Millisecond);
-                sample1.EndDateTimeLocal = sample1.EndDateTimeLocal.AddSeconds(sample1.EndDateTimeLocal.Second).AddMilliseconds(sample1.EndDateTimeLocal.Millisecond);
-
                 sampleDtos.Add(sample1);
 
                 var sample2 = new SampleDto
@@ -337,10 +333,6 @@ namespace Linko.LinkoExchange.Test
                     SampleResults = sampleResults3
                 };
 
-
-                sample2.StartDateTimeLocal = sample2.StartDateTimeLocal.AddSeconds(sample2.StartDateTimeLocal.Second).AddMilliseconds(sample2.StartDateTimeLocal.Millisecond);
-                sample2.EndDateTimeLocal = sample2.EndDateTimeLocal.AddSeconds(sample2.EndDateTimeLocal.Second).AddMilliseconds(sample2.EndDateTimeLocal.Millisecond);
-
                 sampleDtos.Add(sample2);
 
                 var sample3 = new SampleDto
@@ -356,9 +348,6 @@ namespace Linko.LinkoExchange.Test
                     MonitoringPointName = $"TestingMonitoringPoint_{i}",
                     SampleResults = sampleResults2
                 };
-
-                sample3.StartDateTimeLocal = sample3.StartDateTimeLocal.AddSeconds(sample3.StartDateTimeLocal.Second).AddMilliseconds(sample3.StartDateTimeLocal.Millisecond);
-                sample3.EndDateTimeLocal = sample3.EndDateTimeLocal.AddSeconds(sample3.EndDateTimeLocal.Second).AddMilliseconds(sample3.EndDateTimeLocal.Millisecond);
 
                 sampleDtos.Add(sample3);
             }

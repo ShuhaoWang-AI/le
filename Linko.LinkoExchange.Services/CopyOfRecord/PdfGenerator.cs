@@ -22,28 +22,27 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         private readonly TextState _normalTextState = new TextState("Arial", false, false);
 
         private readonly Document _pdfDocument;
-        private readonly Page _pdfPage = null;
+        private readonly Page _pdfPage;
 
         public PdfGenerator(ReportPackageDto reportPackage)
         {
-            PdfInit();
-            this._reportPackage = reportPackage;
+            License pdflicense = new License();
+            pdflicense.SetLicense(@"Aspose.Pdf.lic");
+            pdflicense.Embedded = true;
+
+            _reportPackage = reportPackage;
             _boldTextState.FontSize = 12;
             _normalTextState.FontSize = 10;
             _pdfDocument = new Document();
             _pdfPage = _pdfDocument.Pages.Add();
         }
 
-        private void PdfInit()
-        {
-            License pdflicense = new License();
-            pdflicense.SetLicense(@"Aspose.Pdf.lic");
-            pdflicense.Embedded = true;
-        }
-
         public void CreateCopyOfRecordPdf()
         {
-
+            if (_reportPackage == null)
+            {
+                throw new NullReferenceException("_reportPackage");
+            }
 
             _pdfPage.SetPageSize(PageSize.PageLetter.Width, PageSize.PageLetter.Height);
             _pdfPage.PageInfo.IsLandscape = true;
@@ -56,7 +55,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             var reportName = _reportPackage.Name;
             var authorityName = _reportPackage.RecipientOrganizationName;
             var industryName = _reportPackage.OrganizationName;
-            var submissionDateTimeString = _reportPackage.SubmissionDateTimeLocal.Value.ToString("MMMM dd yyyy hh:mm tt").ToUpper();
+            var submissionDateTimeString = _reportPackage.SubmissionDateTimeLocal?.ToString("MMMM dd yyyy hh:mm tt").ToUpper() ?? "";
 
             HeaderFooterTable(_pdfPage, reportName, submissionDateTimeString, authorityName, industryName);
 
@@ -263,6 +262,10 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
                 foreach (var sample in monthYearGroup.SamplesGroupByMonthAndYear)
                 {
+                    // strip off the seconds and milli-seconds part for time 
+                    sample.StartDateTimeLocal = sample.StartDateTimeLocal.AddSeconds(-sample.StartDateTimeLocal.Second).AddMilliseconds(-sample.StartDateTimeLocal.Millisecond);
+                    sample.EndDateTimeLocal = sample.EndDateTimeLocal.AddSeconds(-sample.EndDateTimeLocal.Second).AddMilliseconds(-sample.EndDateTimeLocal.Millisecond);
+
                     sampleResultExtensions.AddRange(sample.SampleResults.Select(sampleResult => new SampleResultExtension
                     {
                         Sample = sample,
@@ -271,14 +274,13 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 }
 
                 // sort sampleResultExtensions by  start date asc, end date asc, param name asc, limitbasis asc, collection method asc   
-                sampleResultExtensions = sampleResultExtensions.OrderBy(a => a.Sample.StartDateTimeLocal)
-                                      .ThenBy(b => b.Sample.EndDateTimeLocal)
+                sampleResultExtensions = sampleResultExtensions.OrderBy(a => a.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower())
+                                      .ThenBy(b => b.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower())
                                       .ThenBy(c => c.SampleResult.ParameterName)
                                       .ThenBy(d => d.Sample.CollectionMethodName)
                                       .ToList();
 
                 // Fill data; 
-                var firstMonthCell = new Cell();
                 for (var i = 0; i < sampleResultExtensions.Count; i++)
                 {
                     var sampleResultExtension = sampleResultExtensions[i];
@@ -295,8 +297,10 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                     row.Cells.Add(sampleResultExtension.SampleResult.ParameterName);
                     row.Cells.Add($"{sampleResultExtension.SampleResult.Value} {sampleResultExtension.SampleResult.UnitName}");
                     row.Cells.Add($"{sampleResultExtension.SampleResult.MethodDetectionLimit}");
+
                     row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower());
                     row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower());
+
                     row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName);
                     row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier);
                     row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod);
@@ -361,8 +365,8 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             row.Cells.Add("");
 
             row.Cells.Add("Submitted Date:", reportInfoTableBoldTextState);
-            // todo: PM/AM 
-            row.Cells.Add(_reportPackage.SubmissionDateTimeLocal.Value.ToString("MMMM dd, yyyy HH:mm "));
+
+            row.Cells.Add(_reportPackage.SubmissionDateTimeLocal.HasValue ? _reportPackage.SubmissionDateTimeLocal.Value.ToString("MMMM dd, yyyy HH:mm tt ") : "");
 
             //--------------------------------Row 4
             row = reportInfoTable.Rows.Add();
@@ -373,6 +377,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
             row.Cells.Add("Submitted By:");
             row.Cells.Add(_reportPackage.SubmitterUserName);
+
             //--------------------------------Row 5
             row = reportInfoTable.Rows.Add();
             row.Cells.Add("Address:");
