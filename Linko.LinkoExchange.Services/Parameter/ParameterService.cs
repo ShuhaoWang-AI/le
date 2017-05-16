@@ -266,12 +266,12 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// </summary>
         /// <param name="parameterGroup">Parameter group to create new or update if and Id is included</param>
         /// <returns>Existing Id or newly created Id from tParameterGroup</returns>
-        public int SaveParameterGroup(ParameterGroupDto parameterGroup)
+        public int SaveParameterGroup(ParameterGroupDto parameterGroupDto)
         {
             string parameterGroupIdString = string.Empty;
-            if (parameterGroup.ParameterGroupId.HasValue)
+            if (parameterGroupDto.ParameterGroupId.HasValue)
             {
-                parameterGroupIdString = parameterGroup.ParameterGroupId.Value.ToString();
+                parameterGroupIdString = parameterGroupDto.ParameterGroupId.Value.ToString();
             }
             else
             {
@@ -290,7 +290,7 @@ namespace Linko.LinkoExchange.Services.Parameter
             {
                 try
                 {
-                    if (string.IsNullOrWhiteSpace(parameterGroup.Name))
+                    if (string.IsNullOrWhiteSpace(parameterGroupDto.Name))
                     {
                         string message = "Name is required.";
                         validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
@@ -298,13 +298,13 @@ namespace Linko.LinkoExchange.Services.Parameter
                     }
 
                     //Find existing groups with same Name (UC-33-1 7.1)
-                    string proposedParamGroupName = parameterGroup.Name.Trim().ToLower();
+                    string proposedParamGroupName = parameterGroupDto.Name.Trim().ToLower();
                     var paramGroupsWithMatchingName = _dbContext.ParameterGroups
                         .Where(param => param.Name.Trim().ToLower() == proposedParamGroupName
                                 && param.OrganizationRegulatoryProgramId == authOrgRegProgramId);
 
                     //Make sure there is at least 1 parameter
-                    if (parameterGroup.Parameters == null || parameterGroup.Parameters.Count() < 1)
+                    if (parameterGroupDto.Parameters == null || parameterGroupDto.Parameters.Count() < 1)
                     {
                         string message = "At least 1 parameter must be added to the group.";
                         validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
@@ -312,7 +312,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                     }
 
                     //Make sure parameters are unique
-                    var isDuplicates = parameterGroup.Parameters
+                    var isDuplicates = parameterGroupDto.Parameters
                                         .GroupBy(p => p.ParameterId)
                                         .Select(grp => new { Count = grp.Count() })
                                         .Any(grp => grp.Count > 1);
@@ -324,12 +324,12 @@ namespace Linko.LinkoExchange.Services.Parameter
                     }
 
                     ParameterGroup paramGroupToPersist = null;
-                    if (parameterGroup.ParameterGroupId.HasValue && parameterGroup.ParameterGroupId.Value > 0)
+                    if (parameterGroupDto.ParameterGroupId.HasValue && parameterGroupDto.ParameterGroupId.Value > 0)
                     {
                         //Ensure there are no other groups with same name
                         foreach (var paramGroupWithMatchingName in paramGroupsWithMatchingName)
                         {
-                            if (paramGroupWithMatchingName.ParameterGroupId != parameterGroup.ParameterGroupId.Value)
+                            if (paramGroupWithMatchingName.ParameterGroupId != parameterGroupDto.ParameterGroupId.Value)
                             {
                                 string message = "A Parameter Group with that name already exists. Please select another name.";
                                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
@@ -338,12 +338,9 @@ namespace Linko.LinkoExchange.Services.Parameter
                         }
                 
                         //Update existing
-                        paramGroupToPersist = _dbContext.ParameterGroups.Single(param => param.ParameterGroupId == parameterGroup.ParameterGroupId);
+                        paramGroupToPersist = _dbContext.ParameterGroups.Single(param => param.ParameterGroupId == parameterGroupDto.ParameterGroupId);
 
-                        //First remove all children (parameter associations)
-                        _dbContext.ParameterGroupParameters.RemoveRange(paramGroupToPersist.ParameterGroupParameters);
-
-                        paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup, paramGroupToPersist);
+                        paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroupDto, paramGroupToPersist);
                         paramGroupToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
                         paramGroupToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
                         paramGroupToPersist.LastModifierUserId = currentUserProfileId;
@@ -360,12 +357,40 @@ namespace Linko.LinkoExchange.Services.Parameter
                         }
 
                         //Get new
-                        paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroup);
+                        paramGroupToPersist = _mapHelper.GetParameterGroupFromParameterGroupDto(parameterGroupDto);
                         paramGroupToPersist.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
                         paramGroupToPersist.CreationDateTimeUtc = DateTimeOffset.Now;
                         paramGroupToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
                         paramGroupToPersist.LastModifierUserId = currentUserProfileId;
                         _dbContext.ParameterGroups.Add(paramGroupToPersist);
+                    }
+
+
+                    //
+                    //Handle updating parameters
+                    //
+                    if (paramGroupToPersist.ParameterGroupParameters != null && parameterGroupDto.Parameters != null)
+                    {
+                        //1) Deletes
+                        for (int i = 0; i < paramGroupToPersist.ParameterGroupParameters.Count(); i++)
+                        {
+                            var parameter = paramGroupToPersist.ParameterGroupParameters.ElementAt(i);
+                            bool IsNotRemoved = parameterGroupDto.Parameters
+                                .Any(param => param.ParameterId == parameter.ParameterId);
+                            if (!IsNotRemoved)
+                            {
+                                _dbContext.ParameterGroupParameters.Remove(parameter);
+                            }
+                        }
+
+                        //2) Additions
+                        foreach (var dtoParameter in parameterGroupDto.Parameters)
+                        {
+                            if (!paramGroupToPersist.ParameterGroupParameters.Any(pgp => pgp.ParameterId == dtoParameter.ParameterId))
+                            {
+                                paramGroupToPersist.ParameterGroupParameters.Add(new ParameterGroupParameter { ParameterId = dtoParameter.ParameterId });
+                            }
+                        }
                     }
 
                     _dbContext.SaveChanges();

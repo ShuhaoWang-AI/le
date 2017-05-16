@@ -173,6 +173,26 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
+        public void SaveParameterGroup_Test_Inline_Updating_Of_Parmeters()
+        {
+            var totalMetalsParameterGroup = _paramService.GetParameterGroup(1);
+
+            //Remove the first one
+            ParameterDto parameterToRemove = null;
+            foreach (var parameter in totalMetalsParameterGroup.Parameters)
+            {
+                parameterToRemove = parameter;
+                break;
+            }
+            totalMetalsParameterGroup.Parameters.Remove(parameterToRemove);
+
+            //Add new one
+            totalMetalsParameterGroup.Parameters.Add(new ParameterDto { ParameterId = 2 });
+
+            _paramService.SaveParameterGroup(totalMetalsParameterGroup);
+        }
+
+        [TestMethod]
         public void GetParameterGroup_Test()
         {
             var paramGroupDto = _paramService.GetParameterGroup(4);

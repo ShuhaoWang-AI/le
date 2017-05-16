@@ -449,14 +449,13 @@ namespace Linko.LinkoExchange.Services.Mapping
                 parameterGroup = new ParameterGroup();
                 parameterGroup.ParameterGroupParameters = new List<ParameterGroupParameter>();
             }
+         
 
             parameterGroup.Name = parameterGroupDto.Name.Trim();
             parameterGroup.Description = parameterGroupDto.Description;
             parameterGroup.IsActive = parameterGroupDto.IsActive;
-            foreach (var param in parameterGroupDto.Parameters)
-            {
-                parameterGroup.ParameterGroupParameters.Add(new ParameterGroupParameter() { ParameterId = param.ParameterId });
-            }
+            
+            //Handle updating parameters outside this method after calling code
 
             return parameterGroup;
         }
