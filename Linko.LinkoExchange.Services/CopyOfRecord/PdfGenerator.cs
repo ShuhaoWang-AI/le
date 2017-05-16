@@ -21,8 +21,9 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         private readonly TextState _boldTextState = new TextState("Arial", true, false);
         private readonly TextState _normalTextState = new TextState("Arial", false, false);
 
-        private Document _pdfDocument;
-        private Page _pdfPage = null;
+        private readonly Document _pdfDocument;
+        private readonly Page _pdfPage = null;
+
         public PdfGenerator(ReportPackageDto reportPackage)
         {
             PdfInit();
