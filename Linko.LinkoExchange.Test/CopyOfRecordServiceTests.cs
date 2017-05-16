@@ -503,36 +503,50 @@ namespace Linko.LinkoExchange.Test
                 OrganizationCityName = orgRegProgram.Organization.CityName,
                 OrganizationJurisdictionName = orgRegProgram.Organization.Jurisdiction?.Name,
 
-                PermitNumber = "Test---Permit---Number",
                 Comments = "Test comments",
+                OrganizationReferenceNumber = "Test-reference-number",
 
-                //AssociatedFiles = GetMockReportFiles(GetMockAttachmentFiles()),
-                //AssociatedSamples = GetMockReportSamples(GetMockSampleDtos()),
+                AttachmentTypes = GetMockReportFiles(GetMockAttachmentFiles()),
+                SamplesAndResultsTypes = GetMockReportSamples(GetMockSampleDtos()),
                 CertificationTypes = GetMockCertifications(),
             };
 
         }
 
-        private List<ReportFileDto> GetMockReportFiles(List<FileStoreDto> mockFileDtos)
+        private List<ReportPackageElementTypeDto> GetMockReportFiles(List<FileStoreDto> mockFileDtos)
         {
-            var reportFilesDtoList = new List<ReportFileDto>();
-            foreach (var mockFileDto in mockFileDtos)
+            var attachmentTypes = new List<ReportPackageElementTypeDto>();
+            var att = new ReportPackageElementTypeDto
             {
-                reportFilesDtoList.Add(new ReportFileDto() { FileStoreId = mockFileDto.FileStoreId.Value, FileStore = mockFileDto, ReportPackageElementTypeId = 2 });
-            }
+                ReportElementTypeName = "Lab Analysis Report",
+                ReportFiles = mockFileDtos.Select(a => new ReportFileDto
+                {
+                    FileStoreId = a.FileStoreId.Value,
+                    FileStore = a,
+                    ReportPackageElementTypeId = 2
+                }).ToList()
+            };
 
-            return reportFilesDtoList;
+
+            attachmentTypes.Add(att);
+            return attachmentTypes;
         }
 
-        private List<ReportSampleDto> GetMockReportSamples(List<SampleDto> mockSampleDtos)
+        private List<ReportPackageElementTypeDto> GetMockReportSamples(List<SampleDto> mockSampleDtos)
         {
-            var reportSampleDtoList = new List<ReportSampleDto>();
-            foreach (var mockSampleDto in mockSampleDtos)
+            var samplesResults = new List<ReportPackageElementTypeDto>();
+            var rptt = new ReportPackageElementTypeDto
             {
-                reportSampleDtoList.Add(new ReportSampleDto() { SampleId = mockSampleDto.SampleId.Value, Sample = mockSampleDto, ReportPackageElementTypeId = 1 });
-            }
+                ReportElementTypeName = "Samples and Results",
+                ReportSamples = mockSampleDtos.Select(a => new ReportSampleDto
+                {
+                    Sample = a,
+                    ReportPackageElementTypeId = 1
+                }).ToList()
+            };
 
-            return reportSampleDtoList;
+            samplesResults.Add(rptt);
+            return samplesResults;
         }
 
         private List<SampleDto> GetMockSampleDtos()

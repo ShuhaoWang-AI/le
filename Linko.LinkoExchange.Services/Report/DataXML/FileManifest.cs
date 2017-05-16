@@ -6,6 +6,6 @@ namespace Linko.LinkoExchange.Services.Report.DataXML
     public class FileManifest
     {
         [XmlElement("File")]
-        public List<FileInfo> Files { get; set; }
+        public List<FileInfo> Files { get; set; } = new List<FileInfo>();
     }
 }
