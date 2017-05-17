@@ -575,7 +575,7 @@ namespace Linko.LinkoExchange.Services.Sample
                             isValid = false;
                             if (!isSuppressExceptions)
                             {
-                                this.ThrowSimpleException("Numeric qualifiers must be followed by a valid value.");
+                                this.ThrowSimpleException("Result is required.");
                             }
                         }
 
