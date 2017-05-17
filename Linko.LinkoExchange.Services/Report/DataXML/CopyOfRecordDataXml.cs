@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 
 namespace Linko.LinkoExchange.Services.Report.DataXML
 {
-    [XmlRoot("Root")]
+    [XmlRoot("Cor")]
     public class CopyOfRecordDataXml
     {
         public XmlFileVersion XmlFileVersion { get; set; }
