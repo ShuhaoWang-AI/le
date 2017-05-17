@@ -228,5 +228,15 @@ namespace Linko.LinkoExchange.Test
             Assert.IsTrue(result);
         }
 
+        [TestMethod]
+        public void ValidateUserSqData_Test()
+        {
+            var answerDtos = new List<AnswerDto>();
+            answerDtos.Add(new AnswerDto { QuestionId = 1, Content = "test answer" });
+            answerDtos.Add(new AnswerDto { QuestionId = 2, Content = "Test answer" });
+            var result = _questionAnswerService.ValidateUserSqData(answerDtos);
+
+            Assert.AreEqual(result, RegistrationResult.DuplicatedSecurityQuestionAnswer);
+        }
     }
 }

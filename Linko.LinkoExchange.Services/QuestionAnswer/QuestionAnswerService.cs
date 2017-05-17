@@ -647,7 +647,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             }
 
             // Test duplicated security question answers
-            if (securityQuestions.GroupBy(i => i.Content).Any(i => i.Count() > 1))
+            if (securityQuestions.GroupBy(i => i.Content.ToLower()).Any(i => i.Count() > 1))
             {
                 return RegistrationResult.DuplicatedSecurityQuestionAnswer;
             }
