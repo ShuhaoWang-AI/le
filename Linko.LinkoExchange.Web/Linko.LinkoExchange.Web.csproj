@@ -374,9 +374,9 @@
     <Content Include="Scripts\bootstrap-switch.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <AdditionalFiles Include="Aspose.Pdf.lic">
+    <Content Include="Aspose.Pdf.lic">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AdditionalFiles>
+    </Content>
     <None Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="Scripts\fastclick.js" />
     <Content Include="Scripts\jquery-3.1.1.js" />
