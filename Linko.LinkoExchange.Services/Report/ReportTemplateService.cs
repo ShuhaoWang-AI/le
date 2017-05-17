@@ -137,7 +137,7 @@ namespace Linko.LinkoExchange.Services.Report
             {
                 rptsQuery = rptsQuery
                     .Where(i => i.IsActive &&
-                        i.EffectiveDateTimeUtc >= DateTimeOffset.UtcNow &&
+                        i.EffectiveDateTimeUtc <= DateTimeOffset.UtcNow &&
                         i.ReportPackageTemplateAssignments
                         .Select(j => j.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId)
                             .Contains(currentRegulatoryProgramId))

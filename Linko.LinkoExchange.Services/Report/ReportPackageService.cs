@@ -832,6 +832,8 @@ namespace Linko.LinkoExchange.Services.Report
                     newReportPackage.ReportStatusId = _dbContext.ReportStatuses
                         .Single(rs => rs.Name == ReportStatusName.Draft.ToString()).ReportStatusId;
                     newReportPackage.CreationDateTimeUtc = DateTimeOffset.Now;
+                    newReportPackage.LastModificationDateTimeUtc = DateTimeOffset.Now;
+                    newReportPackage.LastModifierUserId = currentUserId;
 
                     //Need to populate IU fields
                     newReportPackage.OrganizationRegulatoryProgramId = currentOrgRegProgramId;
