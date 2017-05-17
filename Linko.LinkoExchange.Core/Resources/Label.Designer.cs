@@ -61,6 +61,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All.
+        /// </summary>
+        public static string All {
+            get {
+                return ResourceManager.GetString("All", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enter your username and we&apos;ll send a password reset link to the email address we have on file..
         /// </summary>
         public static string BoxTitleForgotPassword {
@@ -259,6 +268,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ready to Submit.
+        /// </summary>
+        public static string ReadyToSubmit {
+            get {
+                return ResourceManager.GetString("ReadyToSubmit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remember Me.
         /// </summary>
         public static string RememberMe {
@@ -277,6 +295,24 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Repudiated.
+        /// </summary>
+        public static string Repudiated {
+            get {
+                return ResourceManager.GetString("Repudiated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Repudiated Pending Review.
+        /// </summary>
+        public static string RepudiatedPendingReview {
+            get {
+                return ResourceManager.GetString("RepudiatedPendingReview", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sample Event Type.
         /// </summary>
         public static string SampleEventType {
@@ -291,6 +327,24 @@ namespace Linko.LinkoExchange.Core.Resources {
         public static string SampleEventTypeCollectionMethod {
             get {
                 return ResourceManager.GetString("SampleEventTypeCollectionMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Submitted.
+        /// </summary>
+        public static string Submitted {
+            get {
+                return ResourceManager.GetString("Submitted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Submitted Pending Review.
+        /// </summary>
+        public static string SubmittedPendingReview {
+            get {
+                return ResourceManager.GetString("SubmittedPendingReview", resourceCulture);
             }
         }
         

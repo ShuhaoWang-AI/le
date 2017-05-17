@@ -12,14 +12,14 @@
                     </a>
                 </li>
 
-                <li class="treeview">
+                <li class="treeview @Html.IsActive(actions:"ReportPackages,ReportPackageDetails", controllers: "ReportPackage")">
                     <a href="#">
                         <i class="fa fa-fw glyphicon glyphicon-duplicate"></i>
                         <span>Report Packages</span>
                     </a>
                     <ul class="treeview-menu">
-                        <li>
-                            <a href="#">
+                        <li class="@Html.IsActive(actions:"ReportPackages", controllers:"ReportPackage", routeValueTag:"reportStatus:" + ReportStatusName.SubmittedPendingReview)">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.SubmittedPendingReview})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Pending Review</span>
                                 @*<span class="pull-right-container">
@@ -27,8 +27,8 @@
                             </span>*@
                             </a>
                         </li>
-                        <li>
-                            <a href="#">
+                        <li class="@Html.IsActive(actions:"ReportPackages", controllers:"ReportPackage", routeValueTag:"reportStatus:" + ReportStatusName.RepudiatedPendingReview)">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.RepudiatedPendingReview})'">
                                 <i class="fa fa-fw"></i>
                                 <span>New Repudiations</span>
                                 @*<span class="pull-right-container">
@@ -36,8 +36,8 @@
                             </span>*@
                             </a>
                         </li>
-                        <li>
-                            <a href="#">
+                        <li class="@Html.IsActive(actions:"ReportPackages", controllers:"ReportPackage", routeValueTag:"reportStatus:" + ReportStatusName.All)">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.All})'">
                                 <i class="fa fa-fw"></i>
                                 <span>All</span>
                             </a>
@@ -145,7 +145,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                         <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag:"sampleStatus:" + SampleStatusName.Draft)">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.Draft})'">
                                 <i class="fa fa-fw"></i>
-                                <span>Drafts</span>
+                                <span>Draft</span>
                                 @*<span class="pull-right-container">
                                     <span class="label bg-orange pull-right">2</span>
                                 </span>*@
@@ -166,7 +166,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                     </ul>
                 </li>
 
-                <li class="treeview">
+                <li class="treeview @Html.IsActive(actions:"ReportPackages,ReportPackageDetails", controllers: "ReportPackage")">
                     <a href="#">
                         <i class="fa fa-fw glyphicon glyphicon-duplicate"></i>
                         <span>Report Packages</span>
@@ -176,17 +176,17 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                         </span>*@
                     </a>
                     <ul class="treeview-menu">
-                        <li>
-                            <a href="#">
+                        <li class="@Html.IsActive(actions:"ReportPackages", controllers:"ReportPackage", routeValueTag:"reportStatus:" + ReportStatusName.Draft)">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.Draft})'">
                                 <i class="fa fa-fw"></i>
-                                <span>Drafts</span>
+                                <span>Draft</span>
                                 @*<span class="pull-right-container">
                                         <span class="label label-success pull-right">2</span>
                                     </span>*@
                             </a>
                         </li>
-                        <li>
-                            <a href="#">
+                        <li class="@Html.IsActive(actions:"ReportPackages", controllers:"ReportPackage", routeValueTag:"reportStatus:" + ReportStatusName.ReadyToSubmit)">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.ReadyToSubmit})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Ready to Submit</span>
                                 @*<span class="pull-right-container">
@@ -194,14 +194,14 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                                     </span>*@
                             </a>
                         </li>
-                        <li>
-                            <a href="#">
+                        <li class="@Html.IsActive(actions:"ReportPackages", controllers:"ReportPackage", routeValueTag:"reportStatus:" + ReportStatusName.Submitted)">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.Submitted})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Submitted</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="#">
+                        <li class="@Html.IsActive(actions:"ReportPackages", controllers:"ReportPackage", routeValueTag:"reportStatus:" + ReportStatusName.Repudiated)">
+                            <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.Repudiated})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Repudiated</span>
                             </a>

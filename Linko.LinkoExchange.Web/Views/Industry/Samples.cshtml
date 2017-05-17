@@ -36,29 +36,29 @@
                 @(Html.Kendo().Grid<SampleViewModel>()
                       .Name(componentName:"gridSample")
                       .Columns(columns =>
-                               {
-                                   columns.Bound(c => c.MonitoringPointName)
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.CtsEventTypeName)
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.CollectionMethodName)
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.StartDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
-                                          .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                   columns.Bound(c => c.EndDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
-                                          .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                   columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
-                                          .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                   columns.Bound(c => c.LastModifierUserName)
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                  .SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Template(m => { })
-                                          .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
-                                          .Width(pixelWidth:60);
-                               })
+                      {
+                          columns.Bound(c => c.MonitoringPointName)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.CtsEventTypeName)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.CollectionMethodName)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.StartDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                 .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                          columns.Bound(c => c.EndDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                 .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                          columns.Bound(c => c.LastModificationDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                 .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                          columns.Bound(c => c.LastModifierUserName)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                         .SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Template(m => { })
+                                 .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
+                                 .Width(pixelWidth:60);
+                      })
                       .Pageable(pageable => pageable
                                                 .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
                                                 .Refresh(enabled:true)
@@ -66,10 +66,10 @@
                                                 .Numeric(enabled:false)
                       )
                       .Selectable(selectable =>
-                                  {
-                                      selectable.Mode(mode:GridSelectionMode.Single);
-                                      selectable.Type(type:GridSelectionType.Row);
-                                  })
+                      {
+                          selectable.Mode(mode:GridSelectionMode.Single);
+                          selectable.Type(type:GridSelectionType.Row);
+                      })
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                       .Filterable(filterable => filterable.Enabled(value:false).Mode(value:GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value:true))
@@ -81,15 +81,22 @@
                                                     .ServerOperation(enabled:false)
                                                     .Batch(enabled:true)
                                                     .Sort(sort =>
-                                                          {
-                                                              sort.Add(memberName:"StartDateTimeLocal").Descending();
-                                                              sort.Add(memberName:"MonitoringPointName").Ascending();
-                                                              sort.Add(memberName:"CollectionMethodName").Ascending();
-                                                          }) // <-- initial sort expression
+                                                    {
+                                                        if (ViewBag.SampleStatusName == SampleStatusName.Reported)
+                                                        {
+                                                            sort.Add(memberName:"StartDateTimeLocal").Descending();
+                                                        }
+                                                        else
+                                                        {
+                                                            sort.Add(memberName: "StartDateTimeLocal").Ascending();
+                                                        }
+                                                        sort.Add(memberName:"MonitoringPointName").Ascending();
+                                                        sort.Add(memberName:"CollectionMethodName").Ascending();
+                                                    }) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"Samples_Read", controllerName:"Industry", routeValues:new
-                                                                                                                                                {
-                                                                                                                                                    sampleStatus = ViewBag.SampleStatusName
-                                                                                                                                                }))
+                                                    {
+                                                        sampleStatus = ViewBag.SampleStatusName
+                                                    }))
                                                     .PageSize(pageSize:15)
                                                     .Events(events => events.Error(handler:"error_handler"))
                       )

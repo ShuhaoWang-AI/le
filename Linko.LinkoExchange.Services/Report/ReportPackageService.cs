@@ -1250,7 +1250,7 @@ namespace Linko.LinkoExchange.Services.Report
                 {
                     //allowed
 
-                    //...but check to see if required Report Package Elememt Types are included.
+                    //...but check to see if required Report Package Element Types are included.
                     if (!IsRequiredReportPackageElementTypesIncluded(reportPackageId))
                     {
                         ThrowSimpleException("Minimum counts for required element types must be met before a Report Package can be submitted.");
