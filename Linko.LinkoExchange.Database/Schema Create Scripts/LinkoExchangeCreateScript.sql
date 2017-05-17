@@ -4255,7 +4255,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Registration',   
         'InviteAuthorityUser', 
         
-        'Invitation to {authorityName}',
+        'Invitation to {authorityOrganizationName}',
         '<html>
             <body> 
                 <pre>
@@ -4296,7 +4296,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         'Registration',   
         'AuthorityInviteIndustryUser', 
         
-        'Invitation to {organizationName}({authorityName})',
+        'Invitation to {organizationName} ({authorityOrganizationName})',
         '<html>
             <body> 
                 <pre>
