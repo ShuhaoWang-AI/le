@@ -517,9 +517,9 @@ namespace Linko.LinkoExchange.Services.Sample
             //
             //Validation for Sample Results
             //
+
             if (sampleDto.SampleResults != null)
             {
-                var dateTimeNowLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(DateTime.UtcNow, timeZoneId);
                 foreach (var resultDto in sampleDto.SampleResults)
                 {
                     //Check if concentration entered value is numeric and can be converted to double.
@@ -586,16 +586,6 @@ namespace Linko.LinkoExchange.Services.Sample
                             if (!isSuppressExceptions)
                             {
                                 this.ThrowSimpleException("ND or NF qualifiers cannot be followed by a value.");
-                            }
-                        }
-
-                        //Check Analysis Date & Time is valid and not in the future
-                        if (!resultDto.AnalysisDateTimeLocal.HasValue || resultDto.AnalysisDateTimeLocal.Value > dateTimeNowLocal)
-                        {
-                            isValid = false;
-                            if (!isSuppressExceptions)
-                            {
-                                this.ThrowSimpleException("Analysis Date & Time must be valid and cannot be a future date.");
                             }
                         }
 
