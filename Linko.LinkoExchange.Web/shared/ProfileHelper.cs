@@ -86,24 +86,24 @@ namespace Linko.LinkoExchange.Web.shared
             userKbqViewModel.QuestionPool = GetQuestionPool(type:QuestionTypeName.KBQ);
 
             ////  KBQ questions 
-            userKbqViewModel.KBQ1 = kbqs[index:0].Question.QuestionId ?? -1;
-            userKbqViewModel.KBQ2 = kbqs[index:1].Question.QuestionId ?? -1;
-            userKbqViewModel.KBQ3 = kbqs[index:2].Question.QuestionId ?? -1;
-            userKbqViewModel.KBQ4 = kbqs[index:3].Question.QuestionId ?? -1;
-            userKbqViewModel.KBQ5 = kbqs[index:4].Question.QuestionId ?? -1;
+            userKbqViewModel.KBQ1 = kbqs[0].Question.QuestionId ?? -1;
+            userKbqViewModel.KBQ2 = kbqs[1].Question.QuestionId ?? -1;
+            userKbqViewModel.KBQ3 = kbqs[2].Question.QuestionId ?? -1;
+            userKbqViewModel.KBQ4 = kbqs[3].Question.QuestionId ?? -1;
+            userKbqViewModel.KBQ5 = kbqs[4].Question.QuestionId ?? -1;
 
-            userKbqViewModel.KBQAnswer1 = kbqs[index:0].Answer.Content ?? "";
-            userKbqViewModel.KBQAnswer2 = kbqs[index:1].Answer.Content ?? "";
-            userKbqViewModel.KBQAnswer3 = kbqs[index:2].Answer.Content ?? "";
-            userKbqViewModel.KBQAnswer4 = kbqs[index:3].Answer.Content ?? "";
-            userKbqViewModel.KBQAnswer5 = kbqs[index:4].Answer.Content ?? "";
+            userKbqViewModel.KBQAnswer1 = kbqs[0].Answer.Content ?? "";
+            userKbqViewModel.KBQAnswer2 = kbqs[1].Answer.Content ?? "";
+            userKbqViewModel.KBQAnswer3 = kbqs[2].Answer.Content ?? "";
+            userKbqViewModel.KBQAnswer4 = kbqs[3].Answer.Content ?? "";
+            userKbqViewModel.KBQAnswer5 = kbqs[4].Answer.Content ?? "";
 
             //// keep track UserQuestionAnswerId
-            userKbqViewModel.UserQuestionAnserId_KBQ1 = kbqs[index:0].Answer.UserQuestionAnswerId ?? -1;
-            userKbqViewModel.UserQuestionAnserId_KBQ2 = kbqs[index:1].Answer.UserQuestionAnswerId ?? -1;
-            userKbqViewModel.UserQuestionAnserId_KBQ3 = kbqs[index:2].Answer.UserQuestionAnswerId ?? -1;
-            userKbqViewModel.UserQuestionAnserId_KBQ4 = kbqs[index:3].Answer.UserQuestionAnswerId ?? -1;
-            userKbqViewModel.UserQuestionAnserId_KBQ5 = kbqs[index:4].Answer.UserQuestionAnswerId ?? -1;
+            userKbqViewModel.UserQuestionAnserId_KBQ1 = kbqs[0].Answer.UserQuestionAnswerId ?? -1;
+            userKbqViewModel.UserQuestionAnserId_KBQ2 = kbqs[1].Answer.UserQuestionAnswerId ?? -1;
+            userKbqViewModel.UserQuestionAnserId_KBQ3 = kbqs[2].Answer.UserQuestionAnswerId ?? -1;
+            userKbqViewModel.UserQuestionAnserId_KBQ4 = kbqs[3].Answer.UserQuestionAnswerId ?? -1;
+            userKbqViewModel.UserQuestionAnserId_KBQ5 = kbqs[4].Answer.UserQuestionAnswerId ?? -1;
 
             return userKbqViewModel;
         }
@@ -119,15 +119,15 @@ namespace Linko.LinkoExchange.Web.shared
             userSqViewModel.QuestionPool = GetQuestionPool(type:QuestionTypeName.SQ);
 
             ////  Security questions 
-            userSqViewModel.SecurityQuestion1 = sqs[index:0].Question.QuestionId ?? -1;
-            userSqViewModel.SecurityQuestion2 = sqs[index:1].Question.QuestionId ?? -1;
+            userSqViewModel.SecurityQuestion1 = sqs[0].Question.QuestionId ?? -1;
+            userSqViewModel.SecurityQuestion2 = sqs[1].Question.QuestionId ?? -1;
 
-            userSqViewModel.SecurityQuestionAnswer2 = sqs[index:1].Answer.Content ?? "";
-            userSqViewModel.SecurityQuestionAnswer1 = sqs[index:0].Answer.Content ?? "";
+            userSqViewModel.SecurityQuestionAnswer2 = sqs[1].Answer.Content ?? "";
+            userSqViewModel.SecurityQuestionAnswer1 = sqs[0].Answer.Content ?? "";
 
             //// Keep track UserQuestionAnswerId 
-            userSqViewModel.UserQuestionAnserId_SQ1 = sqs[index:0].Answer.UserQuestionAnswerId ?? -1;
-            userSqViewModel.UserQuestionAnserId_SQ2 = sqs[index:1].Answer.UserQuestionAnswerId ?? -1;
+            userSqViewModel.UserQuestionAnserId_SQ1 = sqs[0].Answer.UserQuestionAnswerId ?? -1;
+            userSqViewModel.UserQuestionAnserId_SQ2 = sqs[1].Answer.UserQuestionAnswerId ?? -1;
 
             return userSqViewModel;
         }

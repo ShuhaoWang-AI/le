@@ -451,9 +451,9 @@
                     @for (var i = 0; i < Model.AvailableResultQualifierValidValues.Count; i++)
                     {
                         <div class="checkbox-inline">
-                            @Html.CheckBoxFor(m => m.AvailableResultQualifierValidValues[index:i].Selected)
-                            @Html.HiddenFor(m => m.AvailableResultQualifierValidValues[index:i].Value)
-                            @Html.LabelFor(m => m.AvailableResultQualifierValidValues[index:i].Selected, labelText:Model.AvailableResultQualifierValidValues[index:i].Text)
+                            @Html.CheckBoxFor(m => m.AvailableResultQualifierValidValues[i].Selected)
+                            @Html.HiddenFor(m => m.AvailableResultQualifierValidValues[i].Value)
+                            @Html.LabelFor(m => m.AvailableResultQualifierValidValues[i].Selected, labelText:Model.AvailableResultQualifierValidValues[i].Text)
                         </div>
                     }
                 </div>
@@ -469,9 +469,9 @@
                     @for (var i = 0; i < Model.AvailableFlowUnitValidValues.Count; i++)
                     {
                         <div class="checkbox-inline">
-                            @Html.CheckBoxFor(m => m.AvailableFlowUnitValidValues[index:i].Selected)
-                            @Html.HiddenFor(m => m.AvailableFlowUnitValidValues[index:i].Value)
-                            @Html.LabelFor(m => m.AvailableFlowUnitValidValues[index:i].Selected, labelText:Model.AvailableFlowUnitValidValues[index:i].Text)
+                            @Html.CheckBoxFor(m => m.AvailableFlowUnitValidValues[i].Selected)
+                            @Html.HiddenFor(m => m.AvailableFlowUnitValidValues[i].Value)
+                            @Html.LabelFor(m => m.AvailableFlowUnitValidValues[i].Selected, labelText:Model.AvailableFlowUnitValidValues[i].Text)
                         </div>
                     }
                 </div>

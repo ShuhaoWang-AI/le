@@ -373,7 +373,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             for (var i = 0; i < filterDescriptors.Count(); i++)
             {
-                var filter = filterDescriptors[index:i];
+                var filter = filterDescriptors[i];
                 if (filter is CompositeFilterDescriptor)
                 {
                     GetFilterDescriptersFromTree(filterDescriptors:((CompositeFilterDescriptor) filter).FilterDescriptors, foundFilterDescriptors:ref foundFilterDescriptors);
