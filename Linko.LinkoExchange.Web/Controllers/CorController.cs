@@ -29,5 +29,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             var verifyResult = _reportPackageService.VerififyCopyOfRecord(reportPackageId);
             return View(verifyResult);
         }
+
+        [Route("Core/{reportPackageId:int}/signAndSubmit")]
+        public ViewResult SignAndSubmitReport(int reportPackageId)
+        {
+            _reportPackageService.SignAndSubmitReportPackage(reportPackageId);
+            return View();
+        }
     }
 }
