@@ -1663,14 +1663,18 @@ END
             , stgp.LEParameterID
             , stgu.LEUnitID
             , stgmpl.CTSDateEffective
-            , stgmpl.CTSDateRetired
+            , CASE
+                    WHEN stgmpl.CTSDateRetired IS NULL THEN
+                        CONVERT(datetimeoffset(0), '9999-12-31 00:00:00')
+                    ELSE
+                        stgmpl.CTSDateRetired
+              END AS CTSDateRetired
     FROM dbo.ts_LE_CTSMonPointLimits stgmpl
         INNER JOIN dbo.ts_LE_CTSMonitoringPoints stgmp ON stgmp.CTSMonPointID = stgmpl.CTSMonPointID
         INNER JOIN dbo.ts_LE_CTSParameters stgp ON stgp.CTSParamName = stgmpl.CTSParamName 
                                                     AND stgp.LEOrganizationRegulatoryProgramID = stgmpl.LEOrganizationRegulatoryProgramID
         INNER JOIN dbo.ts_LE_CTSUnits stgu ON stgu.CTSUnitCode = stgmpl.CTSDailyLimitUnitsCode
-    WHERE stgmpl.CTSDateRetired IS NOT NULL -- testing data has some invalid values, i.e. null values
-        AND stgmpl.LEOrganizationRegulatoryProgramID = @LEAccountID
+    WHERE stgmpl.LEOrganizationRegulatoryProgramID = @LEAccountID
         AND stgmpl.InsertedDateTimeUtc > @LELastSyncDateTimeUtc
     UNION
     -- IU sample requirements
@@ -1678,7 +1682,12 @@ END
             , stgp.LEParameterID
             , NULL
             , stgsr.CTSLimitEffectiveDate
-            , stgsr.CTSLimitRetireDate
+            , CASE
+                    WHEN stgsr.CTSLimitRetireDate IS NULL THEN
+                        CONVERT(datetimeoffset(0), '9999-12-31 00:00:00')
+                    ELSE
+                        stgsr.CTSLimitRetireDate
+              END AS CTSLimitRetireDate
     FROM dbo.ts_LE_CTSIUSampleRequirements stgsr
         LEFT JOIN dbo.ts_LE_CTSMonPointLimits stgmpl ON stgmpl.CTSMonPointID = stgsr.CTSMonPointID
                                                         AND stgmpl.CTSParamName = stgsr.CTSParamName
@@ -1686,8 +1695,7 @@ END
         INNER JOIN dbo.ts_LE_CTSMonitoringPoints stgmp ON stgmp.CTSMonPointID = stgsr.CTSMonPointID
         INNER JOIN dbo.ts_LE_CTSParameters stgp ON stgp.CTSParamName = stgsr.CTSParamName 
                                                     AND stgp.LEOrganizationRegulatoryProgramID = stgsr.LEOrganizationRegulatoryProgramID
-    WHERE stgsr.CTSLimitRetireDate IS NOT NULL -- testing data has some invalid values, i.e. null values
-        AND stgmpl.CTSMonPointLimID IS NULL
+    WHERE stgmpl.CTSMonPointLimID IS NULL
         AND stgsr.LEOrganizationRegulatoryProgramID = @LEAccountID
         AND stgsr.InsertedDateTimeUtc > @LELastSyncDateTimeUtc;
 
