@@ -80,7 +80,7 @@ namespace Linko.LinkoExchange.Test
                 _questionAnswerServices.Object, _logger.Object, _mapHeper, _crommerAuditLogService.Object);
 
 
-            IDigitalSignatureManager certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+            IDigitalSignatureManager certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, _logger.Object, _httpContext.Object);
 
             _copyOrRecordService = new CopyOfRecordService
                 (_dbContext,
@@ -163,7 +163,7 @@ namespace Linko.LinkoExchange.Test
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
-            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, _logger.Object, _httpContext.Object);
             var result = certificateDigitalSignatureManager.VerifySignature(copyOfRecordDto.Signature, copyOfRecordDto.Data);
 
             Assert.IsTrue(result);
@@ -194,7 +194,7 @@ namespace Linko.LinkoExchange.Test
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
 
-            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, _logger.Object, _httpContext.Object);
 
             ////1. Modify sigature 
             copyOfRecordDto.Signature = "aaaa";
@@ -228,7 +228,7 @@ namespace Linko.LinkoExchange.Test
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
 
-            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, _logger.Object, _httpContext.Object);
 
             ////1. Modify sigature  
             var testSingature = "fake signature";
@@ -263,7 +263,7 @@ namespace Linko.LinkoExchange.Test
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
-            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, _logger.Object, _httpContext.Object);
 
             ////1. Fake signature  
             var testSingature = "fake data";
@@ -297,7 +297,7 @@ namespace Linko.LinkoExchange.Test
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
-            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, _logger.Object, _httpContext.Object);
 
             ////1. change some of the data  
             copyOfRecordDto.Data[0] = 10;
@@ -330,7 +330,7 @@ namespace Linko.LinkoExchange.Test
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
-            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object);
+            var certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, _logger.Object, _httpContext.Object);
 
             ////1. assign empty byte array  
             copyOfRecordDto.Data = new byte[] { };

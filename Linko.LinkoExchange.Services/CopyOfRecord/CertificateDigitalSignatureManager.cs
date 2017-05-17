@@ -14,29 +14,22 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
     public class CertificateDigitalSignatureManager : IDigitalSignatureManager
     {
         private readonly LinkoExchangeContext _dbContext;
-        private readonly IMapHelper _mapHelper;
         private readonly ILogger _logger;
 
-        private readonly X509Certificate2 _certificate;
-        private readonly RSACryptoServiceProvider _privateKey;
-        private readonly RSACryptoServiceProvider _publicKey;
+        private RSACryptoServiceProvider _privateKey;
+        private RSACryptoServiceProvider _publicKey;
+        private int _currentCertificateId;
+        private bool _initialized = false;
 
-        private readonly int _currentCertificateId;
 
         public CertificateDigitalSignatureManager(
             LinkoExchangeContext dbContext,
-            IMapHelper mapHelper,
             ILogger logger,
             IHttpContextService httpContextService)
         {
             if (dbContext == null)
             {
                 throw new ArgumentNullException(nameof(dbContext));
-            }
-
-            if (mapHelper == null)
-            {
-                throw new ArgumentNullException(nameof(mapHelper));
             }
 
             if (logger == null)
@@ -50,23 +43,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             }
 
             _dbContext = dbContext;
-            _mapHelper = mapHelper;
             _logger = logger;
-
-            var certificateInfo = GetLatestCertificate();
-            _currentCertificateId = certificateInfo.CopyOfRecordCertificateId;
-
-            var certificatePassword = certificateInfo.Password;
-            var certifcateFile = Path.Combine(certificateInfo.PhysicalPath, certificateInfo.FileName);
-
-            _certificate = new X509Certificate2(certifcateFile, certificatePassword);
-            _privateKey = (RSACryptoServiceProvider)_certificate.PrivateKey;
-            _publicKey = (RSACryptoServiceProvider)_certificate.PublicKey.Key;
-
-            if (_privateKey == null || _publicKey == null)
-            {
-                throw new Exception(message: "Invalid certificate or password.");
-            }
         }
 
         public string SignData(string base64Data)
@@ -90,6 +67,11 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         public int LatestCertificateId()
         {
+            if (_initialized == false)
+            {
+                InitializeCertificate();
+            }
+
             return _currentCertificateId;
         }
 
@@ -106,13 +88,43 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         private byte[] SignData(byte[] data)
         {
+            if (_initialized == false)
+            {
+                InitializeCertificate();
+            }
+
             var halg = new SHA1CryptoServiceProvider();
             return _privateKey.SignData(data, halg);
         }
         private bool VerifySignature(byte[] originData, byte[] signedData)
         {
+            if (_initialized == false)
+            {
+                InitializeCertificate();
+            }
+
             var halg = new SHA1CryptoServiceProvider();
             return _publicKey.VerifyData(originData, halg, signedData);
+        }
+
+        private void InitializeCertificate()
+        {
+            var certificateInfo = GetLatestCertificate();
+            _currentCertificateId = certificateInfo.CopyOfRecordCertificateId;
+
+            var certificatePassword = certificateInfo.Password;
+            var certifcateFile = Path.Combine(certificateInfo.PhysicalPath, certificateInfo.FileName);
+
+            var certificate = new X509Certificate2(certifcateFile, certificatePassword);
+            _privateKey = (RSACryptoServiceProvider)certificate.PrivateKey;
+            _publicKey = (RSACryptoServiceProvider)certificate.PublicKey.Key;
+
+            if (_privateKey == null || _publicKey == null)
+            {
+                throw new Exception(message: "Invalid certificate or password.");
+            }
+
+            _initialized = true;
         }
 
         #endregion 
