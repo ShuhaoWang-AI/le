@@ -431,7 +431,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             if (samplesReportPackageElementCategory != null)
             {
-                var sortedSamplesAndResultsTypes = new SortedList<int, ReportPackageElementTypeDto>();
+                var sortedSamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
                 foreach (var existingSamplesReportPackageElementType in samplesReportPackageElementCategory.ReportPackageElementTypes)
                 {
                     var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingSamplesReportPackageElementType);
@@ -455,9 +455,9 @@ namespace Linko.LinkoExchange.Services.Report
 
                     }
 
-                    sortedSamplesAndResultsTypes.Add(reportPackageElementTypeDto.SortOrder, reportPackageElementTypeDto);
+                    sortedSamplesAndResultsTypes.Add(reportPackageElementTypeDto);
                 }
-                reportPackagegDto.SamplesAndResultsTypes = sortedSamplesAndResultsTypes.Values.ToList();
+                reportPackagegDto.SamplesAndResultsTypes = sortedSamplesAndResultsTypes.OrderBy(item => item.SortOrder).ToList();
             }
 
 
@@ -473,7 +473,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             if (filesReportPackageElementCategory != null)
             {
-                var sortedAttachmentTypes = new SortedList<int, ReportPackageElementTypeDto>();
+                var sortedAttachmentTypes = new List<ReportPackageElementTypeDto>();
                 foreach (var existingFilesReportPackageElementType in filesReportPackageElementCategory.ReportPackageElementTypes)
                 {
                     var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingFilesReportPackageElementType);
@@ -494,9 +494,9 @@ namespace Linko.LinkoExchange.Services.Report
                         reportPackageElementTypeDto.ReportFiles.Add(reportFileDto);
 
                     }
-                    sortedAttachmentTypes.Add(reportPackageElementTypeDto.SortOrder, reportPackageElementTypeDto);
+                    sortedAttachmentTypes.Add(reportPackageElementTypeDto);
                 }
-                reportPackagegDto.AttachmentTypes = sortedAttachmentTypes.Values.ToList();
+                reportPackagegDto.AttachmentTypes = sortedAttachmentTypes.OrderBy(item => item.SortOrder).ToList();
             }
 
 
@@ -508,7 +508,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             if (certificationReportPackageElementCategory != null)
             {
-                var sortedCertificationTypes = new SortedList<int, ReportPackageElementTypeDto>();
+                var sortedCertificationTypes = new List<ReportPackageElementTypeDto>();
                 foreach (var existingCertsReportPackageElementType in certificationReportPackageElementCategory.ReportPackageElementTypes)
                 {
                     var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingCertsReportPackageElementType);
@@ -529,9 +529,9 @@ namespace Linko.LinkoExchange.Services.Report
                         reportPackageElementTypeDto.ReportFiles.Add(reportFileDto);
 
                     }
-                    sortedCertificationTypes.Add(reportPackageElementTypeDto.SortOrder, reportPackageElementTypeDto);
+                    sortedCertificationTypes.Add(reportPackageElementTypeDto);
                 }
-                reportPackagegDto.CertificationTypes = sortedCertificationTypes.Values.ToList();
+                reportPackagegDto.CertificationTypes = sortedCertificationTypes.OrderBy(item => item.SortOrder).ToList();
             }
 
             _logger.Info("Leave ReportPackageService.GetReportPackage. reportPackageId={0}", reportPackageId);
