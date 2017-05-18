@@ -246,7 +246,7 @@ namespace Linko.LinkoExchange.Services.Report
                     {
                         OriginalFileName = reportFile.FileStore.OriginalFileName,
                         SystemGeneratedUniqueFileName = reportFile.FileStore.Name,
-                        AttachmentType = reportFile.FileStore.FileType
+                        AttachmentType = reportFile.FileStore.ReportElementTypeName
                     });
 
                 }
@@ -311,20 +311,6 @@ namespace Linko.LinkoExchange.Services.Report
 
                     foreach (var sampleResultDto in sampleDto.SampleResults)
                     {
-                        var sampleResultValue = "";
-                        var limitBasisValue = "";
-
-                        if (string.IsNullOrEmpty(sampleResultDto.MassLoadingValue))
-                        {
-                            limitBasisValue = LimitBasisName.Concentration.ToString();
-                            sampleResultValue = sampleResultDto.Value;
-                        }
-                        else
-                        {
-                            limitBasisValue = LimitBasisName.MassLoading.ToString();
-                            sampleResultValue = sampleResultDto.MassLoadingValue;
-                        }
-
                         var analysisDateTime = "";
                         if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
                         {
@@ -335,17 +321,37 @@ namespace Linko.LinkoExchange.Services.Report
                         {
                             ParameterName = sampleResultDto.ParameterName,
                             Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier),
-                            Value = sampleResultValue,
+                            Value = sampleResultDto.Value,
                             UnitName = sampleResultDto.UnitName,
                             EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit,
                             MethodDetectionLimit = sampleResultDto.MethodDetectionLimit.ToString(),
                             AnalysisMethod = sampleResultDto.AnalysisMethod,
                             AnalysisDateTimeUtc = analysisDateTime,
                             IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
-                            LimitBasis = limitBasisValue
+                            LimitBasis = LimitBasisName.Concentration.ToString()
                         };
 
                         sampleNode.SampleResults.Add(sampleResultNode);
+
+                        if (sampleResultDto.IsCalcMassLoading)
+                        {
+                            sampleResultNode = new SampleResultNode
+                            {
+                                ParameterName = sampleResultDto.ParameterName,
+                                Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier),
+                                Value = sampleResultDto.MassLoadingValue,
+                                UnitName = sampleResultDto.MassLoadingUnitName,
+                                EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit,
+                                MethodDetectionLimit = sampleResultDto.MethodDetectionLimit.ToString(),
+                                AnalysisMethod = sampleResultDto.AnalysisMethod,
+                                AnalysisDateTimeUtc = analysisDateTime,
+                                IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
+                                LimitBasis = LimitBasisName.MassLoading.ToString()
+                            };
+
+                            sampleNode.SampleResults.Add(sampleResultNode);
+                        }
+
                     }
                 }
             }
@@ -455,7 +461,7 @@ namespace Linko.LinkoExchange.Services.Report
             }
 
 
-            
+
 
             //
             //ADD FILE ASSOCIATIONS (AND OPTIONALLY FILE DATA)
@@ -950,8 +956,9 @@ namespace Linko.LinkoExchange.Services.Report
                         }
 
                     }
-                    else {
-                        
+                    else
+                    {
+
                         //Log -- there is no Sample & Results category for this Report Package
                         //  therefore Samples & Results could not be automatically added.
                     }

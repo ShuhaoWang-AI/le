@@ -285,5 +285,15 @@ namespace Linko.LinkoExchange.Test
             var isGood = _reportPackageService.IsRequiredReportPackageElementTypesIncluded(11);
         }
 
+        [TestMethod]
+        public void Test_CreatePDF()
+        {
+            var templateId = 1;
+            var startDateTimeLocal = new DateTime(2017, 4, 20);
+            var endDateTimeLocal = new DateTime(2018, 4, 28);
+            var reportPackageId = _reportPackageService.CreateDraft(templateId, startDateTimeLocal, endDateTimeLocal);
+
+
+        }
     }
 }
