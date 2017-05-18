@@ -10,8 +10,8 @@ namespace Linko.LinkoExchange.Services.Invitation
         /// Delete an invitation from db.
         /// </summary>
         /// <param name="invitation">The invitation id to be deleted.</param>
-        /// /// <param name="registrationActorOrgRegProgUserId">When we are deleting an invitation after a user Registers</param>
-        void DeleteInvitation(string invitationId, int? registrationActorOrgRegProgUserId = null);
+        /// <param name="isSystemAction">True when system is automatically deleting an Invitation after Registration occurs</param>
+        void DeleteInvitation(string invitationId, bool isSystemAction = false);
 
         /// <summary>
         /// Get the invitation by ID

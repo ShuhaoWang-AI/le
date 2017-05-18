@@ -638,7 +638,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     // All succeed
                     // 4 Remove the invitation from table 
-                    _invitationService.DeleteInvitation(invitationDto.InvitationId, orpu.OrganizationRegulatoryProgramUserId);
+                    _invitationService.DeleteInvitation(invitationDto.InvitationId, true);
 
                     _dbContext.SaveChanges();
                     transaction.Commit();
