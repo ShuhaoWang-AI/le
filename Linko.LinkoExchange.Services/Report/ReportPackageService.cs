@@ -423,40 +423,39 @@ namespace Linko.LinkoExchange.Services.Report
             var samplesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
                 .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.SamplesAndResults.ToString());
 
-            if (samplesReportPackageElementCategory == null)
+            if (samplesReportPackageElementCategory != null)
             {
-                //throw Exception
-                throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.SamplesAndResults}', reportPackageId={reportPackageId}");
-            }
-
-
-            var sortedSamplesAndResultsTypes = new SortedList<int, ReportPackageElementTypeDto>();
-            foreach (var existingSamplesReportPackageElementType in samplesReportPackageElementCategory.ReportPackageElementTypes)
-            {
-                var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingSamplesReportPackageElementType);
-                reportPackageElementTypeDto.ReportSamples = new List<ReportSampleDto>();
-                //Should just be one iteration through this loop for the current phase, but in the future
-                //we might have more than one "Sample and Results" section in a Report Package
-
-                foreach (var reportSampleAssociated in existingSamplesReportPackageElementType.ReportSamples)
+                var sortedSamplesAndResultsTypes = new SortedList<int, ReportPackageElementTypeDto>();
+                foreach (var existingSamplesReportPackageElementType in samplesReportPackageElementCategory.ReportPackageElementTypes)
                 {
-                    var reportSampleDto = new ReportSampleDto()
+                    var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingSamplesReportPackageElementType);
+                    reportPackageElementTypeDto.ReportSamples = new List<ReportSampleDto>();
+                    //Should just be one iteration through this loop for the current phase, but in the future
+                    //we might have more than one "Sample and Results" section in a Report Package
+
+                    foreach (var reportSampleAssociated in existingSamplesReportPackageElementType.ReportSamples)
                     {
-                        ReportSampleId = reportSampleAssociated.ReportSampleId,
-                        ReportPackageElementTypeId = reportSampleAssociated.ReportPackageElementTypeId,
-                        SampleId = reportSampleAssociated.SampleId
-                    };
-                    if (isIncludeAssociatedElementData)
-                    {
-                        reportSampleDto.Sample = _sampleService.GetSampleDetails(reportSampleAssociated.SampleId);
+                        var reportSampleDto = new ReportSampleDto()
+                        {
+                            ReportSampleId = reportSampleAssociated.ReportSampleId,
+                            ReportPackageElementTypeId = reportSampleAssociated.ReportPackageElementTypeId,
+                            SampleId = reportSampleAssociated.SampleId
+                        };
+                        if (isIncludeAssociatedElementData)
+                        {
+                            reportSampleDto.Sample = _sampleService.GetSampleDetails(reportSampleAssociated.SampleId);
+                        }
+                        reportPackageElementTypeDto.ReportSamples.Add(reportSampleDto);
+
                     }
-                    reportPackageElementTypeDto.ReportSamples.Add(reportSampleDto);
 
+                    sortedSamplesAndResultsTypes.Add(reportPackageElementTypeDto.SortOrder, reportPackageElementTypeDto);
                 }
-
-                sortedSamplesAndResultsTypes.Add(reportPackageElementTypeDto.SortOrder, reportPackageElementTypeDto);
+                reportPackagegDto.SamplesAndResultsTypes = sortedSamplesAndResultsTypes.Values.ToList();
             }
-            reportPackagegDto.SamplesAndResultsTypes = sortedSamplesAndResultsTypes.Values.ToList();
+
+
+            
 
             //
             //ADD FILE ASSOCIATIONS (AND OPTIONALLY FILE DATA)
@@ -466,36 +465,34 @@ namespace Linko.LinkoExchange.Services.Report
             var filesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
                 .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.Attachments.ToString());
 
-            if (filesReportPackageElementCategory == null)
+            if (filesReportPackageElementCategory != null)
             {
-                //throw Exception
-                throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.Attachments}', reportPackageId={reportPackageId}");
-            }
-
-            var sortedAttachmentTypes = new SortedList<int, ReportPackageElementTypeDto>();
-            foreach (var existingFilesReportPackageElementType in filesReportPackageElementCategory.ReportPackageElementTypes)
-            {
-                var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingFilesReportPackageElementType);
-                reportPackageElementTypeDto.ReportFiles = new List<ReportFileDto>();
-
-                foreach (var reportFileAssociated in existingFilesReportPackageElementType.ReportFiles)
+                var sortedAttachmentTypes = new SortedList<int, ReportPackageElementTypeDto>();
+                foreach (var existingFilesReportPackageElementType in filesReportPackageElementCategory.ReportPackageElementTypes)
                 {
-                    var reportFileDto = new ReportFileDto()
-                    {
-                        ReportFileId = reportFileAssociated.ReportFileId,
-                        ReportPackageElementTypeId = reportFileAssociated.ReportPackageElementTypeId,
-                        FileStoreId = reportFileAssociated.FileStoreId
-                    };
-                    if (isIncludeAssociatedElementData)
-                    {
-                        reportFileDto.FileStore = _mapHelper.GetFileStoreDtoFromFileStore(_dbContext.FileStores.Single(s => s.FileStoreId == reportFileAssociated.FileStoreId));
-                    }
-                    reportPackageElementTypeDto.ReportFiles.Add(reportFileDto);
+                    var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingFilesReportPackageElementType);
+                    reportPackageElementTypeDto.ReportFiles = new List<ReportFileDto>();
 
+                    foreach (var reportFileAssociated in existingFilesReportPackageElementType.ReportFiles)
+                    {
+                        var reportFileDto = new ReportFileDto()
+                        {
+                            ReportFileId = reportFileAssociated.ReportFileId,
+                            ReportPackageElementTypeId = reportFileAssociated.ReportPackageElementTypeId,
+                            FileStoreId = reportFileAssociated.FileStoreId
+                        };
+                        if (isIncludeAssociatedElementData)
+                        {
+                            reportFileDto.FileStore = _mapHelper.GetFileStoreDtoFromFileStore(_dbContext.FileStores.Single(s => s.FileStoreId == reportFileAssociated.FileStoreId));
+                        }
+                        reportPackageElementTypeDto.ReportFiles.Add(reportFileDto);
+
+                    }
+                    sortedAttachmentTypes.Add(reportPackageElementTypeDto.SortOrder, reportPackageElementTypeDto);
                 }
-                sortedAttachmentTypes.Add(reportPackageElementTypeDto.SortOrder, reportPackageElementTypeDto);
+                reportPackagegDto.AttachmentTypes = sortedAttachmentTypes.Values.ToList();
             }
-            reportPackagegDto.AttachmentTypes = sortedAttachmentTypes.Values.ToList();
+
 
             //
             //ADD CERTIFICATIONS
@@ -503,19 +500,33 @@ namespace Linko.LinkoExchange.Services.Report
             var certificationReportPackageElementCategory = reportPackage.ReportPackageElementCategories
                 .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.Certifications.ToString());
 
-            if (certificationReportPackageElementCategory == null)
+            if (certificationReportPackageElementCategory != null)
             {
-                //throw Exception
-                throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.Certifications}', reportPackageId={reportPackageId}");
-            }
+                var sortedCertificationTypes = new SortedList<int, ReportPackageElementTypeDto>();
+                foreach (var existingCertsReportPackageElementType in certificationReportPackageElementCategory.ReportPackageElementTypes)
+                {
+                    var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingCertsReportPackageElementType);
+                    reportPackageElementTypeDto.ReportFiles = new List<ReportFileDto>();
 
-            var sortedCertificationTypes = new SortedList<int, ReportPackageElementTypeDto>();
-            foreach (var existingCertsReportPackageElementType in certificationReportPackageElementCategory.ReportPackageElementTypes)
-            {
-                var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingCertsReportPackageElementType);
-                sortedCertificationTypes.Add(reportPackageElementTypeDto.SortOrder, reportPackageElementTypeDto);
+                    foreach (var reportFileAssociated in existingCertsReportPackageElementType.ReportFiles)
+                    {
+                        var reportFileDto = new ReportFileDto()
+                        {
+                            ReportFileId = reportFileAssociated.ReportFileId,
+                            ReportPackageElementTypeId = reportFileAssociated.ReportPackageElementTypeId,
+                            FileStoreId = reportFileAssociated.FileStoreId
+                        };
+                        if (isIncludeAssociatedElementData)
+                        {
+                            reportFileDto.FileStore = _mapHelper.GetFileStoreDtoFromFileStore(_dbContext.FileStores.Single(s => s.FileStoreId == reportFileAssociated.FileStoreId));
+                        }
+                        reportPackageElementTypeDto.ReportFiles.Add(reportFileDto);
+
+                    }
+                    sortedCertificationTypes.Add(reportPackageElementTypeDto.SortOrder, reportPackageElementTypeDto);
+                }
+                reportPackagegDto.CertificationTypes = sortedCertificationTypes.Values.ToList();
             }
-            reportPackagegDto.CertificationTypes = sortedCertificationTypes.Values.ToList();
 
             _logger.Info("Leave ReportPackageService.GetReportPackage. reportPackageId={0}", reportPackageId);
             return reportPackagegDto;
@@ -895,18 +906,6 @@ namespace Linko.LinkoExchange.Services.Report
 
                     _dbContext.ReportPackages.Add(newReportPackage);
 
-                    //Associate all existing and eligible samples to this draft
-                    //
-                    //From UC-16.4: "System pulls all samples in status "Ready to Report" with 
-                    //Sample Start date or Sample End Date on or between report period into Draft"
-                    //
-
-                    var existingEligibleSamples = _dbContext.Samples
-                        .Where(s => s.ForOrganizationRegulatoryProgramId == currentOrgRegProgramId
-                            && s.IsReadyToReport
-                            && ((s.StartDateTimeUtc <= endDateTimeUtc && s.StartDateTimeUtc >= startDateTimeUtc) ||
-                                (s.EndDateTimeUtc <= endDateTimeUtc && s.EndDateTimeUtc >= startDateTimeUtc)));
-
                     _dbContext.SaveChanges(); //Need to do this to get new Id for samplesAndResultsReportPackageElementCategory
 
                     var samplesAndResultsReportPackageElementCategory = _dbContext.ReportPackageElementCategories
@@ -915,30 +914,48 @@ namespace Linko.LinkoExchange.Services.Report
                         .SingleOrDefault(rpec => rpec.ReportPackageId == newReportPackage.ReportPackageId
                             && rpec.ReportElementCategory.Name == ReportElementCategoryName.SamplesAndResults.ToString());
 
-                    if (samplesAndResultsReportPackageElementCategory == null)
+                    if (samplesAndResultsReportPackageElementCategory != null)
                     {
-                        //throw Exception
-                        throw new Exception($"ERROR: Could not find a ReportPackageElementCategory associated with '{ReportElementCategoryName.SamplesAndResults}', reportPackageTemplateId={reportPackageTemplateId}");
+                        //Associate all existing and eligible samples to this draft
+                        //
+                        //From UC-16.4: "System pulls all samples in status "Ready to Report" with 
+                        //Sample Start date or Sample End Date on or between report period into Draft"
+                        //
+
+                        var samplesAndResultsReportPackageElementType = samplesAndResultsReportPackageElementCategory.ReportPackageElementTypes.FirstOrDefault();
+                        //Should be 1 and only 1 Report Package Element Type for Sample and Results 
+                        //(but may be more than 1 in the future -- if so, which one is used to add samples??)
+                        if (samplesAndResultsReportPackageElementType != null)
+                        {
+                            var existingEligibleSamples = _dbContext.Samples
+                            .Where(s => s.ForOrganizationRegulatoryProgramId == currentOrgRegProgramId
+                                && s.IsReadyToReport
+                                && ((s.StartDateTimeUtc <= endDateTimeUtc && s.StartDateTimeUtc >= startDateTimeUtc) ||
+                                    (s.EndDateTimeUtc <= endDateTimeUtc && s.EndDateTimeUtc >= startDateTimeUtc)));
+
+                            foreach (var sample in existingEligibleSamples)
+                            {
+                                var reportSampleAssociation = new ReportSample();
+                                reportSampleAssociation.ReportPackageElementTypeId = samplesAndResultsReportPackageElementType.ReportPackageElementTypeId;
+                                reportSampleAssociation.SampleId = sample.SampleId;
+                                _dbContext.ReportSamples.Add(reportSampleAssociation);
+                            }
+
+                            _dbContext.SaveChanges();
+                        }
+                        else
+                        {
+                            //Log -- there is no Sample & Results element type for this Report Package
+                            //  therefore Samples & Results could not be automatically added.
+                        }
+
+                    }
+                    else {
+                        
+                        //Log -- there is no Sample & Results category for this Report Package
+                        //  therefore Samples & Results could not be automatically added.
                     }
 
-                    var samplesAndResultsReportPackageElementType = samplesAndResultsReportPackageElementCategory.ReportPackageElementTypes.FirstOrDefault();
-                    //Should be 1 and only 1 Report Package Element Type for Sample and Results 
-                    //(but may be more than 1 in the future -- if so, which one is used to add samples??)
-                    if (samplesAndResultsReportPackageElementType == null)
-                    {
-                        //throw Exception
-                        throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.SamplesAndResults}', reportPackageTemplateId={reportPackageTemplateId}");
-                    }
-
-                    foreach (var sample in existingEligibleSamples)
-                    {
-                        var reportSampleAssociation = new ReportSample();
-                        reportSampleAssociation.ReportPackageElementTypeId = samplesAndResultsReportPackageElementType.ReportPackageElementTypeId;
-                        reportSampleAssociation.SampleId = sample.SampleId;
-                        _dbContext.ReportSamples.Add(reportSampleAssociation);
-                    }
-
-                    _dbContext.SaveChanges();
                     transaction.Commit();
 
                     newReportPackageId = newReportPackage.ReportPackageId;
@@ -1041,118 +1058,170 @@ namespace Linko.LinkoExchange.Services.Report
                 var samplesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
                     .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.SamplesAndResults.ToString());
 
-                if (samplesReportPackageElementCategory == null)
+                if (samplesReportPackageElementCategory != null)
                 {
-                    //throw Exception
-                    throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.SamplesAndResults}', reportPackageDto.ReportPackageId={reportPackageDto.ReportPackageId}");
-                }
-
-                //Handle deletions first
-                // - Iterate through all SampleAndResult rows in ReportSample and delete ones that cannot be matched with an item in reportPackageDto.AssociatedSamples
-                foreach (var existingSamplesReportPackageElementType in samplesReportPackageElementCategory.ReportPackageElementTypes)
-                {
-                    //Should just be one iteration through this loop for the current phase, but in the future
-                    //we might have more than one "Sample and Results" section in a Report Package
-
-                    var existingReportSamples = existingSamplesReportPackageElementType.ReportSamples.ToArray();
-                    for (var i = 0; i < existingReportSamples.Length; i++)
+                    //Handle deletions first
+                    // - Iterate through all SampleAndResult rows in ReportSample and delete ones that cannot be matched with an item in reportPackageDto.SamplesAndResultsTypes
+                    foreach (var existingSamplesReportPackageElementType in samplesReportPackageElementCategory.ReportPackageElementTypes)
                     {
-                        var existingReportSample = existingReportSamples[i];
-                        //Find match in dto samples
-                        var matchedSampleAssociation = reportPackageDto.SamplesAndResultsTypes
-                                                        .SingleOrDefault(rpet => rpet.ReportPackageElementTypeId == existingReportSample.ReportPackageElementTypeId)
-                                                        ?.ReportSamples
-                                                            .SingleOrDefault(rs => rs.SampleId == existingReportSample.SampleId);
+                        //Should just be one iteration through this loop for the current phase, but in the future
+                        //we might have more than one "Sample and Results" section in a Report Package
 
-                        if (matchedSampleAssociation == null)
+                        var existingReportSamples = existingSamplesReportPackageElementType.ReportSamples.ToArray();
+                        for (var i = 0; i < existingReportSamples.Length; i++)
                         {
-                            //existing association must have been deleted -- remove
-                            _dbContext.ReportSamples.Remove(existingReportSample);
-                        }
-                    }
-                }
+                            var existingReportSample = existingReportSamples[i];
+                            //Find match in dto samples
+                            var matchedSampleAssociation = reportPackageDto.SamplesAndResultsTypes
+                                                            .SingleOrDefault(rpet => rpet.ReportPackageElementTypeId == existingReportSample.ReportPackageElementTypeId)
+                                                            ?.ReportSamples
+                                                                .SingleOrDefault(rs => rs.SampleId == existingReportSample.SampleId);
 
-                //Now handle additions
-                // - Iteration through all requested sample associations (in dto) and add ones that do not already exist
-                foreach (var requestedSampleAssociation in reportPackageDto.SamplesAndResultsTypes)
-                {
-                    foreach (var reportSample in requestedSampleAssociation.ReportSamples)
-                    {
-                        var foundReportSample = _dbContext.ReportSamples
-                       .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedSampleAssociation.ReportPackageElementTypeId
-                           && rs.SampleId == reportSample.SampleId);
-
-                        if (foundReportSample == null)
-                        {
-                            //Need to add association
-                            _dbContext.ReportSamples.Add(new ReportSample()
+                            if (matchedSampleAssociation == null)
                             {
-                                SampleId = reportSample.SampleId,
-                                ReportPackageElementTypeId = requestedSampleAssociation.ReportPackageElementTypeId
-                            });
+                                //existing association must have been deleted -- remove
+                                _dbContext.ReportSamples.Remove(existingReportSample);
+                            }
                         }
                     }
 
+                    //Now handle additions
+                    // - Iteration through all requested sample associations (in dto) and add ones that do not already exist
+                    foreach (var requestedSampleAssociation in reportPackageDto.SamplesAndResultsTypes)
+                    {
+                        foreach (var reportSample in requestedSampleAssociation.ReportSamples)
+                        {
+                            var foundReportSample = _dbContext.ReportSamples
+                           .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedSampleAssociation.ReportPackageElementTypeId
+                               && rs.SampleId == reportSample.SampleId);
+
+                            if (foundReportSample == null)
+                            {
+                                //Need to add association
+                                _dbContext.ReportSamples.Add(new ReportSample()
+                                {
+                                    SampleId = reportSample.SampleId,
+                                    ReportPackageElementTypeId = requestedSampleAssociation.ReportPackageElementTypeId
+                                });
+                            }
+                        }
+
+                    }
                 }
 
-                //FILES
+
+                //ATTACHMENTS
                 //===================
 
-                //Find entry in tReportPackageElementType for this reportPackage associated with Files category
-                var filesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
+                //Find entry in tReportPackageElementType for this reportPackage associated with Attachments category
+                var attachmentsReportPackageElementCategory = reportPackage.ReportPackageElementCategories
                     .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.Attachments.ToString());
 
-                if (filesReportPackageElementCategory == null)
+                if (attachmentsReportPackageElementCategory != null)
                 {
-                    //throw Exception
-                    throw new Exception($"ERROR: Missing ReportPackageElementCategory associated with '{ReportElementCategoryName.Attachments}', reportPackageDto.ReportPackageId={reportPackageDto.ReportPackageId}");
-                }
-
-                //Handle deletions first
-                // - Iterate through all Attachment rows in ReportFile and delete ones that cannot be matched with an item in reportPackageDto.AssociatedSamples
-                foreach (var existingFilesReportPackageElementType in filesReportPackageElementCategory.ReportPackageElementTypes)
-                {
-                    var existingReportFiles = existingFilesReportPackageElementType.ReportFiles.ToArray();
-                    for (var i = 0; i < existingReportFiles.Length; i++)
+                    //Handle deletions first
+                    // - Iterate through all Attachment rows in ReportFile and delete ones that cannot be matched with an item in reportPackageDto.AttachmentTypes
+                    foreach (var existingAttachmentsReportPackageElementType in attachmentsReportPackageElementCategory.ReportPackageElementTypes)
                     {
-                        var existingReportFile = existingReportFiles[i];
-                        //Find match in dto files
-                        var matchedFileAssociation = reportPackageDto.AttachmentTypes
-                                                    .SingleOrDefault(rpet => rpet.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId)
-                                                    ?.ReportFiles
-                                                        .SingleOrDefault(rf => rf.FileStoreId == existingReportFile.FileStoreId);
-
-                        if (matchedFileAssociation == null)
+                        var existingReportFiles = existingAttachmentsReportPackageElementType.ReportFiles.ToArray();
+                        for (var i = 0; i < existingReportFiles.Length; i++)
                         {
-                            //existing association must have been deleted -- remove
-                            _dbContext.ReportFiles.Remove(existingReportFile);
-                        }
-                    }
+                            var existingReportFile = existingReportFiles[i];
+                            //Find match in dto files
+                            var matchedFileAssociation = reportPackageDto.AttachmentTypes
+                                                        .SingleOrDefault(rpet => rpet.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId)
+                                                        ?.ReportFiles
+                                                            .SingleOrDefault(rf => rf.FileStoreId == existingReportFile.FileStoreId);
 
-                }
-
-                //Now handle additions
-                // - Iteration through all requested file associations (in dto) and add ones that do not already exist
-                foreach (var requestedFileAssociation in reportPackageDto.AttachmentTypes)
-                {
-                    foreach (var reportFile in requestedFileAssociation.ReportFiles)
-                    {
-                        var foundReportFile = _dbContext.ReportFiles
-                                        .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedFileAssociation.ReportPackageElementTypeId
-                                            && rs.FileStoreId == reportFile.FileStoreId);
-
-                        if (foundReportFile == null)
-                        {
-                            //Need to add association
-                            _dbContext.ReportFiles.Add(new ReportFile()
+                            if (matchedFileAssociation == null)
                             {
-                                FileStoreId = reportFile.FileStoreId,
-                                ReportPackageElementTypeId = requestedFileAssociation.ReportPackageElementTypeId
-                            });
+                                //existing association must have been deleted -- remove
+                                _dbContext.ReportFiles.Remove(existingReportFile);
+                            }
                         }
+
                     }
 
+                    //Now handle additions
+                    // - Iteration through all requested attachment associations (in dto) and add ones that do not already exist
+                    foreach (var requestedFileAssociation in reportPackageDto.AttachmentTypes)
+                    {
+                        foreach (var reportFile in requestedFileAssociation.ReportFiles)
+                        {
+                            var foundReportFile = _dbContext.ReportFiles
+                                            .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedFileAssociation.ReportPackageElementTypeId
+                                                && rs.FileStoreId == reportFile.FileStoreId);
+
+                            if (foundReportFile == null)
+                            {
+                                //Need to add association
+                                _dbContext.ReportFiles.Add(new ReportFile()
+                                {
+                                    FileStoreId = reportFile.FileStoreId,
+                                    ReportPackageElementTypeId = requestedFileAssociation.ReportPackageElementTypeId
+                                });
+                            }
+                        }
+
+                    }
                 }
+
+                //CERTIFICATIONS
+                //===================
+
+                //Find entry in tReportPackageElementType for this reportPackage associated with Attachments category
+                var certsReportPackageElementCategory = reportPackage.ReportPackageElementCategories
+                    .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.Certifications.ToString());
+
+                if (certsReportPackageElementCategory != null)
+                {
+                    //Handle deletions first
+                    // - Iterate through all Certification rows in ReportFile and delete ones that cannot be matched with an item in reportPackageDto.CertificationTypes
+                    foreach (var existingCertReportPackageElementType in certsReportPackageElementCategory.ReportPackageElementTypes)
+                    {
+                        var existingReportFiles = existingCertReportPackageElementType.ReportFiles.ToArray();
+                        for (var i = 0; i < existingReportFiles.Length; i++)
+                        {
+                            var existingReportFile = existingReportFiles[i];
+                            //Find match in dto files
+                            var matchedFileAssociation = reportPackageDto.CertificationTypes
+                                                        .SingleOrDefault(rpet => rpet.ReportPackageElementTypeId == existingReportFile.ReportPackageElementTypeId)
+                                                        ?.ReportFiles
+                                                            .SingleOrDefault(rf => rf.FileStoreId == existingReportFile.FileStoreId);
+
+                            if (matchedFileAssociation == null)
+                            {
+                                //existing association must have been deleted -- remove
+                                _dbContext.ReportFiles.Remove(existingReportFile);
+                            }
+                        }
+
+                    }
+
+                    //Now handle additions
+                    // - Iteration through all requested attachment associations (in dto) and add ones that do not already exist
+                    foreach (var requestedFileAssociation in reportPackageDto.CertificationTypes)
+                    {
+                        foreach (var reportFile in requestedFileAssociation.ReportFiles)
+                        {
+                            var foundReportFile = _dbContext.ReportFiles
+                                            .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedFileAssociation.ReportPackageElementTypeId
+                                                && rs.FileStoreId == reportFile.FileStoreId);
+
+                            if (foundReportFile == null)
+                            {
+                                //Need to add association
+                                _dbContext.ReportFiles.Add(new ReportFile()
+                                {
+                                    FileStoreId = reportFile.FileStoreId,
+                                    ReportPackageElementTypeId = requestedFileAssociation.ReportPackageElementTypeId
+                                });
+                            }
+                        }
+
+                    }
+                }
+
 
                 _dbContext.SaveChanges();
 

@@ -117,9 +117,9 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void DeleteReportPackage()
         {
-            _reportPackageService.DeleteReportPackage(8);
-            _reportPackageService.DeleteReportPackage(9);
-            _reportPackageService.DeleteReportPackage(10);
+            _reportPackageService.DeleteReportPackage(14);
+            //_reportPackageService.DeleteReportPackage(9);
+            //_reportPackageService.DeleteReportPackage(10);
         }
 
         [TestMethod]
@@ -132,10 +132,28 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
+        public void CreateDraft_Using_Empty_Template()
+        {
+            var emptyReportPackageTemplateId = 9;
+            var startDateTimeLocal = new DateTime(2017, 4, 20);
+            var endDateTimeLocal = new DateTime(2017, 4, 28);
+            var newId = _reportPackageService.CreateDraft(emptyReportPackageTemplateId, startDateTimeLocal, endDateTimeLocal);
+        }
+
+        [TestMethod]
+        public void CreateDraft_Using_Certification_Only__Template()
+        {
+            var emptyReportPackageTemplateId = 10;
+            var startDateTimeLocal = new DateTime(2017, 4, 20);
+            var endDateTimeLocal = new DateTime(2017, 4, 28);
+            var newId = _reportPackageService.CreateDraft(emptyReportPackageTemplateId, startDateTimeLocal, endDateTimeLocal);
+        }
+
+        [TestMethod]
         public void GetReportPackage()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(10, false);
+            var existingReportPackage = _reportPackageService.GetReportPackage(13, false);
         }
 
         [TestMethod]
@@ -158,7 +176,7 @@ namespace Linko.LinkoExchange.Test
         public void SaveReportPackage_Add_Samples()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(11, false);
+            var existingReportPackage = _reportPackageService.GetReportPackage(13, false);
 
             //Add sample associations
             existingReportPackage.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
@@ -174,7 +192,7 @@ namespace Linko.LinkoExchange.Test
         public void SaveReportPackage_Add_Files()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(10, true);
+            var existingReportPackage = _reportPackageService.GetReportPackage(15, true);
 
             existingReportPackage.Comments = "Comments .. test.";
 
@@ -186,13 +204,22 @@ namespace Linko.LinkoExchange.Test
             //sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 53, ReportPackageElementTypeId = 17 });
             existingReportPackage.SamplesAndResultsTypes.Add(sampleReportPackageElementType);
 
-            //Add file associations
+            //Add attachment associations
             existingReportPackage.AttachmentTypes = new List<ReportPackageElementTypeDto>();
-            var filesReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 26 };
-            filesReportPackageElementType.ReportFiles = new List<ReportFileDto>();
-            filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 26 });
+            var attachmentReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 26 };
+            attachmentReportPackageElementType.ReportFiles = new List<ReportFileDto>();
+            attachmentReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 26 });
             //filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 26 });
-            existingReportPackage.AttachmentTypes.Add(filesReportPackageElementType);
+            existingReportPackage.AttachmentTypes.Add(attachmentReportPackageElementType);
+
+            //Add certification associations
+            existingReportPackage.CertificationTypes = new List<ReportPackageElementTypeDto>();
+            var certsReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 34 };
+            certsReportPackageElementType.ReportFiles = new List<ReportFileDto>();
+            certsReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 34 });
+            //filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 27 });
+            existingReportPackage.CertificationTypes.Add(certsReportPackageElementType);
+
             var existingId = _reportPackageService.SaveReportPackage(existingReportPackage, true);
         }
 
