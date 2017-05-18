@@ -3,6 +3,7 @@ using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Dto;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Linko.LinkoExchange.Services.Mapping
 {
@@ -1147,13 +1148,13 @@ namespace Linko.LinkoExchange.Services.Mapping
             }
 
             reportPackageDto.ReportPackageTemplateElementCategories = new List<ReportElementCategoryName>();
-            var sortedCategories = new SortedList<int, ReportPackageElementCategory>();
+            var sortedCategories = new List<ReportPackageElementCategory>();
             foreach (var rpec in rpt.ReportPackageElementCategories)
             {
-                sortedCategories.Add(rpec.SortOrder, rpec);
+                sortedCategories.Add(rpec);
             }
 
-            foreach (var sortedCategoryValue in sortedCategories.Values)
+            foreach (var sortedCategoryValue in sortedCategories.OrderBy(item => item.SortOrder).ToList())
             {
                 reportPackageDto.ReportPackageTemplateElementCategories.Add((ReportElementCategoryName)Enum.Parse(typeof(ReportElementCategoryName), sortedCategoryValue.ReportElementCategory.Name));
             }
