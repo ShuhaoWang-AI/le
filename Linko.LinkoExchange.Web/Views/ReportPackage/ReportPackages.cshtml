@@ -19,7 +19,7 @@
         <div class="box-tools pull-right">
             @if (ViewBag.ReportStatusName == ReportStatusName.Draft)
             {
-                <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewReportPackageDetails", controllerName:"ReportPackage")'">Create New</button>
+                <button class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"NewReportPackage", controllerName:"ReportPackage")'">Create New</button>
             }
             <button class="btn btn-box-tool" data-widget="collapse">
                 <i class="fa fa-minus"></i>

@@ -27,15 +27,16 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
         public DateTime PeriodEndDateTimeLocal { get; set; }
 
         [Display(Name = "Report Period")]
-        public string ReportPeriod => $"{PeriodStartDateTimeLocal:MM/DD/YYYY} - {PeriodEndDateTimeLocal:MM/DD/YYYY}";
+        public string ReportPeriod => $"{PeriodStartDateTimeLocal:MM/dd/yyyy} - {PeriodEndDateTimeLocal:MM/dd/yyyy}";
 
         [Display(Name = "CTS Event Type")]
-        public int CtsEventTypeId { get; set; }
+        public int? CtsEventTypeId { get; set; }
 
         [Display(Name = "CTS Event Type")]
         public string CtsEventTypeName { get; set; }
 
         [Display(Name = "Comments")]
+        [DataType(dataType:DataType.MultilineText)]
         public string Comments { get; set; }
 
         [Display(Name = "Is Submission By Signatory Required")]

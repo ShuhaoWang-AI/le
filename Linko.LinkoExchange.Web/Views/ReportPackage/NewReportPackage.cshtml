@@ -1,6 +1,6 @@
-﻿@model Linko.LinkoExchange.Web.ViewModels.Industry.NewSampleStep1ViewModel
+﻿@model Linko.LinkoExchange.Web.ViewModels.ReportPackage.NewReportPackageViewModel
 @{
-    ViewBag.Title = "New Sample";
+    ViewBag.Title = "New Report Package";
 }
 
 @using (Html.BeginForm())
@@ -10,15 +10,15 @@
     <section>
         <ol class="breadcrumb">
             <li>
-                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:ViewBag.PortalName.ToLower().Equals(value:"authority") ? "Authority" : "Industry")'"><i class=""></i> Home </a>
             </li>
-            <li class="active">New Sample</li>
+            <li class="active">New Report Package</li>
         </ol>
     </section>
 
     <div class="box box-primary">
         <div class="box-header with-border">
-            <h3 class="box-title">Sample</h3>
+            <h3 class="box-title">Report Package</h3>
             <div class="box-tools pull-right">
                 <button class="btn btn-box-tool" data-widget="collapse">
                     <i class="fa fa-minus"></i>
@@ -31,31 +31,41 @@
 
             <div class="form-group">
                 <div class="col-md-12">
-                    @Html.Label(expression:"Select Monitoring Point", htmlAttributes:new
+                    @Html.Label(expression:"Select Report Package Template", htmlAttributes:new
                                                                                      {
                                                                                          @class = "control-label col-md-2 required"
                                                                                      })
                 </div>
                 <div class="col-md-12">
-                    @foreach (var m in Model.AllMonitoringPoints)
+                    @if (Model.AllReportPackageTemplates.Count > 0)
                     {
-                        <div class="col-md-12 form-group">
-                            <label class="col-md-offset-2">
-                                @Html.RadioButtonFor(model => model.SelectedMonitoringPointId, value:m.Id)
+                        foreach (var m in Model.AllReportPackageTemplates)
+                        {
+                            <div class="col-md-12 form-group">
+                                <label class="col-md-offset-2">
+                                    @Html.RadioButtonFor(model => model.SelectedReportPackageTemplateId, value:m.Id)
 
-                                <span>@m.Name</span>
-                                @if (!m.Description.IsEmpty())
-                                {
-                                    <span class="text-info"> - @m.Description</span>
-                                }
-                            </label>
+                                    <span>@m.Name</span>
+                                    @if (!m.Description.IsEmpty())
+                                    {
+                                        <span class="text-info"> - @m.Description</span>
+                                    }
+                                </label>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <br />
+                        <div class="col-md-12 form-group">
+                            <span class="col-md-offset-2">No report package templates exist for your Industry.</span>
                         </div>
                     }
                 </div>
 
                 <div class="col-md-12">
                     <!-- Date range -->
-                    @Html.Label(expression:"Enter Sample Period", htmlAttributes:new
+                    @Html.Label(expression:"Enter Report Period", htmlAttributes:new
                                                                                  {
                                                                                      @class = "control-label col-md-2"
                                                                                  })
@@ -67,10 +77,10 @@
                                                                                              @class = "control-label col-md-2 required"
                                                                                          })
                         <div class="col-md-4">
-                            @(Html.Kendo().DateTimePicker()
+                            @(Html.Kendo().DatePicker()
                                   .Name(componentName:"StartDateTimeLocal")
-                                  .Value(date:DateTime.Now)
-                                  .Format(format:"MM/dd/yyyy hh:mm tt")
+                                  .Value(date:DateTime.Today)
+                                  .Format(format:"MM/dd/yyyy")
                                   .HtmlAttributes(attributes:new
                                                              {
                                                                  style = "width:210px;"
@@ -82,10 +92,10 @@
                                                                                            @class = "control-label col-md-2 required"
                                                                                        })
                         <div class="col-md-4">
-                            @(Html.Kendo().DateTimePicker()
+                            @(Html.Kendo().DatePicker()
                                   .Name(componentName:"EndDateTimeLocal")
-                                  .Value(date:DateTime.Now)
-                                  .Format(format:"MM/dd/yyyy hh:mm tt")
+                                  .Value(date:DateTime.Today)
+                                  .Format(format:"MM/dd/yyyy")
                                   .HtmlAttributes(attributes:new
                                                              {
                                                                  style = "width:210px;"
@@ -95,10 +105,13 @@
                 </div>
             </div>
         </div>
-        <div class="box-footer">
-            <div class="col-md-12 form-group">
-                <input type="submit" value="Next" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"NewSampleDetailsStep1", controllerName:"Industry")" formmethod="post" />
+        @if (Model.AllReportPackageTemplates.Count > 0)
+        {
+            <div class="box-footer">
+                <div class="col-md-12 form-group">
+                    <input type="submit" value="Create Draft" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"NewReportPackage", controllerName:"ReportPackage")" formmethod="post" />
+                </div>
             </div>
-        </div>
+        }
     </div>
 }

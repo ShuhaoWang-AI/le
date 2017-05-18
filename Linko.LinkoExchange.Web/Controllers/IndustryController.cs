@@ -1023,7 +1023,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region Show Sample
+        #region Sample Details
 
         [Route(template:"Sample/New/Step1")]
         public ActionResult NewSampleDetailsStep1()

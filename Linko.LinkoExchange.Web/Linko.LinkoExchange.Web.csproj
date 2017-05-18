@@ -431,6 +431,8 @@
     <Content Include="Views\Industry\NewSampleDetailsStep1.cshtml" />
     <Content Include="Views\Industry\SampleDetails.cshtml" />
     <Content Include="Views\ReportPackage\ReportPackages.cshtml" />
+    <Content Include="Views\ReportPackage\NewReportPackage.cshtml" />
+    <Content Include="Views\ReportPackage\ReportPackageDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -479,6 +481,7 @@
     <Compile Include="ViewModels\Authority\IndustryViewModel.cs" />
     <Compile Include="ViewModels\Authority\IndustryUserViewModel.cs" />
     <Compile Include="ViewModels\Industry\NewSampleStep1ViewModel.cs" />
+    <Compile Include="ViewModels\ReportPackage\NewReportPackageViewModel.cs" />
     <Compile Include="ViewModels\ReportPackage\ReportPackageViewModel.cs" />
     <Compile Include="ViewModels\Shared\MonitoringPointViewModel.cs" />
     <Compile Include="ViewModels\Shared\SampleResultViewModel.cs" />
