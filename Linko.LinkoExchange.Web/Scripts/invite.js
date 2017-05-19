@@ -59,8 +59,10 @@ $(document).ready(function () {
                 $("#searchEmailBtn").hide();
                 $("#boxFoundUser").hide();
                 $("#boxFoundUsers").show();
+                $("#boxSearchEmailAddress").hide();
                 $("#foundUserInDifferentProgramsMessage").html(data.DisplayMessage);
 
+                $('#FoundUser_EmailAddress').val(data.ExistingUsers[0].EmailAddress);
                 $('#FoundUser_FirstName').val(data.ExistingUsers[0].FirstName);
                 $('#FoundUser_LastName').val(data.ExistingUsers[0].LastName);
                 $('#FoundUser_OrganizationName').val(data.ExistingUsers[0].BusinessName);
@@ -88,6 +90,7 @@ $(document).ready(function () {
         $("#noUserFoundMessage").hide();
         $("#boxFoundUser").hide();
         $("#boxFoundUsers").hide();
+        $("#boxSearchEmailAddress").show();
         clearFields();
     });
 
