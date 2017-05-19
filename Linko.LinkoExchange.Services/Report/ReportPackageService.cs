@@ -953,6 +953,7 @@ namespace Linko.LinkoExchange.Services.Report
                         {
                             //Log -- there is no Sample & Results element type for this Report Package
                             //  therefore Samples & Results could not be automatically added.
+                            _logger.Info(message: $"WARNING: Missing 'Samples & Results' element type for this Report Package Template (reportPackageTemplateId={reportPackageTemplateId}). Samples could not be added during 'CreateDraft'.");
                         }
 
                     }
@@ -961,6 +962,7 @@ namespace Linko.LinkoExchange.Services.Report
 
                         //Log -- there is no Sample & Results category for this Report Package
                         //  therefore Samples & Results could not be automatically added.
+                        _logger.Info(message: $"WARNING: Missing 'Samples & Results' element category for this Report Package Template (reportPackageTemplateId={reportPackageTemplateId}). Samples could not be added during 'CreateDraft'.");
                     }
 
                     transaction.Commit();
@@ -1115,6 +1117,13 @@ namespace Linko.LinkoExchange.Services.Report
 
                     }
                 }
+                else
+                {
+                    if (reportPackageDto.SamplesAndResultsTypes != null && reportPackageDto.SamplesAndResultsTypes.Count > 0)
+                    {
+                        _logger.Info(message: $"WARNING: Missing 'Samples & Results' element category for this Report Package (ReportPackageId={reportPackageDto.ReportPackageId}). Samples could not be added.");
+                    }
+                }
 
 
                 //ATTACHMENTS
@@ -1170,6 +1179,13 @@ namespace Linko.LinkoExchange.Services.Report
                             }
                         }
 
+                    }
+                }
+                else
+                {
+                    if (reportPackageDto.AttachmentTypes != null && reportPackageDto.AttachmentTypes.Count > 0)
+                    {
+                        _logger.Info(message: $"WARNING: Missing 'Attachments' element category for this Report Package (ReportPackageId={reportPackageDto.ReportPackageId}). Attachments could not be added.");
                     }
                 }
 
@@ -1228,6 +1244,14 @@ namespace Linko.LinkoExchange.Services.Report
 
                     }
                 }
+                else
+                {
+                    if (reportPackageDto.CertificationTypes != null && reportPackageDto.CertificationTypes.Count > 0)
+                    {
+                        _logger.Info(message: $"WARNING: Missing 'Certifications' element category for this Report Package (ReportPackageId={reportPackageDto.ReportPackageId}). Certifications could not be added.");
+                    }
+                }
+
 
 
                 _dbContext.SaveChanges();

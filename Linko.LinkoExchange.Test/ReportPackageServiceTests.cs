@@ -192,7 +192,7 @@ namespace Linko.LinkoExchange.Test
         public void SaveReportPackage_Add_Files()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(12, true);
+            var existingReportPackage = _reportPackageService.GetReportPackage(15, true);
 
             existingReportPackage.Comments = "Comments .. test.";
 
