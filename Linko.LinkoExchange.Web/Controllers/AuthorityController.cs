@@ -1154,7 +1154,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.Title = string.Format(format:"{0} Users", arg0:industry.OrganizationDto.OrganizationName);
 
             //Invite button only visible if there isn't currently an active Admin for this IU
-            ViewBag.CanInvite = !industry.HasAdmin;
+            //AND at least 1 user license available
+            var remainingUserLicenses = _organizationService.GetRemainingUserLicenseCount(id);
+            ViewBag.CanInvite = !industry.HasAdmin && (remainingUserLicenses > 0);
 
             return View();
         }
