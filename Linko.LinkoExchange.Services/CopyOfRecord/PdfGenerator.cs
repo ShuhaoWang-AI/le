@@ -175,34 +175,36 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         private void SampleAndResult()
         {
-            var sampleResultsTextTable = new Table();
-            sampleResultsTextTable.IsKeptWithNext = true;
-
-            _pdfPage.Paragraphs.Add(sampleResultsTextTable);
-
-            sampleResultsTextTable.Margin.Top = 20;
-
-            sampleResultsTextTable.ColumnWidths = "100%";
-            var row = sampleResultsTextTable.Rows.Add();
-
-            row.Cells.Add("Samples and Results", _boldTextState);
-
-            var tableOrder = new BorderInfo(BorderSide.All, 0.1F);
-
-            //Samples and Results table  
-            var sampleResultsTable = new Table
-            {
-                Border = tableOrder,
-                DefaultCellBorder = tableOrder,
-                DefaultCellPadding = new MarginInfo(3, 3, 3, 3)
-            };
-
-            _pdfPage.Paragraphs.Add(sampleResultsTable);
-            sampleResultsTable.ColumnWidths = "6% 16.2% 8.3% 5.8% 8.9% 8.9% 7.3% 7.8% 8% 5.3% 8.9% 7.4%";
-
             // According to Chris, we can assume there is only one sampleAndResults in one report; 
             if (_reportPackage.SamplesAndResultsTypes != null && _reportPackage.SamplesAndResultsTypes.Count > 0)
             {
+                var sampleResultsTextTable = new Table();
+                sampleResultsTextTable.IsKeptWithNext = true;
+
+                _pdfPage.Paragraphs.Add(sampleResultsTextTable);
+
+                sampleResultsTextTable.Margin.Top = 20;
+
+                sampleResultsTextTable.ColumnWidths = "100%";
+                var row = sampleResultsTextTable.Rows.Add();
+
+                var sectionTitle = _reportPackage.SamplesAndResultsTypes[0].ReportElementTypeName;
+
+                row.Cells.Add(sectionTitle, _boldTextState);
+
+                var tableOrder = new BorderInfo(BorderSide.All, 0.1F);
+
+                //Samples and Results table  
+                var sampleResultsTable = new Table
+                {
+                    Border = tableOrder,
+                    DefaultCellBorder = tableOrder,
+                    DefaultCellPadding = new MarginInfo(3, 3, 3, 3)
+                };
+
+                _pdfPage.Paragraphs.Add(sampleResultsTable);
+                sampleResultsTable.ColumnWidths = "6% 16.2% 8.3% 5.8% 8.9% 8.9% 7.3% 7.8% 8% 5.3% 8.9% 7.4%";
+
                 var allSamples = _reportPackage.SamplesAndResultsTypes.SelectMany(i => i.ReportSamples).Select(i => i.Sample);
                 var sampleMonitoringPointerGroups = allSamples.GroupBy(i => i.MonitoringPointId);
                 foreach (var sampleMonitoringPointerGroup in sampleMonitoringPointerGroups)
@@ -369,12 +371,12 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             //--------------------------------Row 4
             row = reportInfoTable.Rows.Add();
             row.Cells.Add("Industy Number:");
-            row.Cells.Add(_reportPackage.OrganizationReferenceNumber);
+            row.Cells.Add(string.IsNullOrEmpty(_reportPackage.OrganizationReferenceNumber) ? "" : _reportPackage.OrganizationReferenceNumber);
 
             row.Cells.Add("");
 
             row.Cells.Add("Submitted By:");
-            row.Cells.Add(_reportPackage.SubmitterUserName);
+            row.Cells.Add(string.IsNullOrEmpty(_reportPackage.SubmitterUserName) ? "" : _reportPackage.SubmitterUserName);
 
             //--------------------------------Row 5
             row = reportInfoTable.Rows.Add();
@@ -388,7 +390,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             row.Cells.Add("");
 
             row.Cells.Add("Title:");
-            row.Cells.Add(_reportPackage.SubmitterTitleRole);
+            row.Cells.Add(string.IsNullOrEmpty(_reportPackage.SubmitterTitleRole) ? "" : _reportPackage.SubmitterTitleRole);
         }
 
         private static void HeaderFooterTable(Page pdfPage, string reportName, string submittedDateTimeString, string authorityName, string industryName)
