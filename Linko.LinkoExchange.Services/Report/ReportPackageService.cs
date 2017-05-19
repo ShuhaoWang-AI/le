@@ -844,8 +844,15 @@ namespace Linko.LinkoExchange.Services.Report
 
                     var newReportPackage = _mapHelper.GetReportPackageFromReportPackageTemplate(reportPackageTemplate);
 
+                    //Need to ensure these range dates are set to the beginning of the day (12am) for the start date 
+                    //and end of the day (11:59:59pm) for the end date
+                    //
+                    startDateTimeLocal = startDateTimeLocal.Date; //12am
+                    endDateTimeLocal = endDateTimeLocal.Date.AddDays(1).AddTicks(-1); //11:59:59.59
                     var startDateTimeUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(startDateTimeLocal, timeZoneId);
                     var endDateTimeUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(endDateTimeLocal, timeZoneId);
+
+
                     newReportPackage.PeriodStartDateTimeUtc = startDateTimeUtc;
                     newReportPackage.PeriodEndDateTimeUtc = endDateTimeUtc;
                     newReportPackage.ReportStatusId = _dbContext.ReportStatuses
