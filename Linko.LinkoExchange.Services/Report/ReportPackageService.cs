@@ -429,9 +429,10 @@ namespace Linko.LinkoExchange.Services.Report
             var samplesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
                 .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.SamplesAndResults.ToString());
 
+            var sortedSamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
             if (samplesReportPackageElementCategory != null)
             {
-                var sortedSamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
+                
                 foreach (var existingSamplesReportPackageElementType in samplesReportPackageElementCategory.ReportPackageElementTypes)
                 {
                     var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingSamplesReportPackageElementType);
@@ -457,10 +458,9 @@ namespace Linko.LinkoExchange.Services.Report
 
                     sortedSamplesAndResultsTypes.Add(reportPackageElementTypeDto);
                 }
-                reportPackagegDto.SamplesAndResultsTypes = sortedSamplesAndResultsTypes.OrderBy(item => item.SortOrder).ToList();
+                sortedSamplesAndResultsTypes = sortedSamplesAndResultsTypes.OrderBy(item => item.SortOrder).ToList();
             }
-
-
+            reportPackagegDto.SamplesAndResultsTypes = sortedSamplesAndResultsTypes;
 
 
             //
@@ -471,9 +471,9 @@ namespace Linko.LinkoExchange.Services.Report
             var filesReportPackageElementCategory = reportPackage.ReportPackageElementCategories
                 .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.Attachments.ToString());
 
+            var sortedAttachmentTypes = new List<ReportPackageElementTypeDto>();
             if (filesReportPackageElementCategory != null)
             {
-                var sortedAttachmentTypes = new List<ReportPackageElementTypeDto>();
                 foreach (var existingFilesReportPackageElementType in filesReportPackageElementCategory.ReportPackageElementTypes)
                 {
                     var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingFilesReportPackageElementType);
@@ -496,8 +496,9 @@ namespace Linko.LinkoExchange.Services.Report
                     }
                     sortedAttachmentTypes.Add(reportPackageElementTypeDto);
                 }
-                reportPackagegDto.AttachmentTypes = sortedAttachmentTypes.OrderBy(item => item.SortOrder).ToList();
+                sortedAttachmentTypes = sortedAttachmentTypes.OrderBy(item => item.SortOrder).ToList();
             }
+            reportPackagegDto.AttachmentTypes = sortedAttachmentTypes;
 
 
             //
@@ -506,9 +507,9 @@ namespace Linko.LinkoExchange.Services.Report
             var certificationReportPackageElementCategory = reportPackage.ReportPackageElementCategories
                 .SingleOrDefault(rpet => rpet.ReportElementCategory.Name == ReportElementCategoryName.Certifications.ToString());
 
+            var sortedCertificationTypes = new List<ReportPackageElementTypeDto>();
             if (certificationReportPackageElementCategory != null)
             {
-                var sortedCertificationTypes = new List<ReportPackageElementTypeDto>();
                 foreach (var existingCertsReportPackageElementType in certificationReportPackageElementCategory.ReportPackageElementTypes)
                 {
                     var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingCertsReportPackageElementType);
@@ -531,8 +532,9 @@ namespace Linko.LinkoExchange.Services.Report
                     }
                     sortedCertificationTypes.Add(reportPackageElementTypeDto);
                 }
-                reportPackagegDto.CertificationTypes = sortedCertificationTypes.OrderBy(item => item.SortOrder).ToList();
+                sortedCertificationTypes = sortedCertificationTypes.OrderBy(item => item.SortOrder).ToList();
             }
+            reportPackagegDto.CertificationTypes = sortedCertificationTypes;
 
             _logger.Info("Leave ReportPackageService.GetReportPackage. reportPackageId={0}", reportPackageId);
             return reportPackagegDto;
