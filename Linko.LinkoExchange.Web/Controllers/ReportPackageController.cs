@@ -1,11 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
+using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Report;
+using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.ViewModels.ReportPackage;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
@@ -29,11 +35,19 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private readonly IReportPackageService _reportPackageService;
         private readonly IReportTemplateService _reportTemplateService;
+        private readonly LinkoExchangeContext _dbContext;
+        private readonly IHttpContextService _httpContextService;
+        private readonly IUserService _userService;
 
-        public ReportPackageController(IReportPackageService reportPackageService, IReportTemplateService reportTemplateService)
+        public ReportPackageController(IReportPackageService reportPackageService, IReportTemplateService reportTemplateService, LinkoExchangeContext linkoExchangeContext,
+                                       IHttpContextService httpContextService,
+                                       IUserService userService)
         {
             _reportPackageService = reportPackageService;
             _reportTemplateService = reportTemplateService;
+            _dbContext = linkoExchangeContext;
+            _httpContextService = httpContextService;
+            _userService = userService;
         }
 
         #endregion
@@ -204,7 +218,35 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return View(model:viewModel);
         }
-        
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"{id:int}/Details")]
+        public ActionResult ReportPackageDetails(int id, ReportPackageViewModel model)
+        {
+            try
+            {
+                var vm = _reportPackageService.GetReportPackage(reportPackageId:id, isIncludeAssociatedElementData:true);
+
+                // TODO: need to update the ReportPackageDto using ReportPackageViewModel
+                vm.Comments = model.Comments;
+
+                _reportPackageService.SaveReportPackage(reportPackageDto:vm, isUseTransaction:false);
+
+                TempData[key:"ShowSuccessMessage"] = true;
+                TempData[key:"SuccessMessage"] = "Report Package updated successfully!";
+
+                ModelState.Clear();
+                return RedirectToAction(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id});
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            return View(viewName:"ReportPackageDetails", model:model);
+        }
+
         [Route(template:"{id:int}/Delete")]
         public ActionResult DeleteReportPackage(int id)
         {
@@ -224,6 +266,119 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"{id:int}/ReadyToSubmit")]
+        public ActionResult ReadyToSubmit(int id, ReportPackageViewModel model)
+        {
+            try
+            {
+                using (var transaction = _dbContext.BeginTransaction())
+                {
+                    try
+                    {
+                        var vm = _reportPackageService.GetReportPackage(reportPackageId:id, isIncludeAssociatedElementData:true);
+
+                        // TODO: need to update the ReportPackageDto using ReportPackageViewModel
+                        vm.Comments = model.Comments;
+
+                        _reportPackageService.SaveReportPackage(reportPackageDto:vm, isUseTransaction:false);
+                        _reportPackageService.UpdateStatus(reportPackageId:id, reportStatus:ReportStatusName.ReadyToSubmit, isUseTransaction:false);
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+
+                TempData[key:"ShowSuccessMessage"] = true;
+                TempData[key:"SuccessMessage"] = "Report Package updated successfully!";
+
+                ModelState.Clear();
+                return RedirectToAction(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id});
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            return View(viewName:"ReportPackageDetails", model:model);
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [Route(template:"{id:int}/EnableReportPackage")]
+        public ActionResult EnableReportPackage(int id)
+        {
+            try
+            {
+                _reportPackageService.UpdateStatus(reportPackageId:id, reportStatus:ReportStatusName.Draft, isUseTransaction:true);
+
+                TempData[key:"ShowSuccessMessage"] = true;
+                TempData[key:"SuccessMessage"] = "Report Package updated successfully!";
+
+                ModelState.Clear();
+                return RedirectToAction(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id});
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
+        }
+
+        public ActionResult SignAndSubmit(int id, ReportPackageViewModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Route(template:"{id:int}/Details/Preview")]
+        public ActionResult ReportPackagePreview(int id)
+        {
+            try
+            {
+                var fileStore = _reportPackageService.GetReportPackageCopyOfRecordPdfFile(reportPackageId:id);
+                var fileDownloadName = fileStore.FileName;
+                var contentType = "application/pdf";
+                var fileStream = new MemoryStream(buffer:fileStore.FileData) {Position = 0};
+
+                return File(fileStream:fileStream, contentType:contentType, fileDownloadName:fileDownloadName);
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
+        }
+
+        [Route(template:"{id:int}/COR")]
+        public ActionResult DownloadCor(int id)
+        {
+            try
+            {
+                var copyOfRecordDto = _reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId:id);
+                var contentType = "application/zip";
+                var fileDownloadName = copyOfRecordDto.DownloadFileName;
+                var dataStream = new MemoryStream(buffer:copyOfRecordDto.Data) {Position = 0};
+                return File(fileStream:dataStream, contentType:contentType, fileDownloadName:fileDownloadName);
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
+        }
+
+        [Route(template:"{id:int}/COR/Validate")]
+        public ActionResult ValidateCor(int id)
+        {
+            throw new NotImplementedException();
         }
 
         private ReportPackageViewModel PrepareReportPackageDetails(int id)
@@ -248,24 +403,27 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 CtsEventTypeId = vm.CtsEventTypeId,
                                 ReportPackageTemplateElementCategories = vm.ReportPackageTemplateElementCategories,
                                 Comments = vm.Comments,
-                                SamplesAndResultsTypes = vm.SamplesAndResultsTypes.Select(t => new ReportElementTypeViewModel
-                                                                                                          {
-                                                                                                              Id = t.ReportElementTypeId,
-                                                                                                              Name = t.ReportElementTypeName
-                                                                                                          }).ToList(),
-                                AttachmentTypes = vm.AttachmentTypes.Select(t => new ReportElementTypeViewModel
-                                                                                                          {
-                                                                                                              Id = t.ReportElementTypeId,
-                                                                                                              Name = t.ReportElementTypeName
-                                                                                                          }).ToList(),
-                                CertificationTypes = vm.CertificationTypes.Select(t => new ReportElementTypeViewModel
-                                                                                                          {
-                                                                                                              Id = t.ReportElementTypeId,
-                                                                                                              Name = t.ReportElementTypeName,
-                                                                                                              Content = t.ReportElementTypeContent
-                                                                                                          }).ToList()
-
+                                SamplesAndResultsTypes = vm.SamplesAndResultsTypes?.Select(t => new ReportElementTypeViewModel
+                                                                                                {
+                                                                                                    Id = t.ReportElementTypeId,
+                                                                                                    Name = t.ReportElementTypeName
+                                                                                                }).ToList(),
+                                AttachmentTypes = vm.AttachmentTypes?.Select(t => new ReportElementTypeViewModel
+                                                                                  {
+                                                                                      Id = t.ReportElementTypeId,
+                                                                                      Name = t.ReportElementTypeName
+                                                                                  }).ToList(),
+                                CertificationTypes = vm.CertificationTypes?.Select(t => new ReportElementTypeViewModel
+                                                                                        {
+                                                                                            Id = t.ReportElementTypeId,
+                                                                                            Name = t.ReportElementTypeName,
+                                                                                            Content = t.ReportElementTypeContent
+                                                                                        }).ToList(),
+                                IsSubmissionBySignatoryRequired = vm.IsSubmissionBySignatoryRequired
                             };
+
+                //var currentUserId = _httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId);
+                viewModel.IsCurrentUserSignatory = true; // _userService.GetUserProfileById(currentUserId).i
             }
             catch (RuleViolationException rve)
             {
@@ -275,6 +433,5 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         #endregion
-
     }
 }

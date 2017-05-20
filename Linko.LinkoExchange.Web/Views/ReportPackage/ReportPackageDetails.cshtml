@@ -195,7 +195,8 @@
 
     foreach (var category in Model.ReportPackageTemplateElementCategories)
     {
-        switch (category) {
+        switch (category)
+        {
             case ReportElementCategoryName.SamplesAndResults:
                 foreach (var samplesAndResultType in Model.SamplesAndResultsTypes)
                 {
@@ -211,8 +212,7 @@
                             </div>
                         </div>
 
-                        <section class="box-body form-horizontal">
-                        </section>
+                        <section class="box-body form-horizontal"></section>
                     </div>
                 }
                 break;
@@ -231,8 +231,7 @@
                             </div>
                         </div>
 
-                        <section class="box-body form-horizontal">
-                        </section>
+                        <section class="box-body form-horizontal"></section>
                     </div>
                 }
                 break;
@@ -259,6 +258,8 @@
                     </div>
                 }
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
@@ -272,22 +273,55 @@
                 </button>
             </div>
         </div>
-        <div class="box-body box-collapse collapse form-horizontal in" id="step6">
+        <div class="box-body form-horizontal">
             <div class="form-group">
                 <div class="col-md-12">
-                    @Html.EditorFor(model => model.Comments, additionalViewData:new
-                                                                                {
-                                                                                    htmlAttributes = new
-                                                                                                     {
-                                                                                                         @class = "form-control",
-                                                                                                         placeholder = "Enter your Comments",
-                                                                                                         rows = "3"
-                                                                                                     }
-                                                                                })
+                    @if (Model.Status == ReportStatusName.Draft)
+                    {
+                        @Html.EditorFor(model => model.Comments, additionalViewData:new
+                                                                                    {
+                                                                                        htmlAttributes = new
+                                                                                                         {
+                                                                                                             @class = "form-control",
+                                                                                                             placeholder = "Enter your Comments",
+                                                                                                             rows = "3"
+                                                                                                         }
+                                                                                    })
+                    }
+                    else
+                    {
+                        <p class="text-justify">
+                            @Model.Comments
+                        </p>
+                    }
                 </div>
             </div>
         </div>
     </div>
+
+    if (Model.IsSubmissionBySignatoryRequired && Model.IsCurrentUserSignatory && (Model.Status == ReportStatusName.ReadyToSubmit))
+    {
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Sign and Submit Report</h3>
+                <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body form-horizontal">
+                <div class="form-group">
+                </div>
+            </div>
+
+            <div class="box-footer">
+                <div class="form-group pull-right">
+                    <input type="submit" value="Save Draft" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"SignAndSubmit", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
+                </div>
+            </div>
+        </div>
+    }
 
     // Buttons
 
@@ -299,13 +333,20 @@
                 @switch (Model.Status)
                 {
                     case ReportStatusName.Draft:
-                        <input type="submit" value="Save Draft" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ReportPackageDetails", controllerName:"ReportPackage")" formmethod="post" />
-                        <input type="submit" value="Ready to Submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ReadyToSubmit", controllerName:"ReportPackage")" formmethod="post" />
+                        <input type="submit" value="Save Draft" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
+                        <input type="submit" value="Ready to Submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ReadyToSubmit", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
                         <input class="btn btn-primary btn-sm" data-target="#DeleteSampleModal" data-toggle="modal" type="button" value="Delete Draft" />
                         break;
                     case ReportStatusName.ReadyToSubmit:
-                        <input class="btn btn-primary btn-sm" type="button" value="Preview" formaction="@Url.Action(actionName:"ReportPackagePreview", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
+                        @Html.ActionLink(linkText:"Preview", actionName:"ReportPackagePreview", routeValues:new { id = Model.Id }, htmlAttributes:new { @class = "btn btn-primary btn-sm" })
+
                         <input type="submit" value="Enable Edit Report Package" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"EnableReportPackage", controllerName:"ReportPackage")" formmethod="post" />
+
+                        if (!Model.IsSubmissionBySignatoryRequired)
+                        {
+                            <input type="submit" value="Save Draft" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"SignAndSubmit", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
+                        }
+
                         <input class="btn btn-primary btn-sm" data-target="#DeleteSampleModal" data-toggle="modal" type="button" value="Delete Report Package" />
                         break;
                     case ReportStatusName.Submitted:
@@ -313,7 +354,13 @@
                     case ReportStatusName.SubmittedPendingReview:
                     case ReportStatusName.RepudiatedPendingReview:
                     case ReportStatusName.All:
-                        <input class="btn btn-primary btn-sm" type="button" value="Download COR" formaction="@Url.Action(actionName:"DownloadCor", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
+                        @Html.ActionLink(linkText:"Download COR", actionName:"DownloadCor", routeValues:new
+                                                                                                        {
+                                                                                                            id = Model.Id
+                                                                                                        }, htmlAttributes:new
+                                                                                                                          {
+                                                                                                                              @class = "btn btn-primary btn-sm"
+                                                                                                                          })
                         <input class="btn btn-primary btn-sm" type="button" value="Validate COR" formaction="@Url.Action(actionName:"ValidateCor", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
                         break;
                     default:
