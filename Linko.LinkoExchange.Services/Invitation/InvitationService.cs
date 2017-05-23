@@ -151,7 +151,7 @@ namespace Linko.LinkoExchange.Services.Invitation
 
                 if (recipientProgram.RegulatoryProgramDto != null)
                 {
-                    invitationDto.ProgramName = recipientProgram.RegulatoryProgramDto.Name;
+                    invitationDto.ProgramName = recipientProgram.RegulatoryProgramDto.Description;
                 }
             }
 
