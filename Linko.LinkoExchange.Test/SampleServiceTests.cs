@@ -20,6 +20,7 @@ using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.Config;
 using System.Diagnostics;
 using Linko.LinkoExchange.Web;
+using Linko.LinkoExchange.Core.Resources;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -573,6 +574,14 @@ namespace Linko.LinkoExchange.Test
             CompareSampleDtos(sampleDto, sampleDto2, true);
         }
 
+        [TestMethod]
+        public void Missing_Resource_Manager_Entry_Test()
+        {
+            var keyString = "blahblahblah";
+            var missingPhrase = Label.ResourceManager.GetString(keyString);
+
+            Assert.IsNull(missingPhrase);
+        }
 
         private void CompareSampleDtos(SampleDto dto1, SampleDto dto2, bool isAfterUpdate)
         {

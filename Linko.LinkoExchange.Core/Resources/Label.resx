@@ -117,6 +117,21 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccountLocked" xml:space="preserve">
+    <value>Account Locked</value>
+  </data>
+  <data name="AccountResetExpired" xml:space="preserve">
+    <value>Account Reset Expired</value>
+  </data>
+  <data name="AccountResetInitiated" xml:space="preserve">
+    <value>Account Reset Initiated</value>
+  </data>
+  <data name="AccountResetRequired" xml:space="preserve">
+    <value>Account Reset Required</value>
+  </data>
+  <data name="AccountResetSuccessful" xml:space="preserve">
+    <value>Account Reset Successful</value>
+  </data>
   <data name="All" xml:space="preserve">
     <value>All</value>
   </data>
@@ -171,23 +186,65 @@
   <data name="Email" xml:space="preserve">
     <value>Email Address</value>
   </data>
+  <data name="EmailChanged" xml:space="preserve">
+    <value>Email Changed</value>
+  </data>
   <data name="ForgotPassword" xml:space="preserve">
     <value>Forgot Password</value>
   </data>
   <data name="ForgotUserName" xml:space="preserve">
     <value>Forgot User Name</value>
   </data>
+  <data name="IdentityProofed" xml:space="preserve">
+    <value>Identity Proofed</value>
+  </data>
+  <data name="InviteDeleted" xml:space="preserve">
+    <value>Invite Deleted</value>
+  </data>
+  <data name="InviteSent" xml:space="preserve">
+    <value>Invite Sent</value>
+  </data>
+  <data name="KBQChanged" xml:space="preserve">
+    <value>KBQ Changed</value>
+  </data>
   <data name="LinkoExchange" xml:space="preserve">
     <value>LinkoExchange</value>
   </data>
+  <data name="ManualAccountLock" xml:space="preserve">
+    <value>Manual Account Lock</value>
+  </data>
+  <data name="ManualAccountUnlock" xml:space="preserve">
+    <value>Manual Account Unlock</value>
+  </data>
+  <data name="NoAssociation" xml:space="preserve">
+    <value>No Association</value>
+  </data>
   <data name="Password" xml:space="preserve">
     <value>Password</value>
+  </data>
+  <data name="PasswordChanged" xml:space="preserve">
+    <value>Password Changed</value>
+  </data>
+  <data name="PasswordLockout" xml:space="preserve">
+    <value>Password Lockout</value>
+  </data>
+  <data name="PasswordResetExpired" xml:space="preserve">
+    <value>Password Reset Expired</value>
   </data>
   <data name="ReadyToReport" xml:space="preserve">
     <value>Ready to Report</value>
   </data>
   <data name="ReadyToSubmit" xml:space="preserve">
     <value>Ready to Submit</value>
+  </data>
+  <data name="RegistrationApproved" xml:space="preserve">
+    <value>Registration Approved</value>
+  </data>
+  <data name="RegistrationDenied" xml:space="preserve">
+    <value>Registration Denied</value>
+  </data>
+  <data name="RegistrationPending" xml:space="preserve">
+    <value>Registration Pending</value>
   </data>
   <data name="RememberMe" xml:space="preserve">
     <value>Remember Me</value>
@@ -201,11 +258,29 @@
   <data name="RepudiatedPendingReview" xml:space="preserve">
     <value>Repudiated Pending Review</value>
   </data>
+  <data name="RoleChange" xml:space="preserve">
+    <value>Role Change</value>
+  </data>
   <data name="SampleEventType" xml:space="preserve">
     <value>Sample Event Type</value>
   </data>
   <data name="SampleEventTypeCollectionMethod" xml:space="preserve">
     <value>Sample Event Type + Collection Method</value>
+  </data>
+  <data name="SignatoryGranted" xml:space="preserve">
+    <value>Signatory Granted</value>
+  </data>
+  <data name="SignatoryPending" xml:space="preserve">
+    <value>Signatory Pending</value>
+  </data>
+  <data name="SignatoryRevoked" xml:space="preserve">
+    <value>Signatory Revoked</value>
+  </data>
+  <data name="SignFailed" xml:space="preserve">
+    <value>Sign Failed</value>
+  </data>
+  <data name="SQChanged" xml:space="preserve">
+    <value>SQ Changed</value>
   </data>
   <data name="Submitted" xml:space="preserve">
     <value>Submitted</value>
@@ -233,6 +308,12 @@
   </data>
   <data name="TitleResetPassword" xml:space="preserve">
     <value>Reset Password</value>
+  </data>
+  <data name="UserAccess" xml:space="preserve">
+    <value>User Access</value>
+  </data>
+  <data name="UserDisabled" xml:space="preserve">
+    <value>User Disabled</value>
   </data>
   <data name="UserName" xml:space="preserve">
     <value>User Name</value>

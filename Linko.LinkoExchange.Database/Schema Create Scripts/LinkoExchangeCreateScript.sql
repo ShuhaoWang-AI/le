@@ -5014,7 +5014,7 @@ To view the report in LinkoExchange, click the link below or copy and paste the 
         'CromerrEvent_Registration_InviteSent', 
         'CromerrEvent',
         'Registration',   
-        'Invite Sent', 
+        'InviteSent', 
         '',
         'An invitation was sent to:
 User: {firstName} {lastName}
@@ -5039,7 +5039,7 @@ Email:  {inviterEmailAddress}
         'CromerrEvent_Registration_InviteDeleted', 
         'CromerrEvent',
         'Registration',   
-        'Invite Deleted', 
+        'InviteDeleted', 
         '',
         'An invitation was deleted for:
 User: {firstName} {lastName}
@@ -5064,7 +5064,7 @@ Email:  {actorEmailAddress}
         'CromerrEvent_Registration_RegistrationPending', 
         'CromerrEvent',
         'Registration',   
-        'Registration Pending', 
+        'RegistrationPending', 
         '',
         'A registration request was received.
 User: {firstName} {lastName}
@@ -5084,7 +5084,7 @@ For:
         'CromerrEvent_Registration_RegistrationApproved', 
         'CromerrEvent',
         'Registration',   
-        'Registration Approved', 
+        'RegistrationApproved', 
         '',
         'A registration request was approved.
 User: {firstName} {lastName}
@@ -5109,7 +5109,7 @@ Approver Email:  {actorEmailAddress}
         'CromerrEvent_Registration_RegistrationDenied', 
         'CromerrEvent',
         'Registration',   
-        'Registration Denied', 
+        'RegistrationDenied', 
         '',
         'A registration request was denied.
 User: {firstName} {lastName}
@@ -5133,7 +5133,7 @@ Denier Email:  {actorEmailAddress}
     (
         'CromerrEvent_UserAccess_Disabled', 
         'CromerrEvent',
-        'User Access',   
+        'UserAccess',   
         'Disabled', 
         '',
         'Account access to {organizationName} was disabled.
@@ -5152,7 +5152,7 @@ User Name: {actorUserName}
     (
         'CromerrEvent_UserAccess_Enabled', 
         'CromerrEvent',
-        'User Access',   
+        'UserAccess',   
         'Enabled', 
         '',
         'Account access to {organizationName} was enabled.
@@ -5171,7 +5171,7 @@ User Name: {actorUserName}
     (
         'CromerrEvent_UserAccess_Removed', 
         'CromerrEvent',
-        'User Access',   
+        'UserAccess',   
         'Removed', 
         '',
         'User was removed from {organizationName}.
@@ -5190,8 +5190,8 @@ User Name: {actorUserName}
     (
         'CromerrEvent_UserAccess_RoleChange', 
         'CromerrEvent',
-        'User Access',   
-        'Role Change', 
+        'UserAccess',   
+        'RoleChange', 
         '',
         'User roles changed for {organizationName}.
 User: {firstName} {lastName}
@@ -5216,8 +5216,8 @@ User Name: {actorUserName}
     (
         'CromerrEvent_UserAccess_ManualAccountLock', 
         'CromerrEvent',
-        'User Access',   
-        'Manual Account Lock', 
+        'UserAccess',   
+        'ManualAccountLock', 
         '',
         'Account was manually locked.
 User: {firstName} {lastName}
@@ -5237,8 +5237,8 @@ Email:  {authorityEmailaddress}
     (
         'CromerrEvent_UserAccess_ManualAccountUnlock', 
         'CromerrEvent',
-        'User Access',   
-        'Manual Account Unlock', 
+        'UserAccess',   
+        'ManualAccountUnlock', 
         '',
         'Account was manually unlocked.
 User: {firstName} {lastName}
@@ -5258,8 +5258,8 @@ Email:  {authorityEmailaddress}
     (
         'CromerrEvent_UserAccess_AccountResetInitiated', 
         'CromerrEvent',
-        'User Access',   
-        'Account Reset Initiated', 
+        'UserAccess',   
+        'AccountResetInitiated', 
         '',
         'Account reset initiated.  Re-registration pending.
 User: {firstName} {lastName}
@@ -5279,8 +5279,8 @@ Email:  {authorityEmailaddress}
     (
         'CromerrEvent_UserAccess_AccountResetExpired', 
         'CromerrEvent',
-        'User Access',   
-        'Account Reset Expired', 
+        'UserAccess',   
+        'AccountResetExpired', 
         '',
         'An attempt to reset an account failed because the reset link expired.
 User: {firstName} {lastName}
@@ -5294,8 +5294,8 @@ Email: {emailAddress}
     (
         'CromerrEvent_UserAccess_AccountResetSuccessful', 
         'CromerrEvent',
-        'User Access',   
-        'Account Reset Successful', 
+        'UserAccess',   
+        'AccountResetSuccessful', 
         '',
         'Account re-registration from reset complete.
 User: {firstName} {lastName}
@@ -5325,7 +5325,7 @@ Email: {emailAddress}
         'CromerrEvent_Login_PasswordLockout', 
         'CromerrEvent',
         'Login',   
-        'Password Lockout', 
+        'PasswordLockout', 
         '',
         'Login Failed. Consecutive invalid password attempts resulted in a password lock.
 User: {firstName} {lastName}
@@ -5340,7 +5340,7 @@ Email: {emailAddress}
         'CromerrEvent_Login_AccountLocked', 
         'CromerrEvent',
         'Login',   
-        'Account Locked', 
+        'AccountLocked', 
         '',
         'Login failed.  User attempted to log into a Locked Account.
 User: {firstName} {lastName}
@@ -5355,7 +5355,7 @@ Email: {emailAddress}
         'CromerrEvent_Login_AccountResetRequired', 
         'CromerrEvent',
         'Login',   
-        'Account Reset Required', 
+        'AccountResetRequired', 
         '',
         'Login failed.  User attempted to log in when an Account Reset was required.
 User: {firstName} {lastName}
@@ -5370,7 +5370,7 @@ Email: {emailAddress}
         'CromerrEvent_Login_UserDisabled', 
         'CromerrEvent',
         'Login',   
-        'User Disabled', 
+        'UserDisabled', 
         '',
         'Login Failed.  User account is disabled.
 User: {firstName} {lastName}
@@ -5385,7 +5385,7 @@ Email: {emailAddress}
         'CromerrEvent_Login_RegistrationPending', 
         'CromerrEvent',
         'Login',   
-        'Registration Pending', 
+        'RegistrationPending', 
         '',
         'Login failed. User registration is pending.
 User: {firstName} {lastName}
@@ -5400,7 +5400,7 @@ Email: {emailAddress}
         'CromerrEvent_Login_NoAssociation', 
         'CromerrEvent',
         'Login',   
-        'No Association', 
+        'NoAssociation', 
         '',
         'Login failed.  User is not associated with an enabled account.
 User: {firstName} {lastName}
@@ -5414,7 +5414,7 @@ Email: {emailAddress}
     (
         'CromerrEvent_ForgotPassword_Success', 
         'CromerrEvent',
-        'Forgot Password',   
+        'ForgotPassword',   
         'Success', 
         '',
         'Successful password reset.
@@ -5429,8 +5429,8 @@ Email: {emailAddress}
     (
         'CromerrEvent_ForgotPassword_PasswordResetExpired', 
         'CromerrEvent',
-        'Forgot Password',   
-        'Password Reset Expired', 
+        'ForgotPassword',   
+        'PasswordResetExpired', 
         '',
         'Forgot Password reset attempted on an expired link.
 User: {firstName} {lastName}
@@ -5444,8 +5444,8 @@ Email: {emailAddress}
     (
         'CromerrEvent_ForgotPassword_AccountLocked', 
         'CromerrEvent',
-        'Forgot Password',   
-        'Account Locked', 
+        'ForgotPassword',   
+        'AccountLocked', 
         '',
         'Login failed.  Account locked for exceeding Knowledge Based Question attempts during password reset.
 User: {firstName} {lastName}
@@ -5460,7 +5460,7 @@ Email: {emailAddress}
         'CromerrEvent_Profile_AccountLocked', 
         'CromerrEvent',
         'Profile',   
-        'Account Locked', 
+        'AccountLocked', 
         '',
         'Account locked for exceeding Knowledge Based Question attempts during profile access.
 User: {firstName} {lastName}
@@ -5475,7 +5475,7 @@ Email: {emailAddress}
         'CromerrEvent_Profile_PasswordChanged', 
         'CromerrEvent',
         'Profile',   
-        'Password Changed', 
+        'PasswordChanged', 
         '',
         'Password was changed.
 User: {firstName} {lastName}
@@ -5490,7 +5490,7 @@ Email: {emailAddress}
         'CromerrEvent_Profile_EmailChanged', 
         'CromerrEvent',
         'Profile',   
-        'Email Changed', 
+        'EmailChanged', 
         '',
         'Email was changed from {oldEmail} to {newEmail}
 User: {firstName} {lastName}
@@ -5505,7 +5505,7 @@ Email: {emailAddress}
         'CromerrEvent_Profile_KBQChanged', 
         'CromerrEvent',
         'Profile',   
-        'KBQ Changed', 
+        'KBQChanged', 
         '',
         'KBQ were changed
 User: {firstName} {lastName}
@@ -5521,7 +5521,7 @@ Email: {emailAddress}
         'CromerrEvent_Profile_SQChanged', 
         'CromerrEvent',
         'Profile',   
-        'SQ Changed', 
+        'SQChanged', 
         '',
         'Security Questions were changed
 User: {firstName} {lastName}
@@ -5537,7 +5537,7 @@ Email: {emailAddress}
         'CromerrEvent_Signature_IdentityProofed', 
         'CromerrEvent',
         'Signature',   
-        'Identity Proofed', 
+        'IdentityProofed', 
         '',
         'The user has successfully been identity proofed.
 User: {firstName} {lastName}
@@ -5552,7 +5552,7 @@ Email: {emailAddress}
         'CromerrEvent_Signature_SignatoryPending', 
         'CromerrEvent',
         'Signature',   
-        'Signatory Pending', 
+        'SignatoryPending', 
         '',
         'Signatory rights have been requested for {organizationName}.
 User: {firstName} {lastName}
@@ -5568,7 +5568,7 @@ Email: {emailAddress}
         'CromerrEvent_Signature_SignatoryGranted', 
         'CromerrEvent',
         'Signature',   
-        'Signatory Granted', 
+        'SignatoryGranted', 
         '',
         'Signatory rights granted to {organizationName}.
 User: {firstName} {lastName}
@@ -5583,7 +5583,7 @@ Email: {emailAddress}
         'CromerrEvent_Signature_SignatoryRevoked', 
         'CromerrEvent',
         'Signature',   
-        'Signatory Revoked', 
+        'SignatoryRevoked', 
         '',
         'Signatory rights revoked for {organizationName}.
 User: {firstName} {lastName}
@@ -5598,7 +5598,7 @@ Email: {emailAddress}
         'CromerrEvent_Signature_SignFailed', 
         'CromerrEvent',
         'Signature',   
-        'Sign Failed', 
+        'SignFailed', 
         '',
         'Signature ceremony failed because the user entered and incorrect KBQ answer for {organizationName}.
 User: {firstName} {lastName}
@@ -5613,7 +5613,7 @@ Email: {emailAddress}
         'CromerrEvent_Signature_AccountLocked', 
         'CromerrEvent',
         'Signature',   
-        'Account Locked', 
+        'AccountLocked', 
         '',
         'Failed KBQ’s during signature.
 User: {firstName} {lastName}

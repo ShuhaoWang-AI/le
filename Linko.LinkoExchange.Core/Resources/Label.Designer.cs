@@ -61,6 +61,51 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account Locked.
+        /// </summary>
+        public static string AccountLocked {
+            get {
+                return ResourceManager.GetString("AccountLocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Account Reset Expired.
+        /// </summary>
+        public static string AccountResetExpired {
+            get {
+                return ResourceManager.GetString("AccountResetExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Account Reset Initiated.
+        /// </summary>
+        public static string AccountResetInitiated {
+            get {
+                return ResourceManager.GetString("AccountResetInitiated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Account Reset Required.
+        /// </summary>
+        public static string AccountResetRequired {
+            get {
+                return ResourceManager.GetString("AccountResetRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Account Reset Successful.
+        /// </summary>
+        public static string AccountResetSuccessful {
+            get {
+                return ResourceManager.GetString("AccountResetSuccessful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All.
         /// </summary>
         public static string All {
@@ -223,6 +268,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Email Changed.
+        /// </summary>
+        public static string EmailChanged {
+            get {
+                return ResourceManager.GetString("EmailChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Forgot Password.
         /// </summary>
         public static string ForgotPassword {
@@ -241,6 +295,42 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Identity Proofed.
+        /// </summary>
+        public static string IdentityProofed {
+            get {
+                return ResourceManager.GetString("IdentityProofed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invite Deleted.
+        /// </summary>
+        public static string InviteDeleted {
+            get {
+                return ResourceManager.GetString("InviteDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invite Sent.
+        /// </summary>
+        public static string InviteSent {
+            get {
+                return ResourceManager.GetString("InviteSent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to KBQ Changed.
+        /// </summary>
+        public static string KBQChanged {
+            get {
+                return ResourceManager.GetString("KBQChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to LinkoExchange.
         /// </summary>
         public static string LinkoExchange {
@@ -250,11 +340,65 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Manual Account Lock.
+        /// </summary>
+        public static string ManualAccountLock {
+            get {
+                return ResourceManager.GetString("ManualAccountLock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manual Account Unlock.
+        /// </summary>
+        public static string ManualAccountUnlock {
+            get {
+                return ResourceManager.GetString("ManualAccountUnlock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Association.
+        /// </summary>
+        public static string NoAssociation {
+            get {
+                return ResourceManager.GetString("NoAssociation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password.
         /// </summary>
         public static string Password {
             get {
                 return ResourceManager.GetString("Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password Changed.
+        /// </summary>
+        public static string PasswordChanged {
+            get {
+                return ResourceManager.GetString("PasswordChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password Lockout.
+        /// </summary>
+        public static string PasswordLockout {
+            get {
+                return ResourceManager.GetString("PasswordLockout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password Reset Expired.
+        /// </summary>
+        public static string PasswordResetExpired {
+            get {
+                return ResourceManager.GetString("PasswordResetExpired", resourceCulture);
             }
         }
         
@@ -273,6 +417,33 @@ namespace Linko.LinkoExchange.Core.Resources {
         public static string ReadyToSubmit {
             get {
                 return ResourceManager.GetString("ReadyToSubmit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Registration Approved.
+        /// </summary>
+        public static string RegistrationApproved {
+            get {
+                return ResourceManager.GetString("RegistrationApproved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Registration Denied.
+        /// </summary>
+        public static string RegistrationDenied {
+            get {
+                return ResourceManager.GetString("RegistrationDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Registration Pending.
+        /// </summary>
+        public static string RegistrationPending {
+            get {
+                return ResourceManager.GetString("RegistrationPending", resourceCulture);
             }
         }
         
@@ -313,6 +484,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Role Change.
+        /// </summary>
+        public static string RoleChange {
+            get {
+                return ResourceManager.GetString("RoleChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sample Event Type.
         /// </summary>
         public static string SampleEventType {
@@ -327,6 +507,51 @@ namespace Linko.LinkoExchange.Core.Resources {
         public static string SampleEventTypeCollectionMethod {
             get {
                 return ResourceManager.GetString("SampleEventTypeCollectionMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Signatory Granted.
+        /// </summary>
+        public static string SignatoryGranted {
+            get {
+                return ResourceManager.GetString("SignatoryGranted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Signatory Pending.
+        /// </summary>
+        public static string SignatoryPending {
+            get {
+                return ResourceManager.GetString("SignatoryPending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Signatory Revoked.
+        /// </summary>
+        public static string SignatoryRevoked {
+            get {
+                return ResourceManager.GetString("SignatoryRevoked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sign Failed.
+        /// </summary>
+        public static string SignFailed {
+            get {
+                return ResourceManager.GetString("SignFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SQ Changed.
+        /// </summary>
+        public static string SQChanged {
+            get {
+                return ResourceManager.GetString("SQChanged", resourceCulture);
             }
         }
         
@@ -408,6 +633,24 @@ namespace Linko.LinkoExchange.Core.Resources {
         public static string TitleResetPassword {
             get {
                 return ResourceManager.GetString("TitleResetPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User Access.
+        /// </summary>
+        public static string UserAccess {
+            get {
+                return ResourceManager.GetString("UserAccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User Disabled.
+        /// </summary>
+        public static string UserDisabled {
+            get {
+                return ResourceManager.GetString("UserDisabled", resourceCulture);
             }
         }
         

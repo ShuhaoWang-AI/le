@@ -132,6 +132,15 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
+        public void CreateDraft_Using_Date_Plus_Time()
+        {
+            var templateId = 1;
+            var startDateTimeLocal = new DateTime(2017, 4, 20, 17, 30, 30, 30);
+            var endDateTimeLocal = new DateTime(2017, 4, 20, 17, 30, 30, 30);
+            var newId = _reportPackageService.CreateDraft(templateId, startDateTimeLocal, endDateTimeLocal);
+        }
+
+        [TestMethod]
         public void CreateDraft_Using_Empty_Template()
         {
             var emptyReportPackageTemplateId = 9;

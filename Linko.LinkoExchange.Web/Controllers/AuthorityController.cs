@@ -29,6 +29,7 @@ using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.Authority;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
+using Linko.LinkoExchange.Core.Resources;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -480,8 +481,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                           OrganizationId = dto.OrganizationId ?? 0,
                                                           OrganizationName = dto.OrganizationName,
                                                           RegulatorName = dto.RegulatorOrganizationName,
-                                                          EventCategory = dto.EventCategory,
-                                                          EventType = dto.EventType,
+                                                          EventCategory = Label.ResourceManager.GetString(dto.EventCategory) ?? dto.EventCategory,
+                                                          EventType = Label.ResourceManager.GetString(dto.EventType) ?? dto.EventType,
                                                           UserProfileIdDisplay = dto.UserProfileId.HasValue && dto.UserProfileId > 0 ? dto.UserProfileId.ToString() : "n/a",
                                                           UserName = dto.UserName,
                                                           FirstName = dto.UserFirstName,
