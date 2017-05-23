@@ -478,6 +478,13 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
+        public void GetSamples_Only_ReadyToReport_Not_Reported_Status()
+        {
+            var sampleDtos = _sampleService.GetSamples(SampleStatusName.ReadyToReport);
+
+        }
+
+        [TestMethod]
         public void Persist_And_Read_Back_SampleDto_And_Compare_Fields()
         {
             //Remove_All_Samples_From_Db();
