@@ -203,12 +203,14 @@ namespace Linko.LinkoExchange.Services.Report
                         int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
                     //// Check report template name and effective date  
-                    if (string.IsNullOrEmpty(rpt.Name.Trim()))
+                    if (string.IsNullOrWhiteSpace(rpt.Name))
                     {
                         string message = "Name is required.";
                         validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                         throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                     }
+
+                    rpt.Name = rpt.Name.Trim();
 
                     if (rpt.EffectiveDateTimeLocal == DateTimeOffset.MinValue)
                     {
