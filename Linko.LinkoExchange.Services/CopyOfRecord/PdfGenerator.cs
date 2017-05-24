@@ -18,8 +18,8 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
     internal class PdfGenerator
     {
         private readonly ReportPackageDto _reportPackage;
-        TextState _sectionTitleBoldSize12 = new TextState("Arial", true, false);
-        TextState _sectionTextSize10 = new TextState("Arial", false, false);
+        readonly TextState _sectionTitleBoldSize12 = new TextState("Arial", true, false);
+        readonly TextState _sectionTextSize10 = new TextState("Arial", false, false);
 
         private readonly Document _pdfDocument;
         private readonly Page _pdfPage;
@@ -40,7 +40,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             _pdfPage = _pdfDocument.Pages.Add();
         }
 
-        public byte[] CreateCopyOfRecordPdf()
+        public byte[] CreateCopyOfRecordPdf(bool draftMode = false)
         {
             if (_reportPackage == null)
             {
@@ -69,6 +69,12 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             foreach (var elementCategory in _reportPackage.ReportPackageTemplateElementCategories)
             {
                 PrintPdfSections(elementCategory);
+            }
+
+            //Add draft stamp to pdf 
+            if (draftMode)
+            {
+                AddWatermark();
             }
 
             var mStream = new MemoryStream();
@@ -307,7 +313,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
                 foreach (var sample in monthYearGroup.SamplesGroupByMonthAndYear)
                 {
-                    // strip off the seconds and milli-seconds part for time 
+                    // strip off the seconds and milliseconds part for time 
                     sample.StartDateTimeLocal = sample.StartDateTimeLocal.AddSeconds(-sample.StartDateTimeLocal.Second).AddMilliseconds(-sample.StartDateTimeLocal.Millisecond);
                     sample.EndDateTimeLocal = sample.EndDateTimeLocal.AddSeconds(-sample.EndDateTimeLocal.Second).AddMilliseconds(-sample.EndDateTimeLocal.Millisecond);
 
@@ -318,7 +324,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                     }));
                 }
 
-                // sort sampleResultExtensions by  start date asc, end date asc, param name asc, limitbasis asc, collection method asc   
+                // sort sampleResultExtensions by  start date ASC, end date ASC, param name ASC, limitbasis ASC, collection method ASC   
                 sampleResultExtensions = sampleResultExtensions.OrderBy(a => a.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower())
                                       .ThenBy(b => b.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower())
                                       .ThenBy(c => c.SampleResult.ParameterName)
@@ -433,7 +439,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
             //--------------------------------Row 4
             row = reportInfoTable.Rows.Add();
-            row.Cells.Add("Industy Number:");
+            row.Cells.Add("Industry Number:");
             row.Cells.Add(string.IsNullOrEmpty(_reportPackage.OrganizationReferenceNumber) ? "" : _reportPackage.OrganizationReferenceNumber);
 
             row.Cells.Add("");
@@ -521,6 +527,28 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             var cell = row.Cells.Add("");
             cell.Paragraphs.Add(text);
             row.Cells.Add(submittedDateTimeString);
+        }
+
+        private void AddWatermark()
+        {
+            string annotationText = "DRAFT";
+            var textStamp = new TextStamp(annotationText)
+            {
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            textStamp.TextState.ForegroundColor = Color.IndianRed;
+            textStamp.TextState.FontSize = 160;
+            textStamp.Opacity = 0.3;
+            textStamp.RotateAngle = 45;
+
+            _pdfDocument.ProcessParagraphs();
+            foreach (var page in _pdfDocument.Pages)
+            {
+                var pdfPage = page as Page;
+                pdfPage?.AddStamp(textStamp);
+            }
         }
     }
 }
