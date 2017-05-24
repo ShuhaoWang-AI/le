@@ -26,6 +26,7 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Sample;
 using System.Data.Entity.Validation;
 using System.Data.Entity.Infrastructure;
+using System.Xml.Linq;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -173,7 +174,8 @@ namespace Linko.LinkoExchange.Services.Report
         public CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(ReportPackageDto reportPackageDto)
         {
             var pdfGenerator = new PdfGenerator(reportPackageDto);
-            var pdfData = pdfGenerator.CreateCopyOfRecordPdf();
+            var draftMode = reportPackageDto.ReportStatusName == ReportStatusName.Draft || reportPackageDto.ReportStatusName == ReportStatusName.ReadyToSubmit;
+            var pdfData = pdfGenerator.CreateCopyOfRecordPdf(draftMode);
 
             return new CopyOfRecordPdfFileDto
             {
@@ -248,7 +250,6 @@ namespace Linko.LinkoExchange.Services.Report
                         SystemGeneratedUniqueFileName = reportFile.FileStore.Name,
                         AttachmentType = reportFile.FileStore.ReportElementTypeName
                     });
-
                 }
             }
 
@@ -356,11 +357,7 @@ namespace Linko.LinkoExchange.Services.Report
                 }
             }
 
-            var strWriter = new Utf8StringWriter();
-            var xmlSerializer = new XmlSerializer(dataXmlObj.GetType());
-            xmlSerializer.Serialize(strWriter, dataXmlObj);
-            var xmlString = strWriter.ToString();
-
+            var xmlString = GenerateXmlString(dataXmlObj, reportPackageDto);
             var xmlData = new CopyOfRecordDataXmlFileDto
             {
                 FileData = Encoding.UTF8.GetBytes(s: xmlString),
@@ -432,7 +429,7 @@ namespace Linko.LinkoExchange.Services.Report
             var sortedSamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
             if (samplesReportPackageElementCategory != null)
             {
-                
+
                 foreach (var existingSamplesReportPackageElementType in samplesReportPackageElementCategory.ReportPackageElementTypes)
                 {
                     var reportPackageElementTypeDto = _mapHelper.GetReportPackageElementTypeDtoFromReportPackageElementType(existingSamplesReportPackageElementType);
@@ -555,7 +552,7 @@ namespace Linko.LinkoExchange.Services.Report
             return copyOfRecordDto;
         }
 
-        public CopyOfRecordDto CreateCopyOfRecordForReportPackage(ReportPackageDto reportPackageDto)
+        private CopyOfRecordDto CreateCopyOfRecordForReportPackage(ReportPackageDto reportPackageDto)
         {
             _logger.Info("Enter ReportPackageService.CreateCopyOfRecordForReportPackage. reportPackageId={0}", reportPackageDto.ReportPackageId);
             int reportPackageId = reportPackageDto.ReportPackageId;
@@ -683,7 +680,7 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
             emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
 
-            emailContentReplacements.Add("corViewLink", $"{_httpContextService.GetRequestBaseUrl()}reportPackage/{reportPackage.ReportPackageId}/cor");
+            emailContentReplacements.Add("corViewLink", $"{_httpContextService.GetRequestBaseUrl()}reportPackage/{reportPackage.ReportPackageId}/COR");
 
             // Send emails to all IU signatories 
             var signatoriesEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
@@ -2058,6 +2055,75 @@ namespace Linko.LinkoExchange.Services.Report
             return true;
         }
 
+        private string GenerateXmlString(CopyOfRecordDataXml dataXmlObj, ReportPackageDto reportPackageDto)
+        {
+            var strWriter = new Utf8StringWriter();
+            var xmlSerializer = new XmlSerializer(dataXmlObj.GetType());
+            xmlSerializer.Serialize(strWriter, dataXmlObj);
+            var xmlString = strWriter.ToString();
+
+            var xmlDoc = XDocument.Parse(xmlString);
+            var elements = xmlDoc.Root.Elements().ToList();
+
+            var certifications = GetXElementNode(elements, ReportElementCategoryName.Certifications.ToString());
+            var samples = GetXElementNode(elements, "Samples");
+            var attachments = GetXElementNode(elements, "FileManifest");
+            var comment = GetXElementNode(elements, "Comment");
+
+            var certificationsCloned = TakeOffXElementNode(certifications);
+            var samplesCloned = TakeOffXElementNode(samples);
+            var attachmentsCloned = TakeOffXElementNode(attachments);
+            var commentCloned = TakeOffXElementNode(comment);
+
+            foreach (var categoryName in reportPackageDto.ReportPackageTemplateElementCategories)
+            {
+                switch (categoryName)
+                {
+                    case ReportElementCategoryName.Attachments:
+                        if (attachments != null)
+                        {
+                            xmlDoc.Root.Add(attachmentsCloned);
+                        }
+                        break;
+                    case ReportElementCategoryName.Certifications:
+                        if (certifications != null)
+                        {
+                            xmlDoc.Root.Add(certificationsCloned);
+                        }
+                        break;
+                    case ReportElementCategoryName.SamplesAndResults:
+                        if (comment != null)
+                        {
+                            xmlDoc.Root.Add(samplesCloned);
+                            xmlDoc.Root.Add(commentCloned);
+                        }
+                        break;
+                }
+            }
+
+            return xmlDoc.ToString();
+        }
+
+        private XElement TakeOffXElementNode(XElement node)
+        {
+            if (node != null)
+            {
+                var nodeCloned = new XElement(node);
+                node.Remove();
+                return nodeCloned;
+            }
+
+            return null;
+        }
+        private XElement GetXElementNode(IEnumerable<XElement> corElements, string tagName)
+        {
+            if (corElements.Any(i => i.Name.LocalName == ReportElementCategoryName.Certifications.ToString()))
+            {
+                return corElements.Single(i => i.Name.LocalName == tagName);
+            }
+
+            return null;
+        }
 
         private string EmtpyStringIfNull(string value)
         {
