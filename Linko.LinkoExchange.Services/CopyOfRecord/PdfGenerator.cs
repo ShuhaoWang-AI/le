@@ -18,9 +18,8 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
     internal class PdfGenerator
     {
         private readonly ReportPackageDto _reportPackage;
-
-        private readonly TextState _boldTextState = new TextState("Arial", true, false);
-        private readonly TextState _normalTextState = new TextState("Arial", false, false);
+        TextState _sectionTitleBoldSize12 = new TextState("Arial", true, false);
+        TextState _sectionTextSize10 = new TextState("Arial", false, false);
 
         private readonly Document _pdfDocument;
         private readonly Page _pdfPage;
@@ -31,9 +30,12 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             pdflicense.SetLicense(@"Aspose.Pdf.lic");
             pdflicense.Embedded = true;
 
+            _sectionTitleBoldSize12.FontSize = 12;
+            _sectionTitleBoldSize12.FontStyle = FontStyles.Bold;
+            _sectionTextSize10.FontSize = 10;
+
             _reportPackage = reportPackage;
-            _boldTextState.FontSize = 12;
-            _normalTextState.FontSize = 10;
+
             _pdfDocument = new Document();
             _pdfPage = _pdfDocument.Pages.Add();
         }
@@ -47,7 +49,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
             _pdfPage.SetPageSize(PageSize.PageLetter.Width, PageSize.PageLetter.Height);
             _pdfPage.PageInfo.IsLandscape = true;
-            _pdfPage.PageInfo.Margin.Top = 30;
+            _pdfPage.PageInfo.Margin.Top = 20;
             _pdfPage.PageInfo.Margin.Left = 10;
             _pdfPage.PageInfo.Margin.Bottom = 20;
             _pdfPage.PageInfo.Margin.Right = 10;
@@ -61,7 +63,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             HeaderFooterTable(_pdfPage, reportName, submissionDateTimeString, authorityName, industryName);
 
             // report info part  
-            ReportInfoTable(_pdfPage, _normalTextState, _boldTextState);
+            ReportInfoTable(_pdfPage);
 
             //TO determine the order of the following 3 sections 
             foreach (var elementCategory in _reportPackage.ReportPackageTemplateElementCategories)
@@ -95,18 +97,18 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         private void AttachmentsTable()
         {
             var attachmentsTable = new Table();
-            attachmentsTable.DefaultCellPadding = new MarginInfo(2, 3, 2, 3);
+            attachmentsTable.DefaultCellPadding = new MarginInfo(2, 2, 2, 2);
             _pdfPage.Paragraphs.Add(attachmentsTable);
 
             attachmentsTable.Margin.Top = 20;
-            attachmentsTable.ColumnWidths = "33% 33% 33%";
+            attachmentsTable.ColumnWidths = "33% 34% 33%";
             var row = attachmentsTable.Rows.Add();
 
-            var cell = row.Cells.Add("Attachments", _boldTextState);
+            var cell = row.Cells.Add("Attachments", _sectionTitleBoldSize12);
             cell.ColSpan = 3;
 
             row = attachmentsTable.Rows.Add();
-            cell = row.Cells.Add("These files are also part of the Copy Of Records.", _normalTextState);
+            cell = row.Cells.Add("These files are also part of the Copy Of Records.", _sectionTextSize10);
             cell.ColSpan = 3;
 
             //Attachment files list table
@@ -115,25 +117,34 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             {
                 Border = tableOrder,
                 DefaultCellBorder = tableOrder,
-                DefaultCellPadding = new MarginInfo(3, 3, 3, 3),
+                DefaultCellPadding = new MarginInfo(2, 2, 2, 2),
                 Margin = { Top = 10 }
             };
 
-            attachmentFilesTable.DefaultCellPadding = new MarginInfo(3, 3, 3, 3);
+            attachmentFilesTable.DefaultCellPadding = new MarginInfo(2, 2, 2, 2);
             _pdfPage.Paragraphs.Add(attachmentFilesTable);
 
-            attachmentFilesTable.ColumnWidths = "33% 33% 33%";
+            var titleBoldSize8 = new TextState("Arial", false, false);
+            titleBoldSize8.FontSize = 8;
+            titleBoldSize8.FontStyle = FontStyles.Bold;
+
+            var titleSize8 = new TextState("Arial", false, false);
+            titleSize8.FontSize = 8;
+
+            attachmentFilesTable.ColumnWidths = "33% 34% 33%";
             row = attachmentFilesTable.Rows.Add();
+            row.DefaultCellTextState = titleBoldSize8;
             row.BackgroundColor = Color.LightGray;
 
             row.Cells.Add("Original File Name");
-            row.Cells.Add("System Generated Unqiue File Name");
+            row.Cells.Add("System Generated Unique File Name");
             row.Cells.Add("Attachment Type");
 
             var attachments = _reportPackage.AttachmentTypes.SelectMany(i => i.ReportFiles).Select(i => i.FileStore);
             foreach (var attachedFile in attachments)
             {
                 row = attachmentFilesTable.Rows.Add();
+                row.DefaultCellTextState = titleSize8;
                 row.Cells.Add(attachedFile.Name);
                 row.Cells.Add(attachedFile.OriginalFileName);
                 row.Cells.Add(attachedFile.ReportElementTypeName);
@@ -143,33 +154,33 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         // Comment section
         private void CommentTable()
         {
-            var commentTable = new Table { DefaultCellPadding = new MarginInfo(2, 3, 2, 3) };
+            var commentTable = new Table { DefaultCellPadding = new MarginInfo(2, 2, 2, 2) };
             _pdfPage.Paragraphs.Add(commentTable);
 
             commentTable.Margin.Top = 20;
-            commentTable.ColumnWidths = "96%";
+            commentTable.ColumnWidths = "100%";
             var row = commentTable.Rows.Add();
-            row.Cells.Add("Comments", _boldTextState);
+            row.Cells.Add("Comments", _sectionTitleBoldSize12);
 
             row = commentTable.Rows.Add();
-            row.Cells.Add(_reportPackage.Comments, _normalTextState);
+            row.Cells.Add(GetValueOrEmptyString(_reportPackage.Comments), _sectionTitleBoldSize12);
         }
 
-        // This include TTO Certification, and Singature Certification
+        // This include TTO Certification, and Signature Certification
         private void CertificationsTable()
         {
             foreach (var certification in _reportPackage.CertificationTypes)
             {
-                var certificateTable = new Table { DefaultCellPadding = new MarginInfo(2, 3, 2, 3) };
+                var certificateTable = new Table { DefaultCellPadding = new MarginInfo(2, 2, 2, 2) };
                 _pdfPage.Paragraphs.Add(certificateTable);
 
                 certificateTable.Margin.Top = 20;
-                certificateTable.ColumnWidths = "96%";
+                certificateTable.ColumnWidths = "100%";
                 var row = certificateTable.Rows.Add();
-                row.Cells.Add(certification.ReportElementTypeName, _boldTextState);
+                row.Cells.Add(certification.ReportElementTypeName, _sectionTitleBoldSize12);
 
                 row = certificateTable.Rows.Add();
-                row.Cells.Add(certification.ReportElementTypeContent, _normalTextState);
+                row.Cells.Add(GetValueOrEmptyString(certification.ReportElementTypeContent), _sectionTextSize10);
             }
         }
 
@@ -190,7 +201,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
                 var sectionTitle = _reportPackage.SamplesAndResultsTypes[0].ReportElementTypeName;
 
-                row.Cells.Add(sectionTitle, _boldTextState);
+                row.Cells.Add(sectionTitle, _sectionTitleBoldSize12);
 
                 var tableOrder = new BorderInfo(BorderSide.All, 0.1F);
 
@@ -199,11 +210,11 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 {
                     Border = tableOrder,
                     DefaultCellBorder = tableOrder,
-                    DefaultCellPadding = new MarginInfo(3, 3, 3, 3)
+                    DefaultCellPadding = new MarginInfo(2, 2, 2, 2)
                 };
 
                 _pdfPage.Paragraphs.Add(sampleResultsTable);
-                sampleResultsTable.ColumnWidths = "6% 16.2% 8.3% 5.8% 8.9% 8.9% 7.3% 7.8% 8% 5.3% 8.9% 7.4%";
+                sampleResultsTable.ColumnWidths = "6% 19% 11.6% 5.2% 7.1% 7.1% 7.3% 7.8% 8% 5.3% 7.1% 8.5%";
 
                 var allSamples = _reportPackage.SamplesAndResultsTypes.SelectMany(i => i.ReportSamples).Select(i => i.Sample);
                 var sampleMonitoringPointerGroups = allSamples.GroupBy(i => i.MonitoringPointId);
@@ -221,14 +232,48 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         private void DrawMonitoringPointSamplesAndResultsTable(Table sampleResultsTable, List<SampleDto> samples, string monitoringPointName, BorderInfo tableOrder)
         {
+            // table header text font
+            var centerTextBoldSize10 = new TextState("Arial", false, false);
+            centerTextBoldSize10.FontSize = 10;
+            centerTextBoldSize10.FontStyle = FontStyles.Bold;
+            centerTextBoldSize10.HorizontalAlignment = HorizontalAlignment.Center;
+
+            var leftTextBoldSize10 = new TextState("Arial", false, false);
+            leftTextBoldSize10.FontSize = 10;
+            leftTextBoldSize10.FontStyle = FontStyles.Bold;
+            leftTextBoldSize10.HorizontalAlignment = HorizontalAlignment.Left;
+
+            var rightTextBoldSize10 = new TextState("Arial", false, false);
+            rightTextBoldSize10.FontSize = 10;
+            rightTextBoldSize10.FontStyle = FontStyles.Bold;
+            rightTextBoldSize10.HorizontalAlignment = HorizontalAlignment.Right;
+
+            // cell text font
+            var centerTextBoldSize8 = new TextState("Arial", false, false);
+            centerTextBoldSize8.FontSize = 8;
+            centerTextBoldSize8.FontStyle = FontStyles.Bold;
+            centerTextBoldSize8.HorizontalAlignment = HorizontalAlignment.Center;
+
+            var leftTextBoldSize8 = new TextState("Arial", false, false);
+            leftTextBoldSize8.FontSize = 8;
+            leftTextBoldSize8.FontStyle = FontStyles.Bold;
+            leftTextBoldSize8.HorizontalAlignment = HorizontalAlignment.Left;
+
+            var rightTextBoldSize8 = new TextState("Arial", false, false);
+            rightTextBoldSize8.FontSize = 8;
+            rightTextBoldSize8.FontStyle = FontStyles.Bold;
+            rightTextBoldSize8.HorizontalAlignment = HorizontalAlignment.Right;
+
             // Monitoring Point row 
             var row = sampleResultsTable.Rows.Add();
+            row.DefaultCellTextState = leftTextBoldSize10;
             row.BackgroundColor = Color.LightGray;
             row.Border = tableOrder;
             var cell = row.Cells.Add($"Monitoring Point:{monitoringPointName}");
             cell.ColSpan = 12;
 
             row = sampleResultsTable.Rows.Add();
+            row.DefaultCellTextState = centerTextBoldSize10;
             row.BackgroundColor = Color.LightGray;
 
             row.Cells.Add("Month");
@@ -239,9 +284,9 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             row.Cells.Add("Sample End");
             row.Cells.Add("Collection Method");
             row.Cells.Add("Lab Sample ID");
-            row.Cells.Add("Analys Method");
+            row.Cells.Add("Analysis Method");
             row.Cells.Add("EPA Method");
-            row.Cells.Add("Analys Date");
+            row.Cells.Add("Analysis Date");
             row.Cells.Add("Flow");
 
             // samples in the same monitoring pointer are grouped by month plus year
@@ -285,6 +330,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 {
                     var sampleResultExtension = sampleResultExtensions[i];
                     row = sampleResultsTable.Rows.Add();
+                    row.DefaultCellTextState = centerTextBoldSize8;
                     if (i == 0)
                     {
                         row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MMMM"));
@@ -294,9 +340,9 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                         row.Cells.Add("");
                     }
 
-                    row.Cells.Add(sampleResultExtension.SampleResult.ParameterName);
-                    row.Cells.Add($"{sampleResultExtension.SampleResult.Value} {sampleResultExtension.SampleResult.UnitName}");
-                    row.Cells.Add($"{sampleResultExtension.SampleResult.MethodDetectionLimit}");
+                    row.Cells.Add(sampleResultExtension.SampleResult.ParameterName, leftTextBoldSize8);
+                    row.Cells.Add($"{sampleResultExtension.SampleResult.Value} {sampleResultExtension.SampleResult.UnitName}", rightTextBoldSize8);
+                    row.Cells.Add($"{sampleResultExtension.SampleResult.MethodDetectionLimit}", rightTextBoldSize8);
 
                     row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower());
                     row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower());
@@ -312,9 +358,9 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                     {
                         row = sampleResultsTable.Rows.Add();
                         row.Cells.Add("");
-                        row.Cells.Add(sampleResultExtension.SampleResult.ParameterName);
-                        row.Cells.Add($"{sampleResultExtension.SampleResult.MassLoadingValue} {sampleResultExtension.SampleResult.MassLoadingUnitName}");
-                        row.Cells.Add($"{sampleResultExtension.SampleResult.MethodDetectionLimit?.ToString() ?? ""}");
+                        row.Cells.Add(sampleResultExtension.SampleResult.ParameterName, leftTextBoldSize8);
+                        row.Cells.Add($"{sampleResultExtension.SampleResult.MassLoadingValue} {sampleResultExtension.SampleResult.MassLoadingUnitName}", rightTextBoldSize8);
+                        row.Cells.Add($"{sampleResultExtension.SampleResult.MethodDetectionLimit?.ToString() ?? ""}", rightTextBoldSize8);
                         row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower());
                         row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower());
                         row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName);
@@ -322,26 +368,43 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                         row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod);
                         row.Cells.Add(sampleResultExtension.SampleResult.IsApprovedEPAMethod.ToString());
                         row.Cells.Add(sampleResultExtension.SampleResult.AnalysisDateTimeLocal?.ToString("MM/dd/yyyy hh:mm tt").ToLower());
-                        row.Cells.Add($"{sampleResultExtension.Sample.FlowValue} {sampleResultExtension.Sample.FlowUnitName}");
+                        row.Cells.Add($"{sampleResultExtension.Sample.FlowValue} {sampleResultExtension.Sample.FlowUnitName}", rightTextBoldSize8);
                     }
                 }
             }
         }
 
-        private void ReportInfoTable(Page pdfPage, TextState reportInfoTableNormalTextState, TextState reportInfoTableBoldTextState)
+        private string GetValueOrEmptyString(string value)
         {
-            var reportInfoTable = new Table();
-            reportInfoTable.DefaultCellPadding = new MarginInfo(3, 3, 3, 3);
-            reportInfoTable.Margin.Top = 20f;
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            return value;
+        }
+
+        private void ReportInfoTable(Page pdfPage)
+        {
+            var textStateSize10 = new TextState("Arial", true, false);
+            var boldTextStateSize10 = new TextState("Arial", false, false);
+            textStateSize10.FontSize = 10;
+            boldTextStateSize10.FontSize = 10;
+
+            var reportInfoTable = new Table
+            {
+                DefaultCellPadding = new MarginInfo(3, 3, 3, 3),
+                Margin = { Top = 20f }
+            };
 
             pdfPage.Paragraphs.Add(reportInfoTable);
             reportInfoTable.ColumnWidths = "15% 30% 10% 15% 30%";
 
-            reportInfoTable.SetColumnTextState(0, reportInfoTableBoldTextState);
-            reportInfoTable.SetColumnTextState(1, reportInfoTableNormalTextState);
-            reportInfoTable.SetColumnTextState(2, reportInfoTableNormalTextState);
-            reportInfoTable.SetColumnTextState(3, reportInfoTableBoldTextState);
-            reportInfoTable.SetColumnTextState(4, reportInfoTableNormalTextState);
+            reportInfoTable.SetColumnTextState(0, boldTextStateSize10);
+            reportInfoTable.SetColumnTextState(1, textStateSize10);
+            reportInfoTable.SetColumnTextState(2, textStateSize10);
+            reportInfoTable.SetColumnTextState(3, boldTextStateSize10);
+            reportInfoTable.SetColumnTextState(4, textStateSize10);
 
             //--------------------------------Row 1 
             var row = reportInfoTable.Rows.Add();
@@ -355,18 +418,18 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             //--------------------------------Row 2
             // empty row
             row = reportInfoTable.Rows.Add();
-            row.MinRowHeight = 30;
+            row.MinRowHeight = 10;
 
             //--------------------------------Row 3
             row = reportInfoTable.Rows.Add();
-            row.Cells.Add("Industy Name:", reportInfoTableBoldTextState);
+            row.Cells.Add("Industry Name:", boldTextStateSize10);
             row.Cells.Add(_reportPackage.OrganizationName);
 
             row.Cells.Add("");
 
-            row.Cells.Add("Submitted Date:", reportInfoTableBoldTextState);
+            row.Cells.Add("Submitted Date:", boldTextStateSize10);
 
-            row.Cells.Add(_reportPackage.SubmissionDateTimeLocal.HasValue ? _reportPackage.SubmissionDateTimeLocal.Value.ToString("MMMM dd, yyyy HH:mm tt ") : "");
+            row.Cells.Add(_reportPackage.SubmissionDateTimeLocal.HasValue ? _reportPackage.SubmissionDateTimeLocal.Value.ToString("MMMM dd, yyyy hh:mm tt ") : "");
 
             //--------------------------------Row 4
             row = reportInfoTable.Rows.Add();
@@ -398,7 +461,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             Table headerTable = new Table();
 
             pdfPage.Header = new HeaderFooter();
-            var headerMargin = new MarginInfo(10, 20, 10, 5);
+            var headerMargin = new MarginInfo(10, 10, 10, 5);
             pdfPage.Header.Margin = headerMargin;
 
             pdfPage.Header.Paragraphs.Add(headerTable);
@@ -421,8 +484,8 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             rightHeaderFooterTextState.ForegroundColor = Color.Gray;
             rightHeaderFooterTextState.HorizontalAlignment = HorizontalAlignment.Right;
 
-            headerTable.ColumnWidths = "33.3% 33.3% 33.3%";
-            headerTable.DefaultCellPadding = new MarginInfo(2, 3, 2, 3);
+            headerTable.ColumnWidths = "33% 34% 33%";
+            headerTable.DefaultCellPadding = new MarginInfo(2, 2, 2, 2);
             headerTable.Broken = TableBroken.None;
             headerTable.Margin.Top = 5f;
 
@@ -442,8 +505,8 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             pdfPage.Footer.Margin.Right = headerMargin.Right;
             pdfPage.Footer.Paragraphs.Add(footerTable);
 
-            footerTable.ColumnWidths = "33.3% 33.3% 33.3%";
-            footerTable.DefaultCellPadding = new MarginInfo(2, 3, 2, 3);
+            footerTable.ColumnWidths = "33% 34% 33%";
+            footerTable.DefaultCellPadding = new MarginInfo(2, 2, 2, 2);
             footerTable.Broken = TableBroken.None;
             footerTable.Margin.Bottom = -5f;
             footerTable.SetColumnTextState(0, leftHeaderFooterTextState);
