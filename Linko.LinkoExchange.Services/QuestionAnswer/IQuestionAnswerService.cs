@@ -52,7 +52,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         void DeleteUserQuestionAnswer(int userQuestionAnswerId);
 
         /// <summary>
-        /// Delete all user's KBQ an Security Questions and answsers
+        /// Delete all user's KBQ an Security Questions and answers
         /// </summary>
         /// <param name="userProfileId"></param>
         void DeleteUserQuestionAndAnswers(int userProfileId);

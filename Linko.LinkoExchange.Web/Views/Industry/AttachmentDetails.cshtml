@@ -8,7 +8,7 @@
 @using (Html.BeginForm(actionName:"NewAttachmentDetails", controllerName:"Industry", routeValues:null, method:FormMethod.Post, htmlAttributes:new
                                                                                                                                               {
                                                                                                                                                   enctype = "multipart/form-data"
-                                                                                                                                                  , id = "AttachmentDetailsForm"
+                                                                                                                                                  , id = "LinkoExchangeForm"
                                                                                                                                               }))
 {
     @Html.AntiForgeryToken()
@@ -198,7 +198,7 @@
             $(document)
                 .ready(function()
                 {
-                    $("#AttachmentDetailsForm")
+                    $("#LinkoExchangeForm")
                         .submit(function()
                         {
                             $("#ReportElementTypeName").val($("#ReportElementTypeId option:selected").text());

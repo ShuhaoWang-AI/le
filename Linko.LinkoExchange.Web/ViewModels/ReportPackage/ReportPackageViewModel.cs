@@ -42,7 +42,18 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
         [Display(Name = "Is Submission By Signatory Required")]
         public bool IsSubmissionBySignatoryRequired { get; set; }
 
-        public bool IsCurrentUserSignatory{ get; set; } // need to check current user has signatory right or not before submit report
+        public bool IsCurrentUserSignatory { get; set; } // need to check current user has signatory right or not before submit report
+
+        [ScaffoldColumn(scaffold:false)]
+        public int QuestionAnswerId { get; set; }
+
+        public string Question { get; set; }
+
+        public string Answer { get; set; }
+
+        [DataType(dataType:DataType.Password)]
+        [Display(Name = "Enter Your Password")]
+        public string Password { get; set; }
 
         [Display(Name = "Status")]
         public ReportStatusName Status { get; set; }

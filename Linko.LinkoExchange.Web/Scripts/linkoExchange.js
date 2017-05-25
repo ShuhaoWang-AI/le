@@ -128,3 +128,18 @@ showPopupMessage = function (message)
         $('[data-popup="popup-1"]').fadeOut(350);
     });
 }
+
+$(document)
+    .ready(function()
+    {
+        $("#LinkoExchangeForm")
+            .submit(function(e)
+            {
+                $("input[type='submit']").prop('disabled', true);
+                //setTimeout(function()
+                //    {
+                //        $("input[type='submit']").prop('disabled', false);
+                //    }
+                //    , 2000);
+            });
+    });

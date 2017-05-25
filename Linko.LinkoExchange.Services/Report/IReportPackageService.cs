@@ -113,9 +113,8 @@ namespace Linko.LinkoExchange.Services.Report
         ///     Gets Report Package information (without children element data) for displaying in a grid.
         /// </summary>
         /// <param name="reportStatusName">Fetches report packages of this status only</param>
-        /// <param name="isAuthorityViewing">True is User is Authority</param>
         /// <returns>Collection of ReportPackageDto objects (without children element data)</returns>
-        IEnumerable<ReportPackageDto> GetReportPackagesByStatusName(ReportStatusName reportStatusName, bool isAuthorityViewing);
+        IEnumerable<ReportPackageDto> GetReportPackagesByStatusName(ReportStatusName reportStatusName);
 
         /// <summary>
         ///     Gets items to populate a dropdown list of reasons to repudiate a report package (for a specific Org Reg Program Id)

@@ -6,7 +6,7 @@
 
 @using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new
                                                                                                     {
-                                                                                                        id = "ReportPackageDetailsForm"
+                                                                                                        id = "LinkoExchangeForm"
                                                                                                     }))
 {
     @Html.AntiForgeryToken()
@@ -99,9 +99,10 @@
                     </div>
                 </div>
             </div>
-
+            
             <div class="form-group">
                 @Html.HiddenFor(model => model.Id)
+                @Html.HiddenFor(model => model.IsSubmissionBySignatoryRequired)
             </div>
             <div class="form-group">
 
@@ -301,7 +302,7 @@
 
     if (Model.IsSubmissionBySignatoryRequired && Model.IsCurrentUserSignatory && (Model.Status == ReportStatusName.ReadyToSubmit))
     {
-        <div class="box box-primary">
+        <div class="box box-primary" id="divSignAndSubmitReport">
             <div class="box-header with-border">
                 <h3 class="box-title">Sign and Submit Report</h3>
                 <div class="box-tools pull-right">
@@ -311,13 +312,39 @@
                 </div>
             </div>
             <div class="box-body form-horizontal">
+                @if (ViewBag.ShowSubmissionValidationErrorMessage != null && ViewBag.ShowSubmissionValidationErrorMessage)
+                {
+                    <div class="alert alert-dismissible alert-danger">
+                        <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
+                        <h5>
+                            <i class="fa fa-close icon"></i>
+                            @ViewBag.SubmissionValidationErrorMessage
+                        </h5>
+                    </div>
+                }
+
                 <div class="form-group">
+                    @Html.LabelFor(m => m.Password, htmlAttributes:new {@class = "col-md-4 control-label required"})
+                    <div class="col-md-6">
+                        @Html.PasswordFor(m => m.Password, htmlAttributes:new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Password, validationMessage:"", htmlAttributes:new {@class = "text-red"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Answer, labelText:Model.Question, htmlAttributes:new {@class = "col-md-4 control-label required"})
+                    @Html.HiddenFor(model => model.Question)
+                    @Html.HiddenFor(model => model.QuestionAnswerId)
+
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Answer, htmlAttributes:new {@class = "form-control", autocomplete = "off"})
+                        @Html.ValidationMessageFor(m => m.Answer, validationMessage:"", htmlAttributes:new {@class = "text-red"})
+                    </div>
                 </div>
             </div>
 
             <div class="box-footer">
                 <div class="form-group pull-right">
-                    <input type="submit" value="Save Draft" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"SignAndSubmit", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
+                    <input type="submit" value="Sign and Submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"SignAndSubmit", controllerName:"ReportPackage", routeValues:new {id = Model.Id})#divSignAndSubmitReport" formmethod="post" />
                 </div>
             </div>
         </div>
@@ -325,9 +352,26 @@
 
     // Buttons
 
-    <div class="box box-default">
-        <div class="box-body">
-            <strong>&nbsp;</strong>
+    <div class="box box-default" id="divFooter">
+        <div class="box-body form-horizontal">
+           
+            @if (ViewBag.ShowValidateCorMessage != null && ViewBag.ShowValidateCorMessage)
+            {
+                <div class="alert alert-dismissible alert-info">
+                    <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
+                    <h5>
+                        <i class="fa fa-info icon"></i>
+                        @(ViewBag.VerifyResult.Valid ? "COR Validation Successful." : "COR Validation Failed.")
+                    </h5>
+                    <p>
+                        @(ViewBag.VerifyResult.Valid ? "The COR is valid." : "The COR is invalid.")
+                    </p>
+                    <p style="word-wrap: break-word">
+                        @("LinkoExchange COR Signature : " + ViewBag.VerifyResult.DigitalSignature)
+                    </p>
+                </div>
+            }
+
             <div class="box-tools pull-right">
 
                 @switch (Model.Status)
@@ -344,7 +388,7 @@
 
                         if (!Model.IsSubmissionBySignatoryRequired)
                         {
-                            <input type="submit" value="Save Draft" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"SignAndSubmit", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
+                            <input type="submit" value="Sign and Submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"SignAndSubmit", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
                         }
 
                         <input class="btn btn-primary btn-sm" data-target="#DeleteSampleModal" data-toggle="modal" type="button" value="Delete Report Package" />
@@ -361,7 +405,7 @@
                                                                                                                           {
                                                                                                                               @class = "btn btn-primary btn-sm"
                                                                                                                           })
-                        <input class="btn btn-primary btn-sm" type="button" value="Validate COR" formaction="@Url.Action(actionName:"ValidateCor", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
+                        <input class="btn btn-primary btn-sm" type="submit" value="Validate COR" formaction="@Url.Action(actionName:"ValidateCor", controllerName:"ReportPackage", routeValues:new {id = Model.Id})#divFooter" formmethod="post" />
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -369,4 +413,8 @@
             </div>
         </div>
     </div>
-}
+
+@section Scripts {
+    <script>
+    </script>
+}}

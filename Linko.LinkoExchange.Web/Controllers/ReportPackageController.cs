@@ -1,20 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Resources;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.ViewModels.ReportPackage;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
+using Microsoft.Ajax.Utilities;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -33,18 +37,22 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #region constructor
 
+        private readonly IAuthenticationService _authenticationService;
         private readonly IReportPackageService _reportPackageService;
         private readonly IReportTemplateService _reportTemplateService;
+        private readonly IQuestionAnswerService _questionAnswerService;
         private readonly LinkoExchangeContext _dbContext;
         private readonly IHttpContextService _httpContextService;
         private readonly IUserService _userService;
 
-        public ReportPackageController(IReportPackageService reportPackageService, IReportTemplateService reportTemplateService, LinkoExchangeContext linkoExchangeContext,
-                                       IHttpContextService httpContextService,
-                                       IUserService userService)
+        public ReportPackageController(IAuthenticationService authenticationService, IReportPackageService reportPackageService, IReportTemplateService reportTemplateService,
+                                       LinkoExchangeContext linkoExchangeContext,
+                                       IHttpContextService httpContextService, IQuestionAnswerService questionAnswerService, IUserService userService)
         {
+            _authenticationService = authenticationService;
             _reportPackageService = reportPackageService;
             _reportTemplateService = reportTemplateService;
+            _questionAnswerService = questionAnswerService;
             _dbContext = linkoExchangeContext;
             _httpContextService = httpContextService;
             _userService = userService;
@@ -64,7 +72,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         public ActionResult ReportPackages_Read([DataSourceRequest] DataSourceRequest request, ReportStatusName reportStatus)
         {
-            var dtos = _reportPackageService.GetReportPackagesByStatusName(reportStatusName:reportStatus, isAuthorityViewing:false);
+            var dtos = _reportPackageService.GetReportPackagesByStatusName(reportStatusName:reportStatus);
 
             var viewModels = dtos.Select(vm => new ReportPackageViewModel
                                                {
@@ -310,6 +318,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/EnableReportPackage")]
         public ActionResult EnableReportPackage(int id)
         {
@@ -331,9 +340,85 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
         }
 
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"{id:int}/SignAndSubmit")]
         public ActionResult SignAndSubmit(int id, ReportPackageViewModel model)
         {
-            throw new NotImplementedException();
+            if (TempData[key:"FailedCount"] == null)
+            {
+                // first attempt
+                TempData[key:"FailedCount"] = 0;
+            }
+            else
+            {
+                TempData[key:"FailedCount"] = TempData[key:"FailedCount"];
+            }
+
+            try
+            {
+                var isValid = true;
+
+                if (model.IsSubmissionBySignatoryRequired)
+                {
+                    // TODO: need to verify user credential before submission and also check current user has permission to submit or not
+                    if (model.Password == null || model.Password.Trim().Length == 0)
+                    {
+                        ModelState.AddModelError(key:"Password", errorMessage:@"Password is required.");
+                        isValid = false;
+                    }
+
+                    if (model.Answer == null || model.Answer.Trim().Length == 0)
+                    {
+                        ModelState.AddModelError(key:"Answer", errorMessage:@"KBQ answer is required.");
+                        isValid = false;
+                    }
+
+                    if (isValid)
+                    {
+                        var currentUserName = _httpContextService.GetClaimValue(claimType:CacheKey.UserName);
+                        var failedCount = int.Parse(s:TempData[key:"FailedCount"].ToString().IfNullOrWhiteSpace(defaultValue:"0"));
+                        var result = _authenticationService.SignInByUserName(userName:currentUserName, password:model.Password, isPersistent:false).Result;
+
+                        switch (result.AutehticationResult)
+                        {
+                            case AuthenticationResult.Success:
+                                isValid = _questionAnswerService.ConfirmCorrectAnswer(userQuestionAnswerId:model.QuestionAnswerId, answer:model.Answer);
+                                if (!isValid)
+                                {
+                                    TempData[key:"FailedCount"] = failedCount + 1;
+                                    ViewBag.ShowSubmissionValidationErrorMessage = true;
+                                    ViewBag.SubmissionValidationErrorMessage = "The answer is incorrect. Please try again.";
+                                }
+                                break;
+                            default:
+                                isValid = false;
+                                TempData[key:"FailedCount"] = failedCount + 1;
+                                ViewBag.ShowSubmissionValidationErrorMessage = true;
+                                ViewBag.SubmissionValidationErrorMessage = Message.InvalidLoginAttempt;
+                                break;
+                        }
+                    }
+                }
+
+                if (isValid)
+                {
+                    _reportPackageService.SignAndSubmitReportPackage(reportPackageId:id);
+
+                    return View(viewName:"Confirmation", model:new ConfirmationViewModel
+                                                               {
+                                                                   Title = "Report Package Submission Confirmation ",
+                                                                   Message = "Report package submitted successfully."
+                                                               });
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            TempData.Keep(key:"FailedCount");
+            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
         }
 
         [Route(template:"{id:int}/Details/Preview")]
@@ -343,7 +428,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 var fileStore = _reportPackageService.GetReportPackageCopyOfRecordPdfFile(reportPackageId:id);
                 var fileDownloadName = fileStore.FileName;
-                var contentType = "application/pdf";
+                const string contentType = "application/pdf";
                 var fileStream = new MemoryStream(buffer:fileStore.FileData) {Position = 0};
 
                 return File(fileStream:fileStream, contentType:contentType, fileDownloadName:fileDownloadName);
@@ -362,7 +447,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             try
             {
                 var copyOfRecordDto = _reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId:id);
-                var contentType = "application/zip";
+                const string contentType = "application/zip";
                 var fileDownloadName = copyOfRecordDto.DownloadFileName;
                 var dataStream = new MemoryStream(buffer:copyOfRecordDto.Data) {Position = 0};
                 return File(fileStream:dataStream, contentType:contentType, fileDownloadName:fileDownloadName);
@@ -375,10 +460,23 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
         }
 
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/COR/Validate")]
         public ActionResult ValidateCor(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var verifyResult = _reportPackageService.VerififyCopyOfRecord(reportPackageId:id);
+                ViewBag.ShowValidateCorMessage = true;
+                ViewBag.VerifyResult = verifyResult;
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
         }
 
         private ReportPackageViewModel PrepareReportPackageDetails(int id)
@@ -422,8 +520,19 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 IsSubmissionBySignatoryRequired = vm.IsSubmissionBySignatoryRequired
                             };
 
-                //var currentUserId = _httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId);
-                viewModel.IsCurrentUserSignatory = true; // _userService.GetUserProfileById(currentUserId).i
+                if (viewModel.Status == ReportStatusName.ReadyToSubmit)
+                {
+                    var currentOrganizationRegulatoryProgramUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramUserId));
+                    viewModel.IsCurrentUserSignatory = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:currentOrganizationRegulatoryProgramUserId).IsSignatory;
+
+                    var currentUserProfileId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
+                    var userQuestion = _questionAnswerService.GetRandomQuestionAnswerFromUserProfileId(userProfileId:currentUserProfileId, questionType:QuestionTypeName.KBQ);
+
+                    viewModel.QuestionAnswerId = userQuestion.Answer.UserQuestionAnswerId ?? 0;
+                    viewModel.Question = userQuestion.Question.Content;
+                    viewModel.Answer = "";
+                    viewModel.Password = "";
+                }
             }
             catch (RuleViolationException rve)
             {

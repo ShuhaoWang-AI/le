@@ -7,7 +7,7 @@
     ViewBag.Readonly = Model.SampleStatusName != SampleStatusName.Draft;
 }
 
-@using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new {id = "SampleDetailsForm"}))
+@using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new {id = "LinkoExchangeForm"}))
 {
     @Html.AntiForgeryToken()
 
@@ -578,7 +578,7 @@
                         }
                     );
 
-                $("#SampleDetailsForm")
+                $("#LinkoExchangeForm")
                     .submit(function(e)
                     {
                         //if (e.originalEvent.explicitOriginalTarget.id == "myButton")

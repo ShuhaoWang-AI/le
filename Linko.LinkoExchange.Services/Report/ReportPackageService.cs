@@ -1551,12 +1551,11 @@ namespace Linko.LinkoExchange.Services.Report
         /// Gets Report Package information (without children element data) for displaying in a grid.
         /// </summary>
         /// <param name="reportStatusName">Fetches report packages of this status only</param>
-        /// <param name="isAuthorityViewing">True is User is Authority</param>
         /// <returns>Collection of ReportPackageDto objects (without children element data)</returns>
-        public IEnumerable<ReportPackageDto> GetReportPackagesByStatusName(ReportStatusName reportStatusName, bool isAuthorityViewing)
+        public IEnumerable<ReportPackageDto> GetReportPackagesByStatusName(ReportStatusName reportStatusName)
         {
             _logger.Info($"Enter ReportPackageService.GetReportPackagesByStatusName. reportStatusName={reportStatusName}");
-
+            var isAuthorityViewing = _httpContextService.GetClaimValue(CacheKey.PortalName).ToLower().Equals("authority");
             var reportPackageDtoList = new List<ReportPackageDto>();
 
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));

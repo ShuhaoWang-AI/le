@@ -354,10 +354,10 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                     row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower());
 
                     row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName);
-                    row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier);
-                    row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod);
+                    row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier??"");
+                    row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod??"");
                     row.Cells.Add(sampleResultExtension.SampleResult.IsApprovedEPAMethod.ToString());
-                    row.Cells.Add(sampleResultExtension.SampleResult.AnalysisDateTimeLocal?.ToString("MM/dd/yyyy hh:mm tt").ToLower());
+                    row.Cells.Add(sampleResultExtension.SampleResult.AnalysisDateTimeLocal?.ToString("MM/dd/yyyy hh:mm tt").ToLower()??"");
                     row.Cells.Add($"{sampleResultExtension.Sample.FlowValue} {sampleResultExtension.Sample.FlowUnitName}");
 
                     if (sampleResultExtension.SampleResult.IsCalcMassLoading)
@@ -370,10 +370,10 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                         row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower());
                         row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower());
                         row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName);
-                        row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier);
-                        row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod);
+                        row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier??"");
+                        row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod??"");
                         row.Cells.Add(sampleResultExtension.SampleResult.IsApprovedEPAMethod.ToString());
-                        row.Cells.Add(sampleResultExtension.SampleResult.AnalysisDateTimeLocal?.ToString("MM/dd/yyyy hh:mm tt").ToLower());
+                        row.Cells.Add(sampleResultExtension.SampleResult.AnalysisDateTimeLocal?.ToString("MM/dd/yyyy hh:mm tt").ToLower()??"");
                         row.Cells.Add($"{sampleResultExtension.Sample.FlowValue} {sampleResultExtension.Sample.FlowUnitName}", rightTextBoldSize8);
                     }
                 }
