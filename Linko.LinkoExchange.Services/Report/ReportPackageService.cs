@@ -27,6 +27,7 @@ using Linko.LinkoExchange.Services.Sample;
 using System.Data.Entity.Validation;
 using System.Data.Entity.Infrastructure;
 using System.Xml.Linq;
+using Linko.LinkoExchange.Core.Extensions;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -213,29 +214,29 @@ namespace Linko.LinkoExchange.Services.Report
                 SubmittedTo = new SubmittedTo
                 {
                     OrganizationName = reportPackageDto.RecipientOrganizationName,
-                    Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
-                    Address2 = EmtpyStringIfNull(reportPackageDto.RecipientOrganizationAddressLine2),
-                    City = reportPackageDto.RecipientOrganizationCityName,
-                    State = reportPackageDto.RecipientOrganizationJurisdictionName,
-                    ZipCode = reportPackageDto.RecipientOrganizationZipCode
+                    Address1 = reportPackageDto.RecipientOrganizationAddressLine1.GetValueOrEmptyString(),
+                    Address2 = reportPackageDto.RecipientOrganizationAddressLine2.GetValueOrEmptyString(),
+                    City = reportPackageDto.RecipientOrganizationCityName.GetValueOrEmptyString(),
+                    State = reportPackageDto.RecipientOrganizationJurisdictionName.GetValueOrEmptyString(),
+                    ZipCode = reportPackageDto.RecipientOrganizationZipCode.GetValueOrEmptyString()
                 },
                 SubmittedOnBehalfOf = new SubmittedOnBehalfOf
                 {
                     OrganizationName = reportPackageDto.OrganizationName,
-                    ReferenceNumber = reportPackageDto.OrganizationReferenceNumber,
-                    Address1 = reportPackageDto.RecipientOrganizationAddressLine1,
-                    Address2 = EmtpyStringIfNull(reportPackageDto.RecipientOrganizationAddressLine2),
-                    City = reportPackageDto.RecipientOrganizationCityName,
-                    State = reportPackageDto.RecipientOrganizationJurisdictionName,
-                    ZipCode = reportPackageDto.RecipientOrganizationZipCode
+                    ReferenceNumber = reportPackageDto.OrganizationReferenceNumber.GetValueOrEmptyString(),
+                    Address1 = reportPackageDto.RecipientOrganizationAddressLine1.GetValueOrEmptyString(),
+                    Address2 = reportPackageDto.RecipientOrganizationAddressLine2.GetValueOrEmptyString(),
+                    City = reportPackageDto.RecipientOrganizationCityName.GetValueOrEmptyString(),
+                    State = reportPackageDto.RecipientOrganizationJurisdictionName.GetValueOrEmptyString(),
+                    ZipCode = reportPackageDto.RecipientOrganizationZipCode.GetValueOrEmptyString()
                 },
                 SubmittedBy = new SubmittedBy
                 {
-                    FirstName = EmtpyStringIfNull(reportPackageDto.SubmitterFirstName),
-                    LastName = EmtpyStringIfNull(reportPackageDto.SubmitterLastName),
-                    Title = EmtpyStringIfNull(reportPackageDto.SubmitterTitleRole),
-                    UserName = EmtpyStringIfNull(reportPackageDto.SubmitterUserName),
-                    ReportSubmissionFromIP = EmtpyStringIfNull(reportPackageDto.SubmitterIPAddress)
+                    FirstName = reportPackageDto.SubmitterFirstName.GetValueOrEmptyString(),
+                    LastName = reportPackageDto.SubmitterLastName.GetValueOrEmptyString(),
+                    Title = reportPackageDto.SubmitterTitleRole.GetValueOrEmptyString(),
+                    UserName = reportPackageDto.SubmitterUserName.GetValueOrEmptyString(),
+                    ReportSubmissionFromIP = reportPackageDto.SubmitterIPAddress.GetValueOrEmptyString()
                 },
                 FileManifest = new FileManifest() //populated below
             };
@@ -273,7 +274,7 @@ namespace Linko.LinkoExchange.Services.Report
             dataXmlObj.Certifications = reportPackageDto.CertificationTypes.Select(i => new Certification
             {
                 CertificationType = i.ReportElementTypeName,
-                CertificationText = string.IsNullOrWhiteSpace(i.ReportElementTypeContent) ? "" : i.ReportElementTypeContent
+                CertificationText = i.ReportElementTypeContent.GetValueOrEmptyString()
             }).ToList();
 
             dataXmlObj.Comment = reportPackageDto.Comments;
@@ -292,19 +293,19 @@ namespace Linko.LinkoExchange.Services.Report
                         CtsEventTypeCategoryName = sampleDto.CtsEventCategoryName,
                         CtsEventTypeName = sampleDto.CtsEventTypeName,
                         CollectionMethodName = sampleDto.CollectionMethodName,
-                        LabSampleIdentifier = EmtpyStringIfNull(sampleDto.LabSampleIdentifier),
+                        LabSampleIdentifier = sampleDto.LabSampleIdentifier.GetValueOrEmptyString(),
 
                         StartDateTimeUtc = sampleDto.StartDateTimeLocal.ToString(dateTimeFormat),
                         EndDateTimeUtc = sampleDto.EndDateTimeLocal.ToString(dateTimeFormat),
 
-                        SampleFlowForMassCalcs = EmtpyStringIfNull(sampleDto.FlowValue),
-                        SampleFlowForMassCalcsUnitName = EmtpyStringIfNull(sampleDto.FlowUnitName),
+                        SampleFlowForMassCalcs = sampleDto.FlowValue.GetValueOrEmptyString(),
+                        SampleFlowForMassCalcsUnitName = sampleDto.FlowUnitName.GetValueOrEmptyString(),
 
                         MassLoadingsConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds?.ToString(),
                         MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces?.ToString(),
                         IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign.ToString(),
 
-                        SampledBy = sampleDto.ByOrganizationTypeName,
+                        SampledBy = sampleDto.ByOrganizationTypeName.GetValueOrEmptyString(),
                         SampleResults = new List<SampleResultNode>(),
                     };
 
@@ -321,12 +322,12 @@ namespace Linko.LinkoExchange.Services.Report
                         var sampleResultNode = new SampleResultNode
                         {
                             ParameterName = sampleResultDto.ParameterName,
-                            Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier),
-                            Value = sampleResultDto.Value,
-                            UnitName = sampleResultDto.UnitName,
-                            EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit,
-                            MethodDetectionLimit = sampleResultDto.MethodDetectionLimit.ToString(),
-                            AnalysisMethod = sampleResultDto.AnalysisMethod,
+                            Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier).GetValueOrEmptyString(),
+                            Value = sampleResultDto.Value.GetValueOrEmptyString(),
+                            UnitName = sampleResultDto.UnitName.GetValueOrEmptyString(),
+                            EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit.GetValueOrEmptyString(),
+                            MethodDetectionLimit = sampleResultDto.MethodDetectionLimit?.ToString(),
+                            AnalysisMethod = sampleResultDto.AnalysisMethod.GetValueOrEmptyString(),
                             AnalysisDateTimeUtc = analysisDateTime,
                             IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
                             LimitBasis = LimitBasisName.Concentration.ToString()
@@ -339,12 +340,12 @@ namespace Linko.LinkoExchange.Services.Report
                             sampleResultNode = new SampleResultNode
                             {
                                 ParameterName = sampleResultDto.ParameterName,
-                                Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier),
-                                Value = sampleResultDto.MassLoadingValue,
-                                UnitName = sampleResultDto.MassLoadingUnitName,
-                                EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit,
-                                MethodDetectionLimit = sampleResultDto.MethodDetectionLimit.ToString(),
-                                AnalysisMethod = sampleResultDto.AnalysisMethod,
+                                Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier).GetValueOrEmptyString(),
+                                Value = sampleResultDto.MassLoadingValue.GetValueOrEmptyString(),
+                                UnitName = sampleResultDto.MassLoadingUnitName.GetValueOrEmptyString(),
+                                EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit.GetValueOrEmptyString(),
+                                MethodDetectionLimit = sampleResultDto.MethodDetectionLimit?.ToString(),
+                                AnalysisMethod = sampleResultDto.AnalysisMethod.GetValueOrEmptyString(),
                                 AnalysisDateTimeUtc = analysisDateTime,
                                 IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
                                 LimitBasis = LimitBasisName.MassLoading.ToString()
@@ -2114,6 +2115,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             return null;
         }
+
         private XElement GetXElementNode(IEnumerable<XElement> corElements, string tagName)
         {
             if (corElements.Any(i => i.Name.LocalName == ReportElementCategoryName.Certifications.ToString()))
@@ -2124,10 +2126,6 @@ namespace Linko.LinkoExchange.Services.Report
             return null;
         }
 
-        private string EmtpyStringIfNull(string value)
-        {
-            return string.IsNullOrWhiteSpace(value) ? "" : value;
-        }
         private class Utf8StringWriter : StringWriter
         {
             public override Encoding Encoding { get { return Encoding.UTF8; } }

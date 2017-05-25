@@ -163,6 +163,7 @@
     <Compile Include="Enum\SystemSettingType.cs" />
     <Compile Include="Enum\UserRole.cs" />
     <Compile Include="Extensions\IdentityExtensions.cs" />
+    <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="Logging\CreationStackTrackerExtension.cs" />
     <Compile Include="Logging\CreationStackTrackerPolicy.cs" />
     <Compile Include="Logging\CreationStackTrackerStrategy.cs" />
