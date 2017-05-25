@@ -57,13 +57,18 @@ namespace Linko.LinkoExchange.Services.Report
             switch (apiName)
             {
                 case "GetReportPackageTemplate":
+                    var reportPackageTemplateId = id[0];
                     if (currentPortalName.Equals("authority"))
                     {
-                        retVal = true;
+                        //this will also handle scenarios where ReportPackageTemplateId doesn't even exist (regardless of ownership)
+                        var isTemplateForThisAuthorityExist = _dbContext.ReportPackageTempates
+                            .Any(rpt => rpt.ReportPackageTemplateId == reportPackageTemplateId
+                                && rpt.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                        retVal = isTemplateForThisAuthorityExist;
                     }
                     else
                     {
-                        var reportPackageTemplateId = id[0];
                         var isTemplateAssigned = _dbContext.ReportPackageTemplateAssignments
                                         .Any(rpta => rpta.OrganizationRegulatoryProgramId == currentOrgRegProgramId
                                         && rpta.ReportPackageTemplateId == reportPackageTemplateId);

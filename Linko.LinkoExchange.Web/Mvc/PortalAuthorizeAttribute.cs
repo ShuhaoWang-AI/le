@@ -13,7 +13,7 @@ namespace Linko.LinkoExchange.Web.Mvc
     public class PortalAuthorizeAttribute : AuthorizeAttribute
     {
         [Dependency]
-        private IHttpContextService _httpContextService { get; set; }
+        public IHttpContextService _httpContextService { get; set; }
         private readonly string[] _allowedPortals;
         private readonly string _unauthorizedPagePath;
         public PortalAuthorizeAttribute(params string[] roles)
