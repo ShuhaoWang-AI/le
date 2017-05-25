@@ -493,7 +493,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                           Comment = dto.Comment,
                                                           //Need to modify date time to local
                                                           LogDateTimeUtc = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(
-                                                                                                                                    utcDateTime:dto.LogDateTimeUtc.DateTime,
+                                                                                                                                    utcDateTime:dto.LogDateTimeUtc.UtcDateTime,
                                                                                                                                     timeZoneId:timeZoneId)
                                                       });
 
