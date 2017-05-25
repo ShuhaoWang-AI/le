@@ -1563,7 +1563,7 @@ BEGIN
     CREATE TABLE dbo.tMonitoringPoint 
     (
         MonitoringPointId                   int IDENTITY(1,1) NOT NULL  
-        , Name                              varchar(100) NOT NULL  
+        , Name                              varchar(50) NOT NULL  
         , Description                       varchar(500) NULL  
         , OrganizationRegulatoryProgramId   int NOT NULL
         , IsEnabled                         bit NOT NULL
@@ -1576,11 +1576,11 @@ BEGIN
         (
 	        MonitoringPointId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        --, CONSTRAINT AK_tMonitoringPoint_Name_OrganizationRegulatoryProgramId UNIQUE 
-        --(
-        --    Name ASC
-        --    , OrganizationRegulatoryProgramId ASC
-        --) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+        , CONSTRAINT AK_tMonitoringPoint_Name_OrganizationRegulatoryProgramId UNIQUE 
+        (
+            Name ASC
+            , OrganizationRegulatoryProgramId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tMonitoringPoint_tOrganizationRegulatoryProgram FOREIGN KEY 
 		(
 			OrganizationRegulatoryProgramId
@@ -1608,9 +1608,9 @@ BEGIN
     CREATE TABLE dbo.tCtsEventType 
     (
         CtsEventTypeId                      int IDENTITY(1,1) NOT NULL
-        , Name                              varchar(100) NOT NULL
+        , Name                              varchar(50) NOT NULL
         , Description                       varchar(500) NULL
-        , CtsEventCategoryName              varchar(100) NOT NULL
+        , CtsEventCategoryName              varchar(50) NOT NULL
         , OrganizationRegulatoryProgramId   int NOT NULL  
         , IsEnabled                         bit NOT NULL 
         , IsRemoved                         bit NOT NULL  
@@ -1685,7 +1685,7 @@ BEGIN
     CREATE TABLE dbo.tCollectionMethod 
     (
         CollectionMethodId              int IDENTITY(1,1) NOT NULL  
-        , Name                          varchar(100) NOT NULL  
+        , Name                          varchar(50) NOT NULL  
         , Description                   varchar(500) NULL  
         , OrganizationId                int NOT NULL
         , CollectionMethodTypeId        int NOT NULL
@@ -1740,7 +1740,7 @@ BEGIN
     CREATE TABLE dbo.tUnit 
     (
         UnitId                          int IDENTITY(1,1) NOT NULL  
-        , Name                          varchar(100) NOT NULL  
+        , Name                          varchar(50) NOT NULL  
         , Description                   varchar(500) NULL  
         , IsFlowUnit                    bit NOT NULL
         , OrganizationId                int NOT NULL
@@ -2214,14 +2214,14 @@ BEGIN
     CREATE TABLE dbo.tSample 
     (
         SampleId								int IDENTITY(1,1) NOT NULL
-        , Name									varchar(100) NOT NULL
+        , Name									varchar(50) NOT NULL
         , MonitoringPointId						int NOT NULL
-        , MonitoringPointName					varchar(100) NOT NULL
+        , MonitoringPointName					varchar(50) NOT NULL
         , CtsEventTypeId						int NOT NULL
-        , CtsEventTypeName						varchar(100) NOT NULL
-        , CtsEventCategoryName					varchar(100) NOT NULL
+        , CtsEventTypeName						varchar(50) NOT NULL
+        , CtsEventCategoryName					varchar(50) NOT NULL
         , CollectionMethodId					int NOT NULL
-        , CollectionMethodName					varchar(100) NOT NULL
+        , CollectionMethodName					varchar(50) NOT NULL
         , LabSampleIdentifier					varchar(50) NULL
         , StartDateTimeUtc						datetimeoffset(0) NOT NULL
         , EndDateTimeUtc						datetimeoffset(0) NOT NULL
@@ -2286,7 +2286,7 @@ BEGIN
         , EnteredValue                      varchar(50) NULL
         , Value                             float NULL
         , UnitId                            int NOT NULL
-        , UnitName                          varchar(100) NOT NULL
+        , UnitName                          varchar(50) NOT NULL
         , EnteredMethodDetectionLimit       varchar(50) NULL
         , MethodDetectionLimit              float NULL
         , AnalysisMethod                    varchar(50) NULL
@@ -2845,8 +2845,8 @@ BEGIN
         , PeriodStartDateTimeUtc                datetimeoffset(0) NOT NULL
         , PeriodEndDateTimeUtc                  datetimeoffset(0) NOT NULL
         , CtsEventTypeId                        int NULL
-        , CtsEventTypeName                      varchar(100) NULL
-        , CtsEventCategoryName                  varchar(100) NULL
+        , CtsEventTypeName                      varchar(50) NULL
+        , CtsEventCategoryName                  varchar(50) NULL
         , Comments                              varchar(500) NULL
         , IsSubmissionBySignatoryRequired       bit NOT NULL
         , ReportPackageTemplateId               int NOT NULL
@@ -2999,8 +2999,8 @@ BEGIN
         , ReportElementTypeContent              varchar(2000) NULL
         , ReportElementTypeIsContentProvided    bit NOT NULL
         , CtsEventTypeId                        int NULL
-        , CtsEventTypeName                      varchar(100) NULL
-        , CtsEventCategoryName                  varchar(100) NULL
+        , CtsEventTypeName                      varchar(50) NULL
+        , CtsEventCategoryName                  varchar(50) NULL
         , IsRequired                            bit NOT NULL
         , SortOrder                             int NOT NULL  
     
