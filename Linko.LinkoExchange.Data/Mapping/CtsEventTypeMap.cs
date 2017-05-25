@@ -11,11 +11,11 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasKey(x => x.CtsEventTypeId);
 
-            Property(x => x.Name).IsRequired().HasMaxLength(100);
+            Property(x => x.Name).IsRequired().HasMaxLength(50);
 
             Property(x => x.Description).IsOptional().HasMaxLength(500);
 
-            Property(x => x.CtsEventCategoryName).IsRequired().HasMaxLength(100);
+            Property(x => x.CtsEventCategoryName).IsRequired().HasMaxLength(50);
 
             HasRequired(a => a.OrganizationRegulatoryProgram)
                 .WithMany(b => b.CtsEventTypes)

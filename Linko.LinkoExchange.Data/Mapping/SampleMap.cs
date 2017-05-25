@@ -11,21 +11,21 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             HasKey(x => x.SampleId);
 
-            Property(x => x.Name).IsRequired().HasMaxLength(100);
+            Property(x => x.Name).IsRequired().HasMaxLength(50);
 
             Property(x => x.MonitoringPointId).IsRequired();
 
-            Property(x => x.MonitoringPointName).IsRequired().HasMaxLength(100);
+            Property(x => x.MonitoringPointName).IsRequired().HasMaxLength(50);
 
             Property(x => x.CtsEventTypeId).IsRequired();
 
-            Property(x => x.CtsEventTypeName).IsRequired().HasMaxLength(100);
+            Property(x => x.CtsEventTypeName).IsRequired().HasMaxLength(50);
 
-            Property(x => x.CtsEventCategoryName).IsRequired().HasMaxLength(100);
+            Property(x => x.CtsEventCategoryName).IsRequired().HasMaxLength(50);
 
             Property(x => x.CollectionMethodId).IsRequired();
 
-            Property(x => x.CollectionMethodName).IsRequired().HasMaxLength(100);
+            Property(x => x.CollectionMethodName).IsRequired().HasMaxLength(50);
 
             Property(x => x.LabSampleIdentifier).IsOptional().HasMaxLength(50);
 

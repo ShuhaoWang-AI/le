@@ -28,7 +28,7 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.UnitId).IsRequired();
 
-            Property(x => x.UnitName).IsRequired().HasMaxLength(100);
+            Property(x => x.UnitName).IsRequired().HasMaxLength(50);
 
             Property(x => x.EnteredMethodDetectionLimit).IsOptional().HasMaxLength(50);
 

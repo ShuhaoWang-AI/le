@@ -21,9 +21,9 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.CtsEventTypeId).IsOptional();
 
-            Property(x => x.CtsEventTypeName).IsOptional().HasMaxLength(100);
+            Property(x => x.CtsEventTypeName).IsOptional().HasMaxLength(50);
 
-            Property(x => x.CtsEventCategoryName).IsOptional().HasMaxLength(100);
+            Property(x => x.CtsEventCategoryName).IsOptional().HasMaxLength(50);
 
             Property(x => x.Comments).IsOptional().HasMaxLength(500);
 
