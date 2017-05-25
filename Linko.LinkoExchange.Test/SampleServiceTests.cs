@@ -255,8 +255,8 @@ namespace Linko.LinkoExchange.Test
             var sampleDto = new SampleDto();
             sampleDto.CtsEventTypeId = 1;
             sampleDto.CollectionMethodId = 1;
-            sampleDto.StartDateTimeLocal = DateTime.Now.AddDays(1);
-            sampleDto.EndDateTimeLocal = DateTime.Now.AddDays(-1);
+            sampleDto.StartDateTimeLocal = DateTime.SpecifyKind(DateTime.Now.AddDays(1), DateTimeKind.Unspecified);
+            sampleDto.EndDateTimeLocal = DateTime.SpecifyKind(DateTime.Now.AddDays(-1), DateTimeKind.Unspecified);
             try
             {
                 _sampleService.SaveSample(sampleDto);

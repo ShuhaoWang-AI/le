@@ -356,7 +356,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         #region Show Audit Logs
 
         // GET: /Authority/AuditLogs
-        [AuthorizeAuthorityOnly]
+        [PortalAuthorize("authority")]
         public ActionResult AuditLogs()
         {
             return View();
@@ -2250,6 +2250,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
         
         [Route(template:"ReportPackageTemplate/{id:int}/Details")]
+        [PortalAuthorize("authority")]
         public ActionResult ReportPackageTemplateDetails(int? id)
         {
            

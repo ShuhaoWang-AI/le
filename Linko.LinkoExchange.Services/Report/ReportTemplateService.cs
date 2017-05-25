@@ -16,7 +16,7 @@ using Linko.LinkoExchange.Services.Organization;
 
 namespace Linko.LinkoExchange.Services.Report
 {
-    public class ReportTemplateService : IReportTemplateService
+    public class ReportTemplateService : BaseService, IReportTemplateService
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly IHttpContextService _httpContextService;
@@ -44,6 +44,38 @@ namespace Linko.LinkoExchange.Services.Report
             _userService = userService;
             _timeZoneService = timeZoneService;
             _orgService = orgService;
+        }
+
+        public override bool CanUserExecuteAPI(string apiName, params int[] id)
+        {
+            bool retVal = false;
+
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var currentPortalName = _httpContextService.GetClaimValue(CacheKey.PortalName);
+            currentPortalName = string.IsNullOrWhiteSpace(value: currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+            
+            switch (apiName)
+            {
+                case "GetReportPackageTemplate":
+                    if (currentPortalName.Equals("authority"))
+                    {
+                        retVal = true;
+                    }
+                    else
+                    {
+                        var reportPackageTemplateId = id[0];
+                        var isTemplateAssigned = _dbContext.ReportPackageTemplateAssignments
+                                        .Any(rpta => rpta.OrganizationRegulatoryProgramId == currentOrgRegProgramId
+                                        && rpta.ReportPackageTemplateId == reportPackageTemplateId);
+
+                        retVal = isTemplateAssigned;
+                    }
+
+                    break;
+
+            }
+
+            return retVal;
         }
 
         /// <summary>
@@ -101,6 +133,11 @@ namespace Linko.LinkoExchange.Services.Report
         public ReportPackageTemplateDto GetReportPackageTemplate(int reportPackageTemplateId)
         {
             _logger.Info("Enter ReportTemplateService.ReportPackageTemplateDto. reportPackageTemplateId={0}", reportPackageTemplateId);
+
+            if (!CanUserExecuteAPI("GetReportPackageTemplate", reportPackageTemplateId))
+            {
+                throw new UnauthorizedAccessException();
+            }
 
             var rpt =
                 _dbContext.ReportPackageTempates.SingleOrDefault(

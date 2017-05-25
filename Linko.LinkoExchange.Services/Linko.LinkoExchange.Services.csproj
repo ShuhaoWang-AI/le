@@ -114,6 +114,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseService\BaseService.cs" />
     <Compile Include="Config\ConfigSettingService.cs" />
     <Compile Include="CopyOfRecord\CertificateDigitalSignatureManager.cs" />
     <Compile Include="CopyOfRecord\CopyOfRecordService.cs" />
