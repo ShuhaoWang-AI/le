@@ -22,7 +22,7 @@ using System.Data.Entity.Infrastructure;
 
 namespace Linko.LinkoExchange.Services.Sample
 {
-    public class SampleService : ISampleService
+    public class SampleService : BaseService, ISampleService
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly IHttpContextService _httpContext;
@@ -50,6 +50,45 @@ namespace Linko.LinkoExchange.Services.Sample
             _timeZoneService = timeZoneService;
             _settings = settings;
             _unitService = unitService;
+        }
+
+        public override bool CanUserExecuteAPI(string apiName, params int[] id)
+        {
+            bool retVal = false;
+
+            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var currentPortalName = _httpContext.GetClaimValue(CacheKey.PortalName);
+            currentPortalName = string.IsNullOrWhiteSpace(value: currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+
+            switch (apiName)
+            {
+                case "GetSampleDetails":
+                    var sampleId = id[0];
+                    if (currentPortalName.Equals("authority"))
+                    {
+                        //currentOrgRegProgramId must match the authority of the ForOrganizationRegulatoryProgram of the sample
+                        var authorityOrgRegProgramId = _orgService.GetAuthority(_dbContext.Samples
+                                                    .Single(s => s.SampleId == sampleId).ForOrganizationRegulatoryProgramId)
+                                                    .OrganizationRegulatoryProgramId;
+                        
+                        retVal = (currentOrgRegProgramId == authorityOrgRegProgramId);
+                    }
+                    else
+                    {
+                        //currentOrgRegProgramId must match the ForOrganizationRegulatoryProgramId of the sample
+                        //(this also handles unknown sampleId's)
+                        var isSampleWithThisOwnerExist = _dbContext.Samples
+                                        .Any(s => s.SampleId == sampleId
+                                            && s.ForOrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                        retVal = isSampleWithThisOwnerExist;
+                    }
+
+                    break;
+
+            }
+
+            return retVal;
         }
 
         /// <summary>
@@ -139,8 +178,8 @@ namespace Linko.LinkoExchange.Services.Sample
             }
 
             sampleToPersist.Name = sampleName;
-            sampleToPersist.ByOrganizationRegulatoryProgramId = currentOrgRegProgramId; //In our current workflow this is the IU
-            sampleToPersist.ForOrganizationRegulatoryProgramId = authOrgRegProgramId; //In our current workflow this is the Authority
+            sampleToPersist.ByOrganizationRegulatoryProgramId = currentOrgRegProgramId; //these are the same only per current workflow
+            sampleToPersist.ForOrganizationRegulatoryProgramId = currentOrgRegProgramId; //these are the same only per current workflow
             sampleToPersist.StartDateTimeUtc = sampleStartDateTimeUtc;
             sampleToPersist.EndDateTimeUtc = sampleEndDateTimeUtc;
             sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
@@ -868,6 +907,11 @@ namespace Linko.LinkoExchange.Services.Sample
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             _logger.Info($"Enter SampleService.GetSampleDetails. sampleId={sampleId}, currentOrgRegProgramId={currentOrgRegProgramId}");
 
+            if (!CanUserExecuteAPI("GetSampleDetails", sampleId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             var sample = _dbContext.Samples
                 .Include(s => s.ReportSamples)
                 .Include(s => s.SampleResults)
@@ -877,18 +921,6 @@ namespace Linko.LinkoExchange.Services.Sample
             if (sample == null)
             {
                 throw new Exception($"ERROR: Could not find Sample associated with sampleId={sampleId}");
-            }
-
-            //Check authorized access as either one of:
-            //1) Industry - currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId
-            //2) Authority - currentOrgRegProgramId == Id of authority of reportPackage.OrganizationRegulatoryProgram
-            if (currentOrgRegProgramId == sample.ForOrganizationRegulatoryProgramId || currentOrgRegProgramId == sample.ByOrganizationRegulatoryProgramId)
-            {
-                //Industry accessing their own sample or this IU's Authority accessing the IU's sample  => OK
-            }
-            else
-            {
-                throw new UnauthorizedAccessException($"Unauthorized access of Sample Id = {sampleId} by Org Reg Program Id = {currentOrgRegProgramId}");
             }
 
             var dto = this.GetSampleDetails(sample);
