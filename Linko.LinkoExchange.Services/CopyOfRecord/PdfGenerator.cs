@@ -171,7 +171,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             row.Cells.Add("Comments", _sectionTitleBoldSize12);
 
             row = commentTable.Rows.Add();
-            row.Cells.Add(_reportPackage.Comments.GetValueOrEmptyString(), _sectionTitleBoldSize12);
+            row.Cells.Add(_reportPackage.Comments.GetValueOrEmptyString(), _sectionTextSize10);
         }
 
         // This include TTO Certification, and Signature Certification
@@ -258,20 +258,17 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             rightTextBoldSize10.HorizontalAlignment = HorizontalAlignment.Right;
 
             // cell text font
-            var centerTextBoldSize8 = new TextState("Arial", false, false);
-            centerTextBoldSize8.FontSize = 8;
-            centerTextBoldSize8.FontStyle = FontStyles.Bold;
-            centerTextBoldSize8.HorizontalAlignment = HorizontalAlignment.Center;
+            var centerTextSize8 = new TextState("Arial", false, false);
+            centerTextSize8.FontSize = 8;
+            centerTextSize8.HorizontalAlignment = HorizontalAlignment.Center;
 
-            var leftTextBoldSize8 = new TextState("Arial", false, false);
-            leftTextBoldSize8.FontSize = 8;
-            leftTextBoldSize8.FontStyle = FontStyles.Bold;
-            leftTextBoldSize8.HorizontalAlignment = HorizontalAlignment.Left;
+            var leftTextSize8 = new TextState("Arial", false, false);
+            leftTextSize8.FontSize = 8;
+            leftTextSize8.HorizontalAlignment = HorizontalAlignment.Left;
 
-            var rightTextBoldSize8 = new TextState("Arial", false, false);
-            rightTextBoldSize8.FontSize = 8;
-            rightTextBoldSize8.FontStyle = FontStyles.Bold;
-            rightTextBoldSize8.HorizontalAlignment = HorizontalAlignment.Right;
+            var rightTextSize8 = new TextState("Arial", false, false);
+            rightTextSize8.FontSize = 8;
+            rightTextSize8.HorizontalAlignment = HorizontalAlignment.Right;
 
             // Monitoring Point row 
             var row = sampleResultsTable.Rows.Add();
@@ -339,60 +336,74 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 {
                     var sampleResultExtension = sampleResultExtensions[i];
                     row = sampleResultsTable.Rows.Add();
-                    row.DefaultCellTextState = centerTextBoldSize8;
                     if (i == 0)
                     {
-                        row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MMMM"));
+                        row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MMMM"), centerTextSize8);
                     }
                     else
                     {
                         row.Cells.Add("");
                     }
 
-                    row.Cells.Add(sampleResultExtension.SampleResult.ParameterName, leftTextBoldSize8);
-                    row.Cells.Add($"{sampleResultExtension.SampleResult.Value.GetValueOrEmptyString()} {sampleResultExtension.SampleResult.UnitName}", rightTextBoldSize8);
+                    row.Cells.Add(sampleResultExtension.SampleResult.ParameterName, leftTextSize8);
+                    row.Cells.Add(GetSampleResultValue(sampleResultExtension.SampleResult), rightTextSize8);
                     var mdl = "";
                     if (sampleResultExtension.SampleResult.MethodDetectionLimit.HasValue)
                     {
                         mdl = sampleResultExtension.SampleResult.MethodDetectionLimit.ToString();
                     }
 
-                    row.Cells.Add($"{mdl}", rightTextBoldSize8);
+                    row.Cells.Add($"{mdl}", rightTextSize8);
 
-                    row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower());
-                    row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower());
+                    row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower(), centerTextSize8);
+                    row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower(), centerTextSize8);
 
-                    row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName);
-                    row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString());
-                    row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString());
-                    row.Cells.Add(sampleResultExtension.SampleResult.IsApprovedEPAMethod.ToString());
-                    row.Cells.Add(sampleResultExtension.SampleResult.AnalysisDateTimeLocal?.ToString("MM/dd/yyyy hh:mm tt").GetValueOrEmptyString().ToLower());
-                    row.Cells.Add($"{sampleResultExtension.Sample.FlowValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}");
+                    row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName, centerTextSize8);
+                    row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString(), centerTextSize8);
+                    row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString(), centerTextSize8);
+                    row.Cells.Add(sampleResultExtension.SampleResult.IsApprovedEPAMethod.ToString(), centerTextSize8);
+                    var analysisDateTimeString = sampleResultExtension.SampleResult.AnalysisDateTimeLocal.HasValue
+                                                     ? sampleResultExtension.SampleResult.AnalysisDateTimeLocal.Value.ToString("MM/dd/yyyy hh:mm tt").ToLower()
+                                                     : "";
 
-                    if (sampleResultExtension.SampleResult.IsCalcMassLoading)
+                    row.Cells.Add(analysisDateTimeString, centerTextSize8);
+                    row.Cells.Add($"{sampleResultExtension.Sample.FlowValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}", rightTextSize8);
+
+                    if (!string.IsNullOrWhiteSpace(sampleResultExtension.SampleResult.MassLoadingValue))
                     {
                         row = sampleResultsTable.Rows.Add();
                         row.Cells.Add("");
-                        row.Cells.Add(sampleResultExtension.SampleResult.ParameterName, leftTextBoldSize8);
-                        row.Cells.Add($"{sampleResultExtension.SampleResult.MassLoadingValue} {sampleResultExtension.SampleResult.MassLoadingUnitName}", rightTextBoldSize8);
-                        row.Cells.Add($"{sampleResultExtension.SampleResult.MethodDetectionLimit?.ToString() ?? ""}", rightTextBoldSize8);
-                        row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower());
-                        row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower());
-                        row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName);
-                        row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString());
-                        row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString());
-                        row.Cells.Add(sampleResultExtension.SampleResult.IsApprovedEPAMethod.ToString());
-                        row.Cells.Add(sampleResultExtension.SampleResult.AnalysisDateTimeLocal?.ToString("MM/dd/yyyy hh:mm tt").ToLower());
-                        row.Cells.Add($"{sampleResultExtension.Sample.FlowValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}", rightTextBoldSize8);
+                        row.Cells.Add(sampleResultExtension.SampleResult.ParameterName, leftTextSize8);
+                        row.Cells.Add($"{sampleResultExtension.SampleResult.MassLoadingValue} {sampleResultExtension.SampleResult.MassLoadingUnitName}", rightTextSize8);
+                        row.Cells.Add($"{sampleResultExtension.SampleResult.MethodDetectionLimit?.ToString() ?? ""}", rightTextSize8);
+                        row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower(), centerTextSize8);
+                        row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower(), centerTextSize8);
+                        row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName, centerTextSize8);
+                        row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString(), centerTextSize8);
+                        row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString(), centerTextSize8);
+                        row.Cells.Add(sampleResultExtension.SampleResult.IsApprovedEPAMethod.ToString(), centerTextSize8);
+                        row.Cells.Add(analysisDateTimeString, centerTextSize8);
+                        row.Cells.Add($"{sampleResultExtension.Sample.FlowValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}", rightTextSize8);
                     }
                 }
             }
         }
 
+        private string GetSampleResultValue(SampleResultDto sampleResultDto)
+        {
+            if (string.IsNullOrWhiteSpace(sampleResultDto.Value))
+            {
+                return sampleResultDto.Qualifier;
+            }
+
+            return $"{sampleResultDto.Qualifier}{sampleResultDto.Value} {sampleResultDto.UnitName}";
+        }
+
         private void ReportInfoTable(Page pdfPage)
         {
-            var textStateSize10 = new TextState("Arial", true, false);
-            var boldTextStateSize10 = new TextState("Arial", false, false);
+            var textStateSize10 = new TextState("Arial", false, false);
+            var boldTextStateSize10 = new TextState("Arial", true, false);
+
             textStateSize10.FontSize = 10;
             boldTextStateSize10.FontSize = 10;
 
@@ -413,12 +424,12 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
             //--------------------------------Row 1 
             var row = reportInfoTable.Rows.Add();
-            row.Cells.Add("Report:");
-            row.Cells.Add(_reportPackage.Name);
+            row.Cells.Add("Report:", boldTextStateSize10);
+            row.Cells.Add(_reportPackage.Name, textStateSize10);
 
             row.Cells.Add("");
-            row.Cells.Add("Period:");
-            row.Cells.Add($"{_reportPackage.PeriodStartDateTimeLocal}-{_reportPackage.PeriodEndDateTimeLocal}");
+            row.Cells.Add("Period:", boldTextStateSize10);
+            row.Cells.Add($"{_reportPackage.PeriodStartDateTimeLocal.ToString("MMMM dd, yyyy")} - {_reportPackage.PeriodEndDateTimeLocal.ToString("MMMM dd, yyyy")}", textStateSize10);
 
             //--------------------------------Row 2
             // empty row
@@ -428,27 +439,27 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             //--------------------------------Row 3
             row = reportInfoTable.Rows.Add();
             row.Cells.Add("Industry Name:", boldTextStateSize10);
-            row.Cells.Add(_reportPackage.OrganizationName);
+            row.Cells.Add(_reportPackage.OrganizationName, textStateSize10);
 
             row.Cells.Add("");
 
             row.Cells.Add("Submitted Date:", boldTextStateSize10);
 
-            row.Cells.Add(_reportPackage.SubmissionDateTimeLocal.HasValue ? _reportPackage.SubmissionDateTimeLocal.Value.ToString("MMMM dd, yyyy hh:mm tt ") : "");
+            row.Cells.Add(_reportPackage.SubmissionDateTimeLocal.HasValue ? _reportPackage.SubmissionDateTimeLocal.Value.ToString("MMMM dd, yyyy hh:mm tt ") : "", textStateSize10);
 
             //--------------------------------Row 4
             row = reportInfoTable.Rows.Add();
-            row.Cells.Add("Industry Number:");
-            row.Cells.Add(_reportPackage.OrganizationReferenceNumber.GetValueOrEmptyString());
+            row.Cells.Add("Industry Number:", boldTextStateSize10);
+            row.Cells.Add(_reportPackage.OrganizationReferenceNumber.GetValueOrEmptyString(), textStateSize10);
 
             row.Cells.Add("");
 
-            row.Cells.Add("Submitted By:");
-            row.Cells.Add(_reportPackage.SubmitterUserName.GetValueOrEmptyString());
+            row.Cells.Add("Submitted By:", boldTextStateSize10);
+            row.Cells.Add(_reportPackage.SubmitterUserName.GetValueOrEmptyString(), textStateSize10);
 
             //--------------------------------Row 5
             row = reportInfoTable.Rows.Add();
-            row.Cells.Add("Address:");
+            row.Cells.Add("Address:", boldTextStateSize10);
             if (string.IsNullOrWhiteSpace(_reportPackage.OrganizationAddressLine2))
             {
                 _reportPackage.OrganizationAddressLine2 = "";
@@ -459,12 +470,18 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             var jursdicationName = _reportPackage.OrganizationJurisdictionName.GetValueOrEmptyString();
             var zipCode = _reportPackage.OrganizationZipCode.GetValueOrEmptyString();
 
-            row.Cells.Add($"{addressLine1} {addressLine2},{jursdicationName},{zipCode}");
+            var address = $"{addressLine1} {addressLine2},{jursdicationName},{zipCode}";
+            if (address.EndsWith(","))
+            {
+                address = address.Substring(0, address.Length - 1);
+            }
+
+            row.Cells.Add(address, textStateSize10);
 
             row.Cells.Add("");
 
-            row.Cells.Add("Title:");
-            row.Cells.Add(_reportPackage.SubmitterTitleRole.GetValueOrEmptyString());
+            row.Cells.Add("Title:", boldTextStateSize10);
+            row.Cells.Add(_reportPackage.SubmitterTitleRole.GetValueOrEmptyString(), textStateSize10);
         }
 
         private static void HeaderFooterTable(Page pdfPage, string reportName, string submittedDateTimeString, string authorityName, string industryName)
