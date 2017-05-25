@@ -115,47 +115,57 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             var cell = row.Cells.Add("Attachments", _sectionTitleBoldSize12);
             cell.ColSpan = 3;
 
-            row = attachmentsTable.Rows.Add();
-            cell = row.Cells.Add("These files are also part of the Copy Of Records.", _sectionTextSize10);
-            cell.ColSpan = 3;
-
-            //Attachment files list table
-            var tableOrder = new BorderInfo(BorderSide.All, 0.1F);
-            var attachmentFilesTable = new Table
+            var attachments = _reportPackage.AttachmentTypes.SelectMany(i => i.ReportFiles).Select(i => i.FileStore).ToList();
+            if (attachments.Any())
             {
-                Border = tableOrder,
-                DefaultCellBorder = tableOrder,
-                DefaultCellPadding = new MarginInfo(2, 2, 2, 2),
-                Margin = { Top = 10 }
-            };
+                row = attachmentsTable.Rows.Add();
+                cell = row.Cells.Add("These files are also part of the Copy Of Records.", _sectionTextSize10);
+                cell.ColSpan = 3;
 
-            attachmentFilesTable.DefaultCellPadding = new MarginInfo(2, 2, 2, 2);
-            _pdfPage.Paragraphs.Add(attachmentFilesTable);
+                //Attachment files list table
+                var tableOrder = new BorderInfo(BorderSide.All, 0.1F);
+                var attachmentFilesTable = new Table
+                {
+                    Border = tableOrder,
+                    DefaultCellBorder = tableOrder,
+                    DefaultCellPadding = new MarginInfo(2, 2, 2, 2),
+                    Margin = { Top = 10 }
+                };
 
-            var titleBoldSize8 = new TextState("Arial", false, false);
-            titleBoldSize8.FontSize = 8;
-            titleBoldSize8.FontStyle = FontStyles.Bold;
+                attachmentFilesTable.DefaultCellPadding = new MarginInfo(2, 2, 2, 2);
+                _pdfPage.Paragraphs.Add(attachmentFilesTable);
 
-            var titleSize8 = new TextState("Arial", false, false);
-            titleSize8.FontSize = 8;
+                var titleBoldSize8 = new TextState("Arial", false, false);
+                titleBoldSize8.FontSize = 8;
+                titleBoldSize8.FontStyle = FontStyles.Bold;
 
-            attachmentFilesTable.ColumnWidths = "33% 34% 33%";
-            row = attachmentFilesTable.Rows.Add();
-            row.DefaultCellTextState = titleBoldSize8;
-            row.BackgroundColor = Color.LightGray;
+                var titleSize8 = new TextState("Arial", false, false);
+                titleSize8.FontSize = 8;
 
-            row.Cells.Add("Original File Name");
-            row.Cells.Add("System Generated Unique File Name");
-            row.Cells.Add("Attachment Type");
-
-            var attachments = _reportPackage.AttachmentTypes.SelectMany(i => i.ReportFiles).Select(i => i.FileStore);
-            foreach (var attachedFile in attachments)
-            {
+                attachmentFilesTable.ColumnWidths = "33% 34% 33%";
                 row = attachmentFilesTable.Rows.Add();
-                row.DefaultCellTextState = titleSize8;
-                row.Cells.Add(attachedFile.Name);
-                row.Cells.Add(attachedFile.OriginalFileName);
-                row.Cells.Add(attachedFile.ReportElementTypeName);
+                row.DefaultCellTextState = titleBoldSize8;
+                row.BackgroundColor = Color.LightGray;
+
+                row.Cells.Add("Original File Name");
+                row.Cells.Add("System Generated Unique File Name");
+                row.Cells.Add("Attachment Type");
+
+                foreach (var attachedFile in attachments)
+                {
+                    row = attachmentFilesTable.Rows.Add();
+                    row.DefaultCellTextState = titleSize8;
+                    row.Cells.Add(attachedFile.Name);
+                    row.Cells.Add(attachedFile.OriginalFileName);
+                    row.Cells.Add(attachedFile.ReportElementTypeName);
+                }
+            }
+            else
+            {
+                // show "No attachments included
+                row = attachmentsTable.Rows.Add();
+                cell = row.Cells.Add("No attachments included.", _sectionTextSize10);
+                cell.ColSpan = 3;
             }
         }
 
@@ -209,31 +219,40 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 var row = sampleResultsTextTable.Rows.Add();
 
                 var sectionTitle = _reportPackage.SamplesAndResultsTypes[0].ReportElementTypeName;
-
                 row.Cells.Add(sectionTitle, _sectionTitleBoldSize12);
 
-                var tableOrder = new BorderInfo(BorderSide.All, 0.1F);
-
-                //Samples and Results table  
-                var sampleResultsTable = new Table
+                var allSamples = _reportPackage.SamplesAndResultsTypes.SelectMany(i => i.ReportSamples).Select(i => i.Sample).ToList();
+                if (!allSamples.Any())
                 {
-                    Border = tableOrder,
-                    DefaultCellBorder = tableOrder,
-                    DefaultCellPadding = new MarginInfo(2, 2, 2, 2)
-                };
-
-                _pdfPage.Paragraphs.Add(sampleResultsTable);
-                sampleResultsTable.ColumnWidths = "6% 19% 11.6% 5.2% 7.1% 7.1% 7.3% 7.8% 8% 5.3% 7.1% 8.5%";
-
-                var allSamples = _reportPackage.SamplesAndResultsTypes.SelectMany(i => i.ReportSamples).Select(i => i.Sample);
-                var sampleMonitoringPointerGroups = allSamples.GroupBy(i => i.MonitoringPointId);
-                foreach (var sampleMonitoringPointerGroup in sampleMonitoringPointerGroups)
+                    // Show "No samples reported. 
+                    row = sampleResultsTextTable.Rows.Add();
+                    row.Cells.Add("No samples reported.", _sectionTextSize10);
+                }
+                else
                 {
-                    var samples = sampleMonitoringPointerGroup.Select(i => i).ToList();
-                    if (samples.Any())
+                    var tableOrder = new BorderInfo(BorderSide.All, 0.1F);
+
+                    //Samples and Results table  
+                    var sampleResultsTable = new Table
                     {
-                        var monitoringPointName = samples[0].MonitoringPointName;
-                        DrawMonitoringPointSamplesAndResultsTable(sampleResultsTable, samples, monitoringPointName, tableOrder);
+                        Border = tableOrder,
+                        DefaultCellBorder = tableOrder,
+                        DefaultCellPadding = new MarginInfo(2, 2, 2, 2)
+                    };
+
+                    _pdfPage.Paragraphs.Add(sampleResultsTable);
+                    sampleResultsTable.ColumnWidths = "6% 19% 11.6% 5.2% 7.1% 7.1% 7.3% 7.8% 8% 5.3% 7.1% 8.5%";
+
+
+                    var sampleMonitoringPointerGroups = allSamples.GroupBy(i => i.MonitoringPointId);
+                    foreach (var sampleMonitoringPointerGroup in sampleMonitoringPointerGroups)
+                    {
+                        var samples = sampleMonitoringPointerGroup.Select(i => i).ToList();
+                        if (samples.Any())
+                        {
+                            var monitoringPointName = samples[0].MonitoringPointName;
+                            DrawMonitoringPointSamplesAndResultsTable(sampleResultsTable, samples, monitoringPointName, tableOrder);
+                        }
                     }
                 }
             }
