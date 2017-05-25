@@ -139,8 +139,8 @@ namespace Linko.LinkoExchange.Services.Sample
             }
 
             sampleToPersist.Name = sampleName;
-            sampleToPersist.ByOrganizationRegulatoryProgramId = currentOrgRegProgramId; //these are the same only per current workflow
-            sampleToPersist.ForOrganizationRegulatoryProgramId = currentOrgRegProgramId; //these are the same only per current workflow
+            sampleToPersist.ByOrganizationRegulatoryProgramId = currentOrgRegProgramId; //In our current workflow this is the IU
+            sampleToPersist.ForOrganizationRegulatoryProgramId = authOrgRegProgramId; //In our current workflow this is the Authority
             sampleToPersist.StartDateTimeUtc = sampleStartDateTimeUtc;
             sampleToPersist.EndDateTimeUtc = sampleEndDateTimeUtc;
             sampleToPersist.LastModificationDateTimeUtc = DateTimeOffset.Now;
