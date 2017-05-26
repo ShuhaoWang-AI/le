@@ -115,7 +115,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             var cell = row.Cells.Add("Attachments", _sectionTitleBoldSize12);
             cell.ColSpan = 3;
 
-            var attachments = _reportPackage.AttachmentTypes.SelectMany(i => i.ReportFiles).Select(i => i.FileStore).ToList();
+            var attachments = _reportPackage.AttachmentTypes.SelectMany(i => i.FileStores).ToList();
             if (attachments.Any())
             {
                 row = attachmentsTable.Rows.Add();
@@ -221,7 +221,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 var sectionTitle = _reportPackage.SamplesAndResultsTypes[0].ReportElementTypeName;
                 row.Cells.Add(sectionTitle, _sectionTitleBoldSize12);
 
-                var allSamples = _reportPackage.SamplesAndResultsTypes.SelectMany(i => i.ReportSamples).Select(i => i.Sample).ToList();
+                var allSamples = _reportPackage.SamplesAndResultsTypes.SelectMany(i => i.Samples).ToList();
                 if (!allSamples.Any())
                 {
                     // Show "No samples reported. 

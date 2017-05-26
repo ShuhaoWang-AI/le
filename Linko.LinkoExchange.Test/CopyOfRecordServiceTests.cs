@@ -411,9 +411,9 @@ namespace Linko.LinkoExchange.Test
             var fileStores = new List<FileStoreDto>();
             foreach (var rpet in reportPackageDto.AttachmentTypes)
             {
-                foreach (var rf in rpet.ReportFiles)
+                foreach (var fs in rpet.FileStores)
                 {
-                    fileStores.Add(rf.FileStore);
+                    fileStores.Add(fs);
                 }
             }
 
@@ -519,12 +519,7 @@ namespace Linko.LinkoExchange.Test
             var att = new ReportPackageElementTypeDto
             {
                 ReportElementTypeName = "Lab Analysis Report",
-                ReportFiles = mockFileDtos.Select(a => new ReportFileDto
-                {
-                    FileStoreId = a.FileStoreId.Value,
-                    FileStore = a,
-                    ReportPackageElementTypeId = 2
-                }).ToList()
+                FileStores = mockFileDtos
             };
 
 
@@ -538,11 +533,7 @@ namespace Linko.LinkoExchange.Test
             var rptt = new ReportPackageElementTypeDto
             {
                 ReportElementTypeName = "Samples and Results",
-                ReportSamples = mockSampleDtos.Select(a => new ReportSampleDto
-                {
-                    Sample = a,
-                    ReportPackageElementTypeId = 1
-                }).ToList()
+                Samples = mockSampleDtos
             };
 
             samplesResults.Add(rptt);

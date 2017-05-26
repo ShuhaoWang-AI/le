@@ -190,9 +190,9 @@ namespace Linko.LinkoExchange.Test
             //Add sample associations
             existingReportPackage.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
             var sampleReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 25 };
-            sampleReportPackageElementType.ReportSamples = new List<ReportSampleDto>();
-            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 52, ReportPackageElementTypeId = 25 });
-            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 53, ReportPackageElementTypeId = 25 });
+            sampleReportPackageElementType.Samples = new List<SampleDto>();
+            sampleReportPackageElementType.Samples.Add(new SampleDto { SampleId = 52 });
+            sampleReportPackageElementType.Samples.Add(new SampleDto { SampleId = 53 });
             existingReportPackage.SamplesAndResultsTypes.Add(sampleReportPackageElementType);
             var existingId = _reportPackageService.SaveReportPackage(existingReportPackage, true);
         }
@@ -208,25 +208,25 @@ namespace Linko.LinkoExchange.Test
             //Add sample associations
             existingReportPackage.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
             var sampleReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 25 };
-            sampleReportPackageElementType.ReportSamples = new List<ReportSampleDto>();
-            sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 52, ReportPackageElementTypeId = 17 });
-            //sampleReportPackageElementType.ReportSamples.Add(new ReportSampleDto { SampleId = 53, ReportPackageElementTypeId = 17 });
+            sampleReportPackageElementType.Samples = new List<SampleDto>();
+            sampleReportPackageElementType.Samples.Add(new SampleDto { SampleId = 52 });
+            //sampleReportPackageElementType.Samples.Add(new SampleDto { SampleId = 53 });
             existingReportPackage.SamplesAndResultsTypes.Add(sampleReportPackageElementType);
 
             //Add attachment associations
             existingReportPackage.AttachmentTypes = new List<ReportPackageElementTypeDto>();
             var attachmentReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 26 };
-            attachmentReportPackageElementType.ReportFiles = new List<ReportFileDto>();
-            attachmentReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 26 });
-            //filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 26 });
+            attachmentReportPackageElementType.FileStores = new List<FileStoreDto>();
+            attachmentReportPackageElementType.FileStores.Add(new FileStoreDto { FileStoreId = 2 });
+            //filesReportPackageElementType.FileStores.Add(new FileStoreDto { FileStoreId = 4 });
             existingReportPackage.AttachmentTypes.Add(attachmentReportPackageElementType);
 
             //Add certification associations
             existingReportPackage.CertificationTypes = new List<ReportPackageElementTypeDto>();
             var certsReportPackageElementType = new ReportPackageElementTypeDto() { ReportPackageElementTypeId = 34 };
-            certsReportPackageElementType.ReportFiles = new List<ReportFileDto>();
-            certsReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 2, ReportPackageElementTypeId = 34 });
-            //filesReportPackageElementType.ReportFiles.Add(new ReportFileDto { FileStoreId = 4, ReportPackageElementTypeId = 27 });
+            certsReportPackageElementType.FileStores = new List<FileStoreDto>();
+            certsReportPackageElementType.FileStores.Add(new FileStoreDto { FileStoreId = 2 });
+            //filesReportPackageElementType.FileStores.Add(new FileStoreDto { FileStoreId = 4 });
             existingReportPackage.CertificationTypes.Add(certsReportPackageElementType);
 
             var existingId = _reportPackageService.SaveReportPackage(existingReportPackage, true);

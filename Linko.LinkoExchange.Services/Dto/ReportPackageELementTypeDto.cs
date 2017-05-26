@@ -18,7 +18,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool IsRequired { get; set; }
         public int SortOrder { get; set; }
 
-        public List<ReportSampleDto> ReportSamples { get; set; }
-        public List<ReportFileDto> ReportFiles { get; set; }
+        public List<SampleDto> Samples { get; set; }
+        public List<FileStoreDto> FileStores { get; set; }
     }
 }

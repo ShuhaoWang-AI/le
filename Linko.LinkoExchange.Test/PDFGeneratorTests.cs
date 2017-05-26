@@ -206,12 +206,6 @@ namespace Linko.LinkoExchange.Test
             }
 
 
-            var reportSamples = sampleDtos.Select(i => new ReportSampleDto
-            {
-                ReportPackageElementTypeId = 1,
-                Sample = i
-            }).ToList();
-
             _reportPackageDto.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
 
             _reportPackageDto.SamplesAndResultsTypes.Add(new ReportPackageElementTypeDto
@@ -220,7 +214,7 @@ namespace Linko.LinkoExchange.Test
                 ReportElementTypeContent = string.Empty,
                 ReportElementTypeId = 1,
                 ReportPackageElementCategoryId = 1,
-                ReportSamples = reportSamples
+                Samples = sampleDtos
             });
         }
         private void PrepareSampleDtos()
@@ -352,13 +346,6 @@ namespace Linko.LinkoExchange.Test
                 sampleDtos.Add(sample3);
             }
 
-
-            var reportSamples = sampleDtos.Select(i => new ReportSampleDto
-            {
-                ReportPackageElementTypeId = 1,
-                Sample = i
-            }).ToList();
-
             _reportPackageDto.SamplesAndResultsTypes = new List<ReportPackageElementTypeDto>();
 
             _reportPackageDto.SamplesAndResultsTypes.Add(new ReportPackageElementTypeDto
@@ -367,7 +354,7 @@ namespace Linko.LinkoExchange.Test
                 ReportElementTypeContent = string.Empty,
                 ReportElementTypeId = 1,
                 ReportPackageElementCategoryId = 1,
-                ReportSamples = reportSamples
+                Samples = sampleDtos
             });
         }
 
@@ -375,24 +362,21 @@ namespace Linko.LinkoExchange.Test
         {
             _reportPackageDto.AttachmentTypes = new List<ReportPackageElementTypeDto>();
 
-            var reportFiles = new List<ReportFileDto>();
+            var fileStores = new List<FileStoreDto>();
             for (var i = 0; i < 5; i++)
             {
-                reportFiles.Add(new ReportFileDto
+                fileStores.Add(new FileStoreDto
                 {
-                    FileStore = new FileStoreDto
-                    {
-                        FileType = "image/jpg",
-                        ReportElementTypeName = $"Lab Analysis Report",
-                        Name = $"1st Quarter PCR_{i}",
-                        OriginalFileName = $"1st Quarter PCR_{i}"
-                    }
+                    FileType = "image/jpg",
+                    ReportElementTypeName = $"Lab Analysis Report",
+                    Name = $"1st Quarter PCR_{i}",
+                    OriginalFileName = $"1st Quarter PCR_{i}"
                 });
             }
 
             _reportPackageDto.AttachmentTypes.Add(new ReportPackageElementTypeDto
             {
-                ReportFiles = reportFiles
+                FileStores = fileStores
             });
         }
 
