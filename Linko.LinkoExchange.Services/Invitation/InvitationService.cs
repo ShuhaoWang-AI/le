@@ -352,8 +352,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             int thisUserOrgRegProgUserId = Convert.ToInt32(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
             var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
                 .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
-            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
-            var actorUser = _userService.GetUserProfileById(actorProgramUserDto.UserProfileId);
+            var actorUser = _userService.GetUserProfileById(actorProgramUser.UserProfileId);
 
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
             contentReplacements = new Dictionary<string, string>();
@@ -390,7 +389,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             cromerrAuditLogEntryDto.IPAddress = _httpContextService.CurrentUserIPAddress();
             cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
             contentReplacements.Add("authorityName", authority.Organization.Name);
-            contentReplacements.Add("organizationName", actorProgramUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
+            contentReplacements.Add("organizationName", targetOrgRegProgram.Organization.Name);
             contentReplacements.Add("regulatoryProgram", authority.RegulatoryProgram.Name);
             contentReplacements.Add("firstName", firstName);
             contentReplacements.Add("lastName", lastName);
