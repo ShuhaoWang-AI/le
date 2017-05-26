@@ -97,7 +97,7 @@ namespace Linko.LinkoExchange.Services.Report
             var submitterUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
             var submitterFirstName = _httpContextService.GetClaimValue(CacheKey.FirstName);
             var submitterLastName = _httpContextService.GetClaimValue(CacheKey.LastName);
-            var submitterTitleRole = _httpContextService.GetClaimValue(CacheKey.UserRole);
+            var submitterTitleRole = _userService.GetUserProfileById(submitterUserId).TitleRole;
             var submitterIpAddress = _httpContextService.CurrentUserIPAddress();
             var submitterUserName = _httpContextService.GetClaimValue(CacheKey.UserName);
 
