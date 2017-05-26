@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Linko.LinkoExchange.Core.Common;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Cache;
@@ -1070,11 +1071,15 @@ namespace Linko.LinkoExchange.Services.Authentication
             var userProfile = _dbContext.Users.Single(i => i.UserProfileId == userProfileId);
 
             // check if user is a valid user
-            // 1: IsAccountLocked = false, IsAccountResetRequired = false
-            if (userProfile.IsAccountLocked || userProfile.IsAccountResetRequired)
+            // 1: IsAccountLocked = false, IsAccountResetRequired = false 
+            if (userProfile.IsAccountLocked)
             {
-                SignOff();
-                return PasswordAndKbqValidationResult.Failed;
+                ThrowUserStatusRuleValiation("User is locked");
+            }
+
+            if (userProfile.IsAccountResetRequired)
+            {
+                ThrowUserStatusRuleValiation("User is required to reset account");
             }
 
             if (!IsValidPassword(userProfile.PasswordHash, password))
@@ -1091,18 +1096,27 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             // 2: is not disabled, 
             // 3: have access to the regulatory program
-            var isValidUser = _dbContext.OrganizationRegulatoryProgramUsers
-                .Any(i => i.UserProfileId == userProfileId &&
-                     i.IsRegistrationApproved &&
-                     i.IsRegistrationDenied == false &&
-                     i.IsRemoved == false &&
-                     i.IsEnabled);
-            if (!isValidUser)
+            var programUser = _dbContext.OrganizationRegulatoryProgramUsers
+                             .FirstOrDefault(i => i.UserProfileId == userProfileId && i.OrganizationRegulatoryProgramId == orgRegProgId);
+
+            if (programUser == null || programUser.IsRegistrationApproved == false || programUser.IsRegistrationDenied || programUser.IsRemoved)
             {
-                return PasswordAndKbqValidationResult.Failed;
+                ThrowUserStatusRuleValiation("User does not have access to current program");
+            }
+            else if (!programUser.IsEnabled)
+            {
+                ThrowUserStatusRuleValiation("User is disabled");
             }
 
             return PasswordAndKbqValidationResult.Success;
+        }
+
+        private void ThrowUserStatusRuleValiation(string message)
+        {
+            SignOff();
+            List<RuleViolation> validationIssues = new List<RuleViolation>();
+            validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+            throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
         }
 
         /// <summary>
@@ -1149,8 +1163,8 @@ namespace Linko.LinkoExchange.Services.Authentication
         // Validate user access for UC-29(4.a, 5.a, 6.a)
         private bool ValidateUserAccess(UserProfile userProfile, SignInResultDto signInResultDto)
         {
-            var orpus = _programService.GetUserRegulatoryPrograms(userProfile.Email);
-            if (orpus != null && orpus.Any())
+            var orpus = _programService.GetUserRegulatoryPrograms(userProfile.Email).ToList();
+            if (orpus.Any())
             {
                 // UC-29 4.a
                 // System confirms user has status “Registration Pending” (and no access to any other portal where registration is not pending or portal is not disabled)
