@@ -17,7 +17,7 @@ using NLog;
 
 namespace Linko.LinkoExchange.Services.FileStore
 {
-    public class FileStoreService : IFileStoreService
+    public class FileStoreService : BaseService, IFileStoreService
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly IMapHelper _mapHelper;
@@ -66,6 +66,32 @@ namespace Linko.LinkoExchange.Services.FileStore
             _logger = logger;
             _httpContextService = httpContextService;
             _timeZoneService = timeZoneService;
+        }
+
+        public override bool CanUserExecuteAPI(string apiName, params int[] id)
+        {
+            bool retVal = false;
+
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+            switch (apiName)
+            {
+                case "GetFileStoreById":
+                case "UpdateFileStore":
+                case "DeleteFileStore":
+                    var fileStoreId = id[0];
+                    //Also handles scenarios where FileStoreId does not exist
+                    var isFileStoreWithThisOwnerExist = _dbContext.FileStores
+                        .Any(fs => fs.FileStoreId == fileStoreId
+                            && fs.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                    retVal = isFileStoreWithThisOwnerExist;
+
+                    break;
+
+            }
+
+            return retVal;
         }
 
         public List<string> GetValidAttachmentFileExtensions()
@@ -212,6 +238,11 @@ namespace Linko.LinkoExchange.Services.FileStore
         {
             _logger.Info("Enter FileStoreService.GetFileStoreById, attachmentFileId={0}.", fileStoreId);
 
+            if (!CanUserExecuteAPI("GetFileStoreById", fileStoreId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             var currentRegulatoryProgramId =
                 int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
@@ -234,6 +265,12 @@ namespace Linko.LinkoExchange.Services.FileStore
         public void UpdateFileStore(FileStoreDto fileStoreDto)
         {
             _logger.Info("Enter FileStoreService.UpdateFileStore.");
+
+            if (!CanUserExecuteAPI("UpdateFileStore", fileStoreDto.FileStoreId.Value))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             //Check if the file is already set to be 'reported' or not 
             var fileStoreToUpdate = _dbContext.FileStores.Single(i => i.FileStoreId == fileStoreDto.FileStoreId);
             // Check the fileStoreId is in tReportFile table or not, if it, means that file is included in a report  
@@ -281,6 +318,11 @@ namespace Linko.LinkoExchange.Services.FileStore
         {
             _logger.Info("Enter FileStoreService.DeleteFileStore.");
 
+            if (!CanUserExecuteAPI("DeleteFileStore", fileStoreId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+            
             //Check if the file is already set to be 'reported' or not 
             if (IsFileInReports(fileStoreId))
             {
