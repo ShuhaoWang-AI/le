@@ -16,7 +16,7 @@ namespace Linko.LinkoExchange.Core.Enum
         BadUserProfileData,
         BadPassword,
         BadSecurityQuestionAndAnswer,
-        BadKBQAndAnswer, 
+        BadKBQAndAnswer,
         MissingKBQAnswer,
         MissingSecurityQuestionAnswer,
         DuplicatedKBQAnswer,

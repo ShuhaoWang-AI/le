@@ -536,7 +536,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     }
 
                     var isInvitedToIndustry = false;
-                    
+
                     if (recipientProgram.RegulatorOrganizationId.HasValue)
                     {
                         // Invites Industry user
@@ -584,7 +584,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                         emailContentReplacements.Add("cityName", receipientOrg.CityName);
                         emailContentReplacements.Add("stateName", receipientOrg.State);
                     }
-                    
+
                     if (isInvitedToIndustry)
                     {
                         await _emailService.SendEmail(sendTo, EmailType.Registration_IndustryUserRegistrationPendingToApprovers, emailContentReplacements);
@@ -1038,6 +1038,79 @@ namespace Linko.LinkoExchange.Services.Authentication
             return Task.FromResult(signInResultDto);
         }
 
+        public PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int kbqId, string kbqAnswer, int failedPasswordCount, int failedKbqCount)
+        {
+            _logger.Info($"Enter AuthenticationService.PasswordAndKbqValidationResult");
+
+            var userProfileId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.UserProfileId));
+            var orgRegProgId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
+            var authority = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId: orgRegProgId);
+            var authoritySettings = _settingService.GetOrganizationSettingsById(organizationId: authority.OrganizationId).Settings;
+            var failedPasswordAttemptMaxCount = ValueParser.TryParseInt(authoritySettings.Where(s => s.TemplateName.Equals(obj: SettingType.FailedPasswordAttemptMaxCount)).Select(s => s.Value).First(), 3);
+            var failedKbqAttemptMaxCount = ValueParser.TryParseInt(authoritySettings.Where(s => s.TemplateName.Equals(obj: SettingType.FailedKBQAttemptMaxCount)).Select(s => s.Value).First(), 3);
+
+            if (failedKbqAttemptMaxCount <= failedKbqCount)
+            {
+                SignOff();
+                return PasswordAndKbqValidationResult.IncorrectKbqAnswer;
+            }
+
+            if (failedPasswordAttemptMaxCount <= failedPasswordCount)
+            {
+                SignOff();
+                return PasswordAndKbqValidationResult.InvalidPassword;
+            }
+
+            if (!_questionAnswerService.ConfirmCorrectAnswer(kbqId, kbqAnswer.ToLower()))
+            {
+                if (failedKbqAttemptMaxCount <= failedKbqCount + 1)
+                {
+                    SignOff();
+                    _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
+                    return PasswordAndKbqValidationResult.UserLocked;
+                }
+
+                return PasswordAndKbqValidationResult.IncorrectKbqAnswer;
+            }
+
+            var userProfile = _dbContext.Users.Single(i => i.UserProfileId == userProfileId);
+
+            // check if user is a valid user
+            // 1: IsAccountLocked = false, IsAccountResetRequired = false
+            if (userProfile.IsAccountLocked || userProfile.IsAccountResetRequired)
+            {
+                SignOff();
+                return PasswordAndKbqValidationResult.Failed;
+            }
+
+            if (!IsValidPassword(userProfile.PasswordHash, password))
+            {
+                if (failedPasswordCount + 1 < failedPasswordAttemptMaxCount)
+                {
+                    SignOff();
+                    _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
+                    return PasswordAndKbqValidationResult.UserLocked;
+                }
+
+                return PasswordAndKbqValidationResult.InvalidPassword;
+            }
+
+            // 2: is not disabled, 
+            // 3: have access to the regulatory program
+            var isValidUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Any(i => i.UserProfileId == userProfileId &&
+                     i.IsRegistrationApproved &&
+                     i.IsRegistrationDenied == false &&
+                     i.IsRemoved == false &&
+                     i.IsEnabled);
+            if (!isValidUser)
+            {
+                return PasswordAndKbqValidationResult.Failed;
+            }
+
+            return PasswordAndKbqValidationResult.Success;
+        }
+
         /// <summary>
         /// Log to Cromerr events: 
         /// 1) attempting to log into an account that is password locked
@@ -1259,7 +1332,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 .OrderByDescending(i => i.LastModificationDateTimeUtc).Take(numberOfPasswordsInHistory)
                 .ToList();
 
-            if (lastNumberPasswordInHistory.Any(i => isValidPassword(i.PasswordHash, password) == true))
+            if (lastNumberPasswordInHistory.Any(i => IsValidPassword(i.PasswordHash, password) == true))
             {
                 return false;
             }
@@ -1267,7 +1340,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             return true;
         }
 
-        private bool isValidPassword(string passwordHash, string password)
+        private bool IsValidPassword(string passwordHash, string password)
         {
             return _userManager.PasswordHasher.VerifyHashedPassword(passwordHash, password) == PasswordVerificationResult.Success;
         }
