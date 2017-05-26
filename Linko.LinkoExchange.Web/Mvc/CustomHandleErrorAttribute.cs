@@ -4,6 +4,7 @@ using System.Data.Entity.Validation;
 using System.Data.Entity.Infrastructure;
 using System.Collections.Generic;
 using System;
+using System.Configuration;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {
@@ -15,6 +16,7 @@ namespace Linko.LinkoExchange.Web.Mvc
         #region private members
 
         private readonly ILogger _logger;
+        private string _unauthorizedPagePath;
 
         #endregion
 
@@ -24,6 +26,7 @@ namespace Linko.LinkoExchange.Web.Mvc
         public CustomHandleErrorAttribute(ILogger logger)
         {
             _logger = logger;
+            _unauthorizedPagePath = ConfigurationManager.AppSettings["UnauthorizedPagePath"];
         }
 
         #endregion
@@ -38,7 +41,8 @@ namespace Linko.LinkoExchange.Web.Mvc
                 return;
             }
 
-            if (new System.Web.HttpException(message: null, innerException: filterContext.Exception).GetHttpCode() != 500)
+            var httpCode = new System.Web.HttpException(message: null, innerException: filterContext.Exception).GetHttpCode();
+            if (httpCode != 500 && httpCode != 401) //401 = Unauthorized Access
             {
                 return;
             }
@@ -63,16 +67,28 @@ namespace Linko.LinkoExchange.Web.Mvc
             }
             else
             {
-                string controllerName = (string) filterContext.RouteData.Values["controller"];
-                string actionName = (string) filterContext.RouteData.Values["action"];
-                HandleErrorInfo model = new HandleErrorInfo(filterContext.Exception, controllerName, actionName);
-                filterContext.Result = new ViewResult
+                if (filterContext.Exception is UnauthorizedAccessException)
                 {
-                    ViewName = View,
-                    MasterName = Master,
-                    ViewData = new ViewDataDictionary<HandleErrorInfo>(model),
-                    TempData = filterContext.Controller.TempData
-                };
+                    var result = new ViewResult
+                    {
+                        ViewName = _unauthorizedPagePath,
+                    };
+                    filterContext.Result = result;
+                }
+                else {
+
+                    string controllerName = (string)filterContext.RouteData.Values["controller"];
+                    string actionName = (string)filterContext.RouteData.Values["action"];
+                    HandleErrorInfo model = new HandleErrorInfo(filterContext.Exception, controllerName, actionName);
+                    filterContext.Result = new ViewResult
+                    {
+                        ViewName = View,
+                        MasterName = Master,
+                        ViewData = new ViewDataDictionary<HandleErrorInfo>(model),
+                        TempData = filterContext.Controller.TempData
+                    };
+                }
+               
             }
 
             // log the error

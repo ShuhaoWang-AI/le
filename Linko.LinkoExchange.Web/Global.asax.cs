@@ -72,7 +72,11 @@ namespace Linko.LinkoExchange.Web
             CommonController controller = UnityConfig.GetConfiguredContainer().Resolve<CommonController>();
             RouteData routeData = new RouteData();
             string action = "DefaultError";
-            if (ex is System.Web.HttpException)
+            if (ex is UnauthorizedAccessException)
+            {
+                action = "Unauthorized";
+            }
+            else if (ex is System.Web.HttpException)
             {
                 System.Web.HttpException httpEx = ex as System.Web.HttpException;
 

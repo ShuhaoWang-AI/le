@@ -19,6 +19,16 @@ namespace Linko.LinkoExchange.Web.Controllers
         #region error handling
 
         /// <summary>
+        ///     Custom error handler for unauthorized access
+        /// </summary>
+        public ActionResult Unauthorized()
+        {
+            Response.TrySkipIisCustomErrors = true;
+
+            return View();
+        }
+
+        /// <summary>
         ///     Custom error handler for 404 page not found.
         /// </summary>
         public ActionResult PageNotFound()
