@@ -8,12 +8,12 @@ namespace Linko.LinkoExchange.Core.Enum
 {
     public enum ReportStatusName
     {
-        Draft, // for Industry
-        ReadyToSubmit, // for Industry
-        Submitted, // for Industry
-        Repudiated, // for Industry
-        SubmittedPendingReview, // for Authority
-        RepudiatedPendingReview, // for Authority
-        All // for Authority
+        Draft,                      // for Industry -- actual entry in tReportStatus
+        ReadyToSubmit,              // for Industry -- actual entry in tReportStatus
+        Submitted,                  // for Industry -- actual entry in tReportStatus
+        Repudiated,                 // for Industry -- actual entry in tReportStatus
+        SubmittedPendingReview,     // for Authority -- only used to filter for grid display
+        RepudiatedPendingReview,    // for Authority -- only used to filter for grid display
+        All                         // for Authority -- only used to filter for grid display
     }
 }
