@@ -1056,20 +1056,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return PasswordAndKbqValidationResult.InvalidPassword;
             }
 
-            if (!_questionAnswerService.ConfirmCorrectAnswer(userQuestionAnswerId, kbqAnswer.ToLower()))
-            {
-                if (failedKbqAttemptMaxCount <= failedKbqCount + 1)
-                {
-                    SignOff();
-                    _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
-                    return PasswordAndKbqValidationResult.UserLocked;
-                }
-
-                return PasswordAndKbqValidationResult.IncorrectKbqAnswer;
-            }
-
             var userProfile = _dbContext.Users.Single(i => i.UserProfileId == userProfileId);
-
             // check if user is a valid user
             // 1: IsAccountLocked = false, IsAccountResetRequired = false 
             if (userProfile.IsAccountLocked)
@@ -1082,9 +1069,10 @@ namespace Linko.LinkoExchange.Services.Authentication
                 ThrowUserStatusRuleValiation("User is required to reset account");
             }
 
+            // Check to see if password matches.
             if (!IsValidPassword(userProfile.PasswordHash, password))
             {
-                if (failedPasswordCount + 1 < failedPasswordAttemptMaxCount)
+                if (failedPasswordAttemptMaxCount <= failedPasswordCount + 1)
                 {
                     SignOff();
                     _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
@@ -1094,6 +1082,20 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return PasswordAndKbqValidationResult.InvalidPassword;
             }
 
+            // Check to see if KBQ answer matches
+            if (!_questionAnswerService.ConfirmCorrectAnswer(userQuestionAnswerId, kbqAnswer.ToLower()))
+            {
+                if (failedKbqAttemptMaxCount <= failedKbqCount + 1)
+                {
+                    SignOff();
+                    _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
+                    return PasswordAndKbqValidationResult.UserLocked;
+                }
+
+                return PasswordAndKbqValidationResult.IncorrectKbqAnswer;
+            }
+
+            // Check user is validate user or not
             // 2: is not disabled, 
             // 3: have access to the regulatory program
             var programUser = _dbContext.OrganizationRegulatoryProgramUsers
