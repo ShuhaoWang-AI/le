@@ -13,6 +13,7 @@ namespace Linko.LinkoExchange.Services.User
 
         ICollection<OrganizationRegulatoryProgramUserDto> GetProgramUsersByEmail(string emailAddress);
 
+        int GetPendingRegistrationProgramUsersCount(int orgRegProgamId);
         List<OrganizationRegulatoryProgramUserDto> GetPendingRegistrationProgramUsers(int orgRegProgramId);
 
         List<OrganizationRegulatoryProgramUserDto> GetUserProfilesForOrgRegProgram(int orgRegProgramId,
