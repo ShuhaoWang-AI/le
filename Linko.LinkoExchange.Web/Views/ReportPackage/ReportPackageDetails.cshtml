@@ -96,7 +96,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="form-group">
                 @Html.HiddenFor(model => model.Id)
                 @Html.HiddenFor(model => model.IsSubmissionBySignatoryRequired)
@@ -214,7 +214,98 @@
                         </div>
 
                         <section class="box-body form-horizontal">
+                            @* grid name should be start with grid for centralized error handling *@
+                            @(Html.Kendo().Grid<SampleViewModel>()
+                                  .Name(componentName:"gridSample_" + samplesAndResultType.Id)
+                                  .Columns(columns =>
+                                           {
+                                               if (Model.Status == ReportStatusName.Draft)
+                                               {
+                                                   columns.Bound(c => c.IsAssociatedWithReportPackage)
+                                                          .ClientTemplate(value:"<input type='checkbox' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' #/>")
+                                                          .HtmlAttributes(attributes:new
+                                                                                     {
+                                                                                         align = "center"
+                                                                                     })
+                                                          .Filterable(f => f.Enabled(value:false))
+                                                          .Width(pixelWidth:40);
+                                               }
+                                               columns.Bound(c => c.MonitoringPointName)
+                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                              .SuggestionOperator(filterType:FilterType.Contains)));
+                                               columns.Bound(c => c.CtsEventTypeName)
+                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                              .SuggestionOperator(filterType:FilterType.Contains)));
+                                               columns.Bound(c => c.CollectionMethodName)
+                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                              .SuggestionOperator(filterType:FilterType.Contains)));
+                                               columns.Bound(c => c.StartDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                                      .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                                               columns.Bound(c => c.EndDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                                      .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                                               columns.Bound(c => c.LabSampleIdentifier)
+                                                      .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                              .SuggestionOperator(filterType:FilterType.Contains)));
+                                           })
+                                  .Pageable(pageable => pageable
+                                                            .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
+                                                            .Refresh(enabled:true)
+                                                            .Input(enabled:true)
+                                                            .Numeric(enabled:false)
+                                  )
+                                  .ClientDetailTemplateId(id:"template")
+                                  .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+                                  .Filterable(filterable => filterable.Enabled(value:false).Mode(value:GridFilterMode.Row))
+                                  .Resizable(resizable => resizable.Columns(value:true))
+                                  .Scrollable(s => s.Height(value:"auto"))
+                                  .NoRecords(text:"No sample exists.")
+                                  .DataSource(dataSource => dataSource
+                                                                .Ajax()
+                                                                .ServerOperation(enabled:false)
+                                                                .Batch(enabled:true)
+                                                                .Sort(sort =>
+                                                                      {
+                                                                          sort.Add(memberName:"StartDateTimeLocal").Ascending();
+                                                                          sort.Add(memberName:"MonitoringPointName").Ascending();
+                                                                          sort.Add(memberName:"CollectionMethodName").Ascending();
+                                                                      }) // <-- initial sort expression
+                                                                .Read(read => read.Action(actionName:"Samples_Read", controllerName:"ReportPackage", routeValues:new
+                                                                                                                                                                 {
+                                                                                                                                                                     reportPackageElementTypeId = samplesAndResultType.Id.GetValueOrDefault(),
+                                                                                                                                                                     reportStatusName = Model.Status
+                                                                                                                                                                 }))
+                                                                .PageSize(pageSize:15)
+                                                                .Events(events => events.Error(handler:"error_handler"))
+                                  )
+                                  )
                         </section>
+                        <script id="template" type="text/kendo-tmpl">
+                            @(Html.Kendo().Grid<SampleResultViewModel>()
+                                  .Name(componentName:"gridSampleResult_#=Id#")
+                                  .Columns(columns =>
+                                           {
+                                               columns.Bound(c => c.ParameterName);
+                                               columns.Bound(c => c.Value).HtmlAttributes(attributes:new { align = "right" });
+                                               columns.Bound(c => c.MassLoadingValue).HtmlAttributes(attributes:new { align = "right" });
+                                               columns.Bound(c => c.AnalysisMethod);
+                                               columns.Bound(c => c.EnteredMethodDetectionLimit).HtmlAttributes(attributes:new { align = "right" });
+                                               columns.Bound(c => c.AnalysisDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}");
+                                           })
+                                  .Pageable()
+                                  .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+                                  .Scrollable(s => s.Height(value:"auto"))
+                                  .NoRecords(text:"No sample result exists.")
+                                  .DataSource(dataSource => dataSource
+                                                                .Ajax()
+                                                                .ServerOperation(enabled:false)
+                                                                .Read(read => read.Action(actionName:"SampleResults_Read", controllerName:"ReportPackage", routeValues:new
+                                                                                                                                                                       {
+                                                                                                                                                                           sampleId = "#=Id#"
+                                                                                                                                                                       }))
+                                  )
+                                  .ToClientTemplate()
+                                  )
+                        </script>
 
                     </div>
                 }
@@ -239,77 +330,68 @@
                                 <div class="col-md-12">
                                     @* grid name should be start with grid for centralized error handling *@
                                     @(Html.Kendo().Grid<AttachmentViewModel>()
-                                          .Name(componentName: "gridAttachment_" + attachmentType.Id)
+                                          .Name(componentName:"gridAttachment_" + attachmentType.Id)
                                           .Columns(columns =>
-                                          {
-                                              if (Model.Status == ReportStatusName.Draft)
-                                              {
-                                                  columns.Template(c =>
-                                                                   {
-                                                                   })
-                                                         .ClientTemplate(value:"<input type='checkbox' class='checkbox' />")
-                                                         .HtmlAttributes(attributes:new
-                                                                                    {
-                                                                                        align = "center"
-                                                                                    })
-                                                         .Width(pixelWidth:40);
-                                              }
-                                              columns.Bound(c => c.Name)
-                                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                             .SuggestionOperator(filterType: FilterType.Contains)))
-                                                                                             .ClientTemplate(value:Html.ActionLink(linkText: "#=Name#", actionName: "DownloadAttachment", routeValues: new
+                                                   {
+                                                       if (Model.Status == ReportStatusName.Draft)
+                                                       {
+                                                           columns.Bound(c => c.IsAssociatedWithReportPackage)
+                                                                  .ClientTemplate(value:"<input type='checkbox' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' #/>")
+                                                                  .HtmlAttributes(attributes:new
                                                                                              {
-                                                                                                 id = "#=Id#"
-                                                                                             }).ToHtmlString());
-                                              columns.Bound(c => c.OriginalFileName)
-                                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                             .SuggestionOperator(filterType: FilterType.Contains)));
-                                              columns.Bound(c => c.Description)
-                                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                             .SuggestionOperator(filterType: FilterType.Contains)));
-                                              columns.Bound(c => c.UploadDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
-                                                     .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
-                                              columns.Bound(c => c.UploaderUserFullName)
-                                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
-                                                                                             .SuggestionOperator(filterType: FilterType.Contains)));
-                                          })
+                                                                                                 align = "center"
+                                                                                             })
+                                                                  .Filterable(f => f.Enabled(value:false))
+                                                                  .Width(pixelWidth:40);
+                                                       }
+                                                       columns.Bound(c => c.Name)
+                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                                      .SuggestionOperator(filterType:FilterType.Contains)))
+                                                              .ClientTemplate(value:Html.ActionLink(linkText:"#=Name#", actionName:"DownloadAttachment", routeValues:new
+                                                                                                                                                                     {
+                                                                                                                                                                         id = "#=Id#"
+                                                                                                                                                                     }).ToHtmlString());
+                                                       columns.Bound(c => c.OriginalFileName)
+                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
+                                                       columns.Bound(c => c.Description)
+                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
+                                                       columns.Bound(c => c.UploadDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
+                                                              .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                                                       columns.Bound(c => c.UploaderUserFullName)
+                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
+                                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
+                                                   })
                                           .Pageable(pageable => pageable
-                                                                    .PageSizes(pageSizes: new List<object> { "all", 15, 25, 50, 75 })
-                                                                    .Refresh(enabled: true)
-                                                                    .Input(enabled: true)
-                                                                    .Numeric(enabled: false)
+                                                                    .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
+                                                                    .Refresh(enabled:true)
+                                                                    .Input(enabled:true)
+                                                                    .Numeric(enabled:false)
                                           )
-                                          .Selectable(selectable =>
-                                          {
-                                              selectable.Mode(mode: GridSelectionMode.Single);
-                                              selectable.Type(type: GridSelectionType.Row);
-                                          })
-                                          .Sortable(sortable =>
-                                          {
-                                              sortable.SortMode(value: GridSortMode.MultipleColumn);
-                                          })
-                                          .Filterable(filterable => filterable.Enabled(value: false).Mode(value: GridFilterMode.Row))
-                                          .Resizable(resizable => resizable.Columns(value: true))
-                                          .Scrollable(s => s.Height(value: "auto"))
-                                          .NoRecords(text: "No attachment exists.")
+                                          .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
+                                          .Filterable(filterable => filterable.Enabled(value:false).Mode(value:GridFilterMode.Row))
+                                          .Resizable(resizable => resizable.Columns(value:true))
+                                          .Scrollable(s => s.Height(value:"auto"))
+                                          .NoRecords(text:"No attachment exists.")
                                           .DataSource(dataSource => dataSource
                                                                         .Ajax()
-                                                                        .ServerOperation(enabled: false)
-                                                                        .Batch(enabled: true)
+                                                                        .ServerOperation(enabled:false)
+                                                                        .Batch(enabled:true)
                                                                         .Sort(sort =>
-                                                                        {
-                                                                            sort.Add(memberName: "UploadDateTimeLocal").Descending();
-                                                                            sort.Add(memberName: "Name").Ascending();
-                                                                        }) // <-- initial sort expression
-                                                                        .Read(read => read.Action(actionName: "Attachments_Read", controllerName: "ReportPackage", routeValues: new
-                                                                        {
-                                                                            reportPackageElementTypeId = attachmentType.Id.GetValueOrDefault(),
-                                                                            reportStatusName = Model.Status
-                                                                        }))
-                                                                        .PageSize(pageSize: 15)
-                                                                        .Events(events => events.Error(handler: "error_handler"))
+                                                                              {
+                                                                                  sort.Add(memberName:"UploadDateTimeLocal").Descending();
+                                                                                  sort.Add(memberName:"Name").Ascending();
+                                                                              }) // <-- initial sort expression
+                                                                        .Read(read => read.Action(actionName:"Attachments_Read", controllerName:"ReportPackage", routeValues:new
+                                                                                                                                                                             {
+                                                                                                                                                                                 reportPackageElementTypeId = attachmentType.Id.GetValueOrDefault(),
+                                                                                                                                                                                 reportStatusName = Model.Status
+                                                                                                                                                                             }))
+                                                                        .PageSize(pageSize:15)
+                                                                        .Events(events => events.Error(handler:"error_handler"))
                                           )
-                                    )
+                                          )
                                 </div>
                             </div>
                         </section>
@@ -381,7 +463,7 @@
         </div>
     </div>
 
-    if (Model.CanCurrentUserSubmitAndReputiate && (Model.Status == ReportStatusName.ReadyToSubmit))
+    if (Model.CanCurrentUserSubmitAndReputiate && Model.Status == ReportStatusName.ReadyToSubmit)
     {
         <div class="box box-primary" id="divSignAndSubmitReport">
             <div class="box-header with-border">
@@ -395,7 +477,7 @@
             <div class="box-body form-horizontal">
                 @if (ViewBag.ShowSubmissionValidationErrorMessage != null && ViewBag.ShowSubmissionValidationErrorMessage)
                 {
-                    <div class="alert alert-dismissible alert-danger">
+                    <div class="alert alert-danger alert-dismissible">
                         <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
                         <h5>
                             <i class="fa fa-close icon"></i>
@@ -431,7 +513,7 @@
         </div>
     }
 
-    if ((Model.Status == ReportStatusName.Submitted)|| (Model.Status == ReportStatusName.Repudiated))
+    if (Model.Status == ReportStatusName.Submitted || Model.Status == ReportStatusName.Repudiated)
     {
         <div class="box box-primary" id="divSignAndSubmitReport">
             <div class="box-header with-border">
@@ -443,35 +525,35 @@
                 </div>
             </div>
             <div class="box-body form-horizontal">
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.Submitter, htmlAttributes:new {@class = "col-md-2 control-label"})
-                        <div class="col-md-4">
-                             @Html.EditorFor(model => model.Submitter, additionalViewData:new
-                                                                            {
-                                                                                htmlAttributes = new
-                                                                                                 {
-                                                                                                     @class = "form-control",
-                                                                                                     @readonly = "readonly"
-                                                                                                 }
-                                                                            })
-                        </div>
-                        @Html.LabelFor(m => m.SubmitterTitleRole, htmlAttributes:new {@class = "col-md-2 control-label"})
-                        <div class="col-md-4">
-                             @Html.EditorFor(model => model.SubmitterTitleRole, additionalViewData:new
-                                                                            {
-                                                                                htmlAttributes = new
-                                                                                                 {
-                                                                                                     @class = "form-control",
-                                                                                                     @readonly = "readonly"
-                                                                                                 }
-                                                                            })
-                        </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Submitter, htmlAttributes:new {@class = "col-md-2 control-label"})
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.Submitter, additionalViewData:new
+                                                                                     {
+                                                                                         htmlAttributes = new
+                                                                                                          {
+                                                                                                              @class = "form-control",
+                                                                                                              @readonly = "readonly"
+                                                                                                          }
+                                                                                     })
                     </div>
+                    @Html.LabelFor(m => m.SubmitterTitleRole, htmlAttributes:new {@class = "col-md-2 control-label"})
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.SubmitterTitleRole, additionalViewData:new
+                                                                                              {
+                                                                                                  htmlAttributes = new
+                                                                                                                   {
+                                                                                                                       @class = "form-control",
+                                                                                                                       @readonly = "readonly"
+                                                                                                                   }
+                                                                                              })
+                    </div>
+                </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.SubmissionDateTimeLocal, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
                         @(Html.Kendo().DateTimePicker()
-                              .Name(componentName: "SubmissionDateTimeLocal")
+                              .Name(componentName:"SubmissionDateTimeLocal")
                               .Value(date:Model.SubmissionDateTimeLocal)
                               .Format(format:"MM/dd/yyyy hh:mm tt")
                               .Max(date:DateTime.Now)
@@ -486,7 +568,7 @@
         </div>
     }
 
-    if (Model.CanCurrentUserSubmitAndReputiate && (Model.Status == ReportStatusName.Submitted))
+    if (Model.CanCurrentUserSubmitAndReputiate && Model.Status == ReportStatusName.Submitted)
     {
         <div class="box box-primary" id="divRepudiateReport">
             <div class="box-header with-border">
@@ -500,7 +582,7 @@
             <div class="box-body form-horizontal">
                 @if (ViewBag.ShowRepudiateValidationErrorMessage != null && ViewBag.ShowRepudiateValidationErrorMessage)
                 {
-                    <div class="alert alert-dismissible alert-danger">
+                    <div class="alert alert-danger alert-dismissible">
                         <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
                         <h5>
                             <i class="fa fa-close icon"></i>
@@ -512,10 +594,10 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.RepudiationReasonId, htmlAttributes:new {@class = "col-md-4 control-label"})
                     <div class="col-md-6">
-                        @Html.DropDownList(name: "RepudiationReasonId", selectList: Model.AvailableRepudiationReasonNames, htmlAttributes: new
-                       {
-                           @class = "form-control input-sm"
-                       })
+                        @Html.DropDownList(name:"RepudiationReasonId", selectList:Model.AvailableRepudiationReasonNames, htmlAttributes:new
+                                                                                                                                        {
+                                                                                                                                            @class = "form-control input-sm"
+                                                                                                                                        })
 
                         @Html.HiddenFor(model => model.RepudiationReasonId)
                         @Html.HiddenFor(model => model.RepudiationReasonName)
@@ -527,14 +609,14 @@
                     @Html.LabelFor(m => m.RepudiationComments, htmlAttributes:new {@class = "col-md-4 control-label"})
                     <div class="col-md-6">
                         @Html.EditorFor(model => model.RepudiationComments, additionalViewData:new
-                                                                                    {
-                                                                                        htmlAttributes = new
-                                                                                                         {
-                                                                                                             @class = "form-control",
-                                                                                                             placeholder = "Enter your Comments",
-                                                                                                             rows = "3"
-                                                                                                         }
-                                                                                    })
+                                                                                               {
+                                                                                                   htmlAttributes = new
+                                                                                                                    {
+                                                                                                                        @class = "form-control",
+                                                                                                                        placeholder = "Enter your Comments",
+                                                                                                                        rows = "3"
+                                                                                                                    }
+                                                                                               })
                         @Html.ValidationMessageFor(m => m.RepudiationComments, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                     </div>
                 </div>
@@ -566,7 +648,7 @@
         </div>
     }
 
-    if ((Model.Status == ReportStatusName.Repudiated))
+    if (Model.Status == ReportStatusName.Repudiated)
     {
         <div class="box box-primary" id="divSignAndSubmitReport">
             <div class="box-header with-border">
@@ -606,7 +688,7 @@
                     @Html.LabelFor(m => m.RepudiationDateTimeLocal, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
                         @(Html.Kendo().DateTimePicker()
-                              .Name(componentName: "RepudiationDateTimeLocal")
+                              .Name(componentName:"RepudiationDateTimeLocal")
                               .Value(date:Model.RepudiationDateTimeLocal)
                               .Format(format:"MM/dd/yyyy hh:mm tt")
                               .Max(date:DateTime.Now)
@@ -621,13 +703,13 @@
                     @Html.LabelFor(m => m.RepudiationReasonName, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
                         @Html.EditorFor(model => model.RepudiationReasonName, additionalViewData:new
-                                                                                      {
-                                                                                          htmlAttributes = new
-                                                                                                           {
-                                                                                                               @class = "form-control",
-                                                                                                               @readonly = "readonly"
-                                                                                                           }
-                                                                                      })
+                                                                                                 {
+                                                                                                     htmlAttributes = new
+                                                                                                                      {
+                                                                                                                          @class = "form-control",
+                                                                                                                          @readonly = "readonly"
+                                                                                                                      }
+                                                                                                 })
                     </div>
                 </div>
                 <div class="form-group">
@@ -647,9 +729,8 @@
             </div>
         </div>
     }
-    
 
-    if (Model.IsCurrentPortalAuthority && ((Model.Status == ReportStatusName.Submitted) || (Model.Status == ReportStatusName.Repudiated)))
+    if (Model.IsCurrentPortalAuthority && (Model.Status == ReportStatusName.Submitted || Model.Status == ReportStatusName.Repudiated))
     {
         <div class="box box-primary" id="divSendToLinkoCTS">
             <div class="box-header with-border">
@@ -676,7 +757,7 @@
                     @Html.LabelFor(m => m.LastSentDateTimeLocal, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
                         @(Html.Kendo().DateTimePicker()
-                              .Name(componentName: "LastSentDateTimeLocal")
+                              .Name(componentName:"LastSentDateTimeLocal")
                               .Value(date:Model.LastSentDateTimeLocal)
                               .Format(format:"MM/dd/yyyy hh:mm tt")
                               .Max(date:DateTime.Now)
@@ -700,7 +781,7 @@
 
     <div class="box box-default" id="divFooter">
         <div class="box-body form-horizontal">
-           
+
             @if (ViewBag.ShowValidateCorMessage != null && ViewBag.ShowValidateCorMessage)
             {
                 <div class="alert alert-dismissible alert-info">
@@ -728,7 +809,7 @@
                         <input class="btn btn-primary btn-sm" data-target="#DeleteSampleModal" data-toggle="modal" type="button" value="Delete Draft" />
                         break;
                     case ReportStatusName.ReadyToSubmit:
-                        @Html.ActionLink(linkText:"Preview", actionName:"ReportPackagePreview", routeValues:new { id = Model.Id }, htmlAttributes:new { @class = "btn btn-primary btn-sm" })
+                        @Html.ActionLink(linkText:"Preview", actionName:"ReportPackagePreview", routeValues:new {id = Model.Id}, htmlAttributes:new {@class = "btn btn-primary btn-sm"})
 
                         <input type="submit" value="Enable Edit Report Package" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"EnableReportPackage", controllerName:"ReportPackage")" formmethod="post" />
 
@@ -758,33 +839,33 @@
     </div>
 
 @section Scripts {
-    @if (Model.CanCurrentUserSubmitAndReputiate && (Model.Status == ReportStatusName.Submitted))
+    @if (Model.CanCurrentUserSubmitAndReputiate && Model.Status == ReportStatusName.Submitted)
     {
         <script>
-             $(document)
-            .ready(function()
-            {
-                $("#LinkoExchangeForm")
-                    .submit(function(e)
-                    {
-                        //if (e.originalEvent.explicitOriginalTarget.id == "myButton")
-                        //{
-                        //    return true;
-                        //}
-
-                        try
+            $(document)
+                .ready(function()
+                {
+                    $("#LinkoExchangeForm")
+                        .submit(function(e)
                         {
-                            $("#RepudiationReasonName").val($("#RepudiationReasonId option:selected").text());
+                            //if (e.originalEvent.explicitOriginalTarget.id == "myButton")
+                            //{
+                            //    return true;
+                            //}
 
-                            return true;
-                        }
-                        catch (err)
-                        {
-                            alert(err);
-                            return false;
-                        }
-                    });
-            });
+                            try
+                            {
+                                $("#RepudiationReasonName").val($("#RepudiationReasonId option:selected").text());
+
+                                return true;
+                            }
+                            catch (err)
+                            {
+                                alert(err);
+                                return false;
+                            }
+                        });
+                });
         </script>
     }
 }}

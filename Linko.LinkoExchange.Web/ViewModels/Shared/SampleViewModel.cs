@@ -106,6 +106,9 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public IList<ParameterGroupViewModel> ParameterGroups { get; set; }
         public IList<ParameterViewModel> AllParameters { get; set; }
         public string CtsEventCategoryName { get; set; }
+
+        [Display(Name = " ")]
+        public bool IsAssociatedWithReportPackage { get; internal set; } // only to be used when displaying report package to show which samples are included
     }
 
     public class SampleViewModelValidator:AbstractValidator<SampleViewModel> {}

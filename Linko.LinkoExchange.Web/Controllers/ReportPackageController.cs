@@ -16,6 +16,7 @@ using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
+using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.ViewModels.ReportPackage;
@@ -43,12 +44,13 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IReportTemplateService _reportTemplateService;
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly LinkoExchangeContext _dbContext;
+        private readonly IFileStoreService _fileStoreService;
+        private readonly ISampleService _sampleService;
         private readonly IHttpContextService _httpContextService;
         private readonly IUserService _userService;
-        private readonly IFileStoreService _fileStoreService;
 
         public ReportPackageController(IAuthenticationService authenticationService, IReportPackageService reportPackageService, IReportTemplateService reportTemplateService,
-                                       LinkoExchangeContext linkoExchangeContext, IFileStoreService fileStoreService,
+                                       LinkoExchangeContext linkoExchangeContext, IFileStoreService fileStoreService, ISampleService sampleService,
                                        IHttpContextService httpContextService, IQuestionAnswerService questionAnswerService, IUserService userService)
         {
             _authenticationService = authenticationService;
@@ -57,6 +59,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _questionAnswerService = questionAnswerService;
             _dbContext = linkoExchangeContext;
             _fileStoreService = fileStoreService;
+            _sampleService = sampleService;
             _httpContextService = httpContextService;
             _userService = userService;
         }
@@ -258,6 +261,85 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"ReportPackageDetails", model:model);
         }
 
+        public ActionResult Samples_Read([DataSourceRequest] DataSourceRequest request, int reportPackageElementTypeId, ReportStatusName reportStatusName)
+        {
+            var dtos = _reportPackageService.GetSamplesForSelection(reportPackageElementTypeId:reportPackageElementTypeId);
+
+            if (reportStatusName != ReportStatusName.Draft)
+            {
+                dtos = dtos.Where(c => c.IsAssociatedWithReportPackage).ToList();
+            }
+
+            var viewModels = dtos.Select(vm => new SampleViewModel
+                                               {
+                                                   Id = vm.SampleId,
+                                                   MonitoringPointName = vm.MonitoringPointName,
+                                                   CtsEventTypeName = vm.CtsEventTypeName,
+                                                   CollectionMethodName = vm.CollectionMethodName,
+                                                   StartDateTimeLocal = vm.StartDateTimeLocal,
+                                                   EndDateTimeLocal = vm.EndDateTimeLocal,
+                                                   LabSampleIdentifier = vm.LabSampleIdentifier,
+                                                   IsAssociatedWithReportPackage = vm.IsAssociatedWithReportPackage
+                                               });
+
+            var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
+                                                                                       {
+                                                                                           vm.Id,
+                                                                                           vm.MonitoringPointName,
+                                                                                           vm.CtsEventTypeName,
+                                                                                           vm.CollectionMethodName,
+                                                                                           StartDateTimeLocal = vm.StartDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           EndDateTimeLocal = vm.EndDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           vm.LabSampleIdentifier,
+                                                                                           vm.IsAssociatedWithReportPackage
+                                                                                       });
+
+            return Json(data:result);
+        }
+
+        public ActionResult SampleResults_Read([DataSourceRequest] DataSourceRequest request, int sampleId)
+        {
+            var dto = _sampleService.GetSampleDetails(sampleId:sampleId);
+
+            var sampleresults = dto.SampleResults.Select(vm => new SampleResultViewModel
+                                                             {
+                                                                 AnalysisDateTimeLocal = vm.AnalysisDateTimeLocal,
+                                                                 AnalysisMethod = vm.AnalysisMethod,
+                                                                 EnteredMethodDetectionLimit = vm.EnteredMethodDetectionLimit,
+                                                                 Id = vm.ConcentrationSampleResultId,
+                                                                 IsApprovedEPAMethod = vm.IsApprovedEPAMethod,
+                                                                 IsCalcMassLoading = vm.IsCalcMassLoading,
+                                                                 MassLoadingSampleResultId = vm.MassLoadingSampleResultId,
+                                                                 MassLoadingQualifier = vm.MassLoadingQualifier,
+                                                                 MassLoadingUnitId = vm.MassLoadingUnitId,
+                                                                 MassLoadingUnitName = vm.MassLoadingUnitName,
+                                                                 MassLoadingValue = vm.MassLoadingValue,
+                                                                 ParameterId = vm.ParameterId,
+                                                                 ParameterName = vm.ParameterName,
+                                                                 Qualifier = vm.Qualifier,
+                                                                 UnitId = vm.UnitId,
+                                                                 Value = vm.Value,
+                                                                 UnitName = vm.UnitName
+                                                             }).ToList();
+
+            var result = sampleresults.ToDataSourceResult(request:request, selector:vm => new
+                                                                                         {
+                                                                                             vm.Id,
+                                                                                             vm.ParameterName,
+                                                                                             Value =
+                                                                                             string.IsNullOrWhiteSpace(value:vm.Value) ? $"{vm.Qualifier}" : $"{vm.Qualifier} {vm.Value} {vm.UnitName}",
+                                                                                             MassLoadingValue =
+                                                                                             string.IsNullOrWhiteSpace(value:vm.MassLoadingValue)
+                                                                                                 ? ""
+                                                                                                 : $"{vm.MassLoadingQualifier} {vm.MassLoadingValue} {vm.MassLoadingUnitName}",
+                                                                                             vm.AnalysisMethod,
+                                                                                             vm.EnteredMethodDetectionLimit,
+                                                                                             AnalysisDateTimeLocal = vm.AnalysisDateTimeLocal.ToString()
+                                                                                         });
+
+            return Json(data:result);
+        }
+
         public ActionResult Attachments_Read([DataSourceRequest] DataSourceRequest request, int reportPackageElementTypeId, ReportStatusName reportStatusName)
         {
             var dtos = _reportPackageService.GetFilesForSelection(reportPackageElementTypeId:reportPackageElementTypeId);
@@ -274,7 +356,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                    OriginalFileName = vm.OriginalFileName,
                                                    Description = vm.Description,
                                                    UploadDateTimeLocal = vm.UploadDateTimeLocal,
-                                                   UploaderUserFullName = vm.UploaderUserFullName
+                                                   UploaderUserFullName = vm.UploaderUserFullName,
+                                                   IsAssociatedWithReportPackage = vm.IsAssociatedWithReportPackage
                                                });
 
             var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
@@ -284,7 +367,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.OriginalFileName,
                                                                                            vm.Description,
                                                                                            UploadDateTimeLocal = vm.UploadDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
-                                                                                           vm.UploaderUserFullName
+                                                                                           vm.UploaderUserFullName,
+                                                                                           vm.IsAssociatedWithReportPackage
                                                                                        });
 
             return Json(data:result);

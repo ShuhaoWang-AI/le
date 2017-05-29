@@ -51,6 +51,9 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string Status => UsedByReports ? "Reported" : "Draft";
 
         public string AllowedFileExtensions { get; set; }
+
+        [Display(Name = " ")]
+        public bool IsAssociatedWithReportPackage { get; internal set; } // only to be used when displaying report package to show which samples are included
     }
 
     public class AttachmentViewModelValidator:AbstractValidator<AttachmentViewModel>
