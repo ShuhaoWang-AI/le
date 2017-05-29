@@ -1477,6 +1477,8 @@ namespace Linko.LinkoExchange.Services.Report
                 fileStoreDto.ReportPackageElementTypeId = existingFilesReportPackageElementType.ReportPackageElementTypeId;
                 fileStoreDto.IsAssociatedWithReportPackage = existingFilesReportPackageElementType
                                                             .ReportFiles.Any(rf => rf.FileStoreId == eligibleFile.FileStoreId);
+                var uploaderUser = _dbContext.Users.Single(user => user.UserProfileId == fileStoreDto.UploaderUserId);
+                fileStoreDto.UploaderUserFullName = $"{uploaderUser.FirstName} {uploaderUser.LastName}";
                 fileStoreList.Add(fileStoreDto);
             }
 
