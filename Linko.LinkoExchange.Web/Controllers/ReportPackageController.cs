@@ -20,7 +20,6 @@ using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.ViewModels.ReportPackage;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
-using Microsoft.Ajax.Utilities;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -400,28 +399,29 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     if (isValid)
                     {
-                        var failedCountPassword = (TempData[key:"FailedCountPassword"] as int?) ?? 0;
-                        var failedCountKbq = (TempData[key:"FailedCountKbq"] as int?) ?? 0;
+                        var failedCountPassword = model.FailedCountPassword;
+                        var failedCountKbq = model.FailedCountKbq;
                         var result = _authenticationService.ValidatePasswordAndKbq(password:model.Password, userQuestionAnswerId:model.QuestionAnswerId, kbqAnswer:model.Answer,
                                                                                    failedPasswordCount:failedCountPassword, failedKbqCount:failedCountKbq);
-
+                        ModelState.Remove(key:"FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
+                        ModelState.Remove(key:"FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
                         switch (result)
                         {
                             case PasswordAndKbqValidationResult.Success:
                                 break;
                             case PasswordAndKbqValidationResult.IncorrectKbqAnswer:
                                 isValid = false;
-                                TempData[key:"FailedCountKbq"] = failedCountKbq + 1;
-                                TempData[key:"FailedCountPassword"] = failedCountPassword;
+                                model.FailedCountPassword = failedCountPassword;
+                                model.FailedCountKbq = failedCountKbq + 1;
                                 ViewBag.ShowSubmissionValidationErrorMessage = true;
-                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer wrong. Please try again.";
+                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
                                 break;
                             case PasswordAndKbqValidationResult.InvalidPassword:
                                 isValid = false;
-                                TempData[key:"FailedCountKbq"] = failedCountKbq;
-                                TempData[key:"FailedCountPassword"] = failedCountPassword + 1;
+                                model.FailedCountPassword = failedCountPassword + 1;
+                                model.FailedCountKbq = failedCountKbq;
                                 ViewBag.ShowSubmissionValidationErrorMessage = true;
-                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer wrong. Please try again.";
+                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
                                 break;
                             case PasswordAndKbqValidationResult.UserLocked:
                                 return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
@@ -456,8 +456,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
-            
-            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
+
+            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id, failedCountPassword:model.FailedCountPassword, failedCountKbq:model.FailedCountKbq));
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
@@ -484,8 +484,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     if (isValid)
                     {
-                        var failedCountPassword = (TempData[key:"FailedCountPassword"] as int?) ?? 0;
-                        var failedCountKbq = (TempData[key:"FailedCountKbq"] as int?) ?? 0;
+                        var failedCountPassword = model.FailedCountPassword;
+                        var failedCountKbq = model.FailedCountKbq;
                         var result = _authenticationService.ValidatePasswordAndKbq(password:model.Password, userQuestionAnswerId:model.QuestionAnswerId, kbqAnswer:model.Answer,
                                                                                    failedPasswordCount:failedCountPassword, failedKbqCount:failedCountKbq);
 
@@ -495,17 +495,17 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 break;
                             case PasswordAndKbqValidationResult.IncorrectKbqAnswer:
                                 isValid = false;
-                                TempData[key:"FailedCountKbq"] = failedCountKbq + 1;
-                                TempData[key:"FailedCountPassword"] = failedCountPassword;
+                                model.FailedCountPassword = failedCountPassword;
+                                model.FailedCountKbq = failedCountKbq + 1;
                                 ViewBag.ShowSubmissionValidationErrorMessage = true;
-                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer wrong. Please try again.";
+                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
                                 break;
                             case PasswordAndKbqValidationResult.InvalidPassword:
                                 isValid = false;
-                                TempData[key:"FailedCountKbq"] = failedCountKbq;
-                                TempData[key:"FailedCountPassword"] = failedCountPassword + 1;
+                                model.FailedCountPassword = failedCountPassword + 1;
+                                model.FailedCountKbq = failedCountKbq;
                                 ViewBag.ShowSubmissionValidationErrorMessage = true;
-                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer wrong. Please try again.";
+                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
                                 break;
                             case PasswordAndKbqValidationResult.UserLocked:
                                 return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
@@ -541,8 +541,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
-            
-            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
+
+            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id, failedCountPassword:model.FailedCountPassword, failedCountKbq:model.FailedCountKbq));
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
@@ -621,7 +621,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return File(fileStream:fileStream, contentType:contentType, fileDownloadName:fileDownloadName);
         }
 
-        private ReportPackageViewModel PrepareReportPackageDetails(int id)
+        private ReportPackageViewModel PrepareReportPackageDetails(int id, int failedCountPassword = 0, int failedCountKbq = 0)
         {
             var viewModel = new ReportPackageViewModel();
 
@@ -682,7 +682,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 RepudiationReviewerLastName = vm.RepudiationReviewerLastName,
                                 RepudiationReviewDateTimeLocal = vm.RepudiationReviewDateTimeLocal,
                                 RepudiationReviewComments = vm.RepudiationReviewComments,
-                                CanCurrentUserSubmitAndReputiate = false
+                                CanCurrentUserSubmitAndReputiate = false,
+                                FailedCountPassword = failedCountPassword,
+                                FailedCountKbq = failedCountKbq
                             };
 
                 viewModel.IsCurrentPortalAuthority = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName).ToLower().Equals(value:"authority");

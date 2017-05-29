@@ -42,8 +42,12 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
 
         [Display(Name = "Is Submission By Signatory Required")]
         public bool IsSubmissionBySignatoryRequired { get; set; }
-        public  bool CanCurrentUserSubmitAndReputiate { get; set; }
-        public bool IsCurrentPortalAuthority { get; set;}
+
+        public bool CanCurrentUserSubmitAndReputiate { get; set; }
+        public bool IsCurrentPortalAuthority { get; set; }
+
+        public int FailedCountPassword { get; set; }
+        public int FailedCountKbq { get; set; }
 
         [ScaffoldColumn(scaffold:false)]
         public int QuestionAnswerId { get; set; }
@@ -110,6 +114,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
 
         [Display(Name = "Reason")]
         public string RepudiationReasonName { get; set; }
+
         public IList<SelectListItem> AvailableRepudiationReasonNames { get; set; }
 
         [Display(Name = "Comments")]
