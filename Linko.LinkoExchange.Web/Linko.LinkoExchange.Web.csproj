@@ -425,7 +425,6 @@
     <Content Include="Views\Authority\ReportPackageTemplates.cshtml" />
     <Content Include="Views\Authority\ReportPackageTemplateDetails.cshtml" />
     <Content Include="Views\Industry\Attachments.cshtml" />
-    <Content Include="Views\Cor\VerifyCopyOfRecord.cshtml" />
     <Content Include="Views\Industry\AttachmentDetails.cshtml" />
     <Content Include="Views\Industry\Samples.cshtml" />
     <Content Include="Views\Industry\NewSampleDetailsStep1.cshtml" />
@@ -442,7 +441,6 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\CorController.cs" />
     <Compile Include="Extensions\HtmlExtensions.cs" />
     <Compile Include="Controllers\AuthorityController.cs" />
     <Compile Include="Controllers\IndustryController.cs" />

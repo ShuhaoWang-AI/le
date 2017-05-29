@@ -1685,7 +1685,7 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     //Check ARP config "Max days after report period end date to repudiate" has not passed (UC-19 5.2.)
-                    var reportRepudiatedDays = Convert.ToInt32(_settingService.GetOrganizationSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.ReportRepudiatedDays));
+                    var reportRepudiatedDays = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.ReportRepudiatedDays));
 
                     var reportPackage = _dbContext.ReportPackages
                         .Include(rep => rep.OrganizationRegulatoryProgram)

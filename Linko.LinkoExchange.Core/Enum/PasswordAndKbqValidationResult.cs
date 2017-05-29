@@ -5,7 +5,6 @@ namespace Linko.LinkoExchange.Core.Enum
         Success,
         IncorrectKbqAnswer,
         InvalidPassword,
-        UserLocked,
-        Failed
+        UserLocked
     }
 }

@@ -1,17 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Enum;
-using Linko.LinkoExchange.Core.Resources;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.User;
@@ -44,9 +46,10 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly LinkoExchangeContext _dbContext;
         private readonly IHttpContextService _httpContextService;
         private readonly IUserService _userService;
+        private readonly IFileStoreService _fileStoreService;
 
         public ReportPackageController(IAuthenticationService authenticationService, IReportPackageService reportPackageService, IReportTemplateService reportTemplateService,
-                                       LinkoExchangeContext linkoExchangeContext,
+                                       LinkoExchangeContext linkoExchangeContext, IFileStoreService fileStoreService,
                                        IHttpContextService httpContextService, IQuestionAnswerService questionAnswerService, IUserService userService)
         {
             _authenticationService = authenticationService;
@@ -54,6 +57,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _reportTemplateService = reportTemplateService;
             _questionAnswerService = questionAnswerService;
             _dbContext = linkoExchangeContext;
+            _fileStoreService = fileStoreService;
             _httpContextService = httpContextService;
             _userService = userService;
         }
@@ -255,6 +259,38 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"ReportPackageDetails", model:model);
         }
 
+        public ActionResult Attachments_Read([DataSourceRequest] DataSourceRequest request, int reportPackageElementTypeId, ReportStatusName reportStatusName)
+        {
+            var dtos = _reportPackageService.GetFilesForSelection(reportPackageElementTypeId:reportPackageElementTypeId);
+
+            if (reportStatusName != ReportStatusName.Draft)
+            {
+                dtos = dtos.Where(c => c.IsAssociatedWithReportPackage).ToList();
+            }
+
+            var viewModels = dtos.Select(vm => new AttachmentViewModel
+                                               {
+                                                   Id = vm.FileStoreId,
+                                                   Name = vm.Name,
+                                                   OriginalFileName = vm.OriginalFileName,
+                                                   Description = vm.Description,
+                                                   UploadDateTimeLocal = vm.UploadDateTimeLocal,
+                                                   UploaderUserFullName = vm.UploaderUserFullName
+                                               });
+
+            var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
+                                                                                       {
+                                                                                           vm.Id,
+                                                                                           vm.Name,
+                                                                                           vm.OriginalFileName,
+                                                                                           vm.Description,
+                                                                                           UploadDateTimeLocal = vm.UploadDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           vm.UploaderUserFullName
+                                                                                       });
+
+            return Json(data:result);
+        }
+
         [Route(template:"{id:int}/Delete")]
         public ActionResult DeleteReportPackage(int id)
         {
@@ -345,23 +381,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route(template:"{id:int}/SignAndSubmit")]
         public ActionResult SignAndSubmit(int id, ReportPackageViewModel model)
         {
-            if (TempData[key:"FailedCount"] == null)
-            {
-                // first attempt
-                TempData[key:"FailedCount"] = 0;
-            }
-            else
-            {
-                TempData[key:"FailedCount"] = TempData[key:"FailedCount"];
-            }
-
+            var isValid = true;
             try
             {
-                var isValid = true;
-
                 if (model.IsSubmissionBySignatoryRequired)
                 {
-                    // TODO: need to verify user credential before submission and also check current user has permission to submit or not
                     if (model.Password == null || model.Password.Trim().Length == 0)
                     {
                         ModelState.AddModelError(key:"Password", errorMessage:@"Password is required.");
@@ -376,31 +400,47 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     if (isValid)
                     {
-                        var currentUserName = _httpContextService.GetClaimValue(claimType:CacheKey.UserName);
-                        var failedCount = int.Parse(s:TempData[key:"FailedCount"].ToString().IfNullOrWhiteSpace(defaultValue:"0"));
-                        var result = _authenticationService.SignInByUserName(userName:currentUserName, password:model.Password, isPersistent:false).Result;
+                        var failedCountPassword = (TempData[key:"FailedCountPassword"] as int?) ?? 0;
+                        var failedCountKbq = (TempData[key:"FailedCountKbq"] as int?) ?? 0;
+                        var result = _authenticationService.ValidatePasswordAndKbq(password:model.Password, userQuestionAnswerId:model.QuestionAnswerId, kbqAnswer:model.Answer,
+                                                                                   failedPasswordCount:failedCountPassword, failedKbqCount:failedCountKbq);
 
-                        switch (result.AutehticationResult)
+                        switch (result)
                         {
-                            case AuthenticationResult.Success:
-                                isValid = _questionAnswerService.ConfirmCorrectAnswer(userQuestionAnswerId:model.QuestionAnswerId, answer:model.Answer);
-                                if (!isValid)
-                                {
-                                    TempData[key:"FailedCount"] = failedCount + 1;
-                                    ViewBag.ShowSubmissionValidationErrorMessage = true;
-                                    ViewBag.SubmissionValidationErrorMessage = "The answer is incorrect. Please try again.";
-                                }
+                            case PasswordAndKbqValidationResult.Success:
                                 break;
-                            default:
+                            case PasswordAndKbqValidationResult.IncorrectKbqAnswer:
                                 isValid = false;
-                                TempData[key:"FailedCount"] = failedCount + 1;
+                                TempData[key:"FailedCountKbq"] = failedCountKbq + 1;
+                                TempData[key:"FailedCountPassword"] = failedCountPassword;
                                 ViewBag.ShowSubmissionValidationErrorMessage = true;
-                                ViewBag.SubmissionValidationErrorMessage = Message.InvalidLoginAttempt;
+                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer wrong. Please try again.";
                                 break;
+                            case PasswordAndKbqValidationResult.InvalidPassword:
+                                isValid = false;
+                                TempData[key:"FailedCountKbq"] = failedCountKbq;
+                                TempData[key:"FailedCountPassword"] = failedCountPassword + 1;
+                                ViewBag.ShowSubmissionValidationErrorMessage = true;
+                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer wrong. Please try again.";
+                                break;
+                            case PasswordAndKbqValidationResult.UserLocked:
+                                return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
+                            default:
+                                throw new ArgumentOutOfRangeException();
                         }
                     }
                 }
-
+            }
+            catch (RuleViolationException rve)
+            {
+                return View(viewName:"Confirmation", model:new ConfirmationViewModel
+                                                           {
+                                                               Title = "Report Package Submission Failed ",
+                                                               Message = rve.ValidationIssues[index:0].ErrorMessage
+                                                           });
+            }
+            try
+            {
                 if (isValid)
                 {
                     _reportPackageService.SignAndSubmitReportPackage(reportPackageId:id);
@@ -416,9 +456,101 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
-
-            TempData.Keep(key:"FailedCount");
+            
             return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"{id:int}/RepudiateReport")]
+        public ActionResult RepudiateReport(int id, ReportPackageViewModel model)
+        {
+            var isValid = true;
+            try
+            {
+                if (model.IsSubmissionBySignatoryRequired)
+                {
+                    if (model.Password == null || model.Password.Trim().Length == 0)
+                    {
+                        ModelState.AddModelError(key:"Password", errorMessage:@"Password is required.");
+                        isValid = false;
+                    }
+
+                    if (model.Answer == null || model.Answer.Trim().Length == 0)
+                    {
+                        ModelState.AddModelError(key:"Answer", errorMessage:@"KBQ answer is required.");
+                        isValid = false;
+                    }
+
+                    if (isValid)
+                    {
+                        var failedCountPassword = (TempData[key:"FailedCountPassword"] as int?) ?? 0;
+                        var failedCountKbq = (TempData[key:"FailedCountKbq"] as int?) ?? 0;
+                        var result = _authenticationService.ValidatePasswordAndKbq(password:model.Password, userQuestionAnswerId:model.QuestionAnswerId, kbqAnswer:model.Answer,
+                                                                                   failedPasswordCount:failedCountPassword, failedKbqCount:failedCountKbq);
+
+                        switch (result)
+                        {
+                            case PasswordAndKbqValidationResult.Success:
+                                break;
+                            case PasswordAndKbqValidationResult.IncorrectKbqAnswer:
+                                isValid = false;
+                                TempData[key:"FailedCountKbq"] = failedCountKbq + 1;
+                                TempData[key:"FailedCountPassword"] = failedCountPassword;
+                                ViewBag.ShowSubmissionValidationErrorMessage = true;
+                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer wrong. Please try again.";
+                                break;
+                            case PasswordAndKbqValidationResult.InvalidPassword:
+                                isValid = false;
+                                TempData[key:"FailedCountKbq"] = failedCountKbq;
+                                TempData[key:"FailedCountPassword"] = failedCountPassword + 1;
+                                ViewBag.ShowSubmissionValidationErrorMessage = true;
+                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer wrong. Please try again.";
+                                break;
+                            case PasswordAndKbqValidationResult.UserLocked:
+                                return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                return View(viewName:"Confirmation", model:new ConfirmationViewModel
+                                                           {
+                                                               Title = "Report Package Repudiation Failed ",
+                                                               Message = rve.ValidationIssues[index:0].ErrorMessage
+                                                           });
+            }
+            try
+            {
+                if (isValid)
+                {
+                    _reportPackageService.RepudiateReport(reportPackageId:id, repudiationReasonId:model.RepudiationReasonId ?? 0, repudiationReasonName:model.RepudiationReasonName,
+                                                          comments:model.RepudiationComments);
+
+                    return View(viewName:"Confirmation", model:new ConfirmationViewModel
+                                                               {
+                                                                   Title = "Report Package Repudiation Confirmation ",
+                                                                   Message = "Report package repudiated successfully."
+                                                               });
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+            
+            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"{id:int}/SendToLinkoCts")]
+        public ActionResult SendToLinkoCts(int id, ReportPackageViewModel model)
+        {
+            throw new NotImplementedException();
         }
 
         [Route(template:"{id:int}/Details/Preview")]
@@ -479,6 +611,16 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
         }
 
+        public ActionResult DownloadAttachment(int id)
+        {
+            var fileStore = _fileStoreService.GetFileStoreById(fileStoreId:id, includingFileData:true);
+            var fileDownloadName = fileStore.Name;
+            var contentType = $"application/${fileStore.MediaType}";
+            var fileStream = new MemoryStream(buffer:fileStore.Data) {Position = 0};
+
+            return File(fileStream:fileStream, contentType:contentType, fileDownloadName:fileDownloadName);
+        }
+
         private ReportPackageViewModel PrepareReportPackageDetails(int id)
         {
             var viewModel = new ReportPackageViewModel();
@@ -503,27 +645,54 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 Comments = vm.Comments,
                                 SamplesAndResultsTypes = vm.SamplesAndResultsTypes?.Select(t => new ReportElementTypeViewModel
                                                                                                 {
-                                                                                                    Id = t.ReportElementTypeId,
+                                                                                                    Id = t.ReportPackageElementTypeId,
                                                                                                     Name = t.ReportElementTypeName
                                                                                                 }).ToList(),
                                 AttachmentTypes = vm.AttachmentTypes?.Select(t => new ReportElementTypeViewModel
                                                                                   {
-                                                                                      Id = t.ReportElementTypeId,
+                                                                                      Id = t.ReportPackageElementTypeId,
                                                                                       Name = t.ReportElementTypeName
                                                                                   }).ToList(),
                                 CertificationTypes = vm.CertificationTypes?.Select(t => new ReportElementTypeViewModel
                                                                                         {
-                                                                                            Id = t.ReportElementTypeId,
+                                                                                            Id = t.ReportPackageElementTypeId,
                                                                                             Name = t.ReportElementTypeName,
                                                                                             Content = t.ReportElementTypeContent
                                                                                         }).ToList(),
-                                IsSubmissionBySignatoryRequired = vm.IsSubmissionBySignatoryRequired
+                                IsSubmissionBySignatoryRequired = vm.IsSubmissionBySignatoryRequired,
+                                SubmitterFirstName = vm.SubmitterFirstName,
+                                SubmitterLastName = vm.SubmitterLastName,
+                                SubmissionDateTimeLocal = vm.SubmissionDateTimeLocal,
+                                SubmitterTitleRole = vm.SubmitterTitleRole,
+                                SubmissionReviewerFirstName = vm.SubmissionReviewerFirstName,
+                                SubmissionReviewerLastName = vm.SubmissionReviewerLastName,
+                                SubmissionReviewComments = vm.SubmissionReviewComments,
+                                SubmissionReviewDateTimeLocal = vm.SubmissionReviewDateTimeLocal,
+                                LastSenderFirstName = vm.LastSenderFirstName,
+                                LastSenderLastName = vm.LastSenderLastName,
+                                LastSentDateTimeLocal = vm.LastSentDateTimeLocal,
+                                RepudiatorFirstName = vm.RepudiatorFirstName,
+                                RepudiatorLastName = vm.RepudiatorLastName,
+                                RepudiatorTitleRole = vm.RepudiatorTitleRole,
+                                RepudiationDateTimeLocal = vm.RepudiationDateTimeLocal,
+                                RepudiationReasonId = vm.RepudiationReasonId,
+                                RepudiationReasonName = vm.RepudiationReasonName,
+                                RepudiationComments = vm.RepudiationComments,
+                                RepudiationReviewerFirstName = vm.RepudiationReviewerFirstName,
+                                RepudiationReviewerLastName = vm.RepudiationReviewerLastName,
+                                RepudiationReviewDateTimeLocal = vm.RepudiationReviewDateTimeLocal,
+                                RepudiationReviewComments = vm.RepudiationReviewComments,
+                                CanCurrentUserSubmitAndReputiate = false
                             };
 
-                if (viewModel.Status == ReportStatusName.ReadyToSubmit)
+                viewModel.IsCurrentPortalAuthority = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName).ToLower().Equals(value:"authority");
+
+                if (!viewModel.IsCurrentPortalAuthority && (viewModel.Status == ReportStatusName.ReadyToSubmit || viewModel.Status == ReportStatusName.Submitted))
                 {
                     var currentOrganizationRegulatoryProgramUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramUserId));
-                    viewModel.IsCurrentUserSignatory = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:currentOrganizationRegulatoryProgramUserId).IsSignatory;
+                    var isCurrentUserSignatory = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:currentOrganizationRegulatoryProgramUserId).IsSignatory;
+
+                    viewModel.CanCurrentUserSubmitAndReputiate = !viewModel.IsSubmissionBySignatoryRequired || viewModel.IsSubmissionBySignatoryRequired && isCurrentUserSignatory;
 
                     var currentUserProfileId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
                     var userQuestion = _questionAnswerService.GetRandomQuestionAnswerFromUserProfileId(userProfileId:currentUserProfileId, questionType:QuestionTypeName.KBQ);
@@ -532,6 +701,16 @@ namespace Linko.LinkoExchange.Web.Controllers
                     viewModel.Question = userQuestion.Question.Content;
                     viewModel.Answer = "";
                     viewModel.Password = "";
+
+                    if (viewModel.Status == ReportStatusName.Submitted)
+                    {
+                        var repudiationReasons = _reportPackageService.GetRepudiationReasons();
+                        viewModel.AvailableRepudiationReasonNames = repudiationReasons.Select(c => new SelectListItem
+                                                                                                   {
+                                                                                                       Text = c.Name,
+                                                                                                       Value = c.RepudiationReasonId.ToString()
+                                                                                                   }).OrderBy(c => c.Text).ToList();
+                    }
                 }
             }
             catch (RuleViolationException rve)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 using FluentValidation;
 using FluentValidation.Attributes;
 using Linko.LinkoExchange.Core.Enum;
@@ -41,8 +42,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
 
         [Display(Name = "Is Submission By Signatory Required")]
         public bool IsSubmissionBySignatoryRequired { get; set; }
-
-        public bool IsCurrentUserSignatory { get; set; } // need to check current user has signatory right or not before submit report
+        public  bool CanCurrentUserSubmitAndReputiate { get; set; }
+        public bool IsCurrentPortalAuthority { get; set;}
 
         [ScaffoldColumn(scaffold:false)]
         public int QuestionAnswerId { get; set; }
@@ -89,6 +90,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
         public string SubmissionReviewer => $"{SubmissionReviewerFirstName} {SubmissionReviewerLastName}";
 
         [Display(Name = "Comments")]
+        [DataType(dataType:DataType.MultilineText)]
         public string SubmissionReviewComments { get; set; }
 
         [Display(Name = "Repudiated")]
@@ -108,8 +110,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
 
         [Display(Name = "Reason")]
         public string RepudiationReasonName { get; set; }
+        public IList<SelectListItem> AvailableRepudiationReasonNames { get; set; }
 
         [Display(Name = "Comments")]
+        [DataType(dataType:DataType.MultilineText)]
         public string RepudiationComments { get; set; }
 
         [Display(Name = "Last Reviewed")]
@@ -122,6 +126,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
         public string RepudiationReviewer => $"{RepudiationReviewerFirstName} {RepudiationReviewerLastName}";
 
         [Display(Name = "Comments")]
+        [DataType(dataType:DataType.MultilineText)]
         public string RepudiationReviewComments { get; set; }
 
         [Display(Name = "Last Sent to CTS")]

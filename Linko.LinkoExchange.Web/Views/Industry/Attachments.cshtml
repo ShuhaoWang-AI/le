@@ -84,10 +84,7 @@
                                                               sort.Add(memberName:"UploadDateTimeLocal").Descending();
                                                               sort.Add(memberName:"Name").Ascending();
                                                           }) // <-- initial sort expression
-                                                    .Read(read => read.Action(actionName:"Attachments_Read", controllerName:"Industry", routeValues:new
-                                                                                                                                                    {
-                                                                                                                                                        categoryName = ReportElementCategoryName.Attachments
-                                                                                                                                                    }))
+                                                    .Read(read => read.Action(actionName:"Attachments_Read", controllerName:"Industry"))
                                                     .PageSize(pageSize:15)
                                                     .Events(events => events.Error(handler:"error_handler"))
                       )

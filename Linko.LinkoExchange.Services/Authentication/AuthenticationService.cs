@@ -1033,13 +1033,13 @@ namespace Linko.LinkoExchange.Services.Authentication
             return Task.FromResult(signInResultDto);
         }
 
-        public PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int kbqId, string kbqAnswer, int failedPasswordCount, int failedKbqCount)
+        public PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount)
         {
             _logger.Info($"Enter AuthenticationService.PasswordAndKbqValidationResult");
 
             var userProfileId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.UserProfileId));
-            var orgRegProgId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
-            var authority = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId: orgRegProgId);
+            var orgRegProgramId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
+            var authority = _settingService.GetAuthority(orgRegProgramId: orgRegProgramId);
             var authoritySettings = _settingService.GetOrganizationSettingsById(organizationId: authority.OrganizationId).Settings;
             var failedPasswordAttemptMaxCount = ValueParser.TryParseInt(authoritySettings.Where(s => s.TemplateName.Equals(obj: SettingType.FailedPasswordAttemptMaxCount)).Select(s => s.Value).First(), 3);
             var failedKbqAttemptMaxCount = ValueParser.TryParseInt(authoritySettings.Where(s => s.TemplateName.Equals(obj: SettingType.FailedKBQAttemptMaxCount)).Select(s => s.Value).First(), 3);
@@ -1056,7 +1056,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return PasswordAndKbqValidationResult.InvalidPassword;
             }
 
-            if (!_questionAnswerService.ConfirmCorrectAnswer(kbqId, kbqAnswer.ToLower()))
+            if (!_questionAnswerService.ConfirmCorrectAnswer(userQuestionAnswerId, kbqAnswer.ToLower()))
             {
                 if (failedKbqAttemptMaxCount <= failedKbqCount + 1)
                 {
@@ -1097,7 +1097,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             // 2: is not disabled, 
             // 3: have access to the regulatory program
             var programUser = _dbContext.OrganizationRegulatoryProgramUsers
-                             .FirstOrDefault(i => i.UserProfileId == userProfileId && i.OrganizationRegulatoryProgramId == orgRegProgId);
+                             .FirstOrDefault(i => i.UserProfileId == userProfileId && i.OrganizationRegulatoryProgramId == orgRegProgramId);
 
             if (programUser == null || programUser.IsRegistrationApproved == false || programUser.IsRegistrationDenied || programUser.IsRemoved)
             {

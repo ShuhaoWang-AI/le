@@ -12,12 +12,12 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// Validate KBQ answer and password
         /// </summary>
         /// <param name="password">The password user input</param>
-        /// <param name="kbqId">The KBQ question Id</param>
+        /// <param name="userQuestionAnswerId">The KBQ question Id</param>
         /// <param name="kbqAnswer">The KBQ question answer</param>
         /// <param name="failedPasswordCount">Failed password count</param>
         /// <param name="failedKbqCount">Failed KBQ answer count</param>
         /// <returns></returns>
-        PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int kbqId, string kbqAnswer, int failedPasswordCount, int failedKbqCount);
+        PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount);
         /// <summary>
         /// Register a new user
         /// </summary>
