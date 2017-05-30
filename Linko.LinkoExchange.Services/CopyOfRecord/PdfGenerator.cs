@@ -155,8 +155,8 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 {
                     row = attachmentFilesTable.Rows.Add();
                     row.DefaultCellTextState = titleSize8;
-                    row.Cells.Add(attachedFile.Name);
                     row.Cells.Add(attachedFile.OriginalFileName);
+                    row.Cells.Add(attachedFile.Name);
                     row.Cells.Add(attachedFile.ReportElementTypeName);
                 }
             }
