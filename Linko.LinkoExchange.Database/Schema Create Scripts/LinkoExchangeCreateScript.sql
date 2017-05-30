@@ -187,6 +187,31 @@ BEGIN
 END
 GO
 
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tTermCondition') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tTermCondition'
+    PRINT '---------------------'
+
+    CREATE TABLE dbo.tTermCondition 
+    (
+        TermConditionId                 int IDENTITY(1,1) NOT NULL  
+        , Content                       varchar(max) NOT NULL
+		, CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
+        , LastModifierUserId            int NULL  
+    
+        CONSTRAINT PK_tTermCondition PRIMARY KEY CLUSTERED 
+        (
+	       TermConditionId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+    ) ON [LinkoExchange_FG1_Data]
+    
+    ALTER TABLE dbo.tTermCondition ADD CONSTRAINT DF_tTermCondition_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
+END
+GO
+
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tUserProfile') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
 BEGIN
 	PRINT CHAR(13)
@@ -211,7 +236,8 @@ BEGIN
         , IsAccountResetRequired        bit NOT NULL  
         , IsIdentityProofed             bit NOT NULL  
         , IsInternalAccount             bit NOT NULL  
-        , OldEmailAddress               nvarchar(256) NULL  
+        , OldEmailAddress               nvarchar(256) NULL
+        , TermConditionId               int NOT NULL  
         , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
         , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
         , Id                            nvarchar(128) NOT NULL  
@@ -239,6 +265,10 @@ BEGIN
 		(
 			JurisdictionId
 		) REFERENCES dbo.tJurisdiction(JurisdictionId)
+        , CONSTRAINT FK_tUserProfile_tTermCondition FOREIGN KEY 
+		(
+			TermConditionId
+		) REFERENCES dbo.tTermCondition(TermConditionId)
         , CONSTRAINT AK_tUserProfile_Email UNIQUE 
         (
             Email ASC
@@ -258,6 +288,11 @@ BEGIN
     CREATE NONCLUSTERED INDEX IX_tUserProfile_JurisdictionId ON dbo.tUserProfile 
     (
 	    JurisdictionId ASC
+    ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+
+    CREATE NONCLUSTERED INDEX IX_tUserProfile_TermConditionId ON dbo.tUserProfile 
+    (
+	    TermConditionId ASC
     ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
 END
 GO
