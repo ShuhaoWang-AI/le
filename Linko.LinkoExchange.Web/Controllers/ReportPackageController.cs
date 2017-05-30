@@ -662,6 +662,59 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
+        [Route(template:"{id:int}/ReviewSubmission")]
+        public ActionResult ReviewSubmission(int id, ReportPackageViewModel model)
+        {
+            try
+            {
+                _reportPackageService.ReviewSubmission(reportPackageId:id, comments:model.SubmissionReviewComments);
+
+                TempData[key:"ShowSuccessMessage"] = true;
+                TempData[key:"SuccessMessage"] = "Report Package submission review completed successfully!";
+
+                ModelState.Clear();
+                return RedirectToAction(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id});
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
+        [Route(template:"{id:int}/ReviewRepudiation")]
+        public ActionResult ReviewRepudiation(int id, ReportPackageViewModel model)
+        {
+            try
+            {
+                if (model.RepudiationReviewComments == null || model.RepudiationReviewComments.Trim().Length == 0)
+                {
+                    ModelState.AddModelError(key:"RepudiationReviewComments", errorMessage:@"Repudiation review comments is required.");
+                }
+                else
+                {
+                    _reportPackageService.ReviewRepudiation(reportPackageId:id, comments:model.RepudiationReviewComments);
+
+                    TempData[key:"ShowSuccessMessage"] = true;
+                    TempData[key:"SuccessMessage"] = "Report Package repudiation review completed successfully!";
+
+                    ModelState.Clear();
+                    return RedirectToAction(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id});
+                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+            }
+
+            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
+        }
+
+        [AcceptVerbs(verbs:HttpVerbs.Post)]
+        [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/SendToLinkoCts")]
         public ActionResult SendToLinkoCts(int id, ReportPackageViewModel model)
         {

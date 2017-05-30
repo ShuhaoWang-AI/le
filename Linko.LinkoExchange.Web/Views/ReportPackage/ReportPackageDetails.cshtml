@@ -650,6 +650,97 @@
         </div>
     }
 
+    if (Model.IsCurrentPortalAuthority && (Model.Status == ReportStatusName.Submitted || Model.Status == ReportStatusName.Repudiated))
+    {
+        <div class="box box-primary" id="divSignAndSubmitReport">
+            <div class="box-header with-border">
+                <h3 class="box-title">Submission Review</h3>
+                <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body form-horizontal">
+                @if (Model.SubmissionReviewDateTimeLocal.HasValue)
+                {
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.SubmissionReviewer, htmlAttributes:new {@class = "col-md-2 control-label"})
+                        <div class="col-md-4">
+                            @Html.EditorFor(model => model.SubmissionReviewer, additionalViewData:new
+                                                                                                  {
+                                                                                                      htmlAttributes = new
+                                                                                                                       {
+                                                                                                                           @class = "form-control",
+                                                                                                                           @readonly = "readonly"
+                                                                                                                       }
+                                                                                                  })
+                        </div>
+                        @Html.LabelFor(m => m.SubmissionReviewDateTimeLocal, htmlAttributes:new {@class = "col-md-2 control-label"})
+                        <div class="col-md-4">
+                            @(Html.Kendo().DateTimePicker()
+                                  .Name(componentName:"SubmissionReviewDateTimeLocal")
+                                  .Value(date:Model.LastSentDateTimeLocal)
+                                  .Format(format:"MM/dd/yyyy hh:mm tt")
+                                  .Max(date:DateTime.Now)
+                                  .HtmlAttributes(attributes:new
+                                                             {
+                                                                 @readonly = true,
+                                                                 style = "width:210px;"
+                                                             }))
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.SubmissionReviewComments, htmlAttributes:new
+                                                                                       {
+                                                                                           @class = "col-md-2 control-label"
+                                                                                       })
+                        <div class="col-md-4">
+                            @Html.EditorFor(model => model.SubmissionReviewComments, additionalViewData:new
+                                                                                                        {
+                                                                                                            htmlAttributes = new
+                                                                                                                             {
+                                                                                                                                 @class = "form-control",
+                                                                                                                                 @readonly = "readonly",
+                                                                                                                                 rows = "3"
+                                                                                                                             }
+                                                                                                        })
+
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.SubmissionReviewComments, htmlAttributes:new
+                                                                                  {
+                                                                                      @class = "col-md-2 control-label"
+                                                                                  })
+                        <div class="col-md-4">
+                            @Html.EditorFor(model => model.SubmissionReviewComments, additionalViewData:new
+                                                                                                   {
+                                                                                                       htmlAttributes = new
+                                                                                                                        {
+                                                                                                                            @class = "form-control",
+                                                                                                                            rows = "3"
+                                                                                                                        }
+                                                                                                   })
+
+                        </div>
+                    </div>
+                }
+            </div>
+            @if (!Model.SubmissionReviewDateTimeLocal.HasValue)
+            {
+                <div class="box-footer">
+                    <div class="form-group pull-right">
+                        <input type="submit" value="Submission Review Complete" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ReviewSubmission", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
     if (Model.Status == ReportStatusName.Repudiated)
     {
         <div class="box box-primary" id="divSignAndSubmitReport">
@@ -732,6 +823,97 @@
         </div>
     }
 
+    if (Model.IsCurrentPortalAuthority && Model.Status == ReportStatusName.Repudiated)
+    {
+        <div class="box box-primary" id="divSignAndSubmitReport">
+            <div class="box-header with-border">
+                <h3 class="box-title">Repudiation Review</h3>
+                <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body form-horizontal">
+                @if (Model.RepudiationReviewDateTimeLocal.HasValue)
+                {
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RepudiationReviewer, htmlAttributes:new {@class = "col-md-2 control-label"})
+                        <div class="col-md-4">
+                            @Html.EditorFor(model => model.RepudiationReviewer, additionalViewData:new
+                                                                                                  {
+                                                                                                      htmlAttributes = new
+                                                                                                                       {
+                                                                                                                           @class = "form-control",
+                                                                                                                           @readonly = "readonly"
+                                                                                                                       }
+                                                                                                  })
+                        </div>
+                        @Html.LabelFor(m => m.RepudiationReviewDateTimeLocal, htmlAttributes:new {@class = "col-md-2 control-label"})
+                        <div class="col-md-4">
+                            @(Html.Kendo().DateTimePicker()
+                                  .Name(componentName:"RepudiationReviewDateTimeLocal")
+                                  .Value(date:Model.LastSentDateTimeLocal)
+                                  .Format(format:"MM/dd/yyyy hh:mm tt")
+                                  .Max(date:DateTime.Now)
+                                  .HtmlAttributes(attributes:new
+                                                             {
+                                                                 @readonly = true,
+                                                                 style = "width:210px;"
+                                                             }))
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RepudiationReviewComments, htmlAttributes:new
+                                                                                       {
+                                                                                           @class = "col-md-2 control-label"
+                                                                                       })
+                        <div class="col-md-4">
+                            @Html.EditorFor(model => model.RepudiationReviewComments, additionalViewData:new
+                                                                                                        {
+                                                                                                            htmlAttributes = new
+                                                                                                                             {
+                                                                                                                                 @class = "form-control",
+                                                                                                                                 @readonly = "readonly",
+                                                                                                                                 rows = "3"
+                                                                                                                             }
+                                                                                                        })
+
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RepudiationReviewComments, htmlAttributes:new
+                                                                                  {
+                                                                                      @class = "col-md-2 control-label required"
+                                                                                  })
+                        <div class="col-md-4">
+                            @Html.EditorFor(model => model.RepudiationReviewComments, additionalViewData:new
+                                                                                                   {
+                                                                                                       htmlAttributes = new
+                                                                                                                        {
+                                                                                                                            @class = "form-control",
+                                                                                                                            rows = "3"
+                                                                                                                        }
+                                                                                                   })
+
+                        </div>
+                    </div>
+                }
+            </div>
+            @if (!Model.RepudiationReviewDateTimeLocal.HasValue)
+            {
+                <div class="box-footer">
+                    <div class="form-group pull-right">
+                        <input type="submit" value="Repudiation Review Complete" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ReviewRepudiation", controllerName:"ReportPackage", routeValues:new {id = Model.Id})" formmethod="post" />
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
     if (Model.IsCurrentPortalAuthority && (Model.Status == ReportStatusName.Submitted || Model.Status == ReportStatusName.Repudiated))
     {
         <div class="box box-primary" id="divSendToLinkoCTS">
@@ -779,6 +961,7 @@
             </div>
         </div>
     }
+
     // Buttons
 
     <div class="box box-default" id="divFooter">
