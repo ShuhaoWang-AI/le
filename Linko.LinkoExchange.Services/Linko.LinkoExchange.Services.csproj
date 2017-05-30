@@ -228,6 +228,7 @@
     <Compile Include="QuestionAnswer\StringCipher.cs" />
     <Compile Include="Report\IReportElementService.cs" />
     <Compile Include="Report\ReportPackageService.cs" />
+    <Compile Include="Report\ReportPackageStatusCount.cs" />
     <Compile Include="Report\ReportTemplateService.cs" />
     <Compile Include="Sample\ISampleService.cs" />
     <Compile Include="Sample\SampleService.cs" />

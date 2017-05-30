@@ -110,6 +110,14 @@ namespace Linko.LinkoExchange.Services.Report
         ReportPackageElementTypeDto GetReportReportPackageElementType(int reportPackageElementTypeId);
 
         /// <summary>
+        /// Get counts for different report package status 
+        ///  1. Authority portal: return new submitted report package count and new repudiation report package count
+        ///  2. Industry portal: return draft count, and ready to submit report package count
+        /// </summary>
+        /// <returns></returns>
+        List<ReportPackageStatusCount> GetReportPackageStatusCounts();
+
+        /// <summary>
         ///     Gets Report Package information (without children element data) for displaying in a grid.
         /// </summary>
         /// <param name="reportStatusName">Fetches report packages of this status only</param>

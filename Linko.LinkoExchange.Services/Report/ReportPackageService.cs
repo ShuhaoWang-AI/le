@@ -1543,6 +1543,64 @@ namespace Linko.LinkoExchange.Services.Report
             return dto;
         }
 
+        public List<ReportPackageStatusCount> GetReportPackageStatusCounts()
+        {
+            _logger.Info($"Enter ReportPackageService.GetReportPackageStatusCounts.");
+
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var currentOrganizationId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationId));
+            var currentRegulatoryProgramId = _dbContext.OrganizationRegulatoryPrograms
+                .Single(orp => orp.OrganizationRegulatoryProgramId == currentOrgRegProgramId)
+                .RegulatoryProgramId;
+
+            var rptStatusCounts = new List<ReportPackageStatusCount>();
+
+            var isAuthorityViewing = _httpContextService.GetClaimValue(CacheKey.PortalName).ToLower().Equals("authority");
+
+            var reportPackages = _dbContext.ReportPackages
+                .Include(rp => rp.ReportStatus)
+                .Include(rp => rp.OrganizationRegulatoryProgram);
+
+            if (isAuthorityViewing)
+            {
+                // For authority, return submitted pending review count and repudiation pending review count
+                var submittedPendingReview = new ReportPackageStatusCount { Status = ReportStatusName.SubmittedPendingReview };
+                var repudiationRendingReview = new ReportPackageStatusCount { Status = ReportStatusName.RepudiatedPendingReview };
+
+                reportPackages = reportPackages
+                     .Where(rp => rp.OrganizationRegulatoryProgram.RegulatorOrganizationId == currentOrganizationId
+                     && rp.OrganizationRegulatoryProgram.RegulatoryProgramId == currentRegulatoryProgramId);
+
+                submittedPendingReview.Count = reportPackages.Count(rp => rp.ReportStatus.Name == ReportStatusName.Submitted.ToString()
+                        && rp.SubmissionReviewDateTimeUtc == null);
+
+                repudiationRendingReview.Count = reportPackages
+                    .Count(rp => rp.ReportStatus.Name == ReportStatusName.Repudiated.ToString()
+                        && rp.RepudiationReviewDateTimeUtc == null);
+
+                rptStatusCounts.Add(submittedPendingReview);
+                rptStatusCounts.Add(repudiationRendingReview);
+            }
+            else
+            {
+                // For industry portal, return daft count and ready to submit count
+                var draftCount = new ReportPackageStatusCount { Status = ReportStatusName.Draft };
+                var readyToSubmitCount = new ReportPackageStatusCount { Status = ReportStatusName.ReadyToSubmit };
+
+                reportPackages = reportPackages
+                    .Where(rp => rp.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                draftCount.Count = reportPackages.Count(i => i.ReportStatus.Name == ReportStatusName.Draft.ToString());
+                readyToSubmitCount.Count = reportPackages.Count(i => i.ReportStatus.Name == ReportStatusName.ReadyToSubmit.ToString());
+
+                rptStatusCounts.Add(draftCount);
+                rptStatusCounts.Add(readyToSubmitCount);
+            }
+
+            _logger.Info($"Enter ReportPackageService.GetReportPackageStatusCounts.");
+            return rptStatusCounts;
+        }
+
         /// <summary>
         /// Gets Report Package information (without children element data) for displaying in a grid.
         /// </summary>
