@@ -713,18 +713,18 @@
                 {
                     <div class="form-group">
                         @Html.LabelFor(m => m.SubmissionReviewComments, htmlAttributes:new
-                                                                                  {
-                                                                                      @class = "col-md-2 control-label"
-                                                                                  })
+                                                                                       {
+                                                                                           @class = "col-md-2 control-label"
+                                                                                       })
                         <div class="col-md-4">
                             @Html.EditorFor(model => model.SubmissionReviewComments, additionalViewData:new
-                                                                                                   {
-                                                                                                       htmlAttributes = new
-                                                                                                                        {
-                                                                                                                            @class = "form-control",
-                                                                                                                            rows = "3"
-                                                                                                                        }
-                                                                                                   })
+                                                                                                        {
+                                                                                                            htmlAttributes = new
+                                                                                                                             {
+                                                                                                                                 @class = "form-control",
+                                                                                                                                 rows = "3"
+                                                                                                                             }
+                                                                                                        })
 
                         </div>
                     </div>
@@ -841,13 +841,13 @@
                         @Html.LabelFor(m => m.RepudiationReviewer, htmlAttributes:new {@class = "col-md-2 control-label"})
                         <div class="col-md-4">
                             @Html.EditorFor(model => model.RepudiationReviewer, additionalViewData:new
-                                                                                                  {
-                                                                                                      htmlAttributes = new
-                                                                                                                       {
-                                                                                                                           @class = "form-control",
-                                                                                                                           @readonly = "readonly"
-                                                                                                                       }
-                                                                                                  })
+                                                                                                   {
+                                                                                                       htmlAttributes = new
+                                                                                                                        {
+                                                                                                                            @class = "form-control",
+                                                                                                                            @readonly = "readonly"
+                                                                                                                        }
+                                                                                                   })
                         </div>
                         @Html.LabelFor(m => m.RepudiationReviewDateTimeLocal, htmlAttributes:new {@class = "col-md-2 control-label"})
                         <div class="col-md-4">
@@ -865,19 +865,19 @@
                     </div>
                     <div class="form-group">
                         @Html.LabelFor(m => m.RepudiationReviewComments, htmlAttributes:new
-                                                                                       {
-                                                                                           @class = "col-md-2 control-label"
-                                                                                       })
+                                                                                        {
+                                                                                            @class = "col-md-2 control-label"
+                                                                                        })
                         <div class="col-md-4">
                             @Html.EditorFor(model => model.RepudiationReviewComments, additionalViewData:new
-                                                                                                        {
-                                                                                                            htmlAttributes = new
-                                                                                                                             {
-                                                                                                                                 @class = "form-control",
-                                                                                                                                 @readonly = "readonly",
-                                                                                                                                 rows = "3"
-                                                                                                                             }
-                                                                                                        })
+                                                                                                         {
+                                                                                                             htmlAttributes = new
+                                                                                                                              {
+                                                                                                                                  @class = "form-control",
+                                                                                                                                  @readonly = "readonly",
+                                                                                                                                  rows = "3"
+                                                                                                                              }
+                                                                                                         })
 
                         </div>
                     </div>
@@ -886,18 +886,19 @@
                 {
                     <div class="form-group">
                         @Html.LabelFor(m => m.RepudiationReviewComments, htmlAttributes:new
-                                                                                  {
-                                                                                      @class = "col-md-2 control-label required"
-                                                                                  })
+                                                                                        {
+                                                                                            @class = "col-md-2 control-label required"
+                                                                                        })
                         <div class="col-md-4">
                             @Html.EditorFor(model => model.RepudiationReviewComments, additionalViewData:new
-                                                                                                   {
-                                                                                                       htmlAttributes = new
-                                                                                                                        {
-                                                                                                                            @class = "form-control",
-                                                                                                                            rows = "3"
-                                                                                                                        }
-                                                                                                   })
+                                                                                                         {
+                                                                                                             htmlAttributes = new
+                                                                                                                              {
+                                                                                                                                  @class = "form-control",
+                                                                                                                                  rows = "3"
+                                                                                                                              }
+                                                                                                         })
+                            @Html.ValidationMessageFor(m => m.RepudiationReviewComments, validationMessage:"", htmlAttributes:new {@class = "text-red"})
 
                         </div>
                     </div>
