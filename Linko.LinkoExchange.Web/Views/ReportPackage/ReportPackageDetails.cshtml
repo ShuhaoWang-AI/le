@@ -102,6 +102,8 @@
                 @Html.HiddenFor(model => model.IsSubmissionBySignatoryRequired)
                 @Html.HiddenFor(model => model.FailedCountPassword)
                 @Html.HiddenFor(model => model.FailedCountKbq)
+                @Html.Hidden(name:"SelectedSamples")
+                @Html.Hidden(name:"SelectedAttachments")
 
             </div>
             <div class="form-group">
@@ -285,10 +287,10 @@
                                   .Columns(columns =>
                                            {
                                                columns.Bound(c => c.ParameterName);
-                                               columns.Bound(c => c.Value).HtmlAttributes(attributes:new { align = "right" });
-                                               columns.Bound(c => c.MassLoadingValue).HtmlAttributes(attributes:new { align = "right" });
+                                               columns.Bound(c => c.Value).HtmlAttributes(attributes:new {align = "right"});
+                                               columns.Bound(c => c.MassLoadingValue).HtmlAttributes(attributes:new {align = "right"});
                                                columns.Bound(c => c.AnalysisMethod);
-                                               columns.Bound(c => c.EnteredMethodDetectionLimit).HtmlAttributes(attributes:new { align = "right" });
+                                               columns.Bound(c => c.EnteredMethodDetectionLimit).HtmlAttributes(attributes:new {align = "right"});
                                                columns.Bound(c => c.AnalysisDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}");
                                            })
                                   .Pageable()
@@ -848,14 +850,96 @@
                     $("#LinkoExchangeForm")
                         .submit(function(e)
                         {
-                            //if (e.originalEvent.explicitOriginalTarget.id == "myButton")
-                            //{
-                            //    return true;
-                            //}
-
                             try
                             {
                                 $("#RepudiationReasonName").val($("#RepudiationReasonId option:selected").text());
+
+                                return true;
+                            }
+                            catch (err)
+                            {
+                                alert(err);
+                                return false;
+                            }
+                        });
+                });
+        </script>
+    }
+
+    @if (Model.Status == ReportStatusName.Draft)
+    {
+        <script>
+            $(document)
+                .ready(function()
+                {
+                    $("#LinkoExchangeForm")
+                        .submit(function(e)
+                        {
+                            var selectedSamples = [];
+                            var selectedAttachments = [];
+                            try
+                            {
+                                var sampleGrids = $("[id^='gridSample_']");
+
+                                sampleGrids.each(function()
+                                {
+                                    var gridId = this.id;
+                                    var id = gridId.replace('gridSample_', '');
+
+                                    // Get reference to Grid object
+                                    var grid = $(this).data("kendoGrid");
+                                    var sel = $("input:checked", grid.tbody).closest("tr");
+                                    // Get data item for each
+                                    var childElements = [];
+                                    $.each(sel
+                                        , function(idx, row)
+                                        {
+                                            var item = grid.dataItem(row);
+                                            item['IsAssociatedWithReportPackage'] = true;
+                                            var childElement = {};
+                                            childElement.Id = item['Id'];
+                                            childElements.push(childElement);
+                                        });
+
+                                    var sample = {};
+                                    sample.Id = id;
+                                    sample.ChildElements = childElements;
+                                    selectedSamples.push(sample);
+                                });
+
+                                var attachmentGrids = $("[id^='gridAttachment_']");
+
+                                attachmentGrids.each(function()
+                                {
+                                    var gridId = this.id;
+                                    var id = gridId.replace('gridAttachment_', '');
+
+                                    // Get reference to Grid object
+                                    var grid = $(this).data("kendoGrid");
+                                    var sel = $("input:checked", grid.tbody).closest("tr");
+                                    // Get data item for each
+                                    var childElements = [];
+                                    $.each(sel
+                                        , function(idx, row)
+                                        {
+                                            var item = grid.dataItem(row);
+                                            item['IsAssociatedWithReportPackage'] = true;
+                                            var childElement = {};
+                                            childElement.Id = item['Id'];
+                                            childElements.push(childElement);
+                                        });
+
+                                    var attachment = {};
+                                    attachment.Id = id;
+                                    attachment.ChildElements = childElements;
+                                    selectedAttachments.push(attachment);
+                                });
+
+                                $("#SelectedSamples").val(JSON.stringify(selectedSamples));
+                                $("#SelectedAttachments").val(JSON.stringify(selectedAttachments));
+
+                                //console.log($("#SelectedSamples").val());
+                                //console.log($("#SelectedAttachments").val());
 
                                 return true;
                             }

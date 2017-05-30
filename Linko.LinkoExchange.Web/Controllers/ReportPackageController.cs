@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Enum;
@@ -236,16 +237,31 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/Details")]
-        public ActionResult ReportPackageDetails(int id, ReportPackageViewModel model)
+        public ActionResult ReportPackageDetails(int id, ReportPackageViewModel model, string selectedSamples, string selectedAttachments)
         {
             try
             {
                 var vm = _reportPackageService.GetReportPackage(reportPackageId:id, isIncludeAssociatedElementData:true);
 
-                // TODO: need to update the ReportPackageDto using ReportPackageViewModel
                 vm.Comments = model.Comments;
 
-                _reportPackageService.SaveReportPackage(reportPackageDto:vm, isUseTransaction:false);
+                var serializer = new JavaScriptSerializer();
+                var samples = serializer.Deserialize<List<SelectedParentChildCombination>>(input:selectedSamples);
+                var attachments = serializer.Deserialize<List<SelectedParentChildCombination>>(input:selectedAttachments);
+
+                vm.SamplesAndResultsTypes = samples.Select(p => new ReportPackageElementTypeDto
+                                                                {
+                                                                    ReportPackageElementTypeId = p.Id,
+                                                                    Samples = p.ChildElements.Select(c => new SampleDto {SampleId = c.Id}).ToList()
+                                                                }).ToList();
+
+                vm.AttachmentTypes = attachments.Select(p => new ReportPackageElementTypeDto
+                                                             {
+                                                                 ReportPackageElementTypeId = p.Id,
+                                                                 FileStores = p.ChildElements.Select(c => new FileStoreDto {FileStoreId = c.Id}).ToList()
+                                                             }).ToList();
+
+                _reportPackageService.SaveReportPackage(reportPackageDto:vm, isUseTransaction:true);
 
                 TempData[key:"ShowSuccessMessage"] = true;
                 TempData[key:"SuccessMessage"] = "Report Package updated successfully!";
@@ -302,40 +318,40 @@ namespace Linko.LinkoExchange.Web.Controllers
             var dto = _sampleService.GetSampleDetails(sampleId:sampleId);
 
             var sampleresults = dto.SampleResults.Select(vm => new SampleResultViewModel
-                                                             {
-                                                                 AnalysisDateTimeLocal = vm.AnalysisDateTimeLocal,
-                                                                 AnalysisMethod = vm.AnalysisMethod,
-                                                                 EnteredMethodDetectionLimit = vm.EnteredMethodDetectionLimit,
-                                                                 Id = vm.ConcentrationSampleResultId,
-                                                                 IsApprovedEPAMethod = vm.IsApprovedEPAMethod,
-                                                                 IsCalcMassLoading = vm.IsCalcMassLoading,
-                                                                 MassLoadingSampleResultId = vm.MassLoadingSampleResultId,
-                                                                 MassLoadingQualifier = vm.MassLoadingQualifier,
-                                                                 MassLoadingUnitId = vm.MassLoadingUnitId,
-                                                                 MassLoadingUnitName = vm.MassLoadingUnitName,
-                                                                 MassLoadingValue = vm.MassLoadingValue,
-                                                                 ParameterId = vm.ParameterId,
-                                                                 ParameterName = vm.ParameterName,
-                                                                 Qualifier = vm.Qualifier,
-                                                                 UnitId = vm.UnitId,
-                                                                 Value = vm.Value,
-                                                                 UnitName = vm.UnitName
-                                                             }).ToList();
+                                                               {
+                                                                   AnalysisDateTimeLocal = vm.AnalysisDateTimeLocal,
+                                                                   AnalysisMethod = vm.AnalysisMethod,
+                                                                   EnteredMethodDetectionLimit = vm.EnteredMethodDetectionLimit,
+                                                                   Id = vm.ConcentrationSampleResultId,
+                                                                   IsApprovedEPAMethod = vm.IsApprovedEPAMethod,
+                                                                   IsCalcMassLoading = vm.IsCalcMassLoading,
+                                                                   MassLoadingSampleResultId = vm.MassLoadingSampleResultId,
+                                                                   MassLoadingQualifier = vm.MassLoadingQualifier,
+                                                                   MassLoadingUnitId = vm.MassLoadingUnitId,
+                                                                   MassLoadingUnitName = vm.MassLoadingUnitName,
+                                                                   MassLoadingValue = vm.MassLoadingValue,
+                                                                   ParameterId = vm.ParameterId,
+                                                                   ParameterName = vm.ParameterName,
+                                                                   Qualifier = vm.Qualifier,
+                                                                   UnitId = vm.UnitId,
+                                                                   Value = vm.Value,
+                                                                   UnitName = vm.UnitName
+                                                               }).ToList();
 
             var result = sampleresults.ToDataSourceResult(request:request, selector:vm => new
-                                                                                         {
-                                                                                             vm.Id,
-                                                                                             vm.ParameterName,
-                                                                                             Value =
-                                                                                             string.IsNullOrWhiteSpace(value:vm.Value) ? $"{vm.Qualifier}" : $"{vm.Qualifier} {vm.Value} {vm.UnitName}",
-                                                                                             MassLoadingValue =
-                                                                                             string.IsNullOrWhiteSpace(value:vm.MassLoadingValue)
-                                                                                                 ? ""
-                                                                                                 : $"{vm.MassLoadingQualifier} {vm.MassLoadingValue} {vm.MassLoadingUnitName}",
-                                                                                             vm.AnalysisMethod,
-                                                                                             vm.EnteredMethodDetectionLimit,
-                                                                                             AnalysisDateTimeLocal = vm.AnalysisDateTimeLocal.ToString()
-                                                                                         });
+                                                                                          {
+                                                                                              vm.Id,
+                                                                                              vm.ParameterName,
+                                                                                              Value =
+                                                                                              string.IsNullOrWhiteSpace(value:vm.Value) ? $"{vm.Qualifier}" : $"{vm.Qualifier} {vm.Value} {vm.UnitName}",
+                                                                                              MassLoadingValue =
+                                                                                              string.IsNullOrWhiteSpace(value:vm.MassLoadingValue)
+                                                                                                  ? ""
+                                                                                                  : $"{vm.MassLoadingQualifier} {vm.MassLoadingValue} {vm.MassLoadingUnitName}",
+                                                                                              vm.AnalysisMethod,
+                                                                                              vm.EnteredMethodDetectionLimit,
+                                                                                              AnalysisDateTimeLocal = vm.AnalysisDateTimeLocal.ToString()
+                                                                                          });
 
             return Json(data:result);
         }
@@ -398,7 +414,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/ReadyToSubmit")]
-        public ActionResult ReadyToSubmit(int id, ReportPackageViewModel model)
+        public ActionResult ReadyToSubmit(int id, ReportPackageViewModel model, string selectedSamples, string selectedAttachments)
         {
             try
             {
@@ -408,8 +424,23 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         var vm = _reportPackageService.GetReportPackage(reportPackageId:id, isIncludeAssociatedElementData:true);
 
-                        // TODO: need to update the ReportPackageDto using ReportPackageViewModel
                         vm.Comments = model.Comments;
+
+                        var serializer = new JavaScriptSerializer();
+                        var samples = serializer.Deserialize<List<SelectedParentChildCombination>>(input:selectedSamples);
+                        var attachments = serializer.Deserialize<List<SelectedParentChildCombination>>(input:selectedAttachments);
+
+                        vm.SamplesAndResultsTypes = samples.Select(p => new ReportPackageElementTypeDto
+                                                                        {
+                                                                            ReportPackageElementTypeId = p.Id,
+                                                                            Samples = p.ChildElements.Select(c => new SampleDto {SampleId = c.Id}).ToList()
+                                                                        }).ToList();
+
+                        vm.AttachmentTypes = attachments.Select(p => new ReportPackageElementTypeDto
+                                                                     {
+                                                                         ReportPackageElementTypeId = p.Id,
+                                                                         FileStores = p.ChildElements.Select(c => new FileStoreDto {FileStoreId = c.Id}).ToList()
+                                                                     }).ToList();
 
                         _reportPackageService.SaveReportPackage(reportPackageDto:vm, isUseTransaction:false);
                         _reportPackageService.UpdateStatus(reportPackageId:id, reportStatus:ReportStatusName.ReadyToSubmit, isUseTransaction:false);
