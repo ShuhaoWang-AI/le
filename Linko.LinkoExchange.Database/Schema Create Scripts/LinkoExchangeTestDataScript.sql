@@ -47,6 +47,8 @@ BEGIN
         , JurisdictionId
         , IsIdentityProofed
         , IsInternalAccount
+        , TermConditionId
+        , TermConditionAgreedDateTimeUtc
         , Email
         , EmailConfirmed
         , PasswordHash
@@ -72,6 +74,8 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
+        , 1
+        , SYSDATETIMEOFFSET()
         , 'linkoqa01@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
@@ -98,6 +102,8 @@ BEGIN
         , JurisdictionId
         , IsIdentityProofed
         , IsInternalAccount
+        , TermConditionId
+        , TermConditionAgreedDateTimeUtc
         , Email
         , EmailConfirmed
         , PasswordHash
@@ -123,6 +129,8 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
+        , 1
+        , SYSDATETIMEOFFSET()
         , 'linkoqa02@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
@@ -149,6 +157,8 @@ BEGIN
         , JurisdictionId
         , IsIdentityProofed
         , IsInternalAccount
+        , TermConditionId
+        , TermConditionAgreedDateTimeUtc
         , Email
         , EmailConfirmed
         , PasswordHash
@@ -174,6 +184,8 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
+        , 1
+        , SYSDATETIMEOFFSET()
         , 'linkoqa03@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
@@ -200,6 +212,8 @@ BEGIN
         , JurisdictionId
         , IsIdentityProofed
         , IsInternalAccount
+        , TermConditionId
+        , TermConditionAgreedDateTimeUtc
         , Email
         , EmailConfirmed
         , PasswordHash
@@ -225,6 +239,8 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
+        , 1
+        , SYSDATETIMEOFFSET()
         , 'linkoqa04@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
@@ -251,6 +267,8 @@ BEGIN
         , JurisdictionId
         , IsIdentityProofed
         , IsInternalAccount
+        , TermConditionId
+        , TermConditionAgreedDateTimeUtc
         , Email
         , EmailConfirmed
         , PasswordHash
@@ -276,6 +294,8 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
+        , 1
+        , SYSDATETIMEOFFSET()
         , 'linkoqa05@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
@@ -302,6 +322,8 @@ BEGIN
         , JurisdictionId
         , IsIdentityProofed
         , IsInternalAccount
+        , TermConditionId
+        , TermConditionAgreedDateTimeUtc
         , Email
         , EmailConfirmed
         , PasswordHash
@@ -327,6 +349,8 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
+        , 1
+        , SYSDATETIMEOFFSET()
         , 'linkoqa06@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
@@ -353,6 +377,8 @@ BEGIN
         , JurisdictionId
         , IsIdentityProofed
         , IsInternalAccount
+        , TermConditionId
+        , TermConditionAgreedDateTimeUtc
         , Email
         , EmailConfirmed
         , PasswordHash
@@ -378,6 +404,8 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
+        , 1
+        , SYSDATETIMEOFFSET()
         , 'linkoqa07@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
@@ -404,6 +432,8 @@ BEGIN
         , JurisdictionId
         , IsIdentityProofed
         , IsInternalAccount
+        , TermConditionId
+        , TermConditionAgreedDateTimeUtc
         , Email
         , EmailConfirmed
         , PasswordHash
@@ -429,6 +459,8 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
+        , 1
+        , SYSDATETIMEOFFSET()
         , 'linkoqa08@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
@@ -455,6 +487,8 @@ BEGIN
         , JurisdictionId
         , IsIdentityProofed
         , IsInternalAccount
+        , TermConditionId
+        , TermConditionAgreedDateTimeUtc
         , Email
         , EmailConfirmed
         , PasswordHash
@@ -480,6 +514,8 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
+        , 1
+        , SYSDATETIMEOFFSET()
         , 'linkoqa09@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
@@ -506,6 +542,8 @@ BEGIN
         , JurisdictionId
         , IsIdentityProofed
         , IsInternalAccount
+        , TermConditionId
+        , TermConditionAgreedDateTimeUtc
         , Email
         , EmailConfirmed
         , PasswordHash
@@ -531,6 +569,8 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
+        , 1
+        , SYSDATETIMEOFFSET()
         , 'linkoqa10@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
@@ -557,6 +597,8 @@ BEGIN
         , JurisdictionId
         , IsIdentityProofed
         , IsInternalAccount
+        , TermConditionId
+        , TermConditionAgreedDateTimeUtc
         , Email
         , EmailConfirmed
         , PasswordHash
@@ -582,6 +624,8 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
+        , 1
+        , SYSDATETIMEOFFSET()
         , 'linkoqa11@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='
@@ -608,6 +652,8 @@ BEGIN
         , JurisdictionId
         , IsIdentityProofed
         , IsInternalAccount
+        , TermConditionId
+        , TermConditionAgreedDateTimeUtc
         , Email
         , EmailConfirmed
         , PasswordHash
@@ -633,6 +679,8 @@ BEGIN
         , @JurisdictionId_MI
         , 1
         , 0
+        , 1
+        , SYSDATETIMEOFFSET()
         , 'linkoqa12@linkotechnology.com'
         , 1
         , 'AOrF2kSIYL8ig2Dw6gVncnX+YkYvoGRdg6lYySQo+CU1HYWBphkgsQ8Imf1Ga+GTUA=='

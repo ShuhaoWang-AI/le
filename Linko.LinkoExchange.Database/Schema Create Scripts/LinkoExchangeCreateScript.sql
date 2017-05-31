@@ -3420,6 +3420,17 @@ BEGIN
 		VALUES ('Industry', 'A company that discharges industrial process waters to the City’s sewers, permitted by Authority. Industries will be using LinkoExchange to submit reports electronically to Authority.') 
 END
 
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tTermCondition)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tTermCondition'
+    PRINT '-----------------------------'
+    
+    INSERT INTO dbo.tTermCondition (Content)
+		VALUES ('<html><body>Replace this with the actual content when it is ready.</body></html>') 
+END
+
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tUserProfile)
 BEGIN
     PRINT CHAR(13)
@@ -3441,6 +3452,8 @@ BEGIN
         , JurisdictionId
         , IsIdentityProofed
         , IsInternalAccount
+        , TermConditionId
+        , TermConditionAgreedDateTimeUtc
         , Email
         , EmailConfirmed
         , PasswordHash
@@ -3466,6 +3479,8 @@ BEGIN
         , (SELECT JurisdictionId FROM dbo.tJurisdiction WHERE Code = 'CO')
         , 1
         , 1
+        , 1
+        , SYSDATETIMEOFFSET()
         , 'support@linkotechnology.com'
         , 1
         , 'APTVnusF39VRg9PHU64tpgbMY0lE09A8c7u+ZRbEHx/nvflMIFS04TAB3sG2H6q0WQ=='
