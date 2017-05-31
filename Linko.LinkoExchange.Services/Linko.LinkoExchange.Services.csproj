@@ -237,6 +237,8 @@
     <Compile Include="Settings\SettingService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QuestionAnswer\IQuestionAnswerService.cs" />
+    <Compile Include="TermCondition\ITermConditionService.cs" />
+    <Compile Include="TermCondition\TermConditionService.cs" />
     <Compile Include="TimeZone\ITimeZoneService.cs" />
     <Compile Include="TimeZone\TimeZoneService.cs" />
     <Compile Include="Unit\IUnitService.cs" />

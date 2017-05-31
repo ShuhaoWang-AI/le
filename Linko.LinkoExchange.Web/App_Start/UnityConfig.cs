@@ -24,6 +24,7 @@ using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.TermCondition;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.User;
@@ -115,7 +116,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<ITimeZoneService, TimeZoneService>();
             container.RegisterType<IUnitService, UnitService>();
             container.RegisterType<IUserService, UserService>();
-
+            container.RegisterType<ITermConditionService, TermConditionService>();
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
             container.RegisterType<ApplicationUserManager>();

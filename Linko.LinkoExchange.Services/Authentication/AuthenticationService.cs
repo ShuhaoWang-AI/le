@@ -25,6 +25,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.TermCondition;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
@@ -53,6 +54,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IQuestionAnswerService _questionAnswerService;
         private readonly IMapHelper _mapHelper;
         private readonly ICromerrAuditLogService _crommerAuditLogService;
+        private readonly ITermConditionService _termConditionService;
 
         public AuthenticationService(ApplicationUserManager userManager,
             ApplicationSignInManager signInManager,
@@ -73,6 +75,7 @@ namespace Linko.LinkoExchange.Services.Authentication
            , IQuestionAnswerService questionAnswerService
            , IMapHelper mapHelper
            , ICromerrAuditLogService crommerAuditLogService
+           , ITermConditionService termConditionService
             )
         {
             if (linkoExchangeContext == null) throw new ArgumentNullException(paramName: "linkoExchangeContext");
@@ -93,6 +96,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (questionAnswerService == null) throw new ArgumentNullException("questionAnswerService");
             if (mapHelper == null) throw new ArgumentNullException("mapHelper");
             if (crommerAuditLogService == null) throw new ArgumentNullException("crommerAuditLogService");
+            if (termConditionService == null) throw new ArgumentNullException("termConditionService");
 
             _dbContext = linkoExchangeContext;
             _userManager = userManager;
@@ -114,6 +118,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             _questionAnswerService = questionAnswerService;
             _mapHelper = mapHelper;
             _crommerAuditLogService = crommerAuditLogService;
+            _termConditionService = termConditionService;
         }
 
         public IList<Claim> GetClaims()
@@ -398,6 +403,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             {
                 try
                 {
+                    var termConditionId = _termConditionService.GetLatestTermConditionId();
                     #region Create a new user registration 
 
                     if (registrationType == RegistrationType.NewRegistration)
@@ -427,6 +433,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                         applicationUser.IsInternalAccount = false;
                         applicationUser.IsIdentityProofed = false;
                         applicationUser.CreationDateTimeUtc = DateTimeOffset.Now;
+                        applicationUser.TermConditionAgreedDateTimeUtc = DateTimeOffset.Now;
+                        applicationUser.TermConditionId = termConditionId;
 
                         #endregion
 
@@ -479,7 +487,6 @@ namespace Linko.LinkoExchange.Services.Authentication
                         applicationUser.PhoneNumber = userInfo.PhoneNumber;
                         applicationUser.PhoneExt = userInfo.PhoneExt;
                         applicationUser.PasswordHash = passwordHash;
-
                         applicationUser.EmailConfirmed = true;
 
                         // Clear KBQ questions and Security Questions for existing user re-registration 
@@ -487,6 +494,8 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                         // Set IsRestRequired to be false  
                         applicationUser.IsAccountResetRequired = false;
+                        applicationUser.TermConditionAgreedDateTimeUtc = DateTimeOffset.Now;
+                        applicationUser.TermConditionId = termConditionId;
                     }
 
                     #endregion
