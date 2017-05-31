@@ -231,6 +231,7 @@
     <Compile Include="Report\ReportPackageStatusCount.cs" />
     <Compile Include="Report\ReportTemplateService.cs" />
     <Compile Include="Sample\ISampleService.cs" />
+    <Compile Include="Sample\SampleCount.cs" />
     <Compile Include="Sample\SampleService.cs" />
     <Compile Include="Settings\ISettingService.cs" />
     <Compile Include="Settings\SettingService.cs" />

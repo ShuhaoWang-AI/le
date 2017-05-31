@@ -2,14 +2,20 @@
 using Linko.LinkoExchange.Services.Dto;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Linko.LinkoExchange.Services.Sample
 {
     public interface ISampleService
     {
+        /// <summary>
+        /// The the sample statistic count for different sample status
+        /// </summary>
+        /// <param name="startDate">Nullable localized date/time time period range. 
+        /// Sample start dates must on or after this date/time. Null parameters are ignored and not part of the filter.</param>
+        /// <param name="endDate">Nullable localized date/time time period range. 
+        /// Sample end dates must on or before this date/time. Null parameters are ignored and not part of the filter.</param>
+        /// <returns>A list of different sample status</returns>
+        List<SampleCount> GetSampleCounts(DateTime? startDate = null, DateTime? endDate = null);
         /// <summary>
         /// Gets Samples from the database for displaying in a grid
         /// </summary>

@@ -70,7 +70,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         var authorityOrgRegProgramId = _orgService.GetAuthority(_dbContext.Samples
                                                     .Single(s => s.SampleId == sampleId).ForOrganizationRegulatoryProgramId)
                                                     .OrganizationRegulatoryProgramId;
-                        
+
                         retVal = (currentOrgRegProgramId == authorityOrgRegProgramId);
                     }
                     else
@@ -103,7 +103,8 @@ namespace Linko.LinkoExchange.Services.Sample
             {
                 sampleIdString = sampleDto.SampleId.Value.ToString();
             }
-            else {
+            else
+            {
                 sampleIdString = "null";
             }
 
@@ -260,7 +261,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
             }
 
-            
+
 
             //Handle Sample Results "Updates and/or Additions"
             foreach (var sampleResultDto in sampleDto.SampleResults)
@@ -303,7 +304,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 concentrationResultRowToUpdate.LastModifierUserId = currentUserId;
 
                 //this is always persisted with the concentration result NOT the mass loading result
-                concentrationResultRowToUpdate.IsMassLoadingCalculationRequired = sampleResultDto.IsCalcMassLoading; 
+                concentrationResultRowToUpdate.IsMassLoadingCalculationRequired = sampleResultDto.IsCalcMassLoading;
 
                 //... the SampleResultDto MAY ALSO have a Mass Loading component
                 if (!string.IsNullOrEmpty(sampleResultDto.MassLoadingValue))
@@ -348,7 +349,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
             }
 
-            
+
             _dbContext.SaveChanges();
 
             _logger.Info($"Leaving SampleService.SimplePersist. sampleIdToReturn={sampleToPersist.SampleId}");
@@ -379,11 +380,12 @@ namespace Linko.LinkoExchange.Services.Sample
             var sampleId = -1;
             using (var transaction = _dbContext.BeginTransaction())
             {
-                try {
+                try
+                {
                     //Cannot save if included in a report
                     //      (UC-15-1.2(*.a.) - System identifies Sample is in use in a Report Package (draft or otherwise) an displays the "REPORTED" Status.  
                     //      Actor can not perform any actions of any kind except view all details.)
-                    if (sampleDto.SampleId.HasValue && 
+                    if (sampleDto.SampleId.HasValue &&
                         this.IsSampleIncludedInReportPackage(sampleDto.SampleId.Value))
                     {
                         ThrowSimpleException("Sample is in use in a Report Package and is therefore READ-ONLY.");
@@ -418,7 +420,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     }
 
                     _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
-                    
+
                     throw;
 
                 }
@@ -440,7 +442,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
 
             }
-               
+
             _logger.Info($"Leaving SampleService.SaveSample. sampleId={sampleId}, isSavingAsReadyToReport={sampleDto.IsReadyToReport}");
             return sampleId;
         }
@@ -525,7 +527,7 @@ namespace Linko.LinkoExchange.Services.Sample
             }
 
             //Check sample start/end dates are not in the future (UC-15-1.2.9.1.b)
-            
+
             if (_timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId) > DateTimeOffset.Now ||
                 _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.EndDateTimeLocal, timeZoneId) > DateTimeOffset.Now)
             {
@@ -536,11 +538,11 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
             }
 
-            
+
             //Check Flow Value exists and is complete if provided (both value and unit)
 
             bool isValidFlowValueExists = false;
-            if (!string.IsNullOrEmpty(sampleDto.FlowValue) && sampleDto.FlowUnitId.HasValue && 
+            if (!string.IsNullOrEmpty(sampleDto.FlowValue) && sampleDto.FlowUnitId.HasValue &&
                 sampleDto.FlowUnitId.Value > 0 && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
             {
                 isValidFlowValueExists = true;
@@ -631,7 +633,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     }
                 }
             }
-            
+
 
             _logger.Info($"Leaving SampleService.IsValidSample. sampleDto.SampleId.Value={sampleIdString}, isValid={isValid}");
 
@@ -944,6 +946,62 @@ namespace Linko.LinkoExchange.Services.Sample
             _logger.Info($"Leaving SampleService.IsSampleIncludedInReportPackage. sampleId={sampleId}");
 
             return isExists;
+        }
+
+        /// <summary>
+        /// The the sample statistic count for different sample status  
+        /// </summary>
+        /// <param name="startDate">Nullable localized date/time time period range. 
+        /// Sample start dates must on or after this date/time. Null parameters are ignored and not part of the filter.</param>
+        /// <param name="endDate">Nullable localized date/time time period range. 
+        /// Sample end dates must on or before this date/time. Null parameters are ignored and not part of the filter.</param>
+        /// <returns>A list of different sample status</returns>
+        public List<SampleCount> GetSampleCounts(DateTime? startDate = null, DateTime? endDate = null)
+        {
+            var startDateString = startDate?.ToString() ?? "null";
+            var endDateString = endDate?.ToString() ?? "null";
+
+            _logger.Info($"Enter SampleService.GetSamples. startDate={startDateString}, endDate={endDateString}");
+
+            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
+
+            var foundSamples = _dbContext.Samples
+                .Include(s => s.ReportSamples)
+                .Include(s => s.SampleResults)
+                .Include(s => s.ByOrganizationRegulatoryProgram)
+                .Where(s => s.ForOrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+            if (startDate.HasValue)
+            {
+                var startDateUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(startDate.Value, timeZoneId);
+                foundSamples = foundSamples.Where(s => s.StartDateTimeUtc >= startDateUtc);
+            }
+            if (endDate.HasValue)
+            {
+                var endDateUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(endDate.Value, timeZoneId);
+                foundSamples = foundSamples.Where(s => s.EndDateTimeUtc <= endDateUtc);
+            }
+
+            var sampleCounts = new List<SampleCount>();
+            var draftSamples = new SampleCount
+            {
+                Status = SampleStatusName.Draft,
+                Count = foundSamples.Count(i => !i.IsReadyToReport)
+            };
+            sampleCounts.Add(draftSamples);
+
+            var readyToSubmitSamples = new SampleCount
+            {
+                Status = SampleStatusName.ReadyToReport,
+                Count = foundSamples.Count(i => i.IsReadyToReport && !i.ReportSamples.Any())
+            };
+
+            sampleCounts.Add(readyToSubmitSamples);
+
+            _logger.Info($"Leaving SampleService.GetSamples. startDate={startDateString}, endDate={endDateString}");
+
+            return sampleCounts;
         }
 
         /// <summary>
