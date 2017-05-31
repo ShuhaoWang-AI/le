@@ -45,6 +45,10 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.OldEmailAddress).IsOptional().HasMaxLength(256);
 
+            Property(x => x.TermConditionId).IsRequired();
+
+            Property(x => x.TermConditionAgreedDateTimeUtc).IsRequired();
+
             Property(x => x.CreationDateTimeUtc).IsRequired();
 
             Property(x => x.LastModificationDateTimeUtc).IsOptional();

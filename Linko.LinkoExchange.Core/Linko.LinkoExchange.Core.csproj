@@ -131,6 +131,7 @@
     <Compile Include="Domain\SignatoryRequest.cs" />
     <Compile Include="Domain\SignatoryRequestStatus.cs" />
     <Compile Include="Domain\SystemSetting.cs" />
+    <Compile Include="Domain\TermCondition.cs" />
     <Compile Include="Domain\TimeZone.cs" />
     <Compile Include="Domain\Unit.cs" />
     <Compile Include="Domain\UserPasswordHistory.cs" />

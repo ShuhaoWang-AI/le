@@ -48,6 +48,10 @@ namespace Linko.LinkoExchange.Core.Domain
 
         public string OldEmailAddress { get; set; }
 
+        public int TermConditionId { get; set; }
+
+        public DateTimeOffset TermConditionAgreedDateTimeUtc { get; set; }
+
         public DateTimeOffset CreationDateTimeUtc { get; set; }
 
         public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
@@ -61,7 +65,7 @@ namespace Linko.LinkoExchange.Core.Domain
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
             var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
-            
+
             // Add custom user claims here
             userIdentity.AddClaim(new Claim("UserFullName", this.FirstName + " " + this.LastName));
             userIdentity.AddClaim(new Claim("UserProfileId", this.UserProfileId.ToString()));
