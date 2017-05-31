@@ -538,6 +538,16 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
             }
 
+            //Check end date is not before start date
+            if (sampleDto.EndDateTimeLocal < sampleDto.StartDateTimeLocal)
+            {
+                isValid = false;
+                if (!isSuppressExceptions)
+                {
+                    this.ThrowSimpleException("End date must be after start date");
+                }
+            }
+
 
             //Check Flow Value exists and is complete if provided (both value and unit)
 
