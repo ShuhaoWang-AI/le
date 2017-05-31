@@ -221,37 +221,38 @@ BEGIN
 
     CREATE TABLE dbo.tUserProfile 
     (
-        UserProfileId                   int IDENTITY(1,1) NOT NULL  
-        , FirstName                     varchar(50) NOT NULL  
-        , LastName                      varchar(50) NOT NULL  
-        , TitleRole                     varchar(250) NULL  
-        , BusinessName                  varchar(100) NOT NULL  
-        , AddressLine1                  varchar(100) NOT NULL  
-        , AddressLine2                  varchar(100) NULL  
-        , CityName                      varchar(100) NOT NULL  
-        , ZipCode                       varchar(50) NOT NULL  
-        , JurisdictionId                int NULL    
-        , PhoneExt                      int NULL  
-        , IsAccountLocked               bit NOT NULL  
-        , IsAccountResetRequired        bit NOT NULL  
-        , IsIdentityProofed             bit NOT NULL  
-        , IsInternalAccount             bit NOT NULL  
-        , OldEmailAddress               nvarchar(256) NULL
-        , TermConditionId               int NOT NULL  
-        , CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
-        , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
-        , Id                            nvarchar(128) NOT NULL  
-        , Email                         nvarchar(256) NOT NULL  
-        , EmailConfirmed                bit NOT NULL  
-        , PasswordHash                  nvarchar(max) NULL  
-        , SecurityStamp                 nvarchar(max) NULL
-        , PhoneNumber                   nvarchar(max) NOT NULL  
-        , PhoneNumberConfirmed          bit NOT NULL  
-        , TwoFactorEnabled              bit NOT NULL  
-        , LockoutEndDateUtc             datetime NULL  
-        , LockoutEnabled                bit NOT NULL  
-        , AccessFailedCount             int NOT NULL  
-        , UserName                      nvarchar(256) NOT NULL  
+        UserProfileId                       int IDENTITY(1,1) NOT NULL  
+        , FirstName                         varchar(50) NOT NULL  
+        , LastName                          varchar(50) NOT NULL  
+        , TitleRole                         varchar(250) NULL  
+        , BusinessName                      varchar(100) NOT NULL  
+        , AddressLine1                      varchar(100) NOT NULL  
+        , AddressLine2                      varchar(100) NULL  
+        , CityName                          varchar(100) NOT NULL  
+        , ZipCode                           varchar(50) NOT NULL  
+        , JurisdictionId                    int NULL    
+        , PhoneExt                          int NULL  
+        , IsAccountLocked                   bit NOT NULL  
+        , IsAccountResetRequired            bit NOT NULL  
+        , IsIdentityProofed                 bit NOT NULL  
+        , IsInternalAccount                 bit NOT NULL  
+        , OldEmailAddress                   nvarchar(256) NULL
+        , TermConditionId                   int NOT NULL
+        , TermConditionAgreedDateTimeUtc    datetimeoffset(0) NOT NULL
+        , CreationDateTimeUtc               datetimeoffset(0) NOT NULL  
+        , LastModificationDateTimeUtc       datetimeoffset(0) NULL  
+        , Id                                nvarchar(128) NOT NULL  
+        , Email                             nvarchar(256) NOT NULL  
+        , EmailConfirmed                    bit NOT NULL  
+        , PasswordHash                      nvarchar(max) NULL  
+        , SecurityStamp                     nvarchar(max) NULL
+        , PhoneNumber                       nvarchar(max) NOT NULL  
+        , PhoneNumberConfirmed              bit NOT NULL  
+        , TwoFactorEnabled                  bit NOT NULL  
+        , LockoutEndDateUtc                 datetime NULL  
+        , LockoutEnabled                    bit NOT NULL  
+        , AccessFailedCount                 int NOT NULL  
+        , UserName                          nvarchar(256) NOT NULL  
         
         CONSTRAINT PK_tUserProfile PRIMARY KEY NONCLUSTERED 
         (
