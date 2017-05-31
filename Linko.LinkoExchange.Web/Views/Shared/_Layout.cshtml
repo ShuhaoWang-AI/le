@@ -65,7 +65,7 @@
 
         <footer class="main-footer">
             <strong>
-                Copyright &copy; @DateTime.Now.Year - <a href="#" target="_blank">@Label.LinkoExchange</a>.
+                Copyright &copy; @DateTime.Now.Year - <a href="@Url.Action(actionName:"Index", controllerName:"Home")">@Label.LinkoExchange</a>.
             </strong> All rights reserved.
             <div class="hidden-xs pull-right">
                 <b>Version</b> @ViewContext.Controller.GetType().Assembly.GetName().Version

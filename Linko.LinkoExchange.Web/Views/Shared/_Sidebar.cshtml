@@ -12,28 +12,44 @@
                     </a>
                 </li>
 
-                <li class="treeview @Html.IsActive(actions:"ReportPackages,ReportPackageDetails", controllers: "ReportPackage")">
+                <li class="treeview @Html.IsActive(actions:"ReportPackages,ReportPackageDetails", controllers:"ReportPackage")">
                     <a href="#">
                         <i class="fa fa-fw glyphicon glyphicon-duplicate"></i>
                         <span>Report Packages</span>
+                        <span class="pull-right-container">
+                            @if (ViewBag.ReportPackageCount_SubmittedPendingReview != null)
+                            {
+                                <span class="bg-aqua label">@ViewBag.ReportPackageCount_SubmittedPendingReview</span>
+                            }
+                            @if (ViewBag.ReportPackageCount_RepudiatedPendingReview != null)
+                            {
+                                <span class="bg-fuchsia label">@ViewBag.ReportPackageCount_RepudiatedPendingReview</span>
+                            }
+                        </span>
                     </a>
                     <ul class="treeview-menu">
                         <li class="@Html.IsActive(actions:"ReportPackages", controllers:"ReportPackage", routeValueTag:"reportStatus:" + ReportStatusName.SubmittedPendingReview)">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.SubmittedPendingReview})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Pending Review</span>
-                                @*<span class="pull-right-container">
-                                <span class="label label-success pull-right">2</span>
-                            </span>*@
+                                @if (ViewBag.ReportPackageCount_SubmittedPendingReview != null)
+                                {
+                                    <span class="pull-right-container">
+                                        <span class="bg-aqua label">@ViewBag.ReportPackageCount_SubmittedPendingReview</span>
+                                    </span>
+                                }
                             </a>
                         </li>
                         <li class="@Html.IsActive(actions:"ReportPackages", controllers:"ReportPackage", routeValueTag:"reportStatus:" + ReportStatusName.RepudiatedPendingReview)">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.RepudiatedPendingReview})'">
                                 <i class="fa fa-fw"></i>
                                 <span>New Repudiations</span>
-                                @*<span class="pull-right-container">
-                                <span class="label label-danger pull-right">1</span>
-                            </span>*@
+                                @if (ViewBag.ReportPackageCount_RepudiatedPendingReview != null)
+                                {
+                                    <span class="pull-right-container">
+                                        <span class="bg-fuchsia label">@ViewBag.ReportPackageCount_RepudiatedPendingReview</span>
+                                    </span>
+                                }
                             </a>
                         </li>
                         <li class="@Html.IsActive(actions:"ReportPackages", controllers:"ReportPackage", routeValueTag:"reportStatus:" + ReportStatusName.All)">
@@ -49,6 +65,12 @@
                     <a href="#" onclick="location.href = '@Url.Action(actionName:"PendingUserApprovals", controllerName:"Authority")'">
                         <i class="fa fa-fw fa-user-plus"></i>
                         <span>Pending Registrations</span>
+                        @if (ViewBag.PendingRegistrationProgramUsersCount != null)
+                        {
+                            <span class="pull-right-container">
+                                <span class="label label-info">@ViewBag.PendingRegistrationProgramUsersCount</span>
+                            </span>
+                        }
                     </a>
                 </li>
 
@@ -166,32 +188,44 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                     </ul>
                 </li>
 
-                <li class="treeview @Html.IsActive(actions:"ReportPackages,ReportPackageDetails", controllers: "ReportPackage")">
+                <li class="treeview @Html.IsActive(actions:"ReportPackages,ReportPackageDetails", controllers:"ReportPackage")">
                     <a href="#">
                         <i class="fa fa-fw glyphicon glyphicon-duplicate"></i>
                         <span>Report Packages</span>
-                        @*<span class="pull-right-container">
-                            <span class="label bg-orange pull-right">2</span>
-                            <span class="label label-success pull-right">1</span>
-                        </span>*@
+                        <span class="pull-right-container">
+                            @if (ViewBag.ReportPackageCount_Draft != null)
+                            {
+                                <span class="bg-yellow label">@ViewBag.ReportPackageCount_Draft</span>
+                            }
+                            @if (ViewBag.ReportPackageCount_ReadyToSubmit != null)
+                            {
+                                <span class="bg-lime-active label">@ViewBag.ReportPackageCount_ReadyToSubmit</span>
+                            }
+                        </span>
                     </a>
                     <ul class="treeview-menu">
                         <li class="@Html.IsActive(actions:"ReportPackages", controllers:"ReportPackage", routeValueTag:"reportStatus:" + ReportStatusName.Draft)">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.Draft})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Draft</span>
-                                @*<span class="pull-right-container">
-                                        <span class="label label-success pull-right">2</span>
-                                    </span>*@
+                                @if (ViewBag.ReportPackageCount_Draft != null)
+                                {
+                                    <span class="pull-right-container">
+                                        <span class="bg-yellow label">@ViewBag.ReportPackageCount_Draft</span>
+                                    </span>
+                                }
                             </a>
                         </li>
                         <li class="@Html.IsActive(actions:"ReportPackages", controllers:"ReportPackage", routeValueTag:"reportStatus:" + ReportStatusName.ReadyToSubmit)">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.ReadyToSubmit})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Ready to Submit</span>
-                                @*<span class="pull-right-container">
-                                        <span class="label label-danger pull-right">1</span>
-                                    </span>*@
+                                @if (ViewBag.ReportPackageCount_ReadyToSubmit != null)
+                                {
+                                    <span class="pull-right-container">
+                                        <span class="bg-lime-active label">@ViewBag.ReportPackageCount_ReadyToSubmit</span>
+                                    </span>
+                                }
                             </a>
                         </li>
                         <li class="@Html.IsActive(actions:"ReportPackages", controllers:"ReportPackage", routeValueTag:"reportStatus:" + ReportStatusName.Submitted)">
@@ -220,6 +254,12 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                     <a href="#">
                         <i class="fa fa-bank fa-fw"></i>
                         <span>Industry Account</span>
+                        @if (ViewBag.PendingRegistrationProgramUsersCount != null)
+                        {
+                            <span class="pull-right-container">
+                                <span class="label label-info">@ViewBag.PendingRegistrationProgramUsersCount</span>
+                            </span>
+                        }
                     </a>
                     <ul class="treeview-menu">
                         <li class="@Html.IsActive(actions:"IndustryUsers,IndustryUserDetails,IndustryUserRemove,IndustryUserChangeStatus", controllers:"Industry")">
@@ -238,9 +278,13 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"PendingUserApprovals", controllerName:"Industry")'">
                                 <i class="fa fa-fw fa-user-plus"></i>
                                 <span>Pending Registrations</span>
-                                @*<span class="pull-right-container">
-                                    <span class="label bg-primary pull-right">1</span>
-                                </span>*@
+
+                                @if (ViewBag.PendingRegistrationProgramUsersCount != null)
+                                {
+                                    <span class="pull-right-container">
+                                        <span class="label label-info pull-right">@ViewBag.PendingRegistrationProgramUsersCount</span>
+                                    </span>
+                                }
                             </a>
                         </li>
                     </ul>
