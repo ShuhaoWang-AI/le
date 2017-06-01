@@ -592,8 +592,8 @@ namespace Linko.LinkoExchange.Services.Report
             crommerContentReplacements.Add("reportPackageName", reportPackageDto.Name);
 
             var dateTimeFormat = "MM/dd/yyyyThh:mm tt zzzz";
-            crommerContentReplacements.Add("periodStart", reportPackageDto.PeriodStartDateTimeLocal.ToString(dateTimeFormat));
-            crommerContentReplacements.Add("periodEnd", reportPackageDto.PeriodEndDateTimeLocal.ToString(dateTimeFormat));
+            crommerContentReplacements.Add("periodStartDate", reportPackageDto.PeriodStartDateTimeLocal.ToString(dateTimeFormat));
+            crommerContentReplacements.Add("periodEndDate", reportPackageDto.PeriodEndDateTimeLocal.ToString(dateTimeFormat));
             crommerContentReplacements.Add("corSignature", copyOfRecordDto.Signature);
 
             crommerContentReplacements.Add("firstName", reportPackageDto.SubmitterFirstName);
