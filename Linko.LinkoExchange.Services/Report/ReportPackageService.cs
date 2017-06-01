@@ -574,7 +574,7 @@ namespace Linko.LinkoExchange.Services.Report
         private void WriteCrommerrLog(ReportPackageDto reportPackageDto, string submitterIpAddress, CopyOfRecordDto copyOfRecordDto)
         {
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-            cromerrAuditLogEntryDto.RegulatoryProgramId = reportPackageDto.OrganizationRegulatoryProgramId;
+            cromerrAuditLogEntryDto.RegulatoryProgramId = reportPackageDto.OrganizationRegulatoryProgramDto.RegulatoryProgramId;
             cromerrAuditLogEntryDto.OrganizationId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationId));
             var autorityOrg = _orgService.GetAuthority(reportPackageDto.OrganizationRegulatoryProgramId);
             cromerrAuditLogEntryDto.RegulatorOrganizationId = autorityOrg.OrganizationId;
