@@ -29,6 +29,7 @@ using Moq;
 using NLog;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.TermCondition;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -48,6 +49,7 @@ namespace Linko.LinkoExchange.Test
         IPermissionService permService = Mock.Of<IPermissionService>();
         IUserService userService = Mock.Of<IUserService>();
         ISessionCache sessionCache = new SessionCache(new HttpContextServiceMock());
+        private Mock<ITermConditionService> _termConditionService = new Mock<ITermConditionService>();
         //Mock.Of<ISessionCache>();
 
         IPasswordHasher passwordHasher = new PasswordHasher();
@@ -58,6 +60,7 @@ namespace Linko.LinkoExchange.Test
         Mock<ApplicationSignInManager> signmanager;
         Mock<LinkoExchangeContext> dbContext;
         Mock<ApplicationUserManager> userManagerObj;
+
         UserProfile userProfile;
         AuthenticationService _authenticationService;
         Dictionary<SystemSettingType, string> systemSettingDict = new Dictionary<SystemSettingType, string>();
@@ -129,6 +132,9 @@ namespace Linko.LinkoExchange.Test
             //settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.PasswordChangeRequiredDays, OrganizationTypeName.Authority)).Returns("90");
             //settingServiceMock.Setup(i => i.GetSettingTemplateValue(SettingType.FailedPasswordAttemptMaxCount, OrganizationTypeName.Authority)).Returns("3");
 
+            _termConditionService.Setup(i => i.GetLatestTermConditionId()).Returns(1);
+            _termConditionService.Setup(i => i.GetTermCondtionContent()).Returns("test content");
+
             _authenticationService = new AuthenticationService(
                 userManagerObj.Object,
                 signmanager.Object,
@@ -148,7 +154,8 @@ namespace Linko.LinkoExchange.Test
                 logger,
                 questionAnswerService,
                 _mapHelper.Object,
-                _cromerrLog.Object
+                _cromerrLog.Object,
+                _termConditionService.Object
                 );
 
             userManagerObj.Setup(
@@ -864,7 +871,8 @@ namespace Linko.LinkoExchange.Test
                 logger,
                 null,
                 _mapHelper.Object,
-                _cromerrLog.Object
+                _cromerrLog.Object,
+                _termConditionService.Object
                 );
 
             authService.SetClaimsForOrgRegProgramSelection(1);
