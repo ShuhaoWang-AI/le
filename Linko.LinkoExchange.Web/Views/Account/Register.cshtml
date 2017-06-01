@@ -1,7 +1,7 @@
 ﻿@model Linko.LinkoExchange.Web.ViewModels.User.RegistrationViewModel
 
 @{
-    ViewBag.Title = "User Details";
+    ViewBag.Title = "LinkoExchange Registration";
     var sqQuestionPool = Model.UserSQ.QuestionPool;
     var kbqQuestionPool = Model.UserKBQ.QuestionPool;
     var inValidProfile = ViewBag.InValidProfile == null ? false : ViewBag.InValidProfile;
@@ -11,14 +11,7 @@
     var activeLink = "Register";
 }
 
-<section>
-    <ol class="breadcrumb">
-        <li>
-            <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Home")'"><i class=""></i> Home </a>
-        </li>
-        <li class="active">@activeLink</li>
-    </ol>
-</section>
+<section></section>
 
 <style>
     .left-flow-link {
@@ -320,7 +313,7 @@
                     </div>
                 </div>
 
-                <!-- Line 11 UserName -->
+                <!-- Line 11 Password -->
                 <div class="form-group">
                     @Html.LabelFor(model => Model.UserProfile.Password, htmlAttributes: new
                {
@@ -337,8 +330,12 @@
                        @class = "text-danger"
                    })
                     </div>
+                    <div>
+                        <button class="btn btn-info btn-sm" data-placement="middle" data-toggle="tooltip" title="Passwords must be at least 8 characters, have at least one digit ('0'-'9'), and have at least one lowercase ('a'-'z') and one uppercase ('A'-'Z') letter. " type="button">
+                            <i class="fa fa-info-circle"></i>
+                        </button>
+                    </div>
                 </div>
-
                 @Html.HiddenFor(m => m.UserProfile.ShowConfirmPassword)
                 @if (Model.UserProfile.ShowConfirmPassword)
                 {
