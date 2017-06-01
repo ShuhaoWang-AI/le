@@ -432,6 +432,8 @@
     <Content Include="Views\ReportPackage\ReportPackages.cshtml" />
     <Content Include="Views\ReportPackage\NewReportPackage.cshtml" />
     <Content Include="Views\ReportPackage\ReportPackageDetails.cshtml" />
+    <Content Include="Views\Home\TermsAndConditions.cshtml" />
+    <Content Include="Views\Home\PrivacyPolicy.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -555,7 +557,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="ViewModels\Common\" />
-    <Folder Include="Views\Home\" />
     <Folder Include="Views\Invite\" />
   </ItemGroup>
   <ItemGroup>

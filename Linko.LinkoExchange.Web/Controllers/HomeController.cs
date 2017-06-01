@@ -1,6 +1,8 @@
 ﻿using System.Web.Mvc;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.TermCondition;
+using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
@@ -44,12 +46,43 @@ namespace Linko.LinkoExchange.Web.Controllers
         #region constructor
 
         private readonly IAuthenticationService _authenticationService;
+        private readonly ITermConditionService _termConditionService;
 
-        public HomeController(IAuthenticationService authenticationService)
+        public HomeController(IAuthenticationService authenticationService, ITermConditionService termConditionService)
         {
             _authenticationService = authenticationService;
+            _termConditionService = termConditionService;
         }
 
+        #endregion
+        
+        #region Terms And Conditions
+
+        // GET: /TermsAndConditions
+        [AllowAnonymous]
+        [Route(template:"TermsAndConditions")]
+        public ActionResult TermsAndConditions()
+        {
+            var termCondition = _termConditionService.GetTermCondtionContent();
+            var model = new ConfirmationViewModel
+                        {
+                            Title = "Terms and Conditions",
+                            HtmlStr = termCondition
+                        };
+
+            return View(viewName:"TermsAndConditions", model:model);
+        }
+        #endregion
+
+        #region Terms And Conditions
+
+        // GET: /PrivacyPolicy
+        [AllowAnonymous]
+        [Route(template:"PrivacyPolicy")]
+        public ActionResult PrivacyPolicy()
+        {
+            return View();
+        }
         #endregion
     }
 }

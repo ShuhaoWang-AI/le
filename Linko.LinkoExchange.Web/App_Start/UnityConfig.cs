@@ -117,6 +117,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IUnitService, UnitService>();
             container.RegisterType<IUserService, UserService>();
             container.RegisterType<ITermConditionService, TermConditionService>();
+
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
             container.RegisterType<ApplicationUserManager>();

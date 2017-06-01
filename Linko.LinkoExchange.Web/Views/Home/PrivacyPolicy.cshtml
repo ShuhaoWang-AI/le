@@ -1,0 +1,35 @@
+﻿<div id="divPrivacyPolicy_outer">
+    <div class="box box-primary" id="divPrivacyPolicy">
+        <div class="box-header with-border">
+            <h3 class="box-title">Privacy Policy</h3>
+        </div>
+        <section class="box-body form-horizontal">
+            Need to add proper text for Privacy Policy
+
+        </section>
+    </div>
+</div>
+
+@if (Request.IsAuthenticated && ViewBag.PortalName != null)
+{
+    <script type="text/javascript">
+        $('#divPrivacyPolicy_outer').addClass('col-md-12');
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+        $('#divPrivacyPolicy_outer').addClass('col-md-offset-2 col-md-8');
+    </script>
+}
+
+<script type="text/javascript">
+    $(function()
+    {
+        $('#divPrivacyPolicyr')
+            .slimScroll({
+                height: $(window).height() - 200
+                , alwaysVisible: true
+            });
+    });
+</script>

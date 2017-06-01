@@ -62,16 +62,25 @@
             </section>
             <section class="content"> @RenderBody() </section>
         </div>
-
-        <footer class="main-footer">
-            <strong>
-                Copyright &copy; @DateTime.Now.Year - <a href="@Url.Action(actionName:"Index", controllerName:"Home")">@Label.LinkoExchange</a>.
-            </strong> All rights reserved.
-            <div class="hidden-xs pull-right">
-                <b>Version</b> @ViewContext.Controller.GetType().Assembly.GetName().Version
-            </div>
-        </footer>
     </div>
+
+    <footer class="main-footer">
+        <strong>
+            Copyright &copy; @DateTime.Now.Year - <a href="@Url.Action(actionName:"Index", controllerName:"Home")">@Label.LinkoExchange</a>.
+        </strong> All rights reserved.
+        <div class="hidden-xs pull-right">
+            <ul class="list-inline">
+                <li>
+                    <strong>
+                        <a href="@Url.Action(actionName:"PrivacyPolicy", controllerName:"Home")">Privacy Policy</a>
+                    </strong>
+                </li>
+                <li>
+                    <b>Version</b> @ViewContext.Controller.GetType().Assembly.GetName().Version
+                </li>
+            </ul>
+        </div>
+    </footer>
 
     @*<script src="@RouteJs.RouteJsHandler.HandlerUrl"></script>*@
     @Scripts.Render(paths:"~/Bundles/js")

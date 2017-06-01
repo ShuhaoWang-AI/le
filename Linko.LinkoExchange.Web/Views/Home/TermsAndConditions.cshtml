@@ -1,0 +1,26 @@
+﻿@model Linko.LinkoExchange.Web.ViewModels.Shared.ConfirmationViewModel
+<div id="divTermsAndConditions">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">@Model.Title</h3>
+        </div>
+        <section class="box-body form-horizontal">
+            
+            @Html.Raw(value:Model.HtmlStr)
+
+        </section>
+    </div>
+</div>
+
+@if (Request.IsAuthenticated && ViewBag.PortalName != null)
+{
+    <script type="text/javascript">
+        $('#divTermsAndConditions').addClass('col-md-12');
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+        $('#divTermsAndConditions').addClass('col-md-offset-2 col-md-8');
+    </script>
+}
