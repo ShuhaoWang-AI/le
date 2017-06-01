@@ -82,7 +82,7 @@
       <HintPath>..\..\XternalObjects\Glimpse.Mvc5.1.5.3\lib\net45\Glimpse.Mvc5.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Kendo.Mvc, Version=2017.1.223.545, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
+    <Reference Include="Kendo.Mvc, Version=2017.2.504.545, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\XternalObjects\Telerik\LinkoExchange\Kendo.Mvc.dll</HintPath>
       <Private>True</Private>
