@@ -8,21 +8,21 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
     [Validator(typeof(RegistrationValidator))]
     public class RegistrationViewModel : UserViewModel
     {
-        public string Token { get; set; } 
+        public string Token { get; set; }
 
         [Display(Name = "Agree To Terms And Conditions")]
         public bool AgreeTermsAndConditions { get; set; }
 
-        [Display(Name ="Email")]
+        [Display(Name = "Email")]
         public string InvitationEmail { get; set; }
 
-        [Display(Name ="Program")]
+        [Display(Name = "Program")]
         public string ProgramName { get; set; }
 
-        [Display(Name ="Authority")]
+        [Display(Name = "Authority")]
         public string AuthorityName { get; set; }
 
-        [Display(Name ="Facility")]
+        [Display(Name = "Facility")]
         public string IndustryName { get; set; }
         public RegistrationType RegistrationType { get; set; }
     }
@@ -32,7 +32,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         public RegistrationValidator()
         {
             RuleFor(x => x.Token).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
-            RuleFor(x => x.AgreeTermsAndConditions).Equal(toCompare: true).NotEmpty().WithMessage(errorMessage: "You must agree terms and conditions.");
-        } 
-    } 
+            RuleFor(x => x.AgreeTermsAndConditions).Equal(toCompare: false).NotEmpty().WithMessage(errorMessage: "You must agree terms and conditions.");
+        }
+    }
 }
