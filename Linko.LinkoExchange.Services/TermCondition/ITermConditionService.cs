@@ -2,7 +2,7 @@
 {
     public interface ITermConditionService
     {
-        string GetTermCondtionContent(int termConditionId);
+        string GetTermCondtionContent();
         int GetLatestTermConditionId();
     }
 }

@@ -15,19 +15,19 @@ namespace Linko.LinkoExchange.Services.TermCondition
             _logger = logger;
         }
 
-        public string GetTermCondtionContent(int termConditionId)
+        public string GetTermCondtionContent()
         {
-            _logger.Info($"Enter TermConditionService.GetTermCondtionContent. termConditionId={termConditionId}");
-            var termCondition = _dbContext.TermConditions.OrderByDescending(i => i.CreationDateTimeUtc).First();
-            _logger.Info($"Leave TermConditionService.GetTermCondtionContent. termConditionId={termConditionId}");
+            _logger.Info($"Enter TermConditionService.GetTermCondtionContent.");
+            var termCondition = _dbContext.TermConditions.OrderByDescending(i => i.TermConditionId).First();
+            _logger.Info($"Leave TermConditionService.GetTermCondtionContent.");
             return termCondition.Content;
         }
 
         public int GetLatestTermConditionId()
         {
-            _logger.Info($"Enter TermConditionService.GetTermCondtionContent.");
-            var termCondition = _dbContext.TermConditions.OrderByDescending(i => i.CreationDateTimeUtc).First();
-            _logger.Info($"Leave TermConditionService.GetTermCondtionContent. termConditionId={termCondition.TermConditionId}");
+            _logger.Info($"Enter TermConditionService.GetLatestTermConditionId.");
+            var termCondition = _dbContext.TermConditions.OrderByDescending(i => i.TermConditionId).First();
+            _logger.Info($"Leave TermConditionService.GetLatestTermConditionId. termConditionId={termCondition.TermConditionId}");
             return termCondition.TermConditionId;
         }
     }
