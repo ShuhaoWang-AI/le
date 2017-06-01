@@ -159,24 +159,40 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                     <a href="#">
                         <i class="fa fa-fw fa-th-list"></i>
                         <span>Samples</span>
-                        @*<span class="pull-right-container">
-                            <span class="label bg-orange pull-right">2</span>
-                        </span>*@
+                        <span class="pull-right-container">
+                            @if (ViewBag.SampleCount_Draft != null)
+                            {
+                                <span class="bg-yellow label">@ViewBag.SampleCount_Draft</span>
+                            }
+                            @if (ViewBag.SampleCount_ReadyToReport != null)
+                            {
+                                <span class="bg-lime-active label">@ViewBag.SampleCount_ReadyToReport</span>
+                            }
+                        </span>
                     </a>
                     <ul class="treeview-menu">
                         <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag:"sampleStatus:" + SampleStatusName.Draft)">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.Draft})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Draft</span>
-                                @*<span class="pull-right-container">
-                                    <span class="label bg-orange pull-right">2</span>
-                                </span>*@
+                                <span class="pull-right-container">
+                                    @if (ViewBag.SampleCount_Draft != null)
+                                    {
+                                        <span class="bg-yellow label">@ViewBag.SampleCount_Draft</span>
+                                    }
+                                </span>
                             </a>
                         </li>
                         <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag:"sampleStatus:" + SampleStatusName.ReadyToReport)">
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = SampleStatusName.ReadyToReport})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Ready to Report</span>
+                                <span class="pull-right-container">
+                                    @if (ViewBag.SampleCount_ReadyToReport != null)
+                                    {
+                                        <span class="bg-lime-active label">@ViewBag.SampleCount_ReadyToReport</span>
+                                    }
+                                </span>
                             </a>
                         </li>
                         <li class="@Html.IsActive(actions:"Samples", controllers:"Industry", routeValueTag:"sampleStatus:" + SampleStatusName.Reported)">

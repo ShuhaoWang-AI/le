@@ -4,28 +4,15 @@ using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Report;
+using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.User;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {
-    public class CommonInfoAttribute : ActionFilterAttribute
+    public class CommonInfoAttribute:ActionFilterAttribute
     {
-        #region constructor
-
-        private readonly IHttpContextService _httpContextService;
-        private readonly IUserService _userService;
-        private readonly IReportPackageService _reportPackageService;
-        public CommonInfoAttribute(IHttpContextService httpContextService,IUserService userService, IReportPackageService reportPackageService)
-        {
-            _httpContextService = httpContextService;
-            _userService = userService;
-            _reportPackageService = reportPackageService;
-        }
-
-        #endregion
-
-
         #region default action
+
         public override void OnResultExecuting(ResultExecutingContext filterContext)
         {
             if (filterContext.HttpContext.User.Identity.IsAuthenticated)
@@ -37,13 +24,22 @@ namespace Linko.LinkoExchange.Web.Mvc
                 filterContext.Controller.ViewBag.UserRole = _httpContextService.GetClaimValue(claimType:CacheKey.UserRole);
                 if (!string.IsNullOrWhiteSpace(value:portalName))
                 {
-                    var currentOrganizationRegulatoryProgramId = int.Parse( s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+                    var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
                     filterContext.Controller.ViewBag.PendingRegistrationProgramUsersCount = _userService.GetPendingRegistrationProgramUsersCount(orgRegProgamId:currentOrganizationRegulatoryProgramId);
                     var reportPackageStatusCounts = _reportPackageService.GetReportPackageStatusCounts();
                     filterContext.Controller.ViewBag.ReportPackageCount_Draft = reportPackageStatusCounts.SingleOrDefault(c => c.Status == ReportStatusName.Draft)?.Count;
                     filterContext.Controller.ViewBag.ReportPackageCount_ReadyToSubmit = reportPackageStatusCounts.SingleOrDefault(c => c.Status == ReportStatusName.ReadyToSubmit)?.Count;
-                    filterContext.Controller.ViewBag.ReportPackageCount_SubmittedPendingReview = reportPackageStatusCounts.SingleOrDefault(c => c.Status == ReportStatusName.SubmittedPendingReview)?.Count;
-                    filterContext.Controller.ViewBag.ReportPackageCount_RepudiatedPendingReview = reportPackageStatusCounts.SingleOrDefault(c => c.Status == ReportStatusName.RepudiatedPendingReview)?.Count;
+                    filterContext.Controller.ViewBag.ReportPackageCount_SubmittedPendingReview =
+                        reportPackageStatusCounts.SingleOrDefault(c => c.Status == ReportStatusName.SubmittedPendingReview)?.Count;
+                    filterContext.Controller.ViewBag.ReportPackageCount_RepudiatedPendingReview =
+                        reportPackageStatusCounts.SingleOrDefault(c => c.Status == ReportStatusName.RepudiatedPendingReview)?.Count;
+
+                    if (portalName.ToLower().Equals(value:"industry"))
+                    {
+                        var sampleStatusCounts = _sampleService.GetSampleCounts();
+                        filterContext.Controller.ViewBag.SampleCount_Draft = sampleStatusCounts.SingleOrDefault(c => c.Status == SampleStatusName.Draft)?.Count;
+                        filterContext.Controller.ViewBag.SampleCount_ReadyToReport = sampleStatusCounts.SingleOrDefault(c => c.Status == SampleStatusName.ReadyToReport)?.Count;
+                    }
                 }
             }
             else
@@ -55,6 +51,24 @@ namespace Linko.LinkoExchange.Web.Mvc
             }
             base.OnResultExecuting(filterContext:filterContext);
         }
+
+        #endregion
+
+        #region constructor
+
+        private readonly IHttpContextService _httpContextService;
+        private readonly IUserService _userService;
+        private readonly IReportPackageService _reportPackageService;
+        private readonly ISampleService _sampleService;
+
+        public CommonInfoAttribute(IHttpContextService httpContextService, IUserService userService, IReportPackageService reportPackageService, ISampleService sampleService)
+        {
+            _httpContextService = httpContextService;
+            _userService = userService;
+            _reportPackageService = reportPackageService;
+            _sampleService = sampleService;
+        }
+
         #endregion
     }
 }

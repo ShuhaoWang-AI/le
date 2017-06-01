@@ -8,7 +8,7 @@ namespace Linko.LinkoExchange.Services.Sample
     public interface ISampleService
     {
         /// <summary>
-        /// The the sample statistic count for different sample status
+        /// The sample statistic count for different sample status
         /// </summary>
         /// <param name="startDate">Nullable localized date/time time period range. 
         /// Sample start dates must on or after this date/time. Null parameters are ignored and not part of the filter.</param>
