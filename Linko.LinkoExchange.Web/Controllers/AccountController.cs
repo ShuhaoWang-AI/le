@@ -26,6 +26,7 @@ using Linko.LinkoExchange.Web.ViewModels.Account;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 using NLog;
+using System.Text;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -258,25 +259,60 @@ namespace Linko.LinkoExchange.Web.Controllers
                     var authorityPhone = authorityProgramSettings.Settings.First(s => s.TemplateName.Equals(obj:SettingType.EmailContactInfoPhone)).Value;
                     var org = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:invitation.RecipientOrganizationRegulatoryProgramId);
 
-                    var messageBody = "";
-                    messageBody += "<p>Your LinkoExchange registration has been received and is now under review for the following:</p>";
-                    messageBody += $"<p>Authority: {_organizationService.GetAuthority(orgRegProgramId:invitation.RecipientOrganizationRegulatoryProgramId).OrganizationDto.OrganizationName}</pr>";
+                    var messageBody = new StringBuilder();
+                    messageBody.Append($"<p>Your LinkoExchange registration has been received and is now under review for the following:</p>");
+                    messageBody.Append($"<div>");
+                    messageBody.Append($"<div class='col-md-1' style='text-align:right'>Authority:</div>");
+                    var authorityNameInMessage = _organizationService.GetAuthority(orgRegProgramId: invitation.RecipientOrganizationRegulatoryProgramId).OrganizationDto.OrganizationName;
+                    messageBody.Append($"<div class='col-md-11'>{authorityNameInMessage}</div>");
+                    messageBody.Append($"</div");
+
                     if (org.OrganizationDto.OrganizationType.Name.ToLower().IsCaseInsensitiveEqual(comparing:OrganizationTypeName.Industry.ToString()))
                     {
-                        messageBody += $"<p>Facility: {org.OrganizationDto.OrganizationName} </p>";
+                        messageBody.Append($"<div>");
+                        messageBody.Append($"<div class='col-md-1' style='text-align:right'>Facility: </div>");
+                        messageBody.Append($"<div class='col-md-11'>{ org.OrganizationDto.OrganizationName} </div>");
+                        messageBody.Append($"</div>");
+
+                        messageBody.Append($"<div>");
+                        messageBody.Append($"<div class='col-md-1' style='text-align:right'></div>");
+                        messageBody.Append($"<div class='col-md-11'>{org.OrganizationDto.AddressLine1}</div>");
+                        messageBody.Append($"</div>");
+
+                        if (!string.IsNullOrWhiteSpace(org.OrganizationDto.AddressLine2))
+                        {
+                            messageBody.Append($"<div>");
+                            messageBody.Append($"<div class='col-md-1' style='text-align:right'></div>");
+                            messageBody.Append($"<div class='col-md-11'>{org.OrganizationDto.AddressLine2}</div>");
+                            messageBody.Append($"</div>");
+                        }
+                        
+                        messageBody.Append($"<div>");
+                        messageBody.Append($"<div class='col-md-1' style='text-align:right'></div>");
+                        if (!string.IsNullOrWhiteSpace(value: org.OrganizationDto.State))
+                        {
+                            messageBody.Append($"<div class='col-md-11'>{org.OrganizationDto.CityName},{org.OrganizationDto.State}</div>");
+                            
+                        }
+                        else
+                        {
+                            messageBody.Append($"<div class='col-md-11'>{org.OrganizationDto.CityName}</div>");
+                        }
+
+                        messageBody.Append($"</div>");
                     }
                     else
                     {
-                        messageBody += "";
+                        messageBody.Append($"");
                     }
-                    messageBody += "<p>You will be notified by email when a decision has been made about your account request.</p>";
-                    messageBody += $"<p>If you have questions or concerns, please contact {authorityName} at {authorityEmail} or {authorityPhone}.</p>";
+                    messageBody.Append($"<p>You will be notified by email when a decision has been made about your account request.</p>");
+                    messageBody.Append($"<p>If you have questions or concerns, please contact {authorityName} at {authorityEmail} or {authorityPhone}.</p>");
 
                     return View(viewName:"Confirmation",
                                 model:new ConfirmationViewModel
                                       {
                                           Title = $"Thanks for Registering {model.UserProfile.FirstName} {model.UserProfile.LastName}!",
-                                          HtmlStr = messageBody
+                                          HtmlStr = messageBody.ToString()
                                       });
 
                 case RegistrationResult.BadUserProfileData:
