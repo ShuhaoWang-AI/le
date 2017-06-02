@@ -601,7 +601,7 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to KBQ Question Challenge.
+        ///   Looks up a localized string similar to Knowledge Based Question.
         /// </summary>
         public static string TitleKBQChanllenge {
             get {
