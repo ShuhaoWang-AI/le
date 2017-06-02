@@ -2211,7 +2211,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             if (reportPackagegDto.OrganizationRegulatoryProgramDto.RegulatorOrganizationId.HasValue)
             {
-                reportPackagegDto.RecipientOrgRegProgramId = _dbContext.OrganizationRegulatoryPrograms
+                reportPackagegDto.RecipientOrganizationRegulatoryProgramId = _dbContext.OrganizationRegulatoryPrograms
                     .Single(orp => orp.OrganizationId == reportPackagegDto.OrganizationRegulatoryProgramDto.RegulatorOrganizationId
                         && orp.RegulatoryProgramId == reportPackagegDto.OrganizationRegulatoryProgramDto.RegulatoryProgramId).OrganizationRegulatoryProgramId;
             }

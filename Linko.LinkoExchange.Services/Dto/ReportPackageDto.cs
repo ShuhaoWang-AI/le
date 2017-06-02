@@ -40,7 +40,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string RecipientOrganizationJurisdictionName { get; internal set; }
         public string RecipientOrganizationZipCode { get; internal set; }
 
-        public int RecipientOrgRegProgramId { get; internal set; }
+        public int RecipientOrganizationRegulatoryProgramId { get; internal set; }
 
         //Submitter
         public int SubmitterUserId { get; set; }
