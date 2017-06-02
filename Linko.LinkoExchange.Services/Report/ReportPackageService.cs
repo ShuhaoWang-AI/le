@@ -2209,6 +2209,13 @@ namespace Linko.LinkoExchange.Services.Report
             reportPackagegDto.OrganizationRegulatoryProgramDto =
                     _programService.GetOrganizationRegulatoryProgram(reportPackage.OrganizationRegulatoryProgramId);
 
+            if (reportPackagegDto.OrganizationRegulatoryProgramDto.RegulatorOrganizationId.HasValue)
+            {
+                reportPackagegDto.RecipientOrgRegProgramId = _dbContext.OrganizationRegulatoryPrograms
+                    .Single(orp => orp.OrganizationId == reportPackagegDto.OrganizationRegulatoryProgramDto.RegulatorOrganizationId
+                        && orp.RegulatoryProgramId == reportPackagegDto.OrganizationRegulatoryProgramDto.RegulatoryProgramId).OrganizationRegulatoryProgramId;
+            }
+
             if (reportPackage.SubmissionDateTimeUtc.HasValue)
             {
                 reportPackagegDto.SubmissionDateTimeLocal = _timeZoneService

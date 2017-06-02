@@ -31,12 +31,18 @@ namespace Linko.LinkoExchange.Services.Dto
         public DateTimeOffset? SubmissionDateTimeOffset { get; set; }
         public DateTime? SubmissionDateTimeLocal { get; set; }
         public OrganizationRegulatoryProgramDto OrganizationRegulatoryProgramDto { get; set; }
+
+        //Recipient
         public string RecipientOrganizationName { get; internal set; }
         public string RecipientOrganizationAddressLine1 { get; internal set; }
         public string RecipientOrganizationAddressLine2 { get; internal set; }
         public string RecipientOrganizationCityName { get; internal set; }
         public string RecipientOrganizationJurisdictionName { get; internal set; }
         public string RecipientOrganizationZipCode { get; internal set; }
+
+        public int RecipientOrgRegProgramId { get; internal set; }
+
+        //Submitter
         public int SubmitterUserId { get; set; }
         public string SubmitterFirstName { get; set; }
         public string SubmitterLastName { get; set; }
