@@ -199,7 +199,6 @@ BEGIN
         TermConditionId                 int IDENTITY(1,1) NOT NULL  
         , Content                       varchar(max) NOT NULL
 		, CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
-        , LastModificationDateTimeUtc   datetimeoffset(0) NULL  
         , LastModifierUserId            int NULL  
     
         CONSTRAINT PK_tTermCondition PRIMARY KEY CLUSTERED 
