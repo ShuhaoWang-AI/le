@@ -530,6 +530,13 @@
         $(document)
             .ready(function()
             {
+                //Prevent "enter key" press from doing anything on the page, i.e. collapsing boxes, submitting form, etc...
+                $('#LinkoExchangeForm').bind('keydown', function(e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                });
+                
                 $('#ParameterGroupTable')
                     .DataTable(
                         {
