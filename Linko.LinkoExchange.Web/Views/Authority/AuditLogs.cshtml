@@ -98,9 +98,9 @@
                                               .HtmlAttributes(attributes:new {@class = "col-sm-2"})
                                               .HeaderHtmlAttributes(attributes:new {@class = "col-sm-2"})
                                               .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                       //columns.Template(m => { })
-                                       //       .ClientTemplate(value: "<div class='fa fa-chevron-right pull-right'></div>")
-                                       //       .Width(pixelWidth: 60);
+                                       columns.Template(m => { })
+                                              .ClientTemplate(value: "<div class='fa fa-chevron-down pull-right'></div>")
+                                              .Width(pixelWidth: 60);
                                    })
                           .ToolBar(tools => tools.Excel())
                           .Pageable(pageable => pageable
