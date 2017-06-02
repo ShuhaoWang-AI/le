@@ -1109,22 +1109,6 @@ BEGIN
 		(
 			AuditLogTemplateId
 		) REFERENCES dbo.tAuditLogTemplate(AuditLogTemplateId)  
-		, CONSTRAINT FK_tCromerrAuditLog_tOrganization FOREIGN KEY 
-		(
-			OrganizationId
-		) REFERENCES dbo.tOrganization(OrganizationId)
-		, CONSTRAINT FK_tCromerrAuditLog_tOrganization_Regulator FOREIGN KEY 
-		(
-			RegulatorOrganizationId
-		) REFERENCES dbo.tOrganization(OrganizationId)
-		, CONSTRAINT FK_tCromerrAuditLog_tRegulatoryProgram FOREIGN KEY 
-		(
-			RegulatoryProgramId
-		) REFERENCES dbo.tRegulatoryProgram(RegulatoryProgramId)
-		, CONSTRAINT FK_tCromerrAuditLog_tUserProfile FOREIGN KEY 
-		(
-			UserProfileId
-		) REFERENCES dbo.tUserProfile(UserProfileId)
     ) ON [LinkoExchange_FG2_Data]
     
     CREATE NONCLUSTERED INDEX IX_tCromerrAuditLog_AuditLogTemplateId ON dbo.tCromerrAuditLog
