@@ -14,8 +14,7 @@
 <section></section>
 
 <style>
-    .left-flow-link
-    {
+    .left-flow-link {
         float: left;
         margin-left: 0px;
         margin-top: 10px;
@@ -51,10 +50,10 @@
             <div>
                 @if (ViewData.ModelState.IsValid == false && inValidProfile)
                 {
-                    @Html.ValidationSummary(excludePropertyErrors:false, message:"", htmlAttributes:new
-                                                                                                    {
-                                                                                                        @class = "alert alert-danger"
-                                                                                                    })
+                    @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new
+               {
+                   @class = "alert alert-danger"
+               })
                 }
             </div>
 
@@ -91,211 +90,211 @@
                 <div class="editabledDiv">
                     <!-- Line2 FirstName and LastName -->
                     <div class="form-group required">
-                        @Html.LabelFor(model => Model.UserProfile.FirstName, htmlAttributes:new
-                                                                                            {
-                                                                                                @class = "control-label col-md-2 required "
-                                                                                            })
+                        @Html.LabelFor(model => Model.UserProfile.FirstName, htmlAttributes: new
+                   {
+                       @class = "control-label col-md-2 required "
+                   })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.FirstName, additionalViewData:new
-                                                                                                     {
-                                                                                                         htmlAttributes = new
-                                                                                                                          {
-                                                                                                                              @class = "form-control editable"
-                                                                                                                          }
-                                                                                                     })
-                            @Html.ValidationMessageFor(m => m.UserProfile.FirstName, validationMessage:"", htmlAttributes:new
-                                                                                                                          {
-                                                                                                                              @class = "text-danger"
-                                                                                                                          })
+                            @Html.EditorFor(model => Model.UserProfile.FirstName, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control editable"
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserProfile.FirstName, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
 
-                        @Html.LabelFor(model => Model.UserProfile.LastName, htmlAttributes:new
-                                                                                           {
-                                                                                               @class = "control-label col-md-2 required"
-                                                                                           })
+                        @Html.LabelFor(model => Model.UserProfile.LastName, htmlAttributes: new
+                   {
+                       @class = "control-label col-md-2 required"
+                   })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.LastName, additionalViewData:new
-                                                                                                    {
-                                                                                                        htmlAttributes = new
-                                                                                                                         {
-                                                                                                                             @class = "form-control"
-                                                                                                                         }
-                                                                                                    })
-                            @Html.ValidationMessageFor(m => m.UserProfile.LastName, validationMessage:"", htmlAttributes:new
-                                                                                                                         {
-                                                                                                                             @class = "text-danger"
-                                                                                                                         })
+                            @Html.EditorFor(model => Model.UserProfile.LastName, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control"
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserProfile.LastName, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
                     </div>
 
                     <!-- Line3 Organization and TitleROle -->
                     <div class="form-group ">
-                        @Html.LabelFor(model => Model.UserProfile.BusinessName, htmlAttributes:new
-                                                                                               {
-                                                                                                   @class = " control-label col-md-2 required "
-                                                                                               })
+                        @Html.LabelFor(model => Model.UserProfile.BusinessName, htmlAttributes: new
+                   {
+                       @class = " control-label col-md-2 required "
+                   })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.BusinessName, additionalViewData:new
-                                                                                                        {
-                                                                                                            htmlAttributes = new
-                                                                                                                             {
-                                                                                                                                 @class = "form-control "
-                                                                                                                             }
-                                                                                                        })
-                            @Html.ValidationMessageFor(m => m.UserProfile.BusinessName, validationMessage:"", htmlAttributes:new
-                                                                                                                             {
-                                                                                                                                 @class = "text-danger"
-                                                                                                                             })
+                            @Html.EditorFor(model => Model.UserProfile.BusinessName, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control "
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserProfile.BusinessName, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
 
-                        @Html.LabelFor(model => Model.UserProfile.TitleRole, htmlAttributes:new
-                                                                                            {
-                                                                                                @class = "control-label col-md-2"
-                                                                                            })
+                        @Html.LabelFor(model => Model.UserProfile.TitleRole, htmlAttributes: new
+                   {
+                       @class = "control-label col-md-2"
+                   })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.TitleRole, additionalViewData:new
-                                                                                                     {
-                                                                                                         htmlAttributes = new
-                                                                                                                          {
-                                                                                                                              @class = "form-control"
-                                                                                                                          }
-                                                                                                     })
+                            @Html.EditorFor(model => Model.UserProfile.TitleRole, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control"
+                           }
+                       })
                         </div>
                     </div>
 
                     <!-- Line4 Phone and Ext -->
                     <div class="form-group">
-                        @Html.LabelFor(model => Model.UserProfile.PhoneNumber, htmlAttributes:new
-                                                                                              {
-                                                                                                  @class = "control-label col-md-2 required"
-                                                                                              })
+                        @Html.LabelFor(model => Model.UserProfile.PhoneNumber, htmlAttributes: new
+                   {
+                       @class = "control-label col-md-2 required"
+                   })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.PhoneNumber, additionalViewData:new
-                                                                                                       {
-                                                                                                           htmlAttributes = new
-                                                                                                                            {
-                                                                                                                                @class = "form-control"
-                                                                                                                            }
-                                                                                                       })
-                            @Html.ValidationMessageFor(m => m.UserProfile.PhoneNumber, validationMessage:"", htmlAttributes:new
-                                                                                                                            {
-                                                                                                                                @class = "text-danger"
-                                                                                                                            })
+                            @Html.EditorFor(model => Model.UserProfile.PhoneNumber, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control"
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserProfile.PhoneNumber, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
 
-                        @Html.LabelFor(model => Model.UserProfile.PhoneExt, htmlAttributes:new
-                                                                                           {
-                                                                                               @class = "control-label col-md-2"
-                                                                                           })
+                        @Html.LabelFor(model => Model.UserProfile.PhoneExt, htmlAttributes: new
+                   {
+                       @class = "control-label col-md-2"
+                   })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.PhoneExt, additionalViewData:new
-                                                                                                    {
-                                                                                                        htmlAttributes = new
-                                                                                                                         {
-                                                                                                                             @class = "form-control",
-                                                                                                                             type = "text"
-                                                                                                                         }
-                                                                                                    })
+                            @Html.EditorFor(model => Model.UserProfile.PhoneExt, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control",
+                               type = "text"
+                           }
+                       })
                         </div>
                     </div>
 
                     <!-- Line6 AddressLine1 and AddressLine2 -->
                     <div class="form-group">
-                        @Html.LabelFor(model => Model.UserProfile.AddressLine1, htmlAttributes:new
-                                                                                               {
-                                                                                                   @class = "control-label col-md-2 required"
-                                                                                               })
+                        @Html.LabelFor(model => Model.UserProfile.AddressLine1, htmlAttributes: new
+                   {
+                       @class = "control-label col-md-2 required"
+                   })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.AddressLine1, additionalViewData:new
-                                                                                                        {
-                                                                                                            htmlAttributes = new
-                                                                                                                             {
-                                                                                                                                 @class = "form-control"
-                                                                                                                             }
-                                                                                                        })
-                            @Html.ValidationMessageFor(m => m.UserProfile.AddressLine1, validationMessage:"", htmlAttributes:new
-                                                                                                                             {
-                                                                                                                                 @class = "text-danger"
-                                                                                                                             })
+                            @Html.EditorFor(model => Model.UserProfile.AddressLine1, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control"
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserProfile.AddressLine1, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
 
-                        @Html.LabelFor(model => Model.UserProfile.AddressLine2, htmlAttributes:new
-                                                                                               {
-                                                                                                   @class = "control-label col-md-2"
-                                                                                               })
+                        @Html.LabelFor(model => Model.UserProfile.AddressLine2, htmlAttributes: new
+                   {
+                       @class = "control-label col-md-2"
+                   })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.AddressLine2, additionalViewData:new
-                                                                                                        {
-                                                                                                            htmlAttributes = new
-                                                                                                                             {
-                                                                                                                                 @class = "form-control"
-                                                                                                                             }
-                                                                                                        })
+                            @Html.EditorFor(model => Model.UserProfile.AddressLine2, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control"
+                           }
+                       })
                         </div>
 
                     </div>
 
                     <!-- Line7 City and State -->
                     <div class="form-group">
-                        @Html.LabelFor(model => Model.UserProfile.CityName, htmlAttributes:new
-                                                                                           {
-                                                                                               @class = "control-label col-md-2 required"
-                                                                                           })
+                        @Html.LabelFor(model => Model.UserProfile.CityName, htmlAttributes: new
+                   {
+                       @class = "control-label col-md-2 required"
+                   })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.CityName, additionalViewData:new
-                                                                                                    {
-                                                                                                        htmlAttributes = new
-                                                                                                                         {
-                                                                                                                             @class = "form-control"
-                                                                                                                         }
-                                                                                                    })
-                            @Html.ValidationMessageFor(m => m.UserProfile.CityName, validationMessage:"", htmlAttributes:new
-                                                                                                                         {
-                                                                                                                             @class = "text-danger"
-                                                                                                                         })
+                            @Html.EditorFor(model => Model.UserProfile.CityName, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control"
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserProfile.CityName, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
 
-                        @Html.LabelFor(model => Model.UserProfile.JurisdictionId, htmlAttributes:new
-                                                                                                 {
-                                                                                                     @class = "control-label col-md-2 required"
-                                                                                                 })
+                        @Html.LabelFor(model => Model.UserProfile.JurisdictionId, htmlAttributes: new
+                   {
+                       @class = "control-label col-md-2 required"
+                   })
                         <div class="col-md-4">
-                            @Html.DropDownListFor(model => Model.UserProfile.JurisdictionId, selectList:Model.UserProfile.StateList.Select(i => new SelectListItem
-                                                                                                                                                {
-                                                                                                                                                    Text = i.StateName,
-                                                                                                                                                    Value = i.JurisdictionId.ToString(),
-                                                                                                                                                    Selected = Model.UserProfile.JurisdictionId == i.JurisdictionId
-                                                                                                                                                }).ToList(),
-                                htmlAttributes:new
-                                               {
-                                                   @class = "form-control"
-                                               })
+                            @Html.DropDownListFor(model => Model.UserProfile.JurisdictionId, selectList: Model.UserProfile.StateList.Select(i => new SelectListItem
+                       {
+                           Text = i.StateName,
+                           Value = i.JurisdictionId.ToString(),
+                           Selected = Model.UserProfile.JurisdictionId == i.JurisdictionId
+                       }).ToList(),
+                                htmlAttributes: new
+                                {
+                                    @class = "form-control"
+                                })
                             @Html.HiddenFor(model => Model.UserProfile.JurisdictionId)
-                            @Html.ValidationMessageFor(m => m.UserProfile.JurisdictionId, validationMessage:"", htmlAttributes:new
-                                                                                                                               {
-                                                                                                                                   @class = "text-danger"
-                                                                                                                               })
+                            @Html.ValidationMessageFor(m => m.UserProfile.JurisdictionId, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
                     </div>
 
                     <!-- Line8 Zip Code -->
                     <div class="form-group">
-                        @Html.LabelFor(model => Model.UserProfile.ZipCode, htmlAttributes:new
-                                                                                          {
-                                                                                              @class = "control-label col-md-2 required"
-                                                                                          })
+                        @Html.LabelFor(model => Model.UserProfile.ZipCode, htmlAttributes: new
+                   {
+                       @class = "control-label col-md-2 required"
+                   })
                         <div class="col-md-4">
-                            @Html.EditorFor(model => Model.UserProfile.ZipCode, additionalViewData:new
-                                                                                                   {
-                                                                                                       htmlAttributes = new
-                                                                                                                        {
-                                                                                                                            @class = "form-control"
-                                                                                                                        }
-                                                                                                   })
-                            @Html.ValidationMessageFor(m => m.UserProfile.ZipCode, validationMessage:"", htmlAttributes:new
-                                                                                                                        {
-                                                                                                                            @class = "text-danger"
-                                                                                                                        })
+                            @Html.EditorFor(model => Model.UserProfile.ZipCode, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control"
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserProfile.ZipCode, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
 
                     </div>
@@ -304,59 +303,59 @@
 
                 <!-- Line 9 Email -->
                 <div class="form-group">
-                    @Html.LabelFor(model => Model.UserProfile.Email, htmlAttributes:new
-                                                                                    {
-                                                                                        @class = "control-label col-md-2 required"
-                                                                                    })
+                    @Html.LabelFor(model => Model.UserProfile.Email, htmlAttributes: new
+               {
+                   @class = "control-label col-md-2 required"
+               })
                     <div class="col-md-4">
-                        @Html.EditorFor(model => Model.UserProfile.Email, additionalViewData:new
-                                                                                             {
-                                                                                                 htmlAttributes = new
-                                                                                                                  {
-                                                                                                                      @class = "form-control",
-                                                                                                                      @readonly = "readonly"
-                                                                                                                  }
-                                                                                             })
+                        @Html.EditorFor(model => Model.UserProfile.Email, additionalViewData: new
+                   {
+                       htmlAttributes = new
+                       {
+                           @class = "form-control",
+                           @readonly = "readonly"
+                       }
+                   })
                     </div>
                 </div>
 
                 <!-- Line 10 UserName -->
                 <div class="form-group">
-                    @Html.LabelFor(model => Model.UserProfile.UserName, htmlAttributes:new
-                                                                                       {
-                                                                                           @class = "control-label col-md-2 required"
-                                                                                       })
+                    @Html.LabelFor(model => Model.UserProfile.UserName, htmlAttributes: new
+               {
+                   @class = "control-label col-md-2 required"
+               })
                     <div class="col-md-4">
-                        @Html.EditorFor(model => Model.UserProfile.UserName, additionalViewData:new
-                                                                                                {
-                                                                                                    htmlAttributes = new
-                                                                                                                     {
-                                                                                                                         @class = "form-control"
-                                                                                                                     }
-                                                                                                })
-                        @Html.ValidationMessageFor(m => m.UserProfile.UserName, validationMessage:"", htmlAttributes:new
-                                                                                                                     {
-                                                                                                                         @class = "text-danger"
-                                                                                                                     })
+                        @Html.EditorFor(model => Model.UserProfile.UserName, additionalViewData: new
+                   {
+                       htmlAttributes = new
+                       {
+                           @class = "form-control"
+                       }
+                   })
+                        @Html.ValidationMessageFor(m => m.UserProfile.UserName, validationMessage: "", htmlAttributes: new
+                   {
+                       @class = "text-danger"
+                   })
                     </div>
                 </div>
 
                 <!-- Line 11 Password -->
                 <div class="form-group">
-                    @Html.LabelFor(model => Model.UserProfile.Password, htmlAttributes:new
-                                                                                       {
-                                                                                           @class = "control-label col-md-2 required"
-                                                                                       })
+                    @Html.LabelFor(model => Model.UserProfile.Password, htmlAttributes: new
+               {
+                   @class = "control-label col-md-2 required"
+               })
                     <div class="col-md-4">
-                        @Html.PasswordFor(model => model.UserProfile.Password, htmlAttributes:new
-                                                                                              {
-                                                                                                  @class = "form-control",
-                                                                                                  value = Model.UserProfile.Password
-                                                                                              })
-                        @Html.ValidationMessageFor(m => m.UserProfile.Password, validationMessage:"", htmlAttributes:new
-                                                                                                                     {
-                                                                                                                         @class = "text-danger"
-                                                                                                                     })
+                        @Html.PasswordFor(model => model.UserProfile.Password, htmlAttributes: new
+                   {
+                       @class = "form-control",
+                       value = Model.UserProfile.Password
+                   })
+                        @Html.ValidationMessageFor(m => m.UserProfile.Password, validationMessage: "", htmlAttributes: new
+                   {
+                       @class = "text-danger"
+                   })
                     </div>
                     <div>
                         <button class="btn btn-info btn-sm" data-placement="middle" data-toggle="tooltip" title="Passwords must be at least 8 characters, have at least one digit ('0'-'9'), and have at least one lowercase ('a'-'z') and one uppercase ('A'-'Z') letter. " type="button">
@@ -368,20 +367,20 @@
                 @if (Model.UserProfile.ShowConfirmPassword)
                 {
                     <div class="form-group">
-                        @Html.LabelFor(m => m.UserProfile.ConfirmPassword, htmlAttributes:new
-                                                                                          {
-                                                                                              @class = "control-label col-md-2 required"
-                                                                                          })
+                        @Html.LabelFor(m => m.UserProfile.ConfirmPassword, htmlAttributes: new
+                   {
+                       @class = "control-label col-md-2 required"
+                   })
 
                         <div class="col-md-4">
-                            @Html.PasswordFor(m => m.UserProfile.ConfirmPassword, htmlAttributes:new
-                                                                                                 {
-                                                                                                     @class = "form-control"
-                                                                                                 })
-                            @Html.ValidationMessageFor(m => m.UserProfile.ConfirmPassword, validationMessage:"", htmlAttributes:new
-                                                                                                                                {
-                                                                                                                                    @class = "text-red"
-                                                                                                                                })
+                            @Html.PasswordFor(m => m.UserProfile.ConfirmPassword, htmlAttributes: new
+                       {
+                           @class = "form-control"
+                       })
+                            @Html.ValidationMessageFor(m => m.UserProfile.ConfirmPassword, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-red"
+                       })
                         </div>
                     </div>
                 }
@@ -412,10 +411,10 @@
             <div>
                 @if (ViewData.ModelState.IsValid == false && inValidKBQ)
                 {
-                    @Html.ValidationSummary(excludePropertyErrors:false, message:"", htmlAttributes:new
-                                                                                                    {
-                                                                                                        @class = "alert alert-danger"
-                                                                                                    })
+                    @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new
+               {
+                   @class = "alert alert-danger"
+               })
                 }
 
             </div>
@@ -439,16 +438,16 @@
 
                             @Html.DropDownListFor(
                                                   model => Model.UserKBQ.KBQ1,
-                                selectList:kbqQuestionPool.Select(i => new SelectListItem
-                                                                       {
-                                                                           Text = i.Content,
-                                                                           Value = i.QuestionId.Value.ToString(),
-                                                                           Selected = Model.UserKBQ.KBQ1 == i.QuestionId.Value
-                                                                       }),
-                                htmlAttributes:new
-                                               {
-                                                   @class = "form-control"
-                                               }
+                                selectList: kbqQuestionPool.Select(i => new SelectListItem
+                                {
+                                    Text = i.Content,
+                                    Value = i.QuestionId.Value.ToString(),
+                                    Selected = Model.UserKBQ.KBQ1 == i.QuestionId.Value
+                                }),
+                                htmlAttributes: new
+                                {
+                                    @class = "form-control"
+                                }
                                 )
                         </div>
                     </div>
@@ -456,28 +455,28 @@
                     <!-- anwser 1 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer1, htmlAttributes:new
-                                                                                         {
-                                                                                             @class = "control-label required"
-                                                                                         })
+                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer1, htmlAttributes: new
+                       {
+                           @class = "control-label required"
+                       })
                         </div>
 
                         <div class="col-md-8">
                             @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ1)
 
-                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer1, additionalViewData:new
-                                                                                                  {
-                                                                                                      htmlAttributes = new
-                                                                                                                       {
-                                                                                                                           @class = "form-control",
-                                                                                                                           style = "margin-top:5px",
-                                                                                                                           autocomplete = "off"
-                                                                                                                       }
-                                                                                                  })
-                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer1, validationMessage:"", htmlAttributes:new
-                                                                                                                       {
-                                                                                                                           @class = "text-danger"
-                                                                                                                       })
+                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer1, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control",
+                               style = "margin-top:5px",
+                               autocomplete = "off"
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer1, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
                     </div>
 
@@ -489,16 +488,16 @@
                         <div class="col-md-8">
                             @Html.DropDownListFor(
                                                   model => Model.UserKBQ.KBQ2,
-                                selectList:kbqQuestionPool.Select(i => new SelectListItem
-                                                                       {
-                                                                           Text = i.Content,
-                                                                           Value = i.QuestionId.Value.ToString(),
-                                                                           Selected = Model.UserKBQ.KBQ2 == i.QuestionId.Value
-                                                                       }),
-                                htmlAttributes:new
-                                               {
-                                                   @class = "form-control"
-                                               })
+                                selectList: kbqQuestionPool.Select(i => new SelectListItem
+                                {
+                                    Text = i.Content,
+                                    Value = i.QuestionId.Value.ToString(),
+                                    Selected = Model.UserKBQ.KBQ2 == i.QuestionId.Value
+                                }),
+                                htmlAttributes: new
+                                {
+                                    @class = "form-control"
+                                })
                             @Html.HiddenFor(model => Model.UserKBQ.KBQ2)
 
                         </div>
@@ -507,27 +506,27 @@
                     <!-- anwser 2 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer2, htmlAttributes:new
-                                                                                         {
-                                                                                             @class = "control-label required"
-                                                                                         })
+                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer2, htmlAttributes: new
+                       {
+                           @class = "control-label required"
+                       })
                         </div>
 
                         <div class="col-md-8">
                             @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ2)
-                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer2, additionalViewData:new
-                                                                                                  {
-                                                                                                      htmlAttributes = new
-                                                                                                                       {
-                                                                                                                           @class = "form-control",
-                                                                                                                           style = "margin-top:5px",
-                                                                                                                           autocomplete = "off"
-                                                                                                                       }
-                                                                                                  })
-                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer2, validationMessage:"", htmlAttributes:new
-                                                                                                                       {
-                                                                                                                           @class = "text-danger"
-                                                                                                                       })
+                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer2, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control",
+                               style = "margin-top:5px",
+                               autocomplete = "off"
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer2, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
                     </div>
 
@@ -539,16 +538,16 @@
                         <div class="col-md-8">
                             @Html.DropDownListFor(
                                                   model => Model.UserKBQ.KBQ3,
-                                selectList:kbqQuestionPool.Select(i => new SelectListItem
-                                                                       {
-                                                                           Text = i.Content,
-                                                                           Value = i.QuestionId.Value.ToString(),
-                                                                           Selected = Model.UserKBQ.KBQ3 == i.QuestionId.Value
-                                                                       }),
-                                htmlAttributes:new
-                                               {
-                                                   @class = "form-control"
-                                               })
+                                selectList: kbqQuestionPool.Select(i => new SelectListItem
+                                {
+                                    Text = i.Content,
+                                    Value = i.QuestionId.Value.ToString(),
+                                    Selected = Model.UserKBQ.KBQ3 == i.QuestionId.Value
+                                }),
+                                htmlAttributes: new
+                                {
+                                    @class = "form-control"
+                                })
                             @Html.HiddenFor(model => Model.UserKBQ.KBQ3)
                         </div>
                     </div>
@@ -556,27 +555,27 @@
                     <!-- anwser 3 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer3, htmlAttributes:new
-                                                                                         {
-                                                                                             @class = "control-label required"
-                                                                                         })
+                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer3, htmlAttributes: new
+                       {
+                           @class = "control-label required"
+                       })
                         </div>
 
                         <div class="col-md-8">
                             @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ3)
-                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer3, additionalViewData:new
-                                                                                                  {
-                                                                                                      htmlAttributes = new
-                                                                                                                       {
-                                                                                                                           @class = "form-control",
-                                                                                                                           style = "margin-top:5px",
-                                                                                                                           autocomplete = "off"
-                                                                                                                       }
-                                                                                                  })
-                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer3, validationMessage:"", htmlAttributes:new
-                                                                                                                       {
-                                                                                                                           @class = "text-danger"
-                                                                                                                       })
+                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer3, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control",
+                               style = "margin-top:5px",
+                               autocomplete = "off"
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer3, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
                     </div>
 
@@ -589,16 +588,16 @@
 
                             @Html.DropDownListFor(
                                                   model => Model.UserKBQ.KBQ4,
-                                selectList:kbqQuestionPool.Select(i => new SelectListItem
-                                                                       {
-                                                                           Text = i.Content,
-                                                                           Value = i.QuestionId.Value.ToString(),
-                                                                           Selected = Model.UserKBQ.KBQ4 == i.QuestionId.Value
-                                                                       }),
-                                htmlAttributes:new
-                                               {
-                                                   @class = "form-control"
-                                               })
+                                selectList: kbqQuestionPool.Select(i => new SelectListItem
+                                {
+                                    Text = i.Content,
+                                    Value = i.QuestionId.Value.ToString(),
+                                    Selected = Model.UserKBQ.KBQ4 == i.QuestionId.Value
+                                }),
+                                htmlAttributes: new
+                                {
+                                    @class = "form-control"
+                                })
                             @Html.HiddenFor(model => Model.UserKBQ.KBQ4)
 
                         </div>
@@ -607,27 +606,27 @@
                     <!-- anwser 4 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer4, htmlAttributes:new
-                                                                                         {
-                                                                                             @class = "control-label required"
-                                                                                         })
+                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer4, htmlAttributes: new
+                       {
+                           @class = "control-label required"
+                       })
                         </div>
 
                         <div class="col-md-8">
                             @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ4)
-                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer4, additionalViewData:new
-                                                                                                  {
-                                                                                                      htmlAttributes = new
-                                                                                                                       {
-                                                                                                                           @class = "form-control",
-                                                                                                                           style = "margin-top:5px",
-                                                                                                                           autocomplete = "off"
-                                                                                                                       }
-                                                                                                  })
-                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer4, validationMessage:"", htmlAttributes:new
-                                                                                                                       {
-                                                                                                                           @class = "text-danger"
-                                                                                                                       })
+                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer4, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control",
+                               style = "margin-top:5px",
+                               autocomplete = "off"
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer4, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
                     </div>
 
@@ -640,16 +639,16 @@
 
                             @Html.DropDownListFor(
                                                   model => Model.UserKBQ.KBQ5,
-                                selectList:kbqQuestionPool.Select(i => new SelectListItem
-                                                                       {
-                                                                           Text = i.Content,
-                                                                           Value = i.QuestionId.Value.ToString(),
-                                                                           Selected = Model.UserKBQ.KBQ5 == i.QuestionId.Value
-                                                                       }),
-                                htmlAttributes:new
-                                               {
-                                                   @class = "form-control"
-                                               })
+                                selectList: kbqQuestionPool.Select(i => new SelectListItem
+                                {
+                                    Text = i.Content,
+                                    Value = i.QuestionId.Value.ToString(),
+                                    Selected = Model.UserKBQ.KBQ5 == i.QuestionId.Value
+                                }),
+                                htmlAttributes: new
+                                {
+                                    @class = "form-control"
+                                })
                             @Html.HiddenFor(model => Model.UserKBQ.KBQ5)
 
                         </div>
@@ -658,27 +657,27 @@
                     <!-- anwser 5 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer5, htmlAttributes:new
-                                                                                         {
-                                                                                             @class = "control-label required"
-                                                                                         })
+                            @Html.LabelFor(i => Model.UserKBQ.KBQAnswer5, htmlAttributes: new
+                       {
+                           @class = "control-label required"
+                       })
                         </div>
 
                         <div class="col-md-8">
                             @Html.HiddenFor(model => Model.UserKBQ.UserQuestionAnserId_KBQ5)
-                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer5, additionalViewData:new
-                                                                                                  {
-                                                                                                      htmlAttributes = new
-                                                                                                                       {
-                                                                                                                           @class = "form-control",
-                                                                                                                           style = "margin-top:5px",
-                                                                                                                           autocomplete = "off"
-                                                                                                                       }
-                                                                                                  })
-                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer5, validationMessage:"", htmlAttributes:new
-                                                                                                                       {
-                                                                                                                           @class = "text-danger"
-                                                                                                                       })
+                            @Html.EditorFor(model => Model.UserKBQ.KBQAnswer5, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control",
+                               style = "margin-top:5px",
+                               autocomplete = "off"
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQAnswer5, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
                     </div>
                 </div>
@@ -708,10 +707,10 @@
             <div>
                 @if (ViewData.ModelState.IsValid == false && inValidSQ)
                 {
-                    @Html.ValidationSummary(excludePropertyErrors:false, message:"", htmlAttributes:new
-                                                                                                    {
-                                                                                                        @class = "alert alert-danger"
-                                                                                                    })
+                    @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new
+               {
+                   @class = "alert alert-danger"
+               })
                 }
 
             </div>
@@ -735,16 +734,16 @@
 
                             @Html.DropDownListFor(
                                                   model => Model.UserSQ.SecurityQuestion1,
-                                selectList:sqQuestionPool.Select(i => new SelectListItem
-                                                                      {
-                                                                          Text = i.Content,
-                                                                          Value = i.QuestionId.Value.ToString(),
-                                                                          Selected = Model.UserSQ.SecurityQuestion1 == i.QuestionId.Value
-                                                                      }),
-                                htmlAttributes:new
-                                               {
-                                                   @class = "form-control"
-                                               })
+                                selectList: sqQuestionPool.Select(i => new SelectListItem
+                                {
+                                    Text = i.Content,
+                                    Value = i.QuestionId.Value.ToString(),
+                                    Selected = Model.UserSQ.SecurityQuestion1 == i.QuestionId.Value
+                                }),
+                                htmlAttributes: new
+                                {
+                                    @class = "form-control"
+                                })
                             @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer1)*@
                         </div>
                     </div>
@@ -752,27 +751,27 @@
                     <!-- anwser 1 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer1, htmlAttributes:new
-                                                                                                     {
-                                                                                                         @class = "control-label required"
-                                                                                                     })
+                            @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer1, htmlAttributes: new
+                       {
+                           @class = "control-label required"
+                       })
                         </div>
 
                         <div class="col-md-8">
                             @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ1)
-                            @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer1, additionalViewData:new
-                                                                                                              {
-                                                                                                                  htmlAttributes = new
-                                                                                                                                   {
-                                                                                                                                       @class = "form-control readonly",
-                                                                                                                                       style = "margin-top:5px",
-                                                                                                                                       autocomplete = "off"
-                                                                                                                                   }
-                                                                                                              })
-                            @Html.ValidationMessageFor(m => m.UserSQ.SecurityQuestionAnswer1, validationMessage:"", htmlAttributes:new
-                                                                                                                                   {
-                                                                                                                                       @class = "text-danger"
-                                                                                                                                   })
+                            @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer1, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control readonly",
+                               style = "margin-top:5px",
+                               autocomplete = "off"
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserSQ.SecurityQuestionAnswer1, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
                     </div>
 
@@ -785,16 +784,16 @@
 
                             @Html.DropDownListFor(
                                                   model => Model.UserSQ.SecurityQuestion2,
-                                selectList:sqQuestionPool.Select(i => new SelectListItem
-                                                                      {
-                                                                          Text = i.Content,
-                                                                          Value = i.QuestionId.Value.ToString(),
-                                                                          Selected = Model.UserSQ.SecurityQuestion1 == i.QuestionId.Value
-                                                                      }),
-                                htmlAttributes:new
-                                               {
-                                                   @class = "form-control"
-                                               })
+                                selectList: sqQuestionPool.Select(i => new SelectListItem
+                                {
+                                    Text = i.Content,
+                                    Value = i.QuestionId.Value.ToString(),
+                                    Selected = Model.UserSQ.SecurityQuestion1 == i.QuestionId.Value
+                                }),
+                                htmlAttributes: new
+                                {
+                                    @class = "form-control"
+                                })
                             @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer2)*@
 
                         </div>
@@ -803,27 +802,27 @@
                     <!-- anwser 2 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
-                            @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer2, htmlAttributes:new
-                                                                                                     {
-                                                                                                         @class = "control-label required"
-                                                                                                     })
+                            @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer2, htmlAttributes: new
+                       {
+                           @class = "control-label required"
+                       })
                         </div>
 
                         <div class="col-md-8">
                             @Html.HiddenFor(model => Model.UserSQ.UserQuestionAnserId_SQ2)
-                            @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer2, additionalViewData:new
-                                                                                                              {
-                                                                                                                  htmlAttributes = new
-                                                                                                                                   {
-                                                                                                                                       @class = "form-control readonly",
-                                                                                                                                       style = "margin-top:5px;",
-                                                                                                                                       autocomplete = "off"
-                                                                                                                                   }
-                                                                                                              })
-                            @Html.ValidationMessageFor(m => m.UserSQ.SecurityQuestionAnswer2, validationMessage:"", htmlAttributes:new
-                                                                                                                                   {
-                                                                                                                                       @class = "text-danger"
-                                                                                                                                   })
+                            @Html.EditorFor(model => Model.UserSQ.SecurityQuestionAnswer2, additionalViewData: new
+                       {
+                           htmlAttributes = new
+                           {
+                               @class = "form-control readonly",
+                               style = "margin-top:5px;",
+                               autocomplete = "off"
+                           }
+                       })
+                            @Html.ValidationMessageFor(m => m.UserSQ.SecurityQuestionAnswer2, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
                     </div>
                 </div>
@@ -837,12 +836,12 @@
         </div>
         <div class="box-body">
             @*<div class="form-group">
-                <div class="col-md-8 col-md-offset-2 well">
-                    <div id="divTermsAndConditions">
-                        @Html.Raw(value:ViewBag.TermsAndConditionsHtml)
+                    <div class="col-md-8 col-md-offset-2 well">
+                        <div id="divTermsAndConditions">
+                            @Html.Raw(value:ViewBag.TermsAndConditionsHtml)
+                        </div>
                     </div>
-                </div>
-            </div>*@
+                </div>*@
             <div class="form-group">
                 <div class="col-md-10 col-md-offset-2">
                     <div class="checkbox-inline input-group" style="margin-left: -35px">
@@ -850,10 +849,10 @@
                         <strong>
                             I agree to the <a href="@Url.Action(actionName:"TermsAndConditions", controllerName:"Home")" target="_blank">Terms and Conditions</a>
                         </strong>
-                        @Html.ValidationMessageFor(m => m.AgreeTermsAndConditions, validationMessage:"", htmlAttributes:new
-                                                                                                                        {
-                                                                                                                            @class = "text-danger"
-                                                                                                                        })
+                        @Html.ValidationMessageFor(m => m.AgreeTermsAndConditions, validationMessage: "", htmlAttributes: new
+                   {
+                       @class = "text-danger"
+                   })
                     </div>
                 </div>
             </div>
@@ -864,31 +863,26 @@
             </div>
         </div>
     </div>
-}
+                    }
 @section Scripts {
-    @Scripts.Render(paths:"~/bundles/jqueryval")
+    @Scripts.Render(paths: "~/bundles/jqueryval")
 
     <script type="text/javascript">
         var registrationType = '@Html.Raw(value:Model.RegistrationType.ToString())';
 
         $(document)
-            .ready(function()
-            {
-                if (registrationType == 'ReRegistration')
-                {
+            .ready(function () {
+                if (registrationType == 'ReRegistration') {
                     // User can not change any thing
                     $("input").attr("readonly", true);
-                    $("input[type='checkbox'").prop('checked', true);
                     $(".editabledDiv select").attr("readonly", "disabled");
                 }
-                else if (registrationType == 'ResetRegistration')
-                {
+                else if (registrationType == 'ResetRegistration') {
                     // Everything should be editable except email and username
                     $("#UserProfile_Email").attr("readonly", true);
                     $("#UserProfile_UserName").attr("readonly", true);
                 }
-                else if (registrationType == 'NewRegistration')
-                {
+                else if (registrationType == 'NewRegistration') {
                     // All inputs are open to user
                 }
 
@@ -897,22 +891,20 @@
                 $(document)
                     .find("#kbq-panel select")
                     .on("change"
-                        , function()
-                        {
+                        , function () {
                             $(this).closest(".form-group").next().find("input[type=text]").val("");
                         });
                 $(document)
                     .find("#sq-panel select")
                     .on("change"
-                        , function()
-                        {
+                        , function () {
                             $(this).closest(".form-group").next().find("input[type=text]").val("");
                         });
                 $(document)
                     .on("click"
                         , "#register"
-                        , function()
-                        {});
+                        , function ()
+                        { });
             });
 
         //$(function()
