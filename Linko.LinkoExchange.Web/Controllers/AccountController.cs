@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Kendo.Mvc.Extensions;
@@ -26,7 +27,6 @@ using Linko.LinkoExchange.Web.ViewModels.Account;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 using NLog;
-using System.Text;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -154,6 +154,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 model.UserProfile = _profileHelper.GetUserProfileViewModel(userProfileId:user.UserProfileId);
                 model.UserKBQ = _profileHelper.GetUserKbqViewModel(userProfileId:user.UserProfileId);
                 model.UserSQ = _profileHelper.GetUserSecurityQuestionViewModel(userProfileId:user.UserProfileId);
+
                 // For re-registration, set the kbq questions to be **** so that we do not display gully hashed string.
                 model.UserKBQ.KBQAnswer1 = "**********";
                 model.UserKBQ.KBQAnswer2 = "**********";
@@ -260,53 +261,52 @@ namespace Linko.LinkoExchange.Web.Controllers
                     var org = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:invitation.RecipientOrganizationRegulatoryProgramId);
 
                     var messageBody = new StringBuilder();
-                    messageBody.Append($"<p>Your LinkoExchange registration has been received and is now under review for the following:</p>");
-                    messageBody.Append($"<div>");
-                    messageBody.Append($"<div class='col-md-1' style='text-align:right'>Authority:</div>");
-                    var authorityNameInMessage = _organizationService.GetAuthority(orgRegProgramId: invitation.RecipientOrganizationRegulatoryProgramId).OrganizationDto.OrganizationName;
-                    messageBody.Append($"<div class='col-md-11'>{authorityNameInMessage}</div>");
-                    messageBody.Append($"</div");
+                    messageBody.Append(value:$"<p>Your LinkoExchange registration has been received and is now under review for the following:</p>");
+                    messageBody.Append(value:$"<div>");
+                    messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'>Authority:</div>");
+                    var authorityNameInMessage = _organizationService.GetAuthority(orgRegProgramId:invitation.RecipientOrganizationRegulatoryProgramId).OrganizationDto.OrganizationName;
+                    messageBody.Append(value:$"<div class='col-md-11'>{authorityNameInMessage}</div>");
+                    messageBody.Append(value:$"</div");
 
                     if (org.OrganizationDto.OrganizationType.Name.ToLower().IsCaseInsensitiveEqual(comparing:OrganizationTypeName.Industry.ToString()))
                     {
-                        messageBody.Append($"<div>");
-                        messageBody.Append($"<div class='col-md-1' style='text-align:right'>Facility: </div>");
-                        messageBody.Append($"<div class='col-md-11'>{ org.OrganizationDto.OrganizationName} </div>");
-                        messageBody.Append($"</div>");
+                        messageBody.Append(value:$"<div>");
+                        messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'>Facility: </div>");
+                        messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.OrganizationName} </div>");
+                        messageBody.Append(value:$"</div>");
 
-                        messageBody.Append($"<div>");
-                        messageBody.Append($"<div class='col-md-1' style='text-align:right'></div>");
-                        messageBody.Append($"<div class='col-md-11'>{org.OrganizationDto.AddressLine1}</div>");
-                        messageBody.Append($"</div>");
+                        messageBody.Append(value:$"<div>");
+                        messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'></div>");
+                        messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.AddressLine1}</div>");
+                        messageBody.Append(value:$"</div>");
 
-                        if (!string.IsNullOrWhiteSpace(org.OrganizationDto.AddressLine2))
+                        if (!string.IsNullOrWhiteSpace(value:org.OrganizationDto.AddressLine2))
                         {
-                            messageBody.Append($"<div>");
-                            messageBody.Append($"<div class='col-md-1' style='text-align:right'></div>");
-                            messageBody.Append($"<div class='col-md-11'>{org.OrganizationDto.AddressLine2}</div>");
-                            messageBody.Append($"</div>");
+                            messageBody.Append(value:$"<div>");
+                            messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'></div>");
+                            messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.AddressLine2}</div>");
+                            messageBody.Append(value:$"</div>");
                         }
-                        
-                        messageBody.Append($"<div>");
-                        messageBody.Append($"<div class='col-md-1' style='text-align:right'></div>");
-                        if (!string.IsNullOrWhiteSpace(value: org.OrganizationDto.State))
+
+                        messageBody.Append(value:$"<div>");
+                        messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'></div>");
+                        if (!string.IsNullOrWhiteSpace(value:org.OrganizationDto.State))
                         {
-                            messageBody.Append($"<div class='col-md-11'>{org.OrganizationDto.CityName},{org.OrganizationDto.State}</div>");
-                            
+                            messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.CityName},{org.OrganizationDto.State}</div>");
                         }
                         else
                         {
-                            messageBody.Append($"<div class='col-md-11'>{org.OrganizationDto.CityName}</div>");
+                            messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.CityName}</div>");
                         }
 
-                        messageBody.Append($"</div>");
+                        messageBody.Append(value:$"</div>");
                     }
                     else
                     {
-                        messageBody.Append($"");
+                        messageBody.Append(value:$"");
                     }
-                    messageBody.Append($"<p>You will be notified by email when a decision has been made about your account request.</p>");
-                    messageBody.Append($"<p>If you have questions or concerns, please contact {authorityName} at {authorityEmail} or {authorityPhone}.</p>");
+                    messageBody.Append(value:$"<p>You will be notified by email when a decision has been made about your account request.</p>");
+                    messageBody.Append(value:$"<p>If you have questions or concerns, please contact {authorityName} at {authorityEmail} or {authorityPhone}.</p>");
 
                     return View(viewName:"Confirmation",
                                 model:new ConfirmationViewModel
@@ -379,6 +379,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
             var model = new SignInViewModel();
+
             //model.UserName = (HttpContext.Request.Cookies["lastSignInName"] != null) ? HttpContext.Request.Cookies.Get(name: "lastSignInName").Value : "";
 
             return View(model:model);
@@ -402,6 +403,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 switch (result.AutehticationResult)
                 {
                     case AuthenticationResult.Success:
+
                         //HttpCookie cookie = new HttpCookie(name: "lastSignInName", value: model.UserName);
                         //cookie.Expires = DateTime.Now.AddMonths(1);
                         //HttpContext.Response.SetCookie(cookie);
@@ -890,6 +892,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         ModelState.AddModelError(key:"", errorMessage:error);
                     }
+
                     return View(model:model);
 
                 // Can Not Use Old Password
@@ -899,6 +902,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         ModelState.AddModelError(key:"", errorMessage:error);
                     }
+
                     return View(model:model);
 
                 // incorrect answer
@@ -910,6 +914,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         ModelState.AddModelError(key:"", errorMessage:error);
                     }
+
                     return View(model:model);
 
                 // User is got locked
@@ -927,6 +932,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         ModelState.AddModelError(key:"", errorMessage:error);
                     }
+
                     return View(model:model);
             }
         }
@@ -1034,6 +1040,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 TempData[key:"Message"] = "Password successfully changed.";
                 return RedirectToAction(actionName:"ChangeAccountSucceed");
             }
+
             var errorMessage = result.Errors.Aggregate((i, j) => { return i + j; });
             ModelState.AddModelError(key:string.Empty, errorMessage:errorMessage);
             return View(viewName:"ResetPassword", model:model);
@@ -1086,6 +1093,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 TempData[key:"Message"] = "Change password succeeded.";
                 return RedirectToAction(actionName:"ChangeAccountSucceed");
             }
+
             var errorMessage = result.Errors.Aggregate((i, j) => i + j);
             ModelState.AddModelError(key:string.Empty, errorMessage:errorMessage);
             return View(model:model);
@@ -1216,6 +1224,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     ModelState.Remove(key:"Answer");
                     model.Answer = "";
                 }
+
                 return View(model:model);
             }
             else
