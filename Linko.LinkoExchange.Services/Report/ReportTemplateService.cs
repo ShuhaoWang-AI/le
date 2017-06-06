@@ -13,6 +13,7 @@ using Linko.LinkoExchange.Services.User;
 using NLog;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Organization;
+using System.Runtime.CompilerServices;
 
 namespace Linko.LinkoExchange.Services.Report
 {
@@ -46,7 +47,7 @@ namespace Linko.LinkoExchange.Services.Report
             _orgService = orgService;
         }
 
-        public override bool CanUserExecuteAPI(string apiName, params int[] id)
+        public override bool CanUserExecuteAPI([CallerMemberName] string apiName = "", params int[] id)
         {
             bool retVal = false;
 
@@ -77,6 +78,10 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     break;
+
+                default:
+
+                    throw new Exception($"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
 
             }
 
@@ -139,7 +144,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info("Enter ReportTemplateService.ReportPackageTemplateDto. reportPackageTemplateId={0}", reportPackageTemplateId);
 
-            if (!CanUserExecuteAPI("GetReportPackageTemplate", reportPackageTemplateId))
+            if (!CanUserExecuteAPI(id:reportPackageTemplateId))
             {
                 throw new UnauthorizedAccessException();
             }

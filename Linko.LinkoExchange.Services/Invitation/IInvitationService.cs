@@ -38,7 +38,7 @@ namespace Linko.LinkoExchange.Services.Invitation
 
         void CreateInvitation(InvitationDto dto);
 
-        InvitationServiceResultDto SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType, int? existingOrgRegProgramUserId = null);
+        InvitationServiceResultDto SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType, int? existingOrgRegProgramUserId = null, bool isAuthorizationRequired = false);
 
         InvitationCheckEmailResultDto CheckEmailAddress(int orgRegProgramId, string email);
 

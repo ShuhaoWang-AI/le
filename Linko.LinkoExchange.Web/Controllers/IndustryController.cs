@@ -277,10 +277,9 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         // GET: /Industry/User/{id}/Details
         [Route(template:"User/{id:int}/Details")]
-        [AuthorizeIndustryAdminsOnly]
         public ActionResult IndustryUserDetails(int id)
         {
-            var viewModel = PrepareIndustryUserDetails(id:id);
+            var viewModel = PrepareIndustryUserDetails(id: id, isAuthorizationRequired: true);
 
             return View(model:viewModel);
         }
@@ -288,7 +287,6 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"User/{id:int}/Details")]
-        [AuthorizeIndustryAdminsOnly]
         public ActionResult IndustryUserDetails(int id, IndustryUserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -297,7 +295,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                _userService.UpdateUserPermissionGroupId(orgRegProgUserId:model.Id, permissionGroupId:model.Role);
+                _userService.UpdateUserPermissionGroupId(orgRegProgUserId: model.Id, permissionGroupId: model.Role, isAuthorizationRequired: true);
                 _userService.UpdateUserSignatoryStatus(orgRegProgUserId:model.Id, isSignatory:model.IsSignatory);
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = "User updated successfully!";
@@ -316,7 +314,6 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"User/{id:int}/Details/UserRemove")]
-        [AuthorizeIndustryAdminsOnly]
         public ActionResult IndustryUserRemove(int id, IndustryUserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -325,7 +322,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                var result = _userService.RemoveUser(orgRegProgUserId:model.Id);
+                var result = _userService.RemoveUser(orgRegProgUserId: model.Id, isAuthorizationRequired: true);
 
                 if (result)
                 {
@@ -359,7 +356,6 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"User/{id:int}/Details/ChangeStatus")]
-        [AuthorizeIndustryAdminsOnly]
         public ActionResult IndustryUserChangeStatus(int id, IndustryUserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -368,7 +364,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                _userService.EnableDisableUserAccount(orgRegProgramUserId:model.Id, isAttemptingDisable:model.Status);
+                _userService.EnableDisableUserAccount(orgRegProgramUserId: model.Id, isAttemptingDisable: model.Status, isAuthorizationRequired: true);
 
                 ViewBag.ShowSuccessMessage = true;
                 ViewBag.SuccessMessage = model.Status ? "User Disabled!" : "User Enabled!";
@@ -384,9 +380,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"IndustryUserDetails", model:model);
         }
 
-        private IndustryUserViewModel PrepareIndustryUserDetails(int id)
+        private IndustryUserViewModel PrepareIndustryUserDetails(int id, bool isAuthorizationRequired = false)
         {
-            var user = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:id);
+            var user = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:id, isAuthorizationRequired:isAuthorizationRequired);
+
             var userQuesAns = _questionAnswerService.GetUsersQuestionAnswers(userProfileId:user.UserProfileId, questionType:QuestionTypeName.SQ);
             var currentUserRole = _httpContextService.GetClaimValue(claimType:CacheKey.UserRole) ?? "";
             var currentUserProfileId = _httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId);
@@ -523,24 +520,22 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         // GET: /Industry/PendingUserApprovals
         [Route(template:"PendingUserApprovals/{id:int}/Details")]
-        [AuthorizeIndustryAdminsOnly]
         public ActionResult PendingUserApprovalDetails(int id)
         {
-            var viewModel = PreparePendingUserApprovalDetails(id:id);
+            var viewModel = PreparePendingUserApprovalDetails(id: id, isAuthorizationRequired: true);
             return View(model:viewModel);
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"PendingUserApprovals/{id:int}/Details/PendingUserApprove")]
-        [AuthorizeIndustryAdminsOnly]
         public ActionResult PendingUserApprove(int id, PendingUserApprovalViewModel model)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId:model.Id, permissionGroupId:model.Role ?? 0, isApproved:true);
+                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId: model.Id, permissionGroupId: model.Role ?? 0, isApproved: true, isAuthorizationRequired: true);
                     switch (result.Result)
                     {
                         case RegistrationResult.Success:
@@ -571,14 +566,13 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"PendingUserApprovals/{id:int}/Details/PendingUserDeny")]
-        [AuthorizeIndustryAdminsOnly]
         public ActionResult PendingUserDeny(int id, PendingUserApprovalViewModel model)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId:model.Id, permissionGroupId:model.Role ?? 0, isApproved:false);
+                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId: model.Id, permissionGroupId: model.Role ?? 0, isApproved: false);
                     switch (result.Result)
                     {
                         case RegistrationResult.Success:
@@ -603,9 +597,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"PendingUserApprovalDetails", model:model);
         }
 
-        private PendingUserApprovalViewModel PreparePendingUserApprovalDetails(int id)
+        private PendingUserApprovalViewModel PreparePendingUserApprovalDetails(int id, bool isAuthorizationRequired = false)
         {
-            var result = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:id);
+            var result = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:id, isAuthorizationRequired: isAuthorizationRequired);
 
             var viewModel = new PendingUserApprovalViewModel
                             {

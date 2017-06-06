@@ -18,10 +18,12 @@ using System.Data.Entity.Infrastructure;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.AuditLog;
+using System.Data.Entity;
+using System.Runtime.CompilerServices;
 
 namespace Linko.LinkoExchange.Services.User
 {
-    public class UserService : IUserService
+    public class UserService : BaseService, IUserService
     {
         #region private members
 
@@ -71,6 +73,86 @@ namespace Linko.LinkoExchange.Services.User
         #endregion
 
         #region public methods
+
+        public override bool CanUserExecuteAPI([CallerMemberName] string apiName = "", params int[] id)
+        {
+            bool retVal = false;
+
+            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var currentOrgRegProgUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            var currentOrganizationId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationId));
+            var currentRegulatoryProgramId = _dbContext.OrganizationRegulatoryPrograms.Single(orp => orp.OrganizationRegulatoryProgramId == currentOrgRegProgramId).RegulatoryProgramId;
+            var currentPortalName = _httpContext.GetClaimValue(CacheKey.PortalName);
+            currentPortalName = string.IsNullOrWhiteSpace(value: currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+
+            switch (apiName)
+            {
+                case "GetOrganizationRegulatoryProgramUser":
+                case "EnableDisableUserAccount":
+                case "UpdateUserPermissionGroupId":
+                case "UpdateUserSignatoryStatus":
+                case "RemoveUser":
+                case "ApprovePendingRegistration":
+                case "LockUnlockUserAccount":
+                case "ResetUser":
+                    {
+                        //
+                        //Authorize the correct Authority
+                        //
+
+                        var targetOrgRegProgUserId = id[0];
+                        if (currentPortalName.Equals("authority"))
+                        {
+                            var targetOrgRegProgram = _dbContext.OrganizationRegulatoryProgramUsers
+                                .Include(orpu => orpu.OrganizationRegulatoryProgram)
+                                .SingleOrDefault(orpu => orpu.OrganizationRegulatoryProgramUserId == targetOrgRegProgUserId);
+
+                            //this will also handle scenarios where targetOrgRegProgUserId doesn't even exist
+                            if (targetOrgRegProgram != null
+                                && targetOrgRegProgram.OrganizationRegulatoryProgram.RegulatoryProgramId == currentRegulatoryProgramId
+                                && targetOrgRegProgram.OrganizationRegulatoryProgram.RegulatorOrganizationId == currentOrganizationId)
+                            {
+                                retVal = true;
+                            }
+                        }
+                        else
+                        {
+                            //
+                            //Authorize Industry Admins only
+                            //
+
+                            var targetOrganizationRegulatoryProgramId = _dbContext.OrganizationRegulatoryProgramUsers
+                                .Single(orpu => orpu.OrganizationRegulatoryProgramUserId == targetOrgRegProgUserId)
+                                .OrganizationRegulatoryProgramId;
+
+                            var currentUsersPermissionGroup = _dbContext.OrganizationRegulatoryProgramUsers
+                                .Single(orpu => orpu.OrganizationRegulatoryProgramUserId == currentOrgRegProgUserId)
+                                .PermissionGroup;
+
+                            bool isAdmin = currentUsersPermissionGroup.Name.ToLower().StartsWith("admin")
+                                            && currentUsersPermissionGroup.OrganizationRegulatoryProgramId == targetOrganizationRegulatoryProgramId;
+
+                            if (isAdmin)
+                            {
+                                //This is an authorized industry admin within the target organization regulatory program
+                                retVal = true;
+                            }
+
+                        }
+
+                    }
+
+                    break;
+
+                default:
+
+                    throw new Exception($"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
+
+
+            }
+
+            return retVal;
+        }
 
         public UserDto GetUserProfileById(int userProfileId)
         {
@@ -227,8 +309,13 @@ namespace Linko.LinkoExchange.Services.User
             }
         }
 
-        public void UpdateUserPermissionGroupId(int orgRegProgUserId, int permissionGroupId)
+        public void UpdateUserPermissionGroupId(int orgRegProgUserId, int permissionGroupId, bool isAuthorizationRequired = false)
         {
+            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgUserId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             int? previousPermissionGroupId;
             var user = _dbContext.OrganizationRegulatoryProgramUsers
                 .Include("OrganizationRegulatoryProgram")
@@ -286,8 +373,13 @@ namespace Linko.LinkoExchange.Services.User
 
         }
 
-        public void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory)
+        public void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory, bool isAuthorizationRequired = false)
         {
+            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgUserId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             OrganizationRegulatoryProgramUser programUser = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
             if (programUser.IsSignatory == isSignatory)
             {
@@ -377,8 +469,18 @@ namespace Linko.LinkoExchange.Services.User
 
         }
 
-        public ResetUserResultDto ResetUser(int userProfileId, string newEmailAddress, int? targetOrgRegProgramId = null)
+        public ResetUserResultDto ResetUser(int targetOrgRegProgUserId, string newEmailAddress, bool isAuthorizationRequired = false)
         {
+            if (isAuthorizationRequired && !CanUserExecuteAPI(id:targetOrgRegProgUserId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            var targetOrgRegProgUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(orpu => orpu.OrganizationRegulatoryProgramUserId == targetOrgRegProgUserId);
+            var userProfileId = targetOrgRegProgUser.UserProfileId;
+            var targetOrgRegProgramId = targetOrgRegProgUser.OrganizationRegulatoryProgramId;
+
             var user = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
             //Check user is not support role
             if (user.IsInternalAccount)
@@ -479,7 +581,7 @@ namespace Linko.LinkoExchange.Services.User
             newInvitation.EmailAddress = user.Email;
             newInvitation.FirstName = user.FirstName;
             newInvitation.LastName = user.LastName;
-            newInvitation.RecipientOrganizationRegulatoryProgramId = targetOrgRegProgramId.HasValue ? targetOrgRegProgramId.Value : senderOrgRegProgramId;
+            newInvitation.RecipientOrganizationRegulatoryProgramId = targetOrgRegProgramId;
             newInvitation.SenderOrganizationRegulatoryProgramId = senderOrgRegProgramId;
             _dbContext.Invitations.Add(newInvitation);
             _dbContext.SaveChanges();
@@ -643,6 +745,20 @@ namespace Linko.LinkoExchange.Services.User
             }
         }
 
+        public AccountLockoutResultDto LockUnlockUserAccount(int targetOrgRegProgUserId, bool isAttemptingLock, AccountLockEvent reason, bool isAuthorizationRequired = false)
+        {
+            if (isAuthorizationRequired && !CanUserExecuteAPI(id:targetOrgRegProgUserId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            var userProfileId = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(orpu => orpu.OrganizationRegulatoryProgramUserId == targetOrgRegProgUserId)
+                .UserProfileId;
+
+            return LockUnlockUserAccount(userProfileId, isAttemptingLock, reason);
+        }
+
         public AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, AccountLockEvent reason)
         {
             var user = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
@@ -789,9 +905,14 @@ namespace Linko.LinkoExchange.Services.User
 
         }
 
-        public void EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable)
+        public void EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable, bool isAuthorizationRequired = false)
         {
             _logService.Info($"EnableDisableUserAccount. OrgRegProgUserId={orgRegProgramUserId}, IsAttemptingDisable={isAttemptingDisable}...");
+
+            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgramUserId))
+            {
+                throw new UnauthorizedAccessException();
+            }
 
             //Check user is not THIS user's own account
             int thisUserOrgRegProgUserId = Convert.ToInt32(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
@@ -873,8 +994,13 @@ namespace Linko.LinkoExchange.Services.User
             _dbContext.SaveChanges();
         }
 
-        public bool RemoveUser(int orgRegProgUserId)
+        public bool RemoveUser(int orgRegProgUserId, bool isAuthorizationRequired = false)
         {
+            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgUserId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             //Ensure this is not the calling User's account
             int thisUsersOrgRegProgUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
             if (thisUsersOrgRegProgUserId == orgRegProgUserId)
@@ -1145,8 +1271,13 @@ namespace Linko.LinkoExchange.Services.User
             return true;
         }
 
-        public OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId)
+        public OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId, bool isAuthorizationRequired = false)
         {
+            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgUserId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
             OrganizationRegulatoryProgramUserDto userDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user);
             userDto.UserProfileDto = GetUserProfileById(user.UserProfileId);
@@ -1200,8 +1331,13 @@ namespace Linko.LinkoExchange.Services.User
 
         }
 
-        public RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved)
+        public RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved, bool isAuthorizationRequired = false)
         {
+            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgUserId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             var programUser = GetOrganizationRegulatoryProgramUser(orgRegProgUserId);
             int orgRegProgramId = programUser.OrganizationRegulatoryProgramId;
             var authority = _orgService.GetAuthority(orgRegProgramId);

@@ -19,6 +19,7 @@ using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Services.Unit;
 using System.Data.Entity.Validation;
 using System.Data.Entity.Infrastructure;
+using System.Runtime.CompilerServices;
 
 namespace Linko.LinkoExchange.Services.Sample
 {
@@ -52,7 +53,7 @@ namespace Linko.LinkoExchange.Services.Sample
             _unitService = unitService;
         }
 
-        public override bool CanUserExecuteAPI(string apiName, params int[] id)
+        public override bool CanUserExecuteAPI([CallerMemberName] string apiName = "", params int[] id)
         {
             bool retVal = false;
 
@@ -63,28 +64,35 @@ namespace Linko.LinkoExchange.Services.Sample
             switch (apiName)
             {
                 case "GetSampleDetails":
-                    var sampleId = id[0];
-                    if (currentPortalName.Equals("authority"))
                     {
-                        //currentOrgRegProgramId must match the authority of the ForOrganizationRegulatoryProgram of the sample
-                        var authorityOrgRegProgramId = _orgService.GetAuthority(_dbContext.Samples
-                                                    .Single(s => s.SampleId == sampleId).ForOrganizationRegulatoryProgramId)
-                                                    .OrganizationRegulatoryProgramId;
+                        var sampleId = id[0];
+                        if (currentPortalName.Equals("authority"))
+                        {
+                            //currentOrgRegProgramId must match the authority of the ForOrganizationRegulatoryProgram of the sample
+                            var authorityOrgRegProgramId = _orgService.GetAuthority(_dbContext.Samples
+                                                        .Single(s => s.SampleId == sampleId).ForOrganizationRegulatoryProgramId)
+                                                        .OrganizationRegulatoryProgramId;
 
-                        retVal = (currentOrgRegProgramId == authorityOrgRegProgramId);
-                    }
-                    else
-                    {
-                        //currentOrgRegProgramId must match the ForOrganizationRegulatoryProgramId of the sample
-                        //(this also handles unknown sampleId's)
-                        var isSampleWithThisOwnerExist = _dbContext.Samples
-                                        .Any(s => s.SampleId == sampleId
-                                            && s.ForOrganizationRegulatoryProgramId == currentOrgRegProgramId);
+                            retVal = (currentOrgRegProgramId == authorityOrgRegProgramId);
+                        }
+                        else
+                        {
+                            //currentOrgRegProgramId must match the ForOrganizationRegulatoryProgramId of the sample
+                            //(this also handles unknown sampleId's)
+                            var isSampleWithThisOwnerExist = _dbContext.Samples
+                                            .Any(s => s.SampleId == sampleId
+                                                && s.ForOrganizationRegulatoryProgramId == currentOrgRegProgramId);
 
-                        retVal = isSampleWithThisOwnerExist;
+                            retVal = isSampleWithThisOwnerExist;
+                        }
                     }
 
                     break;
+
+                default:
+
+                    throw new Exception($"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
+
 
             }
 
@@ -919,7 +927,7 @@ namespace Linko.LinkoExchange.Services.Sample
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             _logger.Info($"Enter SampleService.GetSampleDetails. sampleId={sampleId}, currentOrgRegProgramId={currentOrgRegProgramId}");
 
-            if (!CanUserExecuteAPI("GetSampleDetails", sampleId))
+            if (!CanUserExecuteAPI(id: sampleId))
             {
                 throw new UnauthorizedAccessException();
             }

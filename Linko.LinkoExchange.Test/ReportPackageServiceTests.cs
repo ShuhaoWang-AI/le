@@ -96,9 +96,10 @@ namespace Linko.LinkoExchange.Test
             var actualAuditLogService = new EmailAuditLogService(connection, _requestCache.Object, new MapHelper());
             var actualEmailService = new LinkoExchangeEmailService(connection, actualAuditLogService, _programService.Object, _settingService.Object, _requestCache.Object);
             var actualCromerrService = new CromerrAuditLogService(connection, _requestCache.Object, new MapHelper(), _httpContext.Object, _logger.Object);
+            var actualProgramService = new ProgramService(connection, new MapHelper());
 
             _reportPackageService = new ReportPackageService(
-                _programService.Object,
+                actualProgramService,
                 _copyOfRecordService.Object,
                 actualTimeZoneService,
                 _logger.Object,
@@ -178,7 +179,7 @@ namespace Linko.LinkoExchange.Test
         public void GetReportPackage_With_Associated_Element_Children()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(8, true);
+            var existingReportPackage = _reportPackageService.GetReportPackage(15, true);
         }
 
         [TestMethod]

@@ -451,9 +451,6 @@
     <Compile Include="GlimpseSecurityPolicy.cs" />
     <Compile Include="Mapping\IMapHelper.cs" />
     <Compile Include="Mapping\MapHelper.cs" />
-    <Compile Include="Mvc\AuthorizeAuthorityOnly.cs" />
-    <Compile Include="Mvc\AuthorizeIndustryAdminsOnly.cs" />
-    <Compile Include="Mvc\AuthorizeCorrectAuthorityOnly.cs" />
     <Compile Include="Mvc\LogAttribute.cs" />
     <Compile Include="Mvc\CommonInfoAttribute.cs" />
     <Compile Include="Controllers\CommonController.cs" />

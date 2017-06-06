@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -16,6 +17,7 @@ namespace Linko.LinkoExchange.Test
     {
         private OrganizationService orgService;
         Mock<ILogger> _logger;
+        Mock<IHttpContextService> _httpContext;
 
         public OrganizationServiceTests()
         {
@@ -25,9 +27,16 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             _logger = new Mock<ILogger>();
+            _httpContext = new Mock<IHttpContextService>();
+
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationId)).Returns("1000");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("Authority");
+
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             orgService = new OrganizationService(new LinkoExchangeContext(connectionString), 
-                new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper()), new HttpContextService(),
+                new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper()), _httpContext.Object,
                 new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), new MapHelper());
         }
 
@@ -110,6 +119,8 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetOrganizationRegulatoryProgram()
         {
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("Industry");
+
             var result = orgService.GetOrganizationRegulatoryProgram(1);
         }
 

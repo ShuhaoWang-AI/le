@@ -14,10 +14,12 @@ using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using System.Data.Entity;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.Cache;
+using System.Runtime.CompilerServices;
 
 namespace Linko.LinkoExchange.Services.Organization
 {
-    public class OrganizationService : IOrganizationService
+    public class OrganizationService : BaseService, IOrganizationService
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly ISettingService _settingService;
@@ -34,6 +36,83 @@ namespace Linko.LinkoExchange.Services.Organization
             _httpContext = httpContext;
             _jurisdictionService = jurisdictionService;
             _mapHelper = mapHelper;
+        }
+
+        public override bool CanUserExecuteAPI([CallerMemberName] string apiName = "", params int[] id)
+        {
+            bool retVal = false;
+
+            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var currentOrgRegProgUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            var currentOrganizationId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationId));
+            var currentRegulatoryProgramId = _dbContext.OrganizationRegulatoryPrograms.Single(orp => orp.OrganizationRegulatoryProgramId == currentOrgRegProgramId).RegulatoryProgramId;
+            var currentPortalName = _httpContext.GetClaimValue(CacheKey.PortalName);
+            currentPortalName = string.IsNullOrWhiteSpace(value: currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+
+            switch (apiName)
+            {
+                case "GetOrganizationRegulatoryProgram":
+                case "UpdateEnableDisableFlag":
+                    {
+                        //
+                        //Authorize the correct Authority for this Org Reg Program
+                        //
+
+                        var targetOrgRegProgId = id[0];
+                        if (currentPortalName.Equals("authority"))
+                        {
+                            if (currentOrgRegProgramId == targetOrgRegProgId)
+                            {
+                                retVal = true;
+                            }
+                            else
+                            {
+                                var targetOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms
+                                    .SingleOrDefault(orpu => orpu.OrganizationRegulatoryProgramId == targetOrgRegProgId);
+
+                                //this will also handle scenarios where targetOrgRegProgId doesn't even exist
+                                if (targetOrgRegProgram != null
+                                    && targetOrgRegProgram.RegulatoryProgramId == currentRegulatoryProgramId
+                                    && targetOrgRegProgram.RegulatorOrganizationId == currentOrganizationId)
+                                {
+                                    retVal = true;
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            //
+                            //Authorize Industry Admins only
+                            //
+
+                            var currentUsersPermissionGroup = _dbContext.OrganizationRegulatoryProgramUsers
+                                .Single(orpu => orpu.OrganizationRegulatoryProgramUserId == currentOrgRegProgUserId)
+                                .PermissionGroup;
+
+                            bool isAdmin = currentUsersPermissionGroup.Name.ToLower().StartsWith("admin")
+                                            && currentUsersPermissionGroup.OrganizationRegulatoryProgramId == targetOrgRegProgId;
+
+                            if (isAdmin)
+                            {
+                                //This is an authorized industry admin within the target organization regulatory program
+                                retVal = true;
+                            }
+
+                        }
+
+                    }
+
+                    break;
+
+                default:
+
+                    throw new Exception($"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
+
+
+            }
+
+            return retVal;
         }
 
         public IEnumerable<OrganizationDto> GetUserOrganizationsByOrgRegProgUserId(int orgRegProgUserId)
@@ -189,8 +268,13 @@ namespace Linko.LinkoExchange.Services.Organization
         /// to see if there are any available licenses left
         ///
         /// Otherwise throw exception
-        public EnableOrganizationResultDto UpdateEnableDisableFlag(int orgRegProgId, bool isEnabled)
+        public EnableOrganizationResultDto UpdateEnableDisableFlag(int orgRegProgId, bool isEnabled, bool isAuthorizationRequired = false)
         {
+            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             var orgRegProg = _dbContext.OrganizationRegulatoryPrograms
                     .Include(path: "RegulatoryProgram")
                     .Include(path: "Organization")
@@ -221,8 +305,13 @@ namespace Linko.LinkoExchange.Services.Organization
             return new EnableOrganizationResultDto() { IsSuccess = true };
         } 
 
-        public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int orgRegProgId)
+        public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int orgRegProgId, bool isAuthorizationRequired = false)
         {
+            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgId))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgId);
             OrganizationRegulatoryProgramDto dto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram);
             var signatoryUserCount = _dbContext.OrganizationRegulatoryProgramUsers

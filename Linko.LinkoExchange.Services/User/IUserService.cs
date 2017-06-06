@@ -26,19 +26,21 @@ namespace Linko.LinkoExchange.Services.User
 
         void UpdateUserState(int orgRegProgUserId, bool? isRegApproved, bool? isRegDenied, bool? isEnabled, bool? isRemoved);
 
-        void UpdateUserPermissionGroupId(int orgRegProgUserId, int permissionGroupId);
+        void UpdateUserPermissionGroupId(int orgRegProgUserId, int permissionGroupId, bool isAuthorizationRequired = false);
 
-        void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory);
+        void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory, bool isAuthorizationRequired = false);
 
-        ResetUserResultDto ResetUser(int userProfileId, string newEmailAddress, int? targetOrgRegProgramId = null);
+        ResetUserResultDto ResetUser(int targetOrgRegProgUserId, string newEmailAddress, bool isAuthorizationRequired = false);
 
         AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, AccountLockEvent reason);
 
-        void EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable);
+        AccountLockoutResultDto LockUnlockUserAccount(int targetOrgRegProgUserId, bool isAttemptingLock, AccountLockEvent reason, bool isAuthorizationRequired = false);
+
+        void EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable, bool isAuthorizationRequired = false);
 
         void SetHashedPassword(int userProfileId, string passwordHash);
 
-        bool RemoveUser(int orgRegProgUserId);
+        bool RemoveUser(int orgRegProgUserId, bool isAuthorizationRequired = false);
 
         /// <summary>
         /// Method to be called by application layer to execute business logic.
@@ -54,7 +56,7 @@ namespace Linko.LinkoExchange.Services.User
 
         bool UpdateEmail(int userProfileId, string newEmailAddress);
 
-        OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId);
+        OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId, bool isAuthorizationRequired = false);
 
         void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, int organizationRegulatoryProgramId, bool isApproved);
 
@@ -71,7 +73,7 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="orgRegProgUserId"></param>
         /// <param name="permissionGroupId"></param>
         /// <param name="isApproved"></param>
-        RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved);
+        RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved, bool isAuthorizationRequired = false);
 
         ICollection<UserDto> GetOrgRegProgSignators(int orgRegProgId);
         ICollection<UserDto> GetAuthorityAdministratorAndStandardUsers(int authorityOrganizationId);

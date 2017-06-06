@@ -19,6 +19,7 @@ using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.AuditLog;
 using System.Data.Entity;
+using System.Runtime.CompilerServices;
 
 namespace Linko.LinkoExchange.Services.Invitation
 {
@@ -202,8 +203,10 @@ namespace Linko.LinkoExchange.Services.Invitation
             return dtos;
         }
 
-        public InvitationServiceResultDto SendUserInvite(int targetOrgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType, int? existingOrgRegProgramUserId = null)
+        public InvitationServiceResultDto SendUserInvite(int targetOrgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType, int? existingOrgRegProgramUserId = null, bool isAuthorizationRequired = false)
         {
+            _logger.Info($"Enter InvitationService.SendUserInvite. targetOrgRegProgramId={targetOrgRegProgramId}, email={email}, invitationType={invitationType}");
+
             OrganizationRegulatoryProgramUserDto existingUser = null;
             if (existingOrgRegProgramUserId.HasValue) //Existing user in a different program -- lookup required invitation fields
             {
@@ -400,6 +403,8 @@ namespace Linko.LinkoExchange.Services.Invitation
             contentReplacements.Add("inviterEmailAddress", actorUser.Email);
 
             _crommerAuditLogService.Log(CromerrEvent.Registration_InviteSent, cromerrAuditLogEntryDto, contentReplacements);
+
+            _logger.Info($"Leaving InvitationService.SendUserInvite. targetOrgRegProgramId={targetOrgRegProgramId}, email={email}, invitationType={invitationType}");
 
             return new InvitationServiceResultDto()
             {

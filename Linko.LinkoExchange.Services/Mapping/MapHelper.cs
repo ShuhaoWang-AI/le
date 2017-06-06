@@ -1091,6 +1091,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             reportPackageDto.RecipientOrganizationCityName = rpt.RecipientOrganizationCityName;
             reportPackageDto.RecipientOrganizationJurisdictionName = rpt.RecipientOrganizationJurisdictionName;
             reportPackageDto.RecipientOrganizationZipCode = rpt.RecipientOrganizationZipCode;
+            //reportPackageDto.RecipientOrgRegProgramId = set outside after calling code
             reportPackageDto.CreationDateTimeLocal = rpt.CreationDateTimeUtc.UtcDateTime;
             reportPackageDto.SubmitterUserId = rpt.SubmitterUserId.HasValue ? rpt.SubmitterUserId.Value : -1;
             reportPackageDto.SubmitterUserName = rpt.SubmitterUserName;

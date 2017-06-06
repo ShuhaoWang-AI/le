@@ -14,6 +14,7 @@ using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.TimeZone;
 using NLog;
+using System.Runtime.CompilerServices;
 
 namespace Linko.LinkoExchange.Services.FileStore
 {
@@ -68,7 +69,7 @@ namespace Linko.LinkoExchange.Services.FileStore
             _timeZoneService = timeZoneService;
         }
 
-        public override bool CanUserExecuteAPI(string apiName, params int[] id)
+        public override bool CanUserExecuteAPI([CallerMemberName] string apiName = "", params int[] id)
         {
             bool retVal = false;
 
@@ -88,6 +89,10 @@ namespace Linko.LinkoExchange.Services.FileStore
                     retVal = isFileStoreWithThisOwnerExist;
 
                     break;
+
+                default:
+
+                    throw new Exception($"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
 
             }
 
@@ -238,7 +243,7 @@ namespace Linko.LinkoExchange.Services.FileStore
         {
             _logger.Info("Enter FileStoreService.GetFileStoreById, attachmentFileId={0}.", fileStoreId);
 
-            if (!CanUserExecuteAPI("GetFileStoreById", fileStoreId))
+            if (!CanUserExecuteAPI(id:fileStoreId))
             {
                 throw new UnauthorizedAccessException();
             }
@@ -266,7 +271,7 @@ namespace Linko.LinkoExchange.Services.FileStore
         {
             _logger.Info("Enter FileStoreService.UpdateFileStore.");
 
-            if (!CanUserExecuteAPI("UpdateFileStore", fileStoreDto.FileStoreId.Value))
+            if (!CanUserExecuteAPI(id:fileStoreDto.FileStoreId.Value))
             {
                 throw new UnauthorizedAccessException();
             }
@@ -318,7 +323,7 @@ namespace Linko.LinkoExchange.Services.FileStore
         {
             _logger.Info("Enter FileStoreService.DeleteFileStore.");
 
-            if (!CanUserExecuteAPI("DeleteFileStore", fileStoreId))
+            if (!CanUserExecuteAPI(id:fileStoreId))
             {
                 throw new UnauthorizedAccessException();
             }

@@ -35,9 +35,9 @@ namespace Linko.LinkoExchange.Services.Organization
         /// to see if there are any available licenses left
         ///
         /// Otherwise throw exception
-        EnableOrganizationResultDto UpdateEnableDisableFlag(int orgRegProgId, bool isEnabled);
+        EnableOrganizationResultDto UpdateEnableDisableFlag(int orgRegProgId, bool isEnabled, bool isAuthorizationRequired = false);
 
-        OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int orgRegProgId);
+        OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int orgRegProgId, bool isAuthorizationRequired = false);
 
         List<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int orgRegProgId, string searchString = null);
 
