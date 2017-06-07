@@ -2173,7 +2173,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         private XElement GetXElementNode(IEnumerable<XElement> corElements, string tagName)
         {
-            if (corElements.Any(i => i.Name.LocalName == ReportElementCategoryName.Certifications.ToString()))
+            if (corElements.Any(i => i.Name.LocalName == tagName))
             {
                 return corElements.Single(i => i.Name.LocalName == tagName);
             }
