@@ -1173,8 +1173,8 @@ namespace Linko.LinkoExchange.Services.Mapping
                 //PeriodStartDateTimeUtc = set outside after calling line
                 //PeriodEndDateTimeUtc = set outside after calling line
                 CtsEventTypeId = rpt.CtsEventTypeId,
-                CtsEventTypeName = rpt.CtsEventType.Name,
-                CtsEventCategoryName = rpt.CtsEventType.CtsEventCategoryName,
+                CtsEventTypeName = rpt.CtsEventType?.Name,
+                CtsEventCategoryName = rpt.CtsEventType?.CtsEventCategoryName,
                 IsSubmissionBySignatoryRequired = rpt.IsSubmissionBySignatoryRequired,
                 ReportPackageTemplateId = rpt.ReportPackageTemplateId,
                 //ReportStatusId = set outside after calling line
