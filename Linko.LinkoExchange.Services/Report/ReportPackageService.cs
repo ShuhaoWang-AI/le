@@ -1455,6 +1455,9 @@ namespace Linko.LinkoExchange.Services.Report
                                 .Include(rp => rp.ReportFiles)
                                 .Single(rp => rp.ReportPackageElementTypeId == reportPackageElementTypeId);
 
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
+
             var reportPackage = existingFilesReportPackageElementType.ReportPackageElementCategory.ReportPackage;
 
             _logger.Info($"Enter ReportPackageService.GetFilesForSelection. reportPackageElementTypeId={reportPackageElementTypeId}");
@@ -1482,6 +1485,7 @@ namespace Linko.LinkoExchange.Services.Report
                 fileStoreDto.ReportPackageElementTypeId = existingFilesReportPackageElementType.ReportPackageElementTypeId;
                 fileStoreDto.IsAssociatedWithReportPackage = existingFilesReportPackageElementType
                                                             .ReportFiles.Any(rf => rf.FileStoreId == eligibleFile.FileStoreId);
+                fileStoreDto.UploadDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(eligibleFile.UploadDateTimeUtc.UtcDateTime, timeZoneId);
                 var uploaderUser = _dbContext.Users.Single(user => user.UserProfileId == fileStoreDto.UploaderUserId);
                 fileStoreDto.UploaderUserFullName = $"{uploaderUser.FirstName} {uploaderUser.LastName}";
                 fileStoreList.Add(fileStoreDto);
