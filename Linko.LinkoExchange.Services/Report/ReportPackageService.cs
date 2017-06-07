@@ -28,10 +28,11 @@ using System.Data.Entity.Validation;
 using System.Data.Entity.Infrastructure;
 using System.Xml.Linq;
 using Linko.LinkoExchange.Core.Extensions;
+using System.Runtime.CompilerServices;
 
 namespace Linko.LinkoExchange.Services.Report
 {
-    public class ReportPackageService : IReportPackageService
+    public class ReportPackageService : BaseService, IReportPackageService
     {
         private readonly IProgramService _programService;
         private readonly ICopyOfRecordService _copyOfRecordService;
@@ -77,6 +78,50 @@ namespace Linko.LinkoExchange.Services.Report
             _crommerAuditLogService = crommerAuditLogService;
         }
 
+        public override bool CanUserExecuteAPI([CallerMemberName] string apiName = "", params int[] id)
+        {
+            bool retVal = false;
+
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+            var currentPortalName = _httpContextService.GetClaimValue(CacheKey.PortalName);
+            currentPortalName = string.IsNullOrWhiteSpace(value: currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+
+            switch (apiName)
+            {
+                case "SignAndSubmitReportPackage":
+                    var reportPackageId = id[0];
+
+                    //this will also handle scenarios where ReportPackageId doesn't even exist (regardless of ownership)
+                    var isReportPackageForThisOrgRegProgramExist = _dbContext.ReportPackages
+                        .Any(rp => rp.ReportPackageId == reportPackageId
+                            && rp.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                    retVal = isReportPackageForThisOrgRegProgramExist;
+
+                    if (retVal)
+                    {
+                        //Check if Org Reg Program User has Signatory Rights
+                        var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                            .Single(orpu => orpu.UserProfileId == currentUserId
+                                && orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                        if (!orgRegProgramUser.IsSignatory)
+                        {
+                            retVal = false;
+                        }
+                    }
+
+                    break;
+
+                default:
+
+                    throw new Exception($"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
+
+            }
+
+            return retVal;
+        }
 
         /// <summary>
         /// Note:  before call this function,  make sure to update draft first.
@@ -85,6 +130,11 @@ namespace Linko.LinkoExchange.Services.Report
         public void SignAndSubmitReportPackage(int reportPackageId)
         {
             _logger.Info("Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
+
+            if (!CanUserExecuteAPI(id: reportPackageId))
+            {
+                throw new UnauthorizedAccessException();
+            }
 
             var reportPackage = _dbContext.ReportPackages.Include(i => i.ReportStatus)
                 .Single(i => i.ReportPackageId == reportPackageId);
