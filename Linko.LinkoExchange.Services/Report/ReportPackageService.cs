@@ -485,6 +485,7 @@ namespace Linko.LinkoExchange.Services.Report
                             var fileStore = _dbContext.FileStores.Single(s => s.FileStoreId == reportFileAssociated.FileStoreId);
                             fileStoreDto = _mapHelper.GetFileStoreDtoFromFileStore(fileStore);
                             fileStoreDto.Data = fileStore.FileStoreData.Data;
+                            fileStoreDto.UploadDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(fileStore.UploadDateTimeUtc.UtcDateTime, timeZoneId);
                         }
                         reportPackageElementTypeDto.FileStores.Add(fileStoreDto);
 
@@ -518,7 +519,9 @@ namespace Linko.LinkoExchange.Services.Report
                         };
                         if (isIncludeAssociatedElementData)
                         {
-                            fileStoreDto = _mapHelper.GetFileStoreDtoFromFileStore(_dbContext.FileStores.Single(s => s.FileStoreId == reportFileAssociated.FileStoreId));
+                            var fileStore = _dbContext.FileStores.Single(s => s.FileStoreId == reportFileAssociated.FileStoreId);
+                            fileStoreDto = _mapHelper.GetFileStoreDtoFromFileStore(fileStore);
+                            fileStoreDto.UploadDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(fileStore.UploadDateTimeUtc.UtcDateTime, timeZoneId);
                         }
                         reportPackageElementTypeDto.FileStores.Add(fileStoreDto);
 
