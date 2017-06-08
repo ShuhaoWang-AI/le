@@ -9,6 +9,10 @@
     var inValidSQ = ViewBag.InValidSQ == null ? false : ViewBag.InValidSQ;
 
     var activeLink = "Register";
+
+    var inValidUserProfileMessages = ViewBag.inValidUserProfileMessages; 
+    var inValidSqMessages = ViewBag.inValidSqMessages; 
+    var inValidKbqMessages = ViewBag.inValidKbqMessages;
 }
 
 <section></section>
@@ -48,12 +52,16 @@
             </div>
 
             <div>
-                @if (ViewData.ModelState.IsValid == false && inValidProfile)
+                @if (inValidProfile)
                 {
-                    @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new
-               {
-                   @class = "alert alert-danger"
-               })
+                    <div class="validation-summary-errors alert alert-danger">
+                        <ul>
+                            @foreach (var message in inValidUserProfileMessages)
+                            {
+                                <li>@message</li>
+                            }
+                        </ul>
+                    </div> 
                 }
             </div>
 
@@ -409,12 +417,16 @@
             </div>
 
             <div>
-                @if (ViewData.ModelState.IsValid == false && inValidKBQ)
+                @if (inValidKBQ)
                 {
-                    @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new
-               {
-                   @class = "alert alert-danger"
-               })
+                    <div class="validation-summary-errors alert alert-danger">
+                        <ul>
+                            @foreach (var message in inValidKbqMessages)
+                            {
+                                <li> @message </li>
+                            } 
+                        </ul>
+                    </div>
                 }
 
             </div>
@@ -449,6 +461,10 @@
                                     @class = "form-control"
                                 }
                                 )
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQ1, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
                     </div>
 
@@ -499,7 +515,10 @@
                                     @class = "form-control"
                                 })
                             @Html.HiddenFor(model => Model.UserKBQ.KBQ2)
-
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQ2, validationMessage: "", htmlAttributes: new
+                        {
+                            @class = "text-danger"
+                        })
                         </div>
                     </div>
 
@@ -549,6 +568,10 @@
                                     @class = "form-control"
                                 })
                             @Html.HiddenFor(model => Model.UserKBQ.KBQ3)
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQ3, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
                     </div>
 
@@ -599,6 +622,10 @@
                                     @class = "form-control"
                                 })
                             @Html.HiddenFor(model => Model.UserKBQ.KBQ4)
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQ4, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
 
                         </div>
                     </div>
@@ -650,6 +677,10 @@
                                     @class = "form-control"
                                 })
                             @Html.HiddenFor(model => Model.UserKBQ.KBQ5)
+                            @Html.ValidationMessageFor(m => m.UserKBQ.KBQ5, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
 
                         </div>
                     </div>
@@ -705,12 +736,16 @@
             </div>
 
             <div>
-                @if (ViewData.ModelState.IsValid == false && inValidSQ)
+                @if (inValidSQ)
                 {
-                    @Html.ValidationSummary(excludePropertyErrors: false, message: "", htmlAttributes: new
-               {
-                   @class = "alert alert-danger"
-               })
+                    <div class="validation-summary-errors alert alert-danger">
+                        <ul>
+                            @foreach(var message in inValidSqMessages)
+                            {
+                                <li>@message</li>
+                            }
+                        </ul>
+                    </div>
                 }
 
             </div>
@@ -745,6 +780,10 @@
                                     @class = "form-control"
                                 })
                             @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer1)*@
+                            @Html.ValidationMessageFor(m => m.UserSQ.SecurityQuestion1, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
                         </div>
                     </div>
 
@@ -795,11 +834,15 @@
                                     @class = "form-control"
                                 })
                             @*@Html.HiddenFor(model => Model.UserSQ.SecurityQuestionAnswer2)*@
+                            @Html.ValidationMessageFor(m => m.UserSQ.SecurityQuestion2, validationMessage: "", htmlAttributes: new
+                       {
+                           @class = "text-danger"
+                       })
 
                         </div>
                     </div>
 
-                    <!-- anwser 2 -->
+                    <!-- answer 2 -->
                     <div class="form-group">
                         <div class="col-lg-2 control-label">
                             @Html.LabelFor(i => Model.UserSQ.SecurityQuestionAnswer2, htmlAttributes: new

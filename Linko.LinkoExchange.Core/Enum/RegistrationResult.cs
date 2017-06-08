@@ -7,6 +7,8 @@ namespace Linko.LinkoExchange.Core.Enum
         EmailIsUsed,
         EmailOrUserNameExists,
         UserNameIsUsed,
+        MissingUserName,
+        MissingEmailAddress,
         InvitationExpired,
         NotAgreedTermsAndConditions,
         InvalidRegistrationToken,

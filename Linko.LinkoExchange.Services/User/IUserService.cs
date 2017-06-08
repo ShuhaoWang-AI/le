@@ -52,6 +52,9 @@ namespace Linko.LinkoExchange.Services.User
 
         RegistrationResult ValidateUserProfileData(UserDto userProfile);
 
+        ICollection<RegistrationResult> KbqValidation(IEnumerable<AnswerDto> kbqQuestions);
+        ICollection<RegistrationResult> SecurityValidation(IEnumerable<AnswerDto> securityQuestions); 
+        
         RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions);
 
         bool UpdateEmail(int userProfileId, string newEmailAddress);

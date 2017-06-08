@@ -8,6 +8,8 @@ namespace Linko.LinkoExchange.Services.Authentication
 {
     public interface IAuthenticationService
     {
+        ICollection<RegistrationResult> ValidateUserProfileForRegistration(UserDto userInfo, RegistrationType registrationType);
+         
         /// <summary>
         /// Validate KBQ answer and password
         /// </summary>

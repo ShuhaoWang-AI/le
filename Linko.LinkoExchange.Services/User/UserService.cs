@@ -1190,6 +1190,66 @@ namespace Linko.LinkoExchange.Services.User
             return RegistrationResult.Success;
         }
 
+        public ICollection<RegistrationResult> KbqValidation(IEnumerable<AnswerDto> kbqQuestions)
+        {
+            var result = new List<RegistrationResult>();  
+
+            if (kbqQuestions.Count() < 5)
+            {
+                result.Add(RegistrationResult.MissingKBQ);
+            }
+
+            // Test duplicated KBQ questions
+            if (kbqQuestions.GroupBy(i => i.QuestionId).Any(i => i.Count() > 1))
+            {
+                result.Add(RegistrationResult.DuplicatedKBQ);
+            }
+ 
+            // Test duplicated KBQ question answers
+            if (kbqQuestions.GroupBy(i => i.Content).Any(i => i.Count() > 1))
+            {
+                result.Add(RegistrationResult.DuplicatedKBQAnswer);
+            }
+            
+            // Test KBQ questions mush have answer
+            if (kbqQuestions.Any(i => i.Content == null))
+            {
+                result.Add(RegistrationResult.MissingKBQAnswer);
+            }
+
+            return result;
+        } 
+
+        public ICollection<RegistrationResult> SecurityValidation(IEnumerable<AnswerDto> securityQuestions)
+        {
+            var result = new List<RegistrationResult>(); 
+
+            if (securityQuestions.Count() < 2)
+            {
+                result.Add(RegistrationResult.MissingSecurityQuestion);
+            } 
+
+            // Test duplicated security questions
+            if (securityQuestions.GroupBy(i => i.QuestionId).Any(i => i.Count() > 1))
+            {
+                result.Add(RegistrationResult.DuplicatedSecurityQuestion);
+            }
+ 
+            // Test duplicated security question answers
+            if (securityQuestions.GroupBy(i => i.Content).Any(i => i.Count() > 1))
+            {
+                result.Add(RegistrationResult.DuplicatedSecurityQuestionAnswer);
+            }
+ 
+            // Test security questions mush have answer
+            if (securityQuestions.Any(i => i.Content == null))
+            {
+                result.Add(RegistrationResult.MissingSecurityQuestionAnswer);
+            } 
+
+            return result;
+        }
+
         public bool UpdateEmail(int userProfileId, string newEmailAddress)
         {
             UserProfile userProfile;

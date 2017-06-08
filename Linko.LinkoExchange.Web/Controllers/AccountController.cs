@@ -185,6 +185,27 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.UserProfile.StateList = GetStateList();
             model.UserKBQ.QuestionPool = _profileHelper.GetQuestionPool(type:QuestionTypeName.KBQ);
             model.UserSQ.QuestionPool = _profileHelper.GetQuestionPool(type:QuestionTypeName.SQ);
+            
+            var kbqs = new List<AnswerDto>();
+            var sqs = new List<AnswerDto>();
+            kbqs.Add(item:new AnswerDto {QuestionId = model.UserKBQ.KBQ1, Content = model.UserKBQ.KBQAnswer1});
+            kbqs.Add(item:new AnswerDto {QuestionId = model.UserKBQ.KBQ2, Content = model.UserKBQ.KBQAnswer2});
+            kbqs.Add(item:new AnswerDto {QuestionId = model.UserKBQ.KBQ3, Content = model.UserKBQ.KBQAnswer3});
+            kbqs.Add(item:new AnswerDto {QuestionId = model.UserKBQ.KBQ4, Content = model.UserKBQ.KBQAnswer4});
+            kbqs.Add(item:new AnswerDto {QuestionId = model.UserKBQ.KBQ5, Content = model.UserKBQ.KBQAnswer5});
+            sqs.Add(item:new AnswerDto {QuestionId = model.UserSQ.SecurityQuestion1, Content = model.UserSQ.SecurityQuestionAnswer1});
+            sqs.Add(item:new AnswerDto {QuestionId = model.UserSQ.SecurityQuestion2, Content = model.UserSQ.SecurityQuestionAnswer2});
+            
+            var userDto = _mapHelper.GetUserDtoFromUserProfileViewModel(viewModel:model.UserProfile);
+            userDto.Password = model.UserProfile.Password;
+            userDto.AgreeTermsAndConditions = model.AgreeTermsAndConditions; 
+            
+            var kbqValidationResults = _userService.KbqValidation(kbqQuestions:kbqs);
+            var sqValidationResults  = _userService.SecurityValidation(securityQuestions:sqs); 
+            
+            var inValidUserProfileMessages = ValidUserProfileData(userDto, model.RegistrationType); 
+            var inValidKbqMessages = ValidateKbq(kbqValidationResults);
+            var inValidSqMessages = ValidateSecurityQuestions(sqValidationResults); 
 
             if (!ModelState.IsValid)
             {
@@ -205,48 +226,35 @@ namespace Linko.LinkoExchange.Web.Controllers
                 context = new ValidationContext(instance:model.UserProfile, serviceProvider:null, items:null);
                 var isValid = Validator.TryValidateObject(instance:model.UserProfile, validationContext:context, validationResults:validationResult, validateAllProperties:true);
 
-                if (!isValid)
+                if (!isValid || inValidUserProfileMessages.Any())
                 {
-                    ViewBag.inValidProfile = true;
-                    return View(model:model);
+                    ViewBag.inValidProfile = true; 
                 }
 
                 // Validate KBQ  
                 context = new ValidationContext(instance:model.UserKBQ, serviceProvider:null, items:null);
                 isValid = Validator.TryValidateObject(instance:model.UserKBQ, validationContext:context, validationResults:validationResult, validateAllProperties:true);
 
-                if (!isValid)
+                if (!isValid || inValidKbqMessages.Any())
                 {
-                    ViewBag.inValidKBQ = true;
-                    return View(model:model);
+                    ViewBag.inValidKBQ = true; 
                 }
 
                 // Validate SQ 
                 context = new ValidationContext(instance:model.UserSQ, serviceProvider:null, items:null);
                 isValid = Validator.TryValidateObject(instance:model.UserSQ, validationContext:context, validationResults:validationResult, validateAllProperties:true);
 
-                if (!isValid)
+                if (!isValid || inValidSqMessages.Any())
                 {
-                    ViewBag.inValidSQ = true;
-                    return View(model:model);
+                    ViewBag.inValidSQ = true; 
                 }
+
+                ViewBag.inValidKbqMessages = inValidKbqMessages;
+                ViewBag.inValidSqMessages = inValidSqMessages;  
+                ViewBag.inValidUserProfileMessages = inValidUserProfileMessages; 
 
                 return View(model:model);
             }
-
-            var userDto = _mapHelper.GetUserDtoFromUserProfileViewModel(viewModel:model.UserProfile);
-            userDto.Password = model.UserProfile.Password;
-            userDto.AgreeTermsAndConditions = model.AgreeTermsAndConditions;
-
-            var kbqs = new List<AnswerDto>();
-            var sqs = new List<AnswerDto>();
-            kbqs.Add(item:new AnswerDto {QuestionId = model.UserKBQ.KBQ1, Content = model.UserKBQ.KBQAnswer1});
-            kbqs.Add(item:new AnswerDto {QuestionId = model.UserKBQ.KBQ2, Content = model.UserKBQ.KBQAnswer2});
-            kbqs.Add(item:new AnswerDto {QuestionId = model.UserKBQ.KBQ3, Content = model.UserKBQ.KBQAnswer3});
-            kbqs.Add(item:new AnswerDto {QuestionId = model.UserKBQ.KBQ4, Content = model.UserKBQ.KBQAnswer4});
-            kbqs.Add(item:new AnswerDto {QuestionId = model.UserKBQ.KBQ5, Content = model.UserKBQ.KBQAnswer5});
-            sqs.Add(item:new AnswerDto {QuestionId = model.UserSQ.SecurityQuestion1, Content = model.UserSQ.SecurityQuestionAnswer1});
-            sqs.Add(item:new AnswerDto {QuestionId = model.UserSQ.SecurityQuestion2, Content = model.UserSQ.SecurityQuestionAnswer2});
 
             var result = await _authenticationService.Register(userInfo:userDto, registrationToken:model.Token, securityQuestions:sqs, kbqQuestions:kbqs, registrationType:model.RegistrationType);
             switch (result.Result)
@@ -317,58 +325,69 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                 case RegistrationResult.BadUserProfileData:
                     ViewBag.inValidProfile = true;
-                    ModelState.AddModelError(key:"", errorMessage:@"Invalid user profile data.");
+                    inValidUserProfileMessages.Add("Invalid user profile data.");
                     break;
                 case RegistrationResult.BadPassword:
                     ViewBag.inValidProfile = true;
-                    ModelState.AddModelError(key:"", errorMessage:@"Password does not meet criteria.");
+                    inValidUserProfileMessages.Add("Password does not meet criteria.");
                     break;
                 case RegistrationResult.CanNotUseLastNumberOfPasswords:
                     ViewBag.inValidProfile = true;
-                    ModelState.AddModelError(key:"", errorMessage:string.Join(separator:" ", values:result.Errors));
+                    inValidUserProfileMessages.Add(string.Join(separator:" ", values:result.Errors));
                     break;
                 case RegistrationResult.DuplicatedKBQ:
                     ViewBag.inValidKBQ = true;
-                    ModelState.AddModelError(key:"", errorMessage:@"Knowledge based questions can not be duplicated.");
+                    inValidKbqMessages.Add("Knowledge based questions can not be duplicated."); 
                     break;
                 case RegistrationResult.DuplicatedKBQAnswer:
                     ViewBag.inValidKBQ = true;
-                    ModelState.AddModelError(key:"", errorMessage:@"Knowledge based question answers can not be duplicated.");
+                    inValidKbqMessages.Add("Knowledge based question answers can not be duplicated."); 
                     break;
                 case RegistrationResult.MissingKBQ:
                     ViewBag.inValidKBQ = true;
-                    ModelState.AddModelError(key:"", errorMessage:@"Not enough knowledge based questions.");
+                    inValidKbqMessages.Add("Not enough knowledge based questions."); 
+                    break;
+                case RegistrationResult.MissingKBQAnswer:
+                    ViewBag.inValidKBQ = true;
+                    inValidKbqMessages.Add("Not enough knowledge based question answers."); 
                     break;
                 case RegistrationResult.DuplicatedSecurityQuestion:
                     ViewBag.inValidSQ = true;
-                    ModelState.AddModelError(key:"", errorMessage:@"Security questions can not be duplicated.");
+                    inValidSqMessages.Add("Security questions can not be duplicated."); 
                     break;
                 case RegistrationResult.MissingSecurityQuestion:
                     ViewBag.inValidSQ = true;
-                    ModelState.AddModelError(key:"", errorMessage:@"Not enough security questions.");
+                    inValidSqMessages.Add("Not enough security questions."); 
+                    break;
+                case RegistrationResult.MissingSecurityQuestionAnswer:
+                    ViewBag.inValidSQ = true;
+                    inValidSqMessages.Add("Not enough security question answers."); 
                     break;
                 case RegistrationResult.DuplicatedSecurityQuestionAnswer:
                     ViewBag.inValidSQ = true;
-                    ModelState.AddModelError(key:"", errorMessage:@"Security question answers can not be duplicated.");
+                    inValidSqMessages.Add("Security question answers can not be duplicated."); 
                     break;
                 case RegistrationResult.BadKBQAndAnswer:
                     ViewBag.inValidKBQ = true;
-                    ModelState.AddModelError(key:"", errorMessage:@"Invalid knowledge based question and answers.");
+                    inValidKbqMessages.Add("Invalid knowledge based question and answers."); 
                     break;
                 case RegistrationResult.UserNameIsUsed:
                     ViewBag.inValidProfile = true;
-                    ModelState.AddModelError(key:"", errorMessage:@"User Name is already in use on another account. Please select a different User Name.");
+                    inValidUserProfileMessages.Add("User Name is already in use on another account. Please select a different User Name.");
                     break;
                 case RegistrationResult.EmailIsUsed:
                     ViewBag.inValidProfile = true;
-                    ModelState.AddModelError(key:"", errorMessage:@"Email is being used by another person, please change a different one.");
+                    inValidUserProfileMessages.Add("Email is being used by another person, please change a different one.");
                     break;
-            }
+            } 
 
+            ViewBag.invalidKbqMessages = inValidSqMessages.Distinct(); 
+            ViewBag.inValidSqMessages = inValidSqMessages.Distinct(); 
+            ViewBag.inValidUserProfileMessages = inValidUserProfileMessages.Distinct();
             _logger.Info(message:$"Registration failed. Email={userDto.Email}, FirstName={userDto.FirstName}, LastName={userDto.LastName}, Result={result.Result}");
             return View(model:model);
         }
-
+      
         #endregion
 
         #region sign in action
@@ -1237,6 +1256,101 @@ namespace Linko.LinkoExchange.Web.Controllers
         #endregion
 
         #region Helpers
+
+        private List<string> ValidUserProfileData(UserDto userInfo, RegistrationType registrationType)
+        {
+            var invalidMessages = new List<string>();  
+            var results = _authenticationService.ValidateUserProfileForRegistration(userInfo, registrationType); 
+            foreach(var result in results)
+            {
+                switch(result)
+                {
+                    case RegistrationResult.BadUserProfileData:
+                        invalidMessages.Add("Invalid user profile data.");
+                        break;
+                    case RegistrationResult.MissingUserName:
+                        invalidMessages.Add("User name is required.");
+                        break;
+                    case RegistrationResult.MissingEmailAddress:
+                        invalidMessages.Add("Email address is required.");
+                        break;
+
+                    default:
+                        invalidMessages.Add("Invalid user profile data.");
+                        break;
+                }
+            } 
+
+            return invalidMessages;
+        }
+
+        private List<string> ValidateKbq(ICollection<RegistrationResult> kbqValidationResults)
+        {
+            List<string> invalidMessages = new List<string>(); 
+
+            if (kbqValidationResults.Any())
+            {
+                ViewBag.inValidKBQ = true;  
+                foreach (var item in kbqValidationResults)
+                {
+                    switch (item)
+                    {
+                        case RegistrationResult.MissingKBQ:
+                            //ModelState.AddModelError(key:"", errorMessage:@"Not enough knowledge based questions."); 
+                            invalidMessages.Add("Not enough knowledge based questions.");   
+                            break;
+                        case RegistrationResult.MissingKBQAnswer:
+                            //ModelState.AddModelError(key:"", errorMessage:@"Not enough knowledge based question answers.");
+                            invalidMessages.Add("Not enough knowledge based question answers.");   
+                            break;
+                        case RegistrationResult.DuplicatedKBQ:
+                           // ModelState.AddModelError(key:"", errorMessage:@"Knowledge based questions can not be duplicated.");
+                            invalidMessages.Add("Knowledge based questions can not be duplicated.");   
+                            break;
+                        case RegistrationResult.DuplicatedKBQAnswer:
+                           // ModelState.AddModelError(key:"", errorMessage:@"Knowledge based question answers can not be duplicated.");
+                            invalidMessages.Add("Knowledge based question answers can not be duplicated.");   
+                            break;
+                    }
+                }
+            }
+
+            return invalidMessages; 
+        }
+        private  List<string>  ValidateSecurityQuestions( ICollection<RegistrationResult> sqValidationResults)
+        {
+            List<string> invalidMessages = new List<string>();
+             
+            if (sqValidationResults.Any())
+            {
+                ViewBag.inValidSQ = true; 
+                foreach (var item in sqValidationResults)
+                {
+                    switch (item)
+                    {
+                        case RegistrationResult.MissingSecurityQuestion:
+                          //  ModelState.AddModelError(key:"", errorMessage:@"Not enough security questions.");
+                            invalidMessages.Add("Not enough security questions.");  
+                            break;
+                        case RegistrationResult.MissingSecurityQuestionAnswer:
+                          //  ModelState.AddModelError(key:"", errorMessage:@"Not enough security question answers.");
+                            invalidMessages.Add("Not enough security question answers.");   
+                            break;
+                        case RegistrationResult.DuplicatedSecurityQuestion:
+                        //    ModelState.AddModelError(key:"", errorMessage:@"Security questions can not be duplicated.");
+                            invalidMessages.Add("Security questions can not be duplicated.");   
+                            break;
+                        case RegistrationResult.DuplicatedSecurityQuestionAnswer:
+                        //    ModelState.AddModelError(key:"", errorMessage:@"Security question answers can not be duplicated.");
+                            invalidMessages.Add("Security question answers can not be duplicated.");   
+                            break;
+                    }
+                }
+            }
+
+            return invalidMessages;
+        }
+
 
         private bool NeedToValidKbq()
         {

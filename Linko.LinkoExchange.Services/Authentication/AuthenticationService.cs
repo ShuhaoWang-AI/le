@@ -287,7 +287,33 @@ namespace Linko.LinkoExchange.Services.Authentication
             return Task.FromResult(authenticationResult);
         }
 
+        public ICollection<RegistrationResult> ValidateUserProfileForRegistration(UserDto userInfo, RegistrationType registrationType)
+        {
+            List<RegistrationResult> inValidUserProfileMessages = new List<RegistrationResult>();  
 
+            var result = _userService.ValidateUserProfileData(userInfo);
+            if (result != RegistrationResult.Success)
+            {
+                inValidUserProfileMessages.Add(RegistrationResult.BadUserProfileData);
+            }
+
+            if (userInfo == null)
+            {
+                inValidUserProfileMessages.Add(RegistrationResult.BadUserProfileData);
+            }
+
+            if (string.IsNullOrWhiteSpace(userInfo.UserName))
+            {
+              inValidUserProfileMessages.Add(RegistrationResult.MissingUserName);
+            }
+
+            if(string.IsNullOrWhiteSpace(userInfo.Email))
+            { 
+              inValidUserProfileMessages.Add(RegistrationResult.MissingEmailAddress); 
+            }
+
+            return inValidUserProfileMessages; 
+        }
 
         /// <summary>
         /// Create a new user for registration
@@ -1592,6 +1618,15 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             return _userService.ValidateRegistrationUserData(userProfile, securityQuestions, kbqQuestions);
         }
+
+        public RegistrationResult[] KbqValidation(UserDto userProfile, IEnumerable<AnswerDto> kbqQuestions)
+        {
+            return null;
+        }
+        public RegistrationResult[] SecurityValidation(UserDto userProfile, IEnumerable<AnswerDto> kbqQuestions)
+        { 
+            return null;
+        } 
 
         public void UpdateClaim(string key, string value)
         {
