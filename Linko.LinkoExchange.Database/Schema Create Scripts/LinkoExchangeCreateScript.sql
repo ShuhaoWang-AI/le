@@ -5414,7 +5414,7 @@ Repudiated By:
 	
 To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser.  Login is required to view the report.
 
-	https://Linkoexchange.com{corViewLink}
+	{corViewLink}
 	
                             
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
@@ -5463,7 +5463,7 @@ Repudiated By:
 	
 To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser.  Login is required to view the report.
 
-	https://Linkoexchange.com{corViewLink}
+	{corViewLink}
                 </pre>
             </body>
         </html>'  

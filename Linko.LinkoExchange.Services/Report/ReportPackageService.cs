@@ -1897,7 +1897,7 @@ namespace Linko.LinkoExchange.Services.Report
                     contentReplacements.Add("organizationZipCode", reportPackage.OrganizationZipCode);
 
                     contentReplacements.Add("userName", currentUser.UserName);
-                    contentReplacements.Add("corViewLink", $"/reportPackage/{reportPackage.ReportPackageId}/cor");
+                    contentReplacements.Add("corViewLink", $"{_httpContextService.GetRequestBaseUrl()}reportPackage/{reportPackage.ReportPackageId}/COR");
 
                     var authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
                     var authorityEmail = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
