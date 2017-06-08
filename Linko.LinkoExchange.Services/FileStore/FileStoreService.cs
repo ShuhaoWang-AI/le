@@ -15,6 +15,7 @@ using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.TimeZone;
 using NLog;
 using System.Runtime.CompilerServices;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.FileStore
 {
@@ -74,20 +75,60 @@ namespace Linko.LinkoExchange.Services.FileStore
             bool retVal = false;
 
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var currentPortalName = _httpContextService.GetClaimValue(CacheKey.PortalName);
+            currentPortalName = string.IsNullOrWhiteSpace(value: currentPortalName) ? "" : currentPortalName.Trim().ToLower();
 
             switch (apiName)
             {
-                case "GetFileStoreById":
                 case "UpdateFileStore":
                 case "DeleteFileStore":
-                    var fileStoreId = id[0];
-                    //Also handles scenarios where FileStoreId does not exist
-                    var isFileStoreWithThisOwnerExist = _dbContext.FileStores
-                        .Any(fs => fs.FileStoreId == fileStoreId
-                            && fs.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+                    {
+                        var fileStoreId = id[0];
+                        retVal = isFileStoreWithThisOwnerExist(fileStoreId, currentOrgRegProgramId);
+                    }
+                    break;
 
-                    retVal = isFileStoreWithThisOwnerExist;
+                case "GetFileStoreById":
+                    {
+                        var fileStoreId = id[0];
+                        if (currentPortalName.Equals("authority"))
+                        {
+                            var fileStore = _dbContext.FileStores
+                                .Include(fs => fs.OrganizationRegulatoryProgram)
+                                .SingleOrDefault(fs => fs.FileStoreId == fileStoreId);
 
+                            if (fileStore != null)
+                            {
+                                //check if current user is authority of file store owner
+                                var authorityOrgRegProgram = fileStore.OrganizationRegulatoryProgram;
+
+                                var currentOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms
+                                    .Single(orpu => orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                                bool isCurrentOrgRegProgramTheAuthority = currentOrgRegProgram.OrganizationId == authorityOrgRegProgram.OrganizationId
+                                    && currentOrgRegProgram.RegulatoryProgramId == authorityOrgRegProgram.RegulatoryProgramId;
+
+                                if (isCurrentOrgRegProgramTheAuthority)
+                                {
+                                    bool isFileIncludedInSubmittedReport = _dbContext.FileStores
+                                    .Single(fs => fs.FileStoreId == fileStoreId)
+                                    .ReportFiles.Select(rf => rf.ReportPackageElementType)
+                                        .Select(rpet => rpet.ReportPackageElementCategory)
+                                            .Select(rpec => rpec.ReportPackage)
+                                                .Any(rp => rp.ReportStatus.Name == ReportStatusName.Submitted.ToString()
+                                                    || rp.ReportStatus.Name == ReportStatusName.Repudiated.ToString());
+
+                                    retVal = isFileIncludedInSubmittedReport;
+                                }
+                                
+                            }
+
+                        }
+                        else
+                        {
+                            retVal = isFileStoreWithThisOwnerExist(fileStoreId, currentOrgRegProgramId);
+                        }
+                    }
                     break;
 
                 default:
@@ -97,6 +138,14 @@ namespace Linko.LinkoExchange.Services.FileStore
             }
 
             return retVal;
+        }
+
+        private bool isFileStoreWithThisOwnerExist(int fileStoreId, int orgRegProgramId)
+        {
+            //Also handles scenarios where FileStoreId does not exist
+            return _dbContext.FileStores
+                        .Any(fs => fs.FileStoreId == fileStoreId
+                            && fs.OrganizationRegulatoryProgramId == orgRegProgramId);
         }
 
         public List<string> GetValidAttachmentFileExtensions()
