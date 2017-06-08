@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace Linko.LinkoExchange.Services.Dto
 {
     public class OrganizationRegulatoryProgramDto
@@ -16,5 +18,8 @@ namespace Linko.LinkoExchange.Services.Dto
         public string ReferenceNumber { get; set; }
         public bool HasSignatory { get; set; }
         public bool HasAdmin { get; set; }
+
+        //Localized most recent date (or null) found in tReportPackage for this OrganizationRegulatoryProgramId
+        public DateTime? LastSubmissionDateTimeLocal { get; set; }
     }
 }

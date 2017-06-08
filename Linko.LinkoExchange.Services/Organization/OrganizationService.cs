@@ -16,6 +16,7 @@ using System.Data.Entity;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Cache;
 using System.Runtime.CompilerServices;
+using Linko.LinkoExchange.Services.TimeZone;
 
 namespace Linko.LinkoExchange.Services.Organization
 {
@@ -25,16 +26,18 @@ namespace Linko.LinkoExchange.Services.Organization
         private readonly ISettingService _settingService;
         private readonly IHttpContextService _httpContext;
         private readonly IJurisdictionService _jurisdictionService;
+        private readonly ITimeZoneService _timeZoneService;
         private readonly IMapHelper _mapHelper;
 
         public OrganizationService(LinkoExchangeContext dbContext, ISettingService settingService,
-             IHttpContextService httpContext, IJurisdictionService jurisdictionService,
+             IHttpContextService httpContext, IJurisdictionService jurisdictionService, ITimeZoneService timeZoneService,
             IMapHelper mapHelper)
         {
             _dbContext = dbContext;
             _settingService = settingService;
             _httpContext = httpContext;
             _jurisdictionService = jurisdictionService;
+            _timeZoneService = timeZoneService;
             _mapHelper = mapHelper;
         }
 
@@ -328,6 +331,18 @@ namespace Linko.LinkoExchange.Services.Organization
             dto.HasAdmin = adminUserCount > 0;
             dto.OrganizationDto.State = orgRegProgram.Organization.JurisdictionId.HasValue ? 
                                         _jurisdictionService.GetJurisdictionById(orgRegProgram.Organization.JurisdictionId.Value).Code : "";
+
+            var lastReportPackageSubmitted = _dbContext.ReportPackages
+                .Where(rp => rp.OrganizationRegulatoryProgramId == orgRegProgId
+                    && rp.SubmissionDateTimeUtc != null)
+                .OrderByDescending(rp => rp.SubmissionDateTimeUtc)
+                .FirstOrDefault();
+            if (lastReportPackageSubmitted != null)
+            {
+                dto.LastSubmissionDateTimeLocal = _timeZoneService
+                    .GetLocalizedDateTimeUsingSettingForThisOrg(lastReportPackageSubmitted.SubmissionDateTimeUtc.Value.UtcDateTime
+                        , orgRegProgId);
+            }
 
             return dto;
         }
