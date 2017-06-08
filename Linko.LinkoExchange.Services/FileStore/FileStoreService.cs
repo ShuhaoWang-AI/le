@@ -69,7 +69,7 @@ namespace Linko.LinkoExchange.Services.FileStore
             _timeZoneService = timeZoneService;
         }
 
-        public override bool CanUserExecuteAPI([CallerMemberName] string apiName = "", params int[] id)
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
         {
             bool retVal = false;
 
@@ -243,7 +243,7 @@ namespace Linko.LinkoExchange.Services.FileStore
         {
             _logger.Info("Enter FileStoreService.GetFileStoreById, attachmentFileId={0}.", fileStoreId);
 
-            if (!CanUserExecuteAPI(id:fileStoreId))
+            if (!CanUserExecuteApi(id:fileStoreId))
             {
                 throw new UnauthorizedAccessException();
             }
@@ -271,7 +271,7 @@ namespace Linko.LinkoExchange.Services.FileStore
         {
             _logger.Info("Enter FileStoreService.UpdateFileStore.");
 
-            if (!CanUserExecuteAPI(id:fileStoreDto.FileStoreId.Value))
+            if (!CanUserExecuteApi(id:fileStoreDto.FileStoreId.Value))
             {
                 throw new UnauthorizedAccessException();
             }
@@ -323,7 +323,7 @@ namespace Linko.LinkoExchange.Services.FileStore
         {
             _logger.Info("Enter FileStoreService.DeleteFileStore.");
 
-            if (!CanUserExecuteAPI(id:fileStoreId))
+            if (!CanUserExecuteApi(id:fileStoreId))
             {
                 throw new UnauthorizedAccessException();
             }

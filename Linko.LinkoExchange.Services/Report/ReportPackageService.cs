@@ -78,7 +78,7 @@ namespace Linko.LinkoExchange.Services.Report
             _crommerAuditLogService = crommerAuditLogService;
         }
 
-        public override bool CanUserExecuteAPI([CallerMemberName] string apiName = "", params int[] id)
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
         {
             bool retVal = false;
 
@@ -131,7 +131,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info("Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
 
-            if (!CanUserExecuteAPI(id: reportPackageId))
+            if (!CanUserExecuteApi(id: reportPackageId))
             {
                 throw new UnauthorizedAccessException();
             }

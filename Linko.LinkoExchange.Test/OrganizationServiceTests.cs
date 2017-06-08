@@ -9,6 +9,9 @@ using Moq;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.TimeZone;
+using Linko.LinkoExchange.Core.Enum;
+using System.Collections.Generic;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -18,6 +21,8 @@ namespace Linko.LinkoExchange.Test
         private OrganizationService orgService;
         Mock<ILogger> _logger;
         Mock<IHttpContextService> _httpContext;
+        ITimeZoneService _timeZones;
+        Mock<ISettingService> _settingService;
 
         public OrganizationServiceTests()
         {
@@ -35,9 +40,20 @@ namespace Linko.LinkoExchange.Test
             _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("Authority");
 
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
+
+            var globalSettingLookup = new Dictionary<SystemSettingType, string>();
+            globalSettingLookup.Add(SystemSettingType.SupportPhoneNumber, "555-555-5555");
+            globalSettingLookup.Add(SystemSettingType.SupportEmailAddress, "test@test.com");
+
+            _settingService = new Mock<ISettingService>();
+            _settingService.Setup(x => x.GetGlobalSettings()).Returns(globalSettingLookup);
+            _settingService.Setup(x => x.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<int>(), SettingType.TimeZone)).Returns("1");
+
+            _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString), _settingService.Object, new MapHelper());
+
             orgService = new OrganizationService(new LinkoExchangeContext(connectionString), 
                 new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper()), _httpContext.Object,
-                new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), new MapHelper());
+                new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), _timeZones, new MapHelper());
         }
 
         [TestMethod]

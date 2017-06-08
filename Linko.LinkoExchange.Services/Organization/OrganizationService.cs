@@ -41,7 +41,7 @@ namespace Linko.LinkoExchange.Services.Organization
             _mapHelper = mapHelper;
         }
 
-        public override bool CanUserExecuteAPI([CallerMemberName] string apiName = "", params int[] id)
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
         {
             bool retVal = false;
 
@@ -273,7 +273,7 @@ namespace Linko.LinkoExchange.Services.Organization
         /// Otherwise throw exception
         public EnableOrganizationResultDto UpdateEnableDisableFlag(int orgRegProgId, bool isEnabled, bool isAuthorizationRequired = false)
         {
-            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgId))
+            if (isAuthorizationRequired && !CanUserExecuteApi(id:orgRegProgId))
             {
                 throw new UnauthorizedAccessException();
             }
@@ -310,7 +310,7 @@ namespace Linko.LinkoExchange.Services.Organization
 
         public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int orgRegProgId, bool isAuthorizationRequired = false)
         {
-            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgId))
+            if (isAuthorizationRequired && !CanUserExecuteApi(id:orgRegProgId))
             {
                 throw new UnauthorizedAccessException();
             }

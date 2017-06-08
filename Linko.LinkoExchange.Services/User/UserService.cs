@@ -74,7 +74,7 @@ namespace Linko.LinkoExchange.Services.User
 
         #region public methods
 
-        public override bool CanUserExecuteAPI([CallerMemberName] string apiName = "", params int[] id)
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
         {
             bool retVal = false;
 
@@ -311,7 +311,7 @@ namespace Linko.LinkoExchange.Services.User
 
         public void UpdateUserPermissionGroupId(int orgRegProgUserId, int permissionGroupId, bool isAuthorizationRequired = false)
         {
-            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgUserId))
+            if (isAuthorizationRequired && !CanUserExecuteApi(id:orgRegProgUserId))
             {
                 throw new UnauthorizedAccessException();
             }
@@ -375,7 +375,7 @@ namespace Linko.LinkoExchange.Services.User
 
         public void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory, bool isAuthorizationRequired = false)
         {
-            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgUserId))
+            if (isAuthorizationRequired && !CanUserExecuteApi(id:orgRegProgUserId))
             {
                 throw new UnauthorizedAccessException();
             }
@@ -471,7 +471,7 @@ namespace Linko.LinkoExchange.Services.User
 
         public ResetUserResultDto ResetUser(int targetOrgRegProgUserId, string newEmailAddress, bool isAuthorizationRequired = false)
         {
-            if (isAuthorizationRequired && !CanUserExecuteAPI(id:targetOrgRegProgUserId))
+            if (isAuthorizationRequired && !CanUserExecuteApi(id:targetOrgRegProgUserId))
             {
                 throw new UnauthorizedAccessException();
             }
@@ -747,7 +747,7 @@ namespace Linko.LinkoExchange.Services.User
 
         public AccountLockoutResultDto LockUnlockUserAccount(int targetOrgRegProgUserId, bool isAttemptingLock, AccountLockEvent reason, bool isAuthorizationRequired = false)
         {
-            if (isAuthorizationRequired && !CanUserExecuteAPI(id:targetOrgRegProgUserId))
+            if (isAuthorizationRequired && !CanUserExecuteApi(id:targetOrgRegProgUserId))
             {
                 throw new UnauthorizedAccessException();
             }
@@ -909,7 +909,7 @@ namespace Linko.LinkoExchange.Services.User
         {
             _logService.Info($"EnableDisableUserAccount. OrgRegProgUserId={orgRegProgramUserId}, IsAttemptingDisable={isAttemptingDisable}...");
 
-            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgramUserId))
+            if (isAuthorizationRequired && !CanUserExecuteApi(id:orgRegProgramUserId))
             {
                 throw new UnauthorizedAccessException();
             }
@@ -996,7 +996,7 @@ namespace Linko.LinkoExchange.Services.User
 
         public bool RemoveUser(int orgRegProgUserId, bool isAuthorizationRequired = false)
         {
-            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgUserId))
+            if (isAuthorizationRequired && !CanUserExecuteApi(id:orgRegProgUserId))
             {
                 throw new UnauthorizedAccessException();
             }
@@ -1273,7 +1273,7 @@ namespace Linko.LinkoExchange.Services.User
 
         public OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId, bool isAuthorizationRequired = false)
         {
-            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgUserId))
+            if (isAuthorizationRequired && !CanUserExecuteApi(id:orgRegProgUserId))
             {
                 throw new UnauthorizedAccessException();
             }
@@ -1333,7 +1333,7 @@ namespace Linko.LinkoExchange.Services.User
 
         public RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved, bool isAuthorizationRequired = false)
         {
-            if (isAuthorizationRequired && !CanUserExecuteAPI(id:orgRegProgUserId))
+            if (isAuthorizationRequired && !CanUserExecuteApi(id:orgRegProgUserId))
             {
                 throw new UnauthorizedAccessException();
             }

@@ -47,7 +47,7 @@ namespace Linko.LinkoExchange.Services.Report
             _orgService = orgService;
         }
 
-        public override bool CanUserExecuteAPI([CallerMemberName] string apiName = "", params int[] id)
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
         {
             bool retVal = false;
 
@@ -144,7 +144,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info("Enter ReportTemplateService.ReportPackageTemplateDto. reportPackageTemplateId={0}", reportPackageTemplateId);
 
-            if (!CanUserExecuteAPI(id:reportPackageTemplateId))
+            if (!CanUserExecuteApi(id:reportPackageTemplateId))
             {
                 throw new UnauthorizedAccessException();
             }

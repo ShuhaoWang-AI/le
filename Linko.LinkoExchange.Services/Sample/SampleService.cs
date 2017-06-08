@@ -53,7 +53,7 @@ namespace Linko.LinkoExchange.Services.Sample
             _unitService = unitService;
         }
 
-        public override bool CanUserExecuteAPI([CallerMemberName] string apiName = "", params int[] id)
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
         {
             bool retVal = false;
 
@@ -927,7 +927,7 @@ namespace Linko.LinkoExchange.Services.Sample
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             _logger.Info($"Enter SampleService.GetSampleDetails. sampleId={sampleId}, currentOrgRegProgramId={currentOrgRegProgramId}");
 
-            if (!CanUserExecuteAPI(id: sampleId))
+            if (!CanUserExecuteApi(id: sampleId))
             {
                 throw new UnauthorizedAccessException();
             }
