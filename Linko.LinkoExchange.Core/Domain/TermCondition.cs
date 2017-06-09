@@ -13,7 +13,6 @@ namespace Linko.LinkoExchange.Core.Domain
         public int TermConditionId { get; set; }
         public string Content { get; set; }
         public DateTimeOffset CreationDateTimeUtc { get; set; }
-        public DateTimeOffset? LastModificationDateTimeUtc { get; set; }
         public int? LastModifierUserId { get; set; }
     }
 }

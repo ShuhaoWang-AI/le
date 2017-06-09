@@ -16,8 +16,6 @@ namespace Linko.LinkoExchange.Data.Mapping
 
             Property(x => x.CreationDateTimeUtc).IsRequired();
 
-            Property(x => x.LastModificationDateTimeUtc).IsOptional();
-
             Property(x => x.LastModifierUserId).IsOptional();
         }
     }
