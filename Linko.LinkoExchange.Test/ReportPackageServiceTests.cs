@@ -179,7 +179,7 @@ namespace Linko.LinkoExchange.Test
         public void GetReportPackage_With_Associated_Element_Children()
         {
             //Fetch existing
-            var existingReportPackage = _reportPackageService.GetReportPackage(15, true);
+            var existingReportPackage = _reportPackageService.GetReportPackage(21, true);
         }
 
         [TestMethod]

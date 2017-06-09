@@ -17,7 +17,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageId">ReportPackageId</param>
         /// <param name="isIncludeAssociatedElementData">Indicating attachments binary data is included or not</param>
         /// <returns>ReportPackageDto Object</returns>
-        ReportPackageDto GetReportPackage(int reportPackageId, bool isIncludeAssociatedElementData);
+        ReportPackageDto GetReportPackage(int reportPackageId, bool isIncludeAssociatedElementData, bool isAuthorizationRequired = false);
 
         /// <summary>
         ///     The file 'Copy of Record Data.xml' contains below:

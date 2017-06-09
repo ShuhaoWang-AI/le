@@ -80,6 +80,8 @@ namespace Linko.LinkoExchange.Services.Report
 
         public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
         {
+            bool retVal = false;
+
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
             var currentPortalName = _httpContextService.GetClaimValue(CacheKey.PortalName);
@@ -87,34 +89,71 @@ namespace Linko.LinkoExchange.Services.Report
 
             switch (apiName)
             {
+                case "GetReportPackage":
+                    {
+                        var reportPackageId = id[0];
+                        var reportPackage = _dbContext.ReportPackages
+                            .SingleOrDefault(rp => rp.ReportPackageId == reportPackageId);
+
+                        if (reportPackage == null)
+                        {
+                            return false;
+                        }
+
+                        //Check authorized access as either one of:
+                        //1) Industry - currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId
+                        //2) Authority - currentOrgRegProgramId == Id of authority of reportPackage.OrganizationRegulatoryProgram
+                        if (currentPortalName.Equals("authority"))
+                        {
+                            if (currentOrgRegProgramId == _orgService.GetAuthority(reportPackage.OrganizationRegulatoryProgramId).OrganizationRegulatoryProgramId)
+                            {
+                                //Authority accessing an IU under their control => OK
+                                retVal = true;
+                            }
+                        }
+                        else
+                        {
+                            if (currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId)
+                            {
+                                //Industry accessing their own report package => OK
+                                retVal = true;
+                            }
+                        }
+                    }
+                  
+                    break;
+
                 case "SignAndSubmitReportPackage":
                 case "RepudiateReport":
-                    var reportPackageId = id[0];
-
-                    //this will also handle scenarios where ReportPackageId doesn't even exist (regardless of ownership)
-                    var isReportPackageForThisOrgRegProgramExist = _dbContext.ReportPackages
-                        .Any(rp => rp.ReportPackageId == reportPackageId
-                            && rp.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
-
-                    if (isReportPackageForThisOrgRegProgramExist)
                     {
-                        //Get current user
-                        var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                            .Single(orpu => orpu.UserProfileId == currentUserId
-                                && orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+                        var reportPackageId = id[0];
 
-                        //Check if user has signatory rights
-                        if (!orgRegProgramUser.IsSignatory)
+                        //this will also handle scenarios where ReportPackageId doesn't even exist (regardless of ownership)
+                        var isReportPackageForThisOrgRegProgramExist = _dbContext.ReportPackages
+                            .Any(rp => rp.ReportPackageId == reportPackageId
+                                && rp.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                        if (isReportPackageForThisOrgRegProgramExist)
                         {
-                            return false;
-                        }
+                            //Get current user
+                            var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                                .Single(orpu => orpu.UserProfileId == currentUserId
+                                    && orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
 
-                        //Check if user is removed or disabled
-                        if (orgRegProgramUser.IsRemoved || !orgRegProgramUser.IsEnabled)
-                        {
-                            return false;
-                        }
+                            //Check if user has signatory rights
+                            if (!orgRegProgramUser.IsSignatory)
+                            {
+                                return false;
+                            }
 
+                            //Check if user is removed or disabled
+                            if (orgRegProgramUser.IsRemoved || !orgRegProgramUser.IsEnabled)
+                            {
+                                return false;
+                            }
+
+                            retVal = true;
+                        }
                     }
 
                     break;
@@ -125,7 +164,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             }
 
-            return true;
+            return retVal;
         }
 
         /// <summary>
@@ -437,12 +476,17 @@ namespace Linko.LinkoExchange.Services.Report
             return validationResult;
         }
 
-        public ReportPackageDto GetReportPackage(int reportPackageId, bool isIncludeAssociatedElementData)
+        public ReportPackageDto GetReportPackage(int reportPackageId, bool isIncludeAssociatedElementData, bool isAuthorizationRequired = false)
         {
             _logger.Info("Enter ReportPackageService.GetReportPackage. reportPackageId={0}", reportPackageId);
 
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
+
+            if (isAuthorizationRequired && !CanUserExecuteApi(id: reportPackageId))
+            {
+                throw new UnauthorizedAccessException();
+            }
 
             var reportPackage = _dbContext.ReportPackages
                 .Include(rp => rp.ReportPackageElementCategories)
@@ -455,22 +499,6 @@ namespace Linko.LinkoExchange.Services.Report
             if (reportPackage == null)
             {
                 throw new Exception($"ERROR: Could not find Report Package associated with reportPackageId={reportPackageId}");
-            }
-
-            //Check authorized access as either one of:
-            //1) Industry - currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId
-            //2) Authority - currentOrgRegProgramId == Id of authority of reportPackage.OrganizationRegulatoryProgram
-            if (currentOrgRegProgramId == reportPackage.OrganizationRegulatoryProgramId)
-            {
-                //Industry accessing their own report package => OK
-            }
-            else if (currentOrgRegProgramId == _orgService.GetAuthority(reportPackage.OrganizationRegulatoryProgramId).OrganizationRegulatoryProgramId)
-            {
-                //Authority accessing an IU under their control => OK
-            }
-            else
-            {
-                throw new UnauthorizedAccessException($"Unauthorized access of Report Package Id = {reportPackageId} by Org Reg Program Id = {currentOrgRegProgramId}");
             }
 
             var reportPackagegDto = GetReportPackageDtoFromReportPackage(reportPackage, timeZoneId);
