@@ -39,7 +39,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Account
 
     public partial class LinkExchangePasswordValidator<T> : AbstractValidator<T> where T : PasswordViewModel
     {
-        protected LinkExchangePasswordValidator()
+        public LinkExchangePasswordValidator()
         {
             var regexp = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,16}$";  
 
