@@ -103,14 +103,14 @@ namespace Linko.LinkoExchange.Services.User
                         var targetOrgRegProgUserId = id[0];
                         if (currentPortalName.Equals("authority"))
                         {
-                            var targetOrgRegProgram = _dbContext.OrganizationRegulatoryProgramUsers
+                            var targetOrgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
                                 .Include(orpu => orpu.OrganizationRegulatoryProgram)
                                 .SingleOrDefault(orpu => orpu.OrganizationRegulatoryProgramUserId == targetOrgRegProgUserId);
 
                             //this will also handle scenarios where targetOrgRegProgUserId doesn't even exist
-                            if (targetOrgRegProgram != null
-                                && targetOrgRegProgram.OrganizationRegulatoryProgram.RegulatoryProgramId == currentRegulatoryProgramId
-                                && targetOrgRegProgram.OrganizationRegulatoryProgram.RegulatorOrganizationId == currentOrganizationId)
+                            if (targetOrgRegProgramUser != null
+                                && targetOrgRegProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId == currentRegulatoryProgramId
+                                && targetOrgRegProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId == currentOrganizationId)
                             {
                                 retVal = true;
                             }

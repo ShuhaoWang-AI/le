@@ -273,7 +273,7 @@ namespace Linko.LinkoExchange.Test
             //5                       A hold time was exceeded
             //6                       Other(please comment)
 
-            _reportPackageService.RepudiateReport(8, 6, "Other(please comment)", "Technical error");
+            _reportPackageService.RepudiateReport(21, 6, "Other(please comment)", "Technical error");
 
         }
 

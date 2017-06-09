@@ -80,8 +80,6 @@ namespace Linko.LinkoExchange.Services.Report
 
         public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
         {
-            bool retVal = false;
-
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
             var currentPortalName = _httpContextService.GetClaimValue(CacheKey.PortalName);
@@ -90,6 +88,7 @@ namespace Linko.LinkoExchange.Services.Report
             switch (apiName)
             {
                 case "SignAndSubmitReportPackage":
+                case "RepudiateReport":
                     var reportPackageId = id[0];
 
                     //this will also handle scenarios where ReportPackageId doesn't even exist (regardless of ownership)
@@ -97,19 +96,25 @@ namespace Linko.LinkoExchange.Services.Report
                         .Any(rp => rp.ReportPackageId == reportPackageId
                             && rp.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
 
-                    retVal = isReportPackageForThisOrgRegProgramExist;
-
-                    if (retVal)
+                    if (isReportPackageForThisOrgRegProgramExist)
                     {
-                        //Check if Org Reg Program User has Signatory Rights
+                        //Get current user
                         var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
                             .Single(orpu => orpu.UserProfileId == currentUserId
                                 && orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
 
+                        //Check if user has signatory rights
                         if (!orgRegProgramUser.IsSignatory)
                         {
-                            retVal = false;
+                            return false;
                         }
+
+                        //Check if user is removed or disabled
+                        if (orgRegProgramUser.IsRemoved || !orgRegProgramUser.IsEnabled)
+                        {
+                            return false;
+                        }
+
                     }
 
                     break;
@@ -120,7 +125,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             }
 
-            return retVal;
+            return true;
         }
 
         /// <summary>
@@ -129,40 +134,41 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageId"></param>
         public void SignAndSubmitReportPackage(int reportPackageId)
         {
-            _logger.Info("Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
-
-            if (!CanUserExecuteApi(id: reportPackageId))
-            {
-                throw new UnauthorizedAccessException();
-            }
-
-            var reportPackage = _dbContext.ReportPackages.Include(i => i.ReportStatus)
-                .Single(i => i.ReportPackageId == reportPackageId);
-
-            if (reportPackage.ReportStatus.Name != ReportStatusName.ReadyToSubmit.ToString())
-            {
-                ThrowSimpleException("Report Package is not ready to submit.");
-            }
-
             var submitterUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
             var submitterFirstName = _httpContextService.GetClaimValue(CacheKey.FirstName);
             var submitterLastName = _httpContextService.GetClaimValue(CacheKey.LastName);
-            var submitterTitleRole = _userService.GetUserProfileById(submitterUserId).TitleRole;
-            var submitterIpAddress = _httpContextService.CurrentUserIPAddress();
             var submitterUserName = _httpContextService.GetClaimValue(CacheKey.UserName);
 
-            reportPackage.SubmissionDateTimeUtc = DateTimeOffset.Now;
-            reportPackage.SubmitterUserId = submitterUserId;
-            reportPackage.SubmitterFirstName = submitterFirstName;
-            reportPackage.SubmitterLastName = submitterLastName;
-            reportPackage.SubmitterTitleRole = submitterTitleRole;
-            reportPackage.SubmitterIPAddress = submitterIpAddress;
-            reportPackage.SubmitterUserName = submitterUserName;
+            _logger.Info($"Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={reportPackageId}, submitterUserId={submitterUserId}, submitterUserName={submitterUserName}");
 
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try
                 {
+                    if (!CanUserExecuteApi(id: reportPackageId))
+                    {
+                        throw new UnauthorizedAccessException();
+                    }
+
+                    var reportPackage = _dbContext.ReportPackages.Include(i => i.ReportStatus)
+                        .Single(i => i.ReportPackageId == reportPackageId);
+
+                    if (reportPackage.ReportStatus.Name != ReportStatusName.ReadyToSubmit.ToString())
+                    {
+                        ThrowSimpleException("Report Package is not ready to submit.");
+                    }
+
+                    var submitterTitleRole = _userService.GetUserProfileById(submitterUserId).TitleRole;
+                    var submitterIpAddress = _httpContextService.CurrentUserIPAddress();
+
+                    reportPackage.SubmissionDateTimeUtc = DateTimeOffset.Now;
+                    reportPackage.SubmitterUserId = submitterUserId;
+                    reportPackage.SubmitterFirstName = submitterFirstName;
+                    reportPackage.SubmitterLastName = submitterLastName;
+                    reportPackage.SubmitterTitleRole = submitterTitleRole;
+                    reportPackage.SubmitterIPAddress = submitterIpAddress;
+                    reportPackage.SubmitterUserName = submitterUserName;
+
                     UpdateStatus(reportPackageId, ReportStatusName.Submitted, false);
                     _dbContext.SaveChanges();
                     var reportPackageDto = GetReportPackage(reportPackageId, true);
@@ -176,7 +182,8 @@ namespace Linko.LinkoExchange.Services.Report
 
                     _dbContext.SaveChanges();
                     transaction.Commit();
-                    _logger.Info("Leave ReportPackageService.SignAndSubmitReportPackage. reportPackageId={0}", reportPackageId);
+
+                    _logger.Info($"Leaving ReportPackageService.SignAndSubmitReportPackage. reportPackageId={reportPackageId}, submitterUserId={submitterUserId}, submitterUserName={submitterUserName}");
                 }
                 catch (DbEntityValidationException ex)
                 {
@@ -1783,25 +1790,21 @@ namespace Linko.LinkoExchange.Services.Report
         {
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var currentUserId = int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId));
+
             _logger.Info($"Enter ReportPackageService.RepudiateReport. reportPackageId={reportPackageId}, repudiationReasonId={repudiationReasonId}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
 
             using (var transaction = _dbContext.BeginTransaction())
             {
                 try
                 {
+                    if (!CanUserExecuteApi(id: reportPackageId))
+                    {
+                        throw new UnauthorizedAccessException();
+                    }
+
                     var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
                     var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
                     var timeZone = _dbContext.TimeZones.Single(tz => tz.TimeZoneId == timeZoneId);
-
-                    //Check has Signatory Rights (UC-19 5.1.)
-                    var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                        .Single(orpu => orpu.UserProfileId == currentUserId
-                            && orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
-
-                    if (!orgRegProgramUser.IsSignatory)
-                    {
-                        ThrowSimpleException("User not authorized to repudiate report packages.");
-                    }
 
                     //Check ARP config "Max days after report period end date to repudiate" has not passed (UC-19 5.2.)
                     var reportRepudiatedDays = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.ReportRepudiatedDays));
@@ -1859,7 +1862,12 @@ namespace Linko.LinkoExchange.Services.Report
                          .ToList();
 
                     var corHash = _dbContext.CopyOfRecords
-                        .Single(cor => cor.ReportPackageId == reportPackageId);
+                        .SingleOrDefault(cor => cor.ReportPackageId == reportPackageId);
+
+                    if (corHash == null)
+                    {
+                        ThrowSimpleException($"ERROR: Could not find COR associated with ReportPackageId={reportPackageId}");
+                    }
 
                     //Use the same contentReplacement dictionary for both emails and Cromerr audit logging
                     var contentReplacements = new Dictionary<string, string>();
