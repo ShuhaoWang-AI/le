@@ -185,7 +185,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             model.UserProfile.StateList = GetStateList();
             model.UserKBQ.QuestionPool = _profileHelper.GetQuestionPool(type:QuestionTypeName.KBQ);
             model.UserSQ.QuestionPool = _profileHelper.GetQuestionPool(type:QuestionTypeName.SQ);
-            
+         
+            if(model.RegistrationType == RegistrationType.ReRegistration)
+            {
+                ModelState.Clear();
+            }
+
             var kbqs = new List<AnswerDto>();
             var sqs = new List<AnswerDto>();
             kbqs.Add(item:new AnswerDto {QuestionId = model.UserKBQ.KBQ1, Content = model.UserKBQ.KBQAnswer1});
@@ -379,7 +384,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                     ViewBag.inValidProfile = true;
                     inValidUserProfileMessages.Add("Email is being used by another person, please change a different one.");
                     break;
-            } 
+            }
+
+            model.AgreeTermsAndConditions = false;
 
             ViewBag.invalidKbqMessages = inValidSqMessages.Distinct(); 
             ViewBag.inValidSqMessages = inValidSqMessages.Distinct(); 
