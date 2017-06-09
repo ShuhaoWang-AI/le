@@ -904,6 +904,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return View(model:model);
             }
 
+            var errorMessage = new List<string>(); 
+
             var result = await _authenticationService.ResetPasswordAsync(token:model.Token, userQuestionAnswerId:model.Id, answer:model.Answer, attempCount:model.FailedCount, password:model.Password);
 
             switch (result.Result)
@@ -916,20 +918,22 @@ namespace Linko.LinkoExchange.Web.Controllers
                     _logger.Info(message:string.Format(format:"ResetPassword. Password Requirements Not Met for Token = {0}.", arg0:model.Token));
                     foreach (var error in result.Errors)
                     {
-                        ModelState.AddModelError(key:"", errorMessage:error);
+                       ModelState.AddModelError(key:"", errorMessage:error);
+                       errorMessage.Add(error);
                     }
 
-                    return View(model:model);
+                    break;
 
                 // Can Not Use Old Password
                 case AuthenticationResult.CanNotUseOldPassword:
                     _logger.Info(message:string.Format(format:"ResetPassword. Can not use old password for Token = {0}.", arg0:model.Token));
                     foreach (var error in result.Errors)
                     {
-                        ModelState.AddModelError(key:"", errorMessage:error);
+                       ModelState.AddModelError(key:"", errorMessage:error);
+                       errorMessage.Add(error);
                     }
 
-                    return View(model:model);
+                    break;
 
                 // incorrect answer
                 case AuthenticationResult.IncorrectAnswerToQuestion:
@@ -938,10 +942,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                     _logger.Info(message:string.Format(format:"ResetPassword. Failed for Token = {0}.", arg0:model.Token));
                     foreach (var error in result.Errors)
                     {
-                        ModelState.AddModelError(key:"", errorMessage:error);
+                      ModelState.AddModelError(key:"", errorMessage:error);
+                      errorMessage.Add(error);
                     }
 
-                    return View(model:model);
+                    break;
 
                 // User is got locked
                 case AuthenticationResult.UserIsLocked: // 3.a
@@ -957,10 +962,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(key:"", errorMessage:error);
+                        errorMessage.Add(error);
                     }
 
-                    return View(model:model);
+                    break; 
             }
+            
+            ViewBag.errorMessage = errorMessage; 
+            return View(model:model);
         }
 
         //
