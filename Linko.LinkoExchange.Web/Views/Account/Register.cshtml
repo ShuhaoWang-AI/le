@@ -10,9 +10,11 @@
 
     var activeLink = "Register";
 
-    var inValidUserProfileMessages = ViewBag.inValidUserProfileMessages; 
-    var inValidSqMessages = ViewBag.inValidSqMessages; 
+    var inValidUserProfileMessages = ViewBag.inValidUserProfileMessages;
+    var inValidSqMessages = ViewBag.inValidSqMessages;
     var inValidKbqMessages = ViewBag.inValidKbqMessages;
+
+    var userInfoSectionTitle = "User Information";
 }
 
 <section></section>
@@ -38,10 +40,19 @@
 
     @Html.HiddenFor(m => m.RegistrationType)
 
+    if (Model.RegistrationType == Linko.LinkoExchange.Core.Enum.RegistrationType.ReRegistration)
+    {
+        userInfoSectionTitle = "Registration";
+        
+        <div class="well">
+            You are already a registered user of LinkoExchange and your user information is below.  To accept the invitation to this Organization, please agree to the Terms and Conditions and Register
+        </div>
+    }
+
     <div class="profileDiv" id="user-info-panel">
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">User Information</h3>
+                <h3 class="box-title"> @userInfoSectionTitle </h3>
                 <div class="box-tools pull-right">
                     <div class="pull-right">
                         <button class="btn btn-box-tool" data-widget="collapse">
@@ -919,6 +930,10 @@
                     // User can not change any thing
                     $("input").attr("readonly", true);
                     $(".editabledDiv select").attr("readonly", "disabled");
+                     
+                    // Hide KBQ and SQ panels 
+                    $("#kbq-panel").hide();
+                    $("#sq-panel").hide(); 
                 }
                 else if (registrationType == 'ResetRegistration') {
                     // Everything should be editable except email and username
@@ -960,14 +975,5 @@
                         , function ()
                         { });
             });
-
-        //$(function()
-        //{
-        //    $('#divTermsAndConditions')
-        //        .slimScroll({
-        //            height: "250px",
-        //            alwaysVisible: true
-        //        });
-        //});
     </script>
 }
