@@ -96,23 +96,32 @@ namespace Linko.LinkoExchange.Services.User
                 case "LockUnlockUserAccount":
                 case "ResetUser":
                     {
+                        var targetOrgRegProgUserId = id[0];
+
+                        var targetOrgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                                .Include(orpu => orpu.OrganizationRegulatoryProgram)
+                                .SingleOrDefault(orpu => orpu.OrganizationRegulatoryProgramUserId == targetOrgRegProgUserId);
+
+                        var currentUsersPermissionGroup = _dbContext.OrganizationRegulatoryProgramUsers
+                               .Single(orpu => orpu.OrganizationRegulatoryProgramUserId == currentOrgRegProgUserId)
+                               .PermissionGroup;
+
+                        bool isCurrentUserAdminOfTargetUser = currentUsersPermissionGroup.Name.ToLower().StartsWith("admin")
+                                        && currentUsersPermissionGroup.OrganizationRegulatoryProgramId == targetOrgRegProgramUser.OrganizationRegulatoryProgramId;
+
                         //
                         //Authorize the correct Authority
                         //
 
-                        var targetOrgRegProgUserId = id[0];
                         if (currentPortalName.Equals("authority"))
                         {
-                            var targetOrgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                                .Include(orpu => orpu.OrganizationRegulatoryProgram)
-                                .SingleOrDefault(orpu => orpu.OrganizationRegulatoryProgramUserId == targetOrgRegProgUserId);
+                            //this will also handle scenarios where the current user and target user of from the same org reg program
+                            retVal = currentOrgRegProgramId == _orgService.GetAuthority(targetOrgRegProgramUser.OrganizationRegulatoryProgramId).OrganizationRegulatoryProgramId;
 
-                            //this will also handle scenarios where targetOrgRegProgUserId doesn't even exist
-                            if (targetOrgRegProgramUser != null
-                                && targetOrgRegProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId == currentRegulatoryProgramId
-                                && targetOrgRegProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId == currentOrganizationId)
+                            //if we are within the same org reg program, current user must be an admin
+                            if (retVal && currentOrgRegProgramId == targetOrgRegProgramUser.OrganizationRegulatoryProgramId)
                             {
-                                retVal = true;
+                                retVal = isCurrentUserAdminOfTargetUser;
                             }
                         }
                         else
@@ -121,23 +130,7 @@ namespace Linko.LinkoExchange.Services.User
                             //Authorize Industry Admins only
                             //
 
-                            var targetOrganizationRegulatoryProgramId = _dbContext.OrganizationRegulatoryProgramUsers
-                                .Single(orpu => orpu.OrganizationRegulatoryProgramUserId == targetOrgRegProgUserId)
-                                .OrganizationRegulatoryProgramId;
-
-                            var currentUsersPermissionGroup = _dbContext.OrganizationRegulatoryProgramUsers
-                                .Single(orpu => orpu.OrganizationRegulatoryProgramUserId == currentOrgRegProgUserId)
-                                .PermissionGroup;
-
-                            bool isAdmin = currentUsersPermissionGroup.Name.ToLower().StartsWith("admin")
-                                            && currentUsersPermissionGroup.OrganizationRegulatoryProgramId == targetOrganizationRegulatoryProgramId;
-
-                            if (isAdmin)
-                            {
-                                //This is an authorized industry admin within the target organization regulatory program
-                                retVal = true;
-                            }
-
+                            retVal = isCurrentUserAdminOfTargetUser;
                         }
 
                     }
