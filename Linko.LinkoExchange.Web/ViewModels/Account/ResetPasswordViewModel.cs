@@ -45,6 +45,21 @@ namespace Linko.LinkoExchange.Web.ViewModels.Account
         {
             get; set;
         }
+
+        [DataType(DataType.Password)]
+        [Display(Name = "New Password")] 
+        public override string Password
+        {
+            get; set;
+        }
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm New Password")] 
+        public override string ConfirmPassword
+        {
+            get; set;
+
+        }
     }
 
     public partial class ResetPasswordValidator : LinkExchangePasswordValidator<ResetPasswordViewModel>

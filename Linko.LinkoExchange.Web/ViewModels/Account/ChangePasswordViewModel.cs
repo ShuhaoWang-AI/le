@@ -12,14 +12,14 @@ namespace Linko.LinkoExchange.Web.ViewModels.Account
     {
         [DataType(DataType.Password)]
         [Display(Name = "Password")] 
-        public string Password
+        public virtual string Password
         {
             get; set;
         }
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm Password")] 
-        public string ConfirmPassword
+        public virtual string ConfirmPassword
         {
             get; set;
 
@@ -34,7 +34,19 @@ namespace Linko.LinkoExchange.Web.ViewModels.Account
     [Validator(typeof(LinkExchangePasswordValidator<PasswordViewModel>))]
     public class ChangePasswordViewModel:PasswordViewModel
     {
+        [DataType(DataType.Password)]
+        [Display(Name = "New Password")] 
+        public override string Password
+        {
+            get; set;
+        }
 
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm New Password")] 
+        public override string ConfirmPassword
+        {
+            get; set;
+        }
     }
 
     public partial class LinkExchangePasswordValidator<T> : AbstractValidator<T> where T : PasswordViewModel
