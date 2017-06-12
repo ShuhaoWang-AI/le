@@ -41,7 +41,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Account
     {
         public LinkExchangePasswordValidator()
         {
-            var regexp = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,16}$";  
+            var regexp = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d$@$#!%^&#'*""?,;:&.<>_\-\[\]\{\}\(\)\+\=~\|\\\?/]{8,16}$";  
 
             RuleFor(x => x.Password).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
             RuleFor(x => x.Password.Length).LessThanOrEqualTo(valueToCompare: 16).WithMessage(errorMessage: "{PropertyName} must be more than 8 and less than or equal to 16 characters long.");
