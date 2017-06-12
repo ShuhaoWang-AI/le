@@ -10,7 +10,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
     [Validator(validatorType:typeof(NewReportPackageViewModelValidator))]
     public class NewReportPackageViewModel
     {
-        [Display(Name = "Monitoring Point")]
+        [Display(Name = "Report Package Template")]
         public int SelectedReportPackageTemplateId { get; set; }
         public List<ReportPackageTemplateViewModel> AllReportPackageTemplates { get; set; }
 
