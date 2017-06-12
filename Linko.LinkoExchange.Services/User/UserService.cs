@@ -88,6 +88,17 @@ namespace Linko.LinkoExchange.Services.User
             switch (apiName)
             {
                 case "GetOrganizationRegulatoryProgramUser":
+                    {
+                        //If the current user is attempting to access their own information, allow this.
+                        var targetOrgRegProgUserId = id[0];
+                        if (currentOrgRegProgUserId == targetOrgRegProgUserId)
+                        {
+                            return true;
+                        }
+                        goto case "GetOrganizationRegulatoryProgramUser_NotSameUser";
+                    }
+
+                case "GetOrganizationRegulatoryProgramUser_NotSameUser":
                 case "EnableDisableUserAccount":
                 case "UpdateUserPermissionGroupId":
                 case "UpdateUserSignatoryStatus":
