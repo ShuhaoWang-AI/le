@@ -572,7 +572,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
 
-            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id, failedCountPassword:model.FailedCountPassword, failedCountKbq:model.FailedCountKbq));
+            model = PrepareReportPackageDetails(id: id, failedCountPassword: model.FailedCountPassword, failedCountKbq: model.FailedCountKbq);
+            ModelState.Remove(key:"QuestionAnswerId"); // if you don't remove then hidden field does not update on post-back 
+            ModelState.Remove(key:"Answer"); // Remove the old KBQ answer
+
+            return View(viewName:"ReportPackageDetails", model:model);
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
@@ -603,6 +607,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                         var failedCountKbq = model.FailedCountKbq;
                         var result = _authenticationService.ValidatePasswordAndKbq(password:model.Password, userQuestionAnswerId:model.QuestionAnswerId, kbqAnswer:model.Answer,
                                                                                    failedPasswordCount:failedCountPassword, failedKbqCount:failedCountKbq);
+                        ModelState.Remove(key:"FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
+                        ModelState.Remove(key:"FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
 
                         switch (result)
                         {
@@ -612,15 +618,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 isValid = false;
                                 model.FailedCountPassword = failedCountPassword;
                                 model.FailedCountKbq = failedCountKbq + 1;
-                                ViewBag.ShowSubmissionValidationErrorMessage = true;
-                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
+                                ViewBag.ShowRepudiateValidationErrorMessage = true;
+                                ViewBag.RepudiateValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
                                 break;
                             case PasswordAndKbqValidationResult.InvalidPassword:
                                 isValid = false;
                                 model.FailedCountPassword = failedCountPassword + 1;
                                 model.FailedCountKbq = failedCountKbq;
-                                ViewBag.ShowSubmissionValidationErrorMessage = true;
-                                ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
+                                ViewBag.ShowRepudiateValidationErrorMessage = true;
+                                ViewBag.RepudiateValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
                                 break;
                             case PasswordAndKbqValidationResult.UserLocked:
                                 return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
@@ -656,8 +662,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
+            
+            model = PrepareReportPackageDetails(id:id, failedCountPassword:model.FailedCountPassword, failedCountKbq:model.FailedCountKbq);
+            ModelState.Remove(key:"QuestionAnswerId"); // if you don't remove then hidden field does not update on post-back 
+            ModelState.Remove(key:"Answer"); // Remove the old KBQ answer 
 
-            return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id, failedCountPassword:model.FailedCountPassword, failedCountKbq:model.FailedCountKbq));
+            return View(viewName:"ReportPackageDetails", model:model);
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
