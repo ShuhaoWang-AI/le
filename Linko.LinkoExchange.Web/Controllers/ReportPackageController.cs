@@ -573,8 +573,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             model = PrepareReportPackageDetails(id: id, failedCountPassword: model.FailedCountPassword, failedCountKbq: model.FailedCountKbq);
-            ModelState.Remove(key:"QuestionAnswerId"); // if you don't remove then hidden field does not update on post-back 
-            ModelState.Remove(key:"Answer"); // Remove the old KBQ answer
+            ModelState.Remove(key: "QuestionAnswerId"); // if you don't remove then hidden field does not update on post-back 
+            ModelState.SetModelValue(key: "Answer", value: null); // Remove the old KBQ answer 
 
             return View(viewName:"ReportPackageDetails", model:model);
         }
@@ -607,8 +607,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                         var failedCountKbq = model.FailedCountKbq;
                         var result = _authenticationService.ValidatePasswordAndKbq(password:model.Password, userQuestionAnswerId:model.QuestionAnswerId, kbqAnswer:model.Answer,
                                                                                    failedPasswordCount:failedCountPassword, failedKbqCount:failedCountKbq);
-                        ModelState.Remove(key:"FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
-                        ModelState.Remove(key:"FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
+                        ModelState.Remove(key: "FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
+                        ModelState.Remove(key: "FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
 
                         switch (result)
                         {
@@ -664,8 +664,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             
             model = PrepareReportPackageDetails(id:id, failedCountPassword:model.FailedCountPassword, failedCountKbq:model.FailedCountKbq);
-            ModelState.Remove(key:"QuestionAnswerId"); // if you don't remove then hidden field does not update on post-back 
-            ModelState.Remove(key:"Answer"); // Remove the old KBQ answer 
+            ModelState.Remove(key: "QuestionAnswerId"); // if you don't remove then hidden field does not update on post-back 
+            ModelState.SetModelValue(key: "Answer", value: null); // Remove the old KBQ answer 
 
             return View(viewName:"ReportPackageDetails", model:model);
         }
