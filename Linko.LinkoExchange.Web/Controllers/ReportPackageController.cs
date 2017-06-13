@@ -104,18 +104,18 @@ namespace Linko.LinkoExchange.Web.Controllers
             var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
                                                                                        {
                                                                                            vm.Id,
-                                                                                           vm.LastModificationDateTimeLocal,
+                                                                                           LastModificationDateTimeLocal = vm.LastModificationDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.LastModifierUserName,
-                                                                                           vm.LastSentDateTimeLocal,
+                                                                                           LastSentDateTimeLocal = vm.LastSentDateTimeLocal.ToString(),
                                                                                            vm.Name,
                                                                                            vm.OrganizationName,
                                                                                            vm.OrganizationReferenceNumber,
-                                                                                           vm.PeriodEndDateTimeLocal,
-                                                                                           vm.PeriodStartDateTimeLocal,
-                                                                                           vm.RepudiationDateTimeLocal,
+                                                                                           PeriodEndDateTimeLocal = vm.PeriodEndDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           PeriodStartDateTimeLocal = vm.PeriodStartDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
+                                                                                           RepudiationDateTimeLocal = vm.RepudiationDateTimeLocal.ToString(),
                                                                                            vm.Repudiator,
                                                                                            vm.Status,
-                                                                                           vm.SubmissionDateTimeLocal,
+                                                                                           SubmissionDateTimeLocal = vm.SubmissionDateTimeLocal.ToString(),
                                                                                            vm.Submitter
                                                                                        });
 
