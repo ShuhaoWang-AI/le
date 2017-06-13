@@ -94,7 +94,8 @@
                                                                             {
                                                                                 htmlAttributes = new
                                                                                                  {
-                                                                                                     @class = "form-control"
+                                                                                                     @class = "form-control",
+                                                                                                     maxlength = 100
                                                                                                  }
                                                                             })
                     @Html.ValidationMessageFor(model => model.Name, validationMessage:"", htmlAttributes:new
@@ -125,7 +126,8 @@
                                                                                        htmlAttributes = new
                                                                                                         {
                                                                                                             @class = "form-control",
-                                                                                                            rows = "3"
+                                                                                                            rows = "3",
+                                                                                                            maxlength = 500
                                                                                                         }
                                                                                    })
                 </div>
