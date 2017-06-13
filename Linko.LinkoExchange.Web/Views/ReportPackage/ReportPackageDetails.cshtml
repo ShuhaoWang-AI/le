@@ -417,9 +417,7 @@
                         </div>
 
                         <section class="box-body form-horizontal">
-                            <p class="text-justify">
-                                @certificationType.Content
-                            </p>
+                            <pre>@certificationType.Content</pre>
                         </section>
                     </div>
                 }
@@ -450,15 +448,15 @@
                                                                                                          {
                                                                                                              @class = "form-control",
                                                                                                              placeholder = "Enter your Comments",
-                                                                                                             rows = "3"
+                                                                                                             rows = "3",
+                                                                                                             maxlength = 500
                                                                                                          }
                                                                                     })
                     }
                     else
                     {
-                        <p class="text-justify">
-                            @Model.Comments
-                        </p>
+
+                        <pre>@Model.Comments</pre>
                     }
                 </div>
             </div>
@@ -638,7 +636,8 @@
                                                                                                                     {
                                                                                                                         @class = "form-control",
                                                                                                                         placeholder = "Enter your Comments",
-                                                                                                                        rows = "3"
+                                                                                                                        rows = "3",
+                                                                                                                        maxlength = 500
                                                                                                                     }
                                                                                                })
                         @Html.ValidationMessageFor(m => m.RepudiationComments, validationMessage:"", htmlAttributes:new {@class = "text-red"})
@@ -743,7 +742,8 @@
                                                                                                             htmlAttributes = new
                                                                                                                              {
                                                                                                                                  @class = "form-control",
-                                                                                                                                 rows = "3"
+                                                                                                                                 rows = "3",
+                                                                                                                                 maxlength = 500
                                                                                                                              }
                                                                                                         })
 
@@ -916,7 +916,8 @@
                                                                                                              htmlAttributes = new
                                                                                                                               {
                                                                                                                                   @class = "form-control",
-                                                                                                                                  rows = "3"
+                                                                                                                                  rows = "3",
+                                                                                                                                  maxlength = 500
                                                                                                                               }
                                                                                                          })
                             @Html.ValidationMessageFor(m => m.RepudiationReviewComments, validationMessage:"", htmlAttributes:new {@class = "text-red"})
