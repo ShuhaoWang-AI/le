@@ -72,7 +72,7 @@
                             </p>
                             <div class="form-group">
                                 <div class="pull-right">
-                                    <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"DeleteParameterGroup", controllerName:"Authority", routeValues:new {id = Model.Id})" formmethod="post">
+                                    <button type="submit" formnovalidate="formnovalidate" class="btn btn-primary btn-sm cancel" formaction="@Url.Action(actionName:"DeleteParameterGroup", controllerName:"Authority", routeValues:new {id = Model.Id})" formmethod="post">
                                         Yes
                                     </button>
                                     <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
