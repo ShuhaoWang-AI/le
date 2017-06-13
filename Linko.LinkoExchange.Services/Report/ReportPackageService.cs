@@ -233,11 +233,11 @@ namespace Linko.LinkoExchange.Services.Report
                     foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
                     {
                         DbEntityEntry entry = item.Entry;
-                        string entityTypeName = entry.Entity.GetType().Name;
+                        var entityTypeName = entry.Entity.GetType().Name;
 
                         foreach (DbValidationError subItem in item.ValidationErrors)
                         {
-                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            string message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
                             errors.Add(message);
                         }
                     }
@@ -245,7 +245,6 @@ namespace Linko.LinkoExchange.Services.Report
                     _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
 
                     throw;
-
                 }
                 catch (Exception ex)
                 {
