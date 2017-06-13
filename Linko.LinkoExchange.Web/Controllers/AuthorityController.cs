@@ -81,7 +81,10 @@ namespace Linko.LinkoExchange.Web.Controllers
         // GET: Authority
         public ActionResult Index()
         {
-            return RedirectToAction(actionName:"Industries", controllerName:"Authority");
+            //
+            //  Default landing page for Authority users: Report Packages - Submitted Pending Review
+            //
+            return RedirectToAction(actionName: "ReportPackages", controllerName: "ReportPackage", routeValues: new { reportStatus = ReportStatusName.SubmittedPendingReview });
         }
 
         #endregion
