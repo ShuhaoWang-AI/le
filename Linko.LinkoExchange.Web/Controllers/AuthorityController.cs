@@ -2427,7 +2427,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model = PrepareReportPackageTemplateDetails();
+                model = PrepareReportPackageTemplateDetails(id: model.Id);
 
                 //foreach (var issue in ModelState[key: "."].Errors)
                 //{
