@@ -20,13 +20,14 @@ using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
+using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.ReportPackage;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
     [RoutePrefix(prefix:"ReportPackage")]
-    public class ReportPackageController:Controller
+    public class ReportPackageController:BaseController
     {
         #region default action
 
@@ -49,10 +50,17 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly ISampleService _sampleService;
         private readonly IHttpContextService _httpContextService;
         private readonly IUserService _userService;
-
-        public ReportPackageController(IAuthenticationService authenticationService, IReportPackageService reportPackageService, IReportTemplateService reportTemplateService,
-                                       LinkoExchangeContext linkoExchangeContext, IFileStoreService fileStoreService, ISampleService sampleService,
-                                       IHttpContextService httpContextService, IQuestionAnswerService questionAnswerService, IUserService userService)
+        public ReportPackageController(
+            IAuthenticationService authenticationService, 
+            IReportPackageService reportPackageService, 
+            IReportTemplateService reportTemplateService,
+            LinkoExchangeContext linkoExchangeContext, 
+            IFileStoreService fileStoreService, 
+            ISampleService sampleService,
+            IHttpContextService httpContextService, 
+            IQuestionAnswerService questionAnswerService, 
+            IUserService userService)
+            :base(httpContextService,userService,reportPackageService,sampleService)
         {
             _authenticationService = authenticationService;
             _reportPackageService = reportPackageService;

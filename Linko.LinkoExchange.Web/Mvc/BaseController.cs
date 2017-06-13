@@ -9,11 +9,11 @@ using Linko.LinkoExchange.Services.User;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {
-    public class CommonInfoAttribute:ActionFilterAttribute
+    public class BaseController:Controller
     {
         #region default action
 
-        public override void OnResultExecuting(ResultExecutingContext filterContext)
+        protected override void OnResultExecuting(ResultExecutingContext filterContext)
         {
             if (filterContext.HttpContext.User.Identity.IsAuthenticated)
             {
@@ -25,7 +25,7 @@ namespace Linko.LinkoExchange.Web.Mvc
                 if (!string.IsNullOrWhiteSpace(value:portalName))
                 {
                     var currentOrganizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-                    filterContext.Controller.ViewBag.PendingRegistrationProgramUsersCount = _userService.GetPendingRegistrationProgramUsersCount(orgRegProgamId:currentOrganizationRegulatoryProgramId);
+                    filterContext.Controller.ViewBag.PendingRegistrationProgramUsersCount = _userService.GetPendingRegistrationProgramUsersCount(orgRegProgamId: currentOrganizationRegulatoryProgramId);
                     var reportPackageStatusCounts = _reportPackageService.GetReportPackageStatusCounts();
                     filterContext.Controller.ViewBag.ReportPackageCount_Draft = reportPackageStatusCounts.SingleOrDefault(c => c.Status == ReportStatusName.Draft)?.Count;
                     filterContext.Controller.ViewBag.ReportPackageCount_ReadyToSubmit = reportPackageStatusCounts.SingleOrDefault(c => c.Status == ReportStatusName.ReadyToSubmit)?.Count;
@@ -34,7 +34,7 @@ namespace Linko.LinkoExchange.Web.Mvc
                     filterContext.Controller.ViewBag.ReportPackageCount_RepudiatedPendingReview =
                         reportPackageStatusCounts.SingleOrDefault(c => c.Status == ReportStatusName.RepudiatedPendingReview)?.Count;
 
-                    if (portalName.ToLower().Equals(value:"industry"))
+                    if (portalName.ToLower().Equals(value: "industry"))
                     {
                         var sampleStatusCounts = _sampleService.GetSampleCounts();
                         filterContext.Controller.ViewBag.SampleCount_Draft = sampleStatusCounts.SingleOrDefault(c => c.Status == SampleStatusName.Draft)?.Count;
@@ -61,7 +61,7 @@ namespace Linko.LinkoExchange.Web.Mvc
         private readonly IReportPackageService _reportPackageService;
         private readonly ISampleService _sampleService;
 
-        public CommonInfoAttribute(IHttpContextService httpContextService, IUserService userService, IReportPackageService reportPackageService, ISampleService sampleService)
+        public BaseController(IHttpContextService httpContextService, IUserService userService, IReportPackageService reportPackageService, ISampleService sampleService)
         {
             _httpContextService = httpContextService;
             _userService = userService;

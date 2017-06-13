@@ -18,10 +18,13 @@ using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.Report;
+using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mapping;
+using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.shared;
 using Linko.LinkoExchange.Web.ViewModels.Account;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
@@ -32,7 +35,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 {
     [RoutePrefix(prefix:"Account")]
     [Route(template:"{action=Index}")]
-    public class AccountController:Controller
+    public class AccountController:BaseController
     {
         #region default action
 
@@ -78,8 +81,10 @@ namespace Linko.LinkoExchange.Web.Controllers
             IJurisdictionService jurisdictionService,
             ISettingService settingService,
             IMapHelper mapHelper,
-            IHttpContextService httpContextService
-        )
+            IHttpContextService httpContextService,
+            IReportPackageService reportPackageService,
+            ISampleService sampleService
+        ):base(httpContextService,userService,reportPackageService,sampleService)
         {
             _authenticationService = authenticationService;
             _organizationService = organizationService;

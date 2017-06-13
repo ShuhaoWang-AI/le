@@ -30,11 +30,12 @@ using Linko.LinkoExchange.Web.ViewModels.Authority;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
 using Linko.LinkoExchange.Core.Resources;
+using Linko.LinkoExchange.Services.Sample;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
     [RoutePrefix(prefix:"Authority")]
-    public class AuthorityController:Controller
+    public class AuthorityController:BaseController
     {
         #region constructor
 
@@ -53,10 +54,24 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IReportTemplateService _reportTemplateService;
         private readonly IUnitService _unitService;
 
-        public AuthorityController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService,
-                                   ISettingService settingService, IQuestionAnswerService questionAnswerService, ITimeZoneService timeZoneService, IPermissionService permissionService,
-                                   ILogger logger, ICromerrAuditLogService cromerrLogService, IHttpContextService httpContextService, IParameterService parameterService,
-                                   IReportElementService reportElementService, IReportTemplateService reportTemplateService, IUnitService unitService)
+        public AuthorityController(
+            IOrganizationService organizationService, 
+            IUserService userService, 
+            IInvitationService invitationService,
+            ISettingService settingService, 
+            IQuestionAnswerService questionAnswerService, 
+            ITimeZoneService timeZoneService, 
+            IPermissionService permissionService,
+            ILogger logger, 
+            ICromerrAuditLogService cromerrLogService, 
+            IHttpContextService httpContextService, 
+            IParameterService parameterService,
+            IReportElementService reportElementService, 
+            IReportTemplateService reportTemplateService, 
+            IUnitService unitService,
+            IReportPackageService reportPackageService, 
+            ISampleService sampleService)
+            :base(httpContextService,userService,reportPackageService,sampleService)
         {
             _organizationService = organizationService;
             _userService = userService;

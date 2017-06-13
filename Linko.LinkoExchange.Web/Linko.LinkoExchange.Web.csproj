@@ -452,7 +452,7 @@
     <Compile Include="Mapping\IMapHelper.cs" />
     <Compile Include="Mapping\MapHelper.cs" />
     <Compile Include="Mvc\LogAttribute.cs" />
-    <Compile Include="Mvc\CommonInfoAttribute.cs" />
+    <Compile Include="Mvc\BaseController.cs" />
     <Compile Include="Controllers\CommonController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\UserController.cs" />

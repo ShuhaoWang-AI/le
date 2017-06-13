@@ -35,7 +35,7 @@ using NLog;
 namespace Linko.LinkoExchange.Web.Controllers
 {
     [RoutePrefix(prefix:"Industry")]
-    public class IndustryController:Controller
+    public class IndustryController:BaseController
     {
         #region default action
 
@@ -65,10 +65,24 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IUnitService _unitService;
         private readonly IUserService _userService;
 
-        public IndustryController(IOrganizationService organizationService, IUserService userService, IInvitationService invitationService, IQuestionAnswerService questionAnswerService,
-                                  IPermissionService permissionService, ILogger logger, IHttpContextService httpContextService, IFileStoreService fileStoreService,
-                                  IReportElementService reportElementService, ISampleService sampleService, IUnitService unitService, IMonitoringPointService monitoringPointService,
-                                  IReportTemplateService reportTemplateService, ISettingService settingService, IParameterService parameterService)
+        public IndustryController(
+            IOrganizationService organizationService,
+            IUserService userService, IInvitationService 
+            invitationService, 
+            IQuestionAnswerService questionAnswerService,
+            IPermissionService permissionService, 
+            ILogger logger, 
+            IHttpContextService httpContextService, 
+            IFileStoreService fileStoreService,
+            IReportElementService reportElementService, 
+            ISampleService sampleService, 
+            IUnitService unitService, 
+            IMonitoringPointService monitoringPointService,
+            IReportTemplateService reportTemplateService, 
+            ISettingService settingService, 
+            IParameterService parameterService, 
+            IReportPackageService reportPackageService)
+            :base(httpContextService,userService,reportPackageService,sampleService)
         {
             _fileStoreService = fileStoreService;
             _httpContextService = httpContextService;
