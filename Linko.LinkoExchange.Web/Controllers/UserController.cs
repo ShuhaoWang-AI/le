@@ -13,15 +13,18 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.QuestionAnswer;
+using Linko.LinkoExchange.Services.Report;
+using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Mapping;
+using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
     [RoutePrefix(prefix:"User")]
-    public class UserController:Controller
+    public class UserController:BaseController
     {
         private readonly IAuthenticationService _authenticateService;
         private readonly IMapHelper _mapHelper;
@@ -35,8 +38,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             IUserService userService,
             IJurisdictionService jurisdictionService,
             IMapHelper mapHelper,
-            IHttpContextService httpContextService
+            IHttpContextService httpContextService,
+            IReportPackageService reportPackageService,
+            ISampleService sampleService
         )
+        :base(httpContextService,userService,reportPackageService,sampleService)
         {
             if (authenticateService == null)
             {

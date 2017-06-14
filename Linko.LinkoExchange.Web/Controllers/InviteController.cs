@@ -6,18 +6,29 @@ using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.Report;
+using Linko.LinkoExchange.Services.Sample;
+using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
-    public class InviteController:Controller
+    public class InviteController:BaseController
     {
         private readonly IHttpContextService _httpContextService;
         private readonly IInvitationService _invitationService;
         private readonly ILogger _logger;
 
-        public InviteController(IInvitationService invitationService, ILogger logger, IHttpContextService httpContextService)
+        public InviteController(
+            IInvitationService invitationService, 
+            ILogger logger, 
+            IHttpContextService httpContextService,
+            IUserService userService,
+            IReportPackageService reportPackageService, 
+            ISampleService sampleService)
+            :base(httpContextService,userService,reportPackageService, sampleService)
         {
             _invitationService = invitationService;
             _logger = logger;

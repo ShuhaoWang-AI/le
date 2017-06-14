@@ -1,13 +1,18 @@
 ﻿using System.Web.Mvc;
+using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.Report;
+using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.TermCondition;
+using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
-    public class HomeController:Controller
+    public class HomeController:BaseController
     {
         #region default action
 
@@ -48,7 +53,14 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IAuthenticationService _authenticationService;
         private readonly ITermConditionService _termConditionService;
 
-        public HomeController(IAuthenticationService authenticationService, ITermConditionService termConditionService)
+        public HomeController(
+            IAuthenticationService authenticationService, 
+            ITermConditionService termConditionService,
+            IHttpContextService httpContextService,
+            IUserService userService,
+            IReportPackageService reportPackageService,
+            ISampleService sampleService)
+            :base(httpContextService,userService,reportPackageService,sampleService)
         {
             _authenticationService = authenticationService;
             _termConditionService = termConditionService;
