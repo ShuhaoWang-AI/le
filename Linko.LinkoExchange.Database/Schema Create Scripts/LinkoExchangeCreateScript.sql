@@ -4691,7 +4691,7 @@ For security reasons, the following account has been locked by the Authority. Ch
         'ResetRequired',
         
         'LinkoExchange Registration Reset Required', 
-        ' <html>
+        '<html>
             <body> 
                 <pre>
 Hello,
@@ -5122,8 +5122,7 @@ If you have questions or concerns, please contact your Authority or Linko Techno
                 <pre>
 Hello,
 
-For security reasons, you must reset your Registration Profile including Password, Knowledge Based Questions
-and Security Questions.
+For security reasons, you must reset your Registration Profile including Password, Knowledge Based Questions and Security Questions.
 
 Please click the link below or copy and paste the link into your web browser.
 
@@ -5135,7 +5134,6 @@ If you have questions or concerns, please contact your Authority or Linko Techno
             </body>
         </html>' 
     ) 
-
 
     -- UC-42.2.a Registration From invitation -- Email to Registration Approvers, industry user
     -- Industry user 
