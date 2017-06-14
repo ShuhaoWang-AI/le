@@ -825,7 +825,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 OrganizationName = vm.OrganizationName,
                                 OrganizationReferenceNumber = vm.OrganizationReferenceNumber,
                                 Status = vm.ReportStatusName,
-                                CtsEventTypeName = vm.CtsEventTypeName,
+                                CtsEventTypeName = $@"({vm.CtsEventCategoryName}) {vm.CtsEventTypeName}",
                                 CtsEventTypeId = vm.CtsEventTypeId,
                                 ReportPackageTemplateElementCategories = vm.ReportPackageTemplateElementCategories,
                                 Comments = vm.Comments,
