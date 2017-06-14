@@ -263,7 +263,7 @@ namespace Linko.LinkoExchange.Services.Report
 
         public CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(int reportPackageId)
         {
-            var reportPackageDto = this.GetReportPackage(reportPackageId, true);
+            var reportPackageDto = this.GetReportPackage(reportPackageId, true, true);
             return GetReportPackageCopyOfRecordPdfFile(reportPackageDto);
         }
 
@@ -626,7 +626,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             if (reportPackageDto == null)
             {
-                reportPackageDto = GetReportPackage(reportPackageId, false);
+                reportPackageDto = GetReportPackage(reportPackageId, false, true);
             }
 
             var copyOfRecordDto = _copyOfRecordService.GetCopyOfRecordByReportPackage(reportPackageDto);

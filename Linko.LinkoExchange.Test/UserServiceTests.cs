@@ -278,5 +278,11 @@ namespace Linko.LinkoExchange.Test
             _userService.EnableDisableUserAccount(9, true);
         }
 
+        [TestMethod]
+        public void GetOrganizationRegulatoryProgramUser_Test()
+        {
+            _userService.GetOrganizationRegulatoryProgramUser(5, true);
+        }
+
     }
 }

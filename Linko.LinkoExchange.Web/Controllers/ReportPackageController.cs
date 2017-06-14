@@ -138,10 +138,18 @@ namespace Linko.LinkoExchange.Web.Controllers
                 if (items != null)
                 {
                     var item = items.First();
+                    var newUrl = Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id = item.Id });
+
+                    if (item.Status == ReportStatusName.Submitted)
+                    {
+                        //Scroll target page to the appropriate section if user is viewing a submitted report package.
+                        newUrl += "#submission-confirmation";
+                    }
+
                     return Json(data:new
                                      {
                                          redirect = true,
-                                         newurl = Url.Action(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id = item.Id})
+                                         newurl = newUrl
                                      });
                 }
                 return Json(data:new
@@ -249,7 +257,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             try
             {
-                var vm = _reportPackageService.GetReportPackage(reportPackageId:id, isIncludeAssociatedElementData:true);
+                var vm = _reportPackageService.GetReportPackage(reportPackageId: id, isIncludeAssociatedElementData: true, isAuthorizationRequired: true);
 
                 vm.Comments = model.Comments;
 
@@ -430,7 +438,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     try
                     {
-                        var vm = _reportPackageService.GetReportPackage(reportPackageId:id, isIncludeAssociatedElementData:true);
+                        var vm = _reportPackageService.GetReportPackage(reportPackageId: id, isIncludeAssociatedElementData: true, isAuthorizationRequired: true);
 
                         vm.Comments = model.Comments;
 
@@ -813,7 +821,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             try
             {
-                var vm = _reportPackageService.GetReportPackage(reportPackageId:id, isIncludeAssociatedElementData:true);
+                var vm = _reportPackageService.GetReportPackage(reportPackageId: id, isIncludeAssociatedElementData: true, isAuthorizationRequired: true);
 
                 viewModel = new ReportPackageViewModel
                             {
