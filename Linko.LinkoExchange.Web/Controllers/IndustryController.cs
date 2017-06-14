@@ -1060,7 +1060,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     if (model.EndDateTimeLocal < model.StartDateTimeLocal)
                     {
                         var validationIssues = new List<RuleViolation>();
-                        var message = "End Date must be greater than Start Date.";
+                        var message = "End Date must be on or after Start date.";
                         validationIssues.Add(item:new RuleViolation(propertyName:string.Empty, propertyValue:null, errorMessage:message));
                         throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
                     }
