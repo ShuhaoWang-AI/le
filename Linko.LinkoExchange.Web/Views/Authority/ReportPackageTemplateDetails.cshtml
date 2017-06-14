@@ -48,6 +48,30 @@
             </div>
         </div>
 
+        <div aria-labelledby="DeleteReportPackageTemplateModalLabel" class="col-md-12 fade modal modal-info" id="DeleteReportPackageTemplateModal" role="dialog" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <div class="alert alert-dismissible alert-info modal-content">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
+                    <h4 class="box-title">Delete Report Package Template</h4>
+
+                    <div class="form-horizontal">
+                        <p>
+                            Deleting this Report Package Template will permanently remove it from the system and it will no longer be available to use by an Industry. Drafts and previously submitted Reports will not be affected.
+                            Do you want to delete this Report Package Template?<br />
+                        </p>
+                        <div class="form-group">
+                            <div class="pull-right">
+                                <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"DeleteReportPackageTemplate", controllerName:"Authority", routeValues:new {id = Model.Id})" formmethod="post">
+                                    Yes
+                                </button>
+                                <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <section class="box-body form-horizontal">
             @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
                                                                                                                             {
@@ -63,30 +87,6 @@
                     </h5>
                 </div>
             }
-
-            <div aria-labelledby="DeleteReportPackageTemplateModalLabel" class="col-md-12 fade modal modal-info" id="DeleteReportPackageTemplateModal" role="dialog" tabindex="-1">
-                <div class="modal-dialog" role="document">
-                    <div class="alert alert-dismissible alert-info modal-content">
-                        <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
-                        <h4 class="box-title">Delete Report Package Template</h4>
-
-                        <div>
-                            <p>
-                                Deleting this Report Package Template will permanently remove it from the system and it will no longer be available to use by an Industry. Drafts and previously submitted Reports will not be affected.
-                                Do you want to delete this Report Package Template?<br />
-                            </p>
-                            <div class="form-group">
-                                <div class="pull-right">
-                                    <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"DeleteReportPackageTemplate", controllerName:"Authority", routeValues:new {id = Model.Id})" formmethod="post">
-                                        Yes
-                                    </button>
-                                    <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div class="form-group">
                 @Html.HiddenFor(model => model.Id)
