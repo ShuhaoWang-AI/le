@@ -667,10 +667,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                     _reportPackageService.RepudiateReport(reportPackageId:id, repudiationReasonId:model.RepudiationReasonId ?? 0, repudiationReasonName:model.RepudiationReasonName,
                                                           comments:model.RepudiationComments);
 
+                    string confirmationMessage = "Report Repudiated<br />";
+                    confirmationMessage += "The entire contents of the report including results, if present, are repudiated<br />";
+                    confirmationMessage += "A repudiation receipt email has been sent<br />";
+
                     return View(viewName:"Confirmation", model:new ConfirmationViewModel
                                                                {
                                                                    Title = "Report Package Repudiation Confirmation ",
-                                                                   Message = "Report package repudiated successfully."
+                                                                   HtmlStr = confirmationMessage
                                                                });
                 }
             }
