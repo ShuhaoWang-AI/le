@@ -944,11 +944,15 @@
 
                     $("#AddParameterDropdown")
                         .kendoDropDownList({
-                            dataSource: availableParameters
+                            filter: "contains"
+                            , dataSource: availableParameters
                             , dataTextField: "Name"
                             , dataValueField: "Id"
                             , autoWidth: true
                             , noDataTemplate: 'No Parameter Available!'
+                            , popup: {
+                                appendTo: $("#AddParameterModal")
+                            }
                         });
 
                     $('#AddParameterModal').modal('show');
