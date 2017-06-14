@@ -121,6 +121,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.ShowSuccessMessageForAuthoritySettings = true;
+                model = PrepareAuthoritySettings();
                 return View(model:model);
             }
 
@@ -170,6 +172,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.ShowErrorMessageForProgramSettings = true;
+                model = PrepareAuthoritySettings();
                 return View(viewName:"Settings", model:model);
             }
 
