@@ -76,7 +76,17 @@
                           selectable.Type(type:GridSelectionType.Row);
                       })
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
-                      .Filterable(filterable => filterable.Enabled(value:false).Mode(value:GridFilterMode.Row))
+                      .Filterable(filterable =>
+                      {
+                          if (new[] { "Submitted", "SubmittedPendingReview", "Repudiated", "RepudiatedPendingReview", "All" }.Contains(value: (string) ViewBag.ReportStatusName.ToString()))
+                          {
+                              filterable.Enabled(value: true).Mode(value: GridFilterMode.Row);
+                          }
+                          else
+                          {
+                              filterable.Enabled(value: false);
+                          }
+                      })
                       .Resizable(resizable => resizable.Columns(value:true))
                       .Scrollable(s => s.Height(value:"auto"))
                       .NoRecords(text:"No report package exists.")
