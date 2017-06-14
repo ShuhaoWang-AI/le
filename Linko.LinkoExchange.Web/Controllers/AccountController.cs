@@ -279,52 +279,56 @@ namespace Linko.LinkoExchange.Web.Controllers
                     var org = _organizationService.GetOrganizationRegulatoryProgram(orgRegProgId:invitation.RecipientOrganizationRegulatoryProgramId);
 
                     var messageBody = new StringBuilder();
-                    messageBody.Append(value:$"<p>Your LinkoExchange registration has been received and is now under review for the following:</p>");
+                    messageBody.Append(value:$"<div>Your LinkoExchange registration has been received and is now under review for the following:</div><br/>"); 
                     messageBody.Append(value:$"<div>");
-                    messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'>Authority:</div>");
+
+                    messageBody.Append(value: $"<div>");
+                    messageBody.Append(value: $"<div class='col-md-1' style='text-align:right;'>Authority:</div>");
                     var authorityNameInMessage = _organizationService.GetAuthority(orgRegProgramId:invitation.RecipientOrganizationRegulatoryProgramId).OrganizationDto.OrganizationName;
-                    messageBody.Append(value:$"<div class='col-md-11'>{authorityNameInMessage}</div>");
-                    messageBody.Append(value:$"</div");
+                    messageBody.Append(value: $"<div class='col-md-11'>{authorityNameInMessage}</div>");
+                    messageBody.Append(value: $"</div><br/>");
 
-                    if (org.OrganizationDto.OrganizationType.Name.ToLower().IsCaseInsensitiveEqual(comparing:OrganizationTypeName.Industry.ToString()))
+
+                    if (org.OrganizationDto.OrganizationType.Name.ToLower().IsCaseInsensitiveEqual(comparing: OrganizationTypeName.Industry.ToString()))
                     {
-                        messageBody.Append(value:$"<div>");
-                        messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'>Facility: </div>");
-                        messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.OrganizationName} </div>");
-                        messageBody.Append(value:$"</div>");
+                        messageBody.Append(value: $"<div>");
+                        messageBody.Append(value: $"<div class='col-md-1' style='text-align:right'>Facility: </div>");
+                        messageBody.Append(value: $"<div class='col-md-11'>{org.OrganizationDto.OrganizationName} </div>");
+                        messageBody.Append(value: $"</div>");
 
-                        messageBody.Append(value:$"<div>");
-                        messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'></div>");
-                        messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.AddressLine1}</div>");
-                        messageBody.Append(value:$"</div>");
+                        messageBody.Append(value: $"<div>");
+                        messageBody.Append(value: $"<div class='col-md-1' style='text-align:right'></div>");
+                        messageBody.Append(value: $"<div class='col-md-11'>{org.OrganizationDto.AddressLine1}</div>");
+                        messageBody.Append(value: $"</div>");
 
-                        if (!string.IsNullOrWhiteSpace(value:org.OrganizationDto.AddressLine2))
+                        if (!string.IsNullOrWhiteSpace(value: org.OrganizationDto.AddressLine2))
                         {
-                            messageBody.Append(value:$"<div>");
-                            messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'></div>");
-                            messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.AddressLine2}</div>");
-                            messageBody.Append(value:$"</div>");
+                            messageBody.Append(value: $"<div>");
+                            messageBody.Append(value: $"<div class='col-md-1' style='text-align:right'></div>");
+                            messageBody.Append(value: $"<div class='col-md-11'>{org.OrganizationDto.AddressLine2}</div>");
+                            messageBody.Append(value: $"</div>");
                         }
 
-                        messageBody.Append(value:$"<div>");
-                        messageBody.Append(value:$"<div class='col-md-1' style='text-align:right'></div>");
-                        if (!string.IsNullOrWhiteSpace(value:org.OrganizationDto.State))
+                        messageBody.Append(value: $"<div class='col-md-1' style='text-align:right'></div>");
+                        if (!string.IsNullOrWhiteSpace(value: org.OrganizationDto.State))
                         {
-                            messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.CityName},{org.OrganizationDto.State}</div>");
+                            messageBody.Append(value: $"<div class='col-md-11'>{org.OrganizationDto.CityName},{org.OrganizationDto.State}</div>");
                         }
                         else
                         {
-                            messageBody.Append(value:$"<div class='col-md-11'>{org.OrganizationDto.CityName}</div>");
+                            messageBody.Append(value: $"<div class='col-md-11'>{org.OrganizationDto.CityName}</div>");
                         }
-
-                        messageBody.Append(value:$"</div>");
                     }
                     else
                     {
-                        messageBody.Append(value:$"");
+                        messageBody.Append(value: $"");
                     }
-                    messageBody.Append(value:$"<p>You will be notified by email when a decision has been made about your account request.</p>");
-                    messageBody.Append(value:$"<p>If you have questions or concerns, please contact {authorityName} at {authorityEmail} or {authorityPhone}.</p>");
+
+                    messageBody.Append(value:$"<br/>&nbsp<br/><div>You will be notified by email when a decision has been made about your account request.</div>");
+                    messageBody.Append(value:$"<div>If you have questions or concerns, please contact {authorityName} at {authorityEmail} or {authorityPhone}.</div>");
+                    
+                    messageBody.Append(value:$"</div>"); 
+
 
                     return View(viewName:"Confirmation",
                                 model:new ConfirmationViewModel
