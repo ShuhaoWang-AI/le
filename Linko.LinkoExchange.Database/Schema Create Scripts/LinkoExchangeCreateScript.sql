@@ -4825,22 +4825,22 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
          
         'Signatory Rights Granted for {organizationName} ({authorityOrganizationName})',
         '<html>
-			<body> 
-				<pre>
+         <body> 
+         <pre>
 Hello {adminFirstName} {adminLastName},
 
 Signatory rights have been granted for:
 
-	     User:	{firstName} {lastName}
-	Authority:	{authorityOrganizationName}
-	 Facility:	{organizationName}
-				{addressLine1}
-				{cityName}, {stateName} 
-	     
+        User:  {firstName} {lastName}
+    Authority: {authorityOrganizationName}
+     Facility: {organizationName}
+               {addressLine1}
+               {cityName}, {stateName} 
+    
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
 If you have questions or concerns, please contact {authorityName} at {emailAddress} or {phoneNumber}.
-				</pre>
-			</body>
+            </pre>
+            </body>
 </html>'
     ) 
 
@@ -4861,10 +4861,10 @@ Hello {firstName} {lastName},
 
 Your signatory rights have been removed for 
 
-    Authority:  {authorityOrganizationName}
-     Facility:  {organizationName}
-                {addressLine1}
-                {cityName}, {stateName} 
+    Authority: {authorityOrganizationName}
+     Facility: {organizationName}
+               {addressLine1}
+               {cityName}, {stateName} 
                      
 You are no longer able to electronically sign report submissions.
                      
@@ -4886,22 +4886,22 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         
         'Signatory Rights Revoked for {organizationName} ({authorityOrganizationName})',
         '<html>
-			<body> 
-				<pre>
+         <body> 
+             <pre>
 Hello {adminFirstName} {adminLastName},
 
 Signatory rights have been revoked for:
 
-	     User:	{firstName} {lastName}
-	Authority:	{authorityOrganizationName}
-	 Facility:	{organizationName}
-				{addressLine1}
-				{cityName}, {stateName} 
-	     
+         User: {firstName} {lastName}
+    Authority: {authorityOrganizationName}
+     Facility: {organizationName}
+               {addressLine1}
+               {cityName}, {stateName} 
+
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
 If you have questions or concerns, please contact {authorityName} at {emailAddress} or {phoneNumber}.
-				</pre>
-			</body>
+              </pre>
+           </body>
 </html>'  
     )
 
