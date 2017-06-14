@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!--<Import Project="..\..\XternalObjects\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props" Condition="Exists('..\..\XternalObjects\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props')" />-->
+  <Import Project="..\..\XternalObjects\Microsoft.Net.Compilers.2.2.0\build\Microsoft.Net.Compilers.props" Condition="Exists('..\..\XternalObjects\Microsoft.Net.Compilers.2.2.0\build\Microsoft.Net.Compilers.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -62,12 +63,12 @@
       <HintPath>..\..\XternalObjects\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FluentValidation, Version=6.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\XternalObjects\FluentValidation.6.2.1.0\lib\Net45\FluentValidation.dll</HintPath>
+    <Reference Include="FluentValidation, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7de548da2fbae0f0, processorArchitecture=MSIL">
+      <HintPath>..\..\XternalObjects\FluentValidation.7.0.3\lib\net45\FluentValidation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FluentValidation.Mvc, Version=6.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\XternalObjects\FluentValidation.MVC5.6.2.1.0\lib\Net45\FluentValidation.Mvc.dll</HintPath>
+    <Reference Include="FluentValidation.Mvc, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7de548da2fbae0f0, processorArchitecture=MSIL">
+      <HintPath>..\..\XternalObjects\FluentValidation.Mvc5.7.0.3\lib\net45\FluentValidation.Mvc.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Glimpse.AspNet, Version=1.9.2.0, Culture=neutral, processorArchitecture=MSIL">
@@ -97,24 +98,24 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\XternalObjects\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+    <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\XternalObjects\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\XternalObjects\Microsoft.Owin.Host.SystemWeb.3.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\XternalObjects\Microsoft.Owin.Host.SystemWeb.3.1.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\XternalObjects\Microsoft.Owin.Security.3.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\XternalObjects\Microsoft.Owin.Security.3.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security.Cookies">
-      <HintPath>..\..\XternalObjects\Microsoft.Owin.Security.Cookies.3.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\XternalObjects\Microsoft.Owin.Security.Cookies.3.1.0\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security.OAuth">
-      <HintPath>..\..\XternalObjects\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\XternalObjects\Microsoft.Owin.Security.OAuth.3.1.0\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -141,12 +142,12 @@
       <HintPath>..\..\XternalObjects\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\XternalObjects\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\XternalObjects\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\..\XternalObjects\NLog.4.3.10\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\..\XternalObjects\NLog.4.4.10\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
@@ -352,11 +353,6 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
-    <Content Include="fonts\FontAwesome.otf" />
-    <Content Include="fonts\fontawesome-webfont.woff2" />
-    <Content Include="fonts\fontawesome-webfont.woff" />
-    <Content Include="fonts\fontawesome-webfont.ttf" />
-    <Content Include="fonts\fontawesome-webfont.eot" />
     <Content Include="Scripts\AdminLTE\app.js" />
     <Content Include="Scripts\AdminLTE\app.min.js" />
     <Content Include="Scripts\AdminLTE\bootstrap-datepicker.js" />
@@ -377,34 +373,62 @@
     <Content Include="Aspose.Pdf.lic">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="fonts\fontawesome-webfont.woff2" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
     <None Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="Scripts\fastclick.js" />
+    <Content Include="Scripts\inputmask\bindings\inputmask.binding.js" />
+    <Content Include="Scripts\inputmask\bindings\inputmask.binding.min.js" />
+    <Content Include="Scripts\inputmask\dependencyLibs\inputmask.dependencyLib.jqlite.js" />
+    <Content Include="Scripts\inputmask\dependencyLibs\inputmask.dependencyLib.jqlite.min.js" />
+    <Content Include="Scripts\inputmask\dependencyLibs\inputmask.dependencyLib.jquery.js" />
+    <Content Include="Scripts\inputmask\dependencyLibs\inputmask.dependencyLib.jquery.min.js" />
+    <Content Include="Scripts\inputmask\dependencyLibs\inputmask.dependencyLib.js" />
+    <Content Include="Scripts\inputmask\dependencyLibs\inputmask.dependencyLib.min.js" />
+    <Content Include="Scripts\inputmask\global\document.js" />
+    <Content Include="Scripts\inputmask\global\document.min.js" />
+    <Content Include="Scripts\inputmask\global\window.js" />
+    <Content Include="Scripts\inputmask\global\window.min.js" />
+    <Content Include="Scripts\inputmask\inputmask.date.extensions.js" />
+    <Content Include="Scripts\inputmask\inputmask.date.extensions.min.js" />
+    <Content Include="Scripts\inputmask\inputmask.extensions.js" />
+    <Content Include="Scripts\inputmask\inputmask.extensions.min.js" />
+    <Content Include="Scripts\inputmask\inputmask.js" />
+    <Content Include="Scripts\inputmask\inputmask.min.js" />
+    <Content Include="Scripts\inputmask\inputmask.numeric.extensions.js" />
+    <Content Include="Scripts\inputmask\inputmask.numeric.extensions.min.js" />
+    <Content Include="Scripts\inputmask\inputmask.phone.extensions.js" />
+    <Content Include="Scripts\inputmask\inputmask.phone.extensions.min.js" />
+    <Content Include="Scripts\inputmask\inputmask.regex.extensions.js" />
+    <Content Include="Scripts\inputmask\inputmask.regex.extensions.min.js" />
+    <Content Include="Scripts\inputmask\jquery.inputmask.js" />
+    <Content Include="Scripts\inputmask\jquery.inputmask.min.js" />
+    <Content Include="Scripts\inputmask\phone-codes\phone-be.js" />
+    <Content Include="Scripts\inputmask\phone-codes\phone-be.min.js" />
+    <Content Include="Scripts\inputmask\phone-codes\phone-nl.js" />
+    <Content Include="Scripts\inputmask\phone-codes\phone-nl.min.js" />
+    <Content Include="Scripts\inputmask\phone-codes\phone-ru.js" />
+    <Content Include="Scripts\inputmask\phone-codes\phone-ru.min.js" />
+    <Content Include="Scripts\inputmask\phone-codes\phone-uk.js" />
+    <Content Include="Scripts\inputmask\phone-codes\phone-uk.min.js" />
+    <Content Include="Scripts\inputmask\phone-codes\phone.js" />
+    <Content Include="Scripts\inputmask\phone-codes\phone.min.js" />
     <Content Include="Scripts\jquery-3.1.1.js" />
     <Content Include="Scripts\jquery-3.1.1.min.js" />
     <Content Include="Scripts\jquery-3.1.1.slim.js" />
     <Content Include="Scripts\jquery-3.1.1.slim.min.js" />
     <Content Include="Scripts\jquery.icheck.js" />
     <Content Include="Scripts\jquery.icheck.min.js" />
-    <Content Include="Scripts\jquery.inputmask\inputmask.date.extensions.js" />
-    <Content Include="Scripts\jquery.inputmask\inputmask.date.extensions.min.js" />
-    <Content Include="Scripts\jquery.inputmask\inputmask.extensions.js" />
-    <Content Include="Scripts\jquery.inputmask\inputmask.extensions.min.js" />
-    <Content Include="Scripts\jquery.inputmask\inputmask.js" />
-    <Content Include="Scripts\jquery.inputmask\inputmask.min.js" />
-    <Content Include="Scripts\jquery.inputmask\inputmask.numeric.extensions.js" />
-    <Content Include="Scripts\jquery.inputmask\inputmask.numeric.extensions.min.js" />
-    <Content Include="Scripts\jquery.inputmask\inputmask.phone.extensions.js" />
-    <Content Include="Scripts\jquery.inputmask\inputmask.phone.extensions.min.js" />
-    <Content Include="Scripts\jquery.inputmask\inputmask.regex.extensions.js" />
-    <Content Include="Scripts\jquery.inputmask\inputmask.regex.extensions.min.js" />
-    <Content Include="Scripts\jquery.inputmask\jquery.inputmask.bundle.js" />
-    <Content Include="Scripts\jquery.inputmask\jquery.inputmask.js" />
-    <Content Include="Scripts\jquery.inputmask\jquery.inputmask.min.js" />
     <Content Include="Scripts\jquery-3.1.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.1.1.min.map" />
-    <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.inputmask.bundle.js" />
+    <Content Include="Scripts\jquery.inputmask.bundle.min.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -594,6 +618,7 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
+    <Error Condition="!Exists('..\..\XternalObjects\Microsoft.Net.Compilers.2.2.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\XternalObjects\Microsoft.Net.Compilers.2.2.0\build\Microsoft.Net.Compilers.props'))" />
     <!--<Error Condition="!Exists('..\..\XternalObjects\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\XternalObjects\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props'))" />-->
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
