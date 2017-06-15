@@ -90,6 +90,16 @@
                     </h5>
                 </div>
             }
+            
+            @if (!ViewBag.Satus.Equals("ViewOnly"))
+            {
+                if (!ViewBag.Satus.Equals("New"))
+                {
+                    <h5>
+                        Any changes you make will not be reflected in any existing Report Packages the Industry has already created.
+                    </h5>
+                }
+            }
 
             <div class="form-group">
                 @Html.HiddenFor(model => model.Id)
