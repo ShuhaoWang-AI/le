@@ -17,7 +17,7 @@
                 <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
             </li>
             <li>
-                <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = Model.SampleStatusName})'"><i class=""></i> Samples </a>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = Model.SampleStatusName})'"><i class=""></i> Samples - @Label.ResourceManager.GetString(name: Model.SampleStatusName.ToString())</a>
             </li>
             <li class="active">
                 Details
