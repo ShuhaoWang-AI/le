@@ -1085,6 +1085,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             reportPackageDto.OrganizationAddressLine2 = rpt.OrganizationAddressLine2;
             reportPackageDto.OrganizationCityName = rpt.OrganizationCityName;
             reportPackageDto.OrganizationJurisdictionName = rpt.OrganizationJurisdictionName;
+            reportPackageDto.OrganizationZipCode = rpt.OrganizationZipCode;
             reportPackageDto.RecipientOrganizationName = rpt.RecipientOrganizationName;
             reportPackageDto.RecipientOrganizationAddressLine1 = rpt.RecipientOrganizationAddressLine1;
             reportPackageDto.RecipientOrganizationAddressLine2 = rpt.RecipientOrganizationAddressLine2;
