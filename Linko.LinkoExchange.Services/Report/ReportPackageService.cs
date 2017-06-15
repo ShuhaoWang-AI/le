@@ -1901,12 +1901,12 @@ namespace Linko.LinkoExchange.Services.Report
 
                     //Report Details:
                     contentReplacements.Add("reportPackageName", reportPackage.Name);
-                    contentReplacements.Add("periodStartDate", reportPackage.PeriodStartDateTimeUtc.UtcDateTime.ToString("MMM d, yyyy"));
-                    contentReplacements.Add("periodEndDate", reportPackage.PeriodEndDateTimeUtc.UtcDateTime.ToString("MMM d, yyyy"));
-                    contentReplacements.Add("submissionDateTime", reportPackage.SubmissionDateTimeUtc.Value.UtcDateTime.ToString("MMM d, yyyy h:mmtt") +
+                    contentReplacements.Add("periodStartDate", _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.PeriodStartDateTimeUtc.UtcDateTime, timeZoneId).ToString("MMM d, yyyy"));
+                    contentReplacements.Add("periodEndDate", _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.PeriodEndDateTimeUtc.UtcDateTime, timeZoneId).ToString("MMM d, yyyy"));
+                    contentReplacements.Add("submissionDateTime", _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.SubmissionDateTimeUtc.Value.UtcDateTime, timeZoneId).ToString("MMM d, yyyy h:mmtt") +
                         $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.SubmissionDateTimeUtc.Value.UtcDateTime, true)}");
                     contentReplacements.Add("corSignature", corHash.Hash);
-                    contentReplacements.Add("repudiatedDateTime", reportPackage.RepudiationDateTimeUtc.Value.UtcDateTime.ToString("MMM d, yyyy h:mmtt") +
+                    contentReplacements.Add("repudiatedDateTime", _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.RepudiationDateTimeUtc.Value.UtcDateTime, timeZoneId).ToString("MMM d, yyyy h:mmtt") +
                         $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.RepudiationDateTimeUtc.Value.UtcDateTime, true)}");
                     contentReplacements.Add("repudiationReason", repudiationReasonName);
                     contentReplacements.Add("repudiationReasonComments", comments ?? "");
