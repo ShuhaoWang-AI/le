@@ -155,8 +155,17 @@ $(document)
         $("#LinkoExchangeForm")
             .submit(function(e)
             {
-                var $form = $(this);
-                if ($form.valid())
+                var isFormValid = true;
+
+                try
+                {
+                    isFormValid = $(this).valid();
+                }                
+                catch(e)
+                {
+                }
+
+                if (isFormValid)
                 {
                     $("input[type='submit']").prop("disabled", true);
                     $("input[type='button']").prop("disabled", true);
