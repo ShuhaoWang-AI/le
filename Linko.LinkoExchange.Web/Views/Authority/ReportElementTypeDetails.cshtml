@@ -98,7 +98,18 @@
                     </h5>
                 </div>
             }
-
+            
+            @if (!ViewBag.Satus.Equals("ViewOnly"))
+            {
+                if (!ViewBag.Satus.Equals("New"))
+                {
+                    <h5>
+                        Any changes you make will be reflected immediately in all Report Package Templates
+                        this @((Model.CategoryName == ReportElementCategoryName.Certifications) ? "certification" : "attachment") is used in,
+                        but not any Report Package Drafts the Industry has already created.
+                    </h5>
+                }
+            }
             <div class="form-group">
                 @Html.HiddenFor(model => model.Id)
                 @Html.HiddenFor(model => model.CategoryName)
