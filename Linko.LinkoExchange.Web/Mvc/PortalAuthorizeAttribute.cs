@@ -32,7 +32,7 @@ namespace Linko.LinkoExchange.Web.Mvc
                 usersPortal = string.IsNullOrWhiteSpace(usersPortal) ? "" : usersPortal.Trim().ToLower();
                 foreach (var allowedPortal in _allowedPortals)
                 {
-                    if (usersPortal == allowedPortal)
+                    if (usersPortal == allowedPortal.ToLower())
                     {
                         authorize = true;
                         break;

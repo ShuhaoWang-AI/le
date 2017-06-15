@@ -34,6 +34,7 @@ using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
+    [PortalAuthorize("industry")]
     [RoutePrefix(prefix:"Industry")]
     public class IndustryController:BaseController
     {

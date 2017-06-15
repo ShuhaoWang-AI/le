@@ -15,6 +15,7 @@ using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
+    [PortalAuthorize("authority","industry")]
     public class InviteController:BaseController
     {
         private readonly IHttpContextService _httpContextService;
@@ -34,6 +35,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _logger = logger;
             _httpContextService = httpContextService;
         }
+        
 
         public ActionResult Invite(string industryOrgRegProgramId, string invitationType)
         {

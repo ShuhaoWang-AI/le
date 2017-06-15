@@ -67,7 +67,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             return RedirectToAction(actionName:"UserProfile", controllerName:"User");
         }
-
+        
+        [PortalAuthorize("industry")]
         public ActionResult DownloadSignatory()
         {
             var file = HostingEnvironment.MapPath(virtualPath:"~/Temp/GRESD Electronic Signature Agreement.pdf");
@@ -78,14 +79,14 @@ namespace Linko.LinkoExchange.Web.Controllers
             fileStream.Position = 0;
             return File(fileStream:fileStream, contentType:contentType, fileDownloadName:fileDownloadName);
         }
-
-        [Authorize]
+        
+        [PortalAuthorize("industry")]
         public ActionResult RequestSignatory()
         {
             return View();
         }
-
-        [Authorize]
+        
+        [PortalAuthorize("authority","industry")]
         [AcceptVerbs(verbs:HttpVerbs.Get)]
         [Route(template:"Profile")]
         public ActionResult UserProfile()
@@ -119,8 +120,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return View(model:user);
         }
-
-        [Authorize]
+        
+        [PortalAuthorize("authority","industry")]
         [AcceptVerbs(verbs: HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"Profile")]

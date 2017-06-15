@@ -34,6 +34,7 @@ using Linko.LinkoExchange.Services.Sample;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
+    [PortalAuthorize("authority")]
     [RoutePrefix(prefix:"Authority")]
     public class AuthorityController:BaseController
     {
@@ -378,7 +379,6 @@ namespace Linko.LinkoExchange.Web.Controllers
         #region Show Audit Logs
 
         // GET: /Authority/AuditLogs
-        [PortalAuthorize("authority")]
         public ActionResult AuditLogs()
         {
             return View();
@@ -2257,7 +2257,6 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
         
         [Route(template:"ReportPackageTemplate/{id:int}/Details")]
-        [PortalAuthorize("authority")]
         public ActionResult ReportPackageTemplateDetails(int? id)
         {
            

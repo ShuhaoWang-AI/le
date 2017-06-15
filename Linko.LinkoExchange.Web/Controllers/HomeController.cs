@@ -6,7 +6,6 @@ using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.TermCondition;
 using Linko.LinkoExchange.Services.User;
-using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
 
@@ -86,7 +85,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
         #endregion
 
-        #region Terms And Conditions
+        #region /PrivacyPolicy
 
         // GET: /PrivacyPolicy
         [AllowAnonymous]

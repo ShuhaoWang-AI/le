@@ -26,6 +26,7 @@ using Linko.LinkoExchange.Web.ViewModels.Shared;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
+    [PortalAuthorize("authority","industry")]
     [RoutePrefix(prefix:"ReportPackage")]
     public class ReportPackageController:BaseController
     {
