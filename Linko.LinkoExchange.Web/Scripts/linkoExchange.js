@@ -126,6 +126,7 @@ error_handler = function(e)
         grid.cancelChanges();
     }
 };
+
 showPopupMessage = function(message)
 {
     $("body")
@@ -147,6 +148,7 @@ showPopupMessage = function(message)
                 $('[data-popup="popup-1"]').fadeOut(350);
             });
 };
+
 $(document)
     .ready(function()
     {
@@ -195,4 +197,17 @@ $(document)
                         $(this).val(val.slice(0, val.length - (length - maxlength)));
                     }
                 });
+    });
+
+$(document)
+    .keypress(function(e)
+    {
+        // http://www.itorian.com/2012/07/stop-from-submission-posting-on-enter.html
+        var evt = (e) ? e : ((event) ? event : null);
+        var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null);
+
+        if (evt.which === 13 && node.type.toLowerCase() !== "textarea" && node.type.toLowerCase() !== "button")
+        {
+            return false;
+        }
     });
