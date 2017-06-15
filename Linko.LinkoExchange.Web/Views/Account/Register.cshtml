@@ -81,6 +81,7 @@
                     <label class="col-md-2 control-label">Authority Name:</label>
                     <div class="col-md-4">
                         <label class="control-label ">@Model.AuthorityName</label>
+                        @Html.HiddenFor(m=>m.AuthorityName)
                     </div>
                 </div>
 
@@ -92,6 +93,7 @@
 
                             <div class="col-md-4">
                                 <label class="control-label ">@Model.IndustryName</label>
+                                @Html.HiddenFor(m => m.IndustryName)
                             </div>
                         </div>
                     }
@@ -101,6 +103,7 @@
 
                     <div class="col-md-4">
                         <label class="control-label ">@Model.ProgramName</label>
+                        @Html.HiddenFor(m => m.ProgramName)
                     </div>
                 </div>
 
