@@ -5290,39 +5290,38 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
 Your report was received. Please keep this email as proof of your report submissions.
 
 Report Details:
-	Report Name: {reportPackageName}
-	Period Start: {periodStartDate}
-	Period end: {periodEndDate}
-	Submission Date:{submissionDateTime}
-	LinkoExchange COR Signature:{corSignature} 
-	
+Report Details:
+    Report Name: {reportPackageName}
+    Period Start: {periodStartDate}
+    Period End: {periodEndDate}
+    Submission Date:{submissionDateTime}
+    LinkoExchange COR Signature:{corSignature}
+    
 Submitted To:
-	{recipientOrganizationName}
-	{recipientOrganizationAddressLine1}
-	{recipientOrganizationAddressLine2}
-	{recipientOrganizationCityName} {recipientOrganizationJurisdictionName} {recipientOrganizationZipCode}
+    {recipientOrganizationName}
+    {recipientOrganizationAddressLine1} {recipientOrganizationAddressLine2}
+    {recipientOrganizationCityName} {recipientOrganizationJurisdictionName} {recipientOrganizationZipCode}
 
 Submitted By:
-	{submitterFirstName} {submitterLastName}
-	{submitterTitle}
-	{iuOrganizationName} 
-	Permit #:{permitNumber} 
-	{organizationAddressLine1} 
-	{organizationAddressLine2}
-	{organizationCityName} {organizationJurisdictionName} {organizationZipCode} 
-	
-	User Name:{userName}
-	
+    {submitterFirstName} {submitterLastName}
+    {submitterTitle}
+    {iuOrganizationName} 
+    Permit #:{permitNumber} 
+    {organizationAddressLine1} {organizationAddressLine2}
+    {organizationCityName} {organizationJurisdictionName} {organizationZipCode} 
+    
+    User Name:{userName}
+    
 To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser.  Login is required to view the report.
 
-	{corViewLink}
-	
+    {corViewLink}
+    
                             
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
 If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
                 </pre>
             </body>
-        </html>'  
+        </html>'
     )
 	
 	--UC-54 4.4 Sign and submit report package, email to authority
@@ -5341,33 +5340,32 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
 The following report was received.
 
 Report Details:
-	Report Name: {reportPackageName}
-	Period Start: {periodStartDate}
-	Period end: {periodEndDate}
-	Submission Date:{submissionDateTime}
-	LinkoExchange COR Signature:{corSignature}  
+    Report Name: {reportPackageName}
+    Period Start: {periodStartDate}
+    Period end: {periodEndDate}
+    Submission Date:{submissionDateTime}
+    LinkoExchange COR Signature:{corSignature}
 
 Submitted By:
-	{submitterFirstName} {submitterLastName}
-	{submitterTitle}
-	{iuOrganizationName} 
-	Permit #:{permitNumber} 
-	{organizationAddressLine1} 
-	{organizationAddressLine2}
-	{organizationCityName} {organizationJurisdictionName} {organizationZipCode} 
-	
-	User Name:{userName}
-	
+    {submitterFirstName} {submitterLastName}
+    {submitterTitle}
+    {iuOrganizationName} 
+    Permit #:{permitNumber} 
+    {organizationAddressLine1} {organizationAddressLine2}
+    {organizationCityName} {organizationJurisdictionName} {organizationZipCode} 
+    
+    User Name:{userName}
+    
 To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser.  Login is required to view the report.
 
-	{corViewLink}
-	
+    {corViewLink}
+    
                             
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
 If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
                 </pre>
             </body>
-        </html>'  
+        </html>'
     )
 	
 	--UC-19 Report Repudiation sent to standard users of Authority (UC-19 8.3.)
