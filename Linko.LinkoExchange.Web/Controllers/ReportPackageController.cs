@@ -266,13 +266,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                 var samples = serializer.Deserialize<List<SelectedParentChildCombination>>(input:selectedSamples);
                 var attachments = serializer.Deserialize<List<SelectedParentChildCombination>>(input:selectedAttachments);
 
-                vm.SamplesAndResultsTypes = samples.Select(p => new ReportPackageElementTypeDto
+                vm.SamplesAndResultsTypes = samples?.Select(p => new ReportPackageElementTypeDto
                                                                 {
                                                                     ReportPackageElementTypeId = p.Id,
                                                                     Samples = p.ChildElements.Select(c => new SampleDto {SampleId = c.Id}).ToList()
                                                                 }).ToList();
 
-                vm.AttachmentTypes = attachments.Select(p => new ReportPackageElementTypeDto
+                vm.AttachmentTypes = attachments?.Select(p => new ReportPackageElementTypeDto
                                                              {
                                                                  ReportPackageElementTypeId = p.Id,
                                                                  FileStores = p.ChildElements.Select(c => new FileStoreDto {FileStoreId = c.Id}).ToList()
@@ -447,13 +447,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                         var samples = serializer.Deserialize<List<SelectedParentChildCombination>>(input:selectedSamples);
                         var attachments = serializer.Deserialize<List<SelectedParentChildCombination>>(input:selectedAttachments);
 
-                        vm.SamplesAndResultsTypes = samples.Select(p => new ReportPackageElementTypeDto
+                        vm.SamplesAndResultsTypes = samples?.Select(p => new ReportPackageElementTypeDto
                                                                         {
                                                                             ReportPackageElementTypeId = p.Id,
                                                                             Samples = p.ChildElements.Select(c => new SampleDto {SampleId = c.Id}).ToList()
                                                                         }).ToList();
 
-                        vm.AttachmentTypes = attachments.Select(p => new ReportPackageElementTypeDto
+                        vm.AttachmentTypes = attachments?.Select(p => new ReportPackageElementTypeDto
                                                                      {
                                                                          ReportPackageElementTypeId = p.Id,
                                                                          FileStores = p.ChildElements.Select(c => new FileStoreDto {FileStoreId = c.Id}).ToList()

@@ -1184,26 +1184,29 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     //Now handle additions
-                    // - Iteration through all requested sample associations (in dto) and add ones that do not already exist
-                    foreach (var requestedSampleAssociation in reportPackageDto.SamplesAndResultsTypes)
+                    if (reportPackageDto.SamplesAndResultsTypes != null)
                     {
-                        foreach (var sample in requestedSampleAssociation.Samples)
+                        // - Iteration through all requested sample associations (in dto) and add ones that do not already exist
+                        foreach (var requestedSampleAssociation in reportPackageDto.SamplesAndResultsTypes)
                         {
-                            var foundReportSample = _dbContext.ReportSamples
-                           .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedSampleAssociation.ReportPackageElementTypeId
-                               && rs.SampleId == sample.SampleId);
-
-                            if (foundReportSample == null)
+                            foreach (var sample in requestedSampleAssociation.Samples)
                             {
-                                //Need to add association
-                                _dbContext.ReportSamples.Add(new ReportSample()
-                                {
-                                    SampleId = sample.SampleId.Value,
-                                    ReportPackageElementTypeId = requestedSampleAssociation.ReportPackageElementTypeId
-                                });
-                            }
-                        }
+                                var foundReportSample = _dbContext.ReportSamples
+                                                                  .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedSampleAssociation.ReportPackageElementTypeId
+                                                                                         && rs.SampleId == sample.SampleId);
 
+                                if (foundReportSample == null)
+                                {
+                                    //Need to add association
+                                    _dbContext.ReportSamples.Add(new ReportSample()
+                                                                 {
+                                                                     SampleId = sample.SampleId.Value,
+                                                                     ReportPackageElementTypeId = requestedSampleAssociation.ReportPackageElementTypeId
+                                                                 });
+                                }
+                            }
+
+                        }
                     }
                 }
                 else
@@ -1248,26 +1251,28 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     //Now handle additions
-                    // - Iteration through all requested attachment associations (in dto) and add ones that do not already exist
-                    foreach (var requestedFileAssociation in reportPackageDto.AttachmentTypes)
+                    if(reportPackageDto.AttachmentTypes != null)
                     {
-                        foreach (var fileStore in requestedFileAssociation.FileStores)
+                        // - Iteration through all requested attachment associations (in dto) and add ones that do not already exist
+                        foreach (var requestedFileAssociation in reportPackageDto.AttachmentTypes)
                         {
-                            var foundReportFile = _dbContext.ReportFiles
-                                            .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedFileAssociation.ReportPackageElementTypeId
-                                                && rs.FileStoreId == fileStore.FileStoreId);
-
-                            if (foundReportFile == null)
+                            foreach (var fileStore in requestedFileAssociation.FileStores)
                             {
-                                //Need to add association
-                                _dbContext.ReportFiles.Add(new ReportFile()
+                                var foundReportFile = _dbContext.ReportFiles
+                                                .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedFileAssociation.ReportPackageElementTypeId
+                                                    && rs.FileStoreId == fileStore.FileStoreId);
+
+                                if (foundReportFile == null)
                                 {
-                                    FileStoreId = fileStore.FileStoreId.Value,
-                                    ReportPackageElementTypeId = requestedFileAssociation.ReportPackageElementTypeId
-                                });
+                                    //Need to add association
+                                    _dbContext.ReportFiles.Add(new ReportFile()
+                                    {
+                                        FileStoreId = fileStore.FileStoreId.Value,
+                                        ReportPackageElementTypeId = requestedFileAssociation.ReportPackageElementTypeId
+                                    });
+                                }
                             }
                         }
-
                     }
                 }
                 else
