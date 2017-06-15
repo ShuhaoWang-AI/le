@@ -153,12 +153,18 @@ $(document)
         $("#LinkoExchangeForm")
             .submit(function(e)
             {
-                $("input[type='submit']").prop("disabled", true);
-                //setTimeout(function()
-                //    {
-                //        $("input[type='submit']").prop('disabled', false);
-                //    }
-                //    , 2000);
+                var $form = $(this);
+                if ($form.valid())
+                {
+                    $("input[type='submit']").prop("disabled", true);
+                    $("input[type='button']").prop("disabled", true);
+                    //setTimeout(function()
+                    //    {
+                    //        $("input[type='submit']").prop('disabled', false);
+                    //        $("input[type='button']").prop('disabled', false);
+                    //    }
+                    //    , 2000);
+                }
             });
 
         // Get all textareas that have a "maxlength" property.
