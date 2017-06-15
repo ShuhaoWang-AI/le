@@ -1184,29 +1184,26 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     //Now handle additions
-                    if (reportPackageDto.SamplesAndResultsTypes != null)
+                    // - Iteration through all requested sample associations (in dto) and add ones that do not already exist
+                    foreach (var requestedSampleAssociation in reportPackageDto.SamplesAndResultsTypes)
                     {
-                        // - Iteration through all requested sample associations (in dto) and add ones that do not already exist
-                        foreach (var requestedSampleAssociation in reportPackageDto.SamplesAndResultsTypes)
+                        foreach (var sample in requestedSampleAssociation.Samples)
                         {
-                            foreach (var sample in requestedSampleAssociation.Samples)
+                            var foundReportSample = _dbContext.ReportSamples
+                           .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedSampleAssociation.ReportPackageElementTypeId
+                               && rs.SampleId == sample.SampleId);
+
+                            if (foundReportSample == null)
                             {
-                                var foundReportSample = _dbContext.ReportSamples
-                                                                  .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedSampleAssociation.ReportPackageElementTypeId
-                                                                                         && rs.SampleId == sample.SampleId);
-
-                                if (foundReportSample == null)
+                                //Need to add association
+                                _dbContext.ReportSamples.Add(new ReportSample()
                                 {
-                                    //Need to add association
-                                    _dbContext.ReportSamples.Add(new ReportSample()
-                                                                 {
-                                                                     SampleId = sample.SampleId.Value,
-                                                                     ReportPackageElementTypeId = requestedSampleAssociation.ReportPackageElementTypeId
-                                                                 });
-                                }
+                                    SampleId = sample.SampleId.Value,
+                                    ReportPackageElementTypeId = requestedSampleAssociation.ReportPackageElementTypeId
+                                });
                             }
-
                         }
+
                     }
                 }
                 else
@@ -1251,28 +1248,26 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     //Now handle additions
-                    if(reportPackageDto.AttachmentTypes != null)
+                    // - Iteration through all requested attachment associations (in dto) and add ones that do not already exist
+                    foreach (var requestedFileAssociation in reportPackageDto.AttachmentTypes)
                     {
-                        // - Iteration through all requested attachment associations (in dto) and add ones that do not already exist
-                        foreach (var requestedFileAssociation in reportPackageDto.AttachmentTypes)
+                        foreach (var fileStore in requestedFileAssociation.FileStores)
                         {
-                            foreach (var fileStore in requestedFileAssociation.FileStores)
-                            {
-                                var foundReportFile = _dbContext.ReportFiles
-                                                .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedFileAssociation.ReportPackageElementTypeId
-                                                    && rs.FileStoreId == fileStore.FileStoreId);
+                            var foundReportFile = _dbContext.ReportFiles
+                                            .SingleOrDefault(rs => rs.ReportPackageElementTypeId == requestedFileAssociation.ReportPackageElementTypeId
+                                                && rs.FileStoreId == fileStore.FileStoreId);
 
-                                if (foundReportFile == null)
+                            if (foundReportFile == null)
+                            {
+                                //Need to add association
+                                _dbContext.ReportFiles.Add(new ReportFile()
                                 {
-                                    //Need to add association
-                                    _dbContext.ReportFiles.Add(new ReportFile()
-                                    {
-                                        FileStoreId = fileStore.FileStoreId.Value,
-                                        ReportPackageElementTypeId = requestedFileAssociation.ReportPackageElementTypeId
-                                    });
-                                }
+                                    FileStoreId = fileStore.FileStoreId.Value,
+                                    ReportPackageElementTypeId = requestedFileAssociation.ReportPackageElementTypeId
+                                });
                             }
                         }
+
                     }
                 }
                 else
