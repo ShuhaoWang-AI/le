@@ -5,7 +5,10 @@
 }
 
 
-@using (Html.BeginForm())
+@using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new
+                                                                                                    {
+                                                                                                        id = "LinkoExchangeForm"
+                                                                                                    }))
 {
     @Html.AntiForgeryToken()
 
@@ -73,7 +76,7 @@
         </div>
 
         <section class="box-body form-horizontal">
-            @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
+            @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
                                                                                                                             {
                                                                                                                                 @class = "alert alert-danger"
                                                                                                                             })
@@ -164,6 +167,11 @@
                                                      {
                                                          style = "width:210px;"
                                                      }))
+                    <br/>
+                    @Html.ValidationMessageFor(model => model.EffectiveDateTimeLocal, validationMessage:"", htmlAttributes:new
+                                                                                                         {
+                                                                                                             @class = "text-danger"
+                                                                                                         })
 
                 </div>
                 <div>

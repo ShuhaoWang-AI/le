@@ -85,6 +85,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         {
             //Name
             RuleFor(x => x.Name).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
+            //EffectiveDateTimeLocal
+            RuleFor(x => x.EffectiveDateTimeLocal).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
         }
     }
 }
