@@ -705,7 +705,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             var timeZoneNameAbbreviation = _timeZoneService.GetTimeZoneNameUsingSettingForThisOrg(reportPackage.OrganizationRegulatoryProgramId, reportPackage.SubmissionDateTimeLocal.Value, true);
             var submissionDateTime =
-                $"{reportPackage.SubmissionDateTimeLocal.Value.ToString("MMM dd, yyyy HH:mm tt ")}{timeZoneNameAbbreviation}";
+                $"{reportPackage.SubmissionDateTimeLocal.Value.ToString("MMM dd, yyyy h:mmtt ")}{timeZoneNameAbbreviation}";
 
             emailContentReplacements.Add("submissionDateTime", submissionDateTime);
             emailContentReplacements.Add("corSignature", copyOfRecordDto.Signature);
