@@ -5389,7 +5389,8 @@ Report Details:
 	Period Start: {periodStartDate}
 	Period end: {periodEndDate}
 	Submission Date: {submissionDateTime}
-	LinkoExchange COR Signature: {corSignature}  
+	LinkoExchange COR Signature:
+	{corSignature}  
 	Repudiated Date: {repudiatedDateTime}
 
 Repudiated To:
@@ -5442,7 +5443,8 @@ Report Details:
 	Period Start: {periodStartDate}
 	Period end: {periodEndDate}
 	Original Submission Date: {submissionDateTime}
-	LinkoExchange COR Signature: {corSignature}  
+	LinkoExchange COR Signature:
+	{corSignature}
 	Repudiated Date: {repudiatedDateTime}
 	Reason: {repudiationReason}
 	Comments: {repudiationReasonComments}
@@ -6094,7 +6096,8 @@ Email: {emailAddress}
 Organization: {organizationName}
 Report: {reportPackageName}
 Report Period: {periodStartDate} - {periodEndDate}
-LinkoExchange COR Signature: {corSignature}
+LinkoExchange COR Signature:
+{corSignature}
 
 By:
 User: {firstName} {lastName}
@@ -6115,7 +6118,8 @@ Email: {emailAddress}
 Organization: {organizationName}
 Report: {reportPackageName}
 Report Period: {periodStartDate} - {periodEndDate}
-LinkoExchange COR Signature: {corSignature}
+LinkoExchange COR Signature:
+{corSignature}
 
 By:
 User: {firstName} {lastName}

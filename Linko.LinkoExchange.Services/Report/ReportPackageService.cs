@@ -1905,7 +1905,7 @@ namespace Linko.LinkoExchange.Services.Report
                     contentReplacements.Add("periodEndDate", _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.PeriodEndDateTimeUtc.UtcDateTime, timeZoneId).ToString("MMM d, yyyy"));
                     contentReplacements.Add("submissionDateTime", _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.SubmissionDateTimeUtc.Value.UtcDateTime, timeZoneId).ToString("MMM d, yyyy h:mmtt") +
                         $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.SubmissionDateTimeUtc.Value.UtcDateTime, true)}");
-                    contentReplacements.Add("corSignature", corHash.Hash);
+                    contentReplacements.Add("corSignature", corHash.Signature);
                     contentReplacements.Add("repudiatedDateTime", _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(reportPackage.RepudiationDateTimeUtc.Value.UtcDateTime, timeZoneId).ToString("MMM d, yyyy h:mmtt") +
                         $" {_timeZoneService.GetTimeZoneNameUsingThisTimeZone(timeZone, reportPackage.RepudiationDateTimeUtc.Value.UtcDateTime, true)}");
                     contentReplacements.Add("repudiationReason", repudiationReasonName);
