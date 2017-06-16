@@ -113,6 +113,7 @@
     <Compile Include="Domain\ReportElementCategory.cs" />
     <Compile Include="Domain\ReportElementType.cs" />
     <Compile Include="Domain\ReportFile.cs" />
+    <Compile Include="Domain\LEReportPackageParsedData.cs" />
     <Compile Include="Domain\ReportPackage.cs" />
     <Compile Include="Domain\ReportPackageElementCategory.cs" />
     <Compile Include="Domain\ReportPackageElementType.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="Domain\RepudiationReason.cs" />
     <Compile Include="Domain\Sample.cs" />
     <Compile Include="Domain\SampleRequirement.cs" />
+    <Compile Include="Domain\LESampleResultParsedData.cs" />
     <Compile Include="Domain\SampleResult.cs" />
     <Compile Include="Domain\SampleFrequency.cs" />
     <Compile Include="Domain\SettingTemplate.cs" />

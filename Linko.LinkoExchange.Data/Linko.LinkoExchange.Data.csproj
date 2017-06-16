@@ -77,6 +77,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SyncContext.cs" />
     <Compile Include="LinkoExchangeContext.cs" />
     <Compile Include="Mapping\AuditLogTemplateMap.cs" />
     <Compile Include="Mapping\CollectionMethodMap.cs" />

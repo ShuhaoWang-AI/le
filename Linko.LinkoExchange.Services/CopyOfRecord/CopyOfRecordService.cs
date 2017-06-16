@@ -105,7 +105,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                 DigitalSignature = copyOfRecord.Signature,
             };
 
-            _logger.Info($"Enter CopyOfRecordService.ValidCopyOfRecordData. ReportPackageId:{reportPackageId}");
+            _logger.Info($"Leave CopyOfRecordService.ValidCopyOfRecordData. ReportPackageId:{reportPackageId}");
 
             return validationResult;
         }
@@ -131,7 +131,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             copyOfRecordDto.DownloadFileName = $"{referenceNumber} {reportPackage.Name} {datetimePart}.zip";
             copyOfRecordDto.DownloadFileName = StripReservedCharacters(copyOfRecordDto.DownloadFileName);
 
-            _logger.Info($"Enter CopyOfRecordService.GetCopyOfRecordByReportPackage. ReportPackageId:{reportPackage.ReportPackageId}");
+            _logger.Info($"Leave CopyOfRecordService.GetCopyOfRecordByReportPackage. ReportPackageId:{reportPackage.ReportPackageId}");
             return copyOfRecordDto;
         }
 

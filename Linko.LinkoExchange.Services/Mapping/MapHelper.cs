@@ -1149,7 +1149,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 reportPackageDto.LastSenderLastName = rpt.LastSenderLastName;
             }
 
-            reportPackageDto.ReportPackageTemplateElementCategories = new List<ReportElementCategoryName>();
+            reportPackageDto.ReportPackageElementCategories = new List<ReportElementCategoryName>();
             var sortedCategories = new List<ReportPackageElementCategory>();
             foreach (var rpec in rpt.ReportPackageElementCategories)
             {
@@ -1158,7 +1158,7 @@ namespace Linko.LinkoExchange.Services.Mapping
 
             foreach (var sortedCategoryValue in sortedCategories.OrderBy(item => item.SortOrder).ToList())
             {
-                reportPackageDto.ReportPackageTemplateElementCategories.Add((ReportElementCategoryName)Enum.Parse(typeof(ReportElementCategoryName), sortedCategoryValue.ReportElementCategory.Name));
+                reportPackageDto.ReportPackageElementCategories.Add((ReportElementCategoryName)Enum.Parse(typeof(ReportElementCategoryName), sortedCategoryValue.ReportElementCategory.Name));
             }
 
             return reportPackageDto;

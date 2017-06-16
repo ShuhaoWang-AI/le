@@ -402,11 +402,11 @@ namespace Linko.LinkoExchange.Test
 
         private void PrepareReportElementCategoryNames()
         {
-            _reportPackageDto.ReportPackageTemplateElementCategories = new List<ReportElementCategoryName>();
+            _reportPackageDto.ReportPackageElementCategories = new List<ReportElementCategoryName>();
 
-            _reportPackageDto.ReportPackageTemplateElementCategories.Add(ReportElementCategoryName.Attachments);
-            _reportPackageDto.ReportPackageTemplateElementCategories.Add(ReportElementCategoryName.Certifications);
-            _reportPackageDto.ReportPackageTemplateElementCategories.Add(ReportElementCategoryName.SamplesAndResults);
+            _reportPackageDto.ReportPackageElementCategories.Add(ReportElementCategoryName.Attachments);
+            _reportPackageDto.ReportPackageElementCategories.Add(ReportElementCategoryName.Certifications);
+            _reportPackageDto.ReportPackageElementCategories.Add(ReportElementCategoryName.SamplesAndResults);
         }
 
 

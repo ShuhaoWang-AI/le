@@ -67,7 +67,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             ReportInfoTable(_pdfPage);
 
             //TO determine the order of the following 3 sections 
-            foreach (var elementCategory in _reportPackage.ReportPackageTemplateElementCategories)
+            foreach (var elementCategory in _reportPackage.ReportPackageElementCategories)
             {
                 PrintPdfSections(elementCategory);
             }

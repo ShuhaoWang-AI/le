@@ -18,6 +18,7 @@ using Linko.LinkoExchange.Services.FileStore;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
+using Linko.LinkoExchange.Services.Sync;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mvc;
@@ -51,6 +52,8 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly ISampleService _sampleService;
         private readonly IHttpContextService _httpContextService;
         private readonly IUserService _userService;
+        private readonly ISyncService _syncService;
+
         public ReportPackageController(
             IAuthenticationService authenticationService, 
             IReportPackageService reportPackageService, 
@@ -60,7 +63,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             ISampleService sampleService,
             IHttpContextService httpContextService, 
             IQuestionAnswerService questionAnswerService, 
-            IUserService userService)
+            IUserService userService,
+            ISyncService syncService)
             :base(httpContextService,userService,reportPackageService,sampleService)
         {
             _authenticationService = authenticationService;
@@ -72,6 +76,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _sampleService = sampleService;
             _httpContextService = httpContextService;
             _userService = userService;
+            _syncService = syncService;
         }
 
         #endregion
@@ -751,7 +756,22 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route(template:"{id:int}/SendToLinkoCts")]
         public ActionResult SendToLinkoCts(int id, ReportPackageViewModel model)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _syncService.SendSubmittedReportPackageToCts(reportPackageId: id);
+
+                TempData[key: "ShowSuccessMessage"] = true;
+                TempData[key: "SuccessMessage"] = "Report Package queued for LinkoCTS.";
+
+                ModelState.Clear();
+                return RedirectToAction(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id });
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
+            }
+
+            return View(viewName: "ReportPackageDetails", model: PrepareReportPackageDetails(id: id));
         }
 
         [Route(template:"{id:int}/Details/Preview")]
@@ -842,7 +862,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 Status = vm.ReportStatusName,
                                 CtsEventTypeName = string.IsNullOrWhiteSpace(value: vm.CtsEventTypeName) ? "" : $@"({vm.CtsEventCategoryName}) {vm.CtsEventTypeName}",
                                 CtsEventTypeId = vm.CtsEventTypeId,
-                                ReportPackageTemplateElementCategories = vm.ReportPackageTemplateElementCategories,
+                                ReportPackageTemplateElementCategories = vm.ReportPackageElementCategories,
                                 Comments = vm.Comments,
                                 SamplesAndResultsTypes = vm.SamplesAndResultsTypes?.Select(t => new ReportElementTypeViewModel
                                                                                                 {

@@ -2240,7 +2240,7 @@ namespace Linko.LinkoExchange.Services.Report
             var attachmentsCloned = TakeOffXElementNode(attachments);
             var commentCloned = TakeOffXElementNode(comment);
 
-            foreach (var categoryName in reportPackageDto.ReportPackageTemplateElementCategories)
+            foreach (var categoryName in reportPackageDto.ReportPackageElementCategories)
             {
                 switch (categoryName)
                 {

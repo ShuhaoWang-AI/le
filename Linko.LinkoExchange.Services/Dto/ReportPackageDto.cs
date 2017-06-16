@@ -87,7 +87,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public List<ReportPackageElementTypeDto> SamplesAndResultsTypes { get; set; }
         public List<ReportPackageElementTypeDto> AttachmentTypes { get; set; }
         public List<ReportPackageElementTypeDto> CertificationTypes { get; set; }
-        public List<ReportElementCategoryName> ReportPackageTemplateElementCategories { get; set; }
+        public List<ReportElementCategoryName> ReportPackageElementCategories { get; set; }
         public string LastModifierFullName { get; set; }
 
     }
