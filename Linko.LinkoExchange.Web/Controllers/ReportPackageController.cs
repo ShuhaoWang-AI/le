@@ -312,7 +312,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                    StartDateTimeLocal = vm.StartDateTimeLocal,
                                                    EndDateTimeLocal = vm.EndDateTimeLocal,
                                                    LabSampleIdentifier = vm.LabSampleIdentifier,
-                                                   IsAssociatedWithReportPackage = vm.IsAssociatedWithReportPackage
+                                                   IsAssociatedWithReportPackage = vm.IsAssociatedWithReportPackage,
+                                                   LastSubmitted = DateTime.Now // need to update by last submission datetime 
                                                });
 
             var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
@@ -324,7 +325,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            StartDateTimeLocal = vm.StartDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            EndDateTimeLocal = vm.EndDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.LabSampleIdentifier,
-                                                                                           vm.IsAssociatedWithReportPackage
+                                                                                           vm.IsAssociatedWithReportPackage,
+                                                                                           LastSubmitted = vm.LastSubmitted.ToString()
                                                                                        });
 
             return Json(data:result);
