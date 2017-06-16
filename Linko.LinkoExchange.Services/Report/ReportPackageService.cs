@@ -1590,6 +1590,9 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info($"Enter ReportPackageService.GetSamplesForSelection. reportPackageElementTypeId={reportPackageElementTypeId}");
 
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
+
             var existingSamplesReportPackageElementType = _dbContext.ReportPackageElementTypes
                                 .Include(rp => rp.ReportPackageElementCategory.ReportPackage)
                                 .Include(rp => rp.ReportPackageElementCategory.ReportElementCategory)
@@ -1616,8 +1619,23 @@ namespace Linko.LinkoExchange.Services.Report
             foreach (var existingEligibleSample in existingEligibleSamples)
             {
                 var sampleDto = _sampleService.GetSampleDetails(existingEligibleSample);
+
                 sampleDto.IsAssociatedWithReportPackage = existingSamplesReportPackageElementType
                                                             .ReportSamples.Any(rs => rs.SampleId == existingEligibleSample.SampleId);
+
+                var lastSubmittedReportPackage = _dbContext.Samples
+                    .Single(s => s.SampleId == existingEligibleSample.SampleId)
+                        .ReportSamples
+                        .Select(rs => rs.ReportPackageElementType.ReportPackageElementCategory.ReportPackage)
+                        .Where(rp => rp.SubmissionDateTimeUtc.HasValue)
+                        .OrderByDescending(rp => rp.SubmissionDateTimeUtc)
+                        .FirstOrDefault();
+
+                if (lastSubmittedReportPackage != null)
+                {
+                    sampleDto.LastSubmissionDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(lastSubmittedReportPackage.SubmissionDateTimeUtc.Value.UtcDateTime, timeZoneId);
+                }
+
                 eligibleSampleList.Add(sampleDto);
             }
 

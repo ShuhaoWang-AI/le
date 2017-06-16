@@ -313,7 +313,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                    EndDateTimeLocal = vm.EndDateTimeLocal,
                                                    LabSampleIdentifier = vm.LabSampleIdentifier,
                                                    IsAssociatedWithReportPackage = vm.IsAssociatedWithReportPackage,
-                                                   LastSubmitted = DateTime.Now // need to update by last submission datetime 
+                                                   LastSubmitted = vm.LastSubmissionDateTimeLocal
                                                });
 
             var result = viewModels.ToDataSourceResult(request:request, selector:vm => new

@@ -43,6 +43,8 @@ namespace Linko.LinkoExchange.Services.Dto
         public IEnumerable<SampleResultDto> SampleResults { get; set; }
         public string ByOrganizationTypeName { get; internal set; }
         public bool IsAssociatedWithReportPackage { get; internal set; } // only to be used when displaying report package to show which samples are included
+
+        public DateTime? LastSubmissionDateTimeLocal { get; internal set; }
     }
 }
 
