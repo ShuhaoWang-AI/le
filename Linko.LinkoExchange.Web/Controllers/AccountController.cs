@@ -311,7 +311,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                         messageBody.Append(value: $"<div class='col-md-1' style='text-align:right'></div>");
                         if (!string.IsNullOrWhiteSpace(value: org.OrganizationDto.State))
                         {
-                            messageBody.Append(value: $"<div class='col-md-11'>{org.OrganizationDto.CityName},{org.OrganizationDto.State}</div>");
+                            messageBody.Append(value: $"<div class='col-md-11'>{org.OrganizationDto.CityName}, {org.OrganizationDto.State}</div>");
                         }
                         else
                         {
