@@ -448,7 +448,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
             row.Cells.Add("");
             row.Cells.Add("Period:", boldTextStateSize10);
-            row.Cells.Add($"{_reportPackage.PeriodStartDateTimeLocal.ToString("MMMM dd, yyyy")} - {_reportPackage.PeriodEndDateTimeLocal.ToString("MMMM dd, yyyy")}", textStateSize10);
+            row.Cells.Add($"{_reportPackage.PeriodStartDateTimeLocal:MMMM dd, yyyy} - {_reportPackage.PeriodEndDateTimeLocal:MMMM dd, yyyy}", textStateSize10);
 
             //--------------------------------Row 2
             // empty row
@@ -464,7 +464,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
             row.Cells.Add("Submitted Date:", boldTextStateSize10);
 
-            row.Cells.Add(_reportPackage.SubmissionDateTimeLocal.HasValue ? _reportPackage.SubmissionDateTimeLocal.Value.ToString("MMMM dd, yyyy hh:mm tt ") : "", textStateSize10);
+            row.Cells.Add(_reportPackage.SubmissionDateTimeLocal?.ToString("MMMM dd, yyyy hh:mm tt ") ?? "", textStateSize10);
 
             //--------------------------------Row 4
             row = reportInfoTable.Rows.Add();
@@ -473,8 +473,9 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
             row.Cells.Add("");
 
-            row.Cells.Add("Submitted By:", boldTextStateSize10);
-            row.Cells.Add(_reportPackage.SubmitterUserName.GetValueOrEmptyString(), textStateSize10);
+            row.Cells.Add("Submitted By:", boldTextStateSize10); 
+            var submitter = $"{_reportPackage.SubmitterFirstName.GetValueOrEmptyString()} {_reportPackage.SubmitterLastName.GetValueOrEmptyString()}";
+            row.Cells.Add(submitter, textStateSize10);
 
             //--------------------------------Row 5
             row = reportInfoTable.Rows.Add();
@@ -490,18 +491,33 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             var jursdicationName = _reportPackage.OrganizationJurisdictionName.GetValueOrEmptyString();
             var zipCode = _reportPackage.OrganizationZipCode.GetValueOrEmptyString();
             
-            var address = $"{addressLine1} {addressLine2}, {cityName}, {jursdicationName},{zipCode}";
-            if (address.EndsWith(","))
+            var address1 =""; 
+            if(string.IsNullOrWhiteSpace(addressLine2))
             {
-                address = address.Substring(0, address.Length - 1);
+                address1 = $"{addressLine1},";
             }
-
-            row.Cells.Add(address, textStateSize10);
+            else
+            {
+                address1 = $"{addressLine1} {addressLine2},";
+            }
+            
+            row.Cells.Add(address1, textStateSize10);
 
             row.Cells.Add("");
 
             row.Cells.Add("Title:", boldTextStateSize10);
             row.Cells.Add(_reportPackage.SubmitterTitleRole.GetValueOrEmptyString(), textStateSize10);
+            
+            // Add another row for city, jurisdiction and zip code 
+            var address2 = $"{cityName}, {jursdicationName} {zipCode}";
+            row = reportInfoTable.Rows.Add();
+            row.Cells.Add("");
+            row.Cells.Add(address2);   
+
+            //  Add empty for the rest cells
+            row.Cells.Add("");
+            row.Cells.Add("");
+            row.Cells.Add("");
         }
 
         private static void HeaderFooterTable(Page pdfPage, string reportName, string submittedDateTimeString, string authorityName, string industryName)
