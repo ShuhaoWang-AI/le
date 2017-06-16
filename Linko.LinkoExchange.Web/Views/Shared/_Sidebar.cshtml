@@ -17,11 +17,11 @@
                         <i class="fa fa-fw glyphicon glyphicon-duplicate"></i>
                         <span>Report Packages</span>
                         <span class="pull-right-container">
-                            @if (ViewBag.ReportPackageCount_SubmittedPendingReview != null)
+                            @if (ViewBag.ReportPackageCount_SubmittedPendingReview != null && ViewBag.ReportPackageCount_SubmittedPendingReview > 0)
                             {
                                 <span class="bg-aqua label">@ViewBag.ReportPackageCount_SubmittedPendingReview</span>
                             }
-                            @if (ViewBag.ReportPackageCount_RepudiatedPendingReview != null)
+                            @if (ViewBag.ReportPackageCount_RepudiatedPendingReview != null && ViewBag.ReportPackageCount_RepudiatedPendingReview > 0)
                             {
                                 <span class="bg-fuchsia label">@ViewBag.ReportPackageCount_RepudiatedPendingReview</span>
                             }
@@ -32,7 +32,7 @@
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.SubmittedPendingReview})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Pending Review</span>
-                                @if (ViewBag.ReportPackageCount_SubmittedPendingReview != null)
+                                @if (ViewBag.ReportPackageCount_SubmittedPendingReview != null && ViewBag.ReportPackageCount_SubmittedPendingReview > 0)
                                 {
                                     <span class="pull-right-container">
                                         <span class="bg-aqua label">@ViewBag.ReportPackageCount_SubmittedPendingReview</span>
@@ -44,7 +44,7 @@
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.RepudiatedPendingReview})'">
                                 <i class="fa fa-fw"></i>
                                 <span>New Repudiations</span>
-                                @if (ViewBag.ReportPackageCount_RepudiatedPendingReview != null)
+                                @if (ViewBag.ReportPackageCount_RepudiatedPendingReview != null && ViewBag.ReportPackageCount_RepudiatedPendingReview > 0)
                                 {
                                     <span class="pull-right-container">
                                         <span class="bg-fuchsia label">@ViewBag.ReportPackageCount_RepudiatedPendingReview</span>
@@ -65,7 +65,7 @@
                     <a href="#" onclick="location.href = '@Url.Action(actionName:"PendingUserApprovals", controllerName:"Authority")'">
                         <i class="fa fa-fw fa-user-plus"></i>
                         <span>Pending Registrations</span>
-                        @if (ViewBag.PendingRegistrationProgramUsersCount != null)
+                        @if (ViewBag.PendingRegistrationProgramUsersCount != null && ViewBag.PendingRegistrationProgramUsersCount > 0)
                         {
                             <span class="pull-right-container">
                                 <span class="label label-info">@ViewBag.PendingRegistrationProgramUsersCount</span>
@@ -160,11 +160,11 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                         <i class="fa fa-fw fa-th-list"></i>
                         <span>Samples</span>
                         <span class="pull-right-container">
-                            @if (ViewBag.SampleCount_Draft != null)
+                            @if (ViewBag.SampleCount_Draft != null && ViewBag.SampleCount_Draft > 0)
                             {
                                 <span class="bg-yellow label">@ViewBag.SampleCount_Draft</span>
                             }
-                            @if (ViewBag.SampleCount_ReadyToReport != null)
+                            @if (ViewBag.SampleCount_ReadyToReport != null && ViewBag.SampleCount_ReadyToReport > 0)
                             {
                                 <span class="bg-lime-active label">@ViewBag.SampleCount_ReadyToReport</span>
                             }
@@ -176,7 +176,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                                 <i class="fa fa-fw"></i>
                                 <span>Draft</span>
                                 <span class="pull-right-container">
-                                    @if (ViewBag.SampleCount_Draft != null)
+                                    @if (ViewBag.SampleCount_Draft != null && ViewBag.SampleCount_Draft > 0)
                                     {
                                         <span class="bg-yellow label">@ViewBag.SampleCount_Draft</span>
                                     }
@@ -188,7 +188,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                                 <i class="fa fa-fw"></i>
                                 <span>Ready to Report</span>
                                 <span class="pull-right-container">
-                                    @if (ViewBag.SampleCount_ReadyToReport != null)
+                                    @if (ViewBag.SampleCount_ReadyToReport != null && ViewBag.SampleCount_ReadyToReport > 0)
                                     {
                                         <span class="bg-lime-active label">@ViewBag.SampleCount_ReadyToReport</span>
                                     }
@@ -209,11 +209,11 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                         <i class="fa fa-fw glyphicon glyphicon-duplicate"></i>
                         <span>Report Packages</span>
                         <span class="pull-right-container">
-                            @if (ViewBag.ReportPackageCount_Draft != null)
+                            @if (ViewBag.ReportPackageCount_Draft != null && ViewBag.ReportPackageCount_Draft > 0)
                             {
                                 <span class="bg-yellow label">@ViewBag.ReportPackageCount_Draft</span>
                             }
-                            @if (ViewBag.ReportPackageCount_ReadyToSubmit != null)
+                            @if (ViewBag.ReportPackageCount_ReadyToSubmit != null && ViewBag.ReportPackageCount_ReadyToSubmit > 0)
                             {
                                 <span class="bg-lime-active label">@ViewBag.ReportPackageCount_ReadyToSubmit</span>
                             }
@@ -224,7 +224,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.Draft})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Draft</span>
-                                @if (ViewBag.ReportPackageCount_Draft != null)
+                                @if (ViewBag.ReportPackageCount_Draft != null && ViewBag.ReportPackageCount_Draft > 0)
                                 {
                                     <span class="pull-right-container">
                                         <span class="bg-yellow label">@ViewBag.ReportPackageCount_Draft</span>
@@ -236,7 +236,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                             <a href="#" onclick="location.href = '@Url.Action(actionName:"ReportPackages", controllerName:"ReportPackage", routeValues:new {reportStatus = ReportStatusName.ReadyToSubmit})'">
                                 <i class="fa fa-fw"></i>
                                 <span>Ready to Submit</span>
-                                @if (ViewBag.ReportPackageCount_ReadyToSubmit != null)
+                                @if (ViewBag.ReportPackageCount_ReadyToSubmit != null && ViewBag.ReportPackageCount_ReadyToSubmit > 0)
                                 {
                                     <span class="pull-right-container">
                                         <span class="bg-lime-active label">@ViewBag.ReportPackageCount_ReadyToSubmit</span>
@@ -270,7 +270,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                     <a href="#">
                         <i class="fa fa-bank fa-fw"></i>
                         <span>Industry Account</span>
-                        @if (ViewBag.PendingRegistrationProgramUsersCount != null)
+                        @if (ViewBag.PendingRegistrationProgramUsersCount != null && ViewBag.PendingRegistrationProgramUsersCount > 0)
                         {
                             <span class="pull-right-container">
                                 <span class="label label-info">@ViewBag.PendingRegistrationProgramUsersCount</span>
@@ -295,7 +295,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                                 <i class="fa fa-fw fa-user-plus"></i>
                                 <span>Pending Registrations</span>
 
-                                @if (ViewBag.PendingRegistrationProgramUsersCount != null)
+                                @if (ViewBag.PendingRegistrationProgramUsersCount != null && ViewBag.PendingRegistrationProgramUsersCount > 0)
                                 {
                                     <span class="pull-right-container">
                                         <span class="label label-info pull-right">@ViewBag.PendingRegistrationProgramUsersCount</span>
