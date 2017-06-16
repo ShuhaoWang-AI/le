@@ -460,11 +460,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                 }
                 if (filterDescriptor.Member == "EventCategory")
                 {
-                    eventCategoryContains = filterDescriptor.Value.ToString();
+                    //Remove spaces
+                    eventCategoryContains = filterDescriptor.Value.ToString().Replace(" ", string.Empty);
                 }
                 else if (filterDescriptor.Member == "EventType")
                 {
-                    eventTypeContains = filterDescriptor.Value.ToString();
+                    eventTypeContains = filterDescriptor.Value.ToString().Replace(" ", string.Empty);
+                    //Remove spaces
                 }
                 else if (filterDescriptor.Member == "EmailAddress")
                 {
