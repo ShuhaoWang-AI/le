@@ -976,41 +976,41 @@ BEGIN
     PRINT '----------------------------------'
     
     -- KBQs
-    -- string: Hash tHiS answer
+    -- string: tv show
     INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'AKuOPfPEFZoHj9FLjgGatC34IIgOfou3ImkGJSew5HNRmJpgHWpG20VkoY/mU0kpVw=='
+	SELECT 'ANNt9pJ1hVDcszILnWshnx+yoHQ8AbgP8ho/onbKUs7twgblyc0bjy8PzoKD1OK7XQ=='
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite TV show?')
 		, UserProfileId
 	FROM dbo.tUserProfile
     WHERE UserName <> 'Linko'
 
-    -- string: Hash tHiS answer 2
+    -- string: book
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'AE+w46NmQpmYTdIShLn6Kt5m97tLl/iaAAMXO5KBm9QaqPRurxHOWxlYHrDcyJO+Tg=='
+	SELECT 'AGjeMk2wr09+GXNpO4U+MRVaOEbA/XFEqDyYBX7csLb6EFF27piP+ylixolTQ2fvsQ=='
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite book?')
 		, UserProfileId
 	FROM dbo.tUserProfile
     WHERE UserName <> 'Linko'
 
-    -- string: Hash tHiS answer 3
+    -- string: hobby
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'APkqDsEGZEKJAUkZ/0jxHAPFeYszYflXH8QYTgkRAAQt4BHmugJXGMV+PQXfDwQ47A=='
+	SELECT 'ABDAYHvc710fg4hxmJCuR1SnuL4u+9PiFl+EIZR+cpEZiAYm0sjiMoQzMmFggF1IYA=='
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite hobby?')
 		, UserProfileId
 	FROM dbo.tUserProfile
     WHERE UserName <> 'Linko'
 
-    -- string: Hash tHiS answer 4
+    -- string: teacher
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'AEAsu7xLtE5tAiJLa6ljvx+INXQMjV2n4Nv2xpTdw7LCUGTZMOjC/SA8UlDVcJCcgw=='
+	SELECT 'AMsMZnqlwBnSVkCkE/R4NizFR24DKSHFI8ztTb6f9xh+t0ZrFzXuHNiYT2MFmgocxw=='
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is the last name of your favorite teacher?')
 		, UserProfileId
 	FROM dbo.tUserProfile
     WHERE UserName <> 'Linko'
 
-    -- string: Hash tHiS answer 5
+    -- string: pet
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'ANiN5YMCvnaN26T9L1ABz0eBl3jqB2SCvljwFFouLIIW5b2dbFHKHqMF7BJccLmdhA=='
+	SELECT 'APzkWYDNw3/ypeIZD3xFGPil88ykLiPjJYZpy8am4VSSn+G2vJ1hQeDTbWRKY5T1Lg=='
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite pet''s name?')
 		, UserProfileId
 	FROM dbo.tUserProfile
