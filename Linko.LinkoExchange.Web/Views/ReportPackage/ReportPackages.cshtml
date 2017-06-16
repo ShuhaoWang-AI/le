@@ -62,7 +62,7 @@
                                 .Hidden(value: new[] { "Draft", "ReadyToSubmit", "Submitted", "Repudiated", "SubmittedPendingReview" }.Contains(value: (string) ViewBag.ReportStatusName.ToString()));
                           columns.Template(m => { })
                                  .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
-                                 .Width(pixelWidth:60);
+                                 .Width(pixelWidth:30);
                       })
                       .Pageable(pageable => pageable
                                                 .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
