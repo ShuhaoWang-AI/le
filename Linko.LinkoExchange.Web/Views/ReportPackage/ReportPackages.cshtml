@@ -59,7 +59,7 @@
                           columns.Bound(c => c.LastModifierUserName)
                                  .Hidden(value:new[] {"Submitted", "Repudiated", "SubmittedPendingReview", "RepudiatedPendingReview", "All" }.Contains(value:(string) ViewBag.ReportStatusName.ToString()));
                           columns.Bound(c => c.LastSentDateTimeLocal).Format(value: "{0:MM-dd-yyyy}")
-                                .Hidden(value: new[] { "Draft", "ReadyToSubmit", "Submitted", "Repudiated" }.Contains(value: (string) ViewBag.ReportStatusName.ToString()));
+                                .Hidden(value: new[] { "Draft", "ReadyToSubmit", "Submitted", "Repudiated", "SubmittedPendingReview" }.Contains(value: (string) ViewBag.ReportStatusName.ToString()));
                           columns.Template(m => { })
                                  .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
                                  .Width(pixelWidth:60);
