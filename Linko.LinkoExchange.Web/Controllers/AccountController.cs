@@ -317,13 +317,16 @@ namespace Linko.LinkoExchange.Web.Controllers
                         {
                             messageBody.Append(value: $"<div class='col-md-11'>{org.OrganizationDto.CityName}</div>");
                         }
+
+                        messageBody.Append(value:$"<br/>&nbsp<br/>");
                     }
                     else
                     {
                         messageBody.Append(value: $"");
+                        messageBody.Append(value:$"<br/>");
                     }
 
-                    messageBody.Append(value:$"<br/>&nbsp<br/><div>You will be notified by email when a decision has been made about your account request.</div>");
+                    messageBody.Append(value:$"<div>You will be notified by email when a decision has been made about your account request.</div>");
                     messageBody.Append(value:$"<div>If you have questions or concerns, please contact {authorityName} at {authorityEmail} or {authorityPhone}.</div>");
                     
                     messageBody.Append(value:$"</div>"); 
