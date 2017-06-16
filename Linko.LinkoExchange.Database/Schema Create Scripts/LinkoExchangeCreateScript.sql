@@ -5295,7 +5295,8 @@ Report Details:
     Period Start: {periodStartDate}
     Period End: {periodEndDate}
     Submission Date:{submissionDateTime}
-    LinkoExchange COR Signature:{corSignature}
+    LinkoExchange COR Signature:
+    {corSignature}
     
 Submitted To:
     {recipientOrganizationName}
@@ -5344,7 +5345,8 @@ Report Details:
     Period Start: {periodStartDate}
     Period end: {periodEndDate}
     Submission Date:{submissionDateTime}
-    LinkoExchange COR Signature:{corSignature}
+    LinkoExchange COR Signature: 
+    {corSignature}
 
 Submitted By:
     {submitterFirstName} {submitterLastName}
