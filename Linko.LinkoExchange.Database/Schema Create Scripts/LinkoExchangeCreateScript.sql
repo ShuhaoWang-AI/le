@@ -5290,7 +5290,6 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
 Your report was received. Please keep this email as proof of your report submissions.
 
 Report Details:
-Report Details:
     Report Name: {reportPackageName}
     Period Start: {periodStartDate}
     Period End: {periodEndDate}
@@ -5301,7 +5300,7 @@ Report Details:
 Submitted To:
     {recipientOrganizationName}
     {recipientOrganizationAddressLine1} {recipientOrganizationAddressLine2}
-    {recipientOrganizationCityName} {recipientOrganizationJurisdictionName} {recipientOrganizationZipCode}
+    {recipientOrganizationCityName}, {recipientOrganizationJurisdictionName} {recipientOrganizationZipCode}
 
 Submitted By:
     {submitterFirstName} {submitterLastName}
@@ -5309,7 +5308,7 @@ Submitted By:
     {iuOrganizationName} 
     Permit #:{permitNumber} 
     {organizationAddressLine1} {organizationAddressLine2}
-    {organizationCityName} {organizationJurisdictionName} {organizationZipCode} 
+    {organizationCityName}, {organizationJurisdictionName} {organizationZipCode} 
     
     User Name:{userName}
     
@@ -5343,7 +5342,7 @@ The following report was received.
 Report Details:
     Report Name: {reportPackageName}
     Period Start: {periodStartDate}
-    Period end: {periodEndDate}
+    Period End: {periodEndDate}
     Submission Date:{submissionDateTime}
     LinkoExchange COR Signature: 
     {corSignature}
@@ -5354,7 +5353,7 @@ Submitted By:
     {iuOrganizationName} 
     Permit #:{permitNumber} 
     {organizationAddressLine1} {organizationAddressLine2}
-    {organizationCityName} {organizationJurisdictionName} {organizationZipCode} 
+    {organizationCityName}, {organizationJurisdictionName} {organizationZipCode} 
     
     User Name:{userName}
     
