@@ -181,7 +181,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                                                                Id = vm.ReportPackageTemplateId,
                                                                                                                                                                Name = vm.Name,
                                                                                                                                                                Description = vm.Description
-                                                                                                                                                           }).ToList();
+                                                                                                                                                           }).OrderBy(c =>c.Name).ToList();
 
             var viewModel = new NewReportPackageViewModel {AllReportPackageTemplates = reportPackageTemplates};
 
@@ -235,7 +235,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                                                                Id = vm.ReportPackageTemplateId,
                                                                                                                                                                Name = vm.Name,
                                                                                                                                                                Description = vm.Description
-                                                                                                                                                           }).ToList();
+                                                                                                                                                           }).OrderBy(c =>c.Name).ToList();
             model.AllReportPackageTemplates = reportPackageTemplates;
             return View(model:model);
         }
