@@ -248,8 +248,11 @@
                                                columns.Bound(c => c.LabSampleIdentifier)
                                                       .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
                                                                                               .SuggestionOperator(filterType:FilterType.Contains)));
-                                               columns.Bound(c => c.LastSubmitted).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
-                                                      .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                                               if (Model.Status == ReportStatusName.Draft || Model.Status == ReportStatusName.ReadyToSubmit)
+                                               {
+                                                   columns.Bound(c => c.LastSubmitted).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
+                                                          .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+                                               }
                                            })
                                   .Pageable(pageable => pageable
                                                             .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
@@ -259,7 +262,17 @@
                                   )
                                   .ClientDetailTemplateId(id:"template")
                                   .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
-                                  .Filterable(filterable => filterable.Enabled(value:false).Mode(value:GridFilterMode.Row))
+                                  .Filterable(filterable =>
+                                              {
+                                                  if (Model.Status == ReportStatusName.Draft)
+                                                  {
+                                                      filterable.Enabled(value: true).Mode(value: GridFilterMode.Row);
+                                                  }
+                                                  else
+                                                  {
+                                                      filterable.Enabled(value: false);
+                                                  }
+                                              })
                                   .Resizable(resizable => resizable.Columns(value:true))
                                   .Scrollable(s => s.Height(value:"auto"))
                                   .NoRecords(text:"No sample exists.")
@@ -334,68 +347,86 @@
                                 <div class="col-md-12">
                                     @* grid name should be start with grid for centralized error handling *@
                                     @(Html.Kendo().Grid<AttachmentViewModel>()
-                                          .Name(componentName:"gridAttachment_" + attachmentType.Id)
+                                          .Name(componentName: "gridAttachment_" + attachmentType.Id)
                                           .Columns(columns =>
-                                                   {
-                                                       if (Model.Status == ReportStatusName.Draft)
-                                                       {
-                                                           columns.Bound(c => c.IsAssociatedWithReportPackage)
-                                                                  .ClientTemplate(value:"<input type='checkbox' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' #/>")
-                                                                  .HtmlAttributes(attributes:new
-                                                                                             {
-                                                                                                 align = "center"
-                                                                                             })
-                                                                  .Filterable(f => f.Enabled(value:false))
-                                                                  .Width(pixelWidth:40);
-                                                       }
-                                                       columns.Bound(c => c.Name)
-                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                                      .SuggestionOperator(filterType:FilterType.Contains)))
-                                                              .ClientTemplate(value:Html.ActionLink(linkText:"#=Name#", actionName:"DownloadAttachment", routeValues:new
-                                                                                                                                                                     {
-                                                                                                                                                                         id = "#=Id#"
-                                                                                                                                                                     }).ToHtmlString());
-                                                       columns.Bound(c => c.OriginalFileName)
-                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
-                                                       columns.Bound(c => c.Description)
-                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
-                                                       columns.Bound(c => c.UploadDateTimeLocal).Format(value:"{0:MM/dd/yyyy hh:mm tt}")
-                                                              .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                                       columns.Bound(c => c.UploaderUserFullName)
-                                                              .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains")
-                                                                                                      .SuggestionOperator(filterType:FilterType.Contains)));
-                                                   })
+                                          {
+                                              if (Model.Status == ReportStatusName.Draft)
+                                              {
+                                                  columns.Bound(c => c.IsAssociatedWithReportPackage)
+                                                         .ClientTemplate(value: "<input type='checkbox' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' #/>")
+                                                         .HtmlAttributes(attributes: new
+                                                         {
+                                                             align = "center"
+                                                         })
+                                                         .Filterable(f => f.Enabled(value: false))
+                                                         .Width(pixelWidth: 40);
+                                              }
+                                              columns.Bound(c => c.Name)
+                                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                                             .SuggestionOperator(filterType: FilterType.Contains)))
+                                                     .ClientTemplate(value: Html.ActionLink(linkText: "#=Name#", actionName: "DownloadAttachment", routeValues: new
+                                                     {
+                                                         id = "#=Id#"
+                                                     }).ToHtmlString());
+                                              columns.Bound(c => c.OriginalFileName)
+                                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                                             .SuggestionOperator(filterType: FilterType.Contains)));
+                                              columns.Bound(c => c.Description)
+                                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                                             .SuggestionOperator(filterType: FilterType.Contains)));
+                                              columns.Bound(c => c.UploadDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
+                                                     .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+                                              columns.Bound(c => c.UploaderUserFullName)
+                                                     .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains")
+                                                                                             .SuggestionOperator(filterType: FilterType.Contains)));
+                                              if (Model.Status == ReportStatusName.Draft || Model.Status == ReportStatusName.ReadyToSubmit)
+                                              {
+                                                  columns.Bound(c => c.LastSubmitted).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
+                                                         .Filterable(ftb => ftb.Enabled(value: true).Extra(value: true));
+                                              }
+                                          })
                                           .Pageable(pageable => pageable
-                                                                    .PageSizes(pageSizes:new List<object> {"all", 15, 25, 50, 75})
-                                                                    .Refresh(enabled:true)
-                                                                    .Input(enabled:true)
-                                                                    .Numeric(enabled:false)
+                                                                    .PageSizes(pageSizes: new List<object> { "all", 15, 25, 50, 75 })
+                                                                    .Refresh(enabled: true)
+                                                                    .Input(enabled: true)
+                                                                    .Numeric(enabled: false)
                                           )
-                                          .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
-                                          .Filterable(filterable => filterable.Enabled(value:false).Mode(value:GridFilterMode.Row))
-                                          .Resizable(resizable => resizable.Columns(value:true))
-                                          .Scrollable(s => s.Height(value:"auto"))
-                                          .NoRecords(text:"No attachment exists.")
+                                          .Sortable(sortable =>
+                                          {
+                                              sortable.SortMode(value: GridSortMode.MultipleColumn);
+                                          })
+                                          .Filterable(filterable =>
+                                          {
+                                              if (Model.Status == ReportStatusName.Draft)
+                                              {
+                                                  filterable.Enabled(value: true).Mode(value: GridFilterMode.Row);
+                                              }
+                                              else
+                                              {
+                                                  filterable.Enabled(value: false);
+                                              }
+                                          })
+                                          .Resizable(resizable => resizable.Columns(value: true))
+                                          .Scrollable(s => s.Height(value: "auto"))
+                                          .NoRecords(text: "No attachment exists.")
                                           .DataSource(dataSource => dataSource
                                                                         .Ajax()
-                                                                        .ServerOperation(enabled:false)
-                                                                        .Batch(enabled:true)
+                                                                        .ServerOperation(enabled: false)
+                                                                        .Batch(enabled: true)
                                                                         .Sort(sort =>
-                                                                              {
-                                                                                  sort.Add(memberName:"UploadDateTimeLocal").Descending();
-                                                                                  sort.Add(memberName:"Name").Ascending();
-                                                                              }) // <-- initial sort expression
-                                                                        .Read(read => read.Action(actionName:"Attachments_Read", controllerName:"ReportPackage", routeValues:new
-                                                                                                                                                                             {
-                                                                                                                                                                                 reportPackageElementTypeId = attachmentType.Id.GetValueOrDefault(),
-                                                                                                                                                                                 reportStatusName = Model.Status
-                                                                                                                                                                             }))
-                                                                        .PageSize(pageSize:15)
-                                                                        .Events(events => events.Error(handler:"error_handler"))
+                                                                        {
+                                                                            sort.Add(memberName: "UploadDateTimeLocal").Descending();
+                                                                            sort.Add(memberName: "Name").Ascending();
+                                                                        }) // <-- initial sort expression
+                                                                        .Read(read => read.Action(actionName: "Attachments_Read", controllerName: "ReportPackage", routeValues: new
+                                                                        {
+                                                                            reportPackageElementTypeId = attachmentType.Id.GetValueOrDefault(),
+                                                                            reportStatusName = Model.Status
+                                                                        }))
+                                                                        .PageSize(pageSize: 15)
+                                                                        .Events(events => events.Error(handler: "error_handler"))
                                           )
-                                          )
+                                    )
                                 </div>
                             </div>
                         </section>

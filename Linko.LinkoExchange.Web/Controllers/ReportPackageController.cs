@@ -397,7 +397,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                    Description = vm.Description,
                                                    UploadDateTimeLocal = vm.UploadDateTimeLocal,
                                                    UploaderUserFullName = vm.UploaderUserFullName,
-                                                   IsAssociatedWithReportPackage = vm.IsAssociatedWithReportPackage
+                                                   IsAssociatedWithReportPackage = vm.IsAssociatedWithReportPackage,
+                                                   LastSubmitted = vm.LastSubmissionDateTimeLocal
                                                });
 
             var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
@@ -408,7 +409,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.Description,
                                                                                            UploadDateTimeLocal = vm.UploadDateTimeLocal.ToString(provider:CultureInfo.CurrentCulture),
                                                                                            vm.UploaderUserFullName,
-                                                                                           vm.IsAssociatedWithReportPackage
+                                                                                           vm.IsAssociatedWithReportPackage,
+                                                                                           LastSubmitted = vm.LastSubmitted.ToString()
                                                                                        });
 
             return Json(data:result);

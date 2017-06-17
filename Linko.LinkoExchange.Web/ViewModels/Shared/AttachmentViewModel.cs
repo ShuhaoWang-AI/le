@@ -44,6 +44,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = "Last Modified By")]
         public string LastModifierUserName { get; set; }
+        
+        [Editable(allowEdit: false)]
+        [Display(Name = "Last Submitted")]
+        public DateTime? LastSubmitted { get; set; }
 
         public bool UsedByReports { get; set; }
 

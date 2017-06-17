@@ -26,5 +26,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public bool UsedByReports { get; set; }
         public int ReportPackageElementTypeId { get; internal set; } //only to be used when fetching files for possible inclusion in Report Package
         public bool IsAssociatedWithReportPackage { get; internal set; } // only to be used when displaying report package to show which samples are included
+        public DateTime? LastSubmissionDateTimeLocal { get; internal set; }
     }
 }

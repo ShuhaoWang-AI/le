@@ -63,10 +63,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Editable(allowEdit: false)]
         [Display(Name = "Last Submitted")]
-        public DateTime? LastSubmitted
-        {
-            get; set;
-        }
+        public DateTime? LastSubmitted { get; set; }
 
         [Display(Name = "Flow")]
         public string FlowValue { get; set; }
