@@ -12,7 +12,7 @@
     </div>
     <div class="box box-primary">
         <section class="box-body" id="SignInForm">
-            @using (Html.BeginForm(actionName:"SignIn", controllerName:"Account", routeValues:new {ViewBag.ReturnUrl}, method:FormMethod.Post, htmlAttributes:new {@class = "form-horizontal", role = "form"}))
+            @using (Html.BeginForm(actionName:"SignIn", controllerName:"Account", routeValues:new {ViewBag.ReturnUrl}, method:FormMethod.Post, htmlAttributes:new {@class = "form-horizontal", role = "form", id = "LinkoExchangeForm"}))
             {
                 @Html.AntiForgeryToken()
                 @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-danger"})
@@ -52,5 +52,16 @@
 </div>
 
 @section Scripts {
-    @Scripts.Render(paths:"~/bundles/jqueryval")
+    @Scripts.Render(paths: "~/bundles/jqueryval")
+
+    <script>
+        $(document)
+            .keypress(function(evt)
+            {
+                if (evt.which === 13)
+                {
+                    $("#LinkoExchangeForm").submit();
+                }
+            });
+    </script>
 }

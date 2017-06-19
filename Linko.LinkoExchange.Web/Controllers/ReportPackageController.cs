@@ -149,7 +149,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     if (item.Status == ReportStatusName.Submitted)
                     {
                         //Scroll target page to the appropriate section if user is viewing a submitted report package.
-                        newUrl += "#submission-confirmation";
+                        newUrl += "#divSubmissionConfirmationReport";
                     }
 
                     return Json(data:new

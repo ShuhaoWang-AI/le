@@ -215,8 +215,9 @@ $(document)
         var evt = (e) ? e : ((event) ? event : null);
         var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null);
 
-        if (evt.which === 13 && node.type.toLowerCase() !== "textarea" && node.type.toLowerCase() !== "button")
+        if (evt.which === 13 && node.type.toLowerCase() !== "textarea" && node.type.toLowerCase() !== "button" && node.type.toLowerCase() !== "submit")
         {
             return false;
         }
+        return true;
     });
