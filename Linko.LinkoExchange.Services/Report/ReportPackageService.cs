@@ -771,7 +771,7 @@ namespace Linko.LinkoExchange.Services.Report
             _emailService.SendEmail(signatoriesEmails, EmailType.Report_Submission_IU, emailContentReplacements, false);
 
             // Send emails to all Standard Users for the authority  
-            var authorityOrganzationId = reportPackage.OrganizationRegulatoryProgramDto.OrganizationId;
+            var authorityOrganzationId = reportPackage.OrganizationRegulatoryProgramDto.RegulatorOrganizationId.Value;
             var authorityAdminAndStandardUsersEmails = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganzationId).Select(i => i.Email).ToList();
             _emailService.SendEmail(authorityAdminAndStandardUsersEmails, EmailType.Report_Submission_AU, emailContentReplacements, false);
 
