@@ -488,7 +488,6 @@
                     }
                     else
                     {
-
                         <p style="white-space:pre-wrap;">@Model.Comments</p>
                     }
                 </div>
@@ -496,6 +495,7 @@
         </div>
     </div>
 
+    // Sign and Submit Report
     if (Model.CanCurrentUserSubmitAndReputiate && Model.Status == ReportStatusName.ReadyToSubmit)
     {
         <div class="box box-primary" id="divSignAndSubmitReport">
@@ -545,9 +545,10 @@
         </div>
     }
 
+    // Submission Confirmation
     if (Model.Status == ReportStatusName.Submitted || Model.Status == ReportStatusName.Repudiated)
     {
-        <div class="box box-primary" id="divSubmissionConfirmationReport">
+        <div class="box box-primary" id="divSubmissionConfirmation">
             <div class="box-header with-border">
                 <h3 class="box-title">Submission Confirmation</h3>
                 <div class="box-tools pull-right">
@@ -557,6 +558,16 @@
                 </div>
             </div>
             <div class="box-body form-horizontal">
+                @if (ViewBag.ShowSubmissionConfirmationMessage != null && ViewBag.ShowSubmissionConfirmationMessage)
+                {
+                    <div class="alert alert-dismissible alert-success">
+                        <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
+                        <h5>
+                            <i class="fa fa-check icon"></i>
+                            @ViewBag.SubmissionConfirmationMessage
+                        </h5>
+                    </div>
+                }
                 <div class="form-group">
                     @Html.LabelFor(m => m.Submitter, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
@@ -600,6 +611,7 @@
         </div>
     }
 
+    // Repudiate Report
     if (Model.CanCurrentUserSubmitAndReputiate && Model.Status == ReportStatusName.Submitted)
     {
         <div class="box box-primary" id="divRepudiateReport">
@@ -607,7 +619,15 @@
                 <h3 class="box-title">Repudiate Report</h3>
                 <div class="box-tools pull-right">
                     <button class="btn btn-box-tool" data-widget="collapse">
+                    @if (ViewBag.ShowSubmissionConfirmationMessage != null && ViewBag.ShowSubmissionConfirmationMessage)
+                    {
+                        // if showing submission confirmation message then collapese the repudiation box onload
+                        <i class="fa fa-plus"></i>
+                    }
+                    else
+                    {
                         <i class="fa fa-minus"></i>
+                    }
                     </button>
                 </div>
             </div>
@@ -703,9 +723,10 @@
         </div>
     }
 
+    // Submission Review
     if (Model.IsCurrentPortalAuthority && (Model.Status == ReportStatusName.Submitted || Model.Status == ReportStatusName.Repudiated))
     {
-        <div class="box box-primary" id="divSignAndSubmitReport">
+        <div class="box box-primary" id="divSubmissionReview">
             <div class="box-header with-border">
                 <h3 class="box-title">Submission Review</h3>
                 <div class="box-tools pull-right">
@@ -795,9 +816,10 @@
         </div>
     }
 
+    // Repudiation Confirmation
     if (Model.Status == ReportStatusName.Repudiated)
     {
-        <div class="box box-primary" id="divSignAndSubmitReport">
+        <div class="box box-primary" id="divRepudiationConfirmation">
             <div class="box-header with-border">
                 <h3 class="box-title">Repudiation Confirmation</h3>
                 <div class="box-tools pull-right">
@@ -807,6 +829,16 @@
                 </div>
             </div>
             <div class="box-body form-horizontal">
+                @if (ViewBag.ShowRepudiationConfirmationMessage != null && ViewBag.ShowRepudiationConfirmationMessage)
+                {
+                    <div class="alert alert-dismissible alert-success">
+                        <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
+                        <h5>
+                            <i class="fa fa-check icon"></i>
+                            <span>@Html.Raw(ViewBag.RepudiationConfirmationMessage)</span>
+                        </h5>
+                    </div>
+                }
                 <div class="form-group">
                     @Html.LabelFor(m => m.Repudiator, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
@@ -877,9 +909,10 @@
         </div>
     }
 
+    // Repudiation Review
     if (Model.IsCurrentPortalAuthority && Model.Status == ReportStatusName.Repudiated)
     {
-        <div class="box box-primary" id="divSignAndSubmitReport">
+        <div class="box box-primary" id="divRepudiationReview">
             <div class="box-header with-border">
                 <h3 class="box-title">Repudiation Review</h3>
                 <div class="box-tools pull-right">
@@ -970,6 +1003,7 @@
         </div>
     }
 
+    // Send to LinkoCTS
     if (Model.IsCurrentPortalAuthority && (Model.Status == ReportStatusName.Submitted || Model.Status == ReportStatusName.Repudiated))
     {
         <div class="box box-primary" id="divSendToLinkoCTS">
@@ -982,6 +1016,16 @@
                 </div>
             </div>
             <div class="box-body form-horizontal">
+                @if (ViewBag.ShowSendToLinkoCTSSuccessMessage != null && ViewBag.ShowSendToLinkoCTSSuccessMessage)
+                {
+                    <div class="alert alert-dismissible alert-success">
+                        <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
+                        <h5>
+                            <i class="fa fa-check icon"></i>
+                            @ViewBag.SendToLinkoCTSSuccessMessage
+                        </h5>
+                    </div>
+                }
                 <div class="form-group">
                     @Html.LabelFor(m => m.LastSender, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
@@ -1019,7 +1063,6 @@
     }
 
     // Buttons
-
     <div class="box box-default" id="divFooter">
         <div class="box-body form-horizontal">
 
@@ -1080,6 +1123,15 @@
     </div>
 
 @section Scripts {
+    
+    @if (ViewBag.ShowSubmissionConfirmationMessage != null && ViewBag.ShowSubmissionConfirmationMessage)
+    {
+        <script>
+            // if showing submission confirmation message then collapese the repudiation box onload
+            $('#divRepudiateReport').addClass('collapsed-box');
+        </script>
+    }
+
     @if (Model.CanCurrentUserSubmitAndReputiate && Model.Status == ReportStatusName.Submitted)
     {
         <script>

@@ -149,7 +149,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     if (item.Status == ReportStatusName.Submitted)
                     {
                         //Scroll target page to the appropriate section if user is viewing a submitted report package.
-                        newUrl += "#divSubmissionConfirmationReport";
+                        newUrl += "#divSubmissionConfirmation";
                     }
 
                     return Json(data:new
@@ -254,6 +254,15 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             ViewBag.ShowSuccessMessage = TempData[key:"ShowSuccessMessage"] ?? false;
             ViewBag.SuccessMessage = TempData[key:"SuccessMessage"] ?? "";
+            
+            ViewBag.ShowSubmissionConfirmationMessage = TempData[key:"ShowSubmissionConfirmationMessage"] ?? false;
+            ViewBag.SubmissionConfirmationMessage = TempData[key:"SubmissionConfirmationMessage"] ?? "";
+            
+            ViewBag.ShowRepudiationConfirmationMessage = TempData[key:"ShowRepudiationConfirmationMessage"] ?? false;
+            ViewBag.RepudiationConfirmationMessage = TempData[key:"RepudiationConfirmationMessage"] ?? "";
+            
+            ViewBag.ShowSendToLinkoCTSSuccessMessage = TempData[key:"ShowSendToLinkoCTSSuccessMessage"] ?? false;
+            ViewBag.SendToLinkoCTSSuccessMessage = TempData[key:"SendToLinkoCTSSuccessMessage"] ?? "";
 
             return View(model:viewModel);
         }
@@ -580,11 +589,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             catch (RuleViolationException rve)
             {
-                return View(viewName:"Confirmation", model:new ConfirmationViewModel
-                                                           {
-                                                               Title = "Report Package Submission Failed ",
-                                                               Message = rve.ValidationIssues[index:0].ErrorMessage
-                                                           });
+                isValid = false;
+                ViewBag.ShowSubmissionValidationErrorMessage = true;
+                ViewBag.SubmissionValidationErrorMessage = rve.ValidationIssues[index:0].ErrorMessage;
             }
             try
             {
@@ -592,11 +599,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     _reportPackageService.SignAndSubmitReportPackage(reportPackageId:id);
 
-                    return View(viewName:"Confirmation", model:new ConfirmationViewModel
-                                                               {
-                                                                   Title = "Report Package Submission Confirmation ",
-                                                                   Message = "Report package submitted successfully."
-                                                               });
+                    TempData[key:"ShowSubmissionConfirmationMessage"] = true;
+                    TempData[key:"SubmissionConfirmationMessage"] = "Report package submitted successfully!";
+                    return  Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }) + "#divSubmissionConfirmation");
                 }
             }
             catch (RuleViolationException rve)
@@ -671,11 +676,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             catch (RuleViolationException rve)
             {
-                return View(viewName:"Confirmation", model:new ConfirmationViewModel
-                                                           {
-                                                               Title = "Report Package Repudiation Failed ",
-                                                               Message = rve.ValidationIssues[index:0].ErrorMessage
-                                                           });
+                isValid = false;
+                ViewBag.ShowRepudiateValidationErrorMessage = true;
+                ViewBag.RepudiateValidationErrorMessage = rve.ValidationIssues[index:0].ErrorMessage;
             }
             try
             {
@@ -684,15 +687,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                     _reportPackageService.RepudiateReport(reportPackageId:id, repudiationReasonId:model.RepudiationReasonId ?? 0, repudiationReasonName:model.RepudiationReasonName,
                                                           comments:model.RepudiationComments);
 
-                    string confirmationMessage = "Report Repudiated<br />";
-                    confirmationMessage += "The entire contents of the report including results, if present, are repudiated<br />";
-                    confirmationMessage += "A repudiation receipt email has been sent<br />";
+                    var confirmationMessage = "Report Repudiated!<br /><br />";
+                    confirmationMessage += "The entire contents of the report including results, if present, are repudiated.<br />";
+                    confirmationMessage += "A repudiation receipt email has been sent.<br />";
 
-                    return View(viewName:"Confirmation", model:new ConfirmationViewModel
-                                                               {
-                                                                   Title = "Report Package Repudiation Confirmation ",
-                                                                   HtmlStr = confirmationMessage
-                                                               });
+                    TempData[key:"ShowRepudiationConfirmationMessage"] = true;
+                    TempData[key:"RepudiationConfirmationMessage"] = confirmationMessage;
+                    return  Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }) + "#divRepudiationConfirmation");
                 }
             }
             catch (RuleViolationException rve)
@@ -772,11 +773,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 _syncService.SendSubmittedReportPackageToCts(reportPackageId: id);
 
-                TempData[key: "ShowSuccessMessage"] = true;
-                TempData[key: "SuccessMessage"] = "Report Package queued for LinkoCTS.";
+                TempData[key: "ShowSendToLinkoCTSSuccessMessage"] = true;
+                TempData[key: "SendToLinkoCTSSuccessMessage"] = "Report Package queued for LinkoCTS.";
 
                 ModelState.Clear();
-                return RedirectToAction(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id });
+                return Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }) + "#divSendToLinkoCTS");
             }
             catch (RuleViolationException rve)
             {
