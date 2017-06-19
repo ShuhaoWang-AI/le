@@ -163,5 +163,16 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
         /// <returns>True if there is an association for all required element types where content is not provided</returns>
         bool IsRequiredReportPackageElementTypesIncluded(int reportPackageId);
+
+        /// <summary>
+        /// Updates the LastSentDateTimeUtc value of a row in table tReportPackage.
+        /// Also optionally updates the "last sender" details.
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <param name="sentDateTime">eg. DateTimeOffset.Now</param>
+        /// <param name="lastSenderUserId">Optional: tUserProfile.UserProfileId</param>
+        /// <param name="lastSenderFirstName">Optional: tUserProfile.FirstName</param>
+        /// <param name="lastSenderLastName">Optional: tUserProfile.LastName</param>
+        void UpdateLastSentDateTime(int reportPackageId, DateTimeOffset sentDateTime, int? lastSenderUserId = null, string lastSenderFirstName = null, string lastSenderLastName = null);
     }
 }

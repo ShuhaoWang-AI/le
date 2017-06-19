@@ -1572,6 +1572,20 @@ namespace Linko.LinkoExchange.Services.Report
                 fileStoreDto.UploadDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(eligibleFile.UploadDateTimeUtc.UtcDateTime, timeZoneId);
                 var uploaderUser = _dbContext.Users.Single(user => user.UserProfileId == fileStoreDto.UploaderUserId);
                 fileStoreDto.UploaderUserFullName = $"{uploaderUser.FirstName} {uploaderUser.LastName}";
+
+                var lastSubmittedReportPackage = _dbContext.FileStores
+                    .Single(fs => fs.FileStoreId == eligibleFile.FileStoreId)
+                        .ReportFiles
+                        .Select(rf => rf.ReportPackageElementType.ReportPackageElementCategory.ReportPackage)
+                        .Where(rp => rp.SubmissionDateTimeUtc.HasValue)
+                        .OrderByDescending(rp => rp.SubmissionDateTimeUtc)
+                        .FirstOrDefault();
+
+                if (lastSubmittedReportPackage != null)
+                {
+                    fileStoreDto.LastSubmissionDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(lastSubmittedReportPackage.SubmissionDateTimeUtc.Value.UtcDateTime, timeZoneId);
+                }
+
                 fileStoreList.Add(fileStoreDto);
             }
 
@@ -2219,6 +2233,41 @@ namespace Linko.LinkoExchange.Services.Report
 
             return true;
         }
+
+        /// <summary>
+        /// Updates the LastSentDateTimeUtc value of a row in table tReportPackage.
+        /// Also optionally updates the "last sender" details.
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <param name="sentDateTime">eg. DateTimeOffset.Now</param>
+        /// <param name="lastSenderUserId">Optional: tUserProfile.UserProfileId</param>
+        /// <param name="lastSenderFirstName">Optional: tUserProfile.FirstName</param>
+        /// <param name="lastSenderLastName">Optional: tUserProfile.LastName</param>
+        public void UpdateLastSentDateTime(int reportPackageId, DateTimeOffset sentDateTime, int? lastSenderUserId = null, string lastSenderFirstName = null, string lastSenderLastName = null)
+        {
+            var reportPackage = _dbContext.ReportPackages
+                .SingleOrDefault(rp => rp.ReportPackageId == reportPackageId);
+
+            reportPackage.LastSentDateTimeUtc = sentDateTime;
+
+            if (lastSenderUserId.HasValue)
+            {
+                reportPackage.LastSenderUserId = lastSenderUserId;
+            }
+
+            if (!String.IsNullOrWhiteSpace(lastSenderFirstName))
+            {
+                reportPackage.LastSenderFirstName = lastSenderFirstName;
+            }
+
+            if (!String.IsNullOrWhiteSpace(lastSenderLastName))
+            {
+                reportPackage.LastSenderLastName = lastSenderLastName;
+            }
+
+            _dbContext.SaveChanges();
+        }
+
 
         private string GenerateXmlString(CopyOfRecordDataXml dataXmlObj, ReportPackageDto reportPackageDto)
         {

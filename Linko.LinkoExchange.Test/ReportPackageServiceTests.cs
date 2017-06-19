@@ -252,7 +252,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetSamplesForSelection()
         {
-            var eligibleSamples = _reportPackageService.GetSamplesForSelection(25);
+            var eligibleSamples = _reportPackageService.GetSamplesForSelection(1);
 
         }
 
@@ -304,6 +304,12 @@ namespace Linko.LinkoExchange.Test
             var reportPackageId = _reportPackageService.CreateDraft(templateId, startDateTimeLocal, endDateTimeLocal);
 
 
+        }
+
+        [TestMethod]
+        public void UpdateLastSentDateTime()
+        {
+            _reportPackageService.UpdateLastSentDateTime(1, DateTimeOffset.Now, 1, "Testing First Name");
         }
     }
 }
