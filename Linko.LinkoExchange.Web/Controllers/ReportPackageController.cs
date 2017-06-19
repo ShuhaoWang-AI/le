@@ -179,6 +179,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         #region Report Package Details
 
         [Route(template:"New")]
+        [PortalAuthorize("industry")]
         public ActionResult NewReportPackage()
         {
             var reportPackageTemplates = _reportTemplateService.GetReportPackageTemplates(isForCreatingDraft:true, includeChildObjects:false).Select(vm => new ReportPackageTemplateViewModel
@@ -196,6 +197,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"New")]
+        [PortalAuthorize("industry")]
         public ActionResult NewReportPackage(NewReportPackageViewModel model)
         {
             if (ModelState.IsValid)
@@ -417,6 +419,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [Route(template:"{id:int}/Delete")]
+        [PortalAuthorize("industry")]
         public ActionResult DeleteReportPackage(int id)
         {
             try
@@ -440,6 +443,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/ReadyToSubmit")]
+        [PortalAuthorize("industry")]
         public ActionResult ReadyToSubmit(int id, ReportPackageViewModel model, string selectedSamples, string selectedAttachments)
         {
             try
@@ -496,6 +500,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/EnableReportPackage")]
+        [PortalAuthorize("industry")]
         public ActionResult EnableReportPackage(int id)
         {
             try
@@ -519,6 +524,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/SignAndSubmit")]
+        [PortalAuthorize("industry")]
         public ActionResult SignAndSubmit(int id, ReportPackageViewModel model)
         {
             var isValid = true;
@@ -608,6 +614,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/RepudiateReport")]
+        [PortalAuthorize("industry")]
         public ActionResult RepudiateReport(int id, ReportPackageViewModel model)
         {
             var isValid = true;
@@ -703,6 +710,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/ReviewSubmission")]
+        [PortalAuthorize("authority")]
         public ActionResult ReviewSubmission(int id, ReportPackageViewModel model)
         {
             try
@@ -726,6 +734,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/ReviewRepudiation")]
+        [PortalAuthorize("authority")]
         public ActionResult ReviewRepudiation(int id, ReportPackageViewModel model)
         {
             try
@@ -756,6 +765,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/SendToLinkoCts")]
+        [PortalAuthorize("authority")]
         public ActionResult SendToLinkoCts(int id, ReportPackageViewModel model)
         {
             try
@@ -777,6 +787,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         }
 
         [Route(template:"{id:int}/Details/Preview")]
+        [PortalAuthorize("industry")]
         public ActionResult ReportPackagePreview(int id)
         {
             try
