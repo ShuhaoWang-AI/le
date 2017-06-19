@@ -711,7 +711,7 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("corSignature", copyOfRecordDto.Signature);
             emailContentReplacements.Add("submitterFirstName", _httpContextService.GetClaimValue(CacheKey.FirstName));
             emailContentReplacements.Add("submitterLastName", _httpContextService.GetClaimValue(CacheKey.LastName));
-            emailContentReplacements.Add("submitterTitle", _httpContextService.GetClaimValue(CacheKey.UserRole));
+            emailContentReplacements.Add("submitterTitle",  reportPackage.SubmitterTitleRole.GetValueOrEmptyString());
 
             emailContentReplacements.Add("permitNumber", reportPackage.OrganizationReferenceNumber);
 
@@ -756,10 +756,11 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("recipientOrganizationJurisdictionName", reportPackage.RecipientOrganizationJurisdictionName);
             emailContentReplacements.Add("recipientOrganizationZipCode", reportPackage.RecipientOrganizationZipCode);
 
+            var contactUserNameOnEmail = _settingService.GetOrgRegProgramSettingValue(reportPackage.OrganizationRegulatoryProgramDto.RegulatoryProgramId, SettingType.EmailContactInfoName);
             var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(reportPackage.OrganizationRegulatoryProgramDto.RegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
             var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(reportPackage.OrganizationRegulatoryProgramDto.RegulatoryProgramId, SettingType.EmailContactInfoPhone);
 
-            emailContentReplacements.Add("authorityName", reportPackage.RecipientOrganizationName);
+            emailContentReplacements.Add("authorityName", contactUserNameOnEmail);
             emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
             emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
 
