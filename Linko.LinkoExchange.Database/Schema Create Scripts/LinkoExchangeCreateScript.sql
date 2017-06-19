@@ -5361,9 +5361,7 @@ To view the report in LinkoExchange, click the link below or copy and paste the 
 
     {corViewLink}
     
-                            
-This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+
                 </pre>
             </body>
         </html>'
