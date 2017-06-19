@@ -5369,6 +5369,59 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         </html>'
     )
 	
+	
+	--UC-54 3.b Sign and submit-Incorrect Password 
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'Email_COR_PasswordFailedLockout' , 
+        'Email',  
+        'COR', 
+        'PasswordFailedUserLock',        
+        'LinkoExchange Account Locked', 
+        ' <html>
+            <body> 
+                <pre>
+Hello,
+Your account has been locked due to exceeding Password attemps during the singature ceremoney.
+
+Please contact your authority for assistance unlocking your account.
+
+        {authorityList}
+
+This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
+If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+                </pre>
+            </body>
+        </html>'
+    )
+	
+	--UC-54 4.b Sign and submit-Incorrect KBQ 
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'Email_COR_KBQFailedLockout' , 
+        'Email',  
+        'COR', 
+        'KBQFailedUserLock',        
+        'LinkoExchange Account Locked', 
+        ' <html>
+            <body> 
+                <pre>
+Hello,
+Your account has been locked due to exceeding Knowledge Based Question attemps during the singature ceremoney.
+
+Please contact your authority for assistance unlocking your account.
+
+        {authorityList}
+
+This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
+If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+                </pre>
+            </body>
+        </html>'
+    )	
+	
 	--UC-19 Report Repudiation sent to standard users of Authority (UC-19 8.3.)
     INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
     VALUES 
