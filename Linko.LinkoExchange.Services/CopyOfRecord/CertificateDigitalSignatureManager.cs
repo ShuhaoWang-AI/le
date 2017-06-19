@@ -58,11 +58,20 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         public bool VerifySignature(string currentSignatureStr, byte[] dataToVerify)
         {
-            var dataToVerifyHash = HashHelper.ComputeSha256Hash(dataToVerify);
-            var dataToVerifyHashBytes = Encoding.UTF8.GetBytes(dataToVerifyHash);
-            var signedDataBytes = Convert.FromBase64String(currentSignatureStr);
+            _logger.Info("Enter CertificateDigitalSignatureManager.VerifySignature.");
+            try
+            {
+                var dataToVerifyHash = HashHelper.ComputeSha256Hash(dataToVerify);
+                var dataToVerifyHashBytes = Encoding.UTF8.GetBytes(dataToVerifyHash);
+                var signedDataBytes = Convert.FromBase64String(currentSignatureStr);
 
-            return VerifySignature(dataToVerifyHashBytes, signedDataBytes);
+                return VerifySignature(dataToVerifyHashBytes, signedDataBytes);
+            }
+            catch (Exception ex)
+            {
+                _logger.Info($"Error happens in CertificateDigitalSignatureManager.VerifySignature.  Error: {ex.Message}");
+                return false;
+            } 
         }
 
         public int LatestCertificateId()
