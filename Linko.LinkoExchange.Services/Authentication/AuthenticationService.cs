@@ -1110,7 +1110,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 if (failedPasswordAttemptMaxCount <= failedPasswordCount + 1)
                 {
                     SignOff();
-                    _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
+                    _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony);
                     return PasswordAndKbqValidationResult.UserLocked;
                 }
 
@@ -1123,7 +1123,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 if (failedKbqAttemptMaxCount <= failedKbqCount + 1)
                 {
                     SignOff();
-                    _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
+                    _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony);
                     return PasswordAndKbqValidationResult.UserLocked;
                 }
 

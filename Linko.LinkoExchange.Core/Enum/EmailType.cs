@@ -86,6 +86,12 @@
 
         // UC-19 Report Repudiation
         Report_Repudiation_IU,
-        Report_Repudiation_AU
+        Report_Repudiation_AU, 
+
+        // COR KBQ failed
+        COR_KBQFailedLockout, 
+
+        // COR Password failed
+        COR_PasswordFailedLockout
     }
 }

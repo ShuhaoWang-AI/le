@@ -728,25 +728,35 @@ namespace Linko.LinkoExchange.Services.User
                     contentReplacements.Add("authoritySupportEmail", authorityEmail);
                     contentReplacements.Add("authoritySupportPhoneNumber", authorityPhone);
                     _emailService.SendEmail(new[] { user.Email }, EmailType.UserAccess_AccountLockout, contentReplacements);
-
                 }
-
             }
 
-            if (reason != AccountLockEvent.ManualAction)
+            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
+            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
+            var authorityListString = _orgService.GetUserAuthorityListForEmailContent(user.UserProfileId);
+            contentReplacements = new Dictionary<string, string>();
+            contentReplacements.Add("firstName", user.FirstName);
+            contentReplacements.Add("lastName", user.LastName);
+            contentReplacements.Add("authorityList", authorityListString);
+            contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
+            contentReplacements.Add("supportEmail", supportEmail);
+
+            var emailType = EmailType.Profile_KBQFailedLockout; 
+
+            if(reason == AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony)
             {
-                string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
-                string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
-                var authorityListString = _orgService.GetUserAuthorityListForEmailContent(user.UserProfileId);
-                contentReplacements = new Dictionary<string, string>();
-                contentReplacements.Add("firstName", user.FirstName);
-                contentReplacements.Add("lastName", user.LastName);
-                contentReplacements.Add("authorityList", authorityListString);
-                contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
-                contentReplacements.Add("supportEmail", supportEmail);
-                _emailService.SendEmail(new[] { user.Email }, EmailType.Profile_KBQFailedLockout, contentReplacements);
-
+                emailType = EmailType.COR_PasswordFailedLockout;
             }
+            else if(reason == AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony)
+            {
+                emailType = EmailType.COR_KBQFailedLockout;
+            }
+            else if (reason != AccountLockEvent.ManualAction)
+            { 
+                 emailType = EmailType.Profile_KBQFailedLockout; 
+            }
+
+            _emailService.SendEmail(new[] { user.Email }, emailType, contentReplacements); 
         }
 
         public AccountLockoutResultDto LockUnlockUserAccount(int targetOrgRegProgUserId, bool isAttemptingLock, AccountLockEvent reason, bool isAuthorizationRequired = false)

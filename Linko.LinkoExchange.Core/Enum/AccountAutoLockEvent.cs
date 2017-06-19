@@ -4,6 +4,8 @@
     {
         ManualAction,
         ExceededKBQMaxAnswerAttemptsDuringPasswordReset,
-        ExceededKBQMaxAnswerAttemptsDuringProfileAccess
+        ExceededKBQMaxAnswerAttemptsDuringProfileAccess,
+        ExceededPasswordMaxAttemptsDuringSignatureCeremony,
+        ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony
     }
 }
