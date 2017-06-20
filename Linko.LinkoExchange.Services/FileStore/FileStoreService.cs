@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Entity;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Web.Configuration;
 using Linko.LinkoExchange.Core.Domain;
+using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
@@ -14,8 +18,6 @@ using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.TimeZone;
 using NLog;
-using System.Runtime.CompilerServices;
-using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Services.FileStore
 {
@@ -28,7 +30,8 @@ namespace Linko.LinkoExchange.Services.FileStore
         private readonly ITimeZoneService _timeZoneService;
 
         // Max file size 10 M Byte 
-        private const int MaxFileSize = 1024 * 1024 * 10;
+        private static readonly int MaxFileSize = ((HttpRuntimeSection) ConfigurationManager.GetSection(sectionName: "system.web/httpRuntime")).MaxRequestLength * 1024;
+
         private const int SizeToReduce = 1024 * 1024 * 2;
 
         public FileStoreService(
@@ -199,22 +202,22 @@ namespace Linko.LinkoExchange.Services.FileStore
 
             if (fileStoreDto.Data == null || fileStoreDto.Data.Length < 1)
             {
-                List<RuleViolation> validationIssues = new List<RuleViolation>();
-                string message = "No file was selected.";
+                var validationIssues = new List<RuleViolation>();
+                var message = "No file was selected.";
                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
             }
 
             if (fileStoreDto.Data.Length > MaxFileSize)
             {
-                List<RuleViolation> validationIssues = new List<RuleViolation>();
+                var validationIssues = new List<RuleViolation>();
 
-                string message = "The file size exceeds that 10 MB limit.";
+                var message = $"The file size exceeds that {(MaxFileSize / 1024) / 1024} MB limit.";
                 validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
             }
 
-            var extension = Path.GetExtension(fileStoreDto.OriginalFileName).ToLower();
+            var extension = Path.GetExtension(fileStoreDto.OriginalFileName)?.ToLower();
             var validFileTypes = _dbContext.FileTypes.ToList();
             var validFileExtensions = validFileTypes.Select(i => i.Extension).Select(i => i.ToLower());
 
@@ -423,6 +426,11 @@ namespace Linko.LinkoExchange.Services.FileStore
             _logger.Info(message: "Leave FileStoreService.IsFileInReports.");
 
             return isFileInReports;
+        }
+
+        public int GetMaxFileSize()
+        {
+            return MaxFileSize;
         }
 
         private FileStoreDto FileStoreDtoHelper(FileStoreDto fileStoreDto, int currentOrgRegProgramId)

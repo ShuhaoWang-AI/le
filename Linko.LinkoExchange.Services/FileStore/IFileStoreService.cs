@@ -26,5 +26,6 @@ namespace Linko.LinkoExchange.Services.FileStore
         void UpdateFileStore(FileStoreDto fileStoreDto);
         void DeleteFileStore(int fileStoreId);
         bool IsFileInReports(int fileStore);
+        int GetMaxFileSize();
     }
 }

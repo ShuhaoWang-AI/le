@@ -923,6 +923,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             else
             {
                 ViewBag.Satus = "New";
+                ViewBag.MaxFileSize = _fileStoreService.GetMaxFileSize();
                 viewModel.UsedByReports = false;
                 viewModel.ReportElementTypeId = 0;
             }
