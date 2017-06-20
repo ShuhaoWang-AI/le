@@ -268,6 +268,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.LastName = invitation.LastName;
             dto.EmailAddress = invitation.EmailAddress;
             dto.InvitationDateTimeUtc = invitation.InvitationDateTimeUtc;
+            dto.IsResetInvitation = invitation.IsResetInvitation;
             //IGNORE ExpiryDateTimeUtc
             dto.SenderOrganizationRegulatoryProgramId = invitation.SenderOrganizationRegulatoryProgramId;
             dto.RecipientOrganizationRegulatoryProgramId = invitation.RecipientOrganizationRegulatoryProgramId;
