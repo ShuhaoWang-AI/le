@@ -1989,22 +1989,22 @@ namespace Linko.LinkoExchange.Services.Report
                         _emailService.SendEmail(new[] { industrySignatoryUser.Email }, EmailType.Report_Repudiation_IU, contentReplacements);
                     }
 
-                    //System sends Submission Receipt to all Standard Users for the Authority (UC-19 8.4.)
-                    var standardUsersOfAuthority = _dbContext.OrganizationRegulatoryProgramUsers
+                    //System sends Report Repudiated Receipt to all Admin and Standard Users for the Authority (UC-19 8.4.)
+                    var usersOfAuthority = _dbContext.OrganizationRegulatoryProgramUsers
                         .Include(orpu => orpu.PermissionGroup)
                         .Where(orpu => orpu.OrganizationRegulatoryProgramId == authorityOrganization.OrganizationRegulatoryProgramId
                             && !orpu.IsRemoved
                             && !orpu.IsRegistrationDenied
                             && orpu.IsRegistrationApproved
-                            && orpu.PermissionGroup.Name == PermissionGroupName.Standard.ToString())
+                            && (orpu.PermissionGroup.Name == PermissionGroupName.Standard.ToString() || orpu.PermissionGroup.Name == PermissionGroupName.Administrator.ToString()))
                         .ToList();
 
-                    foreach (var standardUserOfAuthority in standardUsersOfAuthority)
+                    foreach (var userOfAuthority in usersOfAuthority)
                     {
-                        var standardUserOfAuthorityUser = _dbContext.Users
-                            .Single(user => user.UserProfileId == standardUserOfAuthority.UserProfileId);
+                        var thisUserObject = _dbContext.Users
+                            .Single(user => user.UserProfileId == userOfAuthority.UserProfileId);
 
-                        _emailService.SendEmail(new[] { standardUserOfAuthorityUser.Email }, EmailType.Report_Repudiation_AU, contentReplacements);
+                        _emailService.SendEmail(new[] { thisUserObject.Email }, EmailType.Report_Repudiation_AU, contentReplacements);
                     }
 
                     //Cromerr Log (UC-19 8.6.)
