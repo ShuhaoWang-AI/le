@@ -315,7 +315,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void IsSimilarReportPackageSubmittedAfter()
         {
-            var result = _reportPackageService.IsSimilarReportPackageSubmittedAfter(3);
+            var result = _reportPackageService.IsSimilarReportPackageSubmittedAfter(4);
         }
     }
 }

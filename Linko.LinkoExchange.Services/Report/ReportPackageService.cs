@@ -2304,11 +2304,14 @@ namespace Linko.LinkoExchange.Services.Report
                 throw new Exception($"ERROR: Could not find Report Package associated with reportPackageId={reportPackageId}");
             }
 
+            var startDate = reportPackageToCompare.PeriodStartDateTimeUtc.Date;
+            var endDate = reportPackageToCompare.PeriodEndDateTimeUtc.Date;
+
             isNewerReportPackageExist = _dbContext.ReportPackages
                 .Any(rp => rp.OrganizationRegulatoryProgramId == reportPackageToCompare.OrganizationRegulatoryProgramId
                     && rp.ReportPackageTemplateId == reportPackageToCompare.ReportPackageTemplateId
-                    && (rp.PeriodEndDateTimeUtc >= reportPackageToCompare.PeriodStartDateTimeUtc && rp.PeriodEndDateTimeUtc <= reportPackageToCompare.PeriodEndDateTimeUtc
-                        || reportPackageToCompare.PeriodEndDateTimeUtc >= rp.PeriodStartDateTimeUtc && reportPackageToCompare.PeriodEndDateTimeUtc <= rp.PeriodEndDateTimeUtc)
+                    && rp.PeriodStartDateTimeUtc.Year == startDate.Year && rp.PeriodStartDateTimeUtc.Month == startDate.Month && rp.PeriodStartDateTimeUtc.Day == startDate.Day
+                    && rp.PeriodEndDateTimeUtc.Year == endDate.Year && rp.PeriodEndDateTimeUtc.Month == endDate.Month && rp.PeriodEndDateTimeUtc.Day == endDate.Day
                     && rp.SubmissionDateTimeUtc > reportPackageToCompare.SubmissionDateTimeUtc);
 
             _logger.Info($"Leaving ReportPackageService.UpdateLastSentDateTime. reportPackageId={reportPackageId}, isNewerReportPackageExist={isNewerReportPackageExist}");
