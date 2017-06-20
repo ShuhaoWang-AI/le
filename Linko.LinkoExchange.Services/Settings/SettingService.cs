@@ -370,7 +370,7 @@ namespace Linko.LinkoExchange.Services.Settings
                         }
                         return minValue.ToString();
                     }
-                    else if (isChooseMin.HasValue && isChooseMin.Value)
+                    else if (isChooseMax.HasValue && isChooseMax.Value)
                     {
                         //can't use LINQ .Min and .Max b/c values are string! #argh
                         int maxValue = int.MinValue;
