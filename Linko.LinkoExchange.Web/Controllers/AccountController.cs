@@ -144,7 +144,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 model.RegistrationType = RegistrationType.NewRegistration;
                 model.UserProfile.ShowConfirmPassword = true;
             }
-            else if (user.IsAccountResetRequired)
+            else if(invitation.IsResetInvitation)
             {
                 model.RegistrationType = RegistrationType.ResetRegistration;
                 model.UserProfile = _profileHelper.GetUserProfileViewModel(userProfileId:user.UserProfileId);

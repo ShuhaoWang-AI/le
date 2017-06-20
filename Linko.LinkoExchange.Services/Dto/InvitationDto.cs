@@ -16,6 +16,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public string ProgramName { get; set; }
         public string AuthorityName { get; set; }
         public string IndustryName { get; set; }
-        
+        public bool IsResetInvitation {get;set; }
     }
 }
