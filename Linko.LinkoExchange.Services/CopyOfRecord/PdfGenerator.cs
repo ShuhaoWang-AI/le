@@ -487,7 +487,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
             var addressLine1 = _reportPackage.OrganizationAddressLine1.GetValueOrEmptyString();
             var addressLine2 = _reportPackage.OrganizationAddressLine2.GetValueOrEmptyString();
-            var cityName = _reportPackage.OrganizationCityName;
+            var cityName = _reportPackage.OrganizationCityName.GetValueOrEmptyString();
             var jursdicationName = _reportPackage.OrganizationJurisdictionName.GetValueOrEmptyString();
             var zipCode = _reportPackage.OrganizationZipCode.GetValueOrEmptyString();
             

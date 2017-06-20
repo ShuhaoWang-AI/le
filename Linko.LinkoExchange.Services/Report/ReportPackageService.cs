@@ -319,11 +319,11 @@ namespace Linko.LinkoExchange.Services.Report
                 {
                     OrganizationName = reportPackageDto.OrganizationName,
                     ReferenceNumber = reportPackageDto.OrganizationReferenceNumber.GetValueOrEmptyString(),
-                    Address1 = reportPackageDto.RecipientOrganizationAddressLine1.GetValueOrEmptyString(),
-                    Address2 = reportPackageDto.RecipientOrganizationAddressLine2.GetValueOrEmptyString(),
-                    City = reportPackageDto.RecipientOrganizationCityName.GetValueOrEmptyString(),
-                    State = reportPackageDto.RecipientOrganizationJurisdictionName.GetValueOrEmptyString(),
-                    ZipCode = reportPackageDto.RecipientOrganizationZipCode.GetValueOrEmptyString()
+                    Address1 = reportPackageDto.OrganizationAddressLine1.GetValueOrEmptyString(),
+                    Address2 = reportPackageDto.OrganizationAddressLine2.GetValueOrEmptyString(),
+                    City = reportPackageDto.OrganizationCityName.GetValueOrEmptyString(),
+                    State = reportPackageDto.OrganizationJurisdictionName.GetValueOrEmptyString(),
+                    ZipCode = reportPackageDto.OrganizationZipCode.GetValueOrEmptyString()
                 },
                 SubmittedBy = new SubmittedBy
                 {
