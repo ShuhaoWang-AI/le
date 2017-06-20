@@ -311,5 +311,11 @@ namespace Linko.LinkoExchange.Test
         {
             _reportPackageService.UpdateLastSentDateTime(1, DateTimeOffset.Now, 1, "Testing First Name");
         }
+
+        [TestMethod]
+        public void IsSimilarReportPackageSubmittedAfter()
+        {
+            var result = _reportPackageService.IsSimilarReportPackageSubmittedAfter(3);
+        }
     }
 }

@@ -2217,6 +2217,8 @@ namespace Linko.LinkoExchange.Services.Report
         /// <returns>True if there is an association for all required element types where content is not provided</returns>
         public bool IsRequiredReportPackageElementTypesIncluded(int reportPackageId)
         {
+            _logger.Info($"Enter ReportPackageService.IsRequiredReportPackageElementTypesIncluded. reportPackageId={reportPackageId}");
+
             var requiredReportPackageElementTypes = _dbContext.ReportPackageElementTypes
                                                         .Include(rpet => rpet.ReportPackageElementCategory.ReportElementCategory)
                                                         .Where(rpet => rpet.ReportPackageElementCategory.ReportPackageId == reportPackageId
@@ -2224,15 +2226,19 @@ namespace Linko.LinkoExchange.Services.Report
                                                             && rpet.IsRequired)
                                                         .ToList();
 
+            bool isRequirementsMet = true;
             foreach (var requiredRPET in requiredReportPackageElementTypes)
             {
                 if (requiredRPET.ReportSamples.Count() < 1 && requiredRPET.ReportFiles.Count() < 1)
                 {
-                    return false;
+                    isRequirementsMet = false;
+                    break;
                 }
             }
 
-            return true;
+            _logger.Info($"Leaving ReportPackageService.IsRequiredReportPackageElementTypesIncluded. reportPackageId={reportPackageId}, isIncluded={isRequirementsMet}");
+
+            return isRequirementsMet;
         }
 
         /// <summary>
@@ -2246,8 +2252,15 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="lastSenderLastName">Optional: tUserProfile.LastName</param>
         public void UpdateLastSentDateTime(int reportPackageId, DateTimeOffset sentDateTime, int? lastSenderUserId = null, string lastSenderFirstName = null, string lastSenderLastName = null)
         {
+            _logger.Info($"Enter ReportPackageService.UpdateLastSentDateTime. reportPackageId={reportPackageId}");
+
             var reportPackage = _dbContext.ReportPackages
                 .SingleOrDefault(rp => rp.ReportPackageId == reportPackageId);
+
+            if (reportPackage == null)
+            {
+                throw new Exception($"ERROR: Could not find Report Package associated with reportPackageId={reportPackageId}");
+            }
 
             reportPackage.LastSentDateTimeUtc = sentDateTime;
 
@@ -2267,6 +2280,40 @@ namespace Linko.LinkoExchange.Services.Report
             }
 
             _dbContext.SaveChanges();
+
+            _logger.Info($"Leaving ReportPackageService.UpdateLastSentDateTime. reportPackageId={reportPackageId}");
+        }
+
+        /// <summary>
+        /// Identifies if a newer Report Package (same industry, template name and same Reporting Period)
+        /// exists with a newer SubmissionDateTimeUtc.
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId of the ReportPackage we want to compare the submission date/time with</param>
+        /// <returns>True if a Report Package with a later submission date/time exists</returns>
+        public bool IsSimilarReportPackageSubmittedAfter(int reportPackageId)
+        {
+            bool isNewerReportPackageExist = false;
+
+            _logger.Info($"Enter ReportPackageService.UpdateLastSentDateTime. reportPackageId={reportPackageId}");
+
+            var reportPackageToCompare = _dbContext.ReportPackages
+                .SingleOrDefault(rp => rp.ReportPackageId == reportPackageId);
+
+            if (reportPackageToCompare == null)
+            {
+                throw new Exception($"ERROR: Could not find Report Package associated with reportPackageId={reportPackageId}");
+            }
+
+            isNewerReportPackageExist = _dbContext.ReportPackages
+                .Any(rp => rp.OrganizationRegulatoryProgramId == reportPackageToCompare.OrganizationRegulatoryProgramId
+                    && rp.ReportPackageTemplateId == reportPackageToCompare.ReportPackageTemplateId
+                    && (rp.PeriodEndDateTimeUtc >= reportPackageToCompare.PeriodStartDateTimeUtc && rp.PeriodEndDateTimeUtc <= reportPackageToCompare.PeriodEndDateTimeUtc
+                        || reportPackageToCompare.PeriodEndDateTimeUtc >= rp.PeriodStartDateTimeUtc && reportPackageToCompare.PeriodEndDateTimeUtc <= rp.PeriodEndDateTimeUtc)
+                    && rp.SubmissionDateTimeUtc > reportPackageToCompare.SubmissionDateTimeUtc);
+
+            _logger.Info($"Leaving ReportPackageService.UpdateLastSentDateTime. reportPackageId={reportPackageId}, isNewerReportPackageExist={isNewerReportPackageExist}");
+
+            return isNewerReportPackageExist;
         }
 
 

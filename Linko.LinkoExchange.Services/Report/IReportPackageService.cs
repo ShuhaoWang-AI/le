@@ -174,5 +174,13 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="lastSenderFirstName">Optional: tUserProfile.FirstName</param>
         /// <param name="lastSenderLastName">Optional: tUserProfile.LastName</param>
         void UpdateLastSentDateTime(int reportPackageId, DateTimeOffset sentDateTime, int? lastSenderUserId = null, string lastSenderFirstName = null, string lastSenderLastName = null);
+
+        /// <summary>
+        /// Identifies if a newer Report Package (same industry, template name and same Reporting Period)
+        /// exists with a newer SubmissionDateTimeUtc.
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId of the ReportPackage we want to compare the submission date/time with</param>
+        /// <returns>True if a Report Package with a later submission date/time exists</returns>
+        bool IsSimilarReportPackageSubmittedAfter(int reportPackageId);
     }
 }
