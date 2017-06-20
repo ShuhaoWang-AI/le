@@ -119,7 +119,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             if (attachments.Any())
             {
                 row = attachmentsTable.Rows.Add();
-                cell = row.Cells.Add("These files are also part of the Copy Of Records.", _sectionTextSize10);
+                cell = row.Cells.Add("These files are also part of the Copy Of Record.", _sectionTextSize10);
                 cell.ColSpan = 3;
 
                 //Attachment files list table
