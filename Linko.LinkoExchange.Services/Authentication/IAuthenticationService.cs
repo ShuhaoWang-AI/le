@@ -19,7 +19,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="failedPasswordCount">Failed password count</param>
         /// <param name="failedKbqCount">Failed KBQ answer count</param>
         /// <returns></returns>
-        PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount);
+        PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount, ReportOperation reportOperation);
         /// <summary>
         /// Register a new user
         /// </summary>

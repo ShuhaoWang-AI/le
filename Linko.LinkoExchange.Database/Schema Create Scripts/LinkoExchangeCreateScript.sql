@@ -5394,6 +5394,33 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         </html>'
     )
 	
+	-- repudiation -Incorrect Password 
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'Email_Repudiation_PasswordFailedLockout' , 
+        'Email',  
+        'Repudiation', 
+        'ReportPasswordFailedUserLock',        
+        'LinkoExchange Account Locked', 
+        ' <html>
+            <body> 
+                <pre>
+Hello,
+Your account has been locked due to exceeding Password attempts during repudiation.
+
+Please contact your authority for assistance unlocking your account.
+
+        {authorityList}
+
+This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
+If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+                </pre>
+            </body>
+        </html>'
+    )
+	
+	
 	--UC-54 4.b Sign and submit-Incorrect KBQ 
     INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
     VALUES 
@@ -5419,6 +5446,34 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
             </body>
         </html>'
     )	
+	
+	--repudiation -Incorrect KBQ 
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'Email_Repudiation_KBQFailedLockout' , 
+        'Email',  
+        'Repudiation', 
+        'RepudiationKBQFailedLockout',        
+        'LinkoExchange Account Locked', 
+        ' <html>
+            <body> 
+                <pre>
+Hello,
+Your account has been locked due to exceeding Knowledge Based Question attempts during repudiation.
+
+Please contact your authority for assistance unlocking your account.
+
+        {authorityList}
+
+This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
+If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+                </pre>
+            </body>
+        </html>'
+    )
+	
+	
 	
 	--UC-19 Report Repudiation sent to standard users of Authority (UC-19 8.3.)
     INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)

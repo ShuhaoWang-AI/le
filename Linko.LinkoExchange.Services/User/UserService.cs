@@ -750,22 +750,29 @@ namespace Linko.LinkoExchange.Services.User
                 if (!contentReplacements.Keys.Contains("authorityName"))
                 {
                     contentReplacements.Add("authorityName", authorityName);
-                }
+                }    
             }  
 
             var emailType = EmailType.Profile_KBQFailedLockout; 
-
-            if(reason == AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony)
-            {
-                emailType = EmailType.COR_PasswordFailedLockout;
-            }
-            else if(reason == AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony)
-            {
-                emailType = EmailType.COR_KBQFailedLockout;
-            }
-            else if (reason != AccountLockEvent.ManualAction)
-            { 
-                 emailType = EmailType.Profile_KBQFailedLockout; 
+            switch (reason) {
+                case AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony:
+                    emailType = EmailType.COR_PasswordFailedLockout;
+                    break;
+                case AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony:
+                    emailType = EmailType.Repudiation_PasswordFailedLockout;
+                    break;
+                case AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony:
+                    emailType = EmailType.Repudiation_KBQFailedLockout;
+                    break;
+                case AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony:
+                    emailType = EmailType.COR_KBQFailedLockout;
+                    break;
+                default:
+                    if (reason != AccountLockEvent.ManualAction)
+                    { 
+                        emailType = EmailType.Profile_KBQFailedLockout; 
+                    }
+                    break;
             }
 
             _emailService.SendEmail(new[] { user.Email }, emailType, contentReplacements); 

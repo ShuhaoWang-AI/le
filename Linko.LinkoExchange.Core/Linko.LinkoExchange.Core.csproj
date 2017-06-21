@@ -159,6 +159,7 @@
     <Compile Include="Enum\OrganizationTypeName.cs" />
     <Compile Include="Enum\RegistrationType.cs" />
     <Compile Include="Enum\ReportElementCategory.cs" />
+    <Compile Include="Enum\ReportOperation.cs" />
     <Compile Include="Enum\ReportPackageTemplateStatus.cs" />
     <Compile Include="Enum\ReportStatusName.cs" />
     <Compile Include="Enum\SampleNameCreationRuleOption.cs" />

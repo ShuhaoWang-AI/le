@@ -90,8 +90,10 @@
 
         // COR KBQ failed
         COR_KBQFailedLockout, 
-
         // COR Password failed
-        COR_PasswordFailedLockout
+        COR_PasswordFailedLockout,
+
+        Repudiation_KBQFailedLockout,
+        Repudiation_PasswordFailedLockout
     }
 }

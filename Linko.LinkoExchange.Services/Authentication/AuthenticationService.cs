@@ -1068,7 +1068,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             return Task.FromResult(signInResultDto);
         }
 
-        public PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount)
+        public PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount, ReportOperation reportOperation)
         {
             _logger.Info($"Enter AuthenticationService.PasswordAndKbqValidationResult");
 
@@ -1104,13 +1104,22 @@ namespace Linko.LinkoExchange.Services.Authentication
                 ThrowUserStatusRuleValiation("User is required to reset account");
             }
 
-            // Check to see if password matches.
+            // Check to see if password matches. 
             if (!IsValidPassword(userProfile.PasswordHash, password))
             {
                 if (failedPasswordAttemptMaxCount <= failedPasswordCount + 1)
                 {
-                    SignOff();
-                    _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony);
+                    SignOff();  
+
+                    if(reportOperation == ReportOperation.SignAndSubmit)
+                    {
+                      _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony);
+                    }
+                    else if(reportOperation == ReportOperation.Repudiation)
+                    {
+                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony);
+                    }
+
                     return PasswordAndKbqValidationResult.UserLocked;
                 }
 
@@ -1122,8 +1131,16 @@ namespace Linko.LinkoExchange.Services.Authentication
             {
                 if (failedKbqAttemptMaxCount <= failedKbqCount + 1)
                 {
-                    SignOff();
-                    _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony);
+                    SignOff(); 
+                    if(reportOperation == ReportOperation.SignAndSubmit)
+                    {
+                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony);
+                    }
+                    else if(reportOperation == ReportOperation.Repudiation)
+                    {
+                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony);
+                    }
+
                     return PasswordAndKbqValidationResult.UserLocked;
                 }
 
@@ -1154,7 +1171,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             List<RuleViolation> validationIssues = new List<RuleViolation>();
             validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
             throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
-        }
+        } 
 
         /// <summary>
         /// Log to Cromerr events: 

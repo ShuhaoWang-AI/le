@@ -557,8 +557,13 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         var failedCountPassword = model.FailedCountPassword;
                         var failedCountKbq = model.FailedCountKbq;
-                        var result = _authenticationService.ValidatePasswordAndKbq(password:model.Password, userQuestionAnswerId:model.QuestionAnswerId, kbqAnswer:model.Answer,
-                                                                                   failedPasswordCount:failedCountPassword, failedKbqCount:failedCountKbq);
+                        var result = _authenticationService.ValidatePasswordAndKbq(
+                            password:model.Password, 
+                            userQuestionAnswerId:model.QuestionAnswerId, 
+                            kbqAnswer:model.Answer,
+                            failedPasswordCount:failedCountPassword, 
+                            failedKbqCount:failedCountKbq,
+                            reportOperation:ReportOperation.SignAndSubmit);
                         ModelState.Remove(key:"FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
                         ModelState.Remove(key:"FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
                         switch (result)
@@ -643,8 +648,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         var failedCountPassword = model.FailedCountPassword;
                         var failedCountKbq = model.FailedCountKbq;
-                        var result = _authenticationService.ValidatePasswordAndKbq(password:model.Password, userQuestionAnswerId:model.QuestionAnswerId, kbqAnswer:model.Answer,
-                                                                                   failedPasswordCount:failedCountPassword, failedKbqCount:failedCountKbq);
+                        var result = _authenticationService.ValidatePasswordAndKbq(
+                            password:model.Password, 
+                            userQuestionAnswerId:model.QuestionAnswerId, 
+                            kbqAnswer:model.Answer,
+                            failedPasswordCount:failedCountPassword, 
+                            failedKbqCount:failedCountKbq,
+                            reportOperation:ReportOperation.Repudiation);
+
                         ModelState.Remove(key: "FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
                         ModelState.Remove(key: "FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
 
