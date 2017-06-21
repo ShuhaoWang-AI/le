@@ -678,7 +678,6 @@ namespace Linko.LinkoExchange.Services.User
                         _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements, perProgram);
                         adminEmailList.Add(adminEmail);
                     }
-
                 }
 
                 //Get authority's org id, if it exists. If not, they ARE the authority
@@ -693,7 +692,7 @@ namespace Linko.LinkoExchange.Services.User
                     authorityList.Add(authority);
             }
 
-
+            string authorityName = "";
             foreach (var authority in authorityList)
             {
                 //Find admin users in each of these
@@ -718,7 +717,7 @@ namespace Linko.LinkoExchange.Services.User
                 if (reason == AccountLockEvent.ManualAction)
                 {
                     //Send to user on behalf of each program's authority
-                    var authorityName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+                    authorityName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
                     var authorityEmail = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
                     var authorityPhone = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
 
@@ -740,6 +739,19 @@ namespace Linko.LinkoExchange.Services.User
             contentReplacements.Add("authorityList", authorityListString);
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
             contentReplacements.Add("supportEmail", supportEmail);
+            
+            if (reason != AccountLockEvent.ManualAction)
+            {
+                var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+                var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId); 
+
+                authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName); 
+
+                if (!contentReplacements.Keys.Contains("authorityName"))
+                {
+                    contentReplacements.Add("authorityName", authorityName);
+                }
+            }  
 
             var emailType = EmailType.Profile_KBQFailedLockout; 
 
