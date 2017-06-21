@@ -1625,29 +1625,29 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route(template:"PendingUserApprovals/{id:int}/Details/PendingUserDeny")]
         public ActionResult PendingUserDeny(int id, PendingUserApprovalViewModel model)
         {
-            if (ModelState.IsValid)
+            //Don't check ModelState.IsValid
+            //(Since we are denying, no need to check if Role is selected)
+            //
+            try
             {
-                try
+                var result = _userService.ApprovePendingRegistration(orgRegProgUserId: model.Id, permissionGroupId: model.Role ?? 0, isApproved: false, isAuthorizationRequired: true);
+                switch (result.Result)
                 {
-                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId: model.Id, permissionGroupId: model.Role ?? 0, isApproved: false, isAuthorizationRequired: true);
-                    switch (result.Result)
-                    {
-                        case RegistrationResult.Success:
-                            ViewBag.ShowSuccessMessage = true;
-                            ViewBag.SuccessMessage = "Registration Denied!";
-                            ModelState.Clear();
-                            _logger.Info(message:$"PendingUserDeny. User={model.UserName} - id={model.Id} Registration Denied!");
-                            break;
-                        default:
-                            _logger.Info(message:string.Format(format:"PendingUserDeny. User={0} - id={1} Registration Denial Failed!", arg0:model.UserName, arg1:model.Id));
-                            ModelState.AddModelError(key:"", errorMessage:@"Registration Denial Failed");
-                            break;
-                    }
+                    case RegistrationResult.Success:
+                        ViewBag.ShowSuccessMessage = true;
+                        ViewBag.SuccessMessage = "Registration Denied!";
+                        ModelState.Clear();
+                        _logger.Info(message: $"PendingUserDeny. User={model.UserName} - id={model.Id} Registration Denied!");
+                        break;
+                    default:
+                        _logger.Info(message: string.Format(format: "PendingUserDeny. User={0} - id={1} Registration Denial Failed!", arg0: model.UserName, arg1: model.Id));
+                        ModelState.AddModelError(key: "", errorMessage: @"Registration Denial Failed");
+                        break;
                 }
-                catch (RuleViolationException rve)
-                {
-                    MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
-                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
             }
 
             model = PreparePendingUserApprovalDetails(id:id);
