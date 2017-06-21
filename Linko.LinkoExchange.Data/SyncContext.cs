@@ -11,7 +11,8 @@ namespace Linko.LinkoExchange.Data
         public SyncContext(string nameOrConnectionString)
             : base(nameOrConnectionString)
         {
-
+            // Disable database initialization when the DB is not found
+            Database.SetInitializer<SyncContext>(null);
         }
 
         #endregion

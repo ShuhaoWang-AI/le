@@ -20,7 +20,9 @@
         UserPerIndustryMaxCount,
         ResultQualifierValidValues,
         FlowUnitValidValues,
-        SampleNameCreationRule
+        SampleNameCreationRule,
+        SendToCtsDatabaseServerName,
+        SendToCtsDatabaseName
     }
 
 }

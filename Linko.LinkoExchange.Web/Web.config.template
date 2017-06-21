@@ -73,7 +73,13 @@ For more information on how to configure your ASP.NET application, please visit 
          value="72" />
     <add key="EncryptionPassword" 
          value="L1nk0Exch@ng3" />
-    
+
+    <!-- Send to CTS settings -->
+    <add key="SendToCtsDatabaseUserName"
+         value="inet" />
+    <add key="SendToCtsDatabasePassword"
+         value="test" />
+
     <add key="webpages:Version"
          value="3.0.0.0" />
     <add key="webpages:Enabled"

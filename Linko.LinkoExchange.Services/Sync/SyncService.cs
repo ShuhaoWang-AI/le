@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
@@ -9,10 +10,11 @@ using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Report;
-using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Settings;
 using NLog;
+using System.Configuration;
 
 namespace Linko.LinkoExchange.Services.Sync
 {
@@ -21,21 +23,21 @@ namespace Linko.LinkoExchange.Services.Sync
         #region private member variables
 
         private readonly ILogger _logger;
-        private readonly IReportPackageService _reportPackageService;
-        private readonly ITimeZoneService _timeZoneService;
+        private readonly IHttpContextService _httpContextService;
         private readonly ISettingService _settingService;
+        private readonly IReportPackageService _reportPackageService;
 
         #endregion
 
 
         #region public methods
 
-        public SyncService(ILogger logger, IReportPackageService reportPackageService, ITimeZoneService timeZoneService, ISettingService settingService)
+        public SyncService(ILogger logger, IHttpContextService httpContextService, ISettingService settingService, IReportPackageService reportPackageService)
         {
             _logger = logger;
-            _reportPackageService = reportPackageService;
-            _timeZoneService = timeZoneService;
+            _httpContextService = httpContextService;
             _settingService = settingService;
+            _reportPackageService = reportPackageService;
         }
 
         /// <summary>
@@ -46,7 +48,8 @@ namespace Linko.LinkoExchange.Services.Sync
         {
             _logger.Info($"Enter SyncService.SendSubmittedReportPackageToCts. ReportPackageId: {reportPackageId}");
 
-            
+            List<RuleViolation> validationIssues = new List<RuleViolation>();
+
             // Get ReportPackageDto
             ReportPackageDto reportPackageDto = _reportPackageService.GetReportPackage(reportPackageId: reportPackageId, isIncludeAssociatedElementData: true);
 
@@ -55,27 +58,41 @@ namespace Linko.LinkoExchange.Services.Sync
             // For a Report Element to be included in the export, the Report Package must also be included in the export.
             if (!reportPackageDto.CtsEventTypeId.HasValue || reportPackageDto.ReportPackageElementCategories == null || !reportPackageDto.ReportPackageElementCategories.Any())
             {
-                List<RuleViolation> validationIssues = new List<RuleViolation>();
                 validationIssues.Add(new RuleViolation(string.Empty, null, "Nothing to send."));
 
                 throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
             }
 
             // SyncContext is only used here then there is little reason to put it in Unity
-            // ConfigurationManager.ConnectionStrings["SyncContext"].ToString();
-            // To do: move this to web.config or system setting
-            string connectionString = "data source=localhost;initial catalog=CTS_Import;user id=inet;password=test;MultipleActiveResultSets=True;App=LinkoExchange";
-            using (var syncContext = new SyncContext(connectionString))
+            using (var syncContext = new SyncContext(GetOrganizationRegulatoryProgramConnectionString(reportPackageDto.RecipientOrganizationRegulatoryProgramId)))
             {
+                // Verify connection to CTS
+                try
+                {
+                    syncContext.Database.Connection.Open();
+                    syncContext.Database.Connection.Close();
+                }
+                catch (Exception ex)
+                {
+                    var errors = new List<string>() { ex.Message };
+
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                        errors.Add(ex.Message);
+                    }
+
+                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+
+                    validationIssues.Add(new RuleViolation(string.Empty, null, "Send to CTS Failed. Unable to establish a connection to CTS. Please contact Linko for assistance."));
+
+                    throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+                }
+
                 using (var transaction = syncContext.Database.BeginTransaction())
                 {
                     try
                     {
-                        // Convert current date time to authority time zone
-                        var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(reportPackageDto.RecipientOrganizationRegulatoryProgramId, SettingType.TimeZone));
-                        var syncDateTime = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(DateTimeOffset.UtcNow.UtcDateTime, timeZoneId);
-
-
                         List<LEReportPackageParsedData> reportPackageParsedDatas = new List<LEReportPackageParsedData>();
 
                         // LEReportPackageParsedData: Report Package record
@@ -98,10 +115,9 @@ namespace Linko.LinkoExchange.Services.Sync
                             {
                                 foreach (var attachmentType in reportPackageDto.AttachmentTypes)
                                 {
-                                    if (attachmentType.CtsEventTypeId != null && attachmentType.FileStores != null && attachmentType.FileStores.Any())
+                                    isElementTypePresent = attachmentType.FileStores != null && attachmentType.FileStores.Any();
+                                    if (attachmentType.CtsEventTypeId != null && isElementTypePresent)
                                     {
-                                        isElementTypePresent = true;
-
                                         var reportPackageElementTypeRecord = new LEReportPackageParsedData();
                                         PopulateCommonReportPackageInfo(reportPackageParsedData: reportPackageElementTypeRecord, reportPackageDto: reportPackageDto);
                                         PopulateReportPackageElementTypeInfo(reportPackageParsedData: reportPackageElementTypeRecord, reportPackageElementTypeDto: attachmentType,
@@ -111,7 +127,7 @@ namespace Linko.LinkoExchange.Services.Sync
                                     }
                                     else
                                     {
-                                        isElementTypePresent = false;
+                                        // No record to send. See the general comment for LEReportPackageParsedData above.
                                     }
 
                                     reportPackageElements.Append($"{attachmentType.ReportElementTypeName}\t{(attachmentType.IsRequired ? "Yes" : "No")}\t{(isElementTypePresent ? "Yes" : "No")}\r\n");
@@ -123,10 +139,9 @@ namespace Linko.LinkoExchange.Services.Sync
                             {
                                 foreach (var certificationType in reportPackageDto.CertificationTypes)
                                 {
-                                    if (certificationType.CtsEventTypeId != null)
+                                    isElementTypePresent = certificationType.ReportElementTypeIsContentProvided;
+                                    if (certificationType.CtsEventTypeId != null && isElementTypePresent)
                                     {
-                                        isElementTypePresent = true;
-
                                         var reportPackageElementTypeRecord = new LEReportPackageParsedData();
                                         PopulateCommonReportPackageInfo(reportPackageParsedData: reportPackageElementTypeRecord, reportPackageDto: reportPackageDto);
                                         PopulateReportPackageElementTypeInfo(reportPackageParsedData: reportPackageElementTypeRecord, reportPackageElementTypeDto: certificationType,
@@ -136,7 +151,7 @@ namespace Linko.LinkoExchange.Services.Sync
                                     }
                                     else
                                     {
-                                        isElementTypePresent = false;
+                                        // No record to send. See the general comment for LEReportPackageParsedData above.
                                     }
 
                                     reportPackageElements.Append($"{certificationType.ReportElementTypeName}\t{(certificationType.IsRequired ? "Yes" : "No")}\t{(isElementTypePresent ? "Yes" : "No")}\r\n");
@@ -173,7 +188,12 @@ namespace Linko.LinkoExchange.Services.Sync
                             syncContext.SaveChanges();
                         }
 
-                        // TODO: Update ReportPackage.LastSentDateTimeUtc
+                        // Update ReportPackage last sent related info
+                        _reportPackageService.UpdateLastSentDateTime(reportPackageId, 
+                                                                     DateTimeOffset.Now, 
+                                                                     int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId)), 
+                                                                     _httpContextService.GetClaimValue(CacheKey.FirstName), 
+                                                                     _httpContextService.GetClaimValue(CacheKey.LastName));
 
                         transaction.Commit();
                     }
@@ -181,8 +201,7 @@ namespace Linko.LinkoExchange.Services.Sync
                     {
                         transaction.Rollback();
 
-                        var errors = new List<string>() {ex.Message};
-
+                        var errors = new List<string>() { ex.Message };
                         foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
                         {
                             DbEntityEntry entry = item.Entry;
@@ -197,7 +216,9 @@ namespace Linko.LinkoExchange.Services.Sync
 
                         _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
 
-                        throw;
+                        validationIssues.Add(new RuleViolation(string.Empty, null, "Send to CTS Failed. An unknown error occured. Please contact Linko for assistance."));
+
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                     }
                     catch (Exception ex)
                     {
@@ -213,7 +234,9 @@ namespace Linko.LinkoExchange.Services.Sync
 
                         _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
 
-                        throw;
+                        validationIssues.Add(new RuleViolation(string.Empty, null, "Send to CTS Failed. An unknown error occured. Please contact Linko for assistance."));
+
+                        throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                     }
                 }
             }
@@ -246,9 +269,8 @@ namespace Linko.LinkoExchange.Services.Sync
             
             reportPackageParsedData.LEReportPackageSubmissionComments = reportPackageDto.Comments;
             reportPackageParsedData.LEReportPackageSampleComplianceSummary = null;
-            
-            // To do: move the domain name to the web.config or system setting
-            reportPackageParsedData.LEReportPackageURL = $"https:\\\\client.linkoexchange.com\\ReportPackage\\{reportPackageDto.ReportPackageId}\\Details";
+
+            reportPackageParsedData.LEReportPackageURL = $"{_httpContextService.GetRequestBaseUrl()}ReportPackage/{reportPackageDto.ReportPackageId}/Details";
 
             reportPackageParsedData.LEReportPackageSubmissionDate = reportPackageDto.SubmissionDateTimeLocal.Value; // the package is expected to have been submitted
             reportPackageParsedData.LEReportPackageSubmissionBy = $"{reportPackageDto.SubmitterFirstName} {reportPackageDto.SubmitterLastName}";
@@ -341,6 +363,31 @@ namespace Linko.LinkoExchange.Services.Sync
             sampleResultParsedData.LEIsValidEPAMethod = sampleResultDto.IsApprovedEPAMethod;
             sampleResultParsedData.LEReportPackageID = reportPackageDto.ReportPackageId;
             sampleResultParsedData.LESampleID = sampleDto.SampleId.Value;
+        }
+
+        /// <summary>
+        /// Gets the connection string for a given organization regulatory program id.
+        /// </summary>
+        /// <param name="organizationRegulatoryProgramId">Authority OrganizationRegulatoryProgramId.</param>
+        /// <returns>Connection string.</returns>
+        private string GetOrganizationRegulatoryProgramConnectionString(int organizationRegulatoryProgramId)
+        {
+            string dbServerName = _settingService.GetOrgRegProgramSettingValue(organizationRegulatoryProgramId, SettingType.SendToCtsDatabaseServerName);
+            string dbName = _settingService.GetOrgRegProgramSettingValue(organizationRegulatoryProgramId, SettingType.SendToCtsDatabaseName);
+            string dbUserName = ConfigurationManager.AppSettings["SendToCtsDatabaseUserName"]?.ToString();
+            string dbPassword = ConfigurationManager.AppSettings["SendToCtsDatabasePassword"]?.ToString();
+            if (string.IsNullOrEmpty(dbServerName) || string.IsNullOrEmpty(dbName))
+            {
+                List<RuleViolation> validationIssues = new List<RuleViolation>();
+                validationIssues.Add(new RuleViolation(string.Empty, null, "Send to CTS Failed. This feature is not configured. Please contact Linko for assistance."));
+
+                throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
+            }
+            else
+            {
+                string connectionString = $"data source={dbServerName};initial catalog={dbName};user id={dbUserName};password={dbPassword};MultipleActiveResultSets=True;App=LinkoExchange";
+                return connectionString;
+            }
         }
 
         #endregion

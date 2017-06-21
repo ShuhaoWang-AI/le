@@ -15,7 +15,8 @@ namespace Linko.LinkoExchange.Data
         public LinkoExchangeContext(string nameOrConnectionString)
             : base(nameOrConnectionString)
         {
-
+            // Disable database initialization when the DB is not found
+            Database.SetInitializer<LinkoExchangeContext>(null);
         }
 
         #endregion

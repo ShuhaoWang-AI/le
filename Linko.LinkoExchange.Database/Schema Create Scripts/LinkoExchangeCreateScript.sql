@@ -4198,6 +4198,24 @@ BEGIN
 		    , @OrganizationTypeId_Authority
 		    , @RegulatoryProgramId_IPP
 		)
+    INSERT INTO dbo.tSettingTemplate (Name, Description, DefaultValue, OrganizationTypeId, RegulatoryProgramId)
+		VALUES 
+		(
+		    'SendToCtsDatabaseServerName'
+		    , 'Database server name where the LinkoCTS related data are sent.'
+            , 'localhost'
+		    , @OrganizationTypeId_Authority
+		    , @RegulatoryProgramId_IPP
+		)
+    INSERT INTO dbo.tSettingTemplate (Name, Description, DefaultValue, OrganizationTypeId, RegulatoryProgramId)
+		VALUES 
+		(
+		    'SendToCtsDatabaseName'
+		    , 'Database name where the LinkoCTS related data are sent.'
+            , 'CTS_Import'
+		    , @OrganizationTypeId_Authority
+		    , @RegulatoryProgramId_IPP
+		)
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tSystemSetting)
