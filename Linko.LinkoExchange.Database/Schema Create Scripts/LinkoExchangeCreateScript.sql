@@ -5287,13 +5287,13 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
         ' <html>
             <body> 
                 <pre>
-Your report was received. Please keep this email as proof of your report submissions.
+Your report was received. Please keep this email as proof of your report submission.
 
 Report Details:
     Report Name: {reportPackageName}
     Period Start: {periodStartDate}
     Period End: {periodEndDate}
-    Submission Date:{submissionDateTime}
+    Submission Date: {submissionDateTime}
     LinkoExchange COR Signature:
     {corSignature}
     
@@ -5381,7 +5381,7 @@ To view the report in LinkoExchange, click the link below or copy and paste the 
             <body> 
                 <pre>
 Hello,
-Your account has been locked due to exceeding Password attemps during the singature ceremoney.
+Your account has been locked due to exceeding Password attempts during the signature ceremony.
 
 Please contact your authority for assistance unlocking your account.
 
@@ -5407,7 +5407,7 @@ If you have questions or concerns, please contact {authorityName} at {supportEma
             <body> 
                 <pre>
 Hello,
-Your account has been locked due to exceeding Knowledge Based Question attemps during the singature ceremoney.
+Your account has been locked due to exceeding Knowledge Based Question attempts during the signature ceremony.
 
 Please contact your authority for assistance unlocking your account.
 
