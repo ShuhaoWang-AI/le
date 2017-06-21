@@ -1959,7 +1959,12 @@ namespace Linko.LinkoExchange.Services.Report
                     contentReplacements.Add("iuOrganizationName", reportPackage.OrganizationName);
                     contentReplacements.Add("permitNumber", reportPackage.OrganizationRegulatoryProgram.ReferenceNumber);
                     contentReplacements.Add("organizationAddressLine1", reportPackage.OrganizationAddressLine1);
-                    contentReplacements.Add("organizationAddressLine2", reportPackage.OrganizationAddressLine2);
+
+                    if (!string.IsNullOrWhiteSpace(reportPackage.OrganizationAddressLine2))
+                    {
+                        contentReplacements.Add("organizationAddressLine2", $"{Environment.NewLine}\t{reportPackage.OrganizationAddressLine2}");
+                    }
+
                     contentReplacements.Add("organizationCityName", reportPackage.OrganizationCityName);
                     contentReplacements.Add("organizationJurisdictionName", reportPackage.OrganizationJurisdictionName);
                     contentReplacements.Add("organizationZipCode", reportPackage.OrganizationZipCode);

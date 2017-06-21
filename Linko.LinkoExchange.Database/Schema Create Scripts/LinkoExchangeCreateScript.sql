@@ -5493,7 +5493,7 @@ Your report repudiation was received.  Please keep this email as proof of your r
 Report Details:
 	Report Name: {reportPackageName}
 	Period Start: {periodStartDate}
-	Period end: {periodEndDate}
+	Period End: {periodEndDate}
 	Submission Date: {submissionDateTime}
 	LinkoExchange COR Signature:
 	{corSignature}  
@@ -5510,10 +5510,8 @@ Repudiated By:
 	{submitterTitle}
 	{iuOrganizationName} 
 	Permit #: {permitNumber} 
-	{organizationAddressLine1} 
-	{organizationAddressLine2}
+	{organizationAddressLine1} {organizationAddressLine2}
 	{organizationCityName} {organizationJurisdictionName} {organizationZipCode} 
-	
 	User Name: {userName}
 	
 To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser.  Login is required to view the report.
@@ -5547,7 +5545,7 @@ The following report was repudiated.
 Report Details:
 	Report Name: {reportPackageName}
 	Period Start: {periodStartDate}
-	Period end: {periodEndDate}
+	Period End: {periodEndDate}
 	Original Submission Date: {submissionDateTime}
 	LinkoExchange COR Signature:
 	{corSignature}
@@ -5560,10 +5558,8 @@ Repudiated By:
 	{submitterTitle}
 	{iuOrganizationName} 
 	Permit #: {permitNumber} 
-	{organizationAddressLine1} 
-	{organizationAddressLine2}
+	{organizationAddressLine1} {organizationAddressLine2}
 	{organizationCityName} {organizationJurisdictionName} {organizationZipCode} 
-	
 	User Name: {userName}
 	
 To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser.  Login is required to view the report.
