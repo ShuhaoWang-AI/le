@@ -551,7 +551,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     // need to move inside _programService.CreateOrganizationRegulatoryProgramForUser otherwise it will be send email to all approver when registrationType == RegistrationType.ResetRegistration 
                     // UC-42 7, 8
-                    // Find out who have approval permission   
+                    // Find out who have approval permission    
                     var approvalPeople = _permissionService.GetApprovalPeople(invitationDto.SenderOrganizationRegulatoryProgramId);
                     var sendTo = approvalPeople.Select(i => i.Email).ToArray();
 
@@ -1078,17 +1078,17 @@ namespace Linko.LinkoExchange.Services.Authentication
             var authoritySettings = _settingService.GetOrganizationSettingsById(organizationId: authority.OrganizationId).Settings;
             var failedPasswordAttemptMaxCount = ValueParser.TryParseInt(authoritySettings.Where(s => s.TemplateName.Equals(obj: SettingType.FailedPasswordAttemptMaxCount)).Select(s => s.Value).First(), 3);
             var failedKbqAttemptMaxCount = ValueParser.TryParseInt(authoritySettings.Where(s => s.TemplateName.Equals(obj: SettingType.FailedKBQAttemptMaxCount)).Select(s => s.Value).First(), 3);
+            
+            if (failedPasswordAttemptMaxCount <= failedPasswordCount)
+            {
+                SignOff();
+                return PasswordAndKbqValidationResult.InvalidPassword;
+            }
 
             if (failedKbqAttemptMaxCount <= failedKbqCount)
             {
                 SignOff();
                 return PasswordAndKbqValidationResult.IncorrectKbqAnswer;
-            }
-
-            if (failedPasswordAttemptMaxCount <= failedPasswordCount)
-            {
-                SignOff();
-                return PasswordAndKbqValidationResult.InvalidPassword;
             }
 
             var userProfile = _dbContext.Users.Single(i => i.UserProfileId == userProfileId);
