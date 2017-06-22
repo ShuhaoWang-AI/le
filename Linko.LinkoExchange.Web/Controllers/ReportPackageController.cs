@@ -767,6 +767,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                 contentReplacements.Add("lastName", user.LastName);
                 contentReplacements.Add("userName", user.UserName);
                 contentReplacements.Add("emailAddress", user.Email);
+                contentReplacements.Add("reportPackageName", reportPackageName);
+                contentReplacements.Add("periodStartDateLocal", periodStartDateLocal.ToString("MMM dd, yyyy"));
+                contentReplacements.Add("periodEndDateLocal", periodEndDateLocal.ToString("MMM dd, yyyy"));
 
                 _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
 
