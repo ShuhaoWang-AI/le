@@ -9,7 +9,7 @@ namespace Linko.LinkoExchange.Services.Authentication
     public interface IAuthenticationService
     {
         ICollection<RegistrationResult> ValidateUserProfileForRegistration(UserDto userInfo, RegistrationType registrationType);
-         
+
         /// <summary>
         /// Validate KBQ answer and password
         /// </summary>
@@ -18,6 +18,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="kbqAnswer">The KBQ question answer</param>
         /// <param name="failedPasswordCount">Failed password count</param>
         /// <param name="failedKbqCount">Failed KBQ answer count</param>
+        /// <param name="reportOperation">Sign & Submit or Repudiate</param>
         /// <returns></returns>
         PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount, ReportOperation reportOperation);
         /// <summary>

@@ -1113,14 +1113,14 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     if(reportOperation == ReportOperation.SignAndSubmit)
                     {
-                      _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony);
+                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony);
                     }
                     else if(reportOperation == ReportOperation.Repudiation)
                     {
                         _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony);
                     }
 
-                    return PasswordAndKbqValidationResult.UserLocked;
+                    return PasswordAndKbqValidationResult.UserLocked_Password;
                 }
 
                 return PasswordAndKbqValidationResult.InvalidPassword;
@@ -1141,7 +1141,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                         _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony);
                     }
 
-                    return PasswordAndKbqValidationResult.UserLocked;
+                    return PasswordAndKbqValidationResult.UserLocked_KBQ;
                 }
 
                 return PasswordAndKbqValidationResult.IncorrectKbqAnswer;

@@ -24,6 +24,7 @@ using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.ReportPackage;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
+using Linko.LinkoExchange.Services.AuditLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -53,6 +54,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IHttpContextService _httpContextService;
         private readonly IUserService _userService;
         private readonly ISyncService _syncService;
+        private readonly ICromerrAuditLogService _crommerAuditLogService;
 
         public ReportPackageController(
             IAuthenticationService authenticationService, 
@@ -64,7 +66,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             IHttpContextService httpContextService, 
             IQuestionAnswerService questionAnswerService, 
             IUserService userService,
-            ISyncService syncService)
+            ISyncService syncService,
+            ICromerrAuditLogService crommerAuditLogService)
             :base(httpContextService,userService,reportPackageService,sampleService)
         {
             _authenticationService = authenticationService;
@@ -77,6 +80,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _httpContextService = httpContextService;
             _userService = userService;
             _syncService = syncService;
+            _crommerAuditLogService = crommerAuditLogService;
         }
 
         #endregion
@@ -584,7 +588,9 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 ViewBag.ShowSubmissionValidationErrorMessage = true;
                                 ViewBag.SubmissionValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
                                 break;
-                            case PasswordAndKbqValidationResult.UserLocked:
+                            case PasswordAndKbqValidationResult.UserLocked_KBQ:
+                            case PasswordAndKbqValidationResult.UserLocked_Password:
+                                LogUserLockedToCromerr(result, model.Name, model.PeriodStartDateTimeLocal, model.PeriodEndDateTimeLocal);
                                 return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
                             default:
                                 throw new ArgumentOutOfRangeException();
@@ -677,7 +683,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 ViewBag.ShowRepudiateValidationErrorMessage = true;
                                 ViewBag.RepudiateValidationErrorMessage = "Password or KBQ answer is wrong. Please try again.";
                                 break;
-                            case PasswordAndKbqValidationResult.UserLocked:
+                            case PasswordAndKbqValidationResult.UserLocked_KBQ:
+                            case PasswordAndKbqValidationResult.UserLocked_Password:
                                 return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
                             default:
                                 throw new ArgumentOutOfRangeException();
@@ -717,6 +724,53 @@ namespace Linko.LinkoExchange.Web.Controllers
             ModelState.SetModelValue(key: "Answer", value: null); // Remove the old KBQ answer 
 
             return View(viewName:"ReportPackageDetails", model:model);
+        }
+
+        private void LogUserLockedToCromerr(PasswordAndKbqValidationResult reason, string reportPackageName, DateTime periodStartDateLocal, DateTime periodEndDateLocal)
+        {
+            CromerrEvent cromerrEvent;
+            if (reason == PasswordAndKbqValidationResult.UserLocked_Password)
+            {
+                cromerrEvent = CromerrEvent.Signature_AccountLockedPassword;
+            }
+            else if (reason == PasswordAndKbqValidationResult.UserLocked_KBQ)
+            {
+                cromerrEvent = CromerrEvent.Signature_AccountLockedKBQ;
+            }
+            else
+            {
+                throw new Exception($"Cannot handle unknown PasswordAndKbqValidationResult={reason}");
+            }
+
+            //Log Cromerr
+            var currentUserProfileId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.UserProfileId));
+            var user = _dbContext.Users.Single(u => u.UserProfileId == currentUserProfileId);
+            var programUsers = _dbContext.OrganizationRegulatoryProgramUsers.Where(u => u.UserProfileId == user.UserProfileId);
+            foreach (var programUser in programUsers.ToList())
+            {
+                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+                cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+                cromerrAuditLogEntryDto.OrganizationId = programUser.OrganizationRegulatoryProgram.OrganizationId;
+                cromerrAuditLogEntryDto.RegulatorOrganizationId = programUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
+                cromerrAuditLogEntryDto.UserProfileId = programUser.UserProfileId;
+                cromerrAuditLogEntryDto.UserName = user.UserName;
+                cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
+                cromerrAuditLogEntryDto.UserLastName = user.LastName;
+                cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
+                cromerrAuditLogEntryDto.IPAddress = _httpContextService.CurrentUserIPAddress();
+                cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
+
+                var contentReplacements = new Dictionary<string, string>();
+
+                contentReplacements.Add("organizationName", programUser.OrganizationRegulatoryProgram.Organization.Name);
+                contentReplacements.Add("firstName", user.FirstName);
+                contentReplacements.Add("lastName", user.LastName);
+                contentReplacements.Add("userName", user.UserName);
+                contentReplacements.Add("emailAddress", user.Email);
+
+                _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
+
+            }
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]

@@ -916,7 +916,9 @@ namespace Linko.LinkoExchange.Services.User
                 cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
                 cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
                 cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+
                 var contentReplacements = new Dictionary<string, string>();
+
                 contentReplacements.Add("organizationName", programUser.OrganizationRegulatoryProgram.Organization.Name);
                 contentReplacements.Add("firstName", user.FirstName);
                 contentReplacements.Add("lastName", user.LastName);
@@ -1477,7 +1479,7 @@ namespace Linko.LinkoExchange.Services.User
                     }
 
                     //AUTHORITY CANNOT CHANGE PREVIOUS ROLE
-                    if (programUser.PermissionGroup.PermissionGroupId != permissionGroupId)
+                    if (isApproved && programUser.PermissionGroup.PermissionGroupId != permissionGroupId)
                         return new RegistrationResultDto() { Result = RegistrationResult.ApprovalAfterResetCannotChangeRole };
                 }
                 else
@@ -1511,7 +1513,13 @@ namespace Linko.LinkoExchange.Services.User
             try
             {
                 UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, isApproved);
-                UpdateOrganizationRegulatoryProgramUserRole(orgRegProgUserId, permissionGroupId);
+
+                //Only update Role if we are Approving
+                if (isApproved)
+                {
+                    UpdateOrganizationRegulatoryProgramUserRole(orgRegProgUserId, permissionGroupId);
+                }
+
                 transaction.Commit();
             }
             catch (Exception ex)
