@@ -196,6 +196,8 @@
 
     @if (ViewBag.Satus.Equals("New"))
     {
+        @Scripts.Render(paths: "~/bundles/jqueryval")
+
         <script>
             $(document)
                 .ready(function()
@@ -209,11 +211,7 @@
                             {
                                 // Form is still valid 
                                 validationSummary = $('.validation-summary-valid');
-                                validationSummary.removeClass("validation-summary-valid");
                             }
-
-                            validationSummary.find("ul")
-                                .empty(); // remove li elements from the validation Summary list. valid form also have empty li element
 
                             var maxFileSize = @ViewBag.MaxFileSize;
                             var file = $("input[name=upload]")[0].files[0];
@@ -226,6 +224,9 @@
 
                             if (fileSize > maxFileSize)
                             {
+                                validationSummary.removeClass("validation-summary-valid");
+                                validationSummary.find("ul")
+                                    .empty(); // remove li elements from the validation Summary list. valid form also have empty li element
                                 var msg = "<li>The file size exceeds that "
                                     + (maxFileSize / 1024) / 1024
                                     + " MB limit.</li>";
