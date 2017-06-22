@@ -7,17 +7,17 @@
     ViewBag.Readonly = Model.SampleStatusName != SampleStatusName.Draft;
 }
 
-@using (Html.BeginForm(actionName:null, controllerName:null, method:FormMethod.Post, htmlAttributes:new {id = "LinkoExchangeForm"}))
+@using (Html.BeginForm(actionName: null, controllerName: null, method: FormMethod.Post, htmlAttributes: new {id = "LinkoExchangeForm"}))
 {
     @Html.AntiForgeryToken()
 
     <section>
         <ol class="breadcrumb">
             <li>
-                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
+                <a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Industry")'"><i class=""></i> Home </a>
             </li>
             <li>
-                <a href="#" onclick="location.href = '@Url.Action(actionName:"Samples", controllerName:"Industry", routeValues:new {sampleStatus = Model.SampleStatusName})'"><i class=""></i> Samples - @Label.ResourceManager.GetString(name: Model.SampleStatusName.ToString())</a>
+                <a href="#" onclick="location.href = '@Url.Action(actionName: "Samples", controllerName: "Industry", routeValues: new {sampleStatus = Model.SampleStatusName})'"><i class=""></i> Samples - @Label.ResourceManager.GetString(name: Model.SampleStatusName.ToString())</a>
             </li>
             <li class="active">
                 Details
@@ -66,7 +66,7 @@
                         </p>
                         <div class="form-group">
                             <div class="pull-right">
-                                <button type="submit" formnovalidate="formnovalidate" class="btn btn-primary btn-sm cancel" formaction="@Url.Action(actionName:"DeleteSample", controllerName:"Industry", routeValues:new {id = Model.Id})" formmethod="post">
+                                <button type="submit" formnovalidate="formnovalidate" class="btn btn-primary btn-sm cancel" formaction="@Url.Action(actionName: "DeleteSample", controllerName: "Industry", routeValues: new {id = Model.Id})" formmethod="post">
                                     Yes
                                 </button>
                                 <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
@@ -78,10 +78,10 @@
         </div>
 
         <section class="box-body form-horizontal">
-            @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
-                                                                                                                             {
-                                                                                                                                 @class = "alert alert-danger"
-                                                                                                                             })
+            @Html.ValidationSummary(excludePropertyErrors: false, message: Message.ValidationSummaryHeaderText, htmlAttributes: new
+                                                                                                                                {
+                                                                                                                                    @class = "alert alert-danger"
+                                                                                                                                })
             @if (ViewBag.ShowSuccessMessage != null && ViewBag.ShowSuccessMessage)
             {
                 <div class="alert alert-dismissible alert-success">
@@ -129,86 +129,102 @@
                     @Html.HiddenFor(model => model.IsMassLoadingResultToUseLessThanSign)
                     @Html.HiddenFor(model => model.MassLoadingMassLoadingUnitId)
                     @Html.HiddenFor(model => model.MassLoadingMassLoadingUnitName)
-                    @Html.Hidden(name:"FlowUnitValidValues", value:Html.Raw(value:Json.Encode(value:Model.FlowUnitValidValues)))
+                    @Html.Hidden(name: "FlowUnitValidValues", value: Html.Raw(value: Json.Encode(value: Model.FlowUnitValidValues)))
                     @Html.HiddenFor(model => model.CtsEventTypeName)
                     @Html.HiddenFor(model => model.CollectionMethodName)
                     @Html.HiddenFor(model => model.FlowUnitName)
                     @Html.HiddenFor(model => model.ResultQualifierValidValues)
                     @Html.HiddenFor(model => model.SampleStatusName)
-                    @Html.Hidden(name:"AllParameters", value:Html.Raw(value:Json.Encode(value:Model.AllParameters)))
-                    @Html.Hidden(name:"SampleResults", value:Html.Raw(value:Json.Encode(value:Model.SampleResults)))
+                    @Html.Hidden(name: "AllParameters", value: Html.Raw(value: Json.Encode(value: Model.AllParameters)))
+                    @Html.Hidden(name: "SampleResults", value: Html.Raw(value: Json.Encode(value: Model.SampleResults)))
                 </div>
 
                 <div class="form-group">
                     <div class="col-sm-4">
-                        @Html.LabelFor(model => model.CollectionMethodId, htmlAttributes:new
-                                                                                         {
-                                                                                             @class = "control-label col-sm-6 required"
-                                                                                         })
+                        @Html.LabelFor(model => model.CollectionMethodId, htmlAttributes: new
+                                                                                          {
+                                                                                              @class = "control-label col-sm-6 required"
+                                                                                          })
                         <div class="col-sm-6">
 
-                            @Html.DropDownList(name:"CollectionMethodId", selectList:Model.AvailableCollectionMethods, htmlAttributes:new
-                                                                                                                                      {
-                                                                                                                                          @class = "form-control input-sm"
-                                                                                                                                      })
+                            @Html.DropDownList(name: "CollectionMethodId", selectList: Model.AvailableCollectionMethods, htmlAttributes: new
+                                                                                                                                         {
+                                                                                                                                             @class = "form-control input-sm"
+                                                                                                                                         })
 
                             @Html.HiddenFor(model => model.CollectionMethodId)
-                            @Html.ValidationMessageFor(model => model.CollectionMethodId, validationMessage:"", htmlAttributes:new
-                                                                                                                               {
-                                                                                                                                   @class = "text-danger"
-                                                                                                                               })
+                            @Html.ValidationMessageFor(model => model.CollectionMethodId, validationMessage: "", htmlAttributes: new
+                                                                                                                                 {
+                                                                                                                                     @class = "text-danger"
+                                                                                                                                 })
                         </div>
                     </div>
 
                     <div class="col-sm-4">
-                        @Html.LabelFor(model => model.CtsEventTypeId, htmlAttributes:new
-                                                                                     {
-                                                                                         @class = "control-label col-sm-5 required"
-                                                                                     })
+                        @Html.LabelFor(model => model.CtsEventTypeId, htmlAttributes: new
+                                                                                      {
+                                                                                          @class = "control-label col-sm-5 required"
+                                                                                      })
                         <div class="col-sm-7">
-                            @Html.DropDownList(name:"CtsEventTypeId", selectList:Model.AvailableCtsEventTypes, htmlAttributes:new
-                                                                                                                              {
-                                                                                                                                  @class = "form-control input-sm"
-                                                                                                                              })
+                            @Html.DropDownList(name: "CtsEventTypeId", selectList: Model.AvailableCtsEventTypes, htmlAttributes: new
+                                                                                                                                 {
+                                                                                                                                     @class = "form-control input-sm"
+                                                                                                                                 })
 
                             @Html.HiddenFor(model => model.CtsEventTypeId)
-                            @Html.ValidationMessageFor(model => model.CtsEventTypeId, validationMessage:"", htmlAttributes:new
-                                                                                                                           {
-                                                                                                                               @class = "text-danger"
-                                                                                                                           })
+                            @Html.ValidationMessageFor(model => model.CtsEventTypeId, validationMessage: "", htmlAttributes: new
+                                                                                                                             {
+                                                                                                                                 @class = "text-danger"
+                                                                                                                             })
                         </div>
                     </div>
 
                     <div class="col-sm-4">
-                        @Html.LabelFor(model => model.StartDateTimeLocal, htmlAttributes:new
-                                                                                         {
-                                                                                             @class = "control-label col-sm-4 required"
-                                                                                         })
+                        @Html.LabelFor(model => model.StartDateTimeLocal, htmlAttributes: new
+                                                                                          {
+                                                                                              @class = "control-label col-sm-4 required"
+                                                                                          })
                         <div class="col-sm-8">
                             @if (ViewBag.Readonly)
                             {
-                                @(Html.Kendo().DateTimePicker()
-                                      .Name(componentName:"StartDateTimeLocal")
-                                      .Value(date:Model.StartDateTimeLocal)
-                                      .Format(format:"MM/dd/yyyy hh:mm tt")
-                                      .Max(date:DateTime.Now)
-                                      .HtmlAttributes(attributes:new
-                                                                 {
-                                                                     @readonly = true,
-                                                                     style = "width:210px; background-color: #eee;"
-                                                                 }))
+                                if (Model.StartDateTimeLocal.ToString(format: "hh:mm tt").ToLower().Equals(value: "12:00 am"))
+                                {
+                                    @(Html.Kendo().DateTimePicker()
+                                          .Name(componentName: "StartDateTimeLocal")
+                                          .Value(date: Model.StartDateTimeLocal)
+                                          .Format(format: "MM/dd/yyyy hh:mm tt")
+                                          .Max(date: DateTime.Now)
+                                          .HtmlAttributes(attributes: new
+                                                                      {
+                                                                          @readonly = true,
+                                                                          style = "width:210px; background-color: #eee;"
+                                                                      }))
+                                }
+                                else
+                                {
+                                    @(Html.Kendo().DateTimePicker()
+                                          .Name(componentName: "StartDateTimeLocal")
+                                          .Value(date: Model.StartDateTimeLocal)
+                                          .Format(format: "MM/dd/yyyy hh:mm tt")
+                                          .Max(date: DateTime.Now)
+                                          .HtmlAttributes(attributes: new
+                                                                      {
+                                                                          @readonly = true,
+                                                                          style = "width:210px; background-color: #eee;"
+                                                                      }))
+                                }
                             }
                             else
                             {
                                 @(Html.Kendo().DateTimePicker()
-                                      .Name(componentName:"StartDateTimeLocal")
-                                      .Value(date:Model.StartDateTimeLocal)
-                                      .Format(format:"MM/dd/yyyy hh:mm tt")
-                                      .Max(date:DateTime.Now)
-                                      .HtmlAttributes(attributes:new
-                                                                 {
-                                                                     style = "width:210px;"
-                                                                 }))
+                                      .Name(componentName: "StartDateTimeLocal")
+                                      .Value(date: Model.StartDateTimeLocal)
+                                      .Format(format: "MM/dd/yyyy hh:mm tt")
+                                      .Max(date: DateTime.Now)
+                                      .HtmlAttributes(attributes: new
+                                                                  {
+                                                                      style = "width:210px;"
+                                                                  }))
                             }
                         </div>
                     </div>
@@ -216,83 +232,99 @@
 
                 <div class="form-group">
                     <div class="col-sm-4">
-                        @Html.LabelFor(model => model.LabSampleIdentifier, htmlAttributes:new
-                                                                                          {
-                                                                                              @class = "control-label col-sm-6"
-                                                                                          })
+                        @Html.LabelFor(model => model.LabSampleIdentifier, htmlAttributes: new
+                                                                                           {
+                                                                                               @class = "control-label col-sm-6"
+                                                                                           })
                         <div class="col-sm-6">
-                            @Html.EditorFor(model => model.LabSampleIdentifier, additionalViewData:new
-                                                                                                   {
-                                                                                                       htmlAttributes = new
-                                                                                                                        {
-                                                                                                                            @class = "form-control input-sm",
-                                                                                                                            maxlength = 50
-                                                                                                                        }
-                                                                                                   })
+                            @Html.EditorFor(model => model.LabSampleIdentifier, additionalViewData: new
+                                                                                                    {
+                                                                                                        htmlAttributes = new
+                                                                                                                         {
+                                                                                                                             @class = "form-control input-sm",
+                                                                                                                             maxlength = 50
+                                                                                                                         }
+                                                                                                    })
                         </div>
                     </div>
 
                     <div class="col-sm-4">
-                        @Html.LabelFor(model => model.FlowValue, htmlAttributes:new
-                                                                                {
-                                                                                    @class = "control-label col-sm-5"
-                                                                                })
+                        @Html.LabelFor(model => model.FlowValue, htmlAttributes: new
+                                                                                 {
+                                                                                     @class = "control-label col-sm-5"
+                                                                                 })
                         <div class="col-sm-7">
                             <div class="col-sm-7 no-margin no-padding">
-                                @Html.EditorFor(model => model.FlowValue, additionalViewData:new
-                                                                                             {
-                                                                                                 htmlAttributes = new
-                                                                                                                  {
-                                                                                                                      @class = "form-control input-sm"
-                                                                                                                  }
-                                                                                             })
+                                @Html.EditorFor(model => model.FlowValue, additionalViewData: new
+                                                                                              {
+                                                                                                  htmlAttributes = new
+                                                                                                                   {
+                                                                                                                       @class = "form-control input-sm"
+                                                                                                                   }
+                                                                                              })
                             </div>
                             <div class="col-sm-5 no-padding">
-                                @Html.DropDownList(name:"FlowUnitId", selectList:Model.AvailableFlowUnits, htmlAttributes:new
-                                                                                                                          {
-                                                                                                                              @class = "form-control input-sm"
-                                                                                                                          })
+                                @Html.DropDownList(name: "FlowUnitId", selectList: Model.AvailableFlowUnits, htmlAttributes: new
+                                                                                                                             {
+                                                                                                                                 @class = "form-control input-sm"
+                                                                                                                             })
 
 
                                 @Html.HiddenFor(model => model.FlowUnitId)
-                                @Html.ValidationMessageFor(model => model.FlowUnitId, validationMessage:"", htmlAttributes:new
-                                                                                                                           {
-                                                                                                                               @class = "text-danger"
-                                                                                                                           })
+                                @Html.ValidationMessageFor(model => model.FlowUnitId, validationMessage: "", htmlAttributes: new
+                                                                                                                             {
+                                                                                                                                 @class = "text-danger"
+                                                                                                                             })
                             </div>
                         </div>
                     </div>
 
                     <div class="col-sm-4">
-                        @Html.LabelFor(model => model.EndDateTimeLocal, htmlAttributes:new
-                                                                                       {
-                                                                                           @class = "control-label col-sm-4 required"
-                                                                                       })
+                        @Html.LabelFor(model => model.EndDateTimeLocal, htmlAttributes: new
+                                                                                        {
+                                                                                            @class = "control-label col-sm-4 required"
+                                                                                        })
                         <div class="col-sm-8">
                             @if (ViewBag.Readonly)
                             {
-                                @(Html.Kendo().DateTimePicker()
-                                      .Name(componentName:"EndDateTimeLocal")
-                                      .Value(date:Model.EndDateTimeLocal)
-                                      .Format(format:"MM/dd/yyyy hh:mm tt")
-                                      .Max(date:DateTime.Now)
-                                      .HtmlAttributes(attributes:new
-                                                                 {
-                                                                     @readonly = true,
-                                                                     style = "width:210px; background-color: #eee;"
-                                                                 }))
+                                if (Model.EndDateTimeLocal.ToString(format: "hh:mm tt").ToLower().Equals(value: "12:00 am"))
+                                {
+                                    @(Html.Kendo().DateTimePicker()
+                                          .Name(componentName: "EndDateTimeLocal")
+                                          .Value(date: Model.EndDateTimeLocal)
+                                          .Format(format: "MM/dd/yyyy")
+                                          .Max(date: DateTime.Now)
+                                          .HtmlAttributes(attributes: new
+                                                                      {
+                                                                          @readonly = true,
+                                                                          style = "width:210px; background-color: #eee;"
+                                                                      }))
+                                }
+                                else
+                                {
+                                    @(Html.Kendo().DateTimePicker()
+                                          .Name(componentName: "EndDateTimeLocal")
+                                          .Value(date: Model.EndDateTimeLocal)
+                                          .Format(format: "MM/dd/yyyy hh:mm tt")
+                                          .Max(date: DateTime.Now)
+                                          .HtmlAttributes(attributes: new
+                                                                      {
+                                                                          @readonly = true,
+                                                                          style = "width:210px; background-color: #eee;"
+                                                                      }))
+                                }
                             }
                             else
                             {
                                 @(Html.Kendo().DateTimePicker()
-                                      .Name(componentName:"EndDateTimeLocal")
-                                      .Value(date:Model.EndDateTimeLocal)
-                                      .Format(format:"MM/dd/yyyy hh:mm tt")
-                                      .Max(date:DateTime.Now)
-                                      .HtmlAttributes(attributes:new
-                                                                 {
-                                                                     style = "width:210px;"
-                                                                 }))
+                                      .Name(componentName: "EndDateTimeLocal")
+                                      .Value(date: Model.EndDateTimeLocal)
+                                      .Format(format: "MM/dd/yyyy hh:mm tt")
+                                      .Max(date: DateTime.Now)
+                                      .HtmlAttributes(attributes: new
+                                                                  {
+                                                                      style = "width:210px;"
+                                                                  }))
                             }
                         </div>
                     </div>
@@ -397,7 +429,7 @@
                                 <select class="form-control input-sm no-margin no-padding" id="Qualifier_@sampleResult.ParameterId" style="width: 100%">
                                     @foreach (var q in Model.AvailableResultQualifierValidValues)
                                     {
-                                        if (q.Value.Equals(value:sampleResult.Qualifier.IfNullOrWhiteSpace(defaultValue:"NUMERIC")))
+                                        if (q.Value.Equals(value: sampleResult.Qualifier.IfNullOrWhiteSpace(defaultValue: "NUMERIC")))
                                         {
                                             <option value=@q.Value selected> @q.Text </option>
                                         }
@@ -424,28 +456,44 @@
                             <td>
                                 @if (ViewBag.Readonly)
                                 {
-                                    @(Html.Kendo().DateTimePicker()
-                                          .Name(componentName:"AnalysisDateTime_" + sampleResult.ParameterId)
-                                          .Value(date:sampleResult.AnalysisDateTimeLocal)
-                                          .Format(format:"MM/dd/yyyy hh:mm tt")
-                                          .Max(date:DateTime.Now)
-                                          .HtmlAttributes(attributes:new
-                                                                     {
-                                                                         @readonly = true,
-                                                                         style = "width:100%; font-size:12px; background-color: #eee;"
-                                                                     }))
+                                    if (sampleResult.AnalysisDateTimeLocal.HasValue && sampleResult.AnalysisDateTimeLocal.Value.ToString(format: "hh:mm tt").ToLower().Equals(value: "12:00 am"))
+                                    {
+                                        @(Html.Kendo().DateTimePicker()
+                                              .Name(componentName: "AnalysisDateTime_" + sampleResult.ParameterId)
+                                              .Value(date: sampleResult.AnalysisDateTimeLocal)
+                                              .Format(format: "MM/dd/yyyy")
+                                              .Max(date: DateTime.Now)
+                                              .HtmlAttributes(attributes: new
+                                                                          {
+                                                                              @readonly = true,
+                                                                              style = "width:100%; font-size:12px; background-color: #eee;"
+                                                                          }))
+                                    }
+                                    else
+                                    {
+                                        @(Html.Kendo().DateTimePicker()
+                                              .Name(componentName: "AnalysisDateTime_" + sampleResult.ParameterId)
+                                              .Value(date: sampleResult.AnalysisDateTimeLocal)
+                                              .Format(format: "MM/dd/yyyy hh:mm tt")
+                                              .Max(date: DateTime.Now)
+                                              .HtmlAttributes(attributes: new
+                                                                          {
+                                                                              @readonly = true,
+                                                                              style = "width:100%; font-size:12px; background-color: #eee;"
+                                                                          }))
+                                    }
                                 }
                                 else
                                 {
                                     @(Html.Kendo().DateTimePicker()
-                                          .Name(componentName:"AnalysisDateTime_" + sampleResult.ParameterId)
-                                          .Value(date:sampleResult.AnalysisDateTimeLocal)
-                                          .Format(format:"MM/dd/yyyy hh:mm tt")
-                                          .Max(date:DateTime.Now)
-                                          .HtmlAttributes(attributes:new
-                                                                     {
-                                                                         style = "width:100%; font-size:12px"
-                                                                     }))
+                                          .Name(componentName: "AnalysisDateTime_" + sampleResult.ParameterId)
+                                          .Value(date: sampleResult.AnalysisDateTimeLocal)
+                                          .Format(format: "MM/dd/yyyy hh:mm tt")
+                                          .Max(date: DateTime.Now)
+                                          .HtmlAttributes(attributes: new
+                                                                      {
+                                                                          style = "width:100%; font-size:12px"
+                                                                      }))
                                 }
                             </td>
                             <td>
@@ -472,7 +520,7 @@
                                 <input id="MassResultId_@sampleResult.ParameterId" type="hidden" value=@(sampleResult.MassLoadingSampleResultId.HasValue ? sampleResult.MassLoadingSampleResultId.Value.ToString() : "")>
                             </td>
                             <td>
-                                @if (sampleResult.MassLoadingValue.IfNullOrWhiteSpace(defaultValue:"").Length == 0)
+                                @if (sampleResult.MassLoadingValue.IfNullOrWhiteSpace(defaultValue: "").Length == 0)
                                 {
                                     <strong id="MassResult_@sampleResult.ParameterId"></strong>
                                 }
@@ -507,11 +555,11 @@
                         switch (Model.SampleStatusName)
                         {
                             case SampleStatusName.Draft:
-                                <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"SampleDetails", controllerName:"Industry")" formmethod="post" />
-                                <input type="submit" value="Ready to Report" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"EnableSample", controllerName:"Industry", routeValues:new {isReadyToReport = true})" formmethod="post" />
+                                <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "SampleDetails", controllerName: "Industry")" formmethod="post" />
+                                <input type="submit" value="Ready to Report" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "EnableSample", controllerName: "Industry", routeValues: new {isReadyToReport = true})" formmethod="post" />
                                 break;
                             case SampleStatusName.ReadyToReport:
-                                <input type="submit" value="Enable Edit Sample" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"EnableSample", controllerName:"Industry", routeValues:new {isReadyToReport = false})" formmethod="post" />
+                                <input type="submit" value="Enable Edit Sample" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "EnableSample", controllerName: "Industry", routeValues: new {isReadyToReport = false})" formmethod="post" />
                                 break;
                         }
 
@@ -519,7 +567,7 @@
                     }
                     else
                     {
-                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"NewSampleDetailsStep2", controllerName:"Industry")" formmethod="post" />
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "NewSampleDetailsStep2", controllerName: "Industry")" formmethod="post" />
                     }
                 }
             </div>
@@ -532,12 +580,16 @@
             .ready(function()
             {
                 //Prevent "enter key" press from doing anything on the page, i.e. collapsing boxes, submitting form, etc...
-                $('#LinkoExchangeForm').bind('keydown', function(e) {
-                    if (e.keyCode == 13) {
-                        e.preventDefault();
-                    }
-                });
-                
+                $('#LinkoExchangeForm')
+                    .bind('keydown'
+                        , function(e)
+                        {
+                            if (e.keyCode == 13)
+                            {
+                                e.preventDefault();
+                            }
+                        });
+
                 $('#ParameterGroupTable')
                     .DataTable(
                         {
@@ -684,10 +736,54 @@
                     $("input[id^='Result_']").inputmask('decimal', { digits: '16', rightAlign: true });
                     $("input[id^='MDL_']").inputmask('decimal', { digits: '16', rightAlign: true });
                     $("#FlowValue").inputmask('decimal', { digits: '16', rightAlign: true });
-                    $("#StartDateTimeLocal").inputmask('mm/dd/yyyy hh:mm xm', { clearIncomplete: true });
-                    $("#EndDateTimeLocal").inputmask('mm/dd/yyyy hh:mm xm', { clearIncomplete: true });
-                    $("input[id^='AnalysisDateTime_']").inputmask('mm/dd/yyyy hh:mm xm', { clearIncomplete: true });
+                    $("#StartDateTimeLocal")
+                        .inputmask({
+                            alias: 'mm/dd/yyyy hh:mm xm'
+                            , mask: "1/2/y [h:s t\\m]"
+                            , placeholder: "dd/mm/yyyy 00:00 am"
+                            , greedy: false
+                            , clearMaskOnLostFocus: false
+                            , clearIncomplete: true
+                        });
+                    $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().replace("12:00 am", ""));
+
+                    $("#EndDateTimeLocal")
+                        .inputmask({
+                            alias: 'mm/dd/yyyy hh:mm xm'
+                            , mask: "1/2/y [h:s t\\m]"
+                            , placeholder: "dd/mm/yyyy 00:00 am"
+                            , greedy: false
+                            , clearMaskOnLostFocus: false
+                            , clearIncomplete: true
+                        });
+                    $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().replace("12:00 am", ""));
+
+                    $("input[id^='AnalysisDateTime_']")
+                        .inputmask({
+                            alias: 'mm/dd/yyyy hh:mm xm'
+                            , mask: "1/2/y [h:s t\\m]"
+                            , placeholder: "dd/mm/yyyy 00:00 am"
+                            , greedy: false
+                            , clearMaskOnLostFocus: false
+                            , clearIncomplete: true
+                        });
+                    $("input[id^='AnalysisDateTime_']")
+                        .each(function()
+                        {
+                            var value = $(this).val().replace("12:00 am", "");
+                            $(this).val(value);
+                        });
                 });
+
+            $(document)
+                .on('change'
+                    , "input[id^='AnalysisDateTime_']"
+                    , function()
+                    {
+                        var value = $(this).val().replace("12:00 am", "");
+                        $(this).val(value);
+                    });
+
             updateResultTextBoxState = function()
             {
                 var parameterTable = $('#ParameterTable').DataTable();
@@ -1040,7 +1136,7 @@
                         data[1] = value.Name;
 
                         var availableResultQualifierValidValues =
-                            @Html.Raw(value:Json.Encode(value:Model.AvailableResultQualifierValidValues));
+                            @Html.Raw(value: Json.Encode(value: Model.AvailableResultQualifierValidValues));
 
                         var qualifierCtrl =
                             '<select class="form-control input-sm no-margin no-padding" id="Qualifier_'
@@ -1139,18 +1235,34 @@
 
                 $("input[id^='Result_']").inputmask('decimal', { digits: '16', rightAlign: true });
                 $("input[id^='MDL_']").inputmask('decimal', { digits: '16', rightAlign: true });
-                $("input[id^='AnalysisDateTime_']").inputmask('mm/dd/yyyy hh:mm xm', { clearIncomplete: true });
+                $("input[id^='AnalysisDateTime_']")
+                    .inputmask({
+                        alias: 'mm/dd/yyyy hh:mm xm'
+                        , mask: "1/2/y [h:s t\\m]"
+                        , placeholder: "dd/mm/yyyy 00:00 am"
+                        , greedy: false
+                        , clearMaskOnLostFocus: false
+                        , clearIncomplete: true
+                    });
             };
+
+            $("#StartDateTimeLocal")
+                .change(function()
+                {
+                    $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().replace("12:00 am", ""));
+                });
 
             $("#EndDateTimeLocal")
                 .change(function()
                 {
+                    $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().replace("12:00 am", ""));
+
                     var viewModel = {};
                     viewModel.monitoringPointId = $('#MonitoringPointId').val();
                     viewModel.endDateTime = $('#EndDateTimeLocal').val();
 
                     var postUrl =
-                        "@Url.Action(actionName:"GetParameterGroupsForSample", controllerName:"Industry")";
+                        "@Url.Action(actionName: "GetParameterGroupsForSample", controllerName: "Industry")";
 
                     $.ajax({
                         type: "POST"

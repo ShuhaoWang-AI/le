@@ -72,7 +72,7 @@
                       .Events(events => { events.Change(handler:"gotoNextPage"); })
                       .DataSource(dataSource => dataSource
                                                     .Ajax()
-                                                    .ServerOperation(enabled:false)
+                                                    .ServerOperation(enabled:true)
                                                     .Batch(enabled:true)
                                                     .Sort(sort => sort.Add(memberName:"Name").Ascending()) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"ParameterGroups_Read", controllerName:"Authority"))

@@ -101,4 +101,48 @@
             </div>
         </div>
     </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/inputmask")
+
+    <script>
+        $(document)
+            .ready(function()
+            {
+                $("#StartDateTimeLocal")
+                    .inputmask({
+                        alias: 'mm/dd/yyyy hh:mm xm'
+                        , mask: "1/2/y [h:s t\\m]"
+                        , placeholder: "dd/mm/yyyy 00:00 am"
+                        , greedy: false
+                        , clearMaskOnLostFocus: false
+                        , clearIncomplete: true
+                    });
+                $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().replace("12:00 am", ""));
+
+                $("#EndDateTimeLocal")
+                    .inputmask({
+                        alias: 'mm/dd/yyyy hh:mm xm'
+                        , mask: "1/2/y [h:s t\\m]"
+                        , placeholder: "dd/mm/yyyy 00:00 am"
+                        , greedy: false
+                        , clearMaskOnLostFocus: false
+                        , clearIncomplete: true
+                    });
+                $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().replace("12:00 am", ""));
+            });
+
+        $("#StartDateTimeLocal")
+            .change(function()
+            {
+                $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().replace("12:00 am", ""));
+            });
+
+        $("#EndDateTimeLocal")
+            .change(function()
+            {
+                $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().replace("12:00 am", ""));
+            });
+    </script>
+}
 }

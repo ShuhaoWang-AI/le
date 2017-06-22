@@ -474,6 +474,7 @@
     <Compile Include="GlimpseSecurityPolicy.cs" />
     <Compile Include="Mapping\IMapHelper.cs" />
     <Compile Include="Mapping\MapHelper.cs" />
+    <Compile Include="Mvc\CustomDataSourceRequestAttribute.cs" />
     <Compile Include="Mvc\LogAttribute.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\CommonController.cs" />

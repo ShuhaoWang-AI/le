@@ -93,7 +93,7 @@
                       .Events(events => { events.Change(handler:"gotoNextPage"); })
                       .DataSource(dataSource => dataSource
                                                     .Ajax()
-                                                    .ServerOperation(enabled:false)
+                                                    .ServerOperation(enabled: true)
                                                     .Batch(enabled:true)
                                                     .Sort(sort =>
                                                     {

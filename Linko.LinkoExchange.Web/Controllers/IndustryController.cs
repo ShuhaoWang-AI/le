@@ -159,7 +159,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
-        public ActionResult IndustryUsers_Read([DataSourceRequest] DataSourceRequest request)
+        public ActionResult IndustryUsers_Read([CustomDataSourceRequest] DataSourceRequest request)
         {
             var organizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var users = _userService.GetUserProfilesForOrgRegProgram(orgRegProgramId:organizationRegulatoryProgramId, isRegApproved:true, isRegDenied:false, isEnabled:null, isRemoved:false);
@@ -456,7 +456,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
-        public ActionResult PendingUserApprovals_Read([DataSourceRequest] DataSourceRequest request)
+        public ActionResult PendingUserApprovals_Read([CustomDataSourceRequest] DataSourceRequest request)
         {
             var organizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var users = _userService.GetPendingRegistrationProgramUsers(orgRegProgramId:organizationRegulatoryProgramId);
@@ -671,7 +671,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
-        public ActionResult Attachments_Read([DataSourceRequest] DataSourceRequest request)
+        public ActionResult Attachments_Read([CustomDataSourceRequest] DataSourceRequest request)
         {
             var dtos = _fileStoreService.GetFileStores();
 
@@ -969,7 +969,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
-        public ActionResult Samples_Read([DataSourceRequest] DataSourceRequest request, SampleStatusName sampleStatus)
+        public ActionResult Samples_Read([CustomDataSourceRequest] DataSourceRequest request, SampleStatusName sampleStatus)
         {
             var dtos = _sampleService.GetSamples(status:sampleStatus);
 

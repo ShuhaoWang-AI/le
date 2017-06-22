@@ -95,7 +95,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
-        public ActionResult ReportPackages_Read([DataSourceRequest] DataSourceRequest request, ReportStatusName reportStatus)
+        public ActionResult ReportPackages_Read([CustomDataSourceRequest] DataSourceRequest request, ReportStatusName reportStatus)
         {
             var dtos = _reportPackageService.GetReportPackagesByStatusName(reportStatusName:reportStatus);
 
@@ -314,7 +314,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"ReportPackageDetails", model:model);
         }
 
-        public ActionResult Samples_Read([DataSourceRequest] DataSourceRequest request, int reportPackageElementTypeId, ReportStatusName reportStatusName)
+        public ActionResult Samples_Read([CustomDataSourceRequest] DataSourceRequest request, int reportPackageElementTypeId, ReportStatusName reportStatusName)
         {
             var dtos = _reportPackageService.GetSamplesForSelection(reportPackageElementTypeId:reportPackageElementTypeId);
 
@@ -352,7 +352,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return Json(data:result);
         }
 
-        public ActionResult SampleResults_Read([DataSourceRequest] DataSourceRequest request, int sampleId)
+        public ActionResult SampleResults_Read([CustomDataSourceRequest] DataSourceRequest request, int sampleId)
         {
             var dto = _sampleService.GetSampleDetails(sampleId:sampleId);
 
@@ -395,7 +395,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return Json(data:result);
         }
 
-        public ActionResult Attachments_Read([DataSourceRequest] DataSourceRequest request, int reportPackageElementTypeId, ReportStatusName reportStatusName)
+        public ActionResult Attachments_Read([CustomDataSourceRequest] DataSourceRequest request, int reportPackageElementTypeId, ReportStatusName reportStatusName)
         {
             var dtos = _reportPackageService.GetFilesForSelection(reportPackageElementTypeId:reportPackageElementTypeId);
 

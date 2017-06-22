@@ -609,7 +609,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
-        public ActionResult AuthorityUsers_Read([DataSourceRequest] DataSourceRequest request)
+        public ActionResult AuthorityUsers_Read([CustomDataSourceRequest] DataSourceRequest request)
         {
             var organizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var users = _userService.GetUserProfilesForOrgRegProgram(orgRegProgramId:organizationRegulatoryProgramId, isRegApproved:true, isRegDenied:false, isEnabled:null, isRemoved:false);
@@ -1177,7 +1177,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
-        public ActionResult IndustryUsers_Read([DataSourceRequest] DataSourceRequest request, string industryId)
+        public ActionResult IndustryUsers_Read([CustomDataSourceRequest] DataSourceRequest request, string industryId)
         {
             var organizationRegulatoryProgramId = int.Parse(s:industryId);
             var users = _userService.GetUserProfilesForOrgRegProgram(orgRegProgramId:organizationRegulatoryProgramId, isRegApproved:true, isRegDenied:false, isEnabled:null, isRemoved:false);
@@ -1495,7 +1495,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
-        public ActionResult PendingUserApprovals_Read([DataSourceRequest] DataSourceRequest request)
+        public ActionResult PendingUserApprovals_Read([CustomDataSourceRequest] DataSourceRequest request)
         {
             var organizationRegulatoryProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
             var users = _userService.GetPendingRegistrationProgramUsers(orgRegProgramId:organizationRegulatoryProgramId);
@@ -1734,7 +1734,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
-        public ActionResult ParameterGroups_Read([DataSourceRequest] DataSourceRequest request)
+        public ActionResult ParameterGroups_Read([CustomDataSourceRequest] DataSourceRequest request)
         {
             var parameterGroups = _parameterService.GetStaticParameterGroups();
 
@@ -1946,7 +1946,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
-        public ActionResult ReportElementTypes_Read([DataSourceRequest] DataSourceRequest request, ReportElementCategoryName categoryName)
+        public ActionResult ReportElementTypes_Read([CustomDataSourceRequest] DataSourceRequest request, ReportElementCategoryName categoryName)
         {
             var reportElementTypes = _reportElementService.GetReportElementTypes(categoryName:categoryName);
 
@@ -2170,7 +2170,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View();
         }
 
-        public ActionResult ReportPackageTemplates_Read([DataSourceRequest] DataSourceRequest request)
+        public ActionResult ReportPackageTemplates_Read([CustomDataSourceRequest] DataSourceRequest request)
         {
             var reportPackageTemplates = _reportTemplateService.GetReportPackageTemplates(includeChildObjects:false).ToList();
 
