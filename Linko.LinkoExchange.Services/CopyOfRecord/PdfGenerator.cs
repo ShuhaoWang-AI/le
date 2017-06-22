@@ -61,7 +61,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             var industryName = _reportPackage.OrganizationName;
             var submissionDateTimeString = _reportPackage.SubmissionDateTimeLocal?.ToString("MMMM dd yyyy hh:mm tt").ToUpper() ?? "";
 
-            HeaderFooterTable(_pdfPage, reportName, submissionDateTimeString, authorityName, industryName);
+            HeaderFooterTable(_pdfPage, reportName, submissionDateTimeString, authorityName, industryName, draftMode);
 
             // report info part  
             ReportInfoTable(_pdfPage);
@@ -516,7 +516,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             row.Cells.Add("");
         }
 
-        private static void HeaderFooterTable(Page pdfPage, string reportName, string submittedDateTimeString, string authorityName, string industryName)
+        private static void HeaderFooterTable(Page pdfPage, string reportName, string submittedDateTimeString, string authorityName, string industryName, bool draftMode)
         {
             Table headerTable = new Table();
 
@@ -555,7 +555,14 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
             Row row = headerTable.Rows.Add();
             row.Cells.Add(authorityName);
-            row.Cells.Add("Copy Of Record");
+            if(draftMode)
+            {
+                row.Cells.Add("");
+            }
+            else
+            {
+                row.Cells.Add("Copy Of Record");
+            }
             row.Cells.Add(industryName);
 
             // Footer 
