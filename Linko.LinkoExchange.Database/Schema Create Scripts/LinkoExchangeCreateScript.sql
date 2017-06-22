@@ -5406,7 +5406,7 @@ Please contact your authority for assistance unlocking your account.
         {authorityList}
 
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact your authority or LinkoExchange Technology Inc at {supportEmail} or {supportPhoneNumber}.
                 </pre>
             </body>
         </html>'
@@ -5432,7 +5432,7 @@ Please contact your authority for assistance unlocking your account.
         {authorityList}
 
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact your authority or LinkoExchange Technology Inc at {supportEmail} or {supportPhoneNumber}.
                 </pre>
             </body>
         </html>'
@@ -5459,7 +5459,7 @@ Please contact your authority for assistance unlocking your account.
         {authorityList}
 
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact your authority or LinkoExchange Technology Inc at {supportEmail} or {supportPhoneNumber}.
                 </pre>
             </body>
         </html>'
@@ -5485,7 +5485,7 @@ Please contact your authority for assistance unlocking your account.
         {authorityList}
 
 This email was sent from an unmonitored account. Do not reply to this email because it will not be received.
-If you have questions or concerns, please contact {authorityName} at {supportEmail} or {supportPhoneNumber}.
+If you have questions or concerns, please contact your authority or LinkoExchange Technology Inc at {supportEmail} or {supportPhoneNumber}.
                 </pre>
             </body>
         </html>'
