@@ -5324,13 +5324,13 @@ Submitted By:
     {submitterFirstName} {submitterLastName}
     {submitterTitle}
     {iuOrganizationName} 
-    Permit #:{permitNumber} 
+    Permit #: {permitNumber} 
     {organizationAddressLine1} {organizationAddressLine2}
     {organizationCityName}, {organizationJurisdictionName} {organizationZipCode} 
     
-    User Name:{userName}
+    User Name: {userName}
     
-To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser.  Login is required to view the report.
+To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser. Login is required to view the report.
 
     {corViewLink}
     
@@ -5361,7 +5361,7 @@ Report Details:
     Report Name: {reportPackageName}
     Period Start: {periodStartDate}
     Period End: {periodEndDate}
-    Submission Date:{submissionDateTime}
+    Submission Date: {submissionDateTime}
     LinkoExchange COR Signature: 
     {corSignature}
 
@@ -5369,13 +5369,13 @@ Submitted By:
     {submitterFirstName} {submitterLastName}
     {submitterTitle}
     {iuOrganizationName} 
-    Permit #:{permitNumber} 
+    Permit #: {permitNumber} 
     {organizationAddressLine1} {organizationAddressLine2}
     {organizationCityName}, {organizationJurisdictionName} {organizationZipCode} 
     
-    User Name:{userName}
+    User Name: {userName}
     
-To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser.  Login is required to view the report.
+To view the report in LinkoExchange, click the link below or copy and paste the link into your web browser. Login is required to view the report.
 
     {corViewLink}
     
