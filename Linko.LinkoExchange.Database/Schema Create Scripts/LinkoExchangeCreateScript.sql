@@ -6192,15 +6192,40 @@ Email: {emailAddress}
     INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
     VALUES 
     (
-        'CromerrEvent_Signature_AccountLocked', 
+        'CromerrEvent_Signature_AccountLockedKBQ', 
         'CromerrEvent',
         'Signature',   
-        'AccountLocked', 
+        'AccountLockedKBQ', 
         '',
-        'Failed KBQ’s during signature.
+        'Account locked for exceeding Knowledge Based Question attempts during signature ceremony.
 User: {firstName} {lastName}
 User Name: {userName}
 Email: {emailAddress}
+
+For:
+Organization: {organizationName}
+Report: {reportPackageName}
+Report Period: {periodStartDate} - {periodEndDate}
+' 
+)
+   
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Signature_AccountLockedPassword', 
+        'CromerrEvent',
+        'Signature',   
+        'AccountLockedPassword', 
+        '',
+        'Account locked for exceeding Password attempts during signature ceremony.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+For:
+Organization: {organizationName}
+Report: {reportPackageName}
+Report Period: {periodStartDate} - {periodEndDate}
 ' 
 )
    
