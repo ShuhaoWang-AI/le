@@ -567,7 +567,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                             kbqAnswer:model.Answer,
                             failedPasswordCount:failedCountPassword, 
                             failedKbqCount:failedCountKbq,
-                            reportOperation:ReportOperation.SignAndSubmit);
+                            reportOperation:ReportOperation.SignAndSubmit,
+                            reportPackageId:id);
                         ModelState.Remove(key:"FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
                         ModelState.Remove(key:"FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
                         switch (result)
@@ -590,7 +591,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 break;
                             case PasswordAndKbqValidationResult.UserLocked_KBQ:
                             case PasswordAndKbqValidationResult.UserLocked_Password:
-                                LogUserLockedToCromerr(result, model.Name, model.PeriodStartDateTimeLocal, model.PeriodEndDateTimeLocal);
                                 return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
                             default:
                                 throw new ArgumentOutOfRangeException();
@@ -724,56 +724,6 @@ namespace Linko.LinkoExchange.Web.Controllers
             ModelState.SetModelValue(key: "Answer", value: null); // Remove the old KBQ answer 
 
             return View(viewName:"ReportPackageDetails", model:model);
-        }
-
-        private void LogUserLockedToCromerr(PasswordAndKbqValidationResult reason, string reportPackageName, DateTime periodStartDateLocal, DateTime periodEndDateLocal)
-        {
-            CromerrEvent cromerrEvent;
-            if (reason == PasswordAndKbqValidationResult.UserLocked_Password)
-            {
-                cromerrEvent = CromerrEvent.Signature_AccountLockedPassword;
-            }
-            else if (reason == PasswordAndKbqValidationResult.UserLocked_KBQ)
-            {
-                cromerrEvent = CromerrEvent.Signature_AccountLockedKBQ;
-            }
-            else
-            {
-                throw new Exception($"Cannot handle unknown PasswordAndKbqValidationResult={reason}");
-            }
-
-            //Log Cromerr
-            var currentUserProfileId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.UserProfileId));
-            var user = _dbContext.Users.Single(u => u.UserProfileId == currentUserProfileId);
-            var programUsers = _dbContext.OrganizationRegulatoryProgramUsers.Where(u => u.UserProfileId == user.UserProfileId);
-            foreach (var programUser in programUsers.ToList())
-            {
-                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-                cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
-                cromerrAuditLogEntryDto.OrganizationId = programUser.OrganizationRegulatoryProgram.OrganizationId;
-                cromerrAuditLogEntryDto.RegulatorOrganizationId = programUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
-                cromerrAuditLogEntryDto.UserProfileId = programUser.UserProfileId;
-                cromerrAuditLogEntryDto.UserName = user.UserName;
-                cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
-                cromerrAuditLogEntryDto.UserLastName = user.LastName;
-                cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
-                cromerrAuditLogEntryDto.IPAddress = _httpContextService.CurrentUserIPAddress();
-                cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
-
-                var contentReplacements = new Dictionary<string, string>();
-
-                contentReplacements.Add("organizationName", programUser.OrganizationRegulatoryProgram.Organization.Name);
-                contentReplacements.Add("firstName", user.FirstName);
-                contentReplacements.Add("lastName", user.LastName);
-                contentReplacements.Add("userName", user.UserName);
-                contentReplacements.Add("emailAddress", user.Email);
-                contentReplacements.Add("reportPackageName", reportPackageName);
-                contentReplacements.Add("periodStartDateLocal", periodStartDateLocal.ToString("MMM dd, yyyy"));
-                contentReplacements.Add("periodEndDateLocal", periodEndDateLocal.ToString("MMM dd, yyyy"));
-
-                _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
-
-            }
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]

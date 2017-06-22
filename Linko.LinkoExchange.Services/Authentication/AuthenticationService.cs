@@ -807,7 +807,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 int maxAnswerAttempts = Convert.ToInt32(_settingService.GetOrganizationSettingValueByUserId(userProfileId, SettingType.FailedKBQAttemptMaxCount, true, null));
                 if ((failedCount + 1) >= maxAnswerAttempts) // from web.config
                 {
-                    _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
+                    _userService.LockUnlockUserAccount(userProfileId: userProfileId, isAttemptingLock: true, reason: AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringPasswordReset);
                     //Get all associated authorities
                     var userOrgs = _organizationService.GetUserRegulators(userProfileId).ToList();
                     authenticationResult.RegulatoryList = userOrgs;
@@ -1068,7 +1068,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             return Task.FromResult(signInResultDto);
         }
 
-        public PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount, ReportOperation reportOperation)
+        public PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount, ReportOperation reportOperation, int? reportPackageId = null)
         {
             _logger.Info($"Enter AuthenticationService.PasswordAndKbqValidationResult");
 
@@ -1113,11 +1113,11 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     if(reportOperation == ReportOperation.SignAndSubmit)
                     {
-                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony);
+                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony, reportPackageId);
                     }
                     else if(reportOperation == ReportOperation.Repudiation)
                     {
-                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony);
+                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony, reportPackageId);
                     }
 
                     return PasswordAndKbqValidationResult.UserLocked_Password;
@@ -1134,11 +1134,11 @@ namespace Linko.LinkoExchange.Services.Authentication
                     SignOff(); 
                     if(reportOperation == ReportOperation.SignAndSubmit)
                     {
-                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony);
+                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony, reportPackageId);
                     }
                     else if(reportOperation == ReportOperation.Repudiation)
                     {
-                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony);
+                        _userService.LockUnlockUserAccount(userProfileId, true, AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony, reportPackageId);
                     }
 
                     return PasswordAndKbqValidationResult.UserLocked_KBQ;

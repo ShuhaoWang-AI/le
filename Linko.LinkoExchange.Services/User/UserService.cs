@@ -790,10 +790,10 @@ namespace Linko.LinkoExchange.Services.User
                 .Single(orpu => orpu.OrganizationRegulatoryProgramUserId == targetOrgRegProgUserId)
                 .UserProfileId;
 
-            return LockUnlockUserAccount(userProfileId, isAttemptingLock, reason);
+            return LockUnlockUserAccount(userProfileId, isAttemptingLock, reason, reportPackageId:null);
         }
 
-        public AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, AccountLockEvent reason)
+        public AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, AccountLockEvent reason, int? reportPackageId = null)
         {
             var user = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
             //Check user is not support role
@@ -848,7 +848,7 @@ namespace Linko.LinkoExchange.Services.User
                 SendAccountLockoutEmails(user, reason);
             }
 
-            LogLockUnlockActivityToCromerr(isAttemptingLock, user, reason);
+            LogLockUnlockActivityToCromerr(isAttemptingLock, user, reason, reportPackageId);
 
             //Success
             return new Dto.AccountLockoutResultDto()
@@ -857,7 +857,7 @@ namespace Linko.LinkoExchange.Services.User
             };
         }
 
-        private void LogLockUnlockActivityToCromerr(bool isAttemptingLock, UserProfile user, AccountLockEvent reason)
+        private void LogLockUnlockActivityToCromerr(bool isAttemptingLock, UserProfile user, AccountLockEvent reason, int? reportPackageId = null)
         {
             CromerrEvent cromerrEvent;
             if (!isAttemptingLock)
@@ -875,6 +875,14 @@ namespace Linko.LinkoExchange.Services.User
             else if (reason == AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringProfileAccess)
             {
                 cromerrEvent = CromerrEvent.Profile_AccountLocked;
+            }
+            else if (reason == AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony)
+            {
+                cromerrEvent = CromerrEvent.Signature_AccountLockedKBQ;
+            }
+            else if (reason == AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony)
+            {
+                cromerrEvent = CromerrEvent.Signature_AccountLockedPassword;
             }
             else
             {
@@ -933,6 +941,26 @@ namespace Linko.LinkoExchange.Services.User
                     contentReplacements.Add("authorityFirstName", actorUser.FirstName);
                     contentReplacements.Add("authorityLastName", actorUser.LastName);
                     contentReplacements.Add("authorityEmailaddress", actorUser.Email);
+                }
+
+                if (reason == AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony
+                        || reason == AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony)
+                {
+                    if (reportPackageId.HasValue)
+                    {
+                        var reportPackage = _dbContext.ReportPackages
+                            .Single(rp => rp.ReportPackageId == reportPackageId.Value);
+                        var periodStartDateLocal = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(reportPackage.PeriodStartDateTimeUtc.UtcDateTime, programUser.OrganizationRegulatoryProgramId);
+                        var periodEndDateLocal = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(reportPackage.PeriodEndDateTimeUtc.UtcDateTime, programUser.OrganizationRegulatoryProgramId);
+
+                        contentReplacements.Add("reportPackageName", reportPackage.Name);
+                        contentReplacements.Add("periodStartDateLocal", periodStartDateLocal.ToString("MMM dd, yyyy"));
+                        contentReplacements.Add("periodEndDateLocal", periodEndDateLocal.ToString("MMM dd, yyyy"));
+                    }
+                    else
+                    {
+                        throw new Exception($"ERROR: Account lock Cromerr log entry could not be completed without report package Id");
+                    }
                 }
 
                 _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
