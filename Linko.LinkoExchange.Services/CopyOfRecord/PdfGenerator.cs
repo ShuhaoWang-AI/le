@@ -366,12 +366,8 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
                     row.Cells.Add(sampleResultExtension.SampleResult.ParameterName, leftTextSize8);
                     row.Cells.Add(GetSampleResultValue(sampleResultExtension.SampleResult), rightTextSize8);
-                    var mdl = "";
-                    if (sampleResultExtension.SampleResult.MethodDetectionLimit.HasValue)
-                    {
-                        mdl = sampleResultExtension.SampleResult.MethodDetectionLimit.ToString();
-                    }
-
+                    var mdl = sampleResultExtension.SampleResult.EnteredMethodDetectionLimit.GetValueOrEmptyString(); 
+                    
                     row.Cells.Add($"{mdl}", rightTextSize8);
 
                     row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower(), centerTextSize8);
@@ -394,7 +390,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                         row.Cells.Add("");
                         row.Cells.Add(sampleResultExtension.SampleResult.ParameterName, leftTextSize8);
                         row.Cells.Add($"{sampleResultExtension.SampleResult.MassLoadingValue} {sampleResultExtension.SampleResult.MassLoadingUnitName}", rightTextSize8);
-                        row.Cells.Add($"{sampleResultExtension.SampleResult.MethodDetectionLimit?.ToString() ?? ""}", rightTextSize8);
+                        row.Cells.Add($"{sampleResultExtension.SampleResult.EnteredMethodDetectionLimit.GetValueOrEmptyString()}", rightTextSize8);
                         row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower(), centerTextSize8);
                         row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower(), centerTextSize8);
                         row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName, centerTextSize8);
@@ -577,7 +573,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
             footerTable.SetColumnTextState(1, centerHeaderFooterTextState);
             footerTable.SetColumnTextState(2, rightHeaderFooterTextState);
 
-            TextFragment text = new TextFragment("Page: ($p of $P )");
+            TextFragment text = new TextFragment("Page $p of $P");
             text.TextState.FontSize = 8;
 
             row = footerTable.Rows.Add();
