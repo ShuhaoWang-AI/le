@@ -2362,9 +2362,12 @@ namespace Linko.LinkoExchange.Services.Report
                         }
                         break;
                     case ReportElementCategoryName.SamplesAndResults:
-                        if (comment != null)
+                        if(samplesCloned != null)
                         {
                             xmlDoc.Root.Add(samplesCloned);
+                        }
+                        if (comment != null)
+                        {
                             xmlDoc.Root.Add(commentCloned);
                         }
                         break;
