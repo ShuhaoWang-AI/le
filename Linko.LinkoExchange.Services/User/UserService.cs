@@ -587,6 +587,7 @@ namespace Linko.LinkoExchange.Services.User
             newInvitation.LastName = user.LastName;
             newInvitation.RecipientOrganizationRegulatoryProgramId = targetOrgRegProgramId;
             newInvitation.SenderOrganizationRegulatoryProgramId = senderOrgRegProgramId;
+            newInvitation.IsResetInvitation = true;
             _dbContext.Invitations.Add(newInvitation);
             _dbContext.SaveChanges();
 
