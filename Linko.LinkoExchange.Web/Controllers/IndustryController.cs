@@ -83,7 +83,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             ISettingService settingService, 
             IParameterService parameterService, 
             IReportPackageService reportPackageService)
-            :base(httpContextService,userService,reportPackageService,sampleService)
+            :base(httpContextService: httpContextService,userService: userService,reportPackageService: reportPackageService,sampleService: sampleService)
         {
             _fileStoreService = fileStoreService;
             _httpContextService = httpContextService;
@@ -1219,8 +1219,8 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input:collection[name:"FlowUnitValidValues"]);
                     model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input:HttpUtility.HtmlDecode(s:collection[name:"SampleResults"]));
-
-                    if (!ModelState.IsValid)
+                    
+                    if (!ModelState.IsValidField(key: "FlowUnitId") || !ModelState.IsValidField(key: "StartDateTimeLocal") || !ModelState.IsValidField(key: "EndDateTimeLocal"))
                     {
                         ViewBag.Satus = "Edit";
                         AddAdditionalPropertyToSampleDetails(viewModel: model);
@@ -1264,7 +1264,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     if (isReadyToReport)
                     {
-                        if (!ModelState.IsValid)
+                        if (!ModelState.IsValidField(key: "FlowUnitId") || !ModelState.IsValidField(key: "StartDateTimeLocal") || !ModelState.IsValidField(key: "EndDateTimeLocal"))
                         {
                             ViewBag.Satus = "Edit";
                             AddAdditionalPropertyToSampleDetails(viewModel: model);
