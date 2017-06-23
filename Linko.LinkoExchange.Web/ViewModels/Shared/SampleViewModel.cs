@@ -72,12 +72,21 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string FlowUnitName { get; set; }
         public IEnumerable<UnitDto> FlowUnitValidValues { get; set; }
 
-        public IList<SelectListItem> AvailableFlowUnits => FlowUnitValidValues.Select(c => new SelectListItem
-                                                                                           {
-                                                                                               Text = c.Name,
-                                                                                               Value = c.UnitId.ToString(),
-                                                                                               Selected = c.UnitId.Equals(obj:FlowUnitId)
-                                                                                           }).ToList();
+        public IList<SelectListItem> AvailableFlowUnits
+        {
+            get
+            {
+                var availableFlowUnits = FlowUnitValidValues.Select(c => new SelectListItem
+                                                                         {
+                                                                             Text = c.Name,
+                                                                             Value = c.UnitId.ToString(),
+                                                                             Selected = c.UnitId.Equals(obj: FlowUnitId)
+                                                                         }).ToList();
+
+                availableFlowUnits.Insert(index: 0, item: new SelectListItem {Text = @"Select Flow Unit", Value = "0"});
+                return availableFlowUnits;
+            }
+        }
 
         public string ResultQualifierValidValues { get; set; }
 
@@ -115,5 +124,17 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public bool IsAssociatedWithReportPackage { get; internal set; } // only to be used when displaying report package to show which samples are included
     }
 
-    public class SampleViewModelValidator:AbstractValidator<SampleViewModel> {}
+    public class SampleViewModelValidator : AbstractValidator<SampleViewModel>
+    {
+        public SampleViewModelValidator()
+        {
+            //StartDateTimeLocal
+            RuleFor(x => x.StartDateTimeLocal).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
+            //EndDateTimeLocal
+            RuleFor(x => x.EndDateTimeLocal).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.").GreaterThan(x => x.StartDateTimeLocal)
+                                            .WithMessage(errorMessage: "End date must after Start date");
+            //ReportElementTypeId
+            RuleFor(x => x.FlowUnitId).GreaterThan(valueToCompare:0).When(x => !x.FlowValue.Trim().Equals(value: "")).WithMessage(errorMessage:"{PropertyName} is required.");
+        }
+    }
 }

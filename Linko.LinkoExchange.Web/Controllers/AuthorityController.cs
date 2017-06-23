@@ -1678,7 +1678,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 PhoneNumber = result.UserProfileDto.PhoneNumber,
                                 PhoneExt = result.UserProfileDto.PhoneExt,
                                 DateRegistered = result.RegistrationDateTimeUtc?.DateTime,
-                                Role = result.PermissionGroup == null ? 0 : result.PermissionGroup.PermissionGroupId,
+                                Role = result.PermissionGroup?.PermissionGroupId ?? 0,
                                 RoleText = result.PermissionGroup == null ? "" : result.PermissionGroup.Name
                             };
             // Roles
@@ -1695,7 +1695,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                  Selected = Convert.ToInt32(value:r.PermissionGroupId) == viewModel.Role
                                                              }).ToList();
             }
-            viewModel.AvailableRoles.Insert(index:0, item:new SelectListItem {Text = @"Select User Role", Value = "0"});
+            viewModel.AvailableRoles.Insert(index:0, item:new SelectListItem {Text = @"Select User Role", Value = "0", Disabled = true});
 
             var currentUserRole = _httpContextService.GetClaimValue(claimType:CacheKey.UserRole) ?? "";
             ViewBag.HasPermissionForApproveDeny = false;

@@ -140,12 +140,12 @@
                 </div>
 
                 <div class="form-group">
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 no-padding">
                         @Html.LabelFor(model => model.CollectionMethodId, htmlAttributes: new
                                                                                           {
                                                                                               @class = "control-label col-sm-6 required"
                                                                                           })
-                        <div class="col-sm-6">
+                        <div class="col-sm-6 no-padding">
 
                             @Html.DropDownList(name: "CollectionMethodId", selectList: Model.AvailableCollectionMethods, htmlAttributes: new
                                                                                                                                          {
@@ -160,12 +160,12 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 no-padding">
                         @Html.LabelFor(model => model.CtsEventTypeId, htmlAttributes: new
                                                                                       {
                                                                                           @class = "control-label col-sm-5 required"
                                                                                       })
-                        <div class="col-sm-7">
+                        <div class="col-sm-7 no-padding">
                             @Html.DropDownList(name: "CtsEventTypeId", selectList: Model.AvailableCtsEventTypes, htmlAttributes: new
                                                                                                                                  {
                                                                                                                                      @class = "form-control input-sm"
@@ -179,12 +179,12 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 no-padding">
                         @Html.LabelFor(model => model.StartDateTimeLocal, htmlAttributes: new
                                                                                           {
                                                                                               @class = "control-label col-sm-4 required"
                                                                                           })
-                        <div class="col-sm-8">
+                        <div class="col-sm-8 no-padding">
                             @if (ViewBag.Readonly)
                             {
                                 if (Model.StartDateTimeLocal.ToString(format: "hh:mm tt").ToLower().Equals(value: "12:00 am"))
@@ -231,12 +231,12 @@
                 </div>
 
                 <div class="form-group">
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 no-padding">
                         @Html.LabelFor(model => model.LabSampleIdentifier, htmlAttributes: new
                                                                                            {
                                                                                                @class = "control-label col-sm-6"
                                                                                            })
-                        <div class="col-sm-6">
+                        <div class="col-sm-6 no-padding">
                             @Html.EditorFor(model => model.LabSampleIdentifier, additionalViewData: new
                                                                                                     {
                                                                                                         htmlAttributes = new
@@ -248,12 +248,12 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 no-padding">
                         @Html.LabelFor(model => model.FlowValue, htmlAttributes: new
                                                                                  {
                                                                                      @class = "control-label col-sm-5"
                                                                                  })
-                        <div class="col-sm-7">
+                        <div class="col-sm-7 no-padding">
                             <div class="col-sm-7 no-margin no-padding">
                                 @Html.EditorFor(model => model.FlowValue, additionalViewData: new
                                                                                               {
@@ -279,12 +279,12 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 no-padding">
                         @Html.LabelFor(model => model.EndDateTimeLocal, htmlAttributes: new
                                                                                         {
                                                                                             @class = "control-label col-sm-4 required"
                                                                                         })
-                        <div class="col-sm-8">
+                        <div class="col-sm-8 no-padding">
                             @if (ViewBag.Readonly)
                             {
                                 if (Model.EndDateTimeLocal.ToString(format: "hh:mm tt").ToLower().Equals(value: "12:00 am"))
@@ -555,11 +555,11 @@
                         switch (Model.SampleStatusName)
                         {
                             case SampleStatusName.Draft:
-                                <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "SampleDetails", controllerName: "Industry")" formmethod="post" />
-                                <input type="submit" value="Ready to Report" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "EnableSample", controllerName: "Industry", routeValues: new {isReadyToReport = true})" formmethod="post" />
+                                <input type="submit" id="btnSave" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "SampleDetails", controllerName: "Industry")" formmethod="post" />
+                                <input type="submit" id="btnReadyToReport" value="Ready to Report" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "EnableSample", controllerName: "Industry", routeValues: new {isReadyToReport = true})" formmethod="post" />
                                 break;
                             case SampleStatusName.ReadyToReport:
-                                <input type="submit" value="Enable Edit Sample" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "EnableSample", controllerName: "Industry", routeValues: new {isReadyToReport = false})" formmethod="post" />
+                                <input type="submit" id="btnEnableEditSample" value="Enable Edit Sample" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "EnableSample", controllerName: "Industry", routeValues: new {isReadyToReport = false})" formmethod="post" />
                                 break;
                         }
 
@@ -638,18 +638,40 @@
                         }
                     );
 
-                $("#LinkoExchangeForm")
-                    .submit(function(e)
+                var clickedButtonId = "";
+
+                $("input[type='submit']")
+                    .click(function()
                     {
-                        //if (e.originalEvent.explicitOriginalTarget.id == "myButton")
-                        //{
-                        //    return true;
-                        //}
+                        clickedButtonId = $(this).attr('id');
+                    });
+
+                $("#LinkoExchangeForm")
+                    .submit(function(event)
+                    {
+                        var isFormValid = true;
 
                         try
                         {
+                            isFormValid = $(this).valid();
+                        }                
+                        catch(e)
+                        {
+                        }
+
+                        try
+                        {
+                            var validationSummary = $('.validation-summary-errors');
+
+                            if (validationSummary.length === 0)
+                            {
+                                // Form is still valid 
+                                validationSummary = $('.validation-summary-valid');
+                            }
+
                             // add Results to hidden field
                             var sampleResults = [];
+                            var isValid = true;
 
                             var parameterTable = $('#ParameterTable').DataTable();
                             parameterTable
@@ -667,6 +689,7 @@
                                     sampleResult.ParameterName = d[1];
                                     var qualifier = $("#Qualifier_" + paramId).val();
                                     sampleResult.Qualifier = ((qualifier === "NUMERIC") ? "" : qualifier);
+                                    var result = parseFloat($("#Result_" + paramId).val());
                                     sampleResult.Value = $("#Result_" + paramId).val();
                                     sampleResult.UnitId = $("#UnitId_" + paramId).val();
                                     sampleResult.UnitName = $("#UnitName_" + paramId).html();
@@ -690,14 +713,48 @@
                                     }
 
                                     sampleResults.push(sampleResult);
+
+                                    if (clickedButtonId === "btnReadyToReport" && isFormValid)
+                                    {
+                                        var isSampleResultValid =
+                                            !((qualifier === 'NUMERIC' || qualifier === '<' || qualifier === '>')
+                                                && isNaN(result));
+
+                                        isValid = isValid & isSampleResultValid;
+
+                                        if (!isSampleResultValid)
+                                        {
+                                            $(this.node()).addClass('bg-red');
+                                        }
+                                        else
+                                        {
+                                            $(this.node()).removeClass('bg-red');
+                                        }
+                                    }
                                 });
-                            $("#SampleResults").val(JSON.stringify(sampleResults));
 
-                            $("#CtsEventTypeName").val($("#CtsEventTypeId option:selected").text());
-                            $("#CollectionMethodName").val($("#CollectionMethodId option:selected").text());
-                            $("#FlowUnitName").val($("#FlowUnitId option:selected").text());
+                            if (!isValid && isFormValid)
+                            {
+                                event.preventDefault();
+                                $("input[type='submit']").prop('disabled', false);
+                                $("input[type='button']").prop("disabled", false);
+        
+                                validationSummary.removeClass("validation-summary-valid");
+                                validationSummary.find("ul")
+                                    .empty(); // remove li elements from the validation Summary list. valid form also have empty li element
+                                validationSummary.find("ul").append("<li>Result is required for row(s) marked as red.</li>");
+                                $("#CollectionMethodId").focus(); // to scroll to top validation summary
+                            }
+                            else
+                            {
+                                $("#SampleResults").val(JSON.stringify(sampleResults));
 
-                            return true;
+                                $("#CtsEventTypeName").val($("#CtsEventTypeId option:selected").text());
+                                $("#CollectionMethodName").val($("#CollectionMethodId option:selected").text());
+                                $("#FlowUnitName").val($("#FlowUnitId option:selected").text());
+                            }
+
+                            return isValid;
                         }
                         catch (err)
                         {

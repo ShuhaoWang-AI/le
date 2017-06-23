@@ -29,7 +29,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
             //StartDateTimeLocal
             RuleFor(x => x.StartDateTimeLocal).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
             //EndDateTimeLocal
-            RuleFor(x => x.EndDateTimeLocal).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
+            RuleFor(x => x.EndDateTimeLocal).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.").GreaterThan(x => x.StartDateTimeLocal)
+                                            .WithMessage(errorMessage: "End date must after Start date");
         }
     }
 }

@@ -634,7 +634,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 PhoneNumber = result.UserProfileDto.PhoneNumber,
                                 PhoneExt = result.UserProfileDto.PhoneExt,
                                 DateRegistered = result.RegistrationDateTimeUtc?.DateTime,
-                                Role = result.PermissionGroup == null ? 0 : result.PermissionGroup.PermissionGroupId,
+                                Role = result.PermissionGroup?.PermissionGroupId ?? 0,
                                 RoleText = result.PermissionGroup == null ? "" : result.PermissionGroup.Name
                             };
             // Roles
@@ -651,7 +651,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                  Selected = Convert.ToInt32(value:r.PermissionGroupId) == viewModel.Role
                                                              }).ToList();
             }
-            viewModel.AvailableRoles.Insert(index:0, item:new SelectListItem {Text = @"Select User Role", Value = "0"});
+            viewModel.AvailableRoles.Insert(index:0, item:new SelectListItem {Text = @"Select User Role", Value = "0", Disabled = true});
 
             var currentUserRole = _httpContextService.GetClaimValue(claimType:CacheKey.UserRole) ?? "";
             ViewBag.HasPermissionForApproveDeny = currentUserRole.IsCaseInsensitiveEqual(comparing:UserRole.Administrator.ToString()); // TODO: call service when implement
@@ -948,7 +948,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                });
             }
 
-            viewModel.AvailableReportElementTypes.Insert(index:0, item:new SelectListItem {Text = @"Select Attachment Type", Value = "0"});
+            viewModel.AvailableReportElementTypes.Insert(index:0, item:new SelectListItem {Text = @"Select Attachment Type", Value = "0", Disabled = true});
 
             viewModel.AllowedFileExtensions = string.Join(separator:",", values:_fileStoreService.GetValidAttachmentFileExtensions());
 
@@ -1212,12 +1212,20 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             try
             {
+
                 if (model.Id != null)
                 {
                     var objJavascript = new JavaScriptSerializer();
 
                     model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input:collection[name:"FlowUnitValidValues"]);
                     model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input:HttpUtility.HtmlDecode(s:collection[name:"SampleResults"]));
+
+                    if (!ModelState.IsValid)
+                    {
+                        ViewBag.Satus = "Edit";
+                        AddAdditionalPropertyToSampleDetails(viewModel: model);
+                        return View(viewName: "SampleDetails", model: model);
+                    }
 
                     var vm = ConvertSampleViewModelToDto(model:model);
 
@@ -1256,7 +1264,12 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     if (isReadyToReport)
                     {
-                        // do validation
+                        if (!ModelState.IsValid)
+                        {
+                            ViewBag.Satus = "Edit";
+                            AddAdditionalPropertyToSampleDetails(viewModel: model);
+                            return View(viewName: "SampleDetails", model: model);
+                        }
                     }
 
                     var vm = ConvertSampleViewModelToDto(model:model); // _sampleService.GetSampleDetails(sampleId:model.Id.Value);
@@ -1505,6 +1518,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                               });
             }
 
+            viewModel.AvailableCollectionMethods.Insert(index:0, item:new SelectListItem {Text = @"Select Collection Method", Value = "0", Disabled = true});
+
             var ctsEventTypeDtos = _reportTemplateService.GetCtsEventTypes(isForSample:true);
             var sampleTypes = ctsEventTypeDtos as IList<CtsEventTypeDto> ?? ctsEventTypeDtos.ToList();
             viewModel.CtsEventCategoryName = sampleTypes.First().CtsEventCategoryName;
@@ -1525,6 +1540,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                               Selected = true
                                                           });
             }
+
+            viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select Sample Type", Value = "0", Disabled = true});
 
             viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:viewModel.MonitoringPointId, sampleEndDateTimeUtc:viewModel.EndDateTimeLocal)
                                                        .Select(c => new ParameterViewModel
