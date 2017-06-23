@@ -358,7 +358,7 @@ namespace Linko.LinkoExchange.Services.Organization
                 if (childOrgRegProgs != null && !String.IsNullOrEmpty(searchString))
                 {
                     childOrgRegProgs = childOrgRegProgs.Where(x =>
-                                                               x.Organization.OrganizationId.ToString().Contains(searchString)
+                                                               x.ReferenceNumber.Contains(searchString)
                                                             || x.Organization.Name.Contains(searchString) 
                                                             || x.Organization.AddressLine1.Contains(searchString)
                                                             || x.Organization.AddressLine2.Contains(searchString)
