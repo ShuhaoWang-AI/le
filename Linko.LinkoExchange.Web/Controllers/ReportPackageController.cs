@@ -25,6 +25,7 @@ using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.ReportPackage;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Core.Resources;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -884,74 +885,74 @@ namespace Linko.LinkoExchange.Web.Controllers
                 var vm = _reportPackageService.GetReportPackage(reportPackageId: id, isIncludeAssociatedElementData: true, isAuthorizationRequired: true);
 
                 viewModel = new ReportPackageViewModel
-                            {
-                                Id = vm.ReportPackageId,
-                                Name = vm.Name,
-                                PeriodStartDateTimeLocal = vm.PeriodStartDateTimeLocal,
-                                PeriodEndDateTimeLocal = vm.PeriodEndDateTimeLocal,
-                                OrganizationRegulatoryProgramId = vm.OrganizationRegulatoryProgramId,
-                                OrganizationName = vm.OrganizationName,
-                                OrganizationReferenceNumber = vm.OrganizationReferenceNumber,
-                                Status = vm.ReportStatusName,
-                                CtsEventTypeName = string.IsNullOrWhiteSpace(value: vm.CtsEventTypeName) ? "" : $@"({vm.CtsEventCategoryName}) {vm.CtsEventTypeName}",
-                                CtsEventTypeId = vm.CtsEventTypeId,
-                                ReportPackageTemplateElementCategories = vm.ReportPackageElementCategories,
-                                Comments = vm.Comments,
-                                SamplesAndResultsTypes = vm.SamplesAndResultsTypes?.Select(t => new ReportElementTypeViewModel
-                                                                                                {
-                                                                                                    Id = t.ReportPackageElementTypeId,
-                                                                                                    Name = t.ReportElementTypeName
-                                                                                                }).ToList(),
-                                AttachmentTypes = vm.AttachmentTypes?.Select(t => new ReportElementTypeViewModel
-                                                                                  {
-                                                                                      Id = t.ReportPackageElementTypeId,
-                                                                                      Name = t.ReportElementTypeName
-                                                                                  }).ToList(),
-                                CertificationTypes = vm.CertificationTypes?.Select(t => new ReportElementTypeViewModel
-                                                                                        {
-                                                                                            Id = t.ReportPackageElementTypeId,
-                                                                                            Name = t.ReportElementTypeName,
-                                                                                            Content = t.ReportElementTypeContent
-                                                                                        }).ToList(),
-                                IsSubmissionBySignatoryRequired = vm.IsSubmissionBySignatoryRequired,
-                                SubmitterFirstName = vm.SubmitterFirstName,
-                                SubmitterLastName = vm.SubmitterLastName,
-                                SubmissionDateTimeLocal = vm.SubmissionDateTimeLocal,
-                                SubmitterTitleRole = vm.SubmitterTitleRole,
-                                SubmissionReviewerFirstName = vm.SubmissionReviewerFirstName,
-                                SubmissionReviewerLastName = vm.SubmissionReviewerLastName,
-                                SubmissionReviewComments = vm.SubmissionReviewComments,
-                                SubmissionReviewDateTimeLocal = vm.SubmissionReviewDateTimeLocal,
-                                LastSenderFirstName = vm.LastSenderFirstName,
-                                LastSenderLastName = vm.LastSenderLastName,
-                                LastSentDateTimeLocal = vm.LastSentDateTimeLocal,
-                                RepudiatorFirstName = vm.RepudiatorFirstName,
-                                RepudiatorLastName = vm.RepudiatorLastName,
-                                RepudiatorTitleRole = vm.RepudiatorTitleRole,
-                                RepudiationDateTimeLocal = vm.RepudiationDateTimeLocal,
-                                RepudiationReasonId = vm.RepudiationReasonId,
-                                RepudiationReasonName = vm.RepudiationReasonName,
-                                RepudiationComments = vm.RepudiationComments,
-                                RepudiationReviewerFirstName = vm.RepudiationReviewerFirstName,
-                                RepudiationReviewerLastName = vm.RepudiationReviewerLastName,
-                                RepudiationReviewDateTimeLocal = vm.RepudiationReviewDateTimeLocal,
-                                RepudiationReviewComments = vm.RepudiationReviewComments,
-                                CanCurrentUserSubmitAndReputiate = false,
-                                FailedCountPassword = failedCountPassword,
-                                FailedCountKbq = failedCountKbq
-                            };
+                {
+                    Id = vm.ReportPackageId,
+                    Name = vm.Name,
+                    PeriodStartDateTimeLocal = vm.PeriodStartDateTimeLocal,
+                    PeriodEndDateTimeLocal = vm.PeriodEndDateTimeLocal,
+                    OrganizationRegulatoryProgramId = vm.OrganizationRegulatoryProgramId,
+                    OrganizationName = vm.OrganizationName,
+                    OrganizationReferenceNumber = vm.OrganizationReferenceNumber,
+                    Status = vm.ReportStatusName,
+                    CtsEventTypeName = string.IsNullOrWhiteSpace(value: vm.CtsEventTypeName) ? "" : $@"({vm.CtsEventCategoryName}) {vm.CtsEventTypeName}",
+                    CtsEventTypeId = vm.CtsEventTypeId,
+                    ReportPackageTemplateElementCategories = vm.ReportPackageElementCategories,
+                    Comments = vm.Comments,
+                    SamplesAndResultsTypes = vm.SamplesAndResultsTypes?.Select(t => new ReportElementTypeViewModel
+                    {
+                        Id = t.ReportPackageElementTypeId,
+                        Name = t.ReportElementTypeName
+                    }).ToList(),
+                    AttachmentTypes = vm.AttachmentTypes?.Select(t => new ReportElementTypeViewModel
+                    {
+                        Id = t.ReportPackageElementTypeId,
+                        Name = t.ReportElementTypeName
+                    }).ToList(),
+                    CertificationTypes = vm.CertificationTypes?.Select(t => new ReportElementTypeViewModel
+                    {
+                        Id = t.ReportPackageElementTypeId,
+                        Name = t.ReportElementTypeName,
+                        Content = t.ReportElementTypeContent
+                    }).ToList(),
+                    IsSubmissionBySignatoryRequired = vm.IsSubmissionBySignatoryRequired,
+                    SubmitterFirstName = vm.SubmitterFirstName,
+                    SubmitterLastName = vm.SubmitterLastName,
+                    SubmissionDateTimeLocal = vm.SubmissionDateTimeLocal,
+                    SubmitterTitleRole = vm.SubmitterTitleRole,
+                    SubmissionReviewerFirstName = vm.SubmissionReviewerFirstName,
+                    SubmissionReviewerLastName = vm.SubmissionReviewerLastName,
+                    SubmissionReviewComments = vm.SubmissionReviewComments,
+                    SubmissionReviewDateTimeLocal = vm.SubmissionReviewDateTimeLocal,
+                    LastSenderFirstName = vm.LastSenderFirstName,
+                    LastSenderLastName = vm.LastSenderLastName,
+                    LastSentDateTimeLocal = vm.LastSentDateTimeLocal,
+                    RepudiatorFirstName = vm.RepudiatorFirstName,
+                    RepudiatorLastName = vm.RepudiatorLastName,
+                    RepudiatorTitleRole = vm.RepudiatorTitleRole,
+                    RepudiationDateTimeLocal = vm.RepudiationDateTimeLocal,
+                    RepudiationReasonId = vm.RepudiationReasonId,
+                    RepudiationReasonName = vm.RepudiationReasonName,
+                    RepudiationComments = vm.RepudiationComments,
+                    RepudiationReviewerFirstName = vm.RepudiationReviewerFirstName,
+                    RepudiationReviewerLastName = vm.RepudiationReviewerLastName,
+                    RepudiationReviewDateTimeLocal = vm.RepudiationReviewDateTimeLocal,
+                    RepudiationReviewComments = vm.RepudiationReviewComments,
+                    CanCurrentUserSubmitAndReputiate = false,
+                    FailedCountPassword = failedCountPassword,
+                    FailedCountKbq = failedCountKbq
+                };
 
-                viewModel.IsCurrentPortalAuthority = _httpContextService.GetClaimValue(claimType:CacheKey.PortalName).ToLower().Equals(value:"authority");
+                viewModel.IsCurrentPortalAuthority = _httpContextService.GetClaimValue(claimType: CacheKey.PortalName).ToLower().Equals(value: "authority");
 
                 if (!viewModel.IsCurrentPortalAuthority && (viewModel.Status == ReportStatusName.ReadyToSubmit || viewModel.Status == ReportStatusName.Submitted))
                 {
-                    var currentOrganizationRegulatoryProgramUserId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramUserId));
-                    var isCurrentUserSignatory = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId:currentOrganizationRegulatoryProgramUserId).IsSignatory;
+                    var currentOrganizationRegulatoryProgramUserId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramUserId));
+                    var isCurrentUserSignatory = _userService.GetOrganizationRegulatoryProgramUser(orgRegProgUserId: currentOrganizationRegulatoryProgramUserId).IsSignatory;
 
                     viewModel.CanCurrentUserSubmitAndReputiate = !viewModel.IsSubmissionBySignatoryRequired || viewModel.IsSubmissionBySignatoryRequired && isCurrentUserSignatory;
 
-                    var currentUserProfileId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.UserProfileId));
-                    var userQuestion = _questionAnswerService.GetRandomQuestionAnswerFromUserProfileId(userProfileId:currentUserProfileId, questionType:QuestionTypeName.KBQ);
+                    var currentUserProfileId = int.Parse(s: _httpContextService.GetClaimValue(claimType: CacheKey.UserProfileId));
+                    var userQuestion = _questionAnswerService.GetRandomQuestionAnswerFromUserProfileId(userProfileId: currentUserProfileId, questionType: QuestionTypeName.KBQ);
 
                     viewModel.QuestionAnswerId = userQuestion.Answer.UserQuestionAnswerId ?? 0;
                     viewModel.Question = userQuestion.Question.Content;
@@ -962,16 +963,18 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         var repudiationReasons = _reportPackageService.GetRepudiationReasons();
                         viewModel.AvailableRepudiationReasonNames = repudiationReasons.Select(c => new SelectListItem
-                                                                                                   {
-                                                                                                       Text = c.Name,
-                                                                                                       Value = c.RepudiationReasonId.ToString()
-                                                                                                   }).OrderBy(c => c.Text).ToList();
+                        {
+                            Text = c.Name,
+                            Value = c.RepudiationReasonId.ToString()
+                        }).OrderBy(c => c.Text).ToList();
+
+                        viewModel.AvailableRepudiationReasonNames.Insert(0, new SelectListItem() { Text = Label.ResourceManager.GetString(name: "SelectReason").ToString(), Value = "0" });
                     }
                 }
             }
             catch (RuleViolationException rve)
             {
-                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
             }
             return viewModel;
         }

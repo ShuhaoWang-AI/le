@@ -574,6 +574,15 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select Reason.
+        /// </summary>
+        public static string SelectReason {
+            get {
+                return ResourceManager.GetString("SelectReason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Signatory Granted.
         /// </summary>
         public static string SignatoryGranted {

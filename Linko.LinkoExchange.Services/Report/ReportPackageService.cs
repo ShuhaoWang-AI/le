@@ -1881,7 +1881,7 @@ namespace Linko.LinkoExchange.Services.Report
                     //Check valid reason (UC-19 7.a.)
                     if (repudiationReasonId < 1)
                     {
-                        ThrowSimpleException($"Reason is required.");
+                        ThrowSimpleException($"Reason is required.", "RepudiationReasonId");
                     }
 
                     //=========
@@ -2490,12 +2490,12 @@ namespace Linko.LinkoExchange.Services.Report
         /// Used to simplify and clean up methods where there are multiple validation tests.
         /// </summary>
         /// <param name="message">Rule violation message to use when throwing the exception.</param>
-        private void ThrowSimpleException(string message)
+        private void ThrowSimpleException(string message, string propertyName = null)
         {
             _logger.Info($"Enter SampleService.ThrowSimpleException. message={message}");
 
             List<RuleViolation> validationIssues = new List<RuleViolation>();
-            validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
+            validationIssues.Add(new RuleViolation(propertyName ?? string.Empty, propertyValue: null, errorMessage: message));
 
             _logger.Info($"Leaving SampleService.ThrowSimpleException. message={message}");
 
