@@ -1071,7 +1071,7 @@
 
             @if (ViewBag.ShowValidateCorMessage != null && ViewBag.ShowValidateCorMessage)
             {
-                <div class="alert alert-dismissible alert-info">
+                <div class="alert alert-dismissible" id="divValidateCorMessage">
                     <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
                     <h5>
                         <i class="fa fa-info icon"></i>
@@ -1084,6 +1084,10 @@
                         @("LinkoExchange COR Signature : " + ViewBag.VerifyResult.DigitalSignature)
                     </p>
                 </div>
+                <script>
+                    $("#divValidateCorMessage")
+                        .addClass("@(ViewBag.VerifyResult.Valid ? "alert-success" : "alert-danger")");
+                </script>
             }
 
             <div class="box-tools pull-right">
