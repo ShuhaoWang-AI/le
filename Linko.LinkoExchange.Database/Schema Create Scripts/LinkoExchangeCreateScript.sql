@@ -4849,7 +4849,7 @@ Hello {adminFirstName} {adminLastName},
 
 Signatory rights have been granted for:
 
-        User:  {firstName} {lastName}
+         User: {firstName} {lastName}
     Authority: {authorityOrganizationName}
      Facility: {organizationName}
                {addressLine1}
