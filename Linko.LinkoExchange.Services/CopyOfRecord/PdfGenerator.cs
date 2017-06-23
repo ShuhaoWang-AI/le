@@ -370,15 +370,15 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                     
                     row.Cells.Add($"{mdl}", rightTextSize8);
 
-                    row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower(), centerTextSize8);
-                    row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower(), centerTextSize8);
+                    row.Cells.Add(text: sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue: " 12:00 am",newValue: ""), centerTextSize8);
+                    row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue: " 12:00 am",newValue: ""), centerTextSize8);
 
                     row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName, centerTextSize8);
                     row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString(), centerTextSize8);
                     row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString(), centerTextSize8);
                     row.Cells.Add(sampleResultExtension.SampleResult.IsApprovedEPAMethod.ToString(), centerTextSize8);
                     var analysisDateTimeString = sampleResultExtension.SampleResult.AnalysisDateTimeLocal.HasValue
-                                                     ? sampleResultExtension.SampleResult.AnalysisDateTimeLocal.Value.ToString("MM/dd/yyyy hh:mm tt").ToLower()
+                                                     ? sampleResultExtension.SampleResult.AnalysisDateTimeLocal.Value.ToString("MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue: " 12:00 am",newValue: "")
                                                      : "";
 
                     row.Cells.Add(analysisDateTimeString, centerTextSize8);
@@ -391,8 +391,8 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                         row.Cells.Add(sampleResultExtension.SampleResult.ParameterName, leftTextSize8);
                         row.Cells.Add($"{sampleResultExtension.SampleResult.MassLoadingValue} {sampleResultExtension.SampleResult.MassLoadingUnitName}", rightTextSize8);
                         row.Cells.Add($"{sampleResultExtension.SampleResult.EnteredMethodDetectionLimit.GetValueOrEmptyString()}", rightTextSize8);
-                        row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower(), centerTextSize8);
-                        row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower(), centerTextSize8);
+                        row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue: " 12:00 am",newValue: ""), centerTextSize8);
+                        row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue: " 12:00 am",newValue: ""), centerTextSize8);
                         row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName, centerTextSize8);
                         row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString(), centerTextSize8);
                         row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString(), centerTextSize8);

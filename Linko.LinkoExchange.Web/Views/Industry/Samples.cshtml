@@ -76,7 +76,8 @@
                                          ftb.Enabled(value: false);
                                      }
                                  });
-                          columns.Bound(c => c.StartDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
+                          columns.Bound(c => c.StartDateTimeLocal)
+                                 .ClientTemplate(value: "#= (kendo.toString(StartDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(StartDateTimeLocal,'MM/dd/yyyy') : kendo.toString(StartDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
                                  .Filterable(ftb =>
                                  {
                                      if (ViewBag.SampleStatusName == SampleStatusName.Reported)
@@ -88,7 +89,8 @@
                                          ftb.Enabled(value: false);
                                      }
                                  });
-                          columns.Bound(c => c.EndDateTimeLocal).Format(value: "{0:MM/dd/yyyy hh:mm tt}")
+                          columns.Bound(c => c.EndDateTimeLocal)
+                                 .ClientTemplate(value: "#= (kendo.toString(EndDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(EndDateTimeLocal,'MM/dd/yyyy') : kendo.toString(EndDateTimeLocal,'MM/dd/yyyy hh:mm tt')#")
                                  .Filterable(ftb =>
                                  {
                                      if (ViewBag.SampleStatusName == SampleStatusName.Reported)
