@@ -762,7 +762,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 if (model.RepudiationReviewComments == null || model.RepudiationReviewComments.Trim().Length == 0)
                 {
-                    ModelState.AddModelError(key:"RepudiationReviewComments", errorMessage:@"Repudiation review comments is required.");
+                    ModelState.AddModelError(key:"RepudiationReviewComments", errorMessage:@"Repudiation review comments are required.");
                 }
                 else
                 {
