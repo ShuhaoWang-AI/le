@@ -18,7 +18,17 @@
                 <a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: Model.IsCurrentPortalAuthority ? "Authority" : "Industry")'"><i class=""></i> Home </a>
             </li>
             <li>
-                <a href="#" onclick="location.href = '@Url.Action(actionName: "ReportPackages", controllerName: "ReportPackage", routeValues: new {reportStatus = Model.Status})'"><i class=""></i> Report Package </a>
+                @{
+                    var modelStatusName = Model.Status; //By default
+                    if (TempData["ReportStatusName"] != null)
+                    {
+                        modelStatusName = (ReportStatusName)TempData["ReportStatusName"];
+                        TempData.Keep("ReportStatusName");
+                    }
+                } 
+                <a href="#" onclick="location.href = '@Url.Action(actionName: "ReportPackages", controllerName: "ReportPackage", routeValues: new {reportStatus = modelStatusName})'"><i class=""></i>
+                    @Label.ResourceManager.GetString("Breadcrumb_" + modelStatusName.ToString())
+                </a>
             </li>
             <li class="active">
                 Details

@@ -160,6 +160,69 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All Report Packages.
+        /// </summary>
+        public static string Breadcrumb_All {
+            get {
+                return ResourceManager.GetString("Breadcrumb_All", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report Package - Draft.
+        /// </summary>
+        public static string Breadcrumb_Draft {
+            get {
+                return ResourceManager.GetString("Breadcrumb_Draft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report Package - Ready to Submit.
+        /// </summary>
+        public static string Breadcrumb_ReadyToSubmit {
+            get {
+                return ResourceManager.GetString("Breadcrumb_ReadyToSubmit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report Package - Repudiated.
+        /// </summary>
+        public static string Breadcrumb_Repudiated {
+            get {
+                return ResourceManager.GetString("Breadcrumb_Repudiated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report Package Repudiations Pending Review.
+        /// </summary>
+        public static string Breadcrumb_RepudiatedPendingReview {
+            get {
+                return ResourceManager.GetString("Breadcrumb_RepudiatedPendingReview", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report Package - Submitted.
+        /// </summary>
+        public static string Breadcrumb_Submitted {
+            get {
+                return ResourceManager.GetString("Breadcrumb_Submitted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report Package Submissions Pending Review.
+        /// </summary>
+        public static string Breadcrumb_SubmittedPendingReview {
+            get {
+                return ResourceManager.GetString("Breadcrumb_SubmittedPendingReview", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         public static string ButtonCancel {

@@ -318,4 +318,25 @@
   <data name="UserName" xml:space="preserve">
     <value>User Name</value>
   </data>
+  <data name="Breadcrumb_All" xml:space="preserve">
+    <value>All Report Packages</value>
+  </data>
+  <data name="Breadcrumb_Draft" xml:space="preserve">
+    <value>Report Package - Draft</value>
+  </data>
+  <data name="Breadcrumb_ReadyToSubmit" xml:space="preserve">
+    <value>Report Package - Ready to Submit</value>
+  </data>
+  <data name="Breadcrumb_Repudiated" xml:space="preserve">
+    <value>Report Package - Repudiated</value>
+  </data>
+  <data name="Breadcrumb_RepudiatedPendingReview" xml:space="preserve">
+    <value>Report Package Repudiations Pending Review</value>
+  </data>
+  <data name="Breadcrumb_Submitted" xml:space="preserve">
+    <value>Report Package - Submitted</value>
+  </data>
+  <data name="Breadcrumb_SubmittedPendingReview" xml:space="preserve">
+    <value>Report Package Submissions Pending Review</value>
+  </data>
 </root>

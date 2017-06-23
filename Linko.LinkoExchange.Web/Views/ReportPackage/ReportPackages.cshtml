@@ -9,7 +9,7 @@
         <li>
             <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:ViewBag.PortalName.ToLower().Equals(value:"authority") ? "Authority" : "Industry")'"><i class=""></i> Home </a>
         </li>
-        <li class="active">Report Packages - @Label.ResourceManager.GetString(name:ViewBag.ReportStatusName.ToString())</li>
+        <li class="active">@Label.ResourceManager.GetString(name:"Breadcrumb_" + ViewBag.ReportStatusName.ToString())</li>
     </ol>
 </section>
 

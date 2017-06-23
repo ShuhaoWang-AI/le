@@ -92,6 +92,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult ReportPackages(ReportStatusName reportStatus)
         {
             ViewBag.ReportStatusName = reportStatus;
+            TempData["ReportStatusName"] = reportStatus;
             return View();
         }
 
