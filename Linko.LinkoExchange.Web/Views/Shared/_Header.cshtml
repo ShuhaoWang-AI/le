@@ -1,5 +1,4 @@
-﻿@using System.Web.Configuration
-<header class="main-header">
+﻿<header class="main-header">
     @if (Request.IsAuthenticated)
     {
         @* BEGIN Logo *@
@@ -92,50 +91,6 @@
                 }
             </div>
         </nav>
-
-        @* BEGIN Pop-up for when session timeout *@
-        <script>
-
-            $(document)
-                .ready(function()
-                {
-                    var timeOut = @WebConfigurationManager.AppSettings[name:"CookieValidateInterval"] * 60 * 1000;
-                    setTimeout("showPopup()", timeOut); // milliseconds
-                });
-
-            function showPopup()
-            {
-                var message = "@Message.SessionTimeOutPopupMessage";
-
-                $('body')
-                    .append('<div class="popup" data-popup="popup-1">'
-                        + '<div class="popup-inner">'
-                        + '<h4>'
-                        + message
-                        + '</h4>'
-                        + '<a class="popup-close" data-popup-close="popup-1" href="#">x</a>'
-                        + '</div>'
-                        + '</div>');
-
-                $('[data-popup="popup-1"]').fadeIn(350);
-
-                $('[data-popup-close]')
-                    .on('click'
-                        , function()
-                        {
-                            $('[data-popup="popup-1"]').fadeOut(350);
-                            location.reload();
-                        });
-
-                setTimeout(function()
-                    {
-                        location.reload();
-                    }
-                    , 30 * 1000);
-            }
-
-        </script>
-        @* END Pop-up for when session timeout *@
     }
     else
     {

@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.Web.Configuration
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -60,7 +61,60 @@
                     @ViewBag.Title <small>@ViewBag.Description</small>
                 </h1>
             </section>
-            <section class="content"> @RenderBody() </section>
+            <section class="content">
+                @if (Request.IsAuthenticated)
+                {
+                    @* BEGIN Pop-up for when session timeout *@
+
+                    <div aria-labelledby="Session Time Out" class="fade modal modal-info" id="SessionTimeOut" role="dialog" tabindex="-1">
+                        <div class="modal-dialog" role="document">
+                            <div class="alert alert-dismissible alert-info modal-content">
+                                <button aria-label="Close" class="close" data-dismiss="modal" id="btnCloseSessionTimeOut" type="button">&times;</button>
+                                <h4 class="box-title">Session Timed Out</h4>
+
+                                <div class="form-horizontal">
+                                    <p>
+                                        @Message.SessionTimeOutPopupMessage
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        $(document)
+                            .ready(function()
+                            {
+                                var timeOut = @WebConfigurationManager.AppSettings[name: "CookieValidateInterval"] * 60 * 1000;
+                                setTimeout("showPopup()", timeOut); // milliseconds
+                            });
+
+                        function showPopup()
+                        {
+                            $("#btnCloseSessionTimeOut")
+                                .on('click'
+                                    , function()
+                                    {
+                                        $('#SessionTimeOut').modal('toggle');
+                                        location.reload();
+                                    });
+
+                            $('#SessionTimeOut').modal('toggle');
+
+                            setTimeout(function()
+                                {
+                                    location.reload();
+                                }
+                                , 30 * 1000);
+                        }
+
+                    </script>
+                    @* END Pop-up for when session timeout *@
+                }
+
+                @RenderBody()
+
+            </section>
         </div>
     </div>
 
