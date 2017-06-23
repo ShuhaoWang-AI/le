@@ -990,7 +990,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             var model = new ConfirmationViewModel();
             model.Title = "Reset Password Confirmation";
-            model.HtmlStr = "Your password has been successfully reset. Please click <a href= ";
+            model.HtmlStr = "Your Password has been successfully reset. Please click <a href= ";
             model.HtmlStr += Url.Action(actionName:"SignIn", controllerName:"Account") + ">here </a> to Sign in.";
 
             return View(viewName:"Confirmation", model:model);
@@ -1052,11 +1052,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                         _logger.Info(message:string.Format(format:"KBQ question. Failed to Answer KBQ Question {0} times. Account is locked. UserProfileId:{1}",
                                                            arg0:maxAnswerAttempts, arg1:model.UserProfileId));
 
-                        var regulatoryList = _organizationService.GetUserRegulators(userId:model.UserProfileId);
-                        if (regulatoryList == null)
-                        {
-                            regulatoryList = new List<AuthorityDto>();
-                        }
+                        var regulatoryList = _organizationService.GetUserRegulators(userId:model.UserProfileId) ?? new List<AuthorityDto>();
 
                         TempData[key:"RegulatoryList"] = regulatoryList;
 
@@ -1082,23 +1078,22 @@ namespace Linko.LinkoExchange.Web.Controllers
             var result = _authenticationService.ChangePasswordAsync(userId:model.OwinUserId, newPassword:model.Password).Result;
             if (result.Success)
             {
-                TempData[key:"SubTitle"] = "Change Password";
-                TempData[key:"Message"] = "Password successfully changed.";
-                return RedirectToAction(actionName:"ChangeAccountSucceed");
+                return RedirectToAction(actionName:"ResetExpiredPasswordConfirmation");
             }
 
             var errorMessage = result.Errors.Aggregate((i, j) => { return i + j; });
             ModelState.AddModelError(key:string.Empty, errorMessage:errorMessage);
             return View(viewName:"ResetPassword", model:model);
         }
-
+        
+        // GET: /Account/ResetExpiredPasswordConfirmation
         [AllowAnonymous]
-        public ActionResult ChangeAccountSucceed()
+        public ActionResult ResetExpiredPasswordConfirmation()
         {
             var model = new ConfirmationViewModel
                         {
-                            Title = TempData[key:"SubTitle"].ToString(),
-                            Message = TempData[key:"Message"].ToString()
+                            Title = "Reset Password Confirmation",
+                            Message = "Password successfully changed."
                         };
 
             return View(viewName:"Confirmation", model:model);
@@ -1135,14 +1130,23 @@ namespace Linko.LinkoExchange.Web.Controllers
             var result = _authenticationService.ChangePasswordAsync(userId:userId, newPassword:model.Password).Result;
             if (result.Success)
             {
-                TempData[key:"SubTitle"] = "Change Password";
-                TempData[key:"Message"] = "Change password succeeded.";
-                return RedirectToAction(actionName:"ChangeAccountSucceed");
+                return RedirectToAction(actionName:"ChangePasswordConfirmation");
             }
 
             var errorMessage = result.Errors.Aggregate((i, j) => i + j);
             ModelState.AddModelError(key:string.Empty, errorMessage:errorMessage);
             return View(model:model);
+        }
+        
+        public ActionResult ChangePasswordConfirmation()
+        {
+            var model = new ConfirmationViewModel
+                        {
+                            Title = "Change Password Confirmation",
+                            Message = "Password successfully changed."
+                        };
+
+            return View(viewName:"Confirmation", model:model);
         }
 
         [Authorize]
@@ -1197,11 +1201,20 @@ namespace Linko.LinkoExchange.Web.Controllers
             else
             {
                 _authenticationService.UpdateClaim(key:CacheKey.Email, value:model.NewEmail);
-
-                TempData[key:"SubTitle"] = "Change Email Address";
-                TempData[key:"Message"] = "Email successfully changed.";
-                return RedirectToAction(actionName:"ChangeAccountSucceed");
+                
+                return RedirectToAction(actionName:"ChangeEmailConfirmation");
             }
+        }
+        
+        public ActionResult ChangeEmailConfirmation()
+        {
+            var model = new ConfirmationViewModel
+                        {
+                            Title = "Change Email Address Confirmation",
+                            Message = "Email successfully changed."
+                        };
+
+            return View(viewName:"Confirmation", model:model);
         }
 
         public ActionResult KbqChallenge(string returnUrl)
