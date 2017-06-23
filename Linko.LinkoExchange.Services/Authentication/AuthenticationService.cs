@@ -552,8 +552,15 @@ namespace Linko.LinkoExchange.Services.Authentication
                     // need to move inside _programService.CreateOrganizationRegulatoryProgramForUser otherwise it will be send email to all approver when registrationType == RegistrationType.ResetRegistration 
                     // UC-42 7, 8
                     // Find out who have approval permission    
-                    var approvalPeople = _permissionService.GetApprovalPeople(invitationDto.SenderOrganizationRegulatoryProgramId);
-                    var sendTo = approvalPeople.Select(i => i.Email).ToArray();
+                    var sendTo = new List<string>(); 
+                    if(registrationType == RegistrationType.ResetRegistration)
+                    {
+                       sendTo = _permissionService.GetAllAuthoritiesApprovalPeopleForUser(applicationUser.UserProfileId).Select(i=>i.Email).ToList();   
+                    } 
+                    else
+                    {
+                        sendTo = _permissionService.GetApprovalPeople(invitationDto.SenderOrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
+                    }
 
                     //  Determine if user is authority user or is industry user; 
                     var senderProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.SenderOrganizationRegulatoryProgramId);
@@ -609,7 +616,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     if (!sendTo.Any())
                     {
-                        sendTo = new[] { emailAddressOnEmail }; // send email to authority support email when no approval email found
+                        sendTo.Add(emailAddressOnEmail);    // send email to authority support email when no approval email found
                     }
                     if (isInvitedToIndustry)
                     {

@@ -7,6 +7,7 @@ using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Program;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 
 namespace Linko.LinkoExchange.Services.Permission
@@ -27,6 +28,42 @@ namespace Linko.LinkoExchange.Services.Permission
             _dbContext = dbContext;
             _mapHelper = mapHelper;
 
+        }
+
+        public IEnumerable<UserDto> GetAllAuthoritiesApprovalPeopleForUser(int userProfileId)
+        {
+            var authorityOrganizationIds = new List<int>();
+            // step 1,  find all the OrganziationRegulatoryPrograms this user is in
+            var orgRegPrograms  = _dbContext.OrganizationRegulatoryProgramUsers
+                .Include(s => s.OrganizationRegulatoryProgram)
+                .Where(u => u.UserProfileId == userProfileId &&
+                            !u.IsRemoved &&
+                            u.IsEnabled &&
+                            !u.IsRemoved
+                            )
+                .Select(i=>i.OrganizationRegulatoryProgram);
+
+            // step 2, find the authorities' organization Ids
+            foreach (var orgRegProgram in orgRegPrograms)
+            {
+                authorityOrganizationIds.Add(orgRegProgram.RegulatorOrganizationId ?? orgRegProgram.OrganizationId);
+            }
+            
+            authorityOrganizationIds = authorityOrganizationIds.Distinct().ToList();
+
+            // step 3,  find 'Administrators and standard users for all authorities'
+            var userProfileIds = _dbContext.OrganizationRegulatoryProgramUsers 
+                .Include(i =>i.PermissionGroup)
+                .Where(u => u.IsRemoved == false &&
+                            authorityOrganizationIds.Contains(u.OrganizationRegulatoryProgram.OrganizationId) &&
+                            (u.PermissionGroup.Name == UserRole.Standard.ToString() ||
+                             u.PermissionGroup.Name == UserRole.Administrator.ToString()))
+                .Select(i=>i.UserProfileId).Distinct();
+            
+            var userProfiles = _dbContext.Users.Where(i => userProfileIds.Contains(i.UserProfileId)).ToList();
+            var userDtos = userProfiles.Select(i => _mapHelper.GetUserDtoFromUserProfile(i));
+
+            return userDtos;
         }
 
         // TODO: to implement 
