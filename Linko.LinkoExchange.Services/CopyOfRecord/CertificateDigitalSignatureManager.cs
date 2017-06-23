@@ -20,6 +20,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         private RSACryptoServiceProvider _publicKey;
         private int _currentCertificateId;
         private bool _initialized = false;
+        private readonly object _lock = new object();
 
 
         public CertificateDigitalSignatureManager(
@@ -123,18 +124,22 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
             var certificatePassword = certificateInfo.Password;
             var certifcateFile = Path.Combine(certificateInfo.PhysicalPath, certificateInfo.FileName);
-
-            var certificate = new X509Certificate2(certifcateFile, certificatePassword);
+            X509Certificate2 certificate;
+            lock(_lock)
+            {
+                certificate = new X509Certificate2(certifcateFile, certificatePassword);
+            }
+            
             _privateKey = (RSACryptoServiceProvider)certificate.PrivateKey;
             _publicKey = (RSACryptoServiceProvider)certificate.PublicKey.Key;
-
+            
             if (_privateKey == null || _publicKey == null)
             {
                 throw new Exception(message: "Invalid certificate or password.");
             }
 
             _initialized = true;
-        }
+      }
 
         #endregion 
     }
