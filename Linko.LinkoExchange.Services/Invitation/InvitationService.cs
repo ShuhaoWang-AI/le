@@ -533,7 +533,6 @@ namespace Linko.LinkoExchange.Services.Invitation
                 foreach (var existingUser in existingUsers)
                 {
                     if (existingUser.OrganizationRegulatoryProgramId == orgRegProgramId
-                        && existingUser.UserProfileDto.IsAccountResetRequired == false
                         && existingUser.IsRegistrationDenied != true
                         && existingUser.IsRemoved != true)
                     {
