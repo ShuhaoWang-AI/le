@@ -10,10 +10,10 @@ using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
-    [Validator(validatorType:typeof(SampleViewModelValidator))]
+    [Validator(validatorType: typeof(SampleViewModelValidator))]
     public class SampleViewModel
     {
-        [ScaffoldColumn(scaffold:false)]
+        [ScaffoldColumn(scaffold: false)]
         public int? Id { get; set; }
 
         [Display(Name = "Name")]
@@ -98,13 +98,13 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
                 var options = new List<SelectListItem> {new SelectListItem {Text = " ", Value = "NUMERIC"}};
 
-                options.AddRange(collection:selectedValues.Select(
-                                                       x => new SelectListItem
-                                                            {
-                                                                Text = x,
-                                                                Value = x
-                                                            }
-                                                      ).ToList());
+                options.AddRange(collection: selectedValues.Select(
+                                                                   x => new SelectListItem
+                                                                        {
+                                                                            Text = x,
+                                                                            Value = x
+                                                                        }
+                                                                  ).ToList());
                 return options;
             }
         }
@@ -129,12 +129,15 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public SampleViewModelValidator()
         {
             //StartDateTimeLocal
-            RuleFor(x => x.StartDateTimeLocal).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.");
+            RuleFor(x => x.StartDateTimeLocal).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
+
             //EndDateTimeLocal
-            RuleFor(x => x.EndDateTimeLocal).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.").GreaterThanOrEqualTo(x => x.StartDateTimeLocal)
+            RuleFor(x => x.EndDateTimeLocal).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.").GreaterThanOrEqualTo(x => x.StartDateTimeLocal)
                                             .WithMessage(errorMessage: "End date must after Start date");
+
             //ReportElementTypeId
-            RuleFor(x => x.FlowUnitId).NotEmpty().WithMessage(errorMessage:"{PropertyName} is required.").GreaterThan(valueToCompare:0).When(x => !x.FlowValue.Trim().Equals(value: "")).WithMessage(errorMessage:"{PropertyName} is required.");
+            RuleFor(x => x.FlowUnitId).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.").GreaterThan(valueToCompare: 0)
+                                      .When(x => x.FlowValue != null && !x.FlowValue.Trim().Equals(value: "")).WithMessage(errorMessage: "{PropertyName} is required.");
         }
     }
 }
