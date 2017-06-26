@@ -72,18 +72,36 @@ namespace Linko.LinkoExchange.Core.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Account Locked (KBQ).
         /// </summary>
-        public static string AccountLockedKBQ {
+        public static string AccountLockedKBQRepudiation {
             get {
-                return ResourceManager.GetString("AccountLockedKBQ", resourceCulture);
+                return ResourceManager.GetString("AccountLockedKBQRepudiation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Account Locked (KBQ).
+        /// </summary>
+        public static string AccountLockedKBQSigning {
+            get {
+                return ResourceManager.GetString("AccountLockedKBQSigning", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Account Locked (Password).
         /// </summary>
-        public static string AccountLockedPassword {
+        public static string AccountLockedPasswordRepudiation {
             get {
-                return ResourceManager.GetString("AccountLockedPassword", resourceCulture);
+                return ResourceManager.GetString("AccountLockedPasswordRepudiation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Account Locked (Password).
+        /// </summary>
+        public static string AccountLockedPasswordSigning {
+            get {
+                return ResourceManager.GetString("AccountLockedPasswordSigning", resourceCulture);
             }
         }
         

@@ -6192,10 +6192,10 @@ Email: {emailAddress}
     INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
     VALUES 
     (
-        'CromerrEvent_Signature_AccountLockedKBQ', 
+        'CromerrEvent_Signature_AccountLockedKBQSigning', 
         'CromerrEvent',
         'Signature',   
-        'AccountLockedKBQ', 
+        'AccountLockedKBQSigning', 
         '',
         'Account locked for exceeding Knowledge Based Question attempts during signature ceremony.
 User: {firstName} {lastName}
@@ -6212,10 +6212,10 @@ Report Period: {periodStartDate} - {periodEndDate}
     INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
     VALUES 
     (
-        'CromerrEvent_Signature_AccountLockedPassword', 
+        'CromerrEvent_Signature_AccountLockedPasswordSigning', 
         'CromerrEvent',
         'Signature',   
-        'AccountLockedPassword', 
+        'AccountLockedPasswordSigning', 
         '',
         'Account locked for exceeding Password attempts during signature ceremony.
 User: {firstName} {lastName}
@@ -6229,6 +6229,46 @@ Report Period: {periodStartDate} - {periodEndDate}
 ' 
 )
    
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Signature_AccountLockedKBQRepudiation', 
+        'CromerrEvent',
+        'Signature',   
+        'AccountLockedKBQRepudiation', 
+        '',
+        'Account locked for exceeding Knowledge Based Question attempts during repudiation.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+For:
+Organization: {organizationName}
+Report: {reportPackageName}
+Report Period: {periodStartDate} - {periodEndDate}
+' 
+)
+   
+    INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
+    VALUES 
+    (
+        'CromerrEvent_Signature_AccountLockedPasswordRepudiation', 
+        'CromerrEvent',
+        'Signature',   
+        'AccountLockedPasswordRepudiation', 
+        '',
+        'Account locked for exceeding Password attempts during repudiation.
+User: {firstName} {lastName}
+User Name: {userName}
+Email: {emailAddress}
+
+For:
+Organization: {organizationName}
+Report: {reportPackageName}
+Report Period: {periodStartDate} - {periodEndDate}
+' 
+)
+
     INSERT INTO dbo.tAuditLogTemplate (Name, TemplateType, EventCategory, EventType, SubjectTemplate, MessageTemplate)
     VALUES 
     (

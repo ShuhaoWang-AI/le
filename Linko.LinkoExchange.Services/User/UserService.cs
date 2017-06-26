@@ -878,11 +878,19 @@ namespace Linko.LinkoExchange.Services.User
             }
             else if (reason == AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony)
             {
-                cromerrEvent = CromerrEvent.Signature_AccountLockedKBQ;
+                cromerrEvent = CromerrEvent.Signature_AccountLockedKBQSigning;
             }
             else if (reason == AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony)
             {
-                cromerrEvent = CromerrEvent.Signature_AccountLockedPassword;
+                cromerrEvent = CromerrEvent.Signature_AccountLockedPasswordSigning;
+            }
+            else if (reason == AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony)
+            {
+                cromerrEvent = CromerrEvent.Signature_AccountLockedPasswordRepudiation;
+            }
+            else if (reason == AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony)
+            {
+                cromerrEvent = CromerrEvent.Signature_AccountLockedPasswordRepudiation;
             }
             else
             {
@@ -944,7 +952,9 @@ namespace Linko.LinkoExchange.Services.User
                 }
 
                 if (reason == AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony
-                        || reason == AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony)
+                        || reason == AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony
+                        || reason == AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony
+                        || reason == AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony)
                 {
                     if (reportPackageId.HasValue)
                     {

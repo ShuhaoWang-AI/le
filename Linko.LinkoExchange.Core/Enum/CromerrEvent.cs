@@ -36,8 +36,10 @@
         Signature_SignatoryGranted,
         Signature_SignatoryRevoked,
         Signature_SignFailed,
-        Signature_AccountLockedPassword,
-        Signature_AccountLockedKBQ,
+        Signature_AccountLockedPasswordSigning,
+        Signature_AccountLockedKBQSigning,
+        Signature_AccountLockedPasswordRepudiation,
+        Signature_AccountLockedKBQRepudiation,
         Report_Submitted,
         Report_Repudiated
 
