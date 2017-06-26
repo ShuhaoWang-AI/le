@@ -242,7 +242,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
                     _pdfPage.Paragraphs.Add(sampleResultsTable);
                     // Month, Parameter, result, MDL, Sample Start, Sample End, Collection Method, Lab SampleId, Analysis Method, EPA method, Analysis Data, Flow
-                    sampleResultsTable.ColumnWidths = "6% 19% 11.6% 6.2% 7.1% 7.1% 7.3% 7.8% 7.5% 5.3% 7.1% 8.0%";
+                    sampleResultsTable.ColumnWidths = "6% 19% 8.9% 8.9% 7.1% 7.1% 7.3% 7.8% 7.5% 5.3% 7.1% 8.0%";
 
 
                     var sampleMonitoringPointerGroups = allSamples.GroupBy(i => i.MonitoringPointId);
@@ -381,7 +381,12 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                     row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName, centerTextSize8);
                     row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString(), centerTextSize8);
                     row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString(), centerTextSize8);
-                    row.Cells.Add(sampleResultExtension.SampleResult.IsApprovedEPAMethod.ToString(), centerTextSize8);
+                    var isEpaMethod = "No"; 
+                    if(sampleResultExtension.SampleResult.IsApprovedEPAMethod)
+                    {
+                        isEpaMethod = "Yes"; 
+                    }
+                    row.Cells.Add(isEpaMethod, centerTextSize8);
                     var analysisDateTimeString = sampleResultExtension.SampleResult.AnalysisDateTimeLocal.HasValue
                                                      ? sampleResultExtension.SampleResult.AnalysisDateTimeLocal.Value.ToString("MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue: " 12:00 am",newValue: "")
                                                      : "";
@@ -401,7 +406,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                         row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName, centerTextSize8);
                         row.Cells.Add(sampleResultExtension.Sample.LabSampleIdentifier.GetValueOrEmptyString(), centerTextSize8);
                         row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString(), centerTextSize8);
-                        row.Cells.Add(sampleResultExtension.SampleResult.IsApprovedEPAMethod.ToString(), centerTextSize8);
+                        row.Cells.Add(isEpaMethod, centerTextSize8);
                         row.Cells.Add(analysisDateTimeString, centerTextSize8);
                         row.Cells.Add($"{sampleResultExtension.Sample.FlowValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}", rightTextSize8);
                     }
