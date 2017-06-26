@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 using Kendo.Mvc;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
@@ -1819,8 +1820,11 @@ namespace Linko.LinkoExchange.Web.Controllers
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"ParameterGroup/Details")]
-        public ActionResult ParameterGroupDetails(ParameterGroupViewModel model)
+        public ActionResult ParameterGroupDetails(ParameterGroupViewModel model, string selectedParameters)
         {
+            var serializer = new JavaScriptSerializer();
+            var parameters = serializer.Deserialize<List<ParameterViewModel>>(input:selectedParameters);
+            model.Parameters = parameters;
             return SaveParameterGroupDetails(model:model);
         }
 
@@ -1847,6 +1851,10 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         private ActionResult SaveParameterGroupDetails(ParameterGroupViewModel model)
         {
+            if (model.Parameters.Count > 0)
+            {
+                ModelState.Remove(key: "Parameters");
+            }
             if (!ModelState.IsValid)
             {
                 model = PrepareParameterGroupDetails(id:model.Id, dirtyViewModel: model);
@@ -1882,7 +1890,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 TempData[key:"SuccessMessage"] = $"Parameter Group {(model.Id.HasValue ? "updated" : "created")} successfully!";
 
                 ModelState.Clear();
-                return Json(data:new { redirect = true, newurl = Url.Action(actionName:"ParameterGroupDetails", controllerName:"Authority", routeValues:new {id}) });
+                return RedirectToAction(actionName:"ParameterGroupDetails", controllerName:"Authority", routeValues:new {id});
             }
             catch (RuleViolationException rve)
             {

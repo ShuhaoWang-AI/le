@@ -5,7 +5,7 @@
 }
 
 
-@using (Html.BeginForm())
+@using (Html.BeginForm(actionName: null, controllerName: null, method: FormMethod.Post, htmlAttributes: new { id = "LinkoExchangeForm" }))
 {
     @Html.AntiForgeryToken()
 
@@ -27,7 +27,7 @@
             <div class="box-tools pull-right">
                 @if (!ViewBag.Satus.Equals("ViewOnly"))
                 {
-                    <input class="btn btn-primary btn-sm" id="btnSave" type="button" value="Save" />
+                    <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"ParameterGroupDetails", controllerName:"Authority")" formmethod="post" />
 
                     if (!ViewBag.Satus.Equals("New"))
                     {
@@ -66,7 +66,7 @@
         </div>
 
         <section class="box-body form-horizontal">
-            @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
+            @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
                                                                                                                             {
                                                                                                                                 @class = "alert alert-danger"
                                                                                                                             })
@@ -85,6 +85,7 @@
 
             <div class="form-group">
                 @Html.HiddenFor(model => model.Id)
+                @Html.Hidden(name: "SelectedParameters")
                 @Html.LabelFor(model => model.Name, htmlAttributes:new
                                                                    {
                                                                        @class = "control-label col-md-2 required"
@@ -276,6 +277,35 @@
                             }
                         }
                     );
+
+                $("#LinkoExchangeForm")
+                    .submit(function(e)
+                    {
+                        var selectedParameters = [];
+                        try
+                        {
+                            $('#selectedParameterTable')
+                                .DataTable()
+                                .rows()
+                                .data()
+                                .each(function(d)
+                                {
+                                    var parameterViewModel = {};
+                                    parameterViewModel.Id = d[0];
+                                    parameterViewModel.Name = d[1];
+                                    selectedParameters.push(parameterViewModel);
+                                });
+                            console.debug(selectedParameters.length);
+                            $("#SelectedParameters").val(JSON.stringify(selectedParameters));
+
+                            return true;
+                        }
+                        catch (err)
+                        {
+                            alert(err);
+                            return false;
+                        }
+                    });
             });
 
         $(document)
@@ -322,57 +352,6 @@
                         .draw();
 
                     $(rowNode).css('color', 'green');
-                });
-
-        $("#btnSave")
-            .on("click"
-                , function()
-                {
-                    var selectedParameters = [];
-                    $('#selectedParameterTable')
-                        .DataTable()
-                        .rows()
-                        .data()
-                        .each(function(d)
-                        {
-                            var parameterViewModel = {};
-                            parameterViewModel.Id = d[0];
-                            parameterViewModel.Name = d[1];
-                            selectedParameters.push(parameterViewModel);
-                        });
-                    console.debug(selectedParameters.length);
-
-                    var viewModel = {};
-                    viewModel.Id = $('#Id').val();
-                    viewModel.Name = $('#Name').val();
-                    viewModel.Description = $('#Description').val();
-                    viewModel.IsActive = $('#IsActive').is(":checked");
-                    viewModel.Parameters = selectedParameters;
-
-                    var postUrl = "@Url.Action(actionName:"ParameterGroupDetails", controllerName:"Authority")";
-                    var token = $("[name='__RequestVerificationToken']").val();
-                    viewModel.__RequestVerificationToken = token;
-
-                    $.ajax({
-                        type: "POST"
-                        , url: postUrl
-                        , data: viewModel
-                        , success: function(response)
-                        {
-                            if (response.redirect != null && response.redirect)
-                            {
-                                window.location.replace(response.newurl);
-                            }
-                            else
-                            {
-                                var newDoc = document.open("text/html", "replace");
-                                newDoc.write(response);
-                                newDoc.close();
-                            }
-                        }
-                        //, error: function()
-                        //    {}
-                    });
                 });
     </script>
 }
