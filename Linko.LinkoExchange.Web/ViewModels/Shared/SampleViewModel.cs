@@ -137,7 +137,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
             //ReportElementTypeId
             RuleFor(x => x.FlowUnitId).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.").GreaterThan(valueToCompare: 0)
-                                      .When(x => x.FlowValue != null && !x.FlowValue.Trim().Equals(value: "")).WithMessage(errorMessage: "{PropertyName} is required.");
+                                      .When(x => !string.IsNullOrWhiteSpace(value: x.FlowValue)).WithMessage(errorMessage: "{PropertyName} is required.");
         }
     }
 }
