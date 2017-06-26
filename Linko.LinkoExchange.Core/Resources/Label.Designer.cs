@@ -70,6 +70,24 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account Locked (KBQ).
+        /// </summary>
+        public static string AccountLockedKBQ {
+            get {
+                return ResourceManager.GetString("AccountLockedKBQ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Account Locked (Password).
+        /// </summary>
+        public static string AccountLockedPassword {
+            get {
+                return ResourceManager.GetString("AccountLockedPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Account Reset Expired.
         /// </summary>
         public static string AccountResetExpired {

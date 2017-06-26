@@ -342,4 +342,10 @@
   <data name="SelectReason" xml:space="preserve">
     <value>Select Reason</value>
   </data>
+  <data name="AccountLockedKBQ" xml:space="preserve">
+    <value>Account Locked (KBQ)</value>
+  </data>
+  <data name="AccountLockedPassword" xml:space="preserve">
+    <value>Account Locked (Password)</value>
+  </data>
 </root>
