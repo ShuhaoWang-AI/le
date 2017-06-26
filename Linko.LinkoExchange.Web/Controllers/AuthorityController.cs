@@ -1848,7 +1848,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model = PrepareParameterGroupDetails(id:model.Id);
+                model = PrepareParameterGroupDetails(id:model.Id, parametersToRetain: model.Parameters);
 
                 if (ModelState[key:"."] != null)
                 {
@@ -1886,13 +1886,13 @@ namespace Linko.LinkoExchange.Web.Controllers
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
-                model = PrepareParameterGroupDetails(id:model.Id);
+                model = PrepareParameterGroupDetails(id:model.Id, parametersToRetain: model.Parameters);
             }
 
             return View(viewName:"ParameterGroupDetails", model:model);
         }
 
-        private ParameterGroupViewModel PrepareParameterGroupDetails(int? id = null)
+        private ParameterGroupViewModel PrepareParameterGroupDetails(int? id = null, ICollection<ParameterViewModel> parametersToRetain = null)
         {
             var viewModel = new ParameterGroupViewModel();
             if (id.HasValue)
@@ -1922,6 +1922,15 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 ViewBag.Satus = "New";
                 viewModel.Parameters = new List<ParameterViewModel>();
+            }
+
+            if (parametersToRetain != null)
+            {
+                viewModel.Parameters = new List<ParameterViewModel>();
+                foreach (var parameterToRetain in parametersToRetain)
+                {
+                    viewModel.Parameters.Add(parameterToRetain);
+                }
             }
 
             viewModel.AllParameters = _parameterService.GetGlobalParameters().Select(p => new ParameterViewModel
