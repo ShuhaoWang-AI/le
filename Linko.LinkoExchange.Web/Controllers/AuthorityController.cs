@@ -31,6 +31,7 @@ using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
 using Linko.LinkoExchange.Core.Resources;
 using Linko.LinkoExchange.Services.Sample;
+using System.Web;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
@@ -1848,7 +1849,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model = PrepareParameterGroupDetails(id:model.Id, parametersToRetain: model.Parameters);
+                model = PrepareParameterGroupDetails(id:model.Id, dirtyViewModel: model);
 
                 if (ModelState[key:"."] != null)
                 {
@@ -1886,13 +1887,13 @@ namespace Linko.LinkoExchange.Web.Controllers
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
-                model = PrepareParameterGroupDetails(id:model.Id, parametersToRetain: model.Parameters);
+                model = PrepareParameterGroupDetails(id:model.Id, dirtyViewModel: model);
             }
 
             return View(viewName:"ParameterGroupDetails", model:model);
         }
 
-        private ParameterGroupViewModel PrepareParameterGroupDetails(int? id = null, ICollection<ParameterViewModel> parametersToRetain = null)
+        private ParameterGroupViewModel PrepareParameterGroupDetails(int? id = null, ParameterGroupViewModel dirtyViewModel = null)
         {
             var viewModel = new ParameterGroupViewModel();
             if (id.HasValue)
@@ -1924,10 +1925,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                 viewModel.Parameters = new List<ParameterViewModel>();
             }
 
-            if (parametersToRetain != null)
+            if (dirtyViewModel != null)
             {
                 viewModel.Parameters = new List<ParameterViewModel>();
-                foreach (var parameterToRetain in parametersToRetain)
+                foreach (var parameterToRetain in dirtyViewModel.Parameters)
                 {
                     viewModel.Parameters.Add(parameterToRetain);
                 }
@@ -2316,7 +2317,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"ReportPackageTemplateDetails", model:PrepareReportPackageTemplateDetails(id:id));
         }
 
-        private ReportPackageTemplateViewModel PrepareReportPackageTemplateDetails(int? id = null)
+        private ReportPackageTemplateViewModel PrepareReportPackageTemplateDetails(int? id = null, ReportPackageTemplateViewModel dirtyViewModel = null)
         {
             var viewModel = new ReportPackageTemplateViewModel();
 
@@ -2388,6 +2389,47 @@ namespace Linko.LinkoExchange.Web.Controllers
                 viewModel.EffectiveDateTimeLocal                 = DateTime.Today;
             }
 
+            if (dirtyViewModel != null)
+            {
+                viewModel.AttachmentTypes = new List<ReportElementTypeViewModel>();
+                if (dirtyViewModel.AttachmentTypes != null)
+                {
+                    foreach (var attachment in dirtyViewModel.AttachmentTypes)
+                    {
+                        viewModel.AttachmentTypes.Add(attachment);
+                    }
+                }
+
+                viewModel.CertificationTypes = new List<ReportElementTypeViewModel>();
+                if (dirtyViewModel.CertificationTypes != null)
+                {
+                    foreach (var certification in dirtyViewModel.CertificationTypes)
+                    {
+                        viewModel.CertificationTypes.Add(certification);
+                    }
+                }
+
+                viewModel.SamplesAndResultsTypes = new List<ReportElementTypeViewModel>();
+                if (dirtyViewModel.SamplesAndResultsTypes != null)
+                {
+                    foreach (var sample in dirtyViewModel.SamplesAndResultsTypes)
+                    {
+                        viewModel.SamplesAndResultsTypes.Add(sample);
+                    }
+                }
+
+                viewModel.ReportPackageTemplateAssignments = new List<IndustryViewModel>();
+                if (dirtyViewModel.ReportPackageTemplateAssignments != null)
+                {
+                    foreach (var industry in dirtyViewModel.ReportPackageTemplateAssignments)
+                    {
+                        industry.IndustryName = HttpUtility.HtmlDecode(industry.IndustryName);
+                        viewModel.ReportPackageTemplateAssignments.Add(industry);
+                    }
+                }
+
+            }
+
             viewModel.AllSamplesAndResultsTypes = new List<ReportElementTypeViewModel>();
 
             viewModel.AllAttachmentTypes = _reportElementService.GetReportElementTypes(categoryName:ReportElementCategoryName.Attachments).Select(vm => new ReportElementTypeViewModel
@@ -2441,7 +2483,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model = PrepareReportPackageTemplateDetails(id: model.Id);
+                model = PrepareReportPackageTemplateDetails(id: model.Id, dirtyViewModel: model);
 
                 //foreach (var issue in ModelState[key: "."].Errors)
                 //{
@@ -2485,7 +2527,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
-                model = PrepareReportPackageTemplateDetails(id:model.Id);
+                model = PrepareReportPackageTemplateDetails(id: model.Id, dirtyViewModel: model);
             }
 
             return View(viewName:"ReportPackageTemplateDetails", model:model);

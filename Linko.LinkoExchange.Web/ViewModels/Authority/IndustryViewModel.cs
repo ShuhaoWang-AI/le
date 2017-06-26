@@ -65,13 +65,22 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get; set;
         }
 
+        private string address;
         [Editable(false)]
         [Display(Name = "Address")]
         public string Address
         {
             get
             {
-                return string.Format(format: "{0} {1}, {2}, {3} {4}", args: new object[] { AddressLine1, AddressLine2, CityName, State, ZipCode });
+                if (string.IsNullOrEmpty(address))
+                    return string.Format(format: "{0} {1}, {2}, {3} {4}", args: new object[] { AddressLine1, AddressLine2, CityName, State, ZipCode });
+                else
+                {
+                    return address;
+                }
+            }
+            set {
+                address = value;
             }
         }
 
