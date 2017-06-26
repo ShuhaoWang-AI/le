@@ -241,7 +241,8 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                     };
 
                     _pdfPage.Paragraphs.Add(sampleResultsTable);
-                    sampleResultsTable.ColumnWidths = "6% 19% 11.6% 5.2% 7.1% 7.1% 7.3% 7.8% 8% 5.3% 7.1% 8.5%";
+                    // Month, Parameter, result, MDL, Sample Start, Sample End, Collection Method, Lab SampleId, Analysis Method, EPA method, Analysis Data, Flow
+                    sampleResultsTable.ColumnWidths = "6% 19% 11.6% 6.2% 7.1% 7.1% 7.3% 7.8% 7.5% 5.3% 7.1% 8.0%";
 
 
                     var sampleMonitoringPointerGroups = allSamples.GroupBy(i => i.MonitoringPointId);
@@ -367,6 +368,10 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                     row.Cells.Add(sampleResultExtension.SampleResult.ParameterName, leftTextSize8);
                     row.Cells.Add(GetSampleResultValue(sampleResultExtension.SampleResult), rightTextSize8);
                     var mdl = sampleResultExtension.SampleResult.EnteredMethodDetectionLimit.GetValueOrEmptyString(); 
+                    if(!mdl.Equals(string.Empty))
+                    {
+                       mdl = $"{mdl} {sampleResultExtension.SampleResult.UnitName}"; 
+                    }
                     
                     row.Cells.Add($"{mdl}", rightTextSize8);
 
@@ -389,8 +394,8 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                         row = sampleResultsTable.Rows.Add();
                         row.Cells.Add("");
                         row.Cells.Add(sampleResultExtension.SampleResult.ParameterName, leftTextSize8);
-                        row.Cells.Add($"{sampleResultExtension.SampleResult.MassLoadingValue} {sampleResultExtension.SampleResult.MassLoadingUnitName}", rightTextSize8);
-                        row.Cells.Add($"{sampleResultExtension.SampleResult.EnteredMethodDetectionLimit.GetValueOrEmptyString()}", rightTextSize8);
+                        row.Cells.Add($"{sampleResultExtension.SampleResult.MassLoadingValue} {sampleResultExtension.SampleResult.MassLoadingUnitName}", rightTextSize8); 
+                        row.Cells.Add($"{mdl}", rightTextSize8);
                         row.Cells.Add(sampleResultExtension.Sample.StartDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue: " 12:00 am",newValue: ""), centerTextSize8);
                         row.Cells.Add(sampleResultExtension.Sample.EndDateTimeLocal.ToString("MM/dd/yyyy hh:mm tt").ToLower().Replace(oldValue: " 12:00 am",newValue: ""), centerTextSize8);
                         row.Cells.Add(sampleResultExtension.Sample.CollectionMethodName, centerTextSize8);
