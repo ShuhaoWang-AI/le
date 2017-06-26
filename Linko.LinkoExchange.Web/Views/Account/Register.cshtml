@@ -48,6 +48,12 @@
             You are already a registered user of LinkoExchange and your user information is below.  To accept the invitation to this Organization, please agree to the Terms and Conditions and Register
         </div>
     }
+    else if (Model.RegistrationType == Linko.LinkoExchange.Core.Enum.RegistrationType.ResetRegistration)
+    {
+        <div class="well">
+            For security reasons, your account has been reset.  Please enter the required registration details including a new password.
+        </div>
+    }
 
     <div class="profileDiv" id="user-info-panel">
         <div class="box box-primary">
