@@ -776,6 +776,21 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"ReportPackageDetails", model:PrepareReportPackageDetails(id:id));
         }
 
+        [PortalAuthorize("authority")]
+        public bool IsSimilarReportPackageSubmittedAfter(int id)
+        {
+            var isNewerReportPackageExist = false;
+            try
+            {
+                isNewerReportPackageExist = _reportPackageService.IsSimilarReportPackageSubmittedAfter(reportPackageId: id);
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
+            }
+            return isNewerReportPackageExist;
+        }
+
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"{id:int}/SendToLinkoCts")]

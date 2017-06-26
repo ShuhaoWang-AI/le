@@ -1039,6 +1039,30 @@
                         </h5>
                     </div>
                 }
+                
+                <div aria-labelledby="Send to LinkoCTS" class="col-md-12 fade modal modal-info" id="SendToLinkoCTSModal" role="dialog" tabindex="-1">
+                    <div class="modal-dialog" role="document">
+                        <div class="alert alert-dismissible alert-info modal-content">
+                            <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
+                            <h4 class="box-title">Send Report Package to LinkoCTS</h4>
+
+                            <div class="form-horizontal">
+                                <p>
+                                    <span id="msgForSendToLinkoCTSModal"></span><br />
+                                </p>
+                                <div class="form-group">
+                                    <div class="pull-right">
+                                        <button type="submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "SendToLinkoCTS", controllerName: "ReportPackage", routeValues: new {id = Model.Id})#divSendToLinkoCTS" formmethod="post">
+                                            Yes
+                                        </button>
+                                        <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     @Html.LabelFor(m => m.LastSender, htmlAttributes: new {@class = "col-md-2 control-label"})
                     <div class="col-md-4">
@@ -1069,7 +1093,43 @@
 
             <div class="box-footer">
                 <div class="form-group pull-right">
-                    <input type="submit" value="Send to CTS" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "SendToLinkoCTS", controllerName: "ReportPackage", routeValues: new {id = Model.Id})#divSendToLinkoCTS" formmethod="post" />
+                    @if (Model.CtsEventTypeId.HasValue)
+                    {
+                        <input class="btn btn-primary btn-sm" id="btnSendToLinkoCTS" type="button" value="Send to CTS" />
+
+                        <script>
+                            $("#btnSendToLinkoCTS")
+                                .click(function()
+                                {
+                                    var getUrl = "@Url.Action(actionName: "IsSimilarReportPackageSubmittedAfter", controllerName: "ReportPackage", routeValues: new {id = Model.Id})";
+
+                                    $.ajax({
+                                        type: "GET"
+                                        , url: getUrl
+                                        , success: function(response)
+                                        {
+                                            if (response.toUpperCase() === "TRUE")
+                                            {
+                                                $("#msgForSendToLinkoCTSModal").html("A newer Report Package exists for this reporting period.<br/>Do you still want to send this Report Package to LinkoCTS?");
+                                            }
+                                            else
+                                            {
+                                                $("#msgForSendToLinkoCTSModal").text("Do you want to Send Report Package to LinkoCTS?");
+                                            }
+
+                                            $('#SendToLinkoCTSModal').modal('show');
+                                        }
+                                        //, error: function()
+                                        //    {}
+                                    });
+                                });
+
+                        </script>
+                    }
+                    else
+                    {
+                        <input type="button" value="Send to CTS" class="btn btn-primary btn-sm" disabled="disabled" />
+                    }
                 </div>
             </div>
         </div>
