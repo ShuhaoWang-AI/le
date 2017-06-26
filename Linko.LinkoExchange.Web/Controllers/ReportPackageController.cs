@@ -151,13 +151,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     var item = items.First();
                     var newUrl = Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id = item.Id });
-
-                    if (item.Status == ReportStatusName.Submitted)
-                    {
-                        //Scroll target page to the appropriate section if user is viewing a submitted report package.
-                        newUrl += "#divSubmissionConfirmation";
-                    }
-
                     return Json(data:new
                                      {
                                          redirect = true,
@@ -614,7 +607,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     TempData[key:"ShowSubmissionConfirmationMessage"] = true;
                     TempData[key:"SubmissionConfirmationMessage"] = "Report package submitted successfully!";
-                    return  Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }) + "#divSubmissionConfirmation");
+                    return  Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }));
                 }
             }
             catch (RuleViolationException rve)
