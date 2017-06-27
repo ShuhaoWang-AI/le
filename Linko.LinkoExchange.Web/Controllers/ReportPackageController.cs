@@ -902,7 +902,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     OrganizationName = vm.OrganizationName,
                     OrganizationReferenceNumber = vm.OrganizationReferenceNumber,
                     Status = vm.ReportStatusName,
-                    CtsEventTypeName = string.IsNullOrWhiteSpace(value: vm.CtsEventTypeName) ? "" : $@"({vm.CtsEventCategoryName}) {vm.CtsEventTypeName}",
+                    CtsEventTypeName = string.IsNullOrWhiteSpace(value: vm.CtsEventTypeName) ? "" : $@"{vm.CtsEventTypeName} ({vm.CtsEventCategoryName})",
                     CtsEventTypeId = vm.CtsEventTypeId,
                     ReportPackageTemplateElementCategories = vm.ReportPackageElementCategories,
                     Comments = vm.Comments,

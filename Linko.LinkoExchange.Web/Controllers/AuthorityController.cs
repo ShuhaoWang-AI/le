@@ -2125,12 +2125,13 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             // CtsEventTypes
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
-            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample:false).Select(c => new SelectListItem
-                                                                                                     {
-                                                                                                         Text = c.Name,
-                                                                                                         Value = c.CtsEventTypeId.ToString(),
-                                                                                                         Selected = c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
-                                                                                                     }).ToList();
+            viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample: false)
+                                                                     .OrderBy(c => c.CtsEventCategoryName).Select(c => new SelectListItem
+                                                                                                                       {
+                                                                                                                           Text = $@"{c.Name} ({c.CtsEventCategoryName})",
+                                                                                                                           Value = c.CtsEventTypeId.ToString(),
+                                                                                                                           Selected = c.CtsEventTypeId.Equals(obj: viewModel.CtsEventTypeId)
+                                                                                                                       }).ToList();
 
             viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select CTS Event Type", Value = "0"});
 
@@ -2475,7 +2476,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             viewModel.AvailableCtsEventTypes = new List<SelectListItem>();
             viewModel.AvailableCtsEventTypes = _reportTemplateService.GetCtsEventTypes(isForSample:false).OrderBy(c => c.CtsEventCategoryName).Select(c => new SelectListItem
                                                                                                                                           {
-                                                                                                                                              Text = $@"({c.CtsEventCategoryName}) {c.Name}",
+                                                                                                                                              Text = $@"{c.Name} ({c.CtsEventCategoryName})",
                                                                                                                                               Value = c.CtsEventTypeId.ToString(),
                                                                                                                                               Selected =
                                                                                                                                                   c.CtsEventTypeId.Equals(obj:viewModel.CtsEventTypeId)
