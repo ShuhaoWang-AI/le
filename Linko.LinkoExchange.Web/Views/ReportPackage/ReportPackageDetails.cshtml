@@ -50,13 +50,13 @@
                         <strong class="bg-yellow btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name: Model.Status.ToString())&nbsp; </strong>
                         break;
                     case ReportStatusName.ReadyToSubmit:
-                        <strong class="bg-lime-active btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name: Model.Status.ToString())&nbsp; </strong>
+                        <strong class="bg-green-active btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name: Model.Status.ToString())&nbsp; </strong>
                         break;
                     case ReportStatusName.Submitted:
-                        <strong class="bg-aqua btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name: Model.Status.ToString())&nbsp; </strong>
+                        <strong class="bg-blue btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name: Model.Status.ToString())&nbsp; </strong>
                         break;
                     case ReportStatusName.Repudiated:
-                        <strong class="bg-fuchsia btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name: Model.Status.ToString())&nbsp; </strong>
+                        <strong class="bg-red btn-sm text-info"> &nbsp;&nbsp;@Label.ResourceManager.GetString(name: Model.Status.ToString())&nbsp; </strong>
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

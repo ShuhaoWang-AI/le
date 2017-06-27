@@ -39,10 +39,10 @@
                         <strong class="bg-yellow btn-sm text-info"> &nbsp;&nbsp;Draft&nbsp; </strong>
                         break;
                     case SampleStatusName.ReadyToReport:
-                        <strong class="bg-lime-active btn-sm text-info"> &nbsp;&nbsp;Ready to Report&nbsp; </strong>
+                        <strong class="bg-green-active btn-sm text-info"> &nbsp;&nbsp;Ready to Report&nbsp; </strong>
                         break;
                     case SampleStatusName.Reported:
-                        <strong class="bg-aqua btn-sm text-info"> &nbsp;&nbsp;Reported&nbsp; </strong>
+                        <strong class="bg-blue btn-sm text-info"> &nbsp;&nbsp;Reported&nbsp; </strong>
                         break;
                     default:
                         break;
@@ -724,11 +724,11 @@
 
                                         if (!isSampleResultValid)
                                         {
-                                            $(this.node()).addClass('bg-red');
+                                            $(this.node()).addClass('text-red');
                                         }
                                         else
                                         {
-                                            $(this.node()).removeClass('bg-red');
+                                            $(this.node()).removeClass('text-red');
                                         }
                                     }
                                 });

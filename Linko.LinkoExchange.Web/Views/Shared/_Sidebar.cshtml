@@ -19,11 +19,11 @@
                         <span class="pull-right-container">
                             @if (ViewBag.ReportPackageCount_SubmittedPendingReview != null && ViewBag.ReportPackageCount_SubmittedPendingReview > 0)
                             {
-                                <span class="bg-aqua label">@ViewBag.ReportPackageCount_SubmittedPendingReview</span>
+                                <span class="bg-blue label">@ViewBag.ReportPackageCount_SubmittedPendingReview</span>
                             }
                             @if (ViewBag.ReportPackageCount_RepudiatedPendingReview != null && ViewBag.ReportPackageCount_RepudiatedPendingReview > 0)
                             {
-                                <span class="bg-fuchsia label">@ViewBag.ReportPackageCount_RepudiatedPendingReview</span>
+                                <span class="bg-red label">@ViewBag.ReportPackageCount_RepudiatedPendingReview</span>
                             }
                         </span>
                     </a>
@@ -35,7 +35,7 @@
                                 @if (ViewBag.ReportPackageCount_SubmittedPendingReview != null && ViewBag.ReportPackageCount_SubmittedPendingReview > 0)
                                 {
                                     <span class="pull-right-container">
-                                        <span class="bg-aqua label">@ViewBag.ReportPackageCount_SubmittedPendingReview</span>
+                                        <span class="bg-blue label">@ViewBag.ReportPackageCount_SubmittedPendingReview</span>
                                     </span>
                                 }
                             </a>
@@ -47,7 +47,7 @@
                                 @if (ViewBag.ReportPackageCount_RepudiatedPendingReview != null && ViewBag.ReportPackageCount_RepudiatedPendingReview > 0)
                                 {
                                     <span class="pull-right-container">
-                                        <span class="bg-fuchsia label">@ViewBag.ReportPackageCount_RepudiatedPendingReview</span>
+                                        <span class="bg-red label">@ViewBag.ReportPackageCount_RepudiatedPendingReview</span>
                                     </span>
                                 }
                             </a>
@@ -166,7 +166,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                             }
                             @if (ViewBag.SampleCount_ReadyToReport != null && ViewBag.SampleCount_ReadyToReport > 0)
                             {
-                                <span class="bg-lime-active label">@ViewBag.SampleCount_ReadyToReport</span>
+                                <span class="bg-green-active label">@ViewBag.SampleCount_ReadyToReport</span>
                             }
                         </span>
                     </a>
@@ -190,7 +190,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                                 <span class="pull-right-container">
                                     @if (ViewBag.SampleCount_ReadyToReport != null && ViewBag.SampleCount_ReadyToReport > 0)
                                     {
-                                        <span class="bg-lime-active label">@ViewBag.SampleCount_ReadyToReport</span>
+                                        <span class="bg-green-active label">@ViewBag.SampleCount_ReadyToReport</span>
                                     }
                                 </span>
                             </a>
@@ -215,7 +215,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                             }
                             @if (ViewBag.ReportPackageCount_ReadyToSubmit != null && ViewBag.ReportPackageCount_ReadyToSubmit > 0)
                             {
-                                <span class="bg-lime-active label">@ViewBag.ReportPackageCount_ReadyToSubmit</span>
+                                <span class="bg-green-active label">@ViewBag.ReportPackageCount_ReadyToSubmit</span>
                             }
                         </span>
                     </a>
@@ -239,7 +239,7 @@ else if (Request.IsAuthenticated && ViewBag.PortalName != null && ViewBag.Portal
                                 @if (ViewBag.ReportPackageCount_ReadyToSubmit != null && ViewBag.ReportPackageCount_ReadyToSubmit > 0)
                                 {
                                     <span class="pull-right-container">
-                                        <span class="bg-lime-active label">@ViewBag.ReportPackageCount_ReadyToSubmit</span>
+                                        <span class="bg-green-active label">@ViewBag.ReportPackageCount_ReadyToSubmit</span>
                                     </span>
                                 }
                             </a>
