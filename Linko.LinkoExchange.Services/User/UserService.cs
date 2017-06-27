@@ -890,7 +890,7 @@ namespace Linko.LinkoExchange.Services.User
             }
             else if (reason == AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony)
             {
-                cromerrEvent = CromerrEvent.Signature_AccountLockedPasswordRepudiation;
+                cromerrEvent = CromerrEvent.Signature_AccountLockedKBQRepudiation;
             }
             else
             {
