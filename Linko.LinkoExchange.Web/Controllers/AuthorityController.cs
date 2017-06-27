@@ -842,8 +842,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                var result = _userService.RemoveUser(orgRegProgUserId: model.Id, isAuthorizationRequired: true);
-
+                var result = _userService.RemoveUser(orgRegProgUserId: model.Id, isAuthorizationRequired: true); 
+           
                 if (result)
                 {
                     return RedirectToAction(actionName:"AuthorityUserRemoved", controllerName:"Authority");
@@ -1590,7 +1590,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 try
                 {
-                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId: model.Id, permissionGroupId: model.Role ?? 0, isApproved: true, isAuthorizationRequired: true);
+                    var result = _userService.ApprovePendingRegistration(orgRegProgUserId: model.Id, permissionGroupId: model.Role ?? 0, isApproved: true, isAuthorizationRequired: true, isSignatory: model.IsSignatory);
                     switch (result.Result)
                     {
                         case RegistrationResult.Success:
@@ -1632,7 +1632,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             //
             try
             {
-                var result = _userService.ApprovePendingRegistration(orgRegProgUserId: model.Id, permissionGroupId: model.Role ?? 0, isApproved: false, isAuthorizationRequired: true);
+                var result = _userService.ApprovePendingRegistration(orgRegProgUserId: model.Id, permissionGroupId: model.Role ?? 0, isApproved: false, isAuthorizationRequired: true, isSignatory:model.IsSignatory);
                 switch (result.Result)
                 {
                     case RegistrationResult.Success:
@@ -1681,7 +1681,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 PhoneExt = result.UserProfileDto.PhoneExt,
                                 DateRegistered = result.RegistrationDateTimeUtc?.DateTime,
                                 Role = result.PermissionGroup?.PermissionGroupId ?? 0,
-                                RoleText = result.PermissionGroup == null ? "" : result.PermissionGroup.Name
+                                RoleText = result.PermissionGroup == null ? "" : result.PermissionGroup.Name,
+                                IsSignatory = result.IsSignatory
                             };
             // Roles
             viewModel.AvailableRoles = new List<SelectListItem>();

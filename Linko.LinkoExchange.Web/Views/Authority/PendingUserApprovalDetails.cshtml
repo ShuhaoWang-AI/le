@@ -1,4 +1,5 @@
-﻿@model Linko.LinkoExchange.Web.ViewModels.Shared.PendingUserApprovalViewModel
+﻿@using Linko.LinkoExchange.Core.Enum
+@model Linko.LinkoExchange.Web.ViewModels.Shared.PendingUserApprovalViewModel
 
 @{
     ViewBag.Title = "User Details";
@@ -167,6 +168,19 @@
                                                                                                            }
                                                                                       })
                 </div>
+                @if (Model.Type == OrganizationTypeName.Industry.ToString())
+                {
+                    @Html.LabelFor(model => model.IsSignatory, htmlAttributes: new
+                                                                   {
+                                                                       @class = "control-label col-md-2"
+                                                                   })
+                    <div class="col-md-4">
+                        <div class="checkbox">
+                            @Html.EditorFor(model => model.IsSignatory)
+                        </div>
+                    </div> 
+                } 
+
             </div>
 
             <hr />

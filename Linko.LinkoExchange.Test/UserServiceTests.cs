@@ -105,7 +105,7 @@ namespace Linko.LinkoExchange.Test
             var orgRegProgUserId = 7;
             var permissionGroupId = 1;
             _realUserService.UpdateUserPermissionGroupId(orgRegProgUserId, permissionGroupId);
-            _realUserService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, true);
+            _realUserService.UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, true, false);
         }
 
         [TestMethod]

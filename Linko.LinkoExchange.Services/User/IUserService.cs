@@ -63,7 +63,7 @@ namespace Linko.LinkoExchange.Services.User
 
         void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, int organizationRegulatoryProgramId, bool isApproved);
 
-        void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int orgRegProgUserId, bool isApproved);
+        void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int orgRegProgUserId, bool isApproved, bool isSigantory);
 
         void UpdateOrganizationRegulatoryProgramUserRole(int orgRegProgUserId, int permissionGroupId);
 
@@ -71,12 +71,12 @@ namespace Linko.LinkoExchange.Services.User
         /// Service method to be called from controller
         /// - Updates the Approval flag (transaction)
         /// - Saves the Role (transaction)
-        /// - Send emails out notfying user of approval/denial.
+        /// - Send emails out notifying user of approval/denial.
         /// </summary>
         /// <param name="orgRegProgUserId"></param>
         /// <param name="permissionGroupId"></param>
         /// <param name="isApproved"></param>
-        RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved, bool isAuthorizationRequired = false);
+        RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved, bool isAuthorizationRequired = false, bool isSignatory = false);
 
         ICollection<UserDto> GetOrgRegProgSignators(int orgRegProgId);
         ICollection<UserDto> GetAuthorityAdministratorAndStandardUsers(int authorityOrganizationId);

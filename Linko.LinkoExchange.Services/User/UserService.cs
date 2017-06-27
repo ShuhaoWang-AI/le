@@ -1437,7 +1437,7 @@ namespace Linko.LinkoExchange.Services.User
             _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int orgRegProgUserId, bool isApproved)
+        public void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int orgRegProgUserId, bool isApproved, bool isSignatory)
         {
             var user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
             if (user == null) return;
@@ -1452,6 +1452,9 @@ namespace Linko.LinkoExchange.Services.User
                 user.IsRegistrationApproved = isApproved;
                 user.IsRegistrationDenied = true;
             }
+             
+            // Call UpdateUserSignatoryStatus to set IsSignatory flag to void duplicated code for emails and Cromerr
+            UpdateUserSignatoryStatus(orgRegProgUserId, isSignatory, true); 
             _dbContext.SaveChanges();
         }
 
@@ -1465,7 +1468,12 @@ namespace Linko.LinkoExchange.Services.User
 
         }
 
-        public RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved, bool isAuthorizationRequired = false)
+        public RegistrationResultDto ApprovePendingRegistration(
+            int orgRegProgUserId, 
+            int permissionGroupId, 
+            bool isApproved, 
+            bool isAuthorizationRequired = false, 
+            bool isSignatory = false)
         {
             if (isAuthorizationRequired && !CanUserExecuteApi(id:orgRegProgUserId))
             {
@@ -1550,8 +1558,14 @@ namespace Linko.LinkoExchange.Services.User
 
             var transaction = _dbContext.BeginTransaction();
             try
-            {
-                UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, isApproved);
+            { 
+
+                if(isAuthorityUser)
+                { 
+                    isSignatory = false; 
+                }
+
+                UpdateOrganizationRegulatoryProgramUserApprovedStatus(orgRegProgUserId, isApproved, isSignatory);
 
                 //Only update Role if we are Approving
                 if (isApproved)

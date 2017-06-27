@@ -160,6 +160,12 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
             get; set;
         }
 
+        [Display(Name ="Is Signatory")]
+        public bool IsSignatory
+        {
+            get; set;
+        }
+
         public IList<SelectListItem> AvailableRoles
         {
             get; set;
