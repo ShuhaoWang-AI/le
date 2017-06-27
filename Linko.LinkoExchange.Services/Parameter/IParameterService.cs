@@ -39,7 +39,7 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// </summary>
         /// <param name="parameterGroupId">Id from tParameterGroup associated with Parameter Group to read</param>
         /// <returns></returns>
-        ParameterGroupDto GetParameterGroup(int parameterGroupId);
+        ParameterGroupDto GetParameterGroup(int parameterGroupId, bool isAuthorizationRequired = false);
 
         /// <summary>
         /// Creates a new Parameter group or updates and existing one in the database.

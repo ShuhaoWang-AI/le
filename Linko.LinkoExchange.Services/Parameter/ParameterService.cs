@@ -15,10 +15,11 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Core.Enum;
+using System.Runtime.CompilerServices;
 
 namespace Linko.LinkoExchange.Services.Parameter
 {
-    public class ParameterService : IParameterService
+    public class ParameterService : BaseService, IParameterService
     {
         private readonly LinkoExchangeContext _dbContext;
         private readonly IHttpContextService _httpContext;
@@ -43,6 +44,67 @@ namespace Linko.LinkoExchange.Services.Parameter
             _logger = logger;
             _timeZoneService = timeZoneService;
             _settings = settings;
+        }
+
+        public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
+        {
+            bool retVal = false;
+
+            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+            var currentPortalName = _httpContext.GetClaimValue(CacheKey.PortalName);
+            currentPortalName = string.IsNullOrWhiteSpace(value: currentPortalName) ? "" : currentPortalName.Trim().ToLower();
+
+            switch (apiName)
+            {
+                case "GetParameterGroup":
+                    {
+                        //
+                        //Authorize the correct Authority owner
+                        //
+
+                        var parameterGroupId = id[0];
+                        var parameterGroup = _dbContext.ParameterGroups
+                            .SingleOrDefault(pg => pg.ParameterGroupId == parameterGroupId);
+
+                        if (currentPortalName.Equals("authority"))
+                        {
+                            if (parameterGroup != null && parameterGroup.OrganizationRegulatoryProgramId == currentOrgRegProgramId)
+                            {
+                                retVal = true;
+                            }
+                            else
+                            {
+                                retVal = false;
+                            }
+                        }
+                        else
+                        {
+                            //
+                            //Authorize Industries of the Authority owner only
+                            //
+                            var authorityOfCurrentUser = _orgService.GetAuthority(currentOrgRegProgramId);
+                            if (parameterGroup != null && parameterGroup.OrganizationRegulatoryProgramId == authorityOfCurrentUser.OrganizationRegulatoryProgramId)
+                            {
+                                retVal = true;
+                            }
+                            else
+                            {
+                                retVal = false;
+                            }
+                        }
+
+                    }
+
+                    break;
+
+                default:
+
+                    throw new Exception($"ERROR: Unhandled API authorization attempt using name = '{apiName}'");
+
+
+            }
+
+            return retVal;
         }
 
         /// <summary>
@@ -235,9 +297,14 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// </summary>
         /// <param name="parameterGroupId">Id from tParameterGroup associated with Parameter Group to read</param>
         /// <returns></returns>
-        public ParameterGroupDto GetParameterGroup(int parameterGroupId)
+        public ParameterGroupDto GetParameterGroup(int parameterGroupId, bool isAuthorizationRequired = false)
         {
             _logger.Info($"Enter ParameterService.GetParameterGroup. parameterGroupId={parameterGroupId}");
+
+            if (isAuthorizationRequired && !CanUserExecuteApi(id: parameterGroupId))
+            {
+                throw new UnauthorizedAccessException();
+            }
 
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var foundParamGroup = _dbContext.ParameterGroups

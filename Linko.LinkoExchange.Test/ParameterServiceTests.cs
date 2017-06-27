@@ -195,7 +195,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetParameterGroup_Test()
         {
-            var paramGroupDto = _paramService.GetParameterGroup(4);
+            var paramGroupDto = _paramService.GetParameterGroup(1, true);
         }
 
         [TestMethod]

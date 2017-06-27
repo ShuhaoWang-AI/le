@@ -1804,7 +1804,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             try
             {
-                viewModel = PrepareParameterGroupDetails(id:id);
+                viewModel = PrepareParameterGroupDetails(id:id, isAuthorizationRequired: true);
             }
             catch (RuleViolationException rve)
             {
@@ -1901,13 +1901,13 @@ namespace Linko.LinkoExchange.Web.Controllers
             return View(viewName:"ParameterGroupDetails", model:model);
         }
 
-        private ParameterGroupViewModel PrepareParameterGroupDetails(int? id = null, ParameterGroupViewModel dirtyViewModel = null)
+        private ParameterGroupViewModel PrepareParameterGroupDetails(int? id = null, ParameterGroupViewModel dirtyViewModel = null, bool isAuthorizationRequired = false)
         {
             var viewModel = new ParameterGroupViewModel();
             if (id.HasValue)
             {
                 ViewBag.Satus = "Edit";
-                var parameterGroup = _parameterService.GetParameterGroup(parameterGroupId:id.Value);
+                var parameterGroup = _parameterService.GetParameterGroup(parameterGroupId:id.Value, isAuthorizationRequired: isAuthorizationRequired);
                 viewModel = new ParameterGroupViewModel
                             {
                                 Id = parameterGroup.ParameterGroupId,
