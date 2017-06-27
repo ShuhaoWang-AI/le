@@ -88,7 +88,7 @@
             </div>
         </div>
 
-        <div aria-labelledby="Delete Report Package" class="col-md-12 fade modal modal-info" id="DeleteReportPackage" role="dialog" tabindex="-1">
+        <div aria-labelledby="Delete Report Package" class="col-md-12 fade modal modal-info" id="DeleteReportPackageModal" role="dialog" tabindex="-1">
             <div class="modal-dialog" role="document">
                 <div class="alert alert-dismissible alert-info modal-content">
                     <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
@@ -1202,7 +1202,7 @@
                     case ReportStatusName.Draft:
                         <input type="submit" value="Save Draft" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new {id = Model.Id})" formmethod="post" />
                         <input type="submit" value="Ready to Submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "ReadyToSubmit", controllerName: "ReportPackage", routeValues: new {id = Model.Id})" formmethod="post" />
-                        <input class="btn btn-primary btn-sm" data-target="#DeleteReportPackage" data-toggle="modal" type="button" value="Delete Draft" />
+                        <input class="btn btn-primary btn-sm" data-target="#DeleteReportPackageModal" data-toggle="modal" type="button" value="Delete Draft" />
                         break;
                     case ReportStatusName.ReadyToSubmit:
                         @Html.ActionLink(linkText: "Preview", actionName: "ReportPackagePreview", routeValues: new {id = Model.Id}, htmlAttributes: new {@class = "btn btn-primary btn-sm"})
@@ -1214,7 +1214,7 @@
                             <input type="submit" value="Sign and Submit" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "SignAndSubmit", controllerName: "ReportPackage", routeValues: new {id = Model.Id})" formmethod="post" />
                         }
 
-                        <input class="btn btn-primary btn-sm" data-target="#DeleteReportPackage" data-toggle="modal" type="button" value="Delete Report Package" />
+                        <input class="btn btn-primary btn-sm" data-target="#DeleteReportPackageModal" data-toggle="modal" type="button" value="Delete Report Package" />
                         break;
                     case ReportStatusName.Submitted:
                     case ReportStatusName.Repudiated:

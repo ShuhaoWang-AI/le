@@ -19,6 +19,29 @@
             <li class="active">Details</li>
         </ol>
     </section>
+    
+
+    <div aria-labelledby="Enable/Disable Industry" class="col-md-12 fade modal modal-info" id="EnableDisableIndustryModal" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="alert alert-dismissible alert-info modal-content">
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
+                <h4 class="box-title">@(Model.IsEnabled ? "Disable Industry" :"Enable Industry")</h4>
+
+                <div class="form-horizontal">
+                    <p>
+                        @(Model.IsEnabled ? "If you disable the industry, then users who belong to the industry will not be able to log into this industry's Portal." : "If you enable the industry, then users who belong to the industry will be able to log into this Industry's Portal.")<br />
+                        @(Model.IsEnabled ? "Do you want to disable the industry?" : "Do you want to enable the industry?")<br />
+                    </p>
+                    <div class="form-group">
+                        <div class="pull-right">
+                            <input class="btn btn-primary btn-sm" type="submit" value="Yes" />
+                            <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="box box-primary">
         <div class="box-header with-border">
@@ -27,14 +50,7 @@
                 <div class="pull-right">
                     @if (Model.HasPermissionForEnableDisable)
                     {
-                        if (Model.IsEnabled)
-                        {
-                            <input class="btn btn-primary btn-sm" type="submit" value="Disable" />
-                        }
-                        else
-                        {
-                            <input class="btn btn-primary btn-sm" type="submit" value="Enable" />
-                        }
+                        <input class="btn btn-primary btn-sm" data-target="#EnableDisableIndustryModal" data-toggle="modal" type="button" value="@(Model.IsEnabled ? "Disable" :"Enable")" />
                     }
 
                     <input type="button" value="Users" class="btn btn-primary btn-sm" onclick="location.href = '@Url.Action(actionName:"IndustryUsers", controllerName:"Authority", routeValues:new {id = Model.Id})'" />
