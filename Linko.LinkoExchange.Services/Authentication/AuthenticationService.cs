@@ -1227,9 +1227,15 @@ namespace Linko.LinkoExchange.Services.Authentication
             var orpus = _programService.GetUserRegulatoryPrograms(userProfile.Email).ToList();
             if (orpus.Any())
             {
+                // User at least has one approved program
+                if(orpus.Any(i=>i.IsRegistrationApproved && i.IsRegistrationDenied == false && i.IsEnabled && i.OrganizationRegulatoryProgramDto.IsEnabled))
+                {
+                    return true;
+                }
+                
                 // UC-29 4.a
                 // System confirms user has status “Registration Pending” (and no access to any other portal where registration is not pending or portal is not disabled)
-                if (orpus.All(i => i.IsRegistrationApproved == false && i.IsRegistrationDenied != true && i.OrganizationRegulatoryProgramDto.IsEnabled))
+                if (orpus.Any(i => i.IsRegistrationApproved == false && i.IsRegistrationDenied == false && i.IsEnabled && i.OrganizationRegulatoryProgramDto.IsEnabled))
                 {
                     LogToCromerrThisEvent(orpus, CromerrEvent.Login_RegistrationPending);
                     signInResultDto.AutehticationResult = AuthenticationResult.RegistrationApprovalPending;
@@ -1257,11 +1263,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
 
                 // 6.b returned in the intermediate page call from here. 
-
             }
             else
             {
-
                 // If user doesn't have any program, return below message
                 LogToCromerrThisEvent(orpus, CromerrEvent.Login_NoAssociation);
                 signInResultDto.AutehticationResult = AuthenticationResult.AccountIsNotAssociated;
