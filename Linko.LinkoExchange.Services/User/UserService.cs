@@ -1664,8 +1664,8 @@ namespace Linko.LinkoExchange.Services.User
             cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
             cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
             contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add("authorityName", authorityName);
-            contentReplacements.Add("organizationName", authority.OrganizationDto.OrganizationName);
+            contentReplacements.Add("authorityName", authority.OrganizationDto.OrganizationName);
+            contentReplacements.Add("organizationName", programUser.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
             contentReplacements.Add("regulatoryProgram", authority.RegulatoryProgramDto.Name);
             contentReplacements.Add("firstName", programUser.UserProfileDto.FirstName);
             contentReplacements.Add("lastName", programUser.UserProfileDto.LastName);
