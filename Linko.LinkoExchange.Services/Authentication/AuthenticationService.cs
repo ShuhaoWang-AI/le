@@ -181,7 +181,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// Change password happens after a user login, and change his password.
         /// New password must meet the following criteria
         /// 1. Meet the strictest password policies when the user have multiple access to organizations and programs 
-        /// 2. Can not be the same as the last X number of passwords saved in UserPasswordHistory table.
+        /// 2. Cannot be the same as the last X number of passwords saved in UserPasswordHistory table.
         /// </summary>
         /// <param name="userId">User Id</param>
         /// <param name="newPassword">The new password</param>

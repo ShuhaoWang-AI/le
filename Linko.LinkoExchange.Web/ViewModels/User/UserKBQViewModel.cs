@@ -117,73 +117,73 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         { 
            RuleFor(x=>x.KBQ1)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a=>a.KBQ2).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ3).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ4).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ5).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");
+                .NotEqual(a=>a.KBQ2).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ3).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ4).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ5).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");
 
             RuleFor(x=>x.KBQ2)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a=>a.KBQ1).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ3).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ4).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ5).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");
+                .NotEqual(a=>a.KBQ1).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ3).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ4).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ5).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");
 
             RuleFor(x=>x.KBQ3)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a=>a.KBQ1).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ2).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ4).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ5).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");
+                .NotEqual(a=>a.KBQ1).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ2).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ4).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ5).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");
 
             RuleFor(x=>x.KBQ4)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a=>a.KBQ1).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ2).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ3).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ5).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");
+                .NotEqual(a=>a.KBQ1).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ2).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ3).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ5).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");
 
             RuleFor(x=>x.KBQ5)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a=>a.KBQ1).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ2).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ3).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQ4).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");
+                .NotEqual(a=>a.KBQ1).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ2).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ3).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQ4).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");
 
             RuleFor(x=>x.KBQAnswer1)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a=>a.KBQAnswer2).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQAnswer3).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQAnswer4).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQAnswer5).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");
+                .NotEqual(a=>a.KBQAnswer2).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQAnswer3).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQAnswer4).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQAnswer5).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");
 
             RuleFor(x=>x.KBQAnswer2)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a=>a.KBQAnswer1).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQAnswer3).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQAnswer4).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQAnswer5).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");
+                .NotEqual(a=>a.KBQAnswer1).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQAnswer3).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQAnswer4).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQAnswer5).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");
 
             RuleFor(x => x.KBQAnswer3)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a => a.KBQAnswer1).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a => a.KBQAnswer2).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a => a.KBQAnswer4).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a => a.KBQAnswer5).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");
+                .NotEqual(a => a.KBQAnswer1).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a => a.KBQAnswer2).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a => a.KBQAnswer4).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a => a.KBQAnswer5).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");
 
             RuleFor(x => x.KBQAnswer4)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a => a.KBQAnswer1).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a => a.KBQAnswer2).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a => a.KBQAnswer3).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a => a.KBQAnswer5).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");
+                .NotEqual(a => a.KBQAnswer1).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a => a.KBQAnswer2).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a => a.KBQAnswer3).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a => a.KBQAnswer5).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");
 
             RuleFor(x=>x.KBQAnswer5)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a=>a.KBQAnswer1).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQAnswer2).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQAnswer3).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.")
-                .NotEqual(a=>a.KBQAnswer4).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");  
+                .NotEqual(a=>a.KBQAnswer1).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQAnswer2).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQAnswer3).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.")
+                .NotEqual(a=>a.KBQAnswer4).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");  
         }
     }
 }

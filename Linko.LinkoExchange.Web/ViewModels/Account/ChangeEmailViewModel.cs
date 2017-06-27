@@ -28,7 +28,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Account
         public ChangeEmailValidator()
         {
             RuleFor(x => x.NewEmail).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
-            RuleFor(x => x.NewEmail).NotEqual(a=>a.OldEmail).WithMessage(errorMessage: "Old email address and the new email address can not be the same.");
+            RuleFor(x => x.NewEmail).NotEqual(a=>a.OldEmail).WithMessage(errorMessage: "Old email address and the new email address cannot be the same.");
         }
     }
 }

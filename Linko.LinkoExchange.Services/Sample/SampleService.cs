@@ -392,7 +392,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 {
                     //Cannot save if included in a report
                     //      (UC-15-1.2(*.a.) - System identifies Sample is in use in a Report Package (draft or otherwise) an displays the "REPORTED" Status.  
-                    //      Actor can not perform any actions of any kind except view all details.)
+                    //      Actor cannot perform any actions of any kind except view all details.)
                     if (sampleDto.SampleId.HasValue &&
                         this.IsSampleIncludedInReportPackage(sampleDto.SampleId.Value))
                     {

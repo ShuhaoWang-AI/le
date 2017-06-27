@@ -353,11 +353,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                     break;
                 case RegistrationResult.DuplicatedKBQ:
                     ViewBag.inValidKBQ = true;
-                    inValidKbqMessages.Add("Knowledge based questions can not be duplicated."); 
+                    inValidKbqMessages.Add("Knowledge based questions cannot be duplicated."); 
                     break;
                 case RegistrationResult.DuplicatedKBQAnswer:
                     ViewBag.inValidKBQ = true;
-                    inValidKbqMessages.Add("Knowledge based question answers can not be duplicated."); 
+                    inValidKbqMessages.Add("Knowledge based question answers cannot be duplicated."); 
                     break;
                 case RegistrationResult.MissingKBQ:
                     ViewBag.inValidKBQ = true;
@@ -369,7 +369,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     break;
                 case RegistrationResult.DuplicatedSecurityQuestion:
                     ViewBag.inValidSQ = true;
-                    inValidSqMessages.Add("Security questions can not be duplicated."); 
+                    inValidSqMessages.Add("Security questions cannot be duplicated."); 
                     break;
                 case RegistrationResult.MissingSecurityQuestion:
                     ViewBag.inValidSQ = true;
@@ -381,7 +381,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     break;
                 case RegistrationResult.DuplicatedSecurityQuestionAnswer:
                     ViewBag.inValidSQ = true;
-                    inValidSqMessages.Add("Security question answers can not be duplicated."); 
+                    inValidSqMessages.Add("Security question answers cannot be duplicated."); 
                     break;
                 case RegistrationResult.BadKBQAndAnswer:
                     ViewBag.inValidKBQ = true;
@@ -935,9 +935,9 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     break;
 
-                // Can Not Use Old Password
+                // Cannot Use Old Password
                 case AuthenticationResult.CanNotUseOldPassword:
-                    _logger.Info(message:string.Format(format:"ResetPassword. Can not use old password for Token = {0}.", arg0:model.Token));
+                    _logger.Info(message:string.Format(format:"ResetPassword. Cannot use old password for Token = {0}.", arg0:model.Token));
                     foreach (var error in result.Errors)
                     {
                        ModelState.AddModelError(key:"", errorMessage:error);
@@ -1344,12 +1344,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                             invalidMessages.Add("Not enough knowledge based question answers.");   
                             break;
                         case RegistrationResult.DuplicatedKBQ:
-                           // ModelState.AddModelError(key:"", errorMessage:@"Knowledge based questions can not be duplicated.");
-                            invalidMessages.Add("Knowledge based questions can not be duplicated.");   
+                           // ModelState.AddModelError(key:"", errorMessage:@"Knowledge based questions cannot be duplicated.");
+                            invalidMessages.Add("Knowledge based questions cannot be duplicated.");   
                             break;
                         case RegistrationResult.DuplicatedKBQAnswer:
-                           // ModelState.AddModelError(key:"", errorMessage:@"Knowledge based question answers can not be duplicated.");
-                            invalidMessages.Add("Knowledge based question answers can not be duplicated.");   
+                           // ModelState.AddModelError(key:"", errorMessage:@"Knowledge based question answers cannot be duplicated.");
+                            invalidMessages.Add("Knowledge based question answers cannot be duplicated.");   
                             break;
                     }
                 }
@@ -1377,12 +1377,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                             invalidMessages.Add("Not enough security question answers.");   
                             break;
                         case RegistrationResult.DuplicatedSecurityQuestion:
-                        //    ModelState.AddModelError(key:"", errorMessage:@"Security questions can not be duplicated.");
-                            invalidMessages.Add("Security questions can not be duplicated.");   
+                        //    ModelState.AddModelError(key:"", errorMessage:@"Security questions cannot be duplicated.");
+                            invalidMessages.Add("Security questions cannot be duplicated.");   
                             break;
                         case RegistrationResult.DuplicatedSecurityQuestionAnswer:
-                        //    ModelState.AddModelError(key:"", errorMessage:@"Security question answers can not be duplicated.");
-                            invalidMessages.Add("Security question answers can not be duplicated.");   
+                        //    ModelState.AddModelError(key:"", errorMessage:@"Security question answers cannot be duplicated.");
+                            invalidMessages.Add("Security question answers cannot be duplicated.");   
                             break;
                     }
                 }

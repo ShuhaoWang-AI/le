@@ -62,19 +62,19 @@ namespace Linko.LinkoExchange.Web.ViewModels.User
         { 
             RuleFor(x=>x.SecurityQuestion1)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a=>a.SecurityQuestion2).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");
+                .NotEqual(a=>a.SecurityQuestion2).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");
 
             RuleFor(x=>x.SecurityQuestion2)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a=>a.SecurityQuestion1).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");
+                .NotEqual(a=>a.SecurityQuestion1).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");
 
             RuleFor(x => x.SecurityQuestionAnswer1)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a => a.SecurityQuestionAnswer2).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");
+                .NotEqual(a => a.SecurityQuestionAnswer2).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");
 
             RuleFor(x => x.SecurityQuestionAnswer2)
                 .NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.")
-                .NotEqual(a => a.SecurityQuestionAnswer1).WithMessage(errorMessage: "{PropertyName} can not be duplicated with others.");
+                .NotEqual(a => a.SecurityQuestionAnswer1).WithMessage(errorMessage: "{PropertyName} cannot be duplicated with others.");
         }
     }
 }
