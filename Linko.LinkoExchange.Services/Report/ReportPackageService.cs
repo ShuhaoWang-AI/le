@@ -429,7 +429,7 @@ namespace Linko.LinkoExchange.Services.Report
 
                         sampleNode.SampleResults.Add(sampleResultNode);
 
-                        if (sampleResultDto.IsCalcMassLoading)
+                        if (!string.IsNullOrWhiteSpace(sampleResultDto.MassLoadingValue))
                         {
                             sampleResultNode = new SampleResultNode
                             {
