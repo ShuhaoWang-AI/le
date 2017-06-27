@@ -513,7 +513,7 @@
             <div class="col-md-12"><h5>Select the Industries that will be able to submit this report.</h5></div>
 
             <div class="col-md-6">
-                <strong>Available</strong>
+                <div><strong>Available</strong><button class="btn btn-primary btn-sm pull-right" id="btnAddAllIndustry" type="button"> Add All </button></div><br/>
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="availableIndustryTable">
                     <thead>
                         <tr>
@@ -548,7 +548,7 @@
             </div>
 
             <div class="col-md-6">
-                <strong>Selected</strong>
+                <div><strong>Selected</strong><button class="btn btn-danger btn-sm pull-right" id="btnRemoveAllIndustry" type="button"> Remove All </button></div><br/>
 
                 <table class="dataTable table table-bordered table-condensed table-hover table-striped text-center" id="selectedIndustryTable">
                     <thead>
@@ -564,21 +564,21 @@
                     </thead>
 
                     <tbody>
-@foreach (var industry in Model.ReportPackageTemplateAssignments)
-{
-    <tr>
-        <td>@industry.Id</td>
-        <td>@industry.ReferenceNumber</td>
-        <td>@industry.IndustryName</td>
-        <td>@industry.Address</td>
-        <td>@industry.Classification</td>
-        <td>
-            <button class="btn btn-danger btn-sm" id="btnRemoveIndustry" type="button">
-                <i class="fa fa-minus"></i>
-            </button>
-        </td>
-    </tr>
-}
+                        @foreach (var industry in Model.ReportPackageTemplateAssignments)
+                        {
+                            <tr>
+                                <td>@industry.Id</td>
+                                <td>@industry.ReferenceNumber</td>
+                                <td>@industry.IndustryName</td>
+                                <td>@industry.Address</td>
+                                <td>@industry.Classification</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" id="btnRemoveIndustry" type="button">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
@@ -1032,6 +1032,57 @@
                         .row($(this).parents('tr'))
                         .remove()
                         .draw();
+                });
+
+        $(document)
+            .on('click'
+                , "button[id='btnAddAllIndustry']"
+                , function()
+                {
+                    var tableMoveFrom = $('#availableIndustryTable').DataTable();
+
+                    var tableMoveTo = $('#selectedIndustryTable').DataTable();
+
+                    tableMoveFrom
+                        .rows()
+                        .every(function()
+                        {
+                            var data = this.data();
+                            var rowNode = tableMoveTo
+                                .row.add([data[0], data[1], data[2], data[3], data[4]])
+                                .draw()
+                                .node();
+
+                            $(rowNode).css('color', 'green');
+                            
+                        });
+                        
+                    tableMoveFrom.rows().remove().draw();
+                });
+
+        $(document)
+            .on('click'
+                , "button[id='btnRemoveAllIndustry']"
+                , function()
+                {
+                    var tableMoveFrom = $('#selectedIndustryTable').DataTable();
+
+                    var tableMoveTo = $('#availableIndustryTable').DataTable();
+                    tableMoveFrom
+                        .rows()
+                        .every(function()
+                        {
+                            var data = this.data();
+                            var rowNode = tableMoveTo
+                                .row.add([data[0], data[1], data[2], data[3], data[4]])
+                                .draw()
+                                .node();
+
+                            $(rowNode).css('color', 'green');
+                            
+                        });
+                        
+                    tableMoveFrom.rows().remove().draw();
                 });
 
         $("#btnSave")
