@@ -331,13 +331,13 @@
     <value>Report Package - Repudiated</value>
   </data>
   <data name="Breadcrumb_RepudiatedPendingReview" xml:space="preserve">
-    <value>Report Package Repudiations Pending Review</value>
+    <value>Report Package - Repudiations Pending Review</value>
   </data>
   <data name="Breadcrumb_Submitted" xml:space="preserve">
     <value>Report Package - Submitted</value>
   </data>
   <data name="Breadcrumb_SubmittedPendingReview" xml:space="preserve">
-    <value>Report Package Submissions Pending Review</value>
+    <value>Report Package - Submissions Pending Review</value>
   </data>
   <data name="SelectReason" xml:space="preserve">
     <value>Select Reason</value>

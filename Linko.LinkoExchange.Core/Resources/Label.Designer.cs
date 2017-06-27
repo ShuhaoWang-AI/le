@@ -232,7 +232,7 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Report Package Repudiations Pending Review.
+        ///   Looks up a localized string similar to Report Package - Repudiations Pending Review.
         /// </summary>
         public static string Breadcrumb_RepudiatedPendingReview {
             get {
@@ -250,7 +250,7 @@ namespace Linko.LinkoExchange.Core.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Report Package Submissions Pending Review.
+        ///   Looks up a localized string similar to Report Package - Submissions Pending Review.
         /// </summary>
         public static string Breadcrumb_SubmittedPendingReview {
             get {

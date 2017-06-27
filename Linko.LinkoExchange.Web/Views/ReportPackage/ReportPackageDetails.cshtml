@@ -18,17 +18,37 @@
                 <a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: Model.IsCurrentPortalAuthority ? "Authority" : "Industry")'"><i class=""></i> Home </a>
             </li>
             <li>
-                @{
-                    var modelStatusName = Model.Status; //By default
-                    if (TempData["ReportStatusName"] != null)
+                @if (Model.IsCurrentPortalAuthority)
+                {
+                    if (Model.Status == ReportStatusName.Submitted && !Model.SubmissionReviewDateTimeLocal.HasValue)
                     {
-                        modelStatusName = (ReportStatusName)TempData["ReportStatusName"];
-                        TempData.Keep("ReportStatusName");
+                        <a href="#" onclick="location.href = '@Url.Action(actionName: "ReportPackages", controllerName: "ReportPackage", routeValues: new {reportStatus = ReportStatusName.SubmittedPendingReview})'">
+                            <i class=""></i>
+                            @Label.ResourceManager.GetString(name: "Breadcrumb_" + ReportStatusName.SubmittedPendingReview)
+                        </a>
                     }
-                } 
-                <a href="#" onclick="location.href = '@Url.Action(actionName: "ReportPackages", controllerName: "ReportPackage", routeValues: new {reportStatus = modelStatusName})'"><i class=""></i>
-                    @Label.ResourceManager.GetString("Breadcrumb_" + modelStatusName.ToString())
-                </a>
+                    else if (Model.Status == ReportStatusName.Repudiated && !Model.RepudiationReviewDateTimeLocal.HasValue)
+                    {
+                        <a href="#" onclick="location.href = '@Url.Action(actionName: "ReportPackages", controllerName: "ReportPackage", routeValues: new {reportStatus = ReportStatusName.RepudiatedPendingReview})'">
+                            <i class=""></i>
+                            @Label.ResourceManager.GetString(name: "Breadcrumb_" + ReportStatusName.RepudiatedPendingReview)
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="#" onclick="location.href = '@Url.Action(actionName: "ReportPackages", controllerName: "ReportPackage", routeValues: new {reportStatus = ReportStatusName.All})'">
+                            <i class=""></i>
+                            @Label.ResourceManager.GetString(name: "Breadcrumb_" + ReportStatusName.All)
+                        </a>
+                    }
+                }
+                else
+                {
+                    <a href="#" onclick="location.href = '@Url.Action(actionName: "ReportPackages", controllerName: "ReportPackage", routeValues: new {reportStatus = Model.Status})'">
+                        <i class=""></i>
+                        @Label.ResourceManager.GetString(name: "Breadcrumb_" + Model.Status)
+                    </a>
+                }
             </li>
             <li class="active">
                 Details

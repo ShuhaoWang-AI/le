@@ -15,7 +15,7 @@
 
 <div class="box box-primary">
     <div class="box-header with-border">
-        <h3 class="box-title">Report Packages - @Label.ResourceManager.GetString(name:ViewBag.ReportStatusName.ToString())</h3>
+        <h3 class="box-title">@Label.ResourceManager.GetString(name: "Breadcrumb_" + ViewBag.ReportStatusName.ToString())</h3>
         <div class="box-tools pull-right">
             @if (ViewBag.ReportStatusName == ReportStatusName.Draft)
             {
