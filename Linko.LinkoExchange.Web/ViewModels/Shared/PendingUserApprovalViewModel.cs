@@ -177,7 +177,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public PendingUserApprovalValidator()
         {
             //Role
-            RuleFor(x => x.Role).NotEmpty().GreaterThan(valueToCompare: 0).WithMessage(errorMessage: "{PropertyName} is required.");
+            RuleFor(x => x.Role).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
         }
     }
 }
