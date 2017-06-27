@@ -654,7 +654,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                             kbqAnswer:model.Answer,
                             failedPasswordCount:failedCountPassword, 
                             failedKbqCount:failedCountKbq,
-                            reportOperation:ReportOperation.Repudiation);
+                            reportOperation:ReportOperation.Repudiation,
+                            reportPackageId: id);
 
                         ModelState.Remove(key: "FailedCountPassword"); // if you don't remove then hidden field does not update on post-back 
                         ModelState.Remove(key: "FailedCountKbq"); // if you don't remove then hidden field does not update on post-back 
