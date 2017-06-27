@@ -2324,6 +2324,33 @@ namespace Linko.LinkoExchange.Services.Report
             return isNewerReportPackageExist;
         }
 
+        public bool CanRepudiateReportPackage(int reportPackageId)
+        {
+            bool canRepudiate;
+            var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+
+            _logger.Info($"Enter ReportPackageService.CanRepudiateReportPackage. reportPackageId={reportPackageId}, currentOrgRegProgramId={currentOrgRegProgramId}");
+
+            //Check ARP config "Max days after report period end date to repudiate" has not passed (UC-19 5.2.)
+            var reportRepudiatedDays = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(currentOrgRegProgramId, SettingType.ReportRepudiatedDays));
+
+            var reportPackage = _dbContext.ReportPackages
+                .Single(rep => rep.ReportPackageId == reportPackageId);
+
+            if (reportPackage.PeriodEndDateTimeUtc < DateTime.UtcNow.AddDays(-reportRepudiatedDays))
+            {
+                canRepudiate = false;
+            }
+            else
+            {
+                canRepudiate = true;
+            }
+
+            _logger.Info($"Enter ReportPackageService.CanRepudiateReportPackage. reportPackageId={reportPackageId}, currentOrgRegProgramId={currentOrgRegProgramId}, canRepudiate={canRepudiate}");
+
+            return canRepudiate;
+        }
+
 
         private string GenerateXmlString(CopyOfRecordDataXml dataXmlObj, ReportPackageDto reportPackageDto)
         {

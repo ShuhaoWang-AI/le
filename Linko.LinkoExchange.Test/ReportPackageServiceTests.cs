@@ -317,5 +317,12 @@ namespace Linko.LinkoExchange.Test
         {
             var result = _reportPackageService.IsSimilarReportPackageSubmittedAfter(4);
         }
+
+        [TestMethod]
+        public void CanRepudiateReportPackage()
+        {
+            var result = _reportPackageService.CanRepudiateReportPackage(4);
+        }
+
     }
 }

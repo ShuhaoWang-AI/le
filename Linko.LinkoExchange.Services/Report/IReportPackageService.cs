@@ -182,5 +182,12 @@ namespace Linko.LinkoExchange.Services.Report
         /// <param name="reportPackageId">tReportPackage.ReportPackageId of the ReportPackage we want to compare the submission date/time with</param>
         /// <returns>True if a Report Package with a later submission date/time exists</returns>
         bool IsSimilarReportPackageSubmittedAfter(int reportPackageId);
+
+        /// <summary>
+        /// True if the current date/time is still within the "max days after report period end date" for repudiation
+        /// </summary>
+        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <returns></returns>
+        bool CanRepudiateReportPackage(int reportPackageId);
     }
 }
