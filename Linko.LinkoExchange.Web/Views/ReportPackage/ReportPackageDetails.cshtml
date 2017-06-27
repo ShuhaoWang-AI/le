@@ -698,6 +698,10 @@
                         </div>
                     </div>
                 </div>
+                @if (Model.HasRepudiationTimeExpired)
+                {
+                    <h5>Repudiation no longer available. The report repudiation time period has passed.</h5>
+                }
 
                 <div class="form-group">
                     @Html.LabelFor(m => m.RepudiationReasonId, htmlAttributes: new {@class = "col-md-4 control-label"})
@@ -750,9 +754,20 @@
 
             <div class="box-footer">
                 <div class="form-group pull-right">
-                    <input class="btn btn-primary btn-sm" data-target="#RepudiateReportPackage" data-toggle="modal" type="button" value="Repudiate" />
+                    <input class="btn btn-primary btn-sm" data-target="#RepudiateReportPackage" data-toggle="modal" type="button" value="Repudiate"  id="btnRepudiate"/>
                 </div>
             </div>
+
+            @if (Model.HasRepudiationTimeExpired)
+            {
+                <script>
+                    $("#RepudiationReasonId").prop('disabled', true);
+                    $("#RepudiationComments").prop('readonly', true);
+                    $("#Password").prop('readonly', true);
+                    $("#Answer").prop('readonly', true);
+                    $("#btnRepudiate").prop("disabled", true);
+                </script>
+            }
         </div>
     }
 

@@ -45,6 +45,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
 
         public bool CanCurrentUserSubmitAndReputiate { get; set; }
         public bool IsCurrentPortalAuthority { get; set; }
+        public bool HasRepudiationTimeExpired { get; set; }
 
         public int FailedCountPassword { get; set; }
         public int FailedCountKbq { get; set; }

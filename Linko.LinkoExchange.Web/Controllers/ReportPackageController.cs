@@ -969,6 +969,10 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     if (viewModel.Status == ReportStatusName.Submitted)
                     {
+                        if (viewModel.Id != null)
+                        {
+                            viewModel.HasRepudiationTimeExpired = !_reportPackageService.CanRepudiateReportPackage(reportPackageId: viewModel.Id.Value);
+                        }
                         var repudiationReasons = _reportPackageService.GetRepudiationReasons();
                         viewModel.AvailableRepudiationReasonNames = repudiationReasons.Select(c => new SelectListItem
                         {
@@ -976,7 +980,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                             Value = c.RepudiationReasonId.ToString()
                         }).OrderBy(c => c.Text).ToList();
 
-                        viewModel.AvailableRepudiationReasonNames.Insert(0, new SelectListItem() { Text = Label.ResourceManager.GetString(name: "SelectReason").ToString(), Value = "0" });
+                        viewModel.AvailableRepudiationReasonNames.Insert(0, new SelectListItem() { Text = Label.ResourceManager.GetString(name: "SelectReason"), Value = "0",Disabled = true});
                     }
                 }
             }
