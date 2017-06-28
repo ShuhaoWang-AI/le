@@ -743,15 +743,19 @@ namespace Linko.LinkoExchange.Services.User
             
             if (reason != AccountLockEvent.ManualAction)
             {
-                var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-                var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId); 
-
-                authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName); 
-
-                if (!contentReplacements.Keys.Contains("authorityName"))
+                var orgRegProgramIdStr = _httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId);  
+                if(!string.IsNullOrWhiteSpace(orgRegProgramIdStr))
                 {
-                    contentReplacements.Add("authorityName", authorityName);
-                }    
+                    var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+                    var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId); 
+
+                    authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName); 
+
+                    if (!contentReplacements.Keys.Contains("authorityName"))
+                    {
+                        contentReplacements.Add("authorityName", authorityName);
+                    }
+                } 
             }  
 
             var emailType = EmailType.Profile_KBQFailedLockout; 
