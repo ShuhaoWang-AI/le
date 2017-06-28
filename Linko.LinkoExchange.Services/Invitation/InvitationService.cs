@@ -361,20 +361,12 @@ namespace Linko.LinkoExchange.Services.Invitation
             contentReplacements = new Dictionary<string, string>();
             if (existingUser != null)
             {
-                cromerrAuditLogEntryDto.RegulatoryProgramId = existingUser.OrganizationRegulatoryProgramDto.RegulatoryProgramId;
-                cromerrAuditLogEntryDto.OrganizationId = existingUser.OrganizationRegulatoryProgramDto.OrganizationId;
-                cromerrAuditLogEntryDto.RegulatorOrganizationId = existingUser.OrganizationRegulatoryProgramDto.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                 cromerrAuditLogEntryDto.UserProfileId = existingUser.UserProfileId;
                 cromerrAuditLogEntryDto.UserName = existingUser.UserProfileDto.UserName;
                 contentReplacements.Add("userName", existingUser.UserProfileDto.UserName);
-
             }
             else
             {
-
-                cromerrAuditLogEntryDto.RegulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;
-                cromerrAuditLogEntryDto.OrganizationId = targetOrgRegProgram.OrganizationId;
-                cromerrAuditLogEntryDto.RegulatorOrganizationId = targetOrgRegProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
                 cromerrAuditLogEntryDto.UserName = "n/a";
                 contentReplacements.Add("userName", "n/a");
             }
@@ -386,6 +378,9 @@ namespace Linko.LinkoExchange.Services.Invitation
                 existingUser.IsRemoved = false;
             }
 
+            cromerrAuditLogEntryDto.RegulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = targetOrgRegProgram.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = targetOrgRegProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
             cromerrAuditLogEntryDto.UserFirstName = firstName;
             cromerrAuditLogEntryDto.UserLastName = lastName;
             cromerrAuditLogEntryDto.UserEmailAddress = email;
