@@ -338,7 +338,6 @@ namespace Linko.LinkoExchange.Web.Controllers
             try
             {
                 var result = _userService.RemoveUser(orgRegProgUserId: model.Id, isAuthorizationRequired: true);
-
                 if (result)
                 {
                     return RedirectToAction(actionName:"IndustryUserRemoved", controllerName:"Industry");
@@ -1394,7 +1393,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                               ParameterName = c.ParameterName,
                                                                               Qualifier = c.Qualifier,
                                                                               UnitId = c.UnitId,
-                                                                              Value = string.IsNullOrWhiteSpace(value:c.Value) ? string.Empty : c.Value,
+                                                                              EnteredValue = string.IsNullOrWhiteSpace(value:c.Value) ? string.Empty : c.Value,
                                                                               UnitName = c.UnitName
                                                                           }),
                           FlowUnitId = model.FlowUnitId,
@@ -1474,7 +1473,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                            ParameterName = c.ParameterName,
                                                                            Qualifier = c.Qualifier,
                                                                            UnitId = c.UnitId,
-                                                                           Value = c.Value,
+                                                                           Value = c.EnteredValue,
                                                                            UnitName = c.UnitName
                                                                        });
 
