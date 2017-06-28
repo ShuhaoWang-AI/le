@@ -1255,7 +1255,9 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 // 6.a determine user doesn't have access to any enabled industry or authority 
                 if (orpus.Any(i => i.IsRegistrationApproved &&
-                                   i.IsEnabled && i.OrganizationRegulatoryProgramDto.IsEnabled) == false)
+                                   i.IsEnabled && 
+                                   !i.IsRemoved &&
+                                   i.OrganizationRegulatoryProgramDto.IsEnabled) == false)
                 {
                     LogToCromerrThisEvent(orpus, CromerrEvent.Login_NoAssociation);
                     signInResultDto.AutehticationResult = AuthenticationResult.AccountIsNotAssociated;
