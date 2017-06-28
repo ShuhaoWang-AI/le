@@ -3427,420 +3427,375 @@ BEGIN
     PRINT '-----------------------------'
     
     INSERT INTO dbo.tTermCondition (Content)
-		VALUES ('<style>
-                p.MsoNormal, li.MsoNormal, div.MsoNormal
-                {
-                    font-size: 10.0pt;
-                }
+		VALUES (
+		'<style>
+			p.MsoNormal, li.MsoNormal, div.MsoNormal
+			{
+				font-size: 10.0pt;
+			}
 
-                h1
-                {
-                    color: black;
-                    font-size: 10.0pt;
-                    font-weight: normal;
-                    text-align: justify;
-                }
-            </style>
+			h1
+			{
+				color: black;
+				font-size: 10.0pt;
+				font-weight: normal;
+				text-align: justify;
+			}
 
-            <div>
+			.textUnderline 
+			{
+				text-decoration: underline;
+			}
+		</style>
 
-                <p align="center" class="MsoNormal" style="text-align: center">
-                    <b>
-                        End User Licence Agreement – All Users
-                    </b>
-                </p>
+		<div>
 
-                <p align="center" class="MsoNormal" style="text-align: center">
-                    <b>
-                        <span style="font-size: 11.0pt;">
-                            PLEASE READ THIS DOCUMENT CAREFULLY.&nbsp;<br>
-                            IT SIGNIFICANTLY ALTERS YOUR LEGAL RIGHTS AND REMEDIES.
-                        </span>
-                    </b>
-                </p>
+			<p align="center" class="MsoNormal" style="text-align: center">
+				<b>
+					End User Licence Agreement – All Users
+				</b>
+			</p>
 
-                <p class="MsoNormal">
-                    This is a legal agreement between Linko Technology Inc. (“<b>Linko</b>” or “<b>we</b>” or “<b>us</b>”) of 4251 Kipling Street, Suite 220, Wheat Ridge, Colorado 80033
-                    and you regarding your use of any Linko application(s), such as the Hosted-Linko™ Pretreatment and FOG Software, POM Portal and Linko™ Exchange, and other modules or
-                    applications (collectively, the “<b>Application(s)</b>”). If you do not accept these terms, you must not use the Application(s).
-                </p>
+			<p align="center" class="MsoNormal" style="text-align: center">
+				<b>
+					<span style="font-size: 11.0pt;">
+						PLEASE READ THIS DOCUMENT CAREFULLY.<br>
+						IT SIGNIFICANTLY ALTERS YOUR LEGAL RIGHTS AND REMEDIES.
+					</span>
+				</b>
+			</p>
 
-                <h1>
-                    <b>
-                        BACKGROUND
-                    </b>
-                </h1>
+			<p class="MsoNormal">
+				This is a legal agreement between Linko Technology Inc. (“<b>Linko</b>” or “<b>we</b>” or “<b>us</b>”) of 4251 Kipling Street, Suite 220, Wheat Ridge, Colorado 80033
+				and you regarding your use of any Linko application(s), such as the Hosted-Linko™ Pretreatment and FOG Software, POM Portal and Linko™ Exchange, and other modules or
+				applications (collectively, the “<b>Application(s)</b>”). If you do not accept these terms, you must not use the Application(s).
+			</p>
 
-                <h1>
-                    Cities, municipalities and other government entities (each, a “<b>Government Entity</b>”) use the Application(s) to collect and process data pursuant to a Client Service
-                    Agreement or similar agreement between Linko and the Government Entity (the “<b>CSA</b>”).
-                </h1>
+			<h1>
+				<b>BACKGROUND</b>
+			</h1>
 
-                <h1>
-                    Industry entities (each an “<b>Industry Entity</b>”) use the Application(s) to submit data to Government Entities pursuant to agreements between the Industry Entity
-                    and Government Entity (each, a “<b>GEA</b>”).
-                </h1>
+			<h1>
+				Cities, municipalities and other government entities (each, a “<b>Government Entity</b>”) use the Application(s) to collect and process data pursuant to a Client Service
+				Agreement or similar agreement between Linko and the Government Entity (the “<b>CSA</b>”).
+			</h1>
 
-                <h1>
-                    &nbsp;
-                </h1>
+			<h1>
+				Industry entities (each an “<b>Industry Entity</b>”) use the Application(s) to submit data to Government Entities pursuant to agreements between the Industry Entity
+				and Government Entity (each, a “<b>GEA</b>”).
+			</h1>
 
-                <h1>
-                    <b>
-                        AGREEMENT
-                    </b>
-                </h1>
+			<h1>
+				&nbsp;
+			</h1>
 
-                <p class="MsoNormal">
-                    By accessing or using the Application(s), you agree to the terms and conditions set out here. Linko may change these terms and conditions at our discretion
-                    any time without notice, so please check this page regularly for updates.
-                </p>
+			<h1>
+				<b>
+					AGREEMENT
+				</b>
+			</h1>
 
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <b>
-                        The Application(s).
-                    </b>
-                    You must not access or use any of the Application(s) unless either:
-                </h1>
+			<p class="MsoNormal">
+				By accessing or using the Application(s), you agree to the terms and conditions set out here. Linko may change these terms and conditions at our discretion
+				any time without notice, so please check this page regularly for updates.
+			</p>
 
-                <h1 style="margin-left: .75in; text-indent: -.25in">
-                    a) &nbsp;&nbsp;&nbsp; you work for a Government Entity and you have permission to access or use the Application(s) pursuant to a CSA between Linko and that Government Entity; or
-                </h1>
+			<h1>
+				1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>The Application(s).</b>
+				You must not access or use any of the Application(s) unless either:
+			</h1>
 
-                <h1 style="margin-left: .75in; text-indent: -.25in">
-                    b) &nbsp;&nbsp;&nbsp; you work for an Industry Entity that is required by a Government Entity to use the Application(s) to submit data, reports or other information to that Government Entity.
-                </h1>
+			<h1 style="margin-left: .35in;">
+				a) you work for a Government Entity and you have permission to access or use the Application(s) pursuant to a CSA between Linko and that Government Entity; or
+			</h1>
 
-                <h1>
-                    You must only access and use the Application(s) for the internal business purposes of that Government Entity or Industry Entity, and only to the extent permitted
-                    by the CSA between Linko and that Government Entity and by any GEA between the Government Entity and the Industry Entity.
-                </h1>
+			<h1 style="margin-left: .35in;">
+				b) you work for an Industry Entity that is required by a Government Entity to use the Application(s) to submit data, reports or other information to that Government Entity.
+			</h1>
 
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <b>
-                        Rules.
-                    </b>
-                    Whenever you access or use the Application(s) you must comply with any acceptable use policies and other policies Linko implements with respect to the Application(s)
-                    from time-to-time, as posted by Linko on or through the Application(s), and all applicable laws. You must protect the confidentiality of your user name and
-                    password, and you must immediately notify Linko if you believe that confidentiality may have been compromised. You must not permit any third party to access or use your user name and password.
-                </h1>
+			<h1>
+				You must only access and use the Application(s) for the internal business purposes of that Government Entity or Industry Entity, and only to the extent permitted
+				by the CSA between Linko and that Government Entity and by any GEA between the Government Entity and the Industry Entity.
+			</h1>
 
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    3.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>
-                        Prohibitions.
-                    </b>
-                    You must not:
-                </h1>
+			<h1>
+				2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Rules.</b>
+				Whenever you access or use the Application(s) you must comply with any acceptable use policies and other policies Linko implements with respect to the Application(s)
+				from time-to-time, as posted by Linko on or through the Application(s), and all applicable laws. You must protect the confidentiality of your user name and
+				password, and you must immediately notify Linko if you believe that confidentiality may have been compromised. You must not permit any third party to access or use your user name and password.
+			</h1>
 
-                <p class="MsoNormal" style="margin-left: .75in; text-indent: -.25in">
-                    <span style="font-family: Symbol">
-                        ·&nbsp;&nbsp;&nbsp;
-                    </span>
-                    reverse engineer, de-compile, hack, disable, disrupt, interfere with, disassemble, copy, rent, lease, loan, sell, distribute, decrypt, reassemble, modify,
-                    supplement, translate, adapt or enhance, or create derivative works from any of the Application(s) or the hardware or software used to provide the
-                    Application(s), or any of the services provided through the Application(s) (the “<b>Services</b>”);
-                </p>
+			<h1>
+				3.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Prohibitions.</b>
+				You must not:
+			</h1>
 
-                <p class="MsoNormal" style="margin-left: .75in; text-indent: -.25in">
-                    <span style="font-family: Symbol">
-                        ·&nbsp;&nbsp;&nbsp;
-                    </span>
-                    attempt to access any data, information or content of any third party through the Application(s), except as authorized by Linko;
-                </p>
+			<p class="MsoNormal" style="margin-left: .35in;">
+				<span style="font-family: Symbol">·</span>&nbsp;&nbsp;&nbsp;
+				reverse engineer, de-compile, hack, disable, disrupt, interfere with, disassemble, copy, rent, lease, loan, sell, distribute, decrypt, reassemble, modify,
+				supplement, translate, adapt or enhance, or create derivative works from any of the Application(s) or the hardware or software used to provide the
+				Application(s), or any of the services provided through the Application(s) (the “<b>Services</b>”);
+			</p>
 
-                <p class="MsoNormal" style="margin-left: .75in; text-indent: -.25in">
-                    <span style="font-family: Symbol">
-                        ·&nbsp;&nbsp;&nbsp;
-                    </span>
-                    upload to or transmit via the Application(s) any data, file, software or link that contains or redirects to a virus, Trojan horse, worm or other harmful component;
-                </p>
+			<p class="MsoNormal" style="margin-left: .35in;">
+				<span style="font-family: Symbol">·</span>&nbsp;&nbsp;&nbsp;
+				attempt to access any data, information or content of any third party through the Application(s), except as authorized by Linko;
+			</p>
 
-                <p class="MsoNormal" style="margin-left: .75in; text-indent: -.25in">
-                    <span style="font-family: Symbol">
-                        ·&nbsp;&nbsp;&nbsp;
-                    </span>
-                    upload to or transmit via the Application(s) any content, link or anything else that (if reproduced, published, transmitted or used) may:
-                </p>
+			<p class="MsoNormal" style="margin-left: .35in;">
+				<span style="font-family: Symbol">·</span>&nbsp;&nbsp;&nbsp;
+				upload to or transmit via the Application(s) any data, file, software or link that contains or redirects to a virus, Trojan horse, worm or other harmful component;
+			</p>
 
-                <p class="MsoNormal" style="margin-left: 1.0in; text-indent: -.25in">
-                    <span style=''font-family: "Courier New"; font-size: 10.0pt;''>
-                        o &nbsp;&nbsp;&nbsp;
-                    </span>
-                    be defamatory, threatening, abusive, harassing, hateful, obscene, pornographic, harmful or invasive of anyone’s privacy, or violent,
-                </p>
+			<p class="MsoNormal" style="margin-left: .35in;">
+				<span style="font-family: Symbol">·</span>&nbsp;&nbsp;&nbsp;
+				upload to or transmit via the Application(s) any content, link or anything else that (if reproduced, published, transmitted or used) may:
+			</p>
 
-                <p class="MsoNormal" style="margin-left: 1.0in; text-indent: -.25in">
-                    <span style=''font-family: "Courier New"; font-size: 10.0pt;''>
-                        o &nbsp;&nbsp;&nbsp;
-                    </span>
-                    violate any law including intellectual property, privacy or other laws;
-                </p>
+			<p class="MsoNormal" style="margin-left: .55in;">
+				<span style=''font-family: "Courier New"; font-size: 10.0pt;''>o</span>&nbsp;&nbsp;&nbsp;
+				be defamatory, threatening, abusive, harassing, hateful, obscene, pornographic, harmful or invasive of anyone’s privacy, or violent,
+			</p>
+    
+			<p class="MsoNormal" style="margin-left: .55in;">
+				<span style=''font-family: "Courier New"; font-size: 10.0pt;''>o</span>&nbsp;&nbsp;&nbsp;
+				violate any law including intellectual property, privacy or other laws;
+			</p>
+    
+			<p class="MsoNormal" style="margin-left: .55in;">
+				<span style=''font-family: "Courier New"; font-size: 10.0pt;''>o</span>&nbsp;&nbsp;&nbsp;
+				impersonate any person;
+			</p>
+    
+			<p class="MsoNormal" style="margin-left: .55in;">
+				<span style=''font-family: "Courier New"; font-size: 10.0pt;''>o</span>&nbsp;&nbsp;&nbsp; 
+				give rise to civil or other liability; or
+			</p>
 
-                <p class="MsoNormal" style="margin-left: 1.0in; text-indent: -.25in">
-                    <span style=''font-family: "Courier New"; font-size: 10.0pt;''>
-                        o &nbsp;&nbsp;&nbsp;
-                    </span>
-                    impersonate any person;
-                </p>
+			<p class="MsoNormal" style="margin-left: .55in;">
+				<span style=''font-family: "Courier New"; font-size: 10.0pt;''>o</span>&nbsp;&nbsp;&nbsp; 
+				relate to illegal drugs, weapons, gambling or other illegal activities; upload to or transmit from the Application any data, file, software or link that contains or
+				redirects to a virus, Trojan horse, worm or other harmful component;
+			</p>
+    
+			<p class="MsoNormal" style="margin-left: .35in;">
+				<span style="font-family: Symbol">·</span>&nbsp;&nbsp;&nbsp;
+				interfere with the any third party’s use of the Application(s) or Services;
+			</p>
 
-                <p class="MsoNormal" style="margin-left: 1.0in; text-indent: -.25in">
-                    <span style=''font-family: "Courier New"; font-size: 10.0pt;''>
-                        o &nbsp;&nbsp;&nbsp;
-                    </span> give rise to civil or other liability; or
-                </p>
+   
+			<p class="MsoNormal" style="margin-left: .35in;">
+				<span style="font-family: Symbol">·</span>&nbsp;&nbsp;&nbsp;
+				access the Application(s) by any means other than through the interface that is provided by Linko;
+			</p>
 
-                <p class="MsoNormal" style="margin-left: 1.0in; text-indent: -.25in">
-                    <span style=''font-family: "Courier New"; font-size: 10.0pt;''>
-                        o &nbsp;&nbsp;&nbsp;
-                    </span> relate to illegal drugs, weapons, gambling or other illegal activities; upload to or transmit from the Application any data, file, software or link that contains or
-                    redirects to a virus, Trojan horse, worm or other harmful component;
-                </p>
+    
+			<p class="MsoNormal" style="margin-left: .35in;">
+				<span style="font-family: Symbol">·</span>&nbsp;&nbsp;&nbsp;
+				use the Application(s) to do or attempt to do any of the following without Linko’s prior written permission:
+			</p>
 
-                <p class="MsoNormal" style="margin-left: .75in; text-indent: -.25in">
-                    <span style="font-family: Symbol">
-                        ·&nbsp;&nbsp;&nbsp;
-                    </span>
-                    interfere with the any third party’s use of the Application(s) or Services;
-                </p>
+			<p class="MsoNormal" style="margin-left: .55in;">
+				<span style=''font-family: "Courier New"; font-size: 10.0pt;''>o</span>&nbsp;&nbsp;&nbsp; 
+				send spam or other bulk messages;
+			</p>
 
-                <p class="MsoNormal" style="margin-left: .75in; text-indent: -.25in">
-                    <span style="font-family: Symbol">
-                        ·&nbsp;&nbsp;&nbsp;
-                    </span> access the Application(s) by any means other than through the interface that is provided by Linko;
-                </p>
+			<p class="MsoNormal" style="margin-left: .55in;">
+				<span style=''font-family: "Courier New"; font-size: 10.0pt;''>o</span>&nbsp;&nbsp;&nbsp;
+				gain unauthorized access to any data, network or system;
+			</p>
 
-                <p class="MsoNormal" style="margin-left: .75in; text-indent: -.25in">
-                    <span style="font-family: Symbol">
-                        ·&nbsp;&nbsp;&nbsp;
-                    </span> use the Application(s) to do or attempt to do any of the following without Linko’s prior written permission:
-                </p>
+			<p class="MsoNormal" style="margin-left: .55in;">
+				<span style=''font-family: "Courier New"; font-size: 10.0pt;''>o</span>&nbsp;&nbsp;&nbsp;
+				conduct or promote any commercial activity, other than the purchase of products and services from Linko;
+			</p>
 
-                <p class="MsoNormal" style="margin-left: 1.0in; text-indent: -.25in">
-                    <span style=''font-family: "Courier New"''>
-                        o &nbsp;&nbsp;&nbsp;
-                    </span> send spam or other bulk messages;
-                </p>
+			<p class="MsoNormal" style="margin-left: .55in;">
+				<span style=''font-family: "Courier New"; font-size: 10.0pt;''>o</span>&nbsp;&nbsp;&nbsp;
+				monitor data or traffic on any network or system;
+			</p>
+    
+			<p class="MsoNormal" style="margin-left: .55in;">
+				<span style=''font-family: "Courier New"; font-size: 10.0pt;''>o</span>&nbsp;&nbsp;&nbsp;
+				obtain an email address, user name or other information about a third party without their consent;
+			</p>
+    
+			<p class="MsoNormal" style="margin-left: .55in;">
+				<span style=''font-family: "Courier New"; font-size: 10.0pt;''>o</span>&nbsp;&nbsp;&nbsp;
+				use any misleading, false or deceptive TCP/IP header information in any email or posting; or
+			</p>
+    
+			<p class="MsoNormal" style="margin-left: .55in;">
+				<span style=''font-family: "Courier New"; font-size: 10.0pt;''>o</span>&nbsp;&nbsp;&nbsp;
+				conduct or instigate any denial of service attack against Linko’s website or network, or any third party’s website or network;
+			</p>
 
-                <p class="MsoNormal" style="margin-left: 1.0in; text-indent: -.25in">
-                    <span style=''font-family: "Courier New"''>
-                        o &nbsp;&nbsp;&nbsp;
-                    </span> gain unauthorized access to any data, network or system;
-                </p>
+			<p class="MsoNormal" style="margin-left: .35in;">
+				<span style="font-family: Symbol">·</span>&nbsp;&nbsp;&nbsp;
+				improperly make complaints or use “flag” buttons or make false reports via the Application(s);
+			</p>
+    
+			<p class="MsoNormal" style="margin-left: .35in;">
+				<span style="font-family: Symbol">·</span>&nbsp;&nbsp;&nbsp;
+				falsify any data or information available on the Application(s);
+			</p>
 
-                <p class="MsoNormal" style="margin-left: 1.0in; text-indent: -.25in">
-                    <span style=''font-family: "Courier New"''>
-                        o &nbsp;&nbsp;&nbsp;
-                    </span> conduct or promote any commercial activity, other than the purchase of products and services from Linko;
-                </p>
+			<p class="MsoNormal" style="margin-left: .35in;">
+				<span style="font-family: Symbol">·</span>&nbsp;&nbsp;&nbsp;
+				delete or modify any copyright or other intellectual property notice on the Application(s);
+			</p>
 
-                <p class="MsoNormal" style="margin-left: 1.0in; text-indent: -.25in">
-                    <span style=''font-family: "Courier New"''>
-                        o &nbsp;&nbsp;&nbsp;
-                    </span> monitor data or traffic on any network or system;
-                </p>
+			<p class="MsoNormal" style="margin-left: .35in;">
+				<span style="font-family: Symbol">·</span>&nbsp;&nbsp;&nbsp;
+				avoid, circumvent, or disable any access control technology, security device, procedure, protocol, or technological protection mechanism that may be included
+				or established in or as part of any the Application(s) or any hardware/software used to provide the Application(s), or third party hardware/software or services; or
+			</p>
 
-                <p class="MsoNormal" style="margin-left: 1.0in; text-indent: -.25in">
-                    <span style=''font-family: "Courier New"''>
-                        o &nbsp;&nbsp;&nbsp;
-                    </span>
-                    obtain an email address, user name or other information about a third party without their consent;
-                </p>
+			<p class="MsoNormal" style="margin-left: .35in;">
+				<span style="font-family: Symbol">·</span>&nbsp;&nbsp;&nbsp;
+				authorize or encourage any third party to do any of the above.
+			</p>
 
-                <p class="MsoNormal" style="margin-left: 1.0in; text-indent: -.25in">
-                    <span style=''font-family: "Courier New"''>
-                        o &nbsp;&nbsp;&nbsp;
-                    </span>
-                    use any misleading, false or deceptive TCP/IP header information in any email or posting; or
-                </p>
+			<h1>
+				4.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Your Content.</b>
+				Any feedback, comments, photos, text, data and other content you provide to or through the Application(s) (collectively, “<b>Your</b>
+				<b>Content</b>”) may be shared with anyone as permitted by the CSA between the relevant Government Entity and Linko, and you hereby grant Linko an
+				irrevocable, perpetual licence to copy, modify, display and otherwise use Your Content in that manner. You represent and warrant to Linko that: (a) you
+				either own Your Content or have permission from the copyright owner to make Your Content available on or through the Application(s); (b) Your Content
+				is accurate and correct; (c) you have the right to grant the above licence to Linko; and (d) the reproduction, display, distribution, use and other
+				exploitation of Your Content by Linko and our service providers, users and licensees as permitted by the above licence will not infringe or violate the
+				rights of any third party, and will not violate any law.
+			</h1>
 
-                <p class="MsoNormal" style="margin-left: 1.0in; text-indent: -.25in">
-                    <span style=''font-family: "Courier New"''>
-                        o &nbsp;&nbsp;&nbsp;
-                    </span>
-                    conduct or instigate any denial of service attack against Linko’s website or network, or any third party’s website or network;
-                </p>
+			<h1>
+				5.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Linko’s Content.</b>
+				As between Linko and you, Linko owns: (a) the Application(s) and all content provided on or through the Application(s),
+				including all text, photos, videos, templates, images, icons, software, designs, Application(s), data, and other content and all intellectual property
+				rights in the content; (b) all tools, hardware and software used to provide the Application(s); and (c) the graphical design, user interface and
+				the look and feel of the Application(s).
+			</h1>
 
-                <p class="MsoNormal" style="margin-left: .75in; text-indent: -.25in">
-                    <span style="font-family: Symbol">
-                        ·&nbsp;&nbsp;&nbsp;
-                    </span>
-                    improperly make complaints or use “flag” buttons or make false reports via the Application(s);
-                </p>
+			<h1>
+				6.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Other Content.</b>
+				Linko does not endorse all of the content on the Application(s), and that content may contain viruses, incorrect statements, and material that is not suitable for
+				you. Linko will not be responsible or liable for content that is generated by other users of the Application(s) or Linko’s website.
+			</h1>
 
-                <p class="MsoNormal" style="margin-left: .75in; text-indent: -.25in">
-                    <span style="font-family: Symbol">
-                        ·&nbsp;&nbsp;&nbsp;
-                    </span>
-                    falsify any data or information available on the Application(s);
-                </p>
+			<h1>
+				7.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Monitoring and Disclosure.</b>
+				Linko and its representatives may monitor your use of the Application(s). Linko also reserves the right to remove or edit content that Linko determines, in its sole
+				discretion, is objectionable for any reason; however, Linko will not have any liability for any failure to remove, or delay in removing, any content. Linko may disclose any
+				information that is necessary to satisfy any law, regulation or lawful request or as necessary to operate the Application(s) or to protect the rights or property of Linko or others.
+			</h1>
 
-                <p class="MsoNormal" style="margin-left: .75in; text-indent: -.25in">
-                    <span style="font-family: Symbol">
-                        ·&nbsp;&nbsp;&nbsp;
-                    </span>
-                    delete or modify any copyright or other intellectual property notice on the Application(s);
-                </p>
+			<h1>
+				8.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Links from the Application(s).</b>
+				The Application(s) may provide links to third-party websites and other content. Those sites and content are independent from Linko. We have no control over, and no liability for, those
+				sites, their content, or your use of them. We provide links for your convenience only, and you access them at your own risk.
+			</h1>
 
-                <p class="MsoNormal" style="margin-left: .75in; text-indent: -.25in">
-                    <span style="font-family: Symbol">
-                        ·&nbsp;&nbsp;&nbsp;
-                    </span>
-                    avoid, circumvent, or disable any access control technology, security device, procedure, protocol, or technological protection mechanism that may be included
-                    or established in or as part of any the Application(s) or any hardware/software used to provide the Application(s), or third party hardware/software or services; or
-                </p>
+			<h1>
+				9.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Your Privacy.</b>
+				Linko and its representatives may collect personal information about you through the Application(s) to provide the Application(s) and Services to you, to allow us to communicate with
+				you (including through the use of commercial electronic messages), to manage your account with us, to monitor your compliance with this agreement and any other agreements between you
+				and Linko, and for any other purposes as described in our privacy policies, copies of which are available here
+				<a href="https://client.linkoexchange.com/privacy-policy/">https://client.linkoexchange.com/privacy-policy/</a>
+			</h1>
 
-                <p class="MsoNormal" style="margin-left: .75in; text-indent: -.25in">
-                    <span style="font-family: Symbol">
-                        ·&nbsp;&nbsp;&nbsp;
-                    </span>
-                    authorize or encourage any third party to do any of the above.
-                </p>
+			<p class="MsoNormal">
+				We may disclose your personal information electronically or in writing to our service providers for the above purposes.&nbsp; If we suspect you of prohibited activities, we may
+				disclose your personal information to the police or other authorities. We may also otherwise disclose your personal information as permitted by our privacy policies, mentioned above.
+			</p>
 
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    4.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>
-                        Your Content.
-                    </b>
-                    Any feedback, comments, photos, text, data and other content you provide to or through the Application(s) (collectively, “<b>Your</b>
-                    <b>Content</b>”) may be shared with anyone as permitted by the CSA between the relevant Government Entity and Linko, and you hereby grant Linko an
-                    irrevocable, perpetual licence to copy, modify, display and otherwise use Your Content in that manner. You represent and warrant to Linko that: (a) you
-                    either own Your Content or have permission from the copyright owner to make Your Content available on or through the Application(s); (b) Your Content
-                    is accurate and correct; (c) you have the right to grant the above licence to Linko; and (d) the reproduction, display, distribution, use and other
-                    exploitation of Your Content by Linko and our service providers, users and licensees as permitted by the above licence will not infringe or violate the
-                    rights of any third party, and will not violate any law.
-                </h1>
+			<p class="MsoNormal">
+				YOU HEREBY CONSENT TO LINKO AND ITS REPRESENTATIVES COLLECTING, USING AND DISCLOSING YOUR PERSONAL INFORMATION IN THE MANNER DESCRIBED ABOVE.
+			</p>
 
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    5.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>
-                        Linko’s Content.
-                    </b>
-                    As between Linko and you, Linko owns: (a) the Application(s) and all content provided on or through the Application(s),
-                    including all text, photos, videos, templates, images, icons, software, designs, Application(s), data, and other content and all intellectual property
-                    rights in the content; (b) all tools, hardware and software used to provide the Application(s); and (c) the graphical design, user interface and
-                    the look and feel of the Application(s).
-                </h1>
+			<h1>
+				10.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Interruptions/Errors.</b>
+				Your use of the Application(s) and Services might be interrupted and might not be error-free, accurate, complete or current at all or any times. The
+				Application(s) and Services may also be unavailable from time-to-time due to routine maintenance, upgrades, hardware/software malfunctions, repairs, power
+				outages, hackers, denial of service attacks and unforeseeably large service demands.
+			</h1>
 
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    6.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>
-                        Other Content.
-                    </b>
-                    Linko does not endorse all of the content on the Application(s), and that content may contain viruses, incorrect statements, and material that is not suitable for
-                    you. Linko will not be responsible or liable for content that is generated by other users of the Application(s) or Linko’s website.
-                </h1>
+			<h1>
+				11.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Disclaimers, Liability Exclusions/Limitations and Indemnity.</b>
+				YOUR ACCESS TO AND USE OF THE APPLICATION(S) AND SERVICES IS AT YOUR OWN RISK. THE APPLICATION(S) AND SERVICES ARE PROVIDED ON AN “AS IS” AND “AS AVAILABLE”
+				BASIS, <span class="textUnderline">WITHOUT</span> ANY REPRESENTATIONS, WARRANTIES OR CONDITIONS OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING IMPLIED REPRESENTATIONS, WARRANTIES
+				OR CONDITIONS OF OR RELATING TO ACCURACY, ACCESSIBILITY, AVAILABILITY, COMPLETENESS, DURABILITY, ERRORS, FITNESS FOR A PARTICULAR PURPOSE, LACK OF
+				NEGLIGENCE, MERCHANTABILITY, NON-INFRINGEMENT, PERFORMANCE, PRIVACY, QUALITY, RESULTS, SECURITY, SERVICE, TIMELINESS, TITLE, VIRUSES OR WORKMANLIKE EFFORT,
+				ALL OF WHICH ARE HEREBY WAIVED BY YOU AND DISCLAIMED BY LINKO TO THE FULLEST EXTENT PERMITTED BY LAW.
+			</h1>
 
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    7.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>
-                        Monitoring and Disclosure.
-                    </b>
-                    Linko and its representatives may monitor your use of the Application(s). Linko also reserves the right to remove or edit content that Linko determines, in its sole
-                    discretion, is objectionable for any reason; however, Linko will not have any liability for any failure to remove, or delay in removing, any content. Linko may disclose any
-                    information that is necessary to satisfy any law, regulation or lawful request or as necessary to operate the Application(s) or to protect the rights or property of Linko or others.
-                </h1>
+			<h1>
+				12.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>LIABILITY EXCLUSIONS.</b>
+				WITHOUT LIMITING THE GENERALITY OF THE FOREGOING AND NOTWITHSTANDING ANY OTHER PROVISION OF THIS AGREEMENT, BUT EXCEPT
+				AS OTHERWISE REQUIRED BY LAW, UNDER NO CIRCUMSTANCES WILL LINKO OR ANY OF ITS DIRECTORS, OFFICERS, EMPLOYEES, AGENTS, SERVICE PROVIDERS, SUPPLIERS,
+				SUB-CONTRACTORS, LICENSORS AND LICENSEES (COLLECTIVELY THE “<b>LINKO</b> <b>ENTITIES</b>”) EVER BE LIABLE TO YOU OR ANY OTHER PERSON FOR ANY INDIRECT, INCIDENTAL,
+				CONSEQUENTIAL, SPECIAL, PUNITIVE OR EXEMPLARY LOSS OR DAMAGE ARISING FROM, CONNECTED WITH, OR RELATING TO THE APPLICATION(S) OR THE SERVICES OR THIS
+				AGREEMENT, INCLUDING LOSS OF DATA, BUSINESS, MARKETS, SAVINGS, INCOME, PROFITS, USE, PRODUCTION, REPUTATION OR GOODWILL, ANTICIPATED OR OTHERWISE, OR ECONOMIC
+				LOSS, UNDER ANY THEORY OF LIABILITY (WHETHER IN CONTRACT, TORT, STRICT LIABILITY OR ANY OTHER THEORY OR LAW OR EQUITY), EVEN IF LINKO HAS BEEN ADVISED
+				OF THE POSSIBILITY OF SUCH LOSS OR DAMAGE BEING INCURRED.
+			</h1>
 
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    8.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <b>
-                        Links from the Application(s).
-                    </b>
-                    The Application(s) may provide links to third-party websites and other content. Those sites and content are independent from Linko. We have no control over, and no liability for, those
-                    sites, their content, or your use of them. We provide links for your convenience only, and you access them at your own risk.
-                </h1>
+			<h1>
+				13.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>INDEMNITY.</b>
+				YOU WILL INDEMNIFY, DEFEND AND HOLD THE LINKO ENTITIES HARMLESS FROM AND AGAINST ANY AND ALL LIABILITIES, EXPENSES AND COSTS, INCLUDING REASONABLE LEGAL FEES
+				AND EXPENSES, INCURRED BY THE LINKO ENTITIES IN CONNECTION WITH ANY CLAIM, DEMAND OR PROCEEDING ARISING OUT OF, RELATED TO, OR CONNECTED WITH YOUR BREACH
+				OF THIS AGREEMENT, THE UNTRUTHFULNESS OR INACCURACY OF ANY OF YOUR REPRESENTATIONS OR WARRANTIES TO LINKO, OR ANY WRONGFUL CONDUCT BY YOU OR ANY
+				OTHER PERSON FOR WHOM YOU ARE RESPONSIBLE UNDER THIS AGREEMENT OR AT LAW. YOU WILL ASSIST AND CO-OPERATE AS FULLY AS REASONABLY REQUIRED BY LINKO IN THE
+				DEFENSE OF ANY SUCH CLAIM, DEMAND OR PROCEEDING.
+			</h1>
 
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    9.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b> Your Privacy.</b>
-                    Linko and its representatives may collect personal information about you through the Application(s) to provide the Application(s) and Services to you, to allow us to communicate with
-                    you (including through the use of commercial electronic messages), to manage your account with us, to monitor your compliance with this agreement and any other agreements between you
-                    and Linko, and for any other purposes as described in our privacy policies, copies of which are available here
-                    <a href="https://client.linkoexchange.com/privacy-policy/">https://client.linkoexchange.com/privacy-policy/</a>
-                </h1>
+			<h1>
+				14.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Termination.</b>
+				You will immediately cease using the Application(s) and Services once the CSA between the relevant Government Entity and Linko has been terminated or has
+				expired, or once your permission to use the Application(s) and Services under that CSA or the GEA has ended. Subject to that CSA, Linko may in its sole
+				discretion: (a) change, discontinue, modify, restrict, suspend or terminate the Application(s) or any part of it without any notice or liability to you or any
+				other person, and (b) for its convenience at any time terminate this agreement or your permission to access and use the Application(s), without any prior
+				notice or liability to you or any other person.
+			</h1>
 
-                <p class="MsoNormal">
-                    We may disclose your personal information electronically or in writing to our service providers for the above purposes.&nbsp; If we suspect you of prohibited activities, we may
-                    disclose your personal information to the police or other authorities. We may also otherwise disclose your personal information as permitted by our privacy policies, mentioned above.
-                </p>
+			<p class="MsoNormal">
+				If this agreement or your permission to access or use any or all of the Application(s) is terminated for any reason, then sections 4, 5, 9 and 11 - 16 of this agreement
+				and all other provisions necessary for their interpretation or enforcement, will survive indefinitely after the termination of this agreement and remain in full force and effect.
+			</p>
 
-                <p class="MsoNormal">
-                    YOU HEREBY CONSENT TO LINKO AND ITS REPRESENTATIVES COLLECTING, USING AND DISCLOSING YOUR PERSONAL INFORMATION IN THE MANNER DESCRIBED ABOVE.
-                </p>
+			<h1>
+				15.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Laws and Courts.</b>
+				Use of the Application(s) and Services is governed exclusively by, and will be enforced, construed and interpreted exclusively in accordance with, the laws applicable
+				in Colorado. All disputes under this agreement will be resolved by the courts of Colorado in Denver; however, nothing in this section prohibits either party
+				from obtaining an injunction against the other party in any other jurisdiction.
+			</h1>
 
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    10.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b> Interruptions/Errors. </b>
-                    Your use of the Application(s) and Services might be interrupted and might not be error-free, accurate, complete or current at all or any times. The
-                    Application(s) and Services may also be unavailable from time-to-time due to routine maintenance, upgrades, hardware/software malfunctions, repairs, power
-                    outages, hackers, denial of service attacks and unforeseeably large service demands.
-                </h1>
+			<h1>
+				16.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Other.</b>&nbsp;
+				<span class="textUnderline">Invalidity</span>: If any provision of this agreement is held to be invalid or unenforceable for any reason, then that provision will be deemed to be severed from this agreement
+				and the remaining provisions will continue in full force and effect without being impaired or invalidated in any way, unless as a result of any such
+				severance this agreement would fail in its essential purpose. <span class="textUnderline">Entire Agreement:</span> This agreement supersedes all prior agreements and understandings between
+				Linko and you relating the Application(s). <span class="textUnderline">Enurement:</span> This agreement enures to the benefit of and is binding upon each of Linko and its successors, assigns
+				and related persons, and you and each of your heirs, executors, administrators, successors, permitted assigns and personal representatives. <span class="textUnderline">Assignment:</span> You
+				must not assign this agreement or the rights and obligations under this agreement. Linko may assign this agreement and its rights and obligations under this agreement
+				without your consent. This agreement contains provisions for the benefit of the Linko Entities, each of whom has the right to assert and enforce such provisions
+				directly or on their own behalf. <span class="textUnderline">Waiver:</span> No consent or waiver by any party to or of any breach or default by any other party in its performance of
+				its obligations under this agreement will be: (a) deemed or construed to be a consent to or waiver of a continuing breach or default or any other breach or
+				default of those or any other obligations of that party; or (b) effective unless in writing and signed by all parties. <span class="textUnderline">English</span>: The parties have
+				expressly requested and required that this agreement and all other related documents be drawn up in the English language.
+				<i>Les parties conviennentet exigent expressement que ce Contrat et tous les documents qui s’y rapportent soient rediges en Anglais.</i>
+			</h1>
 
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    11.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b> Disclaimers, Liability Exclusions/Limitations and Indemnity.</b>
-                    YOUR ACCESS TO AND USE OF THE APPLICATION(S) AND SERVICES IS AT YOUR OWN RISK. THE APPLICATION(S) AND SERVICES ARE PROVIDED ON AN “AS IS” AND “AS AVAILABLE”
-                    BASIS, <u>WITHOUT</u> ANY REPRESENTATIONS, WARRANTIES OR CONDITIONS OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING IMPLIED REPRESENTATIONS, WARRANTIES
-                    OR CONDITIONS OF OR RELATING TO ACCURACY, ACCESSIBILITY, AVAILABILITY, COMPLETENESS, DURABILITY, ERRORS, FITNESS FOR A PARTICULAR PURPOSE, LACK OF
-                    NEGLIGENCE, MERCHANTABILITY, NON-INFRINGEMENT, PERFORMANCE, PRIVACY, QUALITY, RESULTS, SECURITY, SERVICE, TIMELINESS, TITLE, VIRUSES OR WORKMANLIKE EFFORT,
-                    ALL OF WHICH ARE HEREBY WAIVED BY YOU AND DISCLAIMED BY LINKO TO THE FULLEST EXTENT PERMITTED BY LAW.
-                </h1>
+			<p class="MsoNormal">
+				Any rights not expressly granted by this agreement are reserved by Linko.
+			</p>
+    
+			<h1>
+				&nbsp;
+			</h1>
 
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    12.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b> LIABILITY EXCLUSIONS.</b>
-                    WITHOUT LIMITING THE GENERALITY OF THE FOREGOING AND NOTWITHSTANDING ANY OTHER PROVISION OF THIS AGREEMENT, BUT EXCEPT
-                    AS OTHERWISE REQUIRED BY LAW, UNDER NO CIRCUMSTANCES WILL LINKO OR ANY OF ITS DIRECTORS, OFFICERS, EMPLOYEES, AGENTS, SERVICE PROVIDERS, SUPPLIERS,
-                    SUB-CONTRACTORS, LICENSORS AND LICENSEES (COLLECTIVELY THE “<b>LINKO</b> <b>ENTITIES</b>”) EVER BE LIABLE TO YOU OR ANY OTHER PERSON FOR ANY INDIRECT, INCIDENTAL,
-                    CONSEQUENTIAL, SPECIAL, PUNITIVE OR EXEMPLARY LOSS OR DAMAGE ARISING FROM, CONNECTED WITH, OR RELATING TO THE APPLICATION(S) OR THE SERVICES OR THIS
-                    AGREEMENT, INCLUDING LOSS OF DATA, BUSINESS, MARKETS, SAVINGS, INCOME, PROFITS, USE, PRODUCTION, REPUTATION OR GOODWILL, ANTICIPATED OR OTHERWISE, OR ECONOMIC
-                    LOSS, UNDER ANY THEORY OF LIABILITY (WHETHER IN CONTRACT, TORT, STRICT LIABILITY OR ANY OTHER THEORY OR LAW OR EQUITY), EVEN IF LINKO HAS BEEN ADVISED
-                    OF THE POSSIBILITY OF SUCH LOSS OR DAMAGE BEING INCURRED.
-                </h1>
-
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    13.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b> INDEMNITY.</b>
-                    YOU WILL INDEMNIFY, DEFEND AND HOLD THE LINKO ENTITIES HARMLESS FROM AND AGAINST ANY AND ALL LIABILITIES, EXPENSES AND COSTS, INCLUDING REASONABLE LEGAL FEES
-                    AND EXPENSES, INCURRED BY THE LINKO ENTITIES IN CONNECTION WITH ANY CLAIM, DEMAND OR PROCEEDING ARISING OUT OF, RELATED TO, OR CONNECTED WITH YOUR BREACH
-                    OF THIS AGREEMENT, THE UNTRUTHFULNESS OR INACCURACY OF ANY OF YOUR REPRESENTATIONS OR WARRANTIES TO LINKO, OR ANY WRONGFUL CONDUCT BY YOU OR ANY
-                    OTHER PERSON FOR WHOM YOU ARE RESPONSIBLE UNDER THIS AGREEMENT OR AT LAW. YOU WILL ASSIST AND CO-OPERATE AS FULLY AS REASONABLY REQUIRED BY LINKO IN THE
-                    DEFENSE OF ANY SUCH CLAIM, DEMAND OR PROCEEDING.
-                </h1>
-
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    14.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b> Termination.</b>
-                    You will immediately cease using the Application(s) and Services once the CSA between the relevant Government Entity and Linko has been terminated or has
-                    expired, or once your permission to use the Application(s) and Services under that CSA or the GEA has ended. Subject to that CSA, Linko may in its sole
-                    discretion: (a) change, discontinue, modify, restrict, suspend or terminate the Application(s) or any part of it without any notice or liability to you or any
-                    other person, and (b) for its convenience at any time terminate this agreement or your permission to access and use the Application(s), without any prior
-                    notice or liability to you or any other person.
-                </h1>
-
-                <p class="MsoNormal">
-                    If this agreement or your permission to access or use any or all of the Application(s) is terminated for any reason, then sections 4, 5, 9 and 11 - 16 of this agreement
-                    and all other provisions necessary for their interpretation or enforcement, will survive indefinitely after the termination of this agreement and remain in full force and effect.
-                </p>
-
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    15.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b> Laws and Courts.</b>
-                    Use of the Application(s) and Services is governed exclusively by, and will be enforced, construed and interpreted exclusively in accordance with, the laws applicable
-                    in Colorado. All disputes under this agreement will be resolved by the courts of Colorado in Denver; however, nothing in this section prohibits either party
-                    from obtaining an injunction against the other party in any other jurisdiction.
-                </h1>
-
-                <h1 style="margin-left: 0in; text-indent: .1in">
-                    16.&nbsp;&nbsp;&nbsp;&nbsp; <b> Other. </b><u> Invalidity </u>
-                    : If any provision of this agreement is held to be invalid or unenforceable for any reason, then that provision will be deemed to be severed from this agreement
-                    and the remaining provisions will continue in full force and effect without being impaired or invalidated in any way, unless as a result of any such
-                    severance this agreement would fail in its essential purpose. <u> Entire Agreement: </u>This agreement supersedes all prior agreements and understandings between
-                    Linko and you relating the Application(s). <u>Enurement:</u> This agreement enures to the benefit of and is binding upon each of Linko and its successors, assigns
-                    and related persons, and you and each of your heirs, executors, administrators, successors, permitted assigns and personal representatives. <u>Assignment:</u> You
-                    must not assign this agreement or the rights and obligations under this agreement. Linko may assign this agreement and its rights and obligations under this agreement
-                    without your consent. This agreement contains provisions for the benefit of the Linko Entities, each of whom has the right to assert and enforce such provisions
-                    directly or on their own behalf. <u>Waiver:</u> No consent or waiver by any party to or of any breach or default by any other party in its performance of
-                    its obligations under this agreement will be: (a) deemed or construed to be a consent to or waiver of a continuing breach or default or any other breach or
-                    default of those or any other obligations of that party; or (b) effective unless in writing and signed by all parties. <u>English</u>: The parties have
-                    expressly requested and required that this agreement and all other related documents be drawn up in the English language.
-                    <i> Les parties conviennentet exigent expressement que ce Contrat et tous les documents qui s’y rapportent soient rediges en Anglais. </i>
-                </h1>
-
-                <p class="MsoNormal">
-                    Any rights not expressly granted by this agreement are reserved by Linko.
-                </p>
-            </div>') 
+			<h1>
+				<b>BY SELECTING ‘I AGREE TO THE TERMS AND CONDITIONS’, YOU ACKNOWLEDGE THAT YOU HAVE READ AND UNDERSTOOD THIS AGREEMENT AND AGREE TO BE BOUND BY IT.</b>
+			</h1>
+		</div>') 
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tUserProfile)
