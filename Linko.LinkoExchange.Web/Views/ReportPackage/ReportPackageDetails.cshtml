@@ -704,7 +704,7 @@
                 }
 
                 <div class="form-group">
-                    @Html.LabelFor(m => m.RepudiationReasonId, htmlAttributes: new {@class = "col-md-4 control-label"})
+                    @Html.LabelFor(m => m.RepudiationReasonId, htmlAttributes: new {@class = "col-md-4 control-label required"})
                     <div class="col-md-6">
                         @Html.DropDownList(name: "RepudiationReasonId", selectList: Model.AvailableRepudiationReasonNames, htmlAttributes: new
                                                                                                                                            {
