@@ -988,7 +988,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.ParameterId = sampleResult.ParameterId;
             dto.ParameterName = sampleResult.ParameterName;
             dto.Qualifier = sampleResult.Qualifier;
-            dto.Value = sampleResult.EnteredValue;
+            dto.EnteredValue = sampleResult.EnteredValue;
             dto.UnitId = sampleResult.UnitId;
             dto.UnitName = sampleResult.UnitName;
             dto.EnteredMethodDetectionLimit = sampleResult.EnteredMethodDetectionLimit;
@@ -1015,7 +1015,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             existingSampleResult.ParameterId = dto.ParameterId;
             existingSampleResult.ParameterName = dto.ParameterName;
             existingSampleResult.Qualifier = dto.Qualifier;
-            existingSampleResult.EnteredValue = dto.Value;
+            existingSampleResult.EnteredValue = dto.EnteredValue;
             //existingSampleResult.Value = Convert.ToDouble(dto.Value), //set outside after calling line
             existingSampleResult.UnitId = dto.UnitId;
             existingSampleResult.UnitName = dto.UnitName;

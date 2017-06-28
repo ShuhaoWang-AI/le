@@ -371,7 +371,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                    ParameterName = vm.ParameterName,
                                                                    Qualifier = vm.Qualifier,
                                                                    UnitId = vm.UnitId,
-                                                                   Value = vm.Value,
+                                                                   Value = vm.EnteredValue,
                                                                    UnitName = vm.UnitName
                                                                }).ToList();
 

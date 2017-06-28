@@ -585,13 +585,13 @@ namespace Linko.LinkoExchange.Services.Sample
                 foreach (var resultDto in sampleDto.SampleResults)
                 {
                     //Check if concentration entered value is numeric and can be converted to double.
-                    if (!String.IsNullOrEmpty(resultDto.Value))
+                    if (!String.IsNullOrEmpty(resultDto.EnteredValue))
                     {
                         Double concentrationValueAsDouble;
-                        if (!Double.TryParse(resultDto.Value, out concentrationValueAsDouble))
+                        if (!Double.TryParse(resultDto.EnteredValue, out concentrationValueAsDouble))
                         {
                             //Could not convert -- throw exception
-                            ThrowSimpleException($"Could not convert provided concentration value '{resultDto.Value}' to double.");
+                            ThrowSimpleException($"Could not convert provided concentration value '{resultDto.EnteredValue}' to double.");
                         }
                     }
 
@@ -632,7 +632,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         //
 
                         if ((resultDto.Qualifier == ">" || resultDto.Qualifier == "<" || string.IsNullOrEmpty(resultDto.Qualifier))
-                        && string.IsNullOrEmpty(resultDto.Value))
+                        && string.IsNullOrEmpty(resultDto.EnteredValue))
                         {
                             isValid = false;
                             if (!isSuppressExceptions)
@@ -642,7 +642,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         }
 
                         if ((resultDto.Qualifier == "ND" || resultDto.Qualifier == "NF")
-                            && !string.IsNullOrEmpty(resultDto.Value))
+                            && !string.IsNullOrEmpty(resultDto.EnteredValue))
                         {
                             isValid = false;
                             if (!isSuppressExceptions)
@@ -855,7 +855,7 @@ namespace Linko.LinkoExchange.Services.Sample
                             resultDto.ParameterId = sampleResult.ParameterId;
                             resultDto.IsCalcMassLoading = sampleResult.IsMassLoadingCalculationRequired;
                             resultDto.Qualifier = sampleResult.Qualifier;
-                            resultDto.Value = sampleResult.EnteredValue;
+                            resultDto.EnteredValue = sampleResult.EnteredValue;
                             resultDto.UnitId = sampleResult.UnitId;
                             resultDto.UnitName = sampleResult.UnitName;
 

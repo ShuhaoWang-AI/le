@@ -344,10 +344,10 @@ namespace Linko.LinkoExchange.Services.Sync
 
             // it is assumed that whenever that qualifier and value are matched and stored correctly in the DB,
             // i.e. "ND and NF" will not have value component, "<" will have corresponding value component, and numeric value only (no qualifier).
-            sampleResultParsedData.LabResult = $"{sampleResultDto.Qualifier}{sampleResultDto.Value}";
+            sampleResultParsedData.LabResult = $"{sampleResultDto.Qualifier}{sampleResultDto.EnteredValue}";
 
             double labNumResult = default(double);
-            sampleResultParsedData.LabNumResult = double.TryParse(sampleResultDto.Value, out labNumResult) ? labNumResult : default(double?);
+            sampleResultParsedData.LabNumResult = double.TryParse(sampleResultDto.EnteredValue, out labNumResult) ? labNumResult : default(double?);
 
             sampleResultParsedData.LabResultFlag = null;
             sampleResultParsedData.LabResultUnits = sampleResultDto.UnitName;

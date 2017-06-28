@@ -416,12 +416,12 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         private string GetSampleResultValue(SampleResultDto sampleResultDto)
         {
-            if (string.IsNullOrWhiteSpace(sampleResultDto.Value))
+            if (string.IsNullOrWhiteSpace(sampleResultDto.EnteredValue))
             {
                 return sampleResultDto.Qualifier;
             }
 
-            return $"{sampleResultDto.Qualifier}{sampleResultDto.Value} {sampleResultDto.UnitName}";
+            return $"{sampleResultDto.Qualifier}{sampleResultDto.EnteredValue} {sampleResultDto.UnitName}";
         }
 
         private void ReportInfoTable(Page pdfPage)

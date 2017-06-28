@@ -417,7 +417,7 @@ namespace Linko.LinkoExchange.Services.Report
                         {
                             ParameterName = sampleResultDto.ParameterName,
                             Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier).GetValueOrEmptyString(),
-                            Value = sampleResultDto.Value.GetValueOrEmptyString(),
+                            EnteredValue = sampleResultDto.EnteredValue.GetValueOrEmptyString(), 
                             UnitName = sampleResultDto.UnitName.GetValueOrEmptyString(),
                             EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit.GetValueOrEmptyString(),
                             MethodDetectionLimit = sampleResultDto.MethodDetectionLimit?.ToString(),

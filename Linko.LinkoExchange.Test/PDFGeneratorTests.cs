@@ -86,7 +86,7 @@ namespace Linko.LinkoExchange.Test
                 {
                     ParameterName = "1,4-Dioxane",
                     MethodDetectionLimit = 0.02,
-                    Value = random.NextDouble().ToString().Substring(0, 4),
+                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
                     UnitName = "mg/L",
                     AnalysisMethod = "200.7",
                     AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
@@ -96,7 +96,7 @@ namespace Linko.LinkoExchange.Test
                 {
                     ParameterName = "Benzidine",
                     MethodDetectionLimit = 0.02,
-                    Value = random.NextDouble().ToString().Substring(0, 4),
+                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
                     UnitName = "mg/L",
                     AnalysisMethod = "200.7",
                     AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
@@ -106,7 +106,7 @@ namespace Linko.LinkoExchange.Test
                 {
                     ParameterName = "1,4-Dioxane",
                     MethodDetectionLimit = 0.02,
-                    Value = random.NextDouble().ToString().Substring(0, 4),
+                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
                     UnitName = "mg/L",
                     AnalysisMethod = "200.7",
                     AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
@@ -117,7 +117,7 @@ namespace Linko.LinkoExchange.Test
                 {
                     ParameterName = "1,4-Dioxane",
                     MethodDetectionLimit = 0.02,
-                    Value = random.NextDouble().ToString().Substring(0, 4),
+                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
                     UnitName = "mg/L",
                     AnalysisMethod = "200.7",
                     AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
@@ -128,7 +128,7 @@ namespace Linko.LinkoExchange.Test
                 {
                     ParameterName = "1,4-Dioxane",
                     MethodDetectionLimit = 0.02,
-                    Value = random.NextDouble().ToString().Substring(0, 4),
+                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
                     UnitName = "mg/L",
                     AnalysisMethod = "200.7",
                     AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
@@ -138,7 +138,7 @@ namespace Linko.LinkoExchange.Test
                 {
                     ParameterName = "bbb",
                     MethodDetectionLimit = 0.02,
-                    Value = random.NextDouble().ToString().Substring(0, 4),
+                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
                     UnitName = "mg/L",
                     AnalysisMethod = "200.7",
                     AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
@@ -148,7 +148,7 @@ namespace Linko.LinkoExchange.Test
                 {
                     ParameterName = "1,4-Dioxane",
                     MethodDetectionLimit = 0.02,
-                    Value = random.NextDouble().ToString().Substring(0, 4),
+                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
                     UnitName = "mg/L",
                     AnalysisMethod = "200.7",
                     AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
@@ -158,7 +158,7 @@ namespace Linko.LinkoExchange.Test
                 {
                     ParameterName = "aa",
                     MethodDetectionLimit = 0.02,
-                    Value = random.NextDouble().ToString().Substring(0, 4),
+                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
                     UnitName = "mg/L",
                     AnalysisMethod = "200.7",
                     AnalysisDateTimeLocal = DateTimeOffset.Now.DateTime.AddMonths(months).AddDays(days).AddHours(random.Next(3)).AddMinutes(random.Next(10))
@@ -242,7 +242,7 @@ namespace Linko.LinkoExchange.Test
                 {
                     ParameterName = GetRandomeParameterName(),
                     MethodDetectionLimit = 0.02,
-                    Value = random.NextDouble().ToString().Substring(0, 4),
+                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
                     UnitName = "mg/L",
                     AnalysisMethod = "200.7",
                     AnalysisDateTimeLocal = dt1
@@ -257,7 +257,7 @@ namespace Linko.LinkoExchange.Test
                 {
                     ParameterName = GetRandomeParameterName(),
                     MethodDetectionLimit = 0.02,
-                    Value = random.NextDouble().ToString().Substring(0, 4),
+                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
                     UnitName = "mg/L",
                     AnalysisMethod = "200.7",
                     AnalysisDateTimeLocal = dt2
@@ -268,7 +268,7 @@ namespace Linko.LinkoExchange.Test
                 {
                     ParameterName = GetRandomeParameterName(),
                     MethodDetectionLimit = 0.02,
-                    Value = random.NextDouble().ToString().Substring(0, 4),
+                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
                     UnitName = "mg/L",
                     AnalysisMethod = "200.7",
                     AnalysisDateTimeLocal = dt2
@@ -281,7 +281,7 @@ namespace Linko.LinkoExchange.Test
                     MethodDetectionLimit = 0.02,
                     MassLoadingUnitName = "ppd",
                     MassLoadingValue = random.NextDouble().ToString().Substring(0, 4),
-                    Value = random.NextDouble().ToString().Substring(0, 4),
+                    EnteredValue = random.NextDouble().ToString().Substring(0, 4),
                     UnitName = "mg/L",
                     AnalysisMethod = "200.7",
                     AnalysisDateTimeLocal = dt2

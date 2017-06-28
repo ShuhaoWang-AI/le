@@ -113,7 +113,7 @@ namespace Linko.LinkoExchange.Test
                 Qualifier = "<",
                 UnitId = 7,
                 UnitName = "mg/L",
-                Value = "0.25",
+                EnteredValue = "0.25",
                 EnteredMethodDetectionLimit = "0.20",
                 AnalysisMethod = "Analysis Method 2",
                 AnalysisDateTimeLocal = DateTime.Now,
@@ -132,7 +132,7 @@ namespace Linko.LinkoExchange.Test
                 Qualifier = "<",
                 UnitId = 11,
                 UnitName = "su",
-                Value = "0.99100",
+                EnteredValue = "0.99100",
                 EnteredMethodDetectionLimit = "",
                 AnalysisMethod = "Analysis Method 5",
                 AnalysisDateTimeLocal = DateTime.Now,
@@ -340,7 +340,7 @@ namespace Linko.LinkoExchange.Test
             var invalidResultDto = new SampleResultDto()
             {
                 Qualifier = "ND",
-                Value = "99",
+                EnteredValue = "99",
                 UnitId = 1
             };
             sampleResults.Add(invalidResultDto);
@@ -366,7 +366,7 @@ namespace Linko.LinkoExchange.Test
             var invalidResultDto = new SampleResultDto()
             {
                 Qualifier = ">",
-                Value = "99",
+                EnteredValue = "99",
                 UnitId = 1,
                 IsCalcMassLoading = true
             };
@@ -393,7 +393,7 @@ namespace Linko.LinkoExchange.Test
             var invalidResultDto = new SampleResultDto()
             {
                 Qualifier = ">",
-                Value = "99",
+                EnteredValue = "99",
                 UnitId = 1,
                 IsCalcMassLoading = true,
                 MassLoadingUnitId = 1,
