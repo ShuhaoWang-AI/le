@@ -15,10 +15,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
         public List<ReportPackageTemplateViewModel> AllReportPackageTemplates { get; set; }
 
         [Display(Name = "Start Date")]
-        public DateTime StartDateTimeLocal { get; set; }
+        public DateTime? StartDateTimeLocal { get; set; }
 
         [Display(Name = "End Date")]
-        public DateTime EndDateTimeLocal { get; set; }
+        public DateTime? EndDateTimeLocal { get; set; }
     }
 
     public class NewReportPackageViewModelValidator:AbstractValidator<NewReportPackageViewModel> {

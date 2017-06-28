@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -69,7 +70,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             IUserService userService,
             ISyncService syncService,
             ICromerrAuditLogService crommerAuditLogService)
-            :base(httpContextService,userService,reportPackageService,sampleService)
+            :base(httpContextService: httpContextService,userService: userService,reportPackageService: reportPackageService,sampleService: sampleService)
         {
             _authenticationService = authenticationService;
             _reportPackageService = reportPackageService;
@@ -210,8 +211,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                         throw new RuleViolationException(message:"Validation errors", validationIssues:validationIssues);
                     }
 
-                    var id = _reportPackageService.CreateDraft(reportPackageTemplateId:model.SelectedReportPackageTemplateId, startDateTimeLocal:model.StartDateTimeLocal,
-                                                               endDateTimeLocal:model.EndDateTimeLocal);
+                    Debug.Assert(condition: model.StartDateTimeLocal != null, message: "model.StartDateTimeLocal != null");
+                    Debug.Assert(condition: model.EndDateTimeLocal != null, message: "model.EndDateTimeLocal != null");
+
+                    var id = _reportPackageService.CreateDraft(reportPackageTemplateId:model.SelectedReportPackageTemplateId, startDateTimeLocal:model.StartDateTimeLocal.Value,
+                                                               endDateTimeLocal:model.EndDateTimeLocal.Value);
 
                     TempData[key:"ShowSuccessMessage"] = true;
                     TempData[key:"SuccessMessage"] = "Report Package created successfully!";
@@ -980,7 +984,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                             Value = c.RepudiationReasonId.ToString()
                         }).OrderBy(c => c.Text).ToList();
 
-                        viewModel.AvailableRepudiationReasonNames.Insert(0, new SelectListItem() { Text = Label.ResourceManager.GetString(name: "SelectReason"), Value = "0",Disabled = true});
+                        viewModel.AvailableRepudiationReasonNames.Insert(index: 0, item: new SelectListItem() { Text = Label.ResourceManager.GetString(name: "SelectReason"), Value = "0",Disabled = true});
                     }
                 }
             }

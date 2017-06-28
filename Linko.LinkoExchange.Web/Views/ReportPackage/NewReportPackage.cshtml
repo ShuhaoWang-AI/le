@@ -77,9 +77,8 @@
                                                                                              @class = "control-label col-md-2 required"
                                                                                          })
                         <div class="col-md-4">
-                            @(Html.Kendo().DatePicker()
-                                  .Name(componentName:"StartDateTimeLocal")
-                                  .Value(date:DateTime.Today)
+                            @(Html.Kendo().DatePickerFor(model => model.StartDateTimeLocal)
+                                  .Max(date: DateTime.Today)
                                   .Format(format:"MM/dd/yyyy")
                                   .HtmlAttributes(attributes:new
                                                              {
@@ -92,14 +91,13 @@
                                                                                            @class = "control-label col-md-2 required"
                                                                                        })
                         <div class="col-md-4">
-                            @(Html.Kendo().DatePicker()
-                                  .Name(componentName:"EndDateTimeLocal")
-                                  .Value(date:DateTime.Today)
+                            @(Html.Kendo().DatePickerFor(model => model.EndDateTimeLocal)
+                                  .Max(date: DateTime.Today)
                                   .Format(format:"MM/dd/yyyy")
                                   .HtmlAttributes(attributes:new
-                                                             {
-                                                                 style = "width:210px;"
-                                                             }))
+                                  {
+                                      style = "width:210px;"
+                                  }))
                         </div>
                     </div>
                 </div>
@@ -114,4 +112,14 @@
             </div>
         }
     </div>
+
+    @section Scripts {
+        <script type="text/javascript">
+            $("#StartDateTimeLocal")
+                .change(function()
+                {
+                    $("#EndDateTimeLocal").val($("#StartDateTimeLocal").val().replace("12:00 am", ""));
+                });
+        </script>
+    }
 }
