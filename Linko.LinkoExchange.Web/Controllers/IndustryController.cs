@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -1118,12 +1119,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                         _settingService.GetProgramSettingsById(orgRegProgramId:_settingService.GetAuthority(orgRegProgramId:currentOrganizationRegulatoryProgramId).OrganizationRegulatoryProgramId);
                     var viewModelMassLoadingMassLoadingUnitId = _unitService.GetUnitForMassLoadingCalculations();
 
+                    Debug.Assert(condition: newSampleStep1ViewModel.StartDateTimeLocal != null, message: "newSampleStep1ViewModel.StartDateTimeLocal != null");
+                    Debug.Assert(condition: newSampleStep1ViewModel.EndDateTimeLocal != null, message: "newSampleStep1ViewModel.EndDateTimeLocal != null");
+
                     var viewModel = new SampleViewModel
                                     {
                                         MonitoringPointId = monitoringPoint.MonitoringPointId,
                                         MonitoringPointName = monitoringPoint.Name,
-                                        StartDateTimeLocal = newSampleStep1ViewModel.StartDateTimeLocal,
-                                        EndDateTimeLocal = newSampleStep1ViewModel.EndDateTimeLocal,
+                                        StartDateTimeLocal = newSampleStep1ViewModel.StartDateTimeLocal.Value,
+                                        EndDateTimeLocal = newSampleStep1ViewModel.EndDateTimeLocal.Value,
                                         MassLoadingMassLoadingUnitId = viewModelMassLoadingMassLoadingUnitId.UnitId,
                                         MassLoadingMassLoadingUnitName = viewModelMassLoadingMassLoadingUnitId.Name,
                                         SampleStatusName = SampleStatusName.Draft,

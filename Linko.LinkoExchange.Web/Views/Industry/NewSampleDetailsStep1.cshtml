@@ -10,7 +10,7 @@
     <section>
         <ol class="breadcrumb">
             <li>
-                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
+                <a href="#" onclick="location.href = '@Url.Action(actionName: "Index", controllerName: "Industry")'"><i class=""></i> Home </a>
             </li>
             <li class="active">New Sample</li>
         </ol>
@@ -27,21 +27,21 @@
         </div>
         <div class="box-body box-collapse collapse form-horizontal in">
 
-            @Html.ValidationSummary(excludePropertyErrors:false, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-danger"})
+            @Html.ValidationSummary(excludePropertyErrors: false, message: Message.ValidationSummaryHeaderText, htmlAttributes: new {@class = "alert alert-danger"})
 
             <div class="form-group">
                 <div class="col-md-12">
-                    @Html.Label(expression:"Select Monitoring Point", htmlAttributes:new
-                                                                                     {
-                                                                                         @class = "control-label col-md-2 required"
-                                                                                     })
+                    @Html.Label(expression: "Select Monitoring Point", htmlAttributes: new
+                                                                                       {
+                                                                                           @class = "control-label col-md-2 required"
+                                                                                       })
                 </div>
                 <div class="col-md-12">
                     @foreach (var m in Model.AllMonitoringPoints)
                     {
                         <div class="col-md-12 form-group">
                             <label class="col-md-offset-2">
-                                @Html.RadioButtonFor(model => model.SelectedMonitoringPointId, value:m.Id)
+                                @Html.RadioButtonFor(model => model.SelectedMonitoringPointId, value: m.Id)
 
                                 <span>@m.Name</span>
                                 @if (!m.Description.IsEmpty())
@@ -55,41 +55,39 @@
 
                 <div class="col-md-12">
                     <!-- Date range -->
-                    @Html.Label(expression:"Enter Sample Period", htmlAttributes:new
-                                                                                 {
-                                                                                     @class = "control-label col-md-2"
-                                                                                 })
+                    @Html.Label(expression: "Enter Sample Period", htmlAttributes: new
+                                                                                   {
+                                                                                       @class = "control-label col-md-2"
+                                                                                   })
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        @Html.LabelFor(model => model.StartDateTimeLocal, htmlAttributes:new
-                                                                                         {
-                                                                                             @class = "control-label col-md-2 required"
-                                                                                         })
+                        @Html.LabelFor(model => model.StartDateTimeLocal, htmlAttributes: new
+                                                                                          {
+                                                                                              @class = "control-label col-md-2 required"
+                                                                                          })
                         <div class="col-md-4">
-                            @(Html.Kendo().DateTimePicker()
-                                  .Name(componentName:"StartDateTimeLocal")
-                                  .Value(date:DateTime.Now)
-                                  .Format(format:"MM/dd/yyyy hh:mm tt")
-                                  .HtmlAttributes(attributes:new
-                                                             {
-                                                                 style = "width:210px;"
-                                                             }))
+                            @(Html.Kendo().DateTimePickerFor(model => model.StartDateTimeLocal)
+                                  .Max(date: DateTime.Now)
+                                  .Format(format: "MM/dd/yyyy hh:mm tt")
+                                  .HtmlAttributes(attributes: new
+                                                              {
+                                                                  style = "width:210px;"
+                                                              }))
                         </div>
 
-                        @Html.LabelFor(model => model.EndDateTimeLocal, htmlAttributes:new
-                                                                                       {
-                                                                                           @class = "control-label col-md-2 required"
-                                                                                       })
+                        @Html.LabelFor(model => model.EndDateTimeLocal, htmlAttributes: new
+                                                                                        {
+                                                                                            @class = "control-label col-md-2 required"
+                                                                                        })
                         <div class="col-md-4">
-                            @(Html.Kendo().DateTimePicker()
-                                  .Name(componentName:"EndDateTimeLocal")
-                                  .Value(date:DateTime.Now)
-                                  .Format(format:"MM/dd/yyyy hh:mm tt")
-                                  .HtmlAttributes(attributes:new
-                                                             {
-                                                                 style = "width:210px;"
-                                                             }))
+                            @(Html.Kendo().DateTimePickerFor(model => model.EndDateTimeLocal)
+                                  .Max(date: DateTime.Now)
+                                  .Format(format: "MM/dd/yyyy hh:mm tt")
+                                  .HtmlAttributes(attributes: new
+                                                              {
+                                                                  style = "width:210px;"
+                                                              }))
                         </div>
                     </div>
                 </div>
@@ -97,7 +95,7 @@
         </div>
         <div class="box-footer">
             <div class="col-md-12 form-group">
-                <input type="submit" value="Next" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"NewSampleDetailsStep1", controllerName:"Industry")" formmethod="post" />
+                <input type="submit" value="Next" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName: "NewSampleDetailsStep1", controllerName: "Industry")" formmethod="post" />
             </div>
         </div>
     </div>
@@ -136,6 +134,7 @@
             .change(function()
             {
                 $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().replace("12:00 am", ""));
+                $("#EndDateTimeLocal").val($("#StartDateTimeLocal").val());
             });
 
         $("#EndDateTimeLocal")
@@ -144,5 +143,4 @@
                 $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().replace("12:00 am", ""));
             });
     </script>
-}
-}
+}}

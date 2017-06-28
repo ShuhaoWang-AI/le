@@ -15,10 +15,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Industry
         public List<MonitoringPointViewModel> AllMonitoringPoints { get; set; }
 
         [Display(Name = "Start Date")]
-        public DateTime StartDateTimeLocal { get; set; }
+        public DateTime? StartDateTimeLocal { get; set; }
 
         [Display(Name = "End Date")]
-        public DateTime EndDateTimeLocal { get; set; }
+        public DateTime? EndDateTimeLocal { get; set; }
     }
 
     public class NewSampleStep1ViewModelValidator:AbstractValidator<NewSampleStep1ViewModel> {

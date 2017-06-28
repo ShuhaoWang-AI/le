@@ -112,14 +112,4 @@
             </div>
         }
     </div>
-
-    @section Scripts {
-        <script type="text/javascript">
-            $("#StartDateTimeLocal")
-                .change(function()
-                {
-                    $("#EndDateTimeLocal").val($("#StartDateTimeLocal").val().replace("12:00 am", ""));
-                });
-        </script>
-    }
 }
