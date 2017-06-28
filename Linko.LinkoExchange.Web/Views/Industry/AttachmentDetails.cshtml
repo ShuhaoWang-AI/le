@@ -6,11 +6,11 @@
 
 
 @using (Html.BeginForm(actionName: "NewAttachmentDetails", controllerName: "Industry", routeValues: null, method: FormMethod.Post, htmlAttributes: new
-{
-    enctype = "multipart/form-data"
-                                                                                                                                                                   ,
-    id = "LinkoExchangeForm"
-}))
+                                                                                                                                                   {
+                                                                                                                                                       enctype = "multipart/form-data"
+                                                                                                                                                       ,
+                                                                                                                                                       id = "LinkoExchangeForm"
+                                                                                                                                                   }))
 {
     @Html.AntiForgeryToken()
 
@@ -37,15 +37,7 @@
                 {
                     if (!ViewBag.Satus.Equals("New"))
                     {
-
-                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "AttachmentDetails", controllerName: "Industry")" formmethod="post" />
-
-                        <input class="btn btn-primary btn-sm" data-target="#DeleteAttachmentModal" data-toggle="modal" type="button" value="Delete" />
                         <strong class="bg-yellow btn-sm text-info"> &nbsp;&nbsp;Draft&nbsp; </strong>
-                    }
-                    else
-                    {
-                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "NewAttachmentDetails", controllerName: "Industry")" formmethod="post" />
                     }
                 }
                 else
@@ -84,9 +76,9 @@
 
         <section class="box-body form-horizontal">
             @Html.ValidationSummary(excludePropertyErrors: false, message: Message.ValidationSummaryHeaderText, htmlAttributes: new
-       {
-           @class = "alert alert-danger"
-       })
+                                                                                                                                {
+                                                                                                                                    @class = "alert alert-danger"
+                                                                                                                                })
             @if (ViewBag.ShowSuccessMessage != null && ViewBag.ShowSuccessMessage)
             {
                 <div class="alert alert-dismissible alert-success">
@@ -102,9 +94,9 @@
             {
                 <div class="form-group">
                     @Html.Label(expression: "File", htmlAttributes: new
-               {
-                   @class = "control-label col-md-2 required"
-               })
+                                                                    {
+                                                                        @class = "control-label col-md-2 required"
+                                                                    })
                     <div class="col-md-10">
                         <input id="upload" name="upload" type="file" accept=@Model.AllowedFileExtensions />
                     </div>
@@ -116,33 +108,33 @@
                     @Html.HiddenFor(model => model.Id)
                     @Html.HiddenFor(model => model.MediaType)
                     @Html.LabelFor(model => model.Name, htmlAttributes: new
-               {
-                   @class = "control-label col-md-2"
-               })
+                                                                        {
+                                                                            @class = "control-label col-md-2"
+                                                                        })
                     <div class="col-md-8">
                         @Html.ActionLink(linkText: Model.Name, actionName: "DownloadAttachment", routeValues: new
-                   {
-                       id = Model.Id
-                   }, htmlAttributes: new
-                   {
-                       @class = "btn btn-sm btn-link"
-                   })
+                                                                                                              {
+                                                                                                                  id = Model.Id
+                                                                                                              }, htmlAttributes: new
+                                                                                                                                 {
+                                                                                                                                     @class = "btn btn-sm btn-link"
+                                                                                                                                 })
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(model => model.OriginalFileName, htmlAttributes: new
-               {
-                   @class = "control-label col-md-2"
-               })
+                                                                                    {
+                                                                                        @class = "control-label col-md-2"
+                                                                                    })
                     <div class="col-md-8">
                         @Html.EditorFor(model => model.OriginalFileName, additionalViewData: new
-                   {
-                       htmlAttributes = new
-                       {
-                           @class = "form-control",
-                           @readonly = "readonly"
-                       }
-                   })
+                                                                                             {
+                                                                                                 htmlAttributes = new
+                                                                                                                  {
+                                                                                                                      @class = "form-control",
+                                                                                                                      @readonly = "readonly"
+                                                                                                                  }
+                                                                                             })
                     </div>
                 </div>
             }
@@ -150,20 +142,20 @@
             <div class="form-group">
 
                 @Html.LabelFor(model => model.ReportElementTypeId, htmlAttributes: new
-           {
-               @class = "control-label col-md-2 required"
-           })
+                                                                                   {
+                                                                                       @class = "control-label col-md-2 required"
+                                                                                   })
                 @if (Model.UsedByReports)
                 {
                     <div class="col-md-8">
                         @Html.EditorFor(model => model.ReportElementTypeName, additionalViewData: new
-                   {
-                       htmlAttributes = new
-                       {
-                           @class = "form-control",
-                           @readonly = "readonly"
-                       }
-                   })
+                                                                                                  {
+                                                                                                      htmlAttributes = new
+                                                                                                                       {
+                                                                                                                           @class = "form-control",
+                                                                                                                           @readonly = "readonly"
+                                                                                                                       }
+                                                                                                  })
                     </div>
                 }
                 else
@@ -171,120 +163,138 @@
                     <div class="col-md-4">
                         @Html.HiddenFor(model => model.ReportElementTypeName)
                         @Html.DropDownList(name: "ReportElementTypeId", selectList: Model.AvailableReportElementTypes, htmlAttributes: new
-                   {
-                       @class = "form-control"
-                   })
+                                                                                                                                       {
+                                                                                                                                           @class = "form-control"
+                                                                                                                                       })
                         @Html.ValidationMessageFor(model => model.ReportElementTypeId, validationMessage: "", htmlAttributes: new
-                   {
-                       @class = "text-danger"
-                   })
+                                                                                                                              {
+                                                                                                                                  @class = "text-danger"
+                                                                                                                              })
                     </div>
                 }
             </div>
 
             <div class="form-group">
                 @Html.LabelFor(model => model.Description, htmlAttributes: new
-           {
-               @class = "control-label col-md-2"
-           })
+                                                                           {
+                                                                               @class = "control-label col-md-2"
+                                                                           })
                 @if (Model.UsedByReports)
                 {
                     <div class="col-md-8">
                         @Html.EditorFor(model => model.Description, additionalViewData: new
-               {
-                   htmlAttributes = new
-                   {
-                       @class = "form-control",
-                       @readonly = "readonly",
-                       rows = "3",
-                       maxlength = 500
-                   }
-               })
+                                                                                        {
+                                                                                            htmlAttributes = new
+                                                                                                             {
+                                                                                                                 @class = "form-control",
+                                                                                                                 @readonly = "readonly",
+                                                                                                                 rows = "3",
+                                                                                                                 maxlength = 500
+                                                                                                             }
+                                                                                        })
                     </div>
                 }
                 else
                 {
                     <div class="col-md-8">
                         @Html.EditorFor(model => model.Description, additionalViewData: new
-               {
-                   htmlAttributes = new
-                   {
-                       @class = "form-control",
-                       rows = "3",
-                       maxlength = 500
-                   }
-               })
+                                                                                        {
+                                                                                            htmlAttributes = new
+                                                                                                             {
+                                                                                                                 @class = "form-control",
+                                                                                                                 rows = "3",
+                                                                                                                 maxlength = 500
+                                                                                                             }
+                                                                                        })
                     </div>
                 }
             </div>
         </section>
-    </div>
-
-    @section Scripts {
-
-        @if (ViewBag.Satus.Equals("New"))
-    {
-            @Scripts.Render(paths: "~/bundles/jqueryval")
-
-            <script>
-                $(document)
-                    .ready(function()
-                    {
-                        $("#LinkoExchangeForm")
-                            .submit(function()
-                            {
-                                var validationSummary = $('.validation-summary-errors');
-
-                                if (validationSummary.length === 0)
-                                {
-                                    // Form is still valid
-                                    validationSummary = $('.validation-summary-valid');
-                                }
-
-                                var maxFileSize = @ViewBag.MaxFileSize;
-                                var file = $("input[name=upload]")[0].files[0];
-                                var fileSize = 0;
-
-                                if (file != null)
-                                {
-                                    fileSize = file.size;
-                                }
-
-                                if (fileSize > maxFileSize)
-                                {
-                                    validationSummary.removeClass("validation-summary-valid");
-                                    validationSummary.find("ul")
-                                        .empty(); // remove li elements from the validation Summary list. valid form also have empty li element
-                                    var msg = "<li>The file size exceeds that "
-                                        + (maxFileSize / 1024) / 1024
-                                        + " MB limit.</li>";
-
-                                    validationSummary.find("ul").append(msg);
-                                    $("input[type='submit']").prop('disabled', false);
-                                    return false;
-                                }
-                                else
-                                {
-                                    return true;
-                                }
-                            });
-                    });
-            </script>
-        }
 
         @if (!Model.UsedByReports)
-    {
-            <script>
-                $(document)
-                    .ready(function()
+        {
+            <div class="box-footer">
+                <div class="form-group pull-right">
+                    @if (!ViewBag.Satus.Equals("New"))
                     {
-                        $("#LinkoExchangeForm")
-                            .submit(function()
-                            {
-                                $("#ReportElementTypeName").val($("#ReportElementTypeId option:selected").text());
-                                return true;
-                            });
-                    });
-            </script>
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "AttachmentDetails", controllerName: "Industry")" formmethod="post" />
+
+                        <input class="btn btn-primary btn-sm" data-target="#DeleteAttachmentModal" data-toggle="modal" type="button" value="Delete" />
+                    }
+                    else
+                    {
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "NewAttachmentDetails", controllerName: "Industry")" formmethod="post" />
+                    }
+                </div>
+            </div>
         }
-    }}
+    </div>
+
+@section Scripts {
+
+    @if (ViewBag.Satus.Equals("New"))
+    {
+        @Scripts.Render(paths: "~/bundles/jqueryval")
+
+        <script>
+            $(document)
+                .ready(function()
+                {
+                    $("#LinkoExchangeForm")
+                        .submit(function()
+                        {
+                            var validationSummary = $('.validation-summary-errors');
+
+                            if (validationSummary.length === 0)
+                            {
+                                // Form is still valid
+                                validationSummary = $('.validation-summary-valid');
+                            }
+
+                            var maxFileSize = @ViewBag.MaxFileSize;
+                            var file = $("input[name=upload]")[0].files[0];
+                            var fileSize = 0;
+
+                            if (file != null)
+                            {
+                                fileSize = file.size;
+                            }
+
+                            if (fileSize > maxFileSize)
+                            {
+                                validationSummary.removeClass("validation-summary-valid");
+                                validationSummary.find("ul")
+                                    .empty(); // remove li elements from the validation Summary list. valid form also have empty li element
+                                var msg = "<li>The file size exceeds that "
+                                    + (maxFileSize / 1024) / 1024
+                                    + " MB limit.</li>";
+
+                                validationSummary.find("ul").append(msg);
+                                $("input[type='submit']").prop('disabled', false);
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        });
+                });
+        </script>
+    }
+
+    @if (!Model.UsedByReports)
+    {
+        <script>
+            $(document)
+                .ready(function()
+                {
+                    $("#LinkoExchangeForm")
+                        .submit(function()
+                        {
+                            $("#ReportElementTypeName").val($("#ReportElementTypeId option:selected").text());
+                            return true;
+                        });
+                });
+        </script>
+    }
+}}
