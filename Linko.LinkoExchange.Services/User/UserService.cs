@@ -1087,7 +1087,12 @@ namespace Linko.LinkoExchange.Services.User
             OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers
                 .SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
 
+            //Set applicable flags
             user.IsRemoved = true;
+            user.IsRegistrationApproved = false;
+            user.IsEnabled = false;
+            user.IsRegistrationDenied = false;
+
             //Persist modification date and modifier actor
             user.LastModificationDateTimeUtc = DateTimeOffset.Now;
             user.LastModifierUserId = Convert.ToInt32(_httpContext.CurrentUserProfileId());
