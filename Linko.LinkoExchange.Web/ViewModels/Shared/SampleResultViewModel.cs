@@ -41,6 +41,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
 
         [Display(Name = "EPA Method")]
         public bool IsApprovedEPAMethod { get; set; }
+        [Display(Name = "EPA Method")]
+        public string IsApprovedEPAMethodText => IsApprovedEPAMethod ? "Yes" : "No";
 
         [Display(Name = "Calculate Loading")]
         public bool IsCalcMassLoading { get; set; }

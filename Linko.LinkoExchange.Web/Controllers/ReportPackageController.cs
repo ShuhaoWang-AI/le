@@ -387,7 +387,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                   : $"{vm.MassLoadingQualifier} {vm.MassLoadingValue} {vm.MassLoadingUnitName}",
                                                                                               vm.AnalysisMethod,
                                                                                               vm.EnteredMethodDetectionLimit,
-                                                                                              AnalysisDateTimeLocal = vm.AnalysisDateTimeLocal.ToString()
+                                                                                              AnalysisDateTimeLocal = vm.AnalysisDateTimeLocal.ToString(),
+                                                                                              vm.IsApprovedEPAMethodText
                                                                                           });
 
             return Json(data:result);

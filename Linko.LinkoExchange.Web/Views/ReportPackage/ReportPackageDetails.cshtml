@@ -337,6 +337,7 @@
                                                columns.Bound(c => c.Value).HtmlAttributes(attributes: new {align = "right"});
                                                columns.Bound(c => c.MassLoadingValue).HtmlAttributes(attributes: new {align = "right"});
                                                columns.Bound(c => c.AnalysisMethod);
+                                               columns.Bound(c => c.IsApprovedEPAMethodText);
                                                columns.Bound(c => c.EnteredMethodDetectionLimit).HtmlAttributes(attributes: new {align = "right"});
                                                columns.Bound(c => c.AnalysisDateTimeLocal)
                                                       .ClientTemplate(value: "\\#= AnalysisDateTimeLocal == null ? '' : ((kendo.toString(AnalysisDateTimeLocal,'hh:mm tt')=='12:00 AM') ? kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy') : kendo.toString(AnalysisDateTimeLocal,'MM/dd/yyyy hh:mm tt'))\\#");
