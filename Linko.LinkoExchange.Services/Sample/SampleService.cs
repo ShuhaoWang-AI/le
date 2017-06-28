@@ -119,7 +119,7 @@ namespace Linko.LinkoExchange.Services.Sample
             _logger.Info($"Enter SampleService.SimplePersist. sampleDto.SampleId.Value={sampleIdString}");
 
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
+            //var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
             var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
             var sampleStartDateTimeUtc = _timeZoneService.GetDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleDto.StartDateTimeLocal, timeZoneId);
@@ -257,8 +257,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     //Could not convert
                     return -1; // throw exception than -1 as that will wrongly treat as sample ID
                 }
-                existingFlowResultRow.Value = valueAsDouble;
-
+                existingFlowResultRow.Value = valueAsDouble;    
             }
             else
             {
@@ -268,9 +267,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     _dbContext.SampleResults.Remove(existingFlowResultRow);
                 }
             }
-
-
-
+             
             //Handle Sample Results "Updates and/or Additions"
             foreach (var sampleResultDto in sampleDto.SampleResults)
             {
@@ -292,14 +289,18 @@ namespace Linko.LinkoExchange.Services.Sample
 
                 if (!String.IsNullOrEmpty(concentrationResultRowToUpdate.EnteredValue))
                 {
-                    Double valueAsDouble;
+                    Double valueAsDouble, mdlAsDouble;
                     if (!Double.TryParse(concentrationResultRowToUpdate.EnteredValue, out valueAsDouble))
                     {
                         //Could not convert
                         return -1; // throw exception than -1 as that will wrongly treat as sample ID
                     }
-                    concentrationResultRowToUpdate.Value = valueAsDouble;
+                    concentrationResultRowToUpdate.Value = valueAsDouble; 
 
+                    if(double.TryParse(concentrationResultRowToUpdate.EnteredMethodDetectionLimit, out mdlAsDouble))
+                    {
+                        concentrationResultRowToUpdate.MethodDetectionLimit = mdlAsDouble;
+                    } 
                 }
                 if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
                 {
@@ -334,14 +335,18 @@ namespace Linko.LinkoExchange.Services.Sample
                     massResultRowToUpdate.IsMassLoadingCalculationRequired = false; //always FALSE for mass loading result
                     if (!String.IsNullOrEmpty(massResultRowToUpdate.EnteredValue))
                     {
-                        Double massValueAsDouble;
+                        Double massValueAsDouble, mdlAsDouble;
                         if (!Double.TryParse(massResultRowToUpdate.EnteredValue, out massValueAsDouble))
                         {
                             //Could not convert
                             return -1; // throw exception than -1 as that will wrongly treat as sample ID
                         }
-                        massResultRowToUpdate.Value = massValueAsDouble;
+                        massResultRowToUpdate.Value = massValueAsDouble; 
 
+                        if( double.TryParse(massResultRowToUpdate.EnteredMethodDetectionLimit, out mdlAsDouble))
+                        {
+                            massResultRowToUpdate.MethodDetectionLimit = mdlAsDouble; 
+                        }
                     }
                     if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
                     {
@@ -352,9 +357,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     massResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
                     massResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
                     massResultRowToUpdate.LastModifierUserId = currentUserId;
-
                 }
-
             }
 
 
