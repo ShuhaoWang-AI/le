@@ -875,7 +875,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId))
                 {
                     var userDto = _userService.GetUserProfileById(userProfileId);
-                    _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_Success, orgRegProgDto, userDto);
+                    await _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_Success, orgRegProgDto, userDto);
                 }
             }
 
