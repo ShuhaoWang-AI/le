@@ -1044,7 +1044,7 @@
                     var tableMoveTo = $('#selectedIndustryTable').DataTable();
 
                     tableMoveFrom
-                        .rows()
+                        .rows({ filter : 'applied'})
                         .every(function()
                         {
                             var data = this.data();
@@ -1057,7 +1057,7 @@
                             
                         });
                         
-                    tableMoveFrom.rows().remove().draw();
+                    tableMoveFrom.rows({ filter : 'applied'}).remove().draw();
                 });
 
         $(document)
@@ -1069,7 +1069,7 @@
 
                     var tableMoveTo = $('#availableIndustryTable').DataTable();
                     tableMoveFrom
-                        .rows()
+                        .rows({ filter : 'applied'})
                         .every(function()
                         {
                             var data = this.data();
@@ -1082,7 +1082,7 @@
                             
                         });
                         
-                    tableMoveFrom.rows().remove().draw();
+                    tableMoveFrom.rows({ filter : 'applied'}).remove().draw();
                 });
 
         $("#btnSave")
