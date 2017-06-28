@@ -850,12 +850,14 @@ namespace Linko.LinkoExchange.Services.Sample
                             resultDto.ParameterId = sampleResult.ParameterId;
                             resultDto.ParameterName = sampleResult.ParameterName;
                             resultDto.EnteredMethodDetectionLimit = sampleResult.EnteredMethodDetectionLimit;
+                            resultDto.MethodDetectionLimit = sampleResult.MethodDetectionLimit;
                             resultDto.AnalysisMethod = sampleResult.AnalysisMethod;
                             resultDto.IsApprovedEPAMethod = sampleResult.IsApprovedEPAMethod;
                             resultDto.ParameterId = sampleResult.ParameterId;
                             resultDto.IsCalcMassLoading = sampleResult.IsMassLoadingCalculationRequired;
                             resultDto.Qualifier = sampleResult.Qualifier;
                             resultDto.EnteredValue = sampleResult.EnteredValue;
+                            resultDto.Value = sampleResult.Value;
                             resultDto.UnitId = sampleResult.UnitId;
                             resultDto.UnitName = sampleResult.UnitName;
 

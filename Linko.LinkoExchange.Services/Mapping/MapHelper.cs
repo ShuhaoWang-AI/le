@@ -972,7 +972,7 @@ namespace Linko.LinkoExchange.Services.Mapping
                 existingSample.MassLoadingCalculationDecimalPlaces = sampleDto.MassLoadingCalculationDecimalPlaces;
                 existingSample.IsMassLoadingResultToUseLessThanSign = sampleDto.IsMassLoadingResultToUseLessThanSign;
             }
-
+            
             //existingSample.OrganizationRegulatoryProgramId = sampleDto.OrganizationRegulatoryProgramId; //set after we exit this method
 
             return existingSample;
@@ -988,6 +988,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.ParameterId = sampleResult.ParameterId;
             dto.ParameterName = sampleResult.ParameterName;
             dto.Qualifier = sampleResult.Qualifier;
+            dto.Value = sampleResult.Value;
             dto.EnteredValue = sampleResult.EnteredValue;
             dto.UnitId = sampleResult.UnitId;
             dto.UnitName = sampleResult.UnitName;
@@ -1020,6 +1021,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             existingSampleResult.UnitId = dto.UnitId;
             existingSampleResult.UnitName = dto.UnitName;
             existingSampleResult.EnteredMethodDetectionLimit = dto.EnteredMethodDetectionLimit;
+            existingSampleResult.MethodDetectionLimit = dto.MethodDetectionLimit;
             existingSampleResult.AnalysisMethod = dto.AnalysisMethod;
             //existingSampleResult.AnalysisDateTimeUtc = set outside after calling line
             existingSampleResult.IsApprovedEPAMethod = dto.IsApprovedEPAMethod;

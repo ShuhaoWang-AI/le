@@ -26,6 +26,7 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Sample;
 using System.Data.Entity.Validation;
 using System.Data.Entity.Infrastructure;
+using System.Globalization;
 using System.Xml.Linq;
 using Linko.LinkoExchange.Core.Extensions;
 using System.Runtime.CompilerServices;
@@ -418,9 +419,10 @@ namespace Linko.LinkoExchange.Services.Report
                             ParameterName = sampleResultDto.ParameterName,
                             Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier).GetValueOrEmptyString(),
                             EnteredValue = sampleResultDto.EnteredValue.GetValueOrEmptyString(), 
+                            Value = sampleResultDto.Value?.ToString(CultureInfo.InvariantCulture) ?? "",
                             UnitName = sampleResultDto.UnitName.GetValueOrEmptyString(),
                             EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit.GetValueOrEmptyString(),
-                            MethodDetectionLimit = sampleResultDto.MethodDetectionLimit?.ToString(),
+                            MethodDetectionLimit = sampleResultDto.MethodDetectionLimit?.ToString() ?? "",
                             AnalysisMethod = sampleResultDto.AnalysisMethod.GetValueOrEmptyString(),
                             AnalysisDateTimeUtc = analysisDateTime,
                             IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod ? "Yes" : "No",
@@ -437,11 +439,6 @@ namespace Linko.LinkoExchange.Services.Report
                                 Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier).GetValueOrEmptyString(),
                                 Value = sampleResultDto.MassLoadingValue.GetValueOrEmptyString(),
                                 UnitName = sampleResultDto.MassLoadingUnitName.GetValueOrEmptyString(),
-                                //EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit.GetValueOrEmptyString(),
-                                //MethodDetectionLimit = sampleResultDto.MethodDetectionLimit?.ToString(),
-                                //AnalysisMethod = sampleResultDto.AnalysisMethod.GetValueOrEmptyString(),
-                                //AnalysisDateTimeUtc = analysisDateTime,
-                                //IsApprovedEPAMethod = sampleResultDto.IsApprovedEPAMethod.ToString(),
                                 LimitBasis = LimitBasisName.MassLoading.ToString()
                             };
 
