@@ -985,7 +985,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                             Value = c.RepudiationReasonId.ToString()
                         }).OrderBy(c => c.Text).ToList();
 
-                        viewModel.AvailableRepudiationReasonNames.Insert(index: 0, item: new SelectListItem() { Text = Label.ResourceManager.GetString(name: "SelectReason"), Value = "0", Disabled = true, Selected = true});
+                        viewModel.AvailableRepudiationReasonNames.Insert(index: 0, item: new SelectListItem() { Text = Label.ResourceManager.GetString(name: "SelectReason"), Value = "0", Disabled = true});
+                        viewModel.RepudiationReasonId = viewModel.RepudiationReasonId ?? 0;
                     }
                 }
             }
