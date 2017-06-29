@@ -67,8 +67,12 @@ namespace Linko.LinkoExchange.Services.Permission
             // step 3,  find 'Administrators and standard users for all authorities' users 
             var approvals = _dbContext.OrganizationRegulatoryProgramUsers 
                 .Include(i =>i.PermissionGroup)
-                .Where(u => u.IsRemoved == false && authorityOrganizationIds.Contains(u.OrganizationRegulatoryProgram.OrganizationId) && 
-                       u.IsRemoved == false && u.IsEnabled && u.IsRegistrationDenied == false  && u.IsRegistrationApproved);
+                .Where(u => u.IsRemoved == false &&
+                        authorityOrganizationIds.Contains(u.OrganizationRegulatoryProgram.OrganizationId) &&
+                        u.IsRemoved == false &&
+                        u.IsEnabled &&
+                        u.IsRegistrationDenied == false &&
+                        u.IsRegistrationApproved);
 
             if (isAuthorityUser)
             {
@@ -83,8 +87,7 @@ namespace Linko.LinkoExchange.Services.Permission
             
             var userProfiles = _dbContext.Users.Where(i => userProfileIds.Contains(i.UserProfileId) && 
                                 i.IsAccountLocked == false && 
-                                i.IsAccountResetRequired == false).ToList(); 
-
+                                i.IsAccountResetRequired == false).ToList();
             var userDtos = userProfiles.Select(i => _mapHelper.GetUserDtoFromUserProfile(i));
 
             return userDtos;
@@ -95,12 +98,17 @@ namespace Linko.LinkoExchange.Services.Permission
             try
             {
                 var users = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
-                .Where(u => u.IsRemoved == false &&
+                .Where(u => u.IsRemoved == false && 
+                            u.IsEnabled && u.IsRegistrationApproved &&
+                            u.IsRegistrationDenied == false &&
                             u.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId &&
                             u.PermissionGroup.Name == UserRole.Administrator.ToString());
 
                 var userProfileIds = users.Select(i => i.UserProfileId).Distinct();
-                var userProfiles = _dbContext.Users.Where(i => userProfileIds.Contains(i.UserProfileId)).ToList();
+                var userProfiles = _dbContext.Users.Where(i => userProfileIds.Contains(i.UserProfileId) &&
+                                i.IsAccountLocked == false && 
+                                i.IsAccountResetRequired == false 
+                            ).ToList();
                 var userDtos = userProfiles.Select(i => _mapHelper.GetUserDtoFromUserProfile(i));
 
                 return userDtos;
