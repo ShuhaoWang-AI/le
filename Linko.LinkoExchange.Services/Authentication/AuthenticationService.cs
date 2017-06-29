@@ -872,7 +872,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Success = true;
                 authenticationResult.Result = AuthenticationResult.Success;
 
-                foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId))
+                foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId, true))
                 {
                     var userDto = _userService.GetUserProfileById(userProfileId);
                     await _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_Success, orgRegProgDto, userDto);

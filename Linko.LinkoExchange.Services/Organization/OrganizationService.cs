@@ -144,17 +144,22 @@ namespace Linko.LinkoExchange.Services.Organization
         /// Get organizations that a user can access to (IU portal, AU portal, content MGT portal)
         /// </summary>
         /// <param name="userId">User id</param>
+        /// <param name="isIncludeAll">True if we need an unfiltered list for logging purposes</param>
         /// <returns>Collection of organization</returns>
-        public IEnumerable<OrganizationRegulatoryProgramDto> GetUserOrganizations(int userId)
+        public IEnumerable<OrganizationRegulatoryProgramDto> GetUserOrganizations(int userId, bool isIncludeAll = false)
         { 
             var orpUsers = _dbContext.OrganizationRegulatoryProgramUsers.ToList()
-                .FindAll(u => u.UserProfileId == userId &&
-                            u.IsRemoved == false &&
+                .FindAll(u => u.UserProfileId == userId);
+
+            if (!isIncludeAll)
+            {
+                orpUsers = orpUsers.FindAll(u => u.IsRemoved == false &&
                             u.IsEnabled == true &&
                             u.IsRegistrationApproved &&
                             u.OrganizationRegulatoryProgram.IsEnabled &&
-                            u.OrganizationRegulatoryProgram.IsRemoved == false);                             
-            
+                            u.OrganizationRegulatoryProgram.IsRemoved == false);
+            }
+
             if (orpUsers == null)
             {
                 return null;
