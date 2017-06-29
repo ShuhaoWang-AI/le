@@ -731,56 +731,57 @@ namespace Linko.LinkoExchange.Services.User
                 }
             }
 
-            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
-            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
-            var authorityListString = _orgService.GetUserAuthorityListForEmailContent(user.UserProfileId);
-            contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add("firstName", user.FirstName);
-            contentReplacements.Add("lastName", user.LastName);
-            contentReplacements.Add("authorityList", authorityListString);
-            contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
-            contentReplacements.Add("supportEmail", supportEmail);
-            
             if (reason != AccountLockEvent.ManualAction)
             {
-                var orgRegProgramIdStr = _httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId);  
-                if(!string.IsNullOrWhiteSpace(orgRegProgramIdStr))
+                string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
+                string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
+                var authorityListString = _orgService.GetUserAuthorityListForEmailContent(user.UserProfileId);
+                contentReplacements = new Dictionary<string, string>();
+                contentReplacements.Add("firstName", user.FirstName);
+                contentReplacements.Add("lastName", user.LastName);
+                contentReplacements.Add("authorityList", authorityListString);
+                contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
+                contentReplacements.Add("supportEmail", supportEmail);
+
+                var orgRegProgramIdStr = _httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId);
+                if (!string.IsNullOrWhiteSpace(orgRegProgramIdStr))
                 {
                     var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-                    var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId); 
+                    var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
 
-                    authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName); 
+                    authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
 
                     if (!contentReplacements.Keys.Contains("authorityName"))
                     {
                         contentReplacements.Add("authorityName", authorityName);
                     }
-                } 
-            }  
+                }
 
-            var emailType = EmailType.Profile_KBQFailedLockout; 
-            switch (reason) {
-                case AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony:
-                    emailType = EmailType.COR_PasswordFailedLockout;
-                    break;
-                case AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony:
-                    emailType = EmailType.Repudiation_PasswordFailedLockout;
-                    break;
-                case AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony:
-                    emailType = EmailType.Repudiation_KBQFailedLockout;
-                    break;
-                case AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony:
-                    emailType = EmailType.COR_KBQFailedLockout;
-                    break;
-                default:
-                    if (reason != AccountLockEvent.ManualAction)
-                    { 
-                        emailType = EmailType.Profile_KBQFailedLockout; 
-                    }
-                    break;
+                var emailType = EmailType.Profile_KBQFailedLockout;
+                switch (reason)
+                {
+                    case AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony:
+                        emailType = EmailType.COR_PasswordFailedLockout;
+                        break;
+                    case AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony:
+                        emailType = EmailType.Repudiation_PasswordFailedLockout;
+                        break;
+                    case AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony:
+                        emailType = EmailType.Repudiation_KBQFailedLockout;
+                        break;
+                    case AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony:
+                        emailType = EmailType.COR_KBQFailedLockout;
+                        break;
+                    default:
+                        if (reason != AccountLockEvent.ManualAction)
+                        {
+                            emailType = EmailType.Profile_KBQFailedLockout;
+                        }
+                        break;
+                }
+
+                _emailService.SendEmail(new[] { user.Email }, emailType, contentReplacements);
             }
-
-            _emailService.SendEmail(new[] { user.Email }, emailType, contentReplacements); 
         }
 
         public AccountLockoutResultDto LockUnlockUserAccount(int targetOrgRegProgUserId, bool isAttemptingLock, AccountLockEvent reason, bool isAuthorizationRequired = false)
