@@ -881,7 +881,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 var model = new ConfirmationViewModel();
                 model.Title = "Password Reset Link Expiry";
-                model.Message = "The password reset link has expired.  Please use Forgot Password.";
+                model.HtmlStr = "The password reset link has expired.  Please use <a href=" +  Url.Action(actionName:"ForgotPassword", controllerName:"Account") + ">Forgot Password</a>";
 
                 return View(viewName:"Confirmation", model:model);
             }
