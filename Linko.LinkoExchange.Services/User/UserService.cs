@@ -967,6 +967,7 @@ namespace Linko.LinkoExchange.Services.User
                         var periodStartDateLocal = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(reportPackage.PeriodStartDateTimeUtc.UtcDateTime, programUser.OrganizationRegulatoryProgramId);
                         var periodEndDateLocal = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(reportPackage.PeriodEndDateTimeUtc.UtcDateTime, programUser.OrganizationRegulatoryProgramId);
 
+                        contentReplacements.Add("organizationName", reportPackage.OrganizationName);
                         contentReplacements.Add("reportPackageName", reportPackage.Name);
                         contentReplacements.Add("periodStartDate", periodStartDateLocal.ToString("MMM dd, yyyy"));
                         contentReplacements.Add("periodEndDate", periodEndDateLocal.ToString("MMM dd, yyyy"));
