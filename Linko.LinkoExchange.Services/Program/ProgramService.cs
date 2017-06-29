@@ -52,8 +52,9 @@ namespace Linko.LinkoExchange.Services.Program
         /// Get all the OrganizationRegulatoryProgramDto(s) that the users have access to
         /// </summary>
         /// <param name="email">The email address.</param>
+        /// <param name="isIncludeRemoved">True if we want to include org reg programs the user has been removed from (for logging purposes)</param>
         /// <returns></returns>
-        public IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string email)
+        public IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string email, bool isIncludeRemoved = false)
         {
             var userProfile = _linkoExchangeDbContext.Users.SingleOrDefault(u => u.Email == email);
             if (userProfile == null)
@@ -62,7 +63,13 @@ namespace Linko.LinkoExchange.Services.Program
             var organziationRegulatoryProgramUserDtos = new List<OrganizationRegulatoryProgramUserDto>();
             var regulatoryProgramUsers = _linkoExchangeDbContext
                 .OrganizationRegulatoryProgramUsers.ToList()
-                .FindAll(i => !i.IsRemoved && i.UserProfileId == userProfile.UserProfileId);
+                .FindAll(i => i.UserProfileId == userProfile.UserProfileId);
+
+            if (!isIncludeRemoved)
+            {
+                regulatoryProgramUsers = regulatoryProgramUsers.FindAll(users => !users.IsRemoved);
+            }
+
             if (regulatoryProgramUsers.Any())
             {
                 organziationRegulatoryProgramUserDtos

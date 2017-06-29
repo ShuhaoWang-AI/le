@@ -6,7 +6,13 @@ namespace Linko.LinkoExchange.Services.Program
 {
     public interface IProgramService
     {
-        IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string email);
+        /// <summary>
+        /// Get all the OrganizationRegulatoryProgramDto(s) that the users have access to
+        /// </summary>
+        /// <param name="email">The email address.</param>
+        /// <param name="isIncludeRemoved">True if we want to include org reg programs the user has been removed from (for logging purposes)</param>
+        /// <returns></returns>
+        IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string email, bool isIncludeRemoved = false);
         /// <summary>
         /// Get programs that a user can access
         /// </summary>

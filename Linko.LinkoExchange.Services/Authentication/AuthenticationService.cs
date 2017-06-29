@@ -1224,7 +1224,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         // Validate user access for UC-29(4.a, 5.a, 6.a)
         private bool ValidateUserAccess(UserProfile userProfile, SignInResultDto signInResultDto)
         {
-            var orpus = _programService.GetUserRegulatoryPrograms(userProfile.Email).ToList();
+            var orpus = _programService.GetUserRegulatoryPrograms(userProfile.Email, true).ToList();
             if (orpus.Any())
             {
                 // User at least has one approved program
@@ -1244,7 +1244,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 // UC-29 5.a, User account is disabled for all industry, or authority or application administrator
                 // If the user is disabled for all programs
-                if (orpus.All(u => u.IsEnabled == false) &&  //--- user is disabled for all industry and authority 
+                if (orpus.All(u => u.IsEnabled == false && u.IsRemoved == false) &&  //--- user is disabled for all industry and authority 
                     userProfile.IsInternalAccount == false   //--- user is disabled for Application administrator.
                 )
                 {
