@@ -27,11 +27,33 @@
                 <div class="pull-right">
                     @if (ViewBag.HasPermissionForUpdate)
                     {
-                        <input type="submit" value="@Model.AccountLockedButtonText" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName:"AuthorityUserLockUnLock", controllerName:"Authority")" formmethod="post" />
+                        <input class="btn btn-primary btn-sm" data-target="#AuthorityUserLockUnLockModal" data-toggle="modal" type="button" value="@Model.AccountLockedButtonText" />
                         <input type="button" value="@Model.StatusButtonText" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#ChangeStatusModal" />
                         <input class="btn btn-primary btn-sm" data-target="#removeModal" data-toggle="modal" type="button" value="Remove" />
                         <input class="btn btn-primary btn-sm" data-target="#resetModal" data-toggle="modal" type="button" value="Reset" />
                     }
+                </div>
+            </div>
+        </div>
+
+        <div aria-labelledby="Lock/Unlock Authority User" class="col-md-12 fade modal modal-info" id="AuthorityUserLockUnLockModal" role="dialog" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <div class="alert alert-dismissible alert-info modal-content">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
+                    <h4 class="box-title">@(Model.AccountLocked ? "Unlock User" : "Lock User")</h4>
+
+                    <div class="form-horizontal">
+                        <p>
+                            @(Model.AccountLocked ? "If you unlock the user, then the user will be able to log into LinkoExchange." : "If you lock the user, then the user will no longer be able to log into any LinkoExchange Portal.")<br />
+                            @(Model.AccountLocked ? "Do you want to unlock the user?" : "Do you want to lock the user?")<br />
+                        </p>
+                        <div class="form-group">
+                            <div class="pull-right">
+                                <input type="submit" value="Yes" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "AuthorityUserLockUnLock", controllerName: "Authority")" formmethod="post" />
+                                <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">No</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -297,8 +319,6 @@
                     @Html.DropDownList(name:"Role", selectList:Model.AvailableRoles, htmlAttributes:new {@class = "form-control"})
                 </div>
             </div>
-
-            <hr />
 
         </section>
         @if (ViewBag.HasPermissionForChangeRole)
