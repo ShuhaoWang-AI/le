@@ -719,7 +719,8 @@ namespace Linko.LinkoExchange.Services.Authentication
             var emailAuditLog = _dbContext.EmailAuditLogs.FirstOrDefault(e => e.Token == token);
             if (emailAuditLog == null)
             {
-                throw new Exception($"ERROR: Cannot find email audit log associated with token={token}");
+                return false;
+                //throw new Exception($"ERROR: Cannot find email audit log associated with token={token}");
             }
 
             DateTimeOffset tokenCreated = emailAuditLog.SentDateTimeUtc;
@@ -788,8 +789,14 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                 return authenticationResult;
             }
-
-            return await ResetPasswordAsync(userQuestionAnswerId, answer, failedCount, newPassword);
+            
+            AuthenticationResultDto resetPasswordResult = await ResetPasswordAsync(userQuestionAnswerId, answer, failedCount, newPassword); 
+            if(resetPasswordResult.Result == AuthenticationResult.Success)
+            {
+                emailAuditLog.Token = string.Empty; 
+            }
+            _dbContext.SaveChanges();
+            return resetPasswordResult; 
         }
 
         public async Task<AuthenticationResultDto> ResetPasswordAsync(int userQuestionAnswerId,
