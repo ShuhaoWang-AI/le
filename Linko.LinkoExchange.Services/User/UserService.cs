@@ -448,28 +448,34 @@ namespace Linko.LinkoExchange.Services.User
                 .Where(o => o.PermissionGroup.Name == "Administrator"
                     && o.OrganizationRegulatoryProgramId == programUser.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId
                     && o.IsEnabled
-                    && !o.IsRemoved);
+                    && !o.IsRemoved
+                    && !o.IsRegistrationDenied
+                    && o.IsRegistrationApproved);
+
             foreach (var admin in admins.ToList())
             {
                 var adminProfile = GetUserProfileById(admin.UserProfileId);
+                if (!adminProfile.IsAccountLocked && !adminProfile.IsAccountResetRequired)
+                {
+                    contentReplacements = new Dictionary<string, string>();
+                    contentReplacements.Add("adminFirstName", adminProfile.FirstName);
+                    contentReplacements.Add("adminLastName", adminProfile.LastName);
+                    contentReplacements.Add("firstName", user.FirstName);
+                    contentReplacements.Add("lastName", user.LastName);
+                    contentReplacements.Add("authorityName", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName));
+                    contentReplacements.Add("authorityOrganizationName", authority.Organization.Name);
+                    contentReplacements.Add("email", user.Email);
+                    contentReplacements.Add("organizationName", orgRegProgram.Organization.Name);
+                    contentReplacements.Add("addressLine1", orgRegProgram.Organization.AddressLine1);
+                    contentReplacements.Add("cityName", orgRegProgram.Organization.CityName);
+                    contentReplacements.Add("stateName", orgRegProgram.Organization.JurisdictionId.HasValue ?
+                                                         _dbContext.Jurisdictions.Single(j => j.JurisdictionId == orgRegProgram.Organization.JurisdictionId.Value).Code : "");
+                    contentReplacements.Add("emailAddress", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress));
+                    contentReplacements.Add("phoneNumber", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone));
 
-                contentReplacements = new Dictionary<string, string>();
-                contentReplacements.Add("adminFirstName", adminProfile.FirstName);
-                contentReplacements.Add("adminLastName", adminProfile.LastName);
-                contentReplacements.Add("firstName", user.FirstName);
-                contentReplacements.Add("lastName", user.LastName);
-                contentReplacements.Add("authorityName", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName));
-                contentReplacements.Add("authorityOrganizationName", authority.Organization.Name);
-                contentReplacements.Add("email", user.Email);
-                contentReplacements.Add("organizationName", orgRegProgram.Organization.Name);
-                contentReplacements.Add("addressLine1", orgRegProgram.Organization.AddressLine1);
-                contentReplacements.Add("cityName", orgRegProgram.Organization.CityName);
-                contentReplacements.Add("stateName", orgRegProgram.Organization.JurisdictionId.HasValue ?
-                                                     _dbContext.Jurisdictions.Single(j => j.JurisdictionId == orgRegProgram.Organization.JurisdictionId.Value).Code : "");
-                contentReplacements.Add("emailAddress", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress));
-                contentReplacements.Add("phoneNumber", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone));
+                    _emailService.SendEmail(new[] { adminProfile.Email }, adminEmailType, contentReplacements);
 
-                _emailService.SendEmail(new[] { adminProfile.Email }, adminEmailType, contentReplacements);
+                }
 
             }
 
@@ -701,19 +707,27 @@ namespace Linko.LinkoExchange.Services.User
                 //Find admin users in each of these
                 var admins = _dbContext.OrganizationRegulatoryProgramUsers
                     .Where(o => o.PermissionGroup.Name == "Administrator"
-                    && o.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId);
+                        && o.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId
+                        && o.IsEnabled
+                        && !o.IsRemoved
+                        && !o.IsRegistrationDenied
+                        && o.IsRegistrationApproved);
+
                 foreach (var admin in admins.ToList())
                 {
-                    string adminEmail = GetUserProfileById(admin.UserProfileId).Email;
-                    if (!adminEmailList.Contains(adminEmail))
+                    var adminUserProfile = GetUserProfileById(admin.UserProfileId);
+
+                    if (!adminUserProfile.IsAccountLocked 
+                        && !adminUserProfile.IsAccountResetRequired
+                        && !adminEmailList.Contains(adminUserProfile.Email))
                     {
                         contentReplacements = new Dictionary<string, string>();
                         contentReplacements.Add("firstName", user.FirstName);
                         contentReplacements.Add("lastName", user.LastName);
                         contentReplacements.Add("userName", user.UserName);
                         contentReplacements.Add("email", user.Email);
-                        _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements);
-                        adminEmailList.Add(adminEmail);
+                        _emailService.SendEmail(new[] { adminUserProfile.Email }, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements);
+                        adminEmailList.Add(adminUserProfile.Email);
                     }
                 }
 
