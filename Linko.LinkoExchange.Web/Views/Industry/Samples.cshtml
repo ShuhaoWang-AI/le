@@ -157,7 +157,7 @@
                       .Resizable(resizable => resizable.Columns(value: true))
                       .Scrollable(s => s.Height(value: "auto"))
                       .NoRecords(text: "No sample exists.")
-                      .Events(events => { events.Change(handler: "gotoNextPageAttachment"); })
+                      .Events(events => { events.Change(handler: "gotoNextPageSample"); })
                       .DataSource(dataSource => dataSource
                                                     .Ajax()
                                                     .ServerOperation(enabled: true)
@@ -190,7 +190,7 @@
 
 @section Scripts {
     <script type="text/javascript">
-        gotoNextPageAttachment = function()
+        gotoNextPageSample = function()
         {
             var grid = $("#gridSample").data("kendoGrid");
             var postUrl = "@Url.Action(actionName: "Samples_Select", controllerName: "Industry")";
