@@ -256,6 +256,38 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             {
                 try
                 {
+                    //Prevent failure scenario where the user is swapping 2 existing questions (causing a duplicate error) = BUG 1856
+                    //  1. For items in the collection where Id is specified, attempt to find another existing row with matching QuestionId (key violation). 
+                    //  2. If found:
+                    //          - Delete from the table "tUserQuestionAnswer"
+                    //          - Remove the Id from item in the collection to force "Create New" in method: "CreateOrUpdateUserQuestionAnswer"
+                    foreach (var questionAnswer in answerDtosToUpdate)
+                    {
+                        var existingRow = _dbContext.UserQuestionAnswers
+                                .SingleOrDefault(uqa => uqa.UserProfileId == userProfileId
+                                    && uqa.QuestionId == questionAnswer.QuestionId);
+
+                        if (existingRow != null)
+                        {
+                            if (questionAnswer.UserQuestionAnswerId.HasValue && existingRow.UserQuestionAnswerId == questionAnswer.UserQuestionAnswerId.Value)
+                            {
+                                //same row -- no problem
+                            }
+                            else
+                            {
+                                //Key violation (User Profile Id / Question Id)
+
+                                //Delete key violating row from the table "tUserQuestionAnswer"
+                                _dbContext.UserQuestionAnswers.Remove(existingRow);
+                                _dbContext.SaveChanges();
+
+                                //Remove the Id to force "Create New" in method: "CreateOrUpdateUserQuestionAnswer"
+                                questionAnswer.UserQuestionAnswerId = null;
+                            }
+                        }
+                    }
+
+                    //Now we can save to the database without risk of key violation error
                     foreach (var questionAnswer in answerDtosToUpdate)
                     {
                         var questionTypeName = _dbContext.Questions.Include(q => q.QuestionType)
