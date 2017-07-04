@@ -716,7 +716,7 @@ namespace Linko.LinkoExchange.Services.Report
             var organizationAddressLine2 = "";
             if (!string.IsNullOrWhiteSpace(reportPackage.OrganizationAddressLine2))
             {
-                organizationAddressLine2 = Environment.NewLine + reportPackage.OrganizationAddressLine2;
+                organizationAddressLine2 = $"{Environment.NewLine}\t{reportPackage.OrganizationAddressLine2}";
             }
 
             emailContentReplacements.Add("organizationAddressLine2", organizationAddressLine2);
@@ -745,7 +745,7 @@ namespace Linko.LinkoExchange.Services.Report
             var recipientOrganizationAddressLine2 = "";
             if (!string.IsNullOrWhiteSpace(reportPackage.RecipientOrganizationAddressLine2))
             {
-                recipientOrganizationAddressLine2 = Environment.NewLine + reportPackage.RecipientOrganizationAddressLine2;
+                recipientOrganizationAddressLine2 = $"{Environment.NewLine}\t{reportPackage.RecipientOrganizationAddressLine2}";
             }
 
             emailContentReplacements.Add("recipientOrganizationAddressLine2", recipientOrganizationAddressLine2);
@@ -1944,7 +1944,14 @@ namespace Linko.LinkoExchange.Services.Report
                     //Repudiated to:
                     contentReplacements.Add("authOrganizationName", reportPackage.RecipientOrganizationName);
                     contentReplacements.Add("authOrganizationAddressLine1", reportPackage.RecipientOrganizationAddressLine1);
-                    contentReplacements.Add("authOrganizationAddressLine2", reportPackage.RecipientOrganizationAddressLine2);
+
+                    string authOrganizationAddressLine2 = "";
+                    if (!string.IsNullOrWhiteSpace(reportPackage.RecipientOrganizationAddressLine2))
+                    {
+                        authOrganizationAddressLine2 = $"{Environment.NewLine}\t{reportPackage.RecipientOrganizationAddressLine2}";
+                    }
+                    contentReplacements.Add("authOrganizationAddressLine2", authOrganizationAddressLine2);
+
                     contentReplacements.Add("authOrganizationCityName", reportPackage.RecipientOrganizationCityName);
                     contentReplacements.Add("authOrganizationJurisdictionName", reportPackage.RecipientOrganizationJurisdictionName);
                     contentReplacements.Add("authOrganizationZipCode", reportPackage.RecipientOrganizationZipCode);
@@ -1957,10 +1964,12 @@ namespace Linko.LinkoExchange.Services.Report
                     contentReplacements.Add("permitNumber", reportPackage.OrganizationRegulatoryProgram.ReferenceNumber);
                     contentReplacements.Add("organizationAddressLine1", reportPackage.OrganizationAddressLine1);
 
+                    string organizationAddressLine2 = "";
                     if (!string.IsNullOrWhiteSpace(reportPackage.OrganizationAddressLine2))
                     {
-                        contentReplacements.Add("organizationAddressLine2", $"{Environment.NewLine}\t{reportPackage.OrganizationAddressLine2}");
+                        organizationAddressLine2 = $"{Environment.NewLine}\t{reportPackage.OrganizationAddressLine2}";
                     }
+                    contentReplacements.Add("organizationAddressLine2", organizationAddressLine2);
 
                     contentReplacements.Add("organizationCityName", reportPackage.OrganizationCityName);
                     contentReplacements.Add("organizationJurisdictionName", reportPackage.OrganizationJurisdictionName);

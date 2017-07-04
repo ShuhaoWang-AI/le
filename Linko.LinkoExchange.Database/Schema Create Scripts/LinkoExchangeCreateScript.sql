@@ -5474,8 +5474,7 @@ Report Details:
 
 Repudiated To:
 	{authOrganizationName}
-	{authOrganizationAddressLine1}
-	{authOrganizationAddressLine2}
+	{authOrganizationAddressLine1} {authOrganizationAddressLine2}
 	{authOrganizationCityName} {authOrganizationJurisdictionName} {authOrganizationZipCode} 
 
 Repudiated By:
