@@ -716,7 +716,7 @@ namespace Linko.LinkoExchange.Services.Report
             var organizationAddressLine2 = "";
             if (!string.IsNullOrWhiteSpace(reportPackage.OrganizationAddressLine2))
             {
-                organizationAddressLine2 = reportPackage.OrganizationAddressLine2;
+                organizationAddressLine2 = Environment.NewLine + reportPackage.OrganizationAddressLine2;
             }
 
             emailContentReplacements.Add("organizationAddressLine2", organizationAddressLine2);
@@ -745,7 +745,7 @@ namespace Linko.LinkoExchange.Services.Report
             var recipientOrganizationAddressLine2 = "";
             if (!string.IsNullOrWhiteSpace(reportPackage.RecipientOrganizationAddressLine2))
             {
-                recipientOrganizationAddressLine2 = reportPackage.RecipientOrganizationAddressLine2;
+                recipientOrganizationAddressLine2 = Environment.NewLine + reportPackage.RecipientOrganizationAddressLine2;
             }
 
             emailContentReplacements.Add("recipientOrganizationAddressLine2", recipientOrganizationAddressLine2);
