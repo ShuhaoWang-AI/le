@@ -446,7 +446,9 @@ namespace Linko.LinkoExchange.Services.User
             //Email all IU Admins
             var admins = _dbContext.OrganizationRegulatoryProgramUsers
                 .Where(o => o.PermissionGroup.Name == "Administrator"
-                && o.OrganizationRegulatoryProgramId == programUser.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId);
+                    && o.OrganizationRegulatoryProgramId == programUser.OrganizationRegulatoryProgram.OrganizationRegulatoryProgramId
+                    && o.IsEnabled
+                    && !o.IsRemoved);
             foreach (var admin in admins.ToList())
             {
                 var adminProfile = GetUserProfileById(admin.UserProfileId);
