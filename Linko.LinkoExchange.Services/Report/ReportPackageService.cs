@@ -1913,6 +1913,7 @@ namespace Linko.LinkoExchange.Services.Report
                     var industrySignatories = _dbContext.OrganizationRegulatoryProgramUsers
                         .Where(orpu => orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId
                             && orpu.IsSignatory
+                            && orpu.IsEnabled
                             && !orpu.IsRemoved
                             && !orpu.IsRegistrationDenied
                             && orpu.IsRegistrationApproved)
@@ -2004,6 +2005,7 @@ namespace Linko.LinkoExchange.Services.Report
                     var usersOfAuthority = _dbContext.OrganizationRegulatoryProgramUsers
                         .Include(orpu => orpu.PermissionGroup)
                         .Where(orpu => orpu.OrganizationRegulatoryProgramId == authorityOrganization.OrganizationRegulatoryProgramId
+                            && orpu.IsEnabled 
                             && !orpu.IsRemoved
                             && !orpu.IsRegistrationDenied
                             && orpu.IsRegistrationApproved
