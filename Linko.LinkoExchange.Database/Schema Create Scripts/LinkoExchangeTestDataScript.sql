@@ -1703,8 +1703,8 @@ END
         MonitoringPointId
         , ParameterId
         , DefaultUnitId
-        , EffectiveDateTimeUtc
-        , RetirementDateTimeUtc
+        , EffectiveDateTime
+        , RetirementDateTime
     )
     -- Monitoring point limits and sample frequencies
     SELECT stgmp.LEMonitoringPointID
@@ -1827,7 +1827,7 @@ END
                                                     AND stgp.LEOrganizationRegulatoryProgramID = src.LEOrganizationRegulatoryProgramID
         INNER JOIN LinkoExchange.dbo.tMonitoringPointParameter mpp ON mpp.MonitoringPointId = stgmp.LEMonitoringPointID
                                                                         AND mpp.ParameterId = stgp.LEParameterID
-                                                                        AND mpp.EffectiveDateTimeUtc = src.CTSDateEffective;
+                                                                        AND mpp.EffectiveDateTime = src.CTSDateEffective;
 
     -- tSampleFrequency
     INSERT INTO LinkoExchange.dbo.tSampleFrequency
@@ -1847,7 +1847,7 @@ END
                                                     AND stgp.LEOrganizationRegulatoryProgramID = src.LEOrganizationRegulatoryProgramID
         INNER JOIN LinkoExchange.dbo.tMonitoringPointParameter mpp ON mpp.MonitoringPointId = stgmp.LEMonitoringPointID
                                                                         AND mpp.ParameterId = stgp.LEParameterID
-                                                                        AND mpp.EffectiveDateTimeUtc = src.CTSDateEffective
+                                                                        AND mpp.EffectiveDateTime = src.CTSDateEffective
         INNER JOIN LinkoExchange.dbo.tCollectionMethod cm ON cm.Name = src.CTSCollectMethCode
     WHERE src.LEOrganizationRegulatoryProgramID = @LEAccountID
         AND src.InsertedDateTimeUtc > @LELastSyncDateTimeUtc;
@@ -1872,8 +1872,8 @@ END
     INSERT INTO LinkoExchange.dbo.tSampleRequirement
     (
         MonitoringPointParameterId
-        , PeriodStartDateTimeUtc
-        , PeriodEndDateTimeUtc
+        , PeriodStartDateTime
+        , PeriodEndDateTime
         , SamplesRequired
         , ByOrganizationRegulatoryProgramId
     )
@@ -1887,7 +1887,7 @@ END
                                                     AND stgp.LEOrganizationRegulatoryProgramID = src.LEOrganizationRegulatoryProgramID
         INNER JOIN LinkoExchange.dbo.tMonitoringPointParameter mpp ON mpp.MonitoringPointId = src.LEMonitoringPointID
                                                                         AND mpp.ParameterId = stgp.LEParameterID
-                                                                        AND mpp.EffectiveDateTimeUtc = src.CTSLimitEffectiveDate;
+                                                                        AND mpp.EffectiveDateTime = src.CTSLimitEffectiveDate;
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tParameterGroup)
 BEGIN

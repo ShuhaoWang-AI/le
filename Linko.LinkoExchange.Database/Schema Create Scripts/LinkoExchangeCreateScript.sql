@@ -2026,18 +2026,18 @@ BEGIN
         , MonitoringPointId                 int NOT NULL
         , ParameterId                       int NOT NULL
         , DefaultUnitId                     int NULL
-        , EffectiveDateTimeUtc              datetimeoffset(0) NOT NULL
-        , RetirementDateTimeUtc             datetimeoffset(0) NOT NULL   
+        , EffectiveDateTime                 datetime NOT NULL
+        , RetirementDateTime                datetime NOT NULL   
     
         CONSTRAINT PK_tMonitoringPointParameter PRIMARY KEY CLUSTERED 
         (
 	        MonitoringPointParameterId ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
-        , CONSTRAINT AK_tMonitoringPointParameter_MonitoringPointId_ParameterId_EffectiveDateTimeUtc UNIQUE 
+        , CONSTRAINT AK_tMonitoringPointParameter_MonitoringPointId_ParameterId_EffectiveDateTime UNIQUE 
         (
             MonitoringPointId ASC
             , ParameterId ASC
-            , EffectiveDateTimeUtc ASC
+            , EffectiveDateTime ASC
         ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
         , CONSTRAINT FK_tMonitoringPointParameter_tMonitoringPoint FOREIGN KEY 
 		(
@@ -2162,8 +2162,8 @@ BEGIN
     (
         SampleRequirementId					int IDENTITY(1,1) NOT NULL
         , MonitoringPointParameterId		int NOT NULL
-        , PeriodStartDateTimeUtc			datetimeoffset(0) NOT NULL  
-        , PeriodEndDateTimeUtc				datetimeoffset(0) NOT NULL
+        , PeriodStartDateTime			    datetime NOT NULL  
+        , PeriodEndDateTime				    datetime NOT NULL
         , SamplesRequired					int NOT NULL
         , ByOrganizationRegulatoryProgramId	int NOT NULL
     
