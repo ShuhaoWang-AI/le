@@ -16,9 +16,9 @@ namespace Linko.LinkoExchange.Data.Mapping
                  .HasForeignKey(c => c.MonitoringPointParameterId)
                  .WillCascadeOnDelete(false);
 
-            Property(x => x.PeriodStartDateTimeUtc).IsRequired();
+            Property(x => x.PeriodStartDateTime).IsRequired();
 
-            Property(x => x.PeriodEndDateTimeUtc).IsRequired();
+            Property(x => x.PeriodEndDateTime).IsRequired();
 
             Property(x => x.SamplesRequired).IsRequired();
 

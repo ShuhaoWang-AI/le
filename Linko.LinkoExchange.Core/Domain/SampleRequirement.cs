@@ -20,13 +20,13 @@ namespace Linko.LinkoExchange.Core.Domain
         /// When calculating if a report submission contains the proper number of samples, 
         /// count the number of results in LE where CollectionStartDateSampled >= PeriodStart AND CollectionEndDateSampled less than or equal to PeriodEnd. 
         /// </summary>
-        public DateTimeOffset PeriodStartDateTimeUtc { get; set; }
+        public DateTime PeriodStartDateTime { get; set; }
 
         /// <summary>
         /// When calculating if a report submission contains the proper number of samples, 
         /// count the number of results in LE where CollectionStartDateSampled >= PeriodStart AND CollectionEndDateSampled less than or equal to PeriodEnd. 
         /// </summary>
-        public DateTimeOffset PeriodEndDateTimeUtc { get; set; }
+        public DateTime PeriodEndDateTime { get; set; }
 
         public int SamplesRequired { get; set; }
 

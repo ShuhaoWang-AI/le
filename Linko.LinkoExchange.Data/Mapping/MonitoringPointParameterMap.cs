@@ -31,9 +31,9 @@ namespace Linko.LinkoExchange.Data.Mapping
               .HasForeignKey(c => c.DefaultUnitId)
               .WillCascadeOnDelete(false);
 
-            Property(x => x.EffectiveDateTimeUtc).IsOptional();
+            Property(x => x.EffectiveDateTime).IsOptional();
 
-            Property(x => x.RetirementDateTimeUtc).IsOptional();
+            Property(x => x.RetirementDateTime).IsOptional();
         }
     }
 }

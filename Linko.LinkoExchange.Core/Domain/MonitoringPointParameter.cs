@@ -25,9 +25,9 @@ namespace Linko.LinkoExchange.Core.Domain
         public int? DefaultUnitId { get; set; }
         public virtual Unit DefaultUnit { get; set; }
 
-        public DateTimeOffset EffectiveDateTimeUtc { get; set; }
+        public DateTime EffectiveDateTime { get; set; }
 
-        public DateTimeOffset RetirementDateTimeUtc { get; set; }
+        public DateTime RetirementDateTime { get; set; }
 
 
         // Reverse navigation

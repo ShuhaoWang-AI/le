@@ -1312,7 +1312,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                       ParameterIds = string.Join(separator:",", values:c.Parameters.Select(p => p.ParameterId).ToList())
                                                   }).OrderBy(c => c.Name).ToList();
 
-                var allParameters = _parameterService.GetGlobalParameters(monitoringPointId:monitoringPointId, sampleEndDateTimeUtc:endDateTime)
+                var allParameters = _parameterService.GetGlobalParameters(monitoringPointId:monitoringPointId, sampleEndDateTimeLocal:endDateTime)
                                                      .Select(c => new ParameterViewModel
                                                                   {
                                                                       Id = c.ParameterId,
@@ -1546,7 +1546,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select Sample Type", Value = "0", Disabled = true});
 
-            viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:viewModel.MonitoringPointId, sampleEndDateTimeUtc:viewModel.EndDateTimeLocal)
+            viewModel.AllParameters = _parameterService.GetGlobalParameters(monitoringPointId:viewModel.MonitoringPointId, sampleEndDateTimeLocal:viewModel.EndDateTimeLocal)
                                                        .Select(c => new ParameterViewModel
                                                                     {
                                                                         Id = c.ParameterId,

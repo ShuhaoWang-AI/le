@@ -15,23 +15,23 @@ namespace Linko.LinkoExchange.Services.Parameter
         /// <param name="startsWith">Optional parameter to filter the Parameter name using "Starts With" condition</param>
         /// <param name="monitoringPointId">Optional Monitoring Point parameter must be combined with the other
         /// optional parameter "sampleEndDateTimeUtc"</param>
-        /// <param name="sampleEndDateTimeUtc">If monitoring point and sample end date/time are passed in,
+        /// <param name="sampleEndDateTimeLocal">If monitoring point and sample end date/time are passed in,
         ///default unit gets overidden with monitoring point specific unit and default "Calc Mass" boolean is set
         ///for each child parameter that is associated with the monitoring point and effective date range.</param>
         /// <returns>A parameter group with children parameters some with potentially overidden default units</returns>
-        IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null, int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null);
+        IEnumerable<ParameterDto> GetGlobalParameters(string startsWith = null, int? monitoringPointId = null, DateTime? sampleEndDateTimeLocal = null);
 
         /// <summary>
         /// Used to obtain a collection of Parameter Groups from the database that matches optionally passed in criteria
         /// </summary>
         /// <param name="monitoringPointId">Optional Monitoring Point parameter must be combined with the other
         /// optional parameter "sampleEndDateTimeUtc"</param>
-        /// <param name="sampleEndDateTimeUtc">If monitoring point and sample end date/time are passed in,
+        /// <param name="sampleEndDateTimeLocal">If monitoring point and sample end date/time are passed in,
         ///default unit gets overidden with monitoring point specific unit and default "Calc Mass" boolean is set
         ///for each child parameter that is associated with the monitoring point and effective date range.</param>
         /// <param name="isGetActiveOnly">True when being called by IU for use in Sample creation. False when being called by Authority</param>
         /// <returns>Collection of parameter groups with children parameters some with potentially overidden default units</returns>
-        IEnumerable<ParameterGroupDto> GetStaticParameterGroups(int? monitoringPointId = null, DateTimeOffset? sampleEndDateTimeUtc = null, bool? isGetActiveOnly = null);
+        IEnumerable<ParameterGroupDto> GetStaticParameterGroups(int? monitoringPointId = null, DateTime? sampleEndDateTimeLocal = null, bool? isGetActiveOnly = null);
 
         /// <summary>
         /// Used to read the details of a static ParameterGroup from the database along with
