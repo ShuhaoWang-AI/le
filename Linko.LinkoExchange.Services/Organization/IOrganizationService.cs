@@ -12,9 +12,8 @@ namespace Linko.LinkoExchange.Services.Organization
         /// Get organizations that a user can access to (IU portal, AU portal, content MGT portal)
         /// </summary>
         /// <param name="userId">User id</param>
-        /// <param name="isIncludeAll">True if we need an unfiltered list for logging purposes</param>
         /// <returns>Collection of organization</returns>
-        IEnumerable<OrganizationRegulatoryProgramDto> GetUserOrganizations(int userId, bool isIncludeAll = false);
+        IEnumerable<OrganizationRegulatoryProgramDto> GetUserOrganizations(int userId);
 
         /// <summary>
         /// Get the regulators list that the user belonged to.

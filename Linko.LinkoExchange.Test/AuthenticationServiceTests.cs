@@ -916,7 +916,7 @@ namespace Linko.LinkoExchange.Test
                     Mock.Of<OrganizationDto>(i => i.OrganizationName == "test-org-name")
                 );
 
-            orgServiceMock.Setup(i => i.GetUserOrganizations(It.IsAny<int>(), false)).
+            orgServiceMock.Setup(i => i.GetUserOrganizations(It.IsAny<int>())).
                 Returns(
                   new[]
                   {

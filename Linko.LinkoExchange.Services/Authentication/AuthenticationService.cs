@@ -26,6 +26,7 @@ using Microsoft.Owin.Security;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.TermCondition;
+using System.Data.Entity;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {
@@ -645,39 +646,49 @@ namespace Linko.LinkoExchange.Services.Authentication
                     var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
                     var actorUser = _userService.GetUserProfileById(actorProgramUserDto.UserProfileId);
 
-                    var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
-                    {
-                        RegulatoryProgramId = recipientProgram.RegulatoryProgramId,
-                        OrganizationId = recipientProgram.OrganizationId,
-                        RegulatorOrganizationId = authorityOrg.OrganizationId,
-                        UserProfileId = applicationUser.UserProfileId,
-                        UserName = applicationUser.UserName,
-                        UserFirstName = applicationUser.FirstName,
-                        UserLastName = applicationUser.LastName,
-                        UserEmailAddress = applicationUser.Email,
-                        IPAddress = _httpContext.CurrentUserIPAddress(),
-                        HostName = _httpContext.CurrentUserHostName()
-                    };
-                    var contentReplacements = new Dictionary<string, string>();
-                    contentReplacements.Add("authorityName", authorityOrg.OrganizationDto.OrganizationName);
-                    contentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
-                    contentReplacements.Add("regulatoryProgram", recipientProgram.RegulatoryProgramDto.Name);
-                    contentReplacements.Add("firstName", applicationUser.FirstName);
-                    contentReplacements.Add("lastName", applicationUser.LastName);
-                    contentReplacements.Add("userName", applicationUser.UserName);
-                    contentReplacements.Add("emailAddress", applicationUser.Email);
-                    contentReplacements.Add("actorFirstName", actorUser.FirstName);
-                    contentReplacements.Add("actorLastName", actorUser.LastName);
-                    contentReplacements.Add("actorUserName", actorUser.UserName);
-                    contentReplacements.Add("actorEmailAddress", actorUser.Email);
+                    //Also log for this additional Cromerr event
+                    var orgRegPrograms = _dbContext.OrganizationRegulatoryProgramUsers
+                           .Include(o => o.OrganizationRegulatoryProgram)
+                           .Where(o => o.UserProfileId == userInfo.UserProfileId
+                            && o.OrganizationRegulatoryProgram.IsEnabled);
 
-                    await _crommerAuditLogService.Log(CromerrEvent.Registration_RegistrationPending, cromerrAuditLogEntryDto, contentReplacements);
-
-                    if (registrationType == RegistrationType.ResetRegistration)
+                    foreach (var orgRegProgram in orgRegPrograms)
                     {
-                        //Also log for this additional Cromerr event
-                        await _crommerAuditLogService.Log(CromerrEvent.UserAccess_AccountResetSuccessful, cromerrAuditLogEntryDto, contentReplacements);
+                        var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                        {
+                            RegulatoryProgramId = recipientProgram.RegulatoryProgramId,
+                            OrganizationId = recipientProgram.OrganizationId,
+                            RegulatorOrganizationId = authorityOrg.OrganizationId,
+                            UserProfileId = applicationUser.UserProfileId,
+                            UserName = applicationUser.UserName,
+                            UserFirstName = applicationUser.FirstName,
+                            UserLastName = applicationUser.LastName,
+                            UserEmailAddress = applicationUser.Email,
+                            IPAddress = _httpContext.CurrentUserIPAddress(),
+                            HostName = _httpContext.CurrentUserHostName()
+                        };
+                        var contentReplacements = new Dictionary<string, string>();
+                        contentReplacements.Add("authorityName", authorityOrg.OrganizationDto.OrganizationName);
+                        contentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
+                        contentReplacements.Add("regulatoryProgram", recipientProgram.RegulatoryProgramDto.Name);
+                        contentReplacements.Add("firstName", applicationUser.FirstName);
+                        contentReplacements.Add("lastName", applicationUser.LastName);
+                        contentReplacements.Add("userName", applicationUser.UserName);
+                        contentReplacements.Add("emailAddress", applicationUser.Email);
+                        contentReplacements.Add("actorFirstName", actorUser.FirstName);
+                        contentReplacements.Add("actorLastName", actorUser.LastName);
+                        contentReplacements.Add("actorUserName", actorUser.UserName);
+                        contentReplacements.Add("actorEmailAddress", actorUser.Email);
+
+                        await _crommerAuditLogService.Log(CromerrEvent.Registration_RegistrationPending, cromerrAuditLogEntryDto, contentReplacements);
+
+                        if (registrationType == RegistrationType.ResetRegistration)
+                        {
+                            await _crommerAuditLogService.Log(CromerrEvent.UserAccess_AccountResetSuccessful, cromerrAuditLogEntryDto, contentReplacements);
+                        }
                     }
+
+                    
 
 
                     // All succeed
@@ -879,7 +890,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 authenticationResult.Success = true;
                 authenticationResult.Result = AuthenticationResult.Success;
 
-                foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId, true))
+                foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId))
                 {
                     var userDto = _userService.GetUserProfileById(userProfileId);
                     await _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_Success, orgRegProgDto, userDto);
