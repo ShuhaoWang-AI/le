@@ -258,7 +258,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            InviteExpires = vm.InviteExpires.ToString()
                                                                                        });
 
-            return Json(data:result);
+            return Json(data:result, behavior:JsonRequestBehavior.AllowGet);
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]

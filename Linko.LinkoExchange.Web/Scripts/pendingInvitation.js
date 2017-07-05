@@ -1,5 +1,4 @@
-﻿
-function onRequestEnd(e) {
+﻿function onRequestEnd(e) {
     if (e.type.toLowerCase() === "destroy" && !e.response.Errors) {
         showPopupMessage("Invitation deleted!");
     }
@@ -102,24 +101,10 @@ function pendingInvitationGridOp(readUrl, deleteUrl) {
 
                             $("#YesDelete").click(function () {
                                 $("#DeletePendingInvitationModal").modal('hide');
-                                $("#DeletePendingInvitationModal").hide();
-                                console.log("data to delete ", data);
+                                $("#DeletePendingInvitationModal").hide(); 
                                 grid.dataSource.remove(data);
-                                var ret = grid.dataSource.sync()
-                                        .then(function (data) {
-                                            console.log(data);
-                                        },
-
-                                            function (err) {
-                                                alert(err);
-                                            })
-                                ;
-                                console.log(ret);
-                            });
-
-                            $("#noButton").click(function () {
-                                window.close();
-                            });
+                                grid.dataSource.sync();
+                            }); 
                         }
                     }
                 ]
