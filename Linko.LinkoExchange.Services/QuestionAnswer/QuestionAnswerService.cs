@@ -339,31 +339,36 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             if (questionCountSQ > 0)
                 _emailService.SendEmail(new[] { userProfile.Email }, EmailType.Profile_SecurityQuestionsChanged, contentReplacements);
 
-            int thisUserOrgRegProgUserId = Convert.ToInt32(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
-            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+            var allOrgRegProgramUsers = _dbContext.OrganizationRegulatoryProgramUsers
+                .Include(orpu => orpu.OrganizationRegulatoryProgram)
+                .Where(orpu => orpu.UserProfileId == userProfileId);
 
-            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-            cromerrAuditLogEntryDto.RegulatoryProgramId = actorProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
-            cromerrAuditLogEntryDto.OrganizationId = actorProgramUser.OrganizationRegulatoryProgram.OrganizationId;
-            cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
-            cromerrAuditLogEntryDto.UserProfileId = userProfile.UserProfileId;
-            cromerrAuditLogEntryDto.UserName = userProfile.UserName;
-            cromerrAuditLogEntryDto.UserFirstName = userProfile.FirstName;
-            cromerrAuditLogEntryDto.UserLastName = userProfile.LastName;
-            cromerrAuditLogEntryDto.UserEmailAddress = userProfile.Email;
-            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
-            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-            contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add("firstName", userProfile.FirstName);
-            contentReplacements.Add("lastName", userProfile.LastName);
-            contentReplacements.Add("userName", userProfile.UserName);
-            contentReplacements.Add("emailAddress", userProfile.Email);
+            foreach (var orgRegProgramUser in allOrgRegProgramUsers)
+            {
+                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+                cromerrAuditLogEntryDto.RegulatoryProgramId = orgRegProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+                cromerrAuditLogEntryDto.OrganizationId = orgRegProgramUser.OrganizationRegulatoryProgram.OrganizationId;
+                cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
+                cromerrAuditLogEntryDto.UserProfileId = userProfile.UserProfileId;
+                cromerrAuditLogEntryDto.UserName = userProfile.UserName;
+                cromerrAuditLogEntryDto.UserFirstName = userProfile.FirstName;
+                cromerrAuditLogEntryDto.UserLastName = userProfile.LastName;
+                cromerrAuditLogEntryDto.UserEmailAddress = userProfile.Email;
+                cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+                cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+                contentReplacements = new Dictionary<string, string>();
+                contentReplacements.Add("firstName", userProfile.FirstName);
+                contentReplacements.Add("lastName", userProfile.LastName);
+                contentReplacements.Add("userName", userProfile.UserName);
+                contentReplacements.Add("emailAddress", userProfile.Email);
 
-            if (questionCountKBQ > 0)
-                _crommerAuditLogService.Log(CromerrEvent.Profile_KBQChanged, cromerrAuditLogEntryDto, contentReplacements);
-            if (questionCountSQ > 0)
-                _crommerAuditLogService.Log(CromerrEvent.Profile_SQChanged, cromerrAuditLogEntryDto, contentReplacements);
+                if (questionCountKBQ > 0)
+                    _crommerAuditLogService.Log(CromerrEvent.Profile_KBQChanged, cromerrAuditLogEntryDto, contentReplacements);
+                if (questionCountSQ > 0)
+                    _crommerAuditLogService.Log(CromerrEvent.Profile_SQChanged, cromerrAuditLogEntryDto, contentReplacements);
+            }
+
+            
 
 
             return CreateOrUpdateAnswersResult.Success;
