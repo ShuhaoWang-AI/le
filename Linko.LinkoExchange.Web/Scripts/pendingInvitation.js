@@ -45,6 +45,9 @@ function pendingInvitationGridOp(readUrl, deleteUrl) {
             schema: {
                 type: "json",
                 data: "Data",
+                total: function (response) {
+                    return response.Data.length;
+                },
                 model: {
                     id: "Id",
                     fields: {
