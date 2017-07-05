@@ -38,4 +38,5 @@
 /// <reference path="jquery-3.1.1.slim.min.js" />
 /// <reference path="kendo.modernizr.custom.js" />
 /// <reference path="linkoexchange.js" />
+/// <reference path="pendinginvitation.js" />
 /// <reference path="profile.js" />

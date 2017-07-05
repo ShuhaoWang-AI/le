@@ -106,69 +106,69 @@
 
         <div class="form-group">
             <div class="col-md-12">
-                @* grid name should be start with grid for centralized error handling *@
-                @(Html.Kendo().Grid<PendingInvitationViewModel>()
-                      .Name(componentName:"gridPendingInvitation")
-                      .Columns(columns =>
-                               {
-                                   columns.Bound(c => c.FirstName);
-                                   columns.Bound(c => c.LastName);
-                                   columns.Bound(c => c.Email);
-                                   columns.Bound(c => c.DateInvited).Format(value:"{0:MM/dd/yyyy hh:mm tt}");
-                                   columns.Bound(c => c.InviteExpires).Format(value:"{0:MM/dd/yyyy hh:mm tt}");
-                                   columns.Command(c => { c.Destroy().Text(text:" "); }).Width(pixelWidth:100);
-                               })
-                      .Pageable(pageable => pageable
-                                                .PageSizes(enabled:true)
-                                                .Refresh(enabled:true)
-                                                .Input(enabled:true)
-                                                .Numeric(enabled:false)
-                      )
-                      .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
-                      //.Filterable(filterable => filterable.Enabled(value: false))
-                      .Resizable(resizable => resizable.Columns(value:true))
-                      .Scrollable(s => s.Height(value:"auto"))
-                      .NoRecords(text:"No pending invitations exist.")
-                      .DataSource(dataSource => dataSource
-                                                    .Ajax()
-                                                    .ServerOperation(enabled:false)
-                                                    .Batch(enabled:true)
-                                                    .Model(model =>
-                                                           {
-                                                               model.Id(m => m.Id);
-                                                               model.Field(m => m.FirstName);
-                                                               model.Field(m => m.LastName);
-                                                               model.Field(m => m.Email);
-                                                               model.Field(m => m.DateInvited);
-                                                               model.Field(m => m.InviteExpires);
-                                                           })
-                                                    .Sort(sort => sort.Add(memberName:"DateInvited").Ascending()) // <-- initial sort expression
-                                                    .Read(read => read.Action(actionName:"AuthorityUsers_PendingInvitations_Read", controllerName:"Authority"))
-                                                    .Destroy(d => d.Action(actionName:"AuthorityUsers_PendingInvitations_Delete", controllerName:"Authority"))
-                                                    .PageSize(pageSize:10)
-                                                    .Events(events => events.Error(handler:"error_handler").RequestEnd(handler:"onRequestEnd"))
-                      )
-                      )
-            </div>
+                <div id="pendingInvitationGrid"></div> 
+            </div>    
         </div>
     </section>
 </div>
 
-@section Scripts {
+<div aria-labelledby="Delete Pending Invitation" class="col-md-12 fade modal modal-info" id="DeletePendingInvitationModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="alert alert-dismissible alert-info modal-content">
+            <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
+            <h4 class="box-title">Delete Pending Invitaton</h4>
+            <div class="form-horizontal">
+                <p>
+                    Are you sure to delete this pending invitation?
+                </p>
+                <div class="form-group">
+                    <div class="pull-right">
+                        <button aria-label="Yes" class="btn btn-primary btn-sm" value="Yes" id="YesDelete" type="button">Yes</button>
+                        <button aria-label="Close" class="btn btn-primary btn-sm" id="CancelDelete" data-dismiss="modal" type="button">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div aria-labelledby="Delete Pending Invitation Result" class="col-md-12 fade modal modal-info" id="DeletePendingInvitationResultModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="alert alert-dismissible alert-info modal-content">
+            <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
+            <h4 class="box-title">Delete Pending Invitaton</h4>
+            <div class="form-horizontal">
+                <p>
+                    <div id="message"></div>
+                    <div class="form-group">
+                        <div class="pull-right">
+                            <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">Close</button>
+                        </div>
+                    </div>
+                </p>
+            </div>
+        </div>
+    </div>
+</div> 
+
+
+
+@section Scripts { 
+    @Scripts.Render(paths: "~/bundles/pendingInvitations") 
     <script type="text/javascript">
-        gotoNextPage = function()
-        {
+        
+        function gotoNextPage() {
+
             var grid = $("#gridUser").data("kendoGrid");
             var postUrl = "@Url.Action(actionName:"AuthorityUsers_Select", controllerName:"Authority")";
 
             doAjaxAction(grid, postUrl, "", "Select an user");
         };
-        onRequestEnd = function(e)
-        {
-            if (e.type.toLowerCase() === "destroy" && !e.response.Errors)
-            {
-                showPopupMessage("Invitation deleted!");
-            }
-        };
-    </script>
+
+        var readUrl = "@Url.Action(actionName: "AuthorityUsers_PendingInvitations_Read", controllerName:"Authority")";
+        var deleteUrl = "@Url.Action(actionName: "AuthorityUsers_PendingInvitations_Delete", controllerName:"Authority")";
+
+        $(document).ready(pendingInvitationGridOp(readUrl, deleteUrl));
+
+    </script> 
 }

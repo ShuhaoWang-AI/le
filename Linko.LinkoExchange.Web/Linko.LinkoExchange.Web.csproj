@@ -436,6 +436,7 @@
     <Content Include="Scripts\kendo.modernizr.custom.js" />
     <Content Include="Scripts\linkoExchange.js" />
     <Content Include="Scripts\invite.js" />
+    <Content Include="Scripts\pendingInvitation.js" />
     <Content Include="Scripts\Profile.js" />
     <Content Include="Views\Account\ChangeEmail.cshtml" />
     <Content Include="Web.config">

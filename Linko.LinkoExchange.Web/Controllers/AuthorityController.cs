@@ -707,11 +707,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.Email,
                                                                                            DateInvited = vm.DateInvited.ToString(),
                                                                                            InviteExpires = vm.InviteExpires.ToString()
-                                                                                       });
-
-            return Json(data:result);
+            });
+              
+            return Json(data:result,behavior:JsonRequestBehavior.AllowGet);
         }
-
+        
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         public ActionResult AuthorityUsers_PendingInvitations_Delete([DataSourceRequest] DataSourceRequest request, [Bind(Prefix = "models")] IEnumerable<PendingInvitationViewModel> items)
         {
@@ -720,7 +720,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return Json(data:items.ToDataSourceResult(request:request, modelState:ModelState));
             }
 
-            var viewModels = items as IList<PendingInvitationViewModel> ?? items.ToList();
+            var viewModels = items as IList<PendingInvitationViewModel> ?? items.ToList(); 
             try
             {
                 if (viewModels.Any())
@@ -1533,7 +1533,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            Role = 1 // role need to be more than 0 otherwise ModelState.IsValid = false 
                                                                                        });
 
-            return Json(data:result);
+            return Json(data:result,behavior:JsonRequestBehavior.AllowGet);
         }
 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
