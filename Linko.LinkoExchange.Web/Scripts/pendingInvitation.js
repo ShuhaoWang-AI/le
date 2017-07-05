@@ -78,12 +78,17 @@ function pendingInvitationGridOp(readUrl, deleteUrl) {
             { field: "Email" },
             {
                 field: "DateInvited",
+                title: "Date Invited",
                 format: "{0:MM/dd/yyyy hh:mm tt}",
                 sortable: {
                     initialDirection: "desc"
                 }
             },
-            { field: "InviteExpires", format: "{0:MM/dd/yyyy hh:mm tt}" },
+            {
+                field: "InviteExpires",
+                title:"Invite Expires",
+                format: "{0:MM/dd/yyyy hh:mm tt}"
+            },
             {
                 command: [
                     {
