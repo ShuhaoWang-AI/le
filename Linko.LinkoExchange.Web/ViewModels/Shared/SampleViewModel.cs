@@ -128,6 +128,12 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
     {
         public SampleViewModelValidator()
         {
+            //CollectionMethodId
+            RuleFor(x => x.CollectionMethodId).NotNull().WithMessage(errorMessage: "{PropertyName} is required.");
+
+            //CtsEventTypeId
+            RuleFor(x => x.CtsEventTypeId).NotNull().WithMessage(errorMessage: "{PropertyName} is required.");
+
             //StartDateTimeLocal
             RuleFor(x => x.StartDateTimeLocal).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
 
