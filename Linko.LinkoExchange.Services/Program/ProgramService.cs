@@ -62,7 +62,8 @@ namespace Linko.LinkoExchange.Services.Program
 
             var organziationRegulatoryProgramUserDtos = new List<OrganizationRegulatoryProgramUserDto>();
             var regulatoryProgramUsers = _linkoExchangeDbContext
-                .OrganizationRegulatoryProgramUsers.ToList()
+                .OrganizationRegulatoryProgramUsers
+                .Include("OrganizationRegulatoryProgram").ToList()
                 .FindAll(i => i.UserProfileId == userProfile.UserProfileId);
 
             if (!isIncludeRemoved)
@@ -78,6 +79,18 @@ namespace Linko.LinkoExchange.Services.Program
                 foreach (var u in organziationRegulatoryProgramUserDtos)
                 {
                     u.UserProfileDto = _mapHelper.GetUserDtoFromUserProfile(_linkoExchangeDbContext.Users.SingleOrDefault(user => user.UserProfileId == u.UserProfileId));
+
+                    //Check if the authority is disabled, making all it's IU's disabled too
+                    if (u.OrganizationRegulatoryProgramDto.IsEnabled && u.OrganizationRegulatoryProgramDto.RegulatorOrganizationId != null)
+                    {
+                        //Disable if it's authority is disabled
+                        var regulatorOrganization = _linkoExchangeDbContext.OrganizationRegulatoryPrograms
+                            .Single(orp => orp.OrganizationId == u.OrganizationRegulatoryProgramDto.RegulatorOrganizationId
+                                && orp.RegulatoryProgramId == u.OrganizationRegulatoryProgramDto.RegulatoryProgramId);
+
+                        u.OrganizationRegulatoryProgramDto.IsEnabled = regulatorOrganization.IsEnabled;
+                    }
+                    
                 }
 
             }

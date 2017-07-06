@@ -238,5 +238,19 @@ namespace Linko.LinkoExchange.Test
 
             Assert.AreEqual(result, RegistrationResult.DuplicatedSecurityQuestionAnswer);
         }
+
+        [TestMethod]
+        public void CreateOrUpdateQuestionAnswerPairs_Reordered_Question_Answers_Test()
+        {
+            var qAndAs = new List<AnswerDto>();
+            //var sq1 = new AnswerDto() { UserQuestionAnswerId = 95, QuestionId = 21, Content = "yzdmYW32U1LNjiFKvB4d5qZVb4g15GqE9f6fhOjlcdOFjE87jgfVkgOH8L4hjpyHu8XetUtTtvckuEEgBgtbJLqqX6kSx3c8/Tk+DGh8WM1DaPvr+ZYUsdclnvW8ZE1I" };
+            var sq2 = new AnswerDto() { UserQuestionAnswerId = 96, QuestionId = 21, Content = "TVh8YtzPPVpnH7WqrW51FLZlzL/HcS38Nsr3MlHMU1yITkWB6KnSgFBea6zvUNTp7a83oe46jo08NnsC/q8n34AQ+GeocGbP1ZIf9VthGKmAV+sZTJHhov/yu25ybX0S" };
+            //qAndAs.Add(sq1);
+            qAndAs.Add(sq2);
+
+            var result = _questionAnswerService.CreateOrUpdateUserQuestionAnswers(1, qAndAs);
+
+            Assert.AreEqual(result, CreateOrUpdateAnswersResult.DuplicateAnswersInNew);
+        }
     }
 }
