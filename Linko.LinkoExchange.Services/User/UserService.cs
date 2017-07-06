@@ -1440,6 +1440,7 @@ namespace Linko.LinkoExchange.Services.User
                 throw new UnauthorizedAccessException();
             }
 
+            var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
             OrganizationRegulatoryProgramUserDto userDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(user);
             userDto.UserProfileDto = GetUserProfileById(user.UserProfileId);
@@ -1447,8 +1448,8 @@ namespace Linko.LinkoExchange.Services.User
             userDto.UserProfileDto.Jurisdiction = _mapHelper.GetJurisdictionDtoFromJurisdiction(jurisdiction);
 
             //Need to modify datetime to local
-            userDto.UserProfileDto.CreationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userDto.UserProfileDto.CreationDateTimeUtc.Value.UtcDateTime, user.OrganizationRegulatoryProgramId);
-            userDto.RegistrationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userDto.RegistrationDateTimeUtc.Value.UtcDateTime, user.OrganizationRegulatoryProgramId);
+            userDto.UserProfileDto.CreationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userDto.UserProfileDto.CreationDateTimeUtc.Value.UtcDateTime, currentOrgRegProgramId);
+            userDto.RegistrationDateTimeUtc = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(userDto.RegistrationDateTimeUtc.Value.UtcDateTime, currentOrgRegProgramId);
 
             return userDto;
         }
