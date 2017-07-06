@@ -1,5 +1,11 @@
 ﻿@using Linko.LinkoExchange.Web.ViewModels.Authority
-@using Linko.LinkoExchange.Web.ViewModels.Shared
+
+<style>
+    .k-grid-content {
+        min-height:50px;
+    }
+</style> 
+
 <section>
     <ol class="breadcrumb">
         <li>
@@ -151,7 +157,10 @@
     </div>
 </div> 
 
-
+<div id="loading" class="k-loading-mask" style="width:100%;height:100%">
+    <span class="k-loading-text">Loading...</span>
+    <div class="k-loading-image"><div class="k-loading-color"></div></div>
+</div>
 
 @section Scripts { 
     @Scripts.Render(paths: "~/bundles/pendingInvitations") 
