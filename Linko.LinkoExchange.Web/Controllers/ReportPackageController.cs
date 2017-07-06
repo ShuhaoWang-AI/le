@@ -916,11 +916,21 @@ namespace Linko.LinkoExchange.Web.Controllers
                         Id = t.ReportPackageElementTypeId,
                         Name = t.ReportElementTypeName
                     }).ToList(),
+                    SelectedSamples = vm.SamplesAndResultsTypes?.Where(t => t.Samples.Count > 0).Select(t => new SelectedParentChildCombination
+                                                                             {
+                                                                                 Id = t.ReportPackageElementTypeId,
+                                                                                 ChildElements = t.Samples?.Select(s => new ChildElement {Id = s.SampleId ?? 0}).ToList()
+                                                                             }).ToList(),
                     AttachmentTypes = vm.AttachmentTypes?.Select(t => new ReportElementTypeViewModel
                     {
                         Id = t.ReportPackageElementTypeId,
                         Name = t.ReportElementTypeName
                     }).ToList(),
+                    SelectedAttachments = vm.AttachmentTypes?.Where(t => t.FileStores.Count > 0).Select(t => new SelectedParentChildCombination
+                                                                             {
+                                                                                 Id = t.ReportPackageElementTypeId,
+                                                                                 ChildElements = t.FileStores?.Select(f => new ChildElement {Id = f.FileStoreId ?? 0}).ToList()
+                                                                             }).ToList(),
                     CertificationTypes = vm.CertificationTypes?.Select(t => new ReportElementTypeViewModel
                     {
                         Id = t.ReportPackageElementTypeId,

@@ -161,6 +161,9 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
 
         [Display(Name = "Categories")]
         public List<ReportElementCategoryName> ReportPackageTemplateElementCategories { get; set; }
+        
+        public List<SelectedParentChildCombination> SelectedSamples{ get; set; }
+        public List<SelectedParentChildCombination> SelectedAttachments{ get; set; }
     }
 
     public class ReportPackageViewModelValidator:AbstractValidator<ReportPackageViewModel> {}

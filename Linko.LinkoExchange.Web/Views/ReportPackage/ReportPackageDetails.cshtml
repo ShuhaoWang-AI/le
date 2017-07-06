@@ -132,8 +132,8 @@
                 @Html.HiddenFor(model => model.IsSubmissionBySignatoryRequired)
                 @Html.HiddenFor(model => model.FailedCountPassword)
                 @Html.HiddenFor(model => model.FailedCountKbq)
-                @Html.Hidden(name: "SelectedSamples")
-                @Html.Hidden(name: "SelectedAttachments")
+                @Html.Hidden(name: "SelectedSamples", value: Html.Raw(value: Json.Encode(value: Model.SelectedSamples)))
+                @Html.Hidden(name: "SelectedAttachments", value: Html.Raw(value: Json.Encode(value: Model.SelectedAttachments)))
 
             </div>
             <div class="form-group">
@@ -254,7 +254,7 @@
                                                if (Model.Status == ReportStatusName.Draft)
                                                {
                                                    columns.Bound(c => c.IsAssociatedWithReportPackage)
-                                                          .ClientTemplate(value: "<input type='checkbox' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' #/>")
+                                                          .ClientTemplate(value: "<input type='checkbox' name='ckgridSample_" + samplesAndResultType.Id + "' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' #/>")
                                                           .HtmlAttributes(attributes: new
                                                                                       {
                                                                                           align = "center"
@@ -308,6 +308,13 @@
                                   .Resizable(resizable => resizable.Columns(value: true))
                                   .Scrollable(s => s.Height(value: "auto"))
                                   .NoRecords(text: "No sample exists.")
+                                  .Events(events =>
+                                          {
+                                              if (Model.Status == ReportStatusName.Draft)
+                                              {
+                                                  events.DataBound(handler: "onGridDataBound");
+                                              }
+                                          })
                                   .DataSource(dataSource => dataSource
                                                                 .Ajax()
                                                                 .ServerOperation(enabled: true)
@@ -376,7 +383,6 @@
                                 </button>
                             </div>
                         </div>
-
                         <section class="box-body form-horizontal">
                             <div class="form-group">
                                 <div class="col-md-12">
@@ -388,7 +394,7 @@
                                                        if (Model.Status == ReportStatusName.Draft)
                                                        {
                                                            columns.Bound(c => c.IsAssociatedWithReportPackage)
-                                                                  .ClientTemplate(value: "<input type='checkbox' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' #/>")
+                                                                  .ClientTemplate(value: "<input type='checkbox' name='ckgridAttachment_" + attachmentType.Id + "' class='checkbox' #=IsAssociatedWithReportPackage ? checked='checked' : '' # />")
                                                                   .HtmlAttributes(attributes: new
                                                                                               {
                                                                                                   align = "center"
@@ -441,6 +447,13 @@
                                           .Resizable(resizable => resizable.Columns(value: true))
                                           .Scrollable(s => s.Height(value: "auto"))
                                           .NoRecords(text: "No attachment exists.")
+                                          .Events(events =>
+                                                  {
+                                                      if (Model.Status == ReportStatusName.Draft)
+                                                      {
+                                                          events.DataBound(handler: "onGridDataBound");
+                                                      }
+                                                  })
                                           .DataSource(dataSource => dataSource
                                                                         .Ajax()
                                                                         .ServerOperation(enabled: true)
@@ -755,7 +768,7 @@
 
             <div class="box-footer">
                 <div class="form-group pull-right">
-                    <input class="btn btn-primary btn-sm" data-target="#RepudiateReportPackage" data-toggle="modal" type="button" value="Repudiate"  id="btnRepudiate"/>
+                    <input class="btn btn-primary btn-sm" data-target="#RepudiateReportPackage" data-toggle="modal" id="btnRepudiate" type="button" value="Repudiate" />
                 </div>
             </div>
 
@@ -1075,7 +1088,7 @@
                         </h5>
                     </div>
                 }
-                
+
                 <div aria-labelledby="Send to LinkoCTS" class="col-md-12 fade modal modal-info" id="SendToLinkoCTSModal" role="dialog" tabindex="-1">
                     <div class="modal-dialog" role="document">
                         <div class="alert alert-dismissible alert-info modal-content">
@@ -1137,7 +1150,8 @@
                             $("#btnSendToLinkoCTS")
                                 .click(function()
                                 {
-                                    var getUrl = "@Url.Action(actionName: "IsSimilarReportPackageSubmittedAfter", controllerName: "ReportPackage", routeValues: new {id = Model.Id})";
+                                    var getUrl =
+                                        "@Url.Action(actionName: "IsSimilarReportPackageSubmittedAfter", controllerName: "ReportPackage", routeValues: new {id = Model.Id})";
 
                                     $.ajax({
                                         type: "GET"
@@ -1146,11 +1160,14 @@
                                         {
                                             if (response.toUpperCase() === "TRUE")
                                             {
-                                                $("#msgForSendToLinkoCTSModal").html("A newer Report Package exists for this reporting period.<br/>Do you still want to send this Report Package to LinkoCTS?");
+                                                $("#msgForSendToLinkoCTSModal")
+                                                    .html(
+                                                        "A newer Report Package exists for this reporting period.<br/>Do you still want to send this Report Package to LinkoCTS?");
                                             }
                                             else
                                             {
-                                                $("#msgForSendToLinkoCTSModal").text("Do you want to Send Report Package to LinkoCTS?");
+                                                $("#msgForSendToLinkoCTSModal")
+                                                    .text("Do you want to Send Report Package to LinkoCTS?");
                                             }
 
                                             $('#SendToLinkoCTSModal').modal('show');
@@ -1164,7 +1181,7 @@
                     }
                     else
                     {
-                        <input type="button" value="Send to CTS" class="btn btn-primary btn-sm" disabled="disabled" />
+                        <input class="btn btn-primary btn-sm" disabled="disabled" type="button" value="Send to CTS" />
                     }
                 </div>
             </div>
@@ -1273,77 +1290,166 @@
     @if (Model.Status == ReportStatusName.Draft)
     {
         <script>
+            var selectedSamples = $.parseJSON($("#SelectedSamples").val());
+            var selectedAttachments = $.parseJSON($("#SelectedAttachments").val());
+
+            //console.log("selectedSamples: " + $("#SelectedSamples").val());
+            //console.log("selectedAttachments: " + $("#SelectedAttachments").val());
+
+            var idField = "Id";
+
+            //on click of the checkbox:gridId
+            $(document)
+                .on('click'
+                    , "input[name^='ckgrid']"
+                    , function()
+                    {
+                        var checked = this.checked;
+                        var row = $(this).closest("tr");
+                        var gridId = this.name.substring(2); // remove 'ck' from the name to get the grid id
+                        var grid = $('[id=' + gridId + ']').data("kendoGrid");
+                        var dataItem = grid.dataItem(row);
+                        var isFound = false;
+                        var id, selectedObj, selectedObjsFromAllGrids;
+
+                        if (gridId.startsWith("gridSample_"))
+                        {
+                            id = parseInt(gridId.replace('gridSample_', ''));
+                            selectedObjsFromAllGrids = selectedSamples;
+                        }
+                        else
+                        {
+                            id = parseInt(gridId.replace('gridAttachment_', ''));
+                            selectedObjsFromAllGrids = selectedAttachments;
+                        }
+
+                        for (var itemIndex = 0; itemIndex < selectedObjsFromAllGrids.length; itemIndex++)
+                        {
+                            if (selectedObjsFromAllGrids[itemIndex].Id === id)
+                            {
+                                selectedObj = selectedObjsFromAllGrids[itemIndex];
+                                isFound = true;
+                                break;
+                            }
+                        }
+
+                        if (!isFound)
+                        {
+                            // there was no row selected for the grid. Need to create the selected object
+                            selectedObj = {};
+                            selectedObj.Id = id;
+                            selectedObj.ChildElements = [];
+
+                            if (gridId.startsWith("gridSample_"))
+                            {
+                                selectedSamples.push(selectedObj);
+                            }
+                            else
+                            {
+                                selectedAttachments.push(selectedObj);
+                            }
+                        }
+
+                        if (selectedObj.Id === id)
+                        {
+                            if (checked)
+                            {
+                                //-select the row
+                                //row.addClass("k-state-selected");
+                                var childElement = {};
+                                childElement.Id = dataItem[idField];
+                                selectedObj.ChildElements.push(childElement);
+                                //console.log(item.ChildElements);
+                            }
+                            else
+                            {
+                                //-remove selection
+                                //row.removeClass("k-state-selected");
+                                var newArray = selectedObj.ChildElements.filter(function(obj)
+                                {
+                                    return obj.Id !== dataItem[idField];
+                                });
+
+                                selectedObj.ChildElements = newArray;
+
+                                //console.log(item.ChildElements);
+                            }
+                        }
+                    });
+
+            //on dataBound event restore previous selected rows:
+            function onGridDataBound(e)
+            {
+                var grid = e.sender;
+                var gridId = grid.element[0].id;
+                var id;
+                var selectedItems;
+
+                if (gridId.startsWith("gridSample_"))
+                {
+                    id = parseInt(gridId.replace('gridSample_', ''));
+                    selectedItems = selectedSamples;
+                }
+                else
+                {
+                    id = parseInt(gridId.replace('gridAttachment_', ''));
+                    selectedItems = selectedAttachments;
+                }
+
+                //console.log("grid id: " + grid.element[0].id);
+                var previouslySelectedItemIds = [];
+
+                for (var i = 0; i < selectedItems.length; i++)
+                {
+                    var item = selectedItems[i];
+
+                    if ((item.Id === id) && (item.ChildElements != null))
+                    {
+                        for (var j = 0; j < item.ChildElements.length; j++)
+                        {
+                            var childElement = item.ChildElements[j];
+                            previouslySelectedItemIds.push(childElement.Id);
+                        }
+                    }
+                }
+
+                //console.log("previouslySelectedItemIds: " + previouslySelectedItemIds);
+
+                if (previouslySelectedItemIds.length)
+                {
+                    var items = grid.items();
+                    items.each(function(idx, row)
+                    {
+                        var dataItem = grid.dataItem(row);
+                        //The $.inArray() method is similar to JavaScript's native .indexOf() method in that it returns -1 when it doesn't find a match.
+
+                        var isPerviouslySelected = ($.inArray(dataItem[idField], previouslySelectedItemIds) !== -1);
+
+                        if (isPerviouslySelected)
+                        {
+                            $(row).find(".checkbox").attr('checked', true);
+                        }
+                        else
+                        {
+                            $(row).find(".checkbox").attr('checked', false);
+                        }
+                    });
+                }
+            }
+
             $(document)
                 .ready(function()
                 {
                     $("#LinkoExchangeForm")
                         .submit(function()
                         {
-                            var selectedSamples = [];
-                            var selectedAttachments = [];
                             try
                             {
-                                var sampleGrids = $("[id^='gridSample_']");
-
-                                sampleGrids.each(function()
-                                {
-                                    var gridId = this.id;
-                                    var id = gridId.replace('gridSample_', '');
-
-                                    // Get reference to Grid object
-                                    var grid = $(this).data("kendoGrid");
-                                    var sel = $("input:checked", grid.tbody).closest("tr");
-                                    // Get data item for each
-                                    var childElements = [];
-                                    $.each(sel
-                                        , function(idx, row)
-                                        {
-                                            var item = grid.dataItem(row);
-                                            item['IsAssociatedWithReportPackage'] = true;
-                                            var childElement = {};
-                                            childElement.Id = item['Id'];
-                                            childElements.push(childElement);
-                                        });
-
-                                    var sample = {};
-                                    sample.Id = id;
-                                    sample.ChildElements = childElements;
-                                    selectedSamples.push(sample);
-                                });
-
-                                var attachmentGrids = $("[id^='gridAttachment_']");
-
-                                attachmentGrids.each(function()
-                                {
-                                    var gridId = this.id;
-                                    var id = gridId.replace('gridAttachment_', '');
-
-                                    // Get reference to Grid object
-                                    var grid = $(this).data("kendoGrid");
-                                    var sel = $("input:checked", grid.tbody).closest("tr");
-                                    // Get data item for each
-                                    var childElements = [];
-                                    $.each(sel
-                                        , function(idx, row)
-                                        {
-                                            var item = grid.dataItem(row);
-                                            item['IsAssociatedWithReportPackage'] = true;
-                                            var childElement = {};
-                                            childElement.Id = item['Id'];
-                                            childElements.push(childElement);
-                                        });
-
-                                    var attachment = {};
-                                    attachment.Id = id;
-                                    attachment.ChildElements = childElements;
-                                    selectedAttachments.push(attachment);
-                                });
-
                                 $("#SelectedSamples").val(JSON.stringify(selectedSamples));
                                 $("#SelectedAttachments").val(JSON.stringify(selectedAttachments));
 
-                                //console.log($("#SelectedSamples").val());
-                                //console.log($("#SelectedAttachments").val());
+                                //console.log("SelectedSamples: " + $("#SelectedSamples").val());
+                                //console.log("SelectedAttachments: " + $("#SelectedAttachments").val());
 
                                 return true;
                             }
