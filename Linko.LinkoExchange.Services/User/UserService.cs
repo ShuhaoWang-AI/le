@@ -616,29 +616,36 @@ namespace Linko.LinkoExchange.Services.User
             var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
             var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
 
-            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-            cromerrAuditLogEntryDto.RegulatoryProgramId = actorProgramUserDto.OrganizationRegulatoryProgramDto.RegulatoryProgramId;
-            cromerrAuditLogEntryDto.OrganizationId = actorProgramUserDto.OrganizationRegulatoryProgramDto.OrganizationId;
-            cromerrAuditLogEntryDto.RegulatorOrganizationId = actorProgramUserDto.OrganizationRegulatoryProgramDto.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
-            cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
-            cromerrAuditLogEntryDto.UserName = user.UserName;
-            cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
-            cromerrAuditLogEntryDto.UserLastName = user.LastName;
-            cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
-            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
-            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-            contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add("firstName", user.FirstName);
-            contentReplacements.Add("lastName", user.LastName);
-            contentReplacements.Add("userName", user.UserName);
-            contentReplacements.Add("emailAddress", user.Email);
-            contentReplacements.Add("authorityName", actorProgramUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
-            contentReplacements.Add("authorityFirstName", actorUser.FirstName);
-            contentReplacements.Add("authorityLastName", actorUser.LastName);
-            contentReplacements.Add("authorityUserName", actorUser.UserName);
-            contentReplacements.Add("authorityEmailaddress", actorUser.Email);
+            var allOrgRegProgramUsers = _dbContext.OrganizationRegulatoryProgramUsers
+                .Include(orpu => orpu.OrganizationRegulatoryProgram)
+                .Where(orpu => orpu.UserProfileId == userProfileId);
 
-            _crommerAuditLogService.Log(CromerrEvent.UserAccess_AccountResetInitiated, cromerrAuditLogEntryDto, contentReplacements);
+            foreach (var targetOrgRegProgramUser in allOrgRegProgramUsers)
+            {
+                var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+                cromerrAuditLogEntryDto.RegulatoryProgramId = targetOrgRegProgramUser.OrganizationRegulatoryProgram.RegulatoryProgramId;
+                cromerrAuditLogEntryDto.OrganizationId = targetOrgRegProgramUser.OrganizationRegulatoryProgram.OrganizationId;
+                cromerrAuditLogEntryDto.RegulatorOrganizationId = targetOrgRegProgramUser.OrganizationRegulatoryProgram.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
+                cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
+                cromerrAuditLogEntryDto.UserName = user.UserName;
+                cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
+                cromerrAuditLogEntryDto.UserLastName = user.LastName;
+                cromerrAuditLogEntryDto.UserEmailAddress = user.Email;
+                cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+                cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+                contentReplacements = new Dictionary<string, string>();
+                contentReplacements.Add("firstName", user.FirstName);
+                contentReplacements.Add("lastName", user.LastName);
+                contentReplacements.Add("userName", user.UserName);
+                contentReplacements.Add("emailAddress", user.Email);
+                contentReplacements.Add("authorityName", actorProgramUserDto.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
+                contentReplacements.Add("authorityFirstName", actorUser.FirstName);
+                contentReplacements.Add("authorityLastName", actorUser.LastName);
+                contentReplacements.Add("authorityUserName", actorUser.UserName);
+                contentReplacements.Add("authorityEmailaddress", actorUser.Email);
+
+                _crommerAuditLogService.Log(CromerrEvent.UserAccess_AccountResetInitiated, cromerrAuditLogEntryDto, contentReplacements);
+            }
 
             return new ResetUserResultDto()
             {
