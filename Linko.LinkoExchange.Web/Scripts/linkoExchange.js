@@ -122,7 +122,7 @@ error_handler = function(e)
         showPopupMessage(message);
 
         // Cancel the changes.
-        var grid = $("[name^='grid']").data("kendoGrid");
+        var grid = $(this.gridId).data("kendoGrid");
         grid.cancelChanges();
     }
 };

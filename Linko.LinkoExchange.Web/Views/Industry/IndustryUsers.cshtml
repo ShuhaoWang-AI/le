@@ -1,10 +1,5 @@
 ﻿@using Linko.LinkoExchange.Web.ViewModels.Industry
-
-<style>
-    .k-grid-content {
-        min-height: 50px;
-    }
-</style>
+@using Linko.LinkoExchange.Web.ViewModels.Shared 
 
 <section>
     <ol class="breadcrumb">
@@ -102,10 +97,60 @@
     </div> @*.box-header*@
     <section class="box-body form-horizontal">
         @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-info"})
-
         <div class="form-group">
             <div class="col-md-12">
-                <div id="pendingInvitationGrid"></div> 
+                @* grid name should be start with grid for centralized error handling *@
+                @(Html.Kendo().Grid<PendingInvitationViewModel>()
+                      .Name(componentName: "gridPendingInvitation")
+                      .Columns(columns =>
+                      {
+                          columns.Bound(c => c.FirstName);
+                          columns.Bound(c => c.LastName);
+                          columns.Bound(c => c.Email);
+                          columns.Bound(c => c.DateInvited).Format(value: "{0:MM/dd/yyyy hh:mm tt}");
+                          columns.Bound(c => c.InviteExpires).Format(value: "{0:MM/dd/yyyy hh:mm tt}");
+                          columns.Command(c =>
+                          {
+                              c.Custom(" ").HtmlAttributes(new
+                              {
+                                  @class = "k-grid-destroy k-icon k-i-close k-delete k-button ",
+                                  type = "text"
+                              })
+                              .Click("confirmDelete");
+                          }).Width(pixelWidth: 100);
+                      })
+                      .Pageable(pageable => pageable
+                                                .PageSizes(enabled: true)
+                                                .Refresh(enabled: true)
+                                                .Input(enabled: true)
+                                                .Numeric(enabled: false)
+                      )
+                      .Sortable(sortable => { sortable.SortMode(value: GridSortMode.MultipleColumn); })
+                      //.Filterable(filterable => filterable.Enabled(value: false))
+                      .Resizable(resizable => resizable.Columns(value: true))
+                      .Scrollable(s => s.Height(value: "auto"))
+                      .NoRecords(text: "No pending invitation exists.")
+                      .Editable(s=> s.DisplayDeleteConfirmation(false))
+                      .DataSource(dataSource => dataSource
+                                                    .Ajax()
+                                                    .ServerOperation(enabled: false)
+                                                    .Batch(enabled: true)
+                                                    .Model(model =>
+                                                    {
+                                                        model.Id(m => m.Id);
+                                                        model.Field(m => m.FirstName);
+                                                        model.Field(m => m.LastName);
+                                                        model.Field(m => m.Email);
+                                                        model.Field(m => m.DateInvited);
+                                                        model.Field(m => m.InviteExpires);
+                                                    })
+                                                    .Sort(sort => sort.Add(memberName: "DateInvited").Ascending()) // <-- initial sort expression
+                                                    .Read(read => read.Action(actionName: "IndustryUsers_PendingInvitations_Read", controllerName: "Industry"))
+                                                    .Destroy(d => d.Action(actionName: "IndustryUsers_PendingInvitations_Delete", controllerName: "Industry"))
+                                                    .PageSize(pageSize: 10)
+                                                     .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridPendingInvitation'})").RequestEnd(handler: "onRequestEnd"))
+                      )
+                )
             </div>
         </div>
     </section>
@@ -131,29 +176,10 @@
         </div>
     </div>
 </div>
-
-<div aria-labelledby="Delete Pending Invitation Result" class="col-md-12 fade modal modal-info" id="DeletePendingInvitationResultModal" role="dialog" tabindex="-1">
-    <div class="modal-dialog" role="document">
-        <div class="alert alert-dismissible alert-info modal-content">
-            <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
-            <h4 class="box-title">Delete Pending Invitaton</h4>
-            <div class="form-horizontal">
-                <p>
-                    <div id="message"></div>
-                    <div class="form-group">
-                        <div class="pull-right">
-                            <button aria-label="Close" class="btn btn-primary btn-sm" data-dismiss="modal" type="button">Close</button>
-                        </div>
-                    </div>
-                </p>
-            </div>
-        </div>
-    </div>
-</div> 
+ 
 
 @section Scripts { 
-    @Scripts.Render(paths: "~/bundles/pendingInvitations")
- 
+    @Scripts.Render(paths: "~/bundles/pendingInvitations") 
     <script type="text/javascript">
         gotoNextPage = function()
         {
@@ -163,10 +189,5 @@
             doAjaxAction(grid, postUrl, "", "Select an user");
         };
  
-        var readUrl = "@Url.Action(actionName: "IndustryUsers_PendingInvitations_Read", controllerName: "Industry")";
-        var deleteUrl = "@Url.Action(actionName: "IndustryUsers_PendingInvitations_Delete", controllerName: "Industry")";  
-
-        $(document).ready(pendingInvitationGridOp(readUrl, deleteUrl));
-
     </script>
 }
