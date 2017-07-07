@@ -289,7 +289,7 @@
                         <tr>
                             @*if you add or reorder any column then need to update the JavaScripts bellow*@
                             <th style="width: 30px"></th>
-                            <th style="display:none">Id</th>
+                            <th class="never">Id</th>
                             <th>Name</th>
                             <th>Description</th>
                             <th style="width: 60px">Remove</th>
@@ -303,7 +303,7 @@
                                 <td>
                                     <span class="btn btn-sm handler">&nbsp;</span>
                                 </td>
-                                <td style="display:none" >@attachment.Id</td>
+                                <td>@attachment.Id</td>
                                 <td>@attachment.Name</td>
                                 <td style="word-break:break-word;">@attachment.Description</td>
                                 <td>
@@ -383,7 +383,7 @@
                         <tr>
                             @*if you add or reorder any column then need to update the JavaScripts bellow*@
                             <th style="width: 30px"></th>
-                            <th style="display:none">Id</th>
+                            <th class="never">Id</th>
                             <th>Name</th>
                             <th>Description</th>
                             <th style="width: 60px">Remove</th>
@@ -397,7 +397,7 @@
                                 <td>
                                     <span class="btn btn-sm handler">&nbsp;</span>
                                 </td>
-                                <td style="display:none">@certification.Id</td>
+                                <td>@certification.Id</td>
                                 <td>@certification.Name</td>
                                 <td style="word-break:break-word;">@certification.Description</td>
                                 <td>
@@ -904,37 +904,53 @@
                     tableMoveFrom.rows({ filter : 'applied'}).remove().draw();
                 });
 
-        function getSelectedReportPackageTemplateElements(domId) {
-            var searchId = "#" + domId + "> tbody > tr";
-            var rows = $.makeArray($(searchId));
-            return rows.map(function (row) {
-                var values = $(row).find("td");
-                return {
-                    Id: values[1].innerHTML,
-                    Name: values[2].innerHTML,
-                    Description: values[3].innerHTML
-                };
-            });
-        }
-
         $("#btnSave")
             .on("click"
-                , function () {
+                , function()
+                {
                     var selectedSamplesAndResults = [];
 
                     var samplesAndResultsTypes = $.parseJSON($("#SamplesAndResultsTypes").val());
-
+                    
                     $.each(samplesAndResultsTypes, function(index, value)
                         {
                             var reportElementTypeViewModel = {};
                             reportElementTypeViewModel.Id = value.Id;
                             reportElementTypeViewModel.Name = value.Name;
                             reportElementTypeViewModel.Description = value.Description;
-                            selectedSamplesAndResults.push(reportElementTypeViewModel); 
+                            selectedSamplesAndResults.push(reportElementTypeViewModel);
+                            //console.debug('Data in index: ' + index + ' is: ' + value);
                         });
 
-                    var selectedAttachments = getSelectedReportPackageTemplateElements("selectedAttachmentTable"); 
-                    var selectedCertifications = getSelectedReportPackageTemplateElements("selectedCertificationTable");
+                    var selectedAttachments = [];
+                    $('#selectedAttachmentTable')
+                        .DataTable()
+                        .rows()
+                        .data()
+                        .each(function(value, index)
+                        {
+                            var reportElementTypeViewModel = {};
+                            reportElementTypeViewModel.Id = value[1];
+                            reportElementTypeViewModel.Name = value[2];
+                            reportElementTypeViewModel.Description = value[3];
+                            selectedAttachments.push(reportElementTypeViewModel);
+                            //console.debug('Data in index: ' + index + ' is: ' + value);
+                        });
+
+                    var selectedCertifications = [];
+                    $('#selectedCertificationTable')
+                        .DataTable()
+                        .rows()
+                        .data()
+                        .each(function(value, index)
+                        {
+                            var reportElementTypeViewModel = {};
+                            reportElementTypeViewModel.Id = value[1];
+                            reportElementTypeViewModel.Name = value[2];
+                            reportElementTypeViewModel.Description = value[3];
+                            selectedCertifications.push(reportElementTypeViewModel);
+                            //console.debug('Data in index: ' + index + ' is: ' + value);
+                        });
 
                     var selectedIndustries = [];
                     $('#selectedIndustryTable')
@@ -952,6 +968,7 @@
                             selectedIndustries.push(industryViewModel);
                         });
 
+
                     var viewModel = {};
                     viewModel.Id = $('#Id').val();
                     viewModel.Name = $('#Name').val();
@@ -964,7 +981,9 @@
                     viewModel.SamplesAndResultsTypes = selectedSamplesAndResults;
                     viewModel.AttachmentTypes = selectedAttachments;
                     viewModel.CertificationTypes = selectedCertifications;
-                    viewModel.ReportPackageTemplateAssignments = selectedIndustries; 
+                    viewModel.ReportPackageTemplateAssignments = selectedIndustries;
+
+                    //console.debug('----', viewModel);
 
                     var postUrl = "@ViewBag.PostURL";
                     var token = $("[name='__RequestVerificationToken']").val();
