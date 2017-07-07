@@ -761,7 +761,7 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
             emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
 
-            emailContentReplacements.Add("corViewLink", $"{_httpContextService.GetRequestBaseUrl()}reportPackage/{reportPackage.ReportPackageId}/COR");
+            emailContentReplacements.Add("corViewLink", $"{_httpContextService.GetRequestBaseUrl()}reportPackage/{reportPackage.ReportPackageId}/Details");
 
             // Send emails to all IU signatories 
             var signatoriesEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
@@ -1977,7 +1977,7 @@ namespace Linko.LinkoExchange.Services.Report
                     contentReplacements.Add("organizationZipCode", reportPackage.OrganizationZipCode);
 
                     contentReplacements.Add("userName", currentUser.UserName);
-                    contentReplacements.Add("corViewLink", $"{_httpContextService.GetRequestBaseUrl()}reportPackage/{reportPackage.ReportPackageId}/COR");
+                    contentReplacements.Add("corViewLink", $"{_httpContextService.GetRequestBaseUrl()}reportPackage/{reportPackage.ReportPackageId}/Details");
 
                     var authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
                     var authorityEmail = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
