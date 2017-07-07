@@ -50,6 +50,8 @@ namespace Linko.LinkoExchange.Services.Settings
             _globalSettings.Add(SystemSettingType.PasswordRequiredMaxLength, systemSettings.First(i => i.Name == SystemSettingType.PasswordRequiredMaxLength.ToString()).Value);
             _globalSettings.Add(SystemSettingType.MassLoadingUnitName, systemSettings.First(i => i.Name == SystemSettingType.MassLoadingUnitName.ToString()).Value);
             _globalSettings.Add(SystemSettingType.FileAvailableToAttachMaxAgeMonths, systemSettings.First(i => i.Name == SystemSettingType.FileAvailableToAttachMaxAgeMonths.ToString()).Value);
+            _globalSettings.Add(SystemSettingType.CTSDatabaseMinVersion, systemSettings.First(i => i.Name == SystemSettingType.CTSDatabaseMinVersion.ToString()).Value);
+            _globalSettings.Add(SystemSettingType.CTSDatabaseMinPatch, systemSettings.First(i => i.Name == SystemSettingType.CTSDatabaseMinPatch.ToString()).Value);
         }
 
         /// <summary>

@@ -4264,6 +4264,20 @@ BEGIN
 		    , '16'
 		    , 'Maximum age in months that a file is available to be selected as an attachment'
 		)
+	INSERT INTO dbo.tSystemSetting (Name, Value, Description)
+		VALUES 
+		(
+		    'CTSDatabaseMinVersion'
+		    , '16.0'
+		    , 'Minimum supported version of CTS_DATA database'
+		)
+	INSERT INTO dbo.tSystemSetting (Name, Value, Description)
+		VALUES 
+		(
+		    'CTSDatabaseMinPatch'
+		    , '07/15/2017'
+		    , 'Minimum supported patch of CTS_DATA database'
+		)
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tOrganizationSetting)

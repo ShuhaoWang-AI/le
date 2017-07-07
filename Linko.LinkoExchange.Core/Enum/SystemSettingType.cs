@@ -13,6 +13,8 @@
         SupportEmailAddress,
         EmailServer,
         MassLoadingUnitName,
-        FileAvailableToAttachMaxAgeMonths
+        FileAvailableToAttachMaxAgeMonths,
+        CTSDatabaseMinVersion,
+        CTSDatabaseMinPatch
     }
 }
