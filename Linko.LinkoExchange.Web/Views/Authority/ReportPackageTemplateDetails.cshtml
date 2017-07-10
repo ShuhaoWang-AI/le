@@ -904,6 +904,38 @@
                     tableMoveFrom.rows({ filter : 'applied'}).remove().draw();
                 });
 
+
+
+        function getSelectedReportPackageTemplateElements(domId) { 
+         
+            var searchId = "#" + domId + "> tbody > tr";
+            var rows = $.makeArray($(searchId));
+            return rows.map(function (row) {
+                var values = $(row).find("td");
+                if (values.length <= 1) {
+                    return [];
+                }
+                return {
+                    Id: getReportPackageTempateElementTypeId(domId, values[1].innerText),
+                    Name: values[1].innerText,
+                    Description: values[2].innerText
+                };
+            }); 
+        }
+
+        function getReportPackageTempateElementTypeId(domId, elementTypeName){  
+
+            var attachmentTypes = $.makeArray($('#' + domId).DataTable().data());
+            for(var i=0; i< attachmentTypes.length; i++){
+                var value = attachmentTypes[i]; 
+                if(value[2] === elementTypeName){
+                    return value[1];
+                }
+            } 
+
+           return -1;
+       }
+
         $("#btnSave")
             .on("click"
                 , function()
@@ -911,46 +943,18 @@
                     var selectedSamplesAndResults = [];
 
                     var samplesAndResultsTypes = $.parseJSON($("#SamplesAndResultsTypes").val());
-                    
-                    $.each(samplesAndResultsTypes, function(index, value)
-                        {
-                            var reportElementTypeViewModel = {};
-                            reportElementTypeViewModel.Id = value.Id;
-                            reportElementTypeViewModel.Name = value.Name;
-                            reportElementTypeViewModel.Description = value.Description;
-                            selectedSamplesAndResults.push(reportElementTypeViewModel);
-                            //console.debug('Data in index: ' + index + ' is: ' + value);
-                        });
 
-                    var selectedAttachments = [];
-                    $('#selectedAttachmentTable')
-                        .DataTable()
-                        .rows()
-                        .data()
-                        .each(function(value, index)
-                        {
-                            var reportElementTypeViewModel = {};
-                            reportElementTypeViewModel.Id = value[1];
-                            reportElementTypeViewModel.Name = value[2];
-                            reportElementTypeViewModel.Description = value[3];
-                            selectedAttachments.push(reportElementTypeViewModel);
-                            //console.debug('Data in index: ' + index + ' is: ' + value);
-                        });
+                    $.each(samplesAndResultsTypes, function (index, value) {
+                        var reportElementTypeViewModel = {};
+                        reportElementTypeViewModel.Id = value.Id;
+                        reportElementTypeViewModel.Name = value.Name;
+                        reportElementTypeViewModel.Description = value.Description;
+                        selectedSamplesAndResults.push(reportElementTypeViewModel);
+                        //console.debug('Data in index: ' + index + ' is: ' + value);
+                    });
 
-                    var selectedCertifications = [];
-                    $('#selectedCertificationTable')
-                        .DataTable()
-                        .rows()
-                        .data()
-                        .each(function(value, index)
-                        {
-                            var reportElementTypeViewModel = {};
-                            reportElementTypeViewModel.Id = value[1];
-                            reportElementTypeViewModel.Name = value[2];
-                            reportElementTypeViewModel.Description = value[3];
-                            selectedCertifications.push(reportElementTypeViewModel);
-                            //console.debug('Data in index: ' + index + ' is: ' + value);
-                        });
+                    var selectedAttachments = getSelectedReportPackageTemplateElements("selectedAttachmentTable");
+                    var selectedCertifications = getSelectedReportPackageTemplateElements("selectedCertificationTable");
 
                     var selectedIndustries = [];
                     $('#selectedIndustryTable')
