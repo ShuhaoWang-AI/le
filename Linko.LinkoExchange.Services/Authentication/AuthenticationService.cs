@@ -482,7 +482,12 @@ namespace Linko.LinkoExchange.Services.Authentication
                     #endregion
 
                     #region User is from re-registration 
-
+                    if (registrationType == RegistrationType.ReRegistration && applicationUser.TermConditionId != termConditionId)
+                    {
+                        applicationUser.TermConditionAgreedDateTimeUtc = DateTimeOffset.Now;
+                        applicationUser.TermConditionId = termConditionId; 
+                    }
+                    
                     // Existing user re-register
                     // Check if the password has been in # password in history
                     if (registrationType == RegistrationType.ResetRegistration)
