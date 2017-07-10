@@ -646,49 +646,53 @@ namespace Linko.LinkoExchange.Services.Authentication
                     var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
                     var actorUser = _userService.GetUserProfileById(actorProgramUserDto.UserProfileId);
 
-                    //Also log for this additional Cromerr event
-                    var orgRegPrograms = _dbContext.OrganizationRegulatoryProgramUsers
-                           .Include(o => o.OrganizationRegulatoryProgram)
-                           .Where(o => o.UserProfileId == userInfo.UserProfileId
-                            && o.OrganizationRegulatoryProgram.IsEnabled);
-
-                    foreach (var orgRegProgram in orgRegPrograms)
+                    var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
                     {
-                        var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
-                        {
-                            RegulatoryProgramId = recipientProgram.RegulatoryProgramId,
-                            OrganizationId = recipientProgram.OrganizationId,
-                            RegulatorOrganizationId = authorityOrg.OrganizationId,
-                            UserProfileId = applicationUser.UserProfileId,
-                            UserName = applicationUser.UserName,
-                            UserFirstName = applicationUser.FirstName,
-                            UserLastName = applicationUser.LastName,
-                            UserEmailAddress = applicationUser.Email,
-                            IPAddress = _httpContext.CurrentUserIPAddress(),
-                            HostName = _httpContext.CurrentUserHostName()
-                        };
-                        var contentReplacements = new Dictionary<string, string>();
-                        contentReplacements.Add("authorityName", authorityOrg.OrganizationDto.OrganizationName);
-                        contentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
-                        contentReplacements.Add("regulatoryProgram", recipientProgram.RegulatoryProgramDto.Name);
-                        contentReplacements.Add("firstName", applicationUser.FirstName);
-                        contentReplacements.Add("lastName", applicationUser.LastName);
-                        contentReplacements.Add("userName", applicationUser.UserName);
-                        contentReplacements.Add("emailAddress", applicationUser.Email);
-                        contentReplacements.Add("actorFirstName", actorUser.FirstName);
-                        contentReplacements.Add("actorLastName", actorUser.LastName);
-                        contentReplacements.Add("actorUserName", actorUser.UserName);
-                        contentReplacements.Add("actorEmailAddress", actorUser.Email);
+                        RegulatoryProgramId = recipientProgram.RegulatoryProgramId,
+                        OrganizationId = recipientProgram.OrganizationId,
+                        RegulatorOrganizationId = recipientProgram.RegulatorOrganizationId,
+                        UserProfileId = applicationUser.UserProfileId,
+                        UserName = applicationUser.UserName,
+                        UserFirstName = applicationUser.FirstName,
+                        UserLastName = applicationUser.LastName,
+                        UserEmailAddress = applicationUser.Email,
+                        IPAddress = _httpContext.CurrentUserIPAddress(),
+                        HostName = _httpContext.CurrentUserHostName()
+                    };
+                    var contentReplacements = new Dictionary<string, string>();
+                    contentReplacements.Add("authorityName", authorityOrg.OrganizationDto.OrganizationName);
+                    contentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
+                    contentReplacements.Add("regulatoryProgram", recipientProgram.RegulatoryProgramDto.Name);
+                    contentReplacements.Add("firstName", applicationUser.FirstName);
+                    contentReplacements.Add("lastName", applicationUser.LastName);
+                    contentReplacements.Add("userName", applicationUser.UserName);
+                    contentReplacements.Add("emailAddress", applicationUser.Email);
+                    contentReplacements.Add("actorFirstName", actorUser.FirstName);
+                    contentReplacements.Add("actorLastName", actorUser.LastName);
+                    contentReplacements.Add("actorUserName", actorUser.UserName);
+                    contentReplacements.Add("actorEmailAddress", actorUser.Email);
 
-                        await _crommerAuditLogService.Log(CromerrEvent.Registration_RegistrationPending, cromerrAuditLogEntryDto, contentReplacements);
+                    await _crommerAuditLogService.Log(CromerrEvent.Registration_RegistrationPending, cromerrAuditLogEntryDto, contentReplacements);
 
-                        if (registrationType == RegistrationType.ResetRegistration)
+                    if (registrationType == RegistrationType.ResetRegistration)
+                    {
+                        //Log additional event in the case of "registration after a reset" TO ALL AUTHORITIES.
+                        var orgRegPrograms = _dbContext.OrganizationRegulatoryProgramUsers
+                            .Include(o => o.OrganizationRegulatoryProgram)
+                            .Where(o => o.UserProfileId == applicationUser.UserProfileId
+                                && o.OrganizationRegulatoryProgram.IsEnabled)
+                                .Select(o => o.OrganizationRegulatoryProgram)
+                                .Distinct()
+                                .ToList();
+
+                        foreach (var orp in orgRegPrograms)
                         {
+                            cromerrAuditLogEntryDto.RegulatoryProgramId = orp.RegulatoryProgramId;
+                            cromerrAuditLogEntryDto.OrganizationId = orp.OrganizationId;
+                            cromerrAuditLogEntryDto.RegulatorOrganizationId = orp.RegulatorOrganizationId;
                             await _crommerAuditLogService.Log(CromerrEvent.UserAccess_AccountResetSuccessful, cromerrAuditLogEntryDto, contentReplacements);
                         }
                     }
-
-                    
 
 
                     // All succeed
