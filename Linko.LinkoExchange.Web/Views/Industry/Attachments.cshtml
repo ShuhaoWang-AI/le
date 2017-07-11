@@ -86,7 +86,7 @@
                                                           }) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"Attachments_Read", controllerName:"Industry"))
                                                     .PageSize(pageSize:15)
-                                                    .Events(events => events.Error(handler:"error_handler"))
+                                                    .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridAttachment'})"))
                       )
                       )
             </div>

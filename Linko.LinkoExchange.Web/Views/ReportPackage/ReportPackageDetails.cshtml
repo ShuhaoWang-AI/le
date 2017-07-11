@@ -331,7 +331,7 @@
                                                                                                                                                                         reportStatusName = Model.Status
                                                                                                                                                                     }))
                                                                 .PageSize(pageSize: 15)
-                                                                .Events(events => events.Error(handler: "error_handler"))
+                                                                .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridSample_" + samplesAndResultType.Id + "'})"))
                                   )
                                   )
                         </section>
@@ -469,7 +469,7 @@
                                                                                                                                                                                     reportStatusName = Model.Status
                                                                                                                                                                                 }))
                                                                         .PageSize(pageSize: 15)
-                                                                        .Events(events => events.Error(handler: "error_handler"))
+                                                                        .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridAttachment_" + attachmentType.Id + "'})"))
                                           )
                                           )
                                 </div>

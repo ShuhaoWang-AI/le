@@ -79,7 +79,7 @@
                                                                                                                                                                 categoryName = ReportElementCategoryName.Attachments
                                                                                                                                                             }))
                                                     .PageSize(pageSize:15)
-                                                    .Events(events => events.Error(handler:"error_handler"))
+                                                    .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridAttachment'})"))
                       )
                       )
             </div>
@@ -153,7 +153,7 @@
                                                         categoryName = ReportElementCategoryName.Certifications
                                                     }))
                                                     .PageSize(pageSize:15)
-                                                    .Events(events => events.Error(handler:"error_handler"))
+                                                    .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridCertification'})"))
                       )
                       )
             </div>

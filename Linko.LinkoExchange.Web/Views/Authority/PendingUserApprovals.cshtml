@@ -74,7 +74,7 @@
                                                     .Group(g => g.Add(c => c.Type))
                                                     .Read(read => read.Action(actionName:"PendingUserApprovals_Read", controllerName:"Authority"))
                                                     .PageSize(pageSize:10)
-                                                    .Events(events => events.Error(handler:"error_handler"))
+                                                    .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridUser'})"))
                       )
                       )
             </div>

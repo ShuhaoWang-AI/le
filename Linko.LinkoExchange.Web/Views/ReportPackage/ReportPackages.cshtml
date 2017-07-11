@@ -115,7 +115,7 @@
                                                         reportStatus = ViewBag.ReportStatusName
                                                     }))
                                                     .PageSize(pageSize:15)
-                                                    .Events(events => events.Error(handler:"error_handler"))
+                                                    .Events(events => events.Error(handler: "error_handler.bind({gridId: '#gridReportPackage'})"))
                       )
                       )
             </div>

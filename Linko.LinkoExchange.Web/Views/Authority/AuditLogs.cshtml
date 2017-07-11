@@ -137,7 +137,7 @@
                                                         .Sort(sort => sort.Add(memberName:"LogDateTimeUtc").Descending()) // <-- initial sort expression
                                                         .Read(read => read.Action(actionName:"AuditLogs_Read", controllerName:"Authority"))
                                                         .PageSize(pageSize:15)
-                                                        .Events(events => events.Error(handler:"error_handler"))
+                                                        .Events(events => events.Error(handler:"error_handler.bind({gridId: '#grid'})"))
                           )
                           )
                 </div>

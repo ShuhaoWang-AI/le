@@ -24,32 +24,27 @@
                 if ($.trim(returnData.message).length > 0)
                 {
                     $("body")
-                        .append('<div class="popup" data-popup="popup-1">'
-                            + '<div class="popup-inner">'
-                            + "<h4>"
+                        .append('<div aria-labelledby="Ajax Return Message" class="fade modal modal-info" id="AjaxReturnDataMessageModal" role="dialog" tabindex="-1">'
+                            + '<div class="modal-dialog" role="document">'
+                            + '<div class="alert alert-dismissible alert-info modal-content">'
+                            + '<button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>'
+                            + '<h4 class="box-title"><i class="fa fa-info icon"></i> Info</h4>'
+                            + '<div class="form-horizontal">'
+                            + '<p>'
                             + returnData.message
-                            + "</h4>"
-                            + '<a class="popup-close" data-popup-close="popup-1" href="#">x</a>'
-                            + "</div>"
-                            + "</div>");
+                            + '</p>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>');
 
-                    $('[data-popup="popup-1"]').fadeIn(350);
-                    $('[data-popup="popup-1"]').delay(2500);
-                    $('[data-popup="popup-1"]').fadeOut(350);
-
-                    $("[data-popup-close]")
-                        .on("click"
-                            , function(e)
-                            {
-                                $('[data-popup="popup-1"]').fadeOut(350);
-                            });
+                    $('#AjaxReturnDataMessageModal').modal('toggle');
                 }
 
                 setTimeout(function()
                     {
                         if (returnData.redirect)
                         {
-                            //$(location).attr("href", returnData.newurl);
                             window.location.replace(returnData.newurl);
                         }
                     }
@@ -60,24 +55,21 @@
     else
     {
         $("body")
-            .append('<div class="popup" data-popup="popup-1">'
-                + '<div class="popup-inner">'
-                + "<h4>"
+            .append('<div aria-labelledby="No Selection Message" class="fade modal modal-info" id="NoSelectionMessageModal" role="dialog" tabindex="-1">'
+                + '<div class="modal-dialog" role="document">'
+                + '<div class="alert alert-dismissible alert-danger modal-content">'
+                + '<button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>'
+                + '<h4 class="box-title">Error</h4>'
+                + '<div class="form-horizontal">'
+                + '<p>'
                 + noSelectionMessage
-                + "</h4>"
-                + '<a class="popup-close" data-popup-close="popup-1" href="#">x</a>'
-                + "</div>"
-                + "</div>");
+                + '</p>'
+                + '</div>'
+                + '</div>'
+                + '</div>'
+                + '</div>');
 
-        $('[data-popup="popup-1"]').fadeIn(350);
-        $('[data-popup="popup-1"]').fadeOut(3000);
-
-        $("[data-popup-close]")
-            .on("click"
-                , function(e)
-                {
-                    $('[data-popup="popup-1"]').fadeOut(350);
-                });
+        $('#NoSelectionMessageModal').modal('toggle');
     }
 };
 
@@ -129,24 +121,23 @@ error_handler = function(e)
 
 showPopupMessage = function(message)
 {
+
     $("body")
-        .append('<div class="popup" data-popup="popup-1">'
-            + '<div class="popup-inner">'
-            + "<h4>"
+        .append('<div aria-labelledby="Error Handler Message" class="fade modal modal-info" id="ErrorHandlerModal" role="dialog" tabindex="-1">'
+            + '<div class="modal-dialog" role="document">'
+            + '<div class="alert alert-dismissible alert-danger modal-content">'
+            + '<button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>'
+            + '<h4 class="box-title">Error</h4>'
+            + '<div class="form-horizontal">'
+            + '<p>'
             + message
-            + "</h4>"
-            + '<a class="popup-close" data-popup-close="popup-1" href="#">x</a>'
-            + "</div>"
-            + "</div>");
+            + '</p>'
+            + '</div>'
+            + '</div>'
+            + '</div>'
+            + '</div>');
 
-    $('[data-popup="popup-1"]').fadeIn(350);
-
-    $("[data-popup-close]")
-        .on("click"
-            , function(e)
-            {
-                $('[data-popup="popup-1"]').fadeOut(350);
-            });
+    $('#ErrorHandlerModal').modal('toggle');
 };
 
 $(document)

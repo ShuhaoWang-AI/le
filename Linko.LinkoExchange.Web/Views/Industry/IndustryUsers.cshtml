@@ -73,7 +73,7 @@
                                                           }) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"IndustryUsers_Read", controllerName:"Industry"))
                                                     .PageSize(pageSize:10)
-                                                    .Events(events => events.Error(handler:"error_handler"))
+                                                    .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridUser'})"))
                       )
                       )
             </div>
@@ -161,7 +161,7 @@
     <div class="modal-dialog" role="document">
         <div class="alert alert-dismissible alert-info modal-content">
             <button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>
-            <h4 class="box-title">Delete Pending Invitaton</h4>
+            <h4 class="box-title">Delete Pending Invitation</h4>
             <div class="form-horizontal">
                 <p>
                     Are you sure to delete this pending invitation?

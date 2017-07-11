@@ -77,7 +77,7 @@
                                                     .Sort(sort => sort.Add(memberName:"Name").Ascending()) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"ParameterGroups_Read", controllerName:"Authority"))
                                                     .PageSize(pageSize:15)
-                                                    .Events(events => events.Error(handler:"error_handler"))
+                                                    .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridParameterGroup'})"))
                       )
                       )
             </div>
