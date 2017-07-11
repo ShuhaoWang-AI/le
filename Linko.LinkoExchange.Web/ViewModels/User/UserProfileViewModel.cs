@@ -2,7 +2,6 @@
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System;
 using FluentValidation;
 using Linko.LinkoExchange.Web.ViewModels.Account;
 

@@ -12,14 +12,11 @@ using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Organization;
 using System;
-using Linko.LinkoExchange.Services.Parameter;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Sample;
 using System.Reflection;
 using Linko.LinkoExchange.Services.Unit;
-using Linko.LinkoExchange.Services.Config;
 using System.Diagnostics;
-using Linko.LinkoExchange.Web;
 using Linko.LinkoExchange.Core.Resources;
 
 namespace Linko.LinkoExchange.Test

@@ -1,10 +1,7 @@
-﻿using Linko.LinkoExchange.Web.ViewModels.Shared;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Web.Mvc;
 using FluentValidation;
 using FluentValidation.Attributes;
-using Linko.LinkoExchange.Web.ViewModels.Account;
 
 namespace Linko.LinkoExchange.Web.ViewModels.User
 {

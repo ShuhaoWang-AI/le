@@ -19,7 +19,6 @@ using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.AuditLog;
 using System.Data.Entity;
-using System.Runtime.CompilerServices;
 
 namespace Linko.LinkoExchange.Services.Invitation
 {

@@ -1,8 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Attributes;
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Account
 {

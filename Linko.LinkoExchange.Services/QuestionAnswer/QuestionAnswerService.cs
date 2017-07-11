@@ -5,7 +5,6 @@ using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
 using Linko.LinkoExchange.Core.Domain;
-using Linko.LinkoExchange.Core.Extensions;
 using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
@@ -15,7 +14,6 @@ using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Email;
 using NLog;
-using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.AuditLog;
 

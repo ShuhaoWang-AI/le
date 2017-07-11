@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-
+﻿
 namespace Linko.LinkoExchange.Services.Dto
 {
     public class ReportPackageTemplateElementTypeDto

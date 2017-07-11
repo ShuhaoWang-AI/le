@@ -1,6 +1,5 @@
 using Linko.LinkoExchange.Data;
 using System.Collections;
-using System.Configuration;
 using System.Linq;
 using System.Net.Mail;
 using System.Web.UI.WebControls;

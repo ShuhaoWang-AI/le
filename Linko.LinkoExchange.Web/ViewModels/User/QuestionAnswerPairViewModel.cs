@@ -1,4 +1,3 @@
-using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Web.ViewModels.User
 {

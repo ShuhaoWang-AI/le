@@ -1,6 +1,4 @@
-﻿
-using Linko.LinkoExchange.Services.Dto;
-using System.Threading.Tasks;
+﻿using Linko.LinkoExchange.Services.Dto;
 
 namespace Linko.LinkoExchange.Services.AuditLog
 {

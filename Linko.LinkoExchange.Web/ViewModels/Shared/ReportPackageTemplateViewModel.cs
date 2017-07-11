@@ -7,7 +7,6 @@ using FluentValidation;
 using FluentValidation.Attributes;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Web.ViewModels.Authority;
-using Linko.LinkoExchange.Web.ViewModels.Shared;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {

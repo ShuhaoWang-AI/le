@@ -6,8 +6,6 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data.Entity;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Validation;

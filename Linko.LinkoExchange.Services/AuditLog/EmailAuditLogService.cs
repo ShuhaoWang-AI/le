@@ -1,5 +1,4 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using Linko.LinkoExchange.Data;
+﻿using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;

@@ -7,7 +7,6 @@ using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.TermCondition;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
-using NLog;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {

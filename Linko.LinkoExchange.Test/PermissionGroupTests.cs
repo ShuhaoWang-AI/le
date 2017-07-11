@@ -1,8 +1,5 @@
 ﻿using System.Configuration;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services;
-using Linko.LinkoExchange.Services.Organization;
-using Linko.LinkoExchange.Services.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.Program;

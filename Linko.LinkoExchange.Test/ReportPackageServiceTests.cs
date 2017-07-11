@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
 using Linko.LinkoExchange.Core.Enum;
-using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Settings;
@@ -20,7 +19,6 @@ using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Unit;
-using Linko.LinkoExchange.Services.Config;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Cache;
 

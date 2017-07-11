@@ -24,7 +24,6 @@ using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Sample;
-using Linko.LinkoExchange.Services.Config;
 using System.Data.Entity;
 
 namespace Linko.LinkoExchange.Test

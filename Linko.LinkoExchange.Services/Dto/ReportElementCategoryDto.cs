@@ -1,4 +1,3 @@
-using Linko.LinkoExchange.Services.Dto;
 using System;
 
 namespace Linko.LinkoExchange.Services.Dto

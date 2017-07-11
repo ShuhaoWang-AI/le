@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
-using Castle.Components.DictionaryAdapter;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.Dto;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 
 namespace Linko.LinkoExchange.Test
 {

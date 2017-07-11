@@ -1,11 +1,9 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using System.Collections.Generic;
 using System.Configuration;
-using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.QuestionAnswer;

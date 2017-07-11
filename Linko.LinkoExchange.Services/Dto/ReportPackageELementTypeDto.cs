@@ -1,5 +1,4 @@
-﻿using Linko.LinkoExchange.Core.Domain;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Linko.LinkoExchange.Services.Dto
 {
