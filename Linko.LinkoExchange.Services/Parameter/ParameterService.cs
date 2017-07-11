@@ -136,7 +136,8 @@ namespace Linko.LinkoExchange.Services.Parameter
             var parameterDtos = new List<ParameterDto>();
             var foundParams = _dbContext.Parameters
                 .Include(p => p.DefaultUnit)
-                .Where(param => param.OrganizationRegulatoryProgramId == authOrgRegProgramId); // need to find authority OrganizationRegulatoryProgramId
+                .Where(param => !param.IsRemoved    //excluded deleted parameters
+                    && param.OrganizationRegulatoryProgramId == authOrgRegProgramId); // need to find authority OrganizationRegulatoryProgramId
 
             if (!string.IsNullOrEmpty(startsWith))
             {
