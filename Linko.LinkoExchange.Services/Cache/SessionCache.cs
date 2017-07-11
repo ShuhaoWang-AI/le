@@ -23,7 +23,7 @@ namespace Linko.LinkoExchange.Services.Cache
             var value = _httpContextService.GetSessionValue(key);
             if (value != null) return value;
 
-            return string.Empty;
+            return null;
         }
 
         public string GetClaimValue(string claimType)

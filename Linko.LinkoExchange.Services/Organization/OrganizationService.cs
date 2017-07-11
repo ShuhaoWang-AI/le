@@ -169,17 +169,21 @@ namespace Linko.LinkoExchange.Services.Organization
         /// </summary>
         /// <param name="userId">The user Id</param>
         /// <returns>The organizationId </returns>
-        public IEnumerable<AuthorityDto> GetUserRegulators(int userId)
+        public IEnumerable<AuthorityDto> GetUserRegulators(int userId, bool isIncludeRemoved = false)
         {
             try
             {
                 var orpUsers = _dbContext.OrganizationRegulatoryProgramUsers.ToList()
                     .FindAll(u => u.UserProfileId == userId &&
-                                u.IsRemoved == false &&
                                // u.IsEnabled == true &&
                                 //u.IsRegistrationApproved &&
                                 //u.OrganizationRegulatoryProgram.IsEnabled &&
                                 u.OrganizationRegulatoryProgram.IsRemoved == false);
+
+                if (!isIncludeRemoved)
+                {
+                    orpUsers = orpUsers.FindAll(u => !u.IsRemoved);
+                }
 
                 var orgs = new List<AuthorityDto>();
                 foreach (var orpUser in orpUsers)

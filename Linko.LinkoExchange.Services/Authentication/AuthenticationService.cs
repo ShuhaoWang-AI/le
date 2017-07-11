@@ -991,7 +991,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return Task.FromResult(signInResultDto);
             }
 
-            signInResultDto.RegulatoryList = _organizationService.GetUserRegulators(applicationUser.UserProfileId).ToList();
+            signInResultDto.RegulatoryList = _organizationService.GetUserRegulators(applicationUser.UserProfileId, true).ToList();
 
             // clear claims from db if there are   
             ClearClaims(applicationUser.Id);
@@ -1412,7 +1412,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         public void SignOff()
         {
-            var owinUserId = _sessionCache.GetValue(CacheKey.OwinUserId) as string;
+            var owinUserId = _sessionCache.GetValue(CacheKey.OwinUserId) != null ? _sessionCache.GetValue(CacheKey.OwinUserId).ToString() : "";
             ClearClaims(owinUserId);
             _sessionCache.Clear();
             _authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);

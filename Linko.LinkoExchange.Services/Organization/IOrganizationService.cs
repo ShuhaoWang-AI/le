@@ -20,7 +20,7 @@ namespace Linko.LinkoExchange.Services.Organization
         /// </summary>
         /// <param name="userId">The user Id.</param>
         /// <returns></returns>
-        IEnumerable<AuthorityDto> GetUserRegulators(int userId);
+        IEnumerable<AuthorityDto> GetUserRegulators(int userId, bool isIncludeRemoved = false);
 
         string GetUserAuthorityListForEmailContent(int userProfileId);
 
