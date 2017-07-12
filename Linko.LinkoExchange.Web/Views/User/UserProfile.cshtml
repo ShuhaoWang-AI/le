@@ -1,4 +1,5 @@
 ﻿@model Linko.LinkoExchange.Web.ViewModels.User.UserViewModel
+@using Linko.LinkoExchange.Web.ViewModels.Shared
 
 @{
     ViewBag.Title = "Profile";
@@ -69,14 +70,26 @@
                 }
  
                 @{
-                    var showMessage = ViewBag.SaveProfileSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage); 
-                    @Html.Partial("_MessageView", new { showMessage = showMessage, message = ViewBag.SuccessMessage });
+                    var vm = new ConfirmationMessageViewModal
+                    {
+                        ShowMessage = ViewBag.SaveProfileSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage),
+                        Messaage =  ViewBag.SuccessMessage
+                    };
+                    @Html.Partial("_ConfirmationMessageView", vm);
 
-                    showMessage = ViewBag.changeEmailSucceed != null && ViewBag.changeEmailSucceed;
-                    @Html.Partial("_MessageView", new { showMessage = showMessage, message = "Email successfully changed." });
+                    vm = new ConfirmationMessageViewModal
+                    {
+                        ShowMessage = ViewBag.changeEmailSucceed != null && ViewBag.changeEmailSucceed,
+                        Messaage = "Email successfully changed."
+                    };
+                    @Html.Partial("_ConfirmationMessageView", vm);
 
-                     showMessage = ViewBag.changePasswordSucceed != null && ViewBag.changePasswordSucceed;
-                    @Html.Partial("_MessageView", new { showMessage = showMessage, message = "Password successfully changed." });
+                    vm = new ConfirmationMessageViewModal
+                    {
+                        ShowMessage = ViewBag.changePasswordSucceed != null && ViewBag.changePasswordSucceed,
+                        Messaage = "Password successfully changed."
+                    };
+                    @Html.Partial("_ConfirmationMessageView", vm);
                 }                 
             </div>
 
@@ -473,8 +486,13 @@
                 }
                 
                 @{
-                    var showMessage = ViewBag.SaveKBQSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage);
-                    @Html.Partial("_MessageView", new { showMessage = showMessage, message = ViewBag.SuccessMessage });
+                    var vm = new ConfirmationMessageViewModal
+                    {
+                        ShowMessage = ViewBag.SaveKBQSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage),
+                        Messaage =  ViewBag.SuccessMessage
+                    };
+
+                    @Html.Partial("_ConfirmationMessageView", vm);
                 } 
             </div>
 
@@ -838,9 +856,13 @@
                 }
                 
                 @{
-                    var showMessage = ViewBag.SaveSQSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage); 
+                    var vm = new ConfirmationMessageViewModal
+                    {
+                        ShowMessage = ViewBag.SaveSQSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage),
+                        Messaage =  ViewBag.SuccessMessage
+                    };
 
-                    @Html.Partial("_MessageView", new { showMessage = showMessage, message = ViewBag.SuccessMessage });
+                    @Html.Partial("_ConfirmationMessageView", vm);
                 } 
             </div>
 

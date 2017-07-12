@@ -458,7 +458,6 @@
     <Content Include="Views\ReportPackage\ReportPackageDetails.cshtml" />
     <Content Include="Views\Home\TermsAndConditions.cshtml" />
     <Content Include="Views\Home\PrivacyPolicy.cshtml" />
-    <Content Include="Views\User\_MessageView.cshtml" />
     <Content Include="Views\Shared\_ConfirmationMessageView.cshtml" />
   </ItemGroup>
   <ItemGroup>
