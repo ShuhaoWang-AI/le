@@ -459,6 +459,7 @@
     <Content Include="Views\Home\TermsAndConditions.cshtml" />
     <Content Include="Views\Home\PrivacyPolicy.cshtml" />
     <Content Include="Views\User\_MessageView.cshtml" />
+    <Content Include="Views\Shared\_ConfirmationMessageView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -507,6 +508,7 @@
     <Compile Include="ViewModels\Industry\NewSampleStep1ViewModel.cs" />
     <Compile Include="ViewModels\ReportPackage\NewReportPackageViewModel.cs" />
     <Compile Include="ViewModels\ReportPackage\ReportPackageViewModel.cs" />
+    <Compile Include="ViewModels\Shared\ConfirmationMessageViewModal.cs" />
     <Compile Include="ViewModels\Shared\MonitoringPointViewModel.cs" />
     <Compile Include="ViewModels\Shared\SampleResultViewModel.cs" />
     <Compile Include="ViewModels\Shared\SampleViewModel.cs" />

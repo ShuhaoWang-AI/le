@@ -880,12 +880,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             try
             {
                 _fileStoreService.DeleteFileStore(fileStoreId:id);
-
-                return View(viewName:"Confirmation", model:new ConfirmationViewModel
-                                                           {
-                                                               Title = "Delete Confirmation",
-                                                               Message = "Attachment deleted successfully."
-                                                           });
+                TempData["AttachmentDeletedSucceed"] = true; 
+                return RedirectToAction("Attachments");
             }
             catch (RuleViolationException rve)
             {

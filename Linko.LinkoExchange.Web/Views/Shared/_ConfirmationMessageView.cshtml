@@ -1,0 +1,14 @@
+﻿@model Linko.LinkoExchange.Web.ViewModels.Shared.ConfirmationMessageViewModal
+
+@if (Model.ShowMessage)
+{
+    <div class="alert alert-dismissible alert-success">
+        <button aria-hidden="true" class="close" data-dismiss="alert" type="button">
+            &times;
+        </button>
+        <h5>
+            <i class="fa fa-check icon"></i>
+            @Model.Messaage
+        </h5>
+    </div>
+}
