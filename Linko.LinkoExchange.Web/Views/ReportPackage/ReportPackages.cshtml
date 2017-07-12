@@ -1,5 +1,6 @@
 ﻿@using Linko.LinkoExchange.Core.Enum
 @using Linko.LinkoExchange.Web.ViewModels.ReportPackage
+@using Linko.LinkoExchange.Web.ViewModels.Shared
 @{
     ViewBag.Title = "Report Packages";
 }
@@ -32,6 +33,15 @@
                                                                                                                         {
                                                                                                                             @class = "alert alert-info"
                                                                                                                         })
+        @{ 
+            var vm = new ConfirmationMessageViewModal
+            {
+                ShowMessage = TempData["ReportPackageDeletedSucceed"] != null,
+                Messaage =  "Report package deleted successfully."
+            };
+
+            @Html.Partial("_ConfirmationMessageView", vm);
+        }
         <div class="form-group">
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@

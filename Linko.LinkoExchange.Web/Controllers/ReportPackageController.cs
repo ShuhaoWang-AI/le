@@ -437,12 +437,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             try
             {
                 _reportPackageService.DeleteReportPackage(reportPackageId:id);
-
-                return View(viewName:"Confirmation", model:new ConfirmationViewModel
-                                                           {
-                                                               Title = "Delete Report Package",
-                                                               Message = "Report package deleted successfully."
-                                                           });
+                TempData["ReportPackageDeletedSucceed"] = true;
+                return RedirectToAction("ReportPackages", new {reportStatus="Draft" }); 
             }
             catch (RuleViolationException rve)
             {
