@@ -1540,7 +1540,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             var ctsEventTypeDtos = _reportTemplateService.GetCtsEventTypes(isForSample:true);
             var sampleTypes = ctsEventTypeDtos as IList<CtsEventTypeDto> ?? ctsEventTypeDtos.ToList();
-            viewModel.CtsEventCategoryName = sampleTypes.First().CtsEventCategoryName;
+            viewModel.CtsEventCategoryName = sampleTypes.Count > 0 ? sampleTypes.First().CtsEventCategoryName : "sample"; //if there is no active sampleTypes then hard code the CtsEventCategoryName as sample
             viewModel.AvailableCtsEventTypes = sampleTypes.Select(c => new SelectListItem
                                                                        {
                                                                            Text = c.Name,
