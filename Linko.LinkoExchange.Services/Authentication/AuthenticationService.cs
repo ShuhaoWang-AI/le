@@ -655,7 +655,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                     {
                         RegulatoryProgramId = recipientProgram.RegulatoryProgramId,
                         OrganizationId = recipientProgram.OrganizationId,
-                        RegulatorOrganizationId = recipientProgram.RegulatorOrganizationId,
+                        RegulatorOrganizationId = recipientProgram.RegulatorOrganizationId ?? recipientProgram.OrganizationId,
                         UserProfileId = applicationUser.UserProfileId,
                         UserName = applicationUser.UserName,
                         UserFirstName = applicationUser.FirstName,
