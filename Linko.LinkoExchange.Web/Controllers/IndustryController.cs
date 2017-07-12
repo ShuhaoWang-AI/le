@@ -1165,8 +1165,18 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route(template:"Sample/New/Step2")]
         public ActionResult NewSampleDetailsStep2(SampleViewModel model, FormCollection collection)
         {
-            int id;
-            if (ModelState.IsValid)
+            // don't check ModelState.IsValid as SampleResults is always invalid and it is re-populated later from the FormCollection[name: "SampleResults"]
+            if (!ModelState.IsValidField(key: "FlowUnitId") || !ModelState.IsValidField(key: "StartDateTimeLocal") || !ModelState.IsValidField(key: "EndDateTimeLocal"))
+            {
+                if (ModelState[key: "."] != null)
+                {
+                    foreach (var issue in ModelState[key: "."].Errors)
+                    {
+                        ModelState.AddModelError(key: string.Empty, errorMessage: issue.ErrorMessage);
+                    }
+                }
+            }
+            else
             {
                 try
                 {
@@ -1177,7 +1187,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     var vm = ConvertSampleViewModelToDto(model: model);
 
-                    id = _sampleService.SaveSample(sample: vm);
+                    var id = _sampleService.SaveSample(sample: vm);
 
                     TempData[key: "ShowSuccessMessage"] = true;
                     TempData[key: "SuccessMessage"] = "Sample updated successfully!";
@@ -1189,16 +1199,6 @@ namespace Linko.LinkoExchange.Web.Controllers
                 catch (RuleViolationException rve)
                 {
                     MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
-                }
-            }
-            else
-            {
-                if (ModelState[key: "."] != null)
-                {
-                    foreach (var issue in ModelState[key: "."].Errors)
-                    {
-                        ModelState.AddModelError(key: string.Empty, errorMessage: issue.ErrorMessage);
-                    }
                 }
             }
 
@@ -1234,6 +1234,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input:collection[name:"FlowUnitValidValues"]);
                     model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input:HttpUtility.HtmlDecode(s:collection[name:"SampleResults"]));
                     
+                    // don't check ModelState.IsValid as SampleResults is always invalid and it is re-populated later from the FormCollection[name: "SampleResults"]
                     if (!ModelState.IsValidField(key: "FlowUnitId") || !ModelState.IsValidField(key: "StartDateTimeLocal") || !ModelState.IsValidField(key: "EndDateTimeLocal"))
                     {
                         ViewBag.Satus = "Edit";
@@ -1278,6 +1279,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     if (isReadyToReport)
                     {
+                        // don't check ModelState.IsValid as SampleResults is always invalid and it is re-populated later from the FormCollection[name: "SampleResults"]
                         if (!ModelState.IsValidField(key: "FlowUnitId") || !ModelState.IsValidField(key: "StartDateTimeLocal") || !ModelState.IsValidField(key: "EndDateTimeLocal"))
                         {
                             ViewBag.Satus = "Edit";
