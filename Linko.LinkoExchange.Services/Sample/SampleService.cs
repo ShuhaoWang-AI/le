@@ -332,24 +332,15 @@ namespace Linko.LinkoExchange.Services.Sample
                     massResultRowToUpdate.IsMassLoadingCalculationRequired = false; //always FALSE for mass loading result
                     if (!String.IsNullOrEmpty(massResultRowToUpdate.EnteredValue))
                     {
-                        Double massValueAsDouble, mdlAsDouble;
+                        Double massValueAsDouble;
                         if (!Double.TryParse(massResultRowToUpdate.EnteredValue, out massValueAsDouble))
                         {
                             //Could not convert
                             return -1; // throw exception than -1 as that will wrongly treat as sample ID
                         }
                         massResultRowToUpdate.Value = massValueAsDouble; 
+                    }
 
-                        if( double.TryParse(massResultRowToUpdate.EnteredMethodDetectionLimit, out mdlAsDouble))
-                        {
-                            massResultRowToUpdate.MethodDetectionLimit = mdlAsDouble; 
-                        }
-                    }
-                    if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
-                    {
-                        massResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
-                            .GetDateTimeOffsetFromLocalUsingThisTimeZoneId(sampleResultDto.AnalysisDateTimeLocal.Value, timeZoneId);
-                    }
                     massResultRowToUpdate.LimitBasisId = massLimitBasisId;
                     massResultRowToUpdate.LimitTypeId = dailyLimitTypeId;
                     massResultRowToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
@@ -370,7 +361,7 @@ namespace Linko.LinkoExchange.Services.Sample
         /// Saves a Sample to the database after validating. Throw a list of RuleViolation exceptions
         /// for failed validation issues. If SampleDto.IsReadyToReport is true, validation is more strict.
         /// </summary>
-        /// <param name="sample">Sample Dto</param>
+        /// <param name="sampleDto">Sample Dto</param>
         /// <returns>Existing Sample Id or newly created Sample Id</returns>
         public int SaveSample(SampleDto sampleDto)
         {

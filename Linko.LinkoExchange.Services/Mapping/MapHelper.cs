@@ -1049,10 +1049,10 @@ namespace Linko.LinkoExchange.Services.Mapping
             //existingSampleResult.Value = Convert.ToDouble(dto.MassLoadingValue), //set outside after calling line
             existingSampleResult.UnitId = dto.MassLoadingUnitId;
             existingSampleResult.UnitName = dto.MassLoadingUnitName;
-            existingSampleResult.EnteredMethodDetectionLimit = dto.EnteredMethodDetectionLimit;
-            existingSampleResult.AnalysisMethod = dto.AnalysisMethod;
-            //existingSampleResult.AnalysisDateTimeUtc = set outside after calling line
-            existingSampleResult.IsApprovedEPAMethod = dto.IsApprovedEPAMethod;
+            //existingSampleResult.EnteredMethodDetectionLimit  // do not save. see more details in #Bug 4316
+            //existingSampleResult.AnalysisMethod // do not save. see more details in #Bug 4316
+            //existingSampleResult.AnalysisDateTimeUtc  // do not save. see more details in #Bug 4316
+            //existingSampleResult.IsApprovedEPAMethod // do not save. see more details in #Bug 4316
             existingSampleResult.IsCalculated = true;
             //existingSampleResult.LimitTypeId = set outside after calling line
             //existingSampleResult.LimitBasisId = set outside after calling line
