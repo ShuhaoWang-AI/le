@@ -68,6 +68,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Flow")]
         public string FlowValue { get; set; }
 
+        [Display(Name = "Flow Unit")]
         public int? FlowUnitId { get; set; }
         public string FlowUnitName { get; set; }
         public IEnumerable<UnitDto> FlowUnitValidValues { get; set; }

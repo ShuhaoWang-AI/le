@@ -1170,31 +1170,46 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult NewSampleDetailsStep2(SampleViewModel model, FormCollection collection)
         {
             int id;
-            try
+            if (ModelState.IsValid)
             {
-                var objJavascript = new JavaScriptSerializer();
+                try
+                {
+                    var objJavascript = new JavaScriptSerializer();
 
-                model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input:collection[name:"FlowUnitValidValues"]);
-                model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input:HttpUtility.HtmlDecode(s:collection[name:"SampleResults"]));
+                    model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input: collection[name: "FlowUnitValidValues"]);
+                    model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input: HttpUtility.HtmlDecode(s: collection[name: "SampleResults"]));
 
-                var vm = ConvertSampleViewModelToDto(model:model);
+                    var vm = ConvertSampleViewModelToDto(model: model);
 
-                id = _sampleService.SaveSample(sample:vm);
+                    id = _sampleService.SaveSample(sample: vm);
+
+                    TempData[key: "ShowSuccessMessage"] = true;
+                    TempData[key: "SuccessMessage"] = "Sample updated successfully!";
+
+                    ModelState.Clear();
+
+                    return RedirectToAction(actionName: "SampleDetails", controllerName: "Industry", routeValues: new { id });
+                }
+                catch (RuleViolationException rve)
+                {
+                    MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
+                }
             }
-            catch (RuleViolationException rve)
+            else
             {
-                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
-
-                ViewBag.Satus = "New";
-                AddAdditionalPropertyToSampleDetails(viewModel:model);
-                return View(viewName:"SampleDetails", model:model);
+                if (ModelState[key: "."] != null)
+                {
+                    foreach (var issue in ModelState[key: "."].Errors)
+                    {
+                        ModelState.AddModelError(key: string.Empty, errorMessage: issue.ErrorMessage);
+                    }
+                }
             }
 
-            TempData[key:"ShowSuccessMessage"] = true;
-            TempData[key:"SuccessMessage"] = "Sample updated successfully!";
-
-            ModelState.Clear();
-            return RedirectToAction(actionName:"SampleDetails", controllerName:"Industry", routeValues:new {id});
+            ViewBag.Satus = "New";
+            model.FlowUnitValidValues = _unitService.GetFlowUnitValidValues();
+            AddAdditionalPropertyToSampleDetails(viewModel: model);
+            return View(viewName: "SampleDetails", model: model);
         }
 
         [Route(template:"Sample/{id:int}/Details")]
