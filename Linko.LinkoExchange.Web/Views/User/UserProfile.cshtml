@@ -67,19 +67,17 @@
                                            @class = "alert alert-danger"
                                        })
                 }
+ 
+                @{
+                    var showMessage = ViewBag.SaveProfileSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage); 
+                    @Html.Partial("_MessageView", new { showMessage = showMessage, message = ViewBag.SuccessMessage });
 
-                @if (ViewBag.SaveProfileSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage))
-                {
-                    <div class="alert alert-dismissible alert-success">
-                        <button aria-hidden="true" class="close" data-dismiss="alert" type="button">
-                            &times;
-                        </button>
-                        <h5>
-                            <i class="fa fa-check icon"></i>
-                            @ViewBag.SuccessMessage
-                        </h5>
-                    </div>
-                }
+                    showMessage = ViewBag.changeEmailSucceed != null && ViewBag.changeEmailSucceed;
+                    @Html.Partial("_MessageView", new { showMessage = showMessage, message = "Email successfully changed." });
+
+                     showMessage = ViewBag.changePasswordSucceed != null && ViewBag.changePasswordSucceed;
+                    @Html.Partial("_MessageView", new { showMessage = showMessage, message = "Password successfully changed." });
+                }                 
             </div>
 
             <section class="box-body form-horizontal">
@@ -473,19 +471,11 @@
                                            @class = "alert alert-danger"
                                        })
                 }
-
-                @if (ViewBag.SaveKBQSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage))
-                {
-                    <div class="alert alert-dismissible alert-success">
-                        <button aria-hidden="true" class="close" data-dismiss="alert" type="button">
-                            &times;
-                        </button>
-                        <h5>
-                            <i class="fa fa-check icon"></i>
-                            @ViewBag.SuccessMessage
-                        </h5>
-                    </div>
-                }
+                
+                @{
+                    var showMessage = ViewBag.SaveKBQSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage);
+                    @Html.Partial("_MessageView", new { showMessage = showMessage, message = ViewBag.SuccessMessage });
+                } 
             </div>
 
             <section class="box-body form-horizontal">
@@ -846,20 +836,12 @@
                                            @class = "alert alert-danger"
                                        })
                 }
+                
+                @{
+                    var showMessage = ViewBag.SaveSQSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage); 
 
-                @if (ViewBag.SaveSQSuccessfull != null && !string.IsNullOrWhiteSpace(value:ViewBag.SuccessMessage))
-                {
-                    <div class="alert alert-dismissible alert-success">
-                        <button aria-hidden="true" class="close" data-dismiss="alert" type="button">
-                            &times;
-                        </button>
-                        <h5>
-                            <i class="fa fa-check icon"></i>
-                            @ViewBag.SuccessMessage
-                        </h5>
-                    </div>
-                }
-
+                    @Html.Partial("_MessageView", new { showMessage = showMessage, message = ViewBag.SuccessMessage });
+                } 
             </div>
 
             <section class="box-body form-horizontal">

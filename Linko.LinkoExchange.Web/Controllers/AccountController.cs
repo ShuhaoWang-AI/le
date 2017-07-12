@@ -1130,7 +1130,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             var result = _authenticationService.ChangePasswordAsync(userId:userId, newPassword:model.Password).Result;
             if (result.Success)
             {
-                return RedirectToAction(actionName:"ChangePasswordConfirmation");
+                TempData["ChangePasswordSucceed"] = true;
+                TempData[key:"KbqPass"] = "true";
+                return RedirectToAction(actionName: "Profile", controllerName: "User");
             }
 
             var errorMessage = result.Errors.Aggregate((i, j) => i + j);
@@ -1202,7 +1204,9 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 _authenticationService.UpdateClaim(key:CacheKey.Email, value:model.NewEmail);
                 
-                return RedirectToAction(actionName:"ChangeEmailConfirmation");
+                TempData["ChangeEmailSucceed"] = true;
+                TempData[key:"KbqPass"] = "true";
+                return RedirectToAction(actionName: "Profile", controllerName: "User"); 
             }
         }
         

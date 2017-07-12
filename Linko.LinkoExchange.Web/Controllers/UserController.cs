@@ -116,8 +116,9 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             ViewBag.userKBQ = userKbqViewModel;
             ViewBag.userProfile = userProfileViewModel;
-            ViewBag.userSQ = userSqViewModel;
-
+            ViewBag.userSQ = userSqViewModel; 
+            ViewBag.changeEmailSucceed = TempData["ChangeEmailSucceed"];
+            ViewBag.changePasswordSucceed = TempData["ChangePasswordSucceed"];
             return View(model:user);
         }
         
@@ -165,7 +166,19 @@ namespace Linko.LinkoExchange.Web.Controllers
         private bool NeedToValidKbq()
         {
             var previousUri = HttpContext.Request.UrlReferrer;
-            return previousUri == null || previousUri.AbsolutePath.ToLower().IndexOf(value:"account/changeaccountsucceed", comparisonType:StringComparison.Ordinal) < 0;
+            if( previousUri == null)
+            {
+                return true;
+            }
+
+            if(previousUri.AbsolutePath.ToLower().IndexOf(value:"account/ChangeEmail", comparisonType:StringComparison.OrdinalIgnoreCase) >=0 ||
+               previousUri.AbsolutePath.ToLower().IndexOf(value:"account/ChangePassword", comparisonType:StringComparison.OrdinalIgnoreCase) >=0 )
+            {
+                var kbqPass = TempData[key:"KbqPass"] as string;
+                return string.IsNullOrWhiteSpace(value:kbqPass) || kbqPass.ToLower() != "true";
+            }
+
+            return previousUri.AbsolutePath.ToLower().IndexOf(value:"account/changeaccountsucceed", comparisonType:StringComparison.Ordinal) < 0;
         }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
