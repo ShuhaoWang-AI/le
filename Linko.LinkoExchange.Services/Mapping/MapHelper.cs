@@ -434,7 +434,8 @@ namespace Linko.LinkoExchange.Services.Mapping
             paramGroupDto.Parameters = new List<ParameterDto>();
             foreach (var paramAssocation in parameterGroup.ParameterGroupParameters)
             {
-                paramGroupDto.Parameters.Add(GetParameterDtoFromParameter(paramAssocation.Parameter));
+                if (!paramAssocation.Parameter.IsRemoved)
+                    paramGroupDto.Parameters.Add(GetParameterDtoFromParameter(paramAssocation.Parameter));
             }
 
             return paramGroupDto;
