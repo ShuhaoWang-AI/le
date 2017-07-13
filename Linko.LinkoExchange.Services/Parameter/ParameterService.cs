@@ -211,7 +211,10 @@ namespace Linko.LinkoExchange.Services.Parameter
 
             if (isGetActiveOnly.HasValue && isGetActiveOnly.Value)
             {
-                foundParamGroups = foundParamGroups.Where(param => param.IsActive).ToList();
+                foundParamGroups = foundParamGroups
+                    .Where(param => param.IsActive 
+                        && param.ParameterGroupParameters.Count(pgp => !pgp.Parameter.IsRemoved) > 0)
+                    .ToList();
             }
 
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
