@@ -122,22 +122,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                 orgRegProgramId = viewModel.OrgRegProgramId;
             }
 
-            var redirectUrl = GetRedirectUrl(invitationType:viewModel.InvitationType, industryOrgRegProgramId:orgRegProgramId);
-
+           var redirectUrl = GetRedirectUrl(invitationType:viewModel.InvitationType, industryOrgRegProgramId:orgRegProgramId);
             var result = _invitationService.SendUserInvite(orgRegProgramId:orgRegProgramId, email:viewModel.EmailAddress, firstName:viewModel.FirstName, lastName:viewModel.LastName,
                                                            invitationType:viewModel.InvitationType);
             if (result.Success)
             {
                 _logger.Info(message:string.Format(format:"Invite successfully sent. Email={0}, FirstName={1}, LastName={2}.",
                                                    arg0:viewModel.EmailAddress, arg1:viewModel.FirstName, arg2:viewModel.LastName));
-
-                //return new RedirectResult(redirectUrl);
-                return View(viewName:"Confirmation", model:new ConfirmationViewModel
-                                                           {
-                                                               Title = "Invitation Confirmation",
-                                                               Message = "An invitation has been sent",
-                                                               HtmlStr = "<p><a href=\"#\" onclick=\"location.href='" + redirectUrl + "'\" class=\"btn btn-sm btn-primary\">OK</a></p>"
-                                                           });
+                TempData["InivteSendSucceed"] = true; 
+                return Redirect(redirectUrl);  
             }
             foreach (var error in result.Errors)
             {
@@ -163,14 +156,13 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             var redirectUrl = GetRedirectUrl(invitationType:thisInvitationType, industryOrgRegProgramId:orgRegProgramId);
-
             var result = _invitationService.SendUserInvite(orgRegProgramId:orgRegProgramId, email:"", firstName:"", lastName:"", invitationType:thisInvitationType,
                                                            existingOrgRegProgramUserId:orgRegProgramUserId);
             if (result.Success)
             {
-                _logger.Info(message:
-                             string.Format(format:"Invite successfully sent to existing user in different program. OrgRegProgUserId={0} from ProgramId={1}", arg0:orgRegProgramUserId,
-                                           arg1:orgRegProgramId));
+                _logger.Info(message: $"Invite successfully sent to existing user in different program. OrgRegProgUserId={orgRegProgramUserId} from ProgramId={orgRegProgramId}") ;
+                TempData["InivteSendSucceed"] = true; 
+                return Redirect(redirectUrl);  
             }
             else
             {
@@ -180,15 +172,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                                  string.Format(format:"Invite failed to send to existing user {0} in different program. Error={1} from ProgramId={2}", arg0:orgRegProgramUserId, arg1:error,
                                                arg2:orgRegProgramId));
                 }
-            }
 
-            //return new RedirectResult(redirectUrl);
-            return View(viewName:"Confirmation", model:new ConfirmationViewModel
+               //return new RedirectResult(redirectUrl);
+                return View(viewName:"Confirmation", model:new ConfirmationViewModel
                                                        {
                                                            Title = "Invitation Confirmation",
                                                            Message = "An invitation has been sent",
                                                            HtmlStr = "<p><a href=\"#\" onclick=\"location.href='" + redirectUrl + "'\" class=\"btn btn-sm btn-primary\">OK</a></p>"
                                                        });
+            }
         }
 
         private string GetRedirectUrl(InvitationType invitationType, int? industryOrgRegProgramId = null)
@@ -208,6 +200,6 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
 
             return @"../";
-        }
+        } 
     }
 }
