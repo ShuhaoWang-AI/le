@@ -80,21 +80,48 @@ namespace Linko.LinkoExchange.Services.Program
                 {
                     u.UserProfileDto = _mapHelper.GetUserDtoFromUserProfile(_linkoExchangeDbContext.Users.SingleOrDefault(user => user.UserProfileId == u.UserProfileId));
 
-                    //Check if the authority is disabled, making all it's IU's disabled too
-                    if (u.OrganizationRegulatoryProgramDto.IsEnabled && u.OrganizationRegulatoryProgramDto.RegulatorOrganizationId != null)
+                    //Check if any of the authorities up the chain are disabled, making all it's IU's disabled too
+                    var traversedAuthorityList = GetTraversedAuthorityList(u.OrganizationRegulatoryProgramDto.OrganizationRegulatoryProgramId);
+                    if (traversedAuthorityList.Any(authority => !authority.IsEnabled))
                     {
-                        //Disable if it's authority is disabled
-                        var regulatorOrganization = _linkoExchangeDbContext.OrganizationRegulatoryPrograms
-                            .Single(orp => orp.OrganizationId == u.OrganizationRegulatoryProgramDto.RegulatorOrganizationId
-                                && orp.RegulatoryProgramId == u.OrganizationRegulatoryProgramDto.RegulatoryProgramId);
-
-                        u.OrganizationRegulatoryProgramDto.IsEnabled = regulatorOrganization.IsEnabled;
+                        u.OrganizationRegulatoryProgramDto.IsEnabled = false;
                     }
-                    
+
                 }
 
             }
             return organziationRegulatoryProgramUserDtos;
+        }
+
+        public IEnumerable<OrganizationRegulatoryProgramDto> GetTraversedAuthorityList(int orgRegProgramId, List<OrganizationRegulatoryProgramDto> authorityList = null)
+        {
+            if (authorityList == null)
+                authorityList = new List<Dto.OrganizationRegulatoryProgramDto>();
+
+            var orgRegProgram = _linkoExchangeDbContext.OrganizationRegulatoryPrograms
+                .SingleOrDefault(orp => orp.OrganizationRegulatoryProgramId == orgRegProgramId);
+
+            if (orgRegProgram != null && orgRegProgram.RegulatorOrganizationId != null)
+            {
+                //Fetch authority
+                var authority = _linkoExchangeDbContext.OrganizationRegulatoryPrograms
+                    .SingleOrDefault(orp => orp.OrganizationId == orgRegProgram.RegulatorOrganizationId
+                        && orp.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
+
+                if (authority != null)
+                {
+                    //prevent circular references by checking if authority exists in list already
+                    if (!authorityList.Any(orp => orp.OrganizationRegulatoryProgramId == authority.OrganizationRegulatoryProgramId))
+                    {
+                        var authorityDto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(authority);
+                        authorityList.Add(authorityDto);
+                        return GetTraversedAuthorityList(authority.OrganizationRegulatoryProgramId, authorityList);
+                    }
+                }
+
+            }
+
+            return authorityList;
         }
 
         public OrganizationRegulatoryProgramUserDto CreateOrganizationRegulatoryProgramForUser(int userProfileId, int organizationRegulatoryProgramId, int inviterOrganizationRegulatoryProgramId, RegistrationType registrationType)
