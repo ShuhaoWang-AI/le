@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -27,7 +28,7 @@ namespace Linko.LinkoExchange.Test
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             _logger = new Mock<ILogger>();
-            _settingService = new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper());
+            _settingService = new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object);
         }
 
         [TestMethod]

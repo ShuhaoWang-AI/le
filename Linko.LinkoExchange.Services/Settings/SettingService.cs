@@ -11,6 +11,8 @@ using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
+using System.Web.Caching;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Services.Settings
 {
@@ -21,6 +23,7 @@ namespace Linko.LinkoExchange.Services.Settings
         private readonly LinkoExchangeContext _dbContext;
         private readonly ILogger _logger;
         private readonly IMapHelper _mapHelper;
+        private readonly IApplicationCache _cache;
 
         private  Dictionary<SystemSettingType, string> _globalSettings = new Dictionary<SystemSettingType, string>();
 
@@ -28,11 +31,12 @@ namespace Linko.LinkoExchange.Services.Settings
         #endregion
 
         public SettingService(LinkoExchangeContext dbContext, ILogger logger,
-            IMapHelper mapHelper)
+            IMapHelper mapHelper, IApplicationCache cache)
         {
             _dbContext = dbContext; 
             _logger = logger;
             _mapHelper = mapHelper;
+            _cache = cache;
 
             var systemSettings = _dbContext.SystemSettings.ToList(); 
 
@@ -430,10 +434,23 @@ namespace Linko.LinkoExchange.Services.Settings
 
         public string GetOrganizationSettingValue(int orgRegProgramId, SettingType settingType)
         {
+            string cacheKey = $"{orgRegProgramId}-{settingType}";
+            if (settingType == SettingType.TimeZone && _cache.Get(cacheKey) != null)
+            {
+                return (string)_cache.Get(cacheKey);
+            }
+
             OrganizationRegulatoryProgram authority = GetAuthority(orgRegProgramId: orgRegProgramId);
-            return _dbContext.OrganizationSettings
+            var settingValue = _dbContext.OrganizationSettings
                .Single(s => s.OrganizationId == authority.OrganizationId
                && s.SettingTemplate.Name == settingType.ToString()).Value;
+
+            //Cache time zone value only
+            if (settingType == SettingType.TimeZone)
+                _cache.Insert(cacheKey, settingValue);
+
+            return settingValue;
+
         }
 
         public string GetOrganizationSettingValue(int organizationId, int regProgramId, SettingType settingType)

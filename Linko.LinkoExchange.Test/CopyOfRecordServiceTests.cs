@@ -71,7 +71,7 @@ namespace Linko.LinkoExchange.Test
             _settingService.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>()))
                 .Returns("1");
 
-            _actualTimeZoneService = new TimeZoneService(_dbContext, _settService, new MapHelper());
+            _actualTimeZoneService = new TimeZoneService(_dbContext, _settService, new MapHelper(), new Mock<IApplicationCache>().Object);
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
 
             _userService = new UserService(_dbContext, _auditLoger.Object, _passwordHasher.Object, _httpContext.Object, emailService.Object,

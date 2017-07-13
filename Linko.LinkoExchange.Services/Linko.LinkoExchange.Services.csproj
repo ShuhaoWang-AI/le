@@ -115,6 +115,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseService\BaseService.cs" />
+    <Compile Include="Cache\ApplicationCache.cs" />
+    <Compile Include="Cache\IApplicationCache.cs" />
     <Compile Include="Config\ConfigSettingService.cs" />
     <Compile Include="CopyOfRecord\CertificateDigitalSignatureManager.cs" />
     <Compile Include="CopyOfRecord\CopyOfRecordService.cs" />

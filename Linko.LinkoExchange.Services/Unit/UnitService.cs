@@ -22,6 +22,7 @@ namespace Linko.LinkoExchange.Services.Unit
         private readonly ITimeZoneService _timeZoneService;
         private readonly IOrganizationService _orgService;
         private readonly ISettingService _settingService;
+        private readonly ISessionCache _sessionCache;
 
         public UnitService(
             LinkoExchangeContext dbContext,
@@ -30,7 +31,8 @@ namespace Linko.LinkoExchange.Services.Unit
             IHttpContextService httpContextService,
             ITimeZoneService timeZoneService,
             IOrganizationService orgService,
-            ISettingService settingService)
+            ISettingService settingService,
+            ISessionCache sessionCache)
         {
             if (dbContext == null)
             {
@@ -67,6 +69,11 @@ namespace Linko.LinkoExchange.Services.Unit
                 throw new ArgumentNullException(nameof(settingService));
             }
 
+            if (sessionCache == null)
+            {
+                throw new ArgumentNullException(nameof(sessionCache));
+            }
+
             _dbContext = dbContext;
             _mapHelper = mapHelper;
             _logger = logger;
@@ -74,6 +81,7 @@ namespace Linko.LinkoExchange.Services.Unit
             _timeZoneService = timeZoneService;
             _orgService = orgService;
             _settingService = settingService;
+            _sessionCache = sessionCache;
         }
 
         /// <summary>
@@ -132,20 +140,28 @@ namespace Linko.LinkoExchange.Services.Unit
             _logger.Info("Enter UnitService.GetFlowUnitsFromCommaDelimitedString.");
 
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            var authOrganizationId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationId;
-            var flowUnitsArray = commaDelimitedString.Split(',');
 
-            var units = _dbContext.Units
-                .Where(i => i.IsFlowUnit
-                    && i.OrganizationId == authOrganizationId
-                    && flowUnitsArray.Contains(i.Name)
-                    ).ToList();
+            string cacheKey = $"GetFlowUnitsFromCommaDelimitedString-{commaDelimitedString}";
+            if (_sessionCache.GetValue(cacheKey) == null)
+            {
+                var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms
+                    .Single(orp => orp.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+                var authorityOrganizationId = orgRegProgram.RegulatorOrganizationId ?? orgRegProgram.OrganizationId;
+                var flowUnitsArray = commaDelimitedString.Split(',');
 
-            var unitDtos = UnitDtosHelper(units);
+                var units = _dbContext.Units
+                    .Where(i => i.IsFlowUnit
+                        && i.OrganizationId == authorityOrganizationId
+                        && flowUnitsArray.Contains(i.Name)
+                        ).ToList();
+
+                var unitDtos = UnitDtosHelper(units);
+                _sessionCache.SetValue(cacheKey, unitDtos);
+            }
 
             _logger.Info("Leave UnitService.GetFlowUnitsFromCommaDelimitedString.");
 
-            return unitDtos;
+            return (List<UnitDto>)_sessionCache.GetValue(cacheKey);
         }
 
         /// <summary>

@@ -40,6 +40,8 @@ namespace Linko.LinkoExchange.Test
         Mock<ICromerrAuditLogService> _cromerrService = new Mock<ICromerrAuditLogService>();
         Mock<IRequestCache> _requestCache = new Mock<IRequestCache>();
         Mock<IAuditLogService> _auditLogService = new Mock<IAuditLogService>();
+        Mock<IApplicationCache> _mockAppCache = new Mock<IApplicationCache>();
+        Mock<ISessionCache> _mockSessionCache = new Mock<ISessionCache>();
 
         public ReportPackageServiceTests()
         {
@@ -54,8 +56,23 @@ namespace Linko.LinkoExchange.Test
             _orgService = new Mock<IOrganizationService>();
             _logger = new Mock<ILogger>();
             _timeZoneService = new Mock<ITimeZoneService>();
-            var actualSettingService = new SettingService(connection, _logger.Object, new MapHelper());
-            var actualTimeZoneService = new TimeZoneService(connection, actualSettingService, new MapHelper());
+
+            _mockAppCache = new Mock<IApplicationCache>();
+            _mockAppCache.Setup(c => c.Get("1-TimeZone")).Returns("6");
+            _mockAppCache.Setup(c => c.Get("VolumeFlowRateLimitBasisId")).Returns("3");
+            _mockAppCache.Setup(c => c.Get("TimeZoneId_6")).Returns("Eastern Standard Time");
+
+            var cachedFlowUnits = new List<UnitDto>();
+            cachedFlowUnits.Add(new UnitDto() { UnitId = 1, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah" });
+            cachedFlowUnits.Add(new UnitDto() { UnitId = 2, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah" });
+            cachedFlowUnits.Add(new UnitDto() { UnitId = 3, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah" });
+            cachedFlowUnits.Add(new UnitDto() { UnitId = 4, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah" });
+            cachedFlowUnits.Add(new UnitDto() { UnitId = 5, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah" });
+            _mockSessionCache = new Mock<ISessionCache>();
+            _mockSessionCache.Setup(c => c.GetValue("GetFlowUnitsFromCommaDelimitedString-gpd,mgd")).Returns(cachedFlowUnits);
+
+            var actualSettingService = new SettingService(connection, _logger.Object, new MapHelper(), _mockAppCache.Object);
+            var actualTimeZoneService = new TimeZoneService(connection, actualSettingService, new MapHelper(), _mockAppCache.Object);
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
 
             var authorityOrgRegProgramDto = new OrganizationRegulatoryProgramDto();
@@ -88,8 +105,8 @@ namespace Linko.LinkoExchange.Test
 
             _requestCache.Setup(s => s.GetValue(CacheKey.Token)).Returns("some_token_string");
 
-            var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, actualSettingService);
-            var actualSampleService = new SampleService(connection, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService);
+            var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, actualSettingService, _mockSessionCache.Object);
+            var actualSampleService = new SampleService(connection, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService, _mockAppCache.Object);
 
             var actualAuditLogService = new EmailAuditLogService(connection, _requestCache.Object, new MapHelper());
             var actualEmailService = new LinkoExchangeEmailService(connection, actualAuditLogService, _programService.Object, _settingService.Object, _requestCache.Object);
@@ -250,8 +267,24 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetSamplesForSelection()
         {
+            var originalCount = 78665;
+            //68824 = "GetFlowUnitsFromCommaDelimitedString" commented out
+            //64501 = optimized linq
+            //60351 = logging removed + only checking for last submitted if associated with any reports
+            //44859 = cached timezone
+            //39136 = cached "flow" limit basis id
+            //25011 = app caching time zone name fetch
+            //16030 = GetFlowUnitsFromCommaDelimitedString caching List<UnitDto>
+
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+
             var eligibleSamples = _reportPackageService.GetSamplesForSelection(1);
 
+            watch.Stop();
+
+            var elapsedMs = watch.ElapsedMilliseconds;
+
+            decimal percentageImprovement = Math.Round(Decimal.Divide((originalCount - elapsedMs), originalCount)*100, 2);
         }
 
         [TestMethod]

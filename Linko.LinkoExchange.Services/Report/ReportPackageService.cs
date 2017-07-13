@@ -1605,6 +1605,12 @@ namespace Linko.LinkoExchange.Services.Report
             var currentOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
 
+            var associatedSampleIds = _dbContext.ReportSamples
+                .OrderBy(rs => rs.SampleId)
+                .Select(rs => rs.SampleId)
+                .Distinct()
+                .ToList();
+
             var existingSamplesReportPackageElementType = _dbContext.ReportPackageElementTypes
                                 .Include(rp => rp.ReportPackageElementCategory.ReportPackage)
                                 .Include(rp => rp.ReportPackageElementCategory.ReportElementCategory)
@@ -1628,24 +1634,26 @@ namespace Linko.LinkoExchange.Services.Report
                                 (s.EndDateTimeUtc <= reportPackage.PeriodEndDateTimeUtc && s.EndDateTimeUtc >= reportPackage.PeriodStartDateTimeUtc)))
                          .ToList();
 
+
             foreach (var existingEligibleSample in existingEligibleSamples)
             {
-                var sampleDto = _sampleService.GetSampleDetails(existingEligibleSample);
+                var sampleDto = _sampleService.GetSampleDetails(existingEligibleSample, isLoggingDisabled: true);
 
-                sampleDto.IsAssociatedWithReportPackage = existingSamplesReportPackageElementType
-                                                            .ReportSamples.Any(rs => rs.SampleId == existingEligibleSample.SampleId);
+                sampleDto.IsAssociatedWithReportPackage = associatedSampleIds.IndexOf(existingEligibleSample.SampleId) != -1;
 
-                var lastSubmittedReportPackage = _dbContext.Samples
-                    .Single(s => s.SampleId == existingEligibleSample.SampleId)
-                        .ReportSamples
-                        .Select(rs => rs.ReportPackageElementType.ReportPackageElementCategory.ReportPackage)
+                if (sampleDto.IsAssociatedWithReportPackage)
+                {
+                    var lastSubmittedReportPackage = existingSamplesReportPackageElementType.ReportSamples
+                    .Where(rs => rs.SampleId == existingEligibleSample.SampleId)
+                    .Select(rs => rs.ReportPackageElementType.ReportPackageElementCategory.ReportPackage)
                         .Where(rp => rp.SubmissionDateTimeUtc.HasValue)
                         .OrderByDescending(rp => rp.SubmissionDateTimeUtc)
                         .FirstOrDefault();
 
-                if (lastSubmittedReportPackage != null)
-                {
-                    sampleDto.LastSubmissionDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(lastSubmittedReportPackage.SubmissionDateTimeUtc.Value.UtcDateTime, timeZoneId);
+                    if (lastSubmittedReportPackage != null)
+                    {
+                        sampleDto.LastSubmissionDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(lastSubmittedReportPackage.SubmissionDateTimeUtc.Value.UtcDateTime, timeZoneId);
+                    }
                 }
 
                 eligibleSampleList.Add(sampleDto);

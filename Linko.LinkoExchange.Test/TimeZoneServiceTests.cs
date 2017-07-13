@@ -7,6 +7,7 @@ using System;
 using Moq;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Services.Mapping;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -29,7 +30,7 @@ namespace Linko.LinkoExchange.Test
             _settings.Setup(i => i.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<SettingType>())).Returns("4");
 
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            _tZservice = new TimeZoneService(new LinkoExchangeContext(connectionString), _settings.Object, new MapHelper());
+            _tZservice = new TimeZoneService(new LinkoExchangeContext(connectionString), _settings.Object, new MapHelper(), new Mock<IApplicationCache>().Object);
         }
 
         [TestMethod]

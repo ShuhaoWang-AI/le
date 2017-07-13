@@ -40,5 +40,11 @@ namespace Linko.LinkoExchange.Test
             var result = _programService.GetUserRegulatoryPrograms(1);
         }
 
+        [TestMethod]
+        public void GetTraversedAuthorityList_TEST()
+        {
+            var result = _programService.GetTraversedAuthorityList(13);
+        }
+
     }
 }

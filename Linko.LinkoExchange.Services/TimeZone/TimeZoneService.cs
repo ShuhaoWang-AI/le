@@ -1,5 +1,6 @@
 ﻿using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Settings;
@@ -14,17 +15,26 @@ namespace Linko.LinkoExchange.Services.TimeZone
         private readonly LinkoExchangeContext _dbContext;
         private readonly ISettingService _settings;
         private readonly IMapHelper _mapHelper;
+        private readonly IApplicationCache _appCache;
 
-        public TimeZoneService(LinkoExchangeContext dbContext, ISettingService settings, IMapHelper mapHelper)
+        public TimeZoneService(LinkoExchangeContext dbContext, ISettingService settings, IMapHelper mapHelper, IApplicationCache appCache)
         {
             _dbContext = dbContext;
             _settings = settings;
             _mapHelper = mapHelper;
+            _appCache = appCache;
         }
 
         public string GetTimeZoneName(int timeZoneId)
         {
-            return (_dbContext.TimeZones.Single(t => t.TimeZoneId == timeZoneId).Name);
+            string cacheKey = $"TimeZoneId_{timeZoneId}";
+            if (_appCache.Get(cacheKey) == null)
+            {
+                var cacheItem = _dbContext.TimeZones.Single(t => t.TimeZoneId == timeZoneId).Name;
+                _appCache.Insert(cacheKey, cacheItem);
+            }
+
+            return (string)_appCache.Get(cacheKey);
         }
 
         public TimeZoneDto GetTimeZone(int timeZoneId)

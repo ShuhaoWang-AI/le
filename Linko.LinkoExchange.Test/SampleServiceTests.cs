@@ -18,6 +18,7 @@ using System.Reflection;
 using Linko.LinkoExchange.Services.Unit;
 using System.Diagnostics;
 using Linko.LinkoExchange.Core.Resources;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -48,8 +49,8 @@ namespace Linko.LinkoExchange.Test
             _settingsService = new Mock<ISettingService>();
             _unitService = new Mock<IUnitService>();
 
-            var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper()), new MapHelper());
-            var actualSettings = new SettingService(connection, _logger.Object, new MapHelper());
+            var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object), new MapHelper(), new Mock<IApplicationCache>().Object);
+            var actualSettings = new SettingService(connection, _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object);
 
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
             _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1, OrganizationId = 1000 });
@@ -60,7 +61,8 @@ namespace Linko.LinkoExchange.Test
                 _httpContext.Object,
                 actualTimeZoneService,
                 _orgService.Object,
-                actualSettings);
+                actualSettings,
+                new Mock<ISessionCache>().Object);
 
             _sampleService = new SampleService(connection, 
                 _httpContext.Object, 
@@ -69,7 +71,8 @@ namespace Linko.LinkoExchange.Test
                 _logger.Object,
                 actualTimeZoneService,
                 actualSettings,
-                actualUnitService);
+                actualUnitService,
+                new Mock<IApplicationCache>().Object);
         }
 
         #region Private helper functions

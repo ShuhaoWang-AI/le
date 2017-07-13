@@ -30,6 +30,7 @@ namespace Linko.LinkoExchange.Services.Sample
         private readonly ITimeZoneService _timeZoneService;
         private readonly ISettingService _settings;
         private readonly IUnitService _unitService;
+        private readonly IApplicationCache _cache;
 
         public SampleService(LinkoExchangeContext dbContext,
             IHttpContextService httpContext,
@@ -38,7 +39,8 @@ namespace Linko.LinkoExchange.Services.Sample
             ILogger logger,
             ITimeZoneService timeZoneService,
             ISettingService settings,
-            IUnitService unitService)
+            IUnitService unitService,
+            IApplicationCache cache)
         {
             _dbContext = dbContext;
             _httpContext = httpContext;
@@ -48,6 +50,7 @@ namespace Linko.LinkoExchange.Services.Sample
             _timeZoneService = timeZoneService;
             _settings = settings;
             _unitService = unitService;
+            _cache = cache;
         }
 
         public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
@@ -734,19 +737,34 @@ namespace Linko.LinkoExchange.Services.Sample
             }
         }
 
+        private int GetVolumeFlowRateLimitBasisId()
+        {
+            if (_cache.Get("VolumeFlowRateLimitBasisId") == null)
+            {
+                var flowlimitBasisId = _dbContext.LimitBases
+                    .Single(lb => lb.Name == LimitBasisName.VolumeFlowRate.ToString()).LimitBasisId;
+
+                _cache.Insert("VolumeFlowRateLimitBasisId", flowlimitBasisId);
+            }
+
+            return Convert.ToInt32(_cache.Get("VolumeFlowRateLimitBasisId"));
+
+        }
+
         /// <summary>
         /// Converts a Sample POCO into the complete details of a single Sample (Dto)
         /// </summary>
         /// <param name="sample">POCO</param>
         /// <param name="isIncludeChildObjects">Switch to load result list or not (for display in grid)</param>
         /// <returns></returns>
-        public SampleDto GetSampleDetails(Core.Domain.Sample sample, bool isIncludeChildObjects = true)
+        public SampleDto GetSampleDetails(Core.Domain.Sample sample, bool isIncludeChildObjects = true, bool isLoggingDisabled = false)
         {
-            _logger.Info($"Enter SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
+            if (!isLoggingDisabled)
+                _logger.Info($"Enter SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
+
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
-            int flowLimitBasisId = _dbContext.LimitBases
-                .Single(lb => lb.Name == LimitBasisName.VolumeFlowRate.ToString()).LimitBasisId;
+            int flowLimitBasisId = GetVolumeFlowRateLimitBasisId();
 
             var dto = _mapHelper.GetSampleDtoFromSample(sample);
 
@@ -872,7 +890,10 @@ namespace Linko.LinkoExchange.Services.Sample
             }
 
             dto.SampleResults = resultDtoList.Values.ToList();
-            _logger.Info($"Leaving SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
+
+            if (!isLoggingDisabled)
+                    _logger.Info($"Leaving SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
+
             return dto;
         }
 

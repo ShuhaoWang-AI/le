@@ -49,10 +49,10 @@ namespace Linko.LinkoExchange.Test
             _settingService.Setup(x => x.GetGlobalSettings()).Returns(globalSettingLookup);
             _settingService.Setup(x => x.GetOrganizationSettingValue(It.IsAny<int>(), It.IsAny<int>(), SettingType.TimeZone)).Returns("1");
 
-            _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString), _settingService.Object, new MapHelper());
+            _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString), _settingService.Object, new MapHelper(), new Mock<IApplicationCache>().Object);
 
             orgService = new OrganizationService(new LinkoExchangeContext(connectionString), 
-                new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper()), _httpContext.Object,
+                new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object), _httpContext.Object,
                 new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), _timeZones, new MapHelper());
         }
 

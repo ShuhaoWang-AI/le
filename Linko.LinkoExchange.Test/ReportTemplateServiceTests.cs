@@ -16,6 +16,8 @@ using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Unit;
+using Linko.LinkoExchange.Services.Config;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -46,8 +48,8 @@ namespace Linko.LinkoExchange.Test
             _orgService = new Mock<IOrganizationService>();
             _logger = new Mock<ILogger>();
             _timeZoneService = new Mock<ITimeZoneService>();
-            var actualSettingService = new SettingService(connection, _logger.Object, new MapHelper());
-            var actualTimeZoneService = new TimeZoneService(connection, actualSettingService, new MapHelper());
+            var actualSettingService = new SettingService(connection, _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object);
+            var actualTimeZoneService = new TimeZoneService(connection, actualSettingService, new MapHelper(), new Mock<IApplicationCache>().Object);
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
 
             var authorityOrgRegProgramDto = new OrganizationRegulatoryProgramDto();
@@ -61,8 +63,8 @@ namespace Linko.LinkoExchange.Test
 
             _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(authorityOrgRegProgramDto);
 
-            var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, actualSettingService);
-            var actualSampleService = new SampleService(connection, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService);
+            var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, actualSettingService, new Mock<ISessionCache>().Object);
+            var actualSampleService = new SampleService(connection, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService, new Mock<IApplicationCache>().Object);
 
             _reportTemplateService = new ReportTemplateService(
                 connection,

@@ -12,6 +12,7 @@ using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.Config;
 using Linko.LinkoExchange.Services.Dto;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -54,7 +55,8 @@ namespace Linko.LinkoExchange.Test
                 _httpContext.Object,
                 _timeZones.Object,
                 _orgService.Object,
-                _settings.Object);
+                _settings.Object,
+                new Mock<ISessionCache>().Object);
         }
 
         [TestMethod]
