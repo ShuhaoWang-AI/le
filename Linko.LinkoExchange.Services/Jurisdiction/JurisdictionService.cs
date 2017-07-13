@@ -36,9 +36,8 @@ namespace Linko.LinkoExchange.Services.Jurisdiction
 
         public JurisdictionDto GetJurisdictionById(int jurisdictionId)
         {
-            Core.Domain.Jurisdiction jurisdiction = _dbContext.Jurisdictions.Single(j => j.JurisdictionId == jurisdictionId);
+            Core.Domain.Jurisdiction jurisdiction = _dbContext.Jurisdictions.SingleOrDefault(j => j.JurisdictionId == jurisdictionId);
             JurisdictionDto dto = _mapHelper.GetJurisdictionDtoFromJurisdiction(jurisdiction);
-
             return dto;
         }
     }

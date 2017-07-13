@@ -342,6 +342,11 @@ namespace Linko.LinkoExchange.Services.Mapping
 
         public JurisdictionDto GetJurisdictionDtoFromJurisdiction(Core.Domain.Jurisdiction jurisdiction, JurisdictionDto dto = null)
         {
+            if(jurisdiction == null)
+            {
+                return null;
+            }
+
             if (dto == null)
             {
                 dto = new JurisdictionDto();
