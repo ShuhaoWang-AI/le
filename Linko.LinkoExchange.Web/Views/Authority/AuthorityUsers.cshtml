@@ -23,7 +23,18 @@
                                                                                                                         {
                                                                                                                             @class = "alert alert-info"
                                                                                                                         })
-        <div class="form-group">
+        <div>
+            @{
+                var vm = new ConfirmationMessageViewModal
+                {
+                    ShowMessage = TempData["UserDeleteSucceed"] != null && (bool)TempData["UserDeleteSucceed"],
+                    Messaage =  "User Removed!"
+                };
+
+                @Html.Partial("_ConfirmationMessageView", vm);
+            }
+        </div>
+         <div class="form-group">
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@
                 @(Html.Kendo().Grid<AuthorityUserViewModel>()
@@ -107,7 +118,7 @@
 
         <div>
             @{
-                var vm = new ConfirmationMessageViewModal
+                vm = new ConfirmationMessageViewModal
                 {
                     ShowMessage = TempData["InivteSendSucceed"] != null && (bool)TempData["InivteSendSucceed"],
                     Messaage =  "An invitation has been sent."
