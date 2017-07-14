@@ -28,6 +28,17 @@
                                                                                                                         {
                                                                                                                             @class = "alert alert-info"
                                                                                                                         })
+        <div>
+            @{
+                var vm = new ConfirmationMessageViewModal
+                {
+                    ShowMessage = TempData["ReportPackageTemplateDeleteSucceed"] != null && (bool)TempData["ReportPackageTemplateDeleteSucceed"],
+                    Messaage =  "Report package template has been deleted successfully."
+                };
+
+                @Html.Partial("_ConfirmationMessageView", vm);
+            }
+        </div>
         <div class="form-group">
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@

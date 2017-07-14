@@ -2313,11 +2313,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 _reportTemplateService.DeleteReportPackageTemplate(reportPackageTemplateId:id);
 
-                return View(viewName:"Confirmation", model:new ConfirmationViewModel
-                                                           {
-                                                               Title = "Delete Confirmation",
-                                                               Message = "Report package template has been deleted successfully."
-                                                           });
+                TempData["ReportPackageTemplateDeleteSucceed"] = true; 
+                return  RedirectToAction("ReportPackageTemplates");
             }
             catch (RuleViolationException rve)
             {
