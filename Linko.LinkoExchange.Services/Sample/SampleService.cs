@@ -656,7 +656,8 @@ namespace Linko.LinkoExchange.Services.Sample
         /// Deletes a sample from the database
         /// </summary>
         /// <param name="sampleId">SampleId associated with the object in the tSample table</param>
-        public void DeleteSample(int sampleId)
+        /// <returns>The sample object deleted</returns>
+        public SampleDto DeleteSample(int sampleId)
         {
             _logger.Info($"Enter SampleService.DeleteSample. sampleId={sampleId}");
             List<RuleViolation> validationIssues = new List<RuleViolation>();
@@ -677,6 +678,7 @@ namespace Linko.LinkoExchange.Services.Sample
                             .Include(s => s.SampleResults)
                             .Single(s => s.SampleId == sampleId);
 
+                        var sampleDto = _mapHelper.GetSampleDtoFromSample(sampleToRemove);  
                         //First remove results (if applicable)
                         if (sampleToRemove.SampleResults != null)
                         {
@@ -685,6 +687,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         _dbContext.Samples.Remove(sampleToRemove);
                         _dbContext.SaveChanges();
                         transaction.Commit();
+                        return sampleDto;
                     }
 
                     _logger.Info($"Leaving SampleService.DeleteSample. sampleId={sampleId}");

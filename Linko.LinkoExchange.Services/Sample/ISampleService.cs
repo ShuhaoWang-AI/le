@@ -40,7 +40,8 @@ namespace Linko.LinkoExchange.Services.Sample
         /// Deletes a sample from the database
         /// </summary>
         /// <param name="sampleId">SampleId associated with the object in the tSample table</param>
-        void DeleteSample(int sampleId);
+        /// <returns>The sample object deleted</returns>
+        SampleDto DeleteSample(int sampleId);
 
         /// <summary>
         /// Gets the complete details of a single Sample

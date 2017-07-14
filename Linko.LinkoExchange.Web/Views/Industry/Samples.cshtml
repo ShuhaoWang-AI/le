@@ -28,6 +28,18 @@
             </button>
         </div>
     </div>
+    
+    <div>
+        @{
+            var vm = new ConfirmationMessageViewModal
+            {
+                ShowMessage = TempData["SampleDeleteSucceed"] != null,
+                Messaage = "Sample deleted successfully."
+            };
+
+            @Html.Partial("_ConfirmationMessageView", vm);
+        }
+    </div>
 
     <section class="box-body form-horizontal">
         <div class="form-group">

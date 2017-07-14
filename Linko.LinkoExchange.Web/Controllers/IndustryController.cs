@@ -1356,20 +1356,15 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             try
             {
-                _sampleService.DeleteSample(sampleId:id);
-
-                return View(viewName:"Confirmation", model:new ConfirmationViewModel
-                                                           {
-                                                               Title = "Delete Sample",
-                                                               Message = "Sample deleted successfully."
-                                                           });
+                var sampleDto = _sampleService.DeleteSample(sampleId:id);
+                TempData["SampleDeleteSucceed"] = true; 
+                return RedirectToAction("Samples",new { sampleStatus = sampleDto.SampleStatusName.ToString()});
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+                return View(viewName:"SampleDetails", model:PrepareSampleDetails(id:id));
             }
-
-            return View(viewName:"SampleDetails", model:PrepareSampleDetails(id:id));
         }
 
         private SampleDto ConvertSampleViewModelToDto(SampleViewModel model)
