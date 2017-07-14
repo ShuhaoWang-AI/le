@@ -31,8 +31,9 @@ namespace Linko.LinkoExchange.Services.Report
         /// <summary>
         /// Removes a Report Element Type from the database
         /// </summary>
-        /// <param name="reportElementTypeId">Id of the Report Element Type to remove from the database</param>
-        void DeleteReportElementType(int reportElementTypeId);
+        /// <param name="reportElementTypeId">Id of the Report Element Type to remove from the database</param> 
+        /// <returns>The report element type object got deleted.</returns>
+        ReportElementTypeDto DeleteReportElementType(int reportElementTypeId);
 
         /// <summary>
         /// Checks to see if a Report Element Type is used in any Report Package Template

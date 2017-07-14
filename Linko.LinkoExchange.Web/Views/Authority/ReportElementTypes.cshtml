@@ -28,7 +28,17 @@
             </button>
         </div>
     </div>
+      <div>
+          @{
+              var vm = new ConfirmationMessageViewModal
+              {
+                  ShowMessage = TempData["ReporElementTypeDeleteSucceed"] !=null && ((ReportElementCategoryName)(TempData["ReporElementTypeDeleteSucceed"]) == ReportElementCategoryName.Attachments),
+                  Messaage = "Attachment Report Element Type has been deleted successfully."
+              };
 
+              @Html.Partial("_ConfirmationMessageView", vm);
+        }
+      </div>
     <section class="box-body form-horizontal">
         <div class="form-group">
             <div class="col-md-12">
@@ -102,7 +112,17 @@
             </button>
         </div>
     </div>
+    <div>
+        @{
+            vm = new ConfirmationMessageViewModal
+            {
+                ShowMessage = TempData["ReporElementTypeDeleteSucceed"] !=null && ((ReportElementCategoryName)(TempData["ReporElementTypeDeleteSucceed"]) == ReportElementCategoryName.Certifications),
+                Messaage = "Certification Report Element Type has been deleted successfully."
+            };
 
+            @Html.Partial("_ConfirmationMessageView", vm);
+        }
+    </div>
     <section class="box-body form-horizontal">
         <div class="form-group">
             <div class="col-md-12">

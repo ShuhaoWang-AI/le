@@ -259,7 +259,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// Removes a Report Element Type from the database
         /// </summary>
         /// <param name="reportElementTypeId">Id of the Report Element Type to remove from the database</param>
-        public void DeleteReportElementType(int reportElementTypeId)
+        public ReportElementTypeDto DeleteReportElementType(int reportElementTypeId)
         {
             _logger.Info($"Enter ReportElementService.DeleteReportElementType. reportElementTypeId={reportElementTypeId}");
 
@@ -291,12 +291,14 @@ namespace Linko.LinkoExchange.Services.Report
                     }
 
                     var foundReportElementType = _dbContext.ReportElementTypes
-                        .Single(r => r.ReportElementTypeId == reportElementTypeId);
+                        .Single(r => r.ReportElementTypeId == reportElementTypeId); 
+
+                    var elementTypeDto = _mapHelper.GetReportElementTypeDtoFromReportElementType(foundReportElementType);
                     _dbContext.ReportElementTypes.Remove(foundReportElementType);
 
                     _dbContext.SaveChanges();
-
-                    transaction.Commit();
+                    transaction.Commit(); 
+                    return elementTypeDto;
                 }
                 catch (RuleViolationException ex)
                 {

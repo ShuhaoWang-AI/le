@@ -2058,20 +2058,16 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             try
             {
-                _reportElementService.DeleteReportElementType(reportElementTypeId:id);
+                var reportElementTypeDto = _reportElementService.DeleteReportElementType(reportElementTypeId:id);
+                TempData["ReporElementTypeDeleteSucceed"] = reportElementTypeDto.ReportElementCategory;
 
-                return View(viewName:"Confirmation", model:new ConfirmationViewModel
-                                                           {
-                                                               Title = "Delete Confirmation",
-                                                               Message = "Report element type deleted successfully."
-                                                           });
+                return  RedirectToAction("ReportElementTypes"); 
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
-            }
-
-            return View(viewName:"ReportElementTypeDetails", model:PrepareReportElementTypeDetails(id:id));
+                return View(viewName:"ReportElementTypeDetails", model:PrepareReportElementTypeDetails(id:id));
+            } 
         }
 
         private ReportElementTypeViewModel PrepareReportElementTypeDetails(int? id = null)
@@ -2296,9 +2292,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
-            }
-
-            return View(viewName:"ReportPackageTemplateDetails", model:PrepareReportPackageTemplateDetails(id:id));
+                return View(viewName:"ReportPackageTemplateDetails", model:PrepareReportPackageTemplateDetails(id:id));
+            } 
         }
 
         private ReportPackageTemplateViewModel PrepareReportPackageTemplateDetails(int? id = null, ReportPackageTemplateViewModel dirtyViewModel = null)
