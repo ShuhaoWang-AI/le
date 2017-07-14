@@ -1812,19 +1812,14 @@ namespace Linko.LinkoExchange.Web.Controllers
             try
             {
                 _parameterService.DeleteParameterGroup(parameterGroupId:id);
-
-                return View(viewName:"Confirmation", model:new ConfirmationViewModel
-                                                           {
-                                                               Title = "Delete Confirmation",
-                                                               Message = "Parameter group deleted successfully."
-                                                           });
+                TempData["ParameterGroupDeleteSucceed"] = true; 
+                return RedirectToAction("ParameterGroups");
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
-            }
-
-            return View(viewName:"ParameterGroupDetails", model:PrepareParameterGroupDetails(id:id));
+                return View(viewName:"ParameterGroupDetails", model:PrepareParameterGroupDetails(id:id));
+            } 
         }
 
         private ActionResult SaveParameterGroupDetails(ParameterGroupViewModel model)

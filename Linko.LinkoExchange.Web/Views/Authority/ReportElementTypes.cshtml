@@ -33,7 +33,7 @@
               var vm = new ConfirmationMessageViewModal
               {
                   ShowMessage = TempData["ReporElementTypeDeleteSucceed"] !=null && ((ReportElementCategoryName)(TempData["ReporElementTypeDeleteSucceed"]) == ReportElementCategoryName.Attachments),
-                  Messaage = "Attachment Report Element Type has been deleted successfully."
+                  Messaage = "Attachment Report Element Type deleted successfully."
               };
 
               @Html.Partial("_ConfirmationMessageView", vm);
@@ -117,7 +117,7 @@
             vm = new ConfirmationMessageViewModal
             {
                 ShowMessage = TempData["ReporElementTypeDeleteSucceed"] !=null && ((ReportElementCategoryName)(TempData["ReporElementTypeDeleteSucceed"]) == ReportElementCategoryName.Certifications),
-                Messaage = "Certification Report Element Type has been deleted successfully."
+                Messaage = "Certification Report Element Type deleted successfully."
             };
 
             @Html.Partial("_ConfirmationMessageView", vm);

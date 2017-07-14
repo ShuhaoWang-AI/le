@@ -27,7 +27,19 @@
         @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new
                                                                                                                         {
                                                                                                                             @class = "alert alert-info"
-                                                                                                                        })
+                                                                                                                      })
+        
+        <div>
+            @{
+                var vm = new ConfirmationMessageViewModal
+                {
+                    ShowMessage = TempData["ParameterGroupDeleteSucceed"] != null && (bool)TempData["ParameterGroupDeleteSucceed"],
+                    Messaage =  "Parameter group deleted successfully."
+                };
+
+                @Html.Partial("_ConfirmationMessageView", vm);
+            }
+        </div>
         <div class="form-group">
             <div class="col-md-12">
                 @* grid name should be start with grid for centralized error handling *@
