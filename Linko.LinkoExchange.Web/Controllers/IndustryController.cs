@@ -341,7 +341,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                 var result = _userService.RemoveUser(orgRegProgUserId: model.Id, isAuthorizationRequired: true);
                 if (result)
                 {
-                    return RedirectToAction(actionName:"IndustryUserRemoved", controllerName:"Industry");
+                    TempData["DeleteUserSucceed"] = true; 
+                    return RedirectToAction("Users");  
                 }
                 var validationIssues = new List<RuleViolation>();
                 var message = "Remove user failed.";
@@ -352,9 +353,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
                 model = PrepareIndustryUserDetails(id:id);
-            }
-
-            return View(viewName:"IndustryUserDetails", model:model);
+                return View(viewName:"IndustryUserDetails", model:model);
+            } 
         }
 
         // user remove successfully
