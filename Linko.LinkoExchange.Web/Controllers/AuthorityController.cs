@@ -523,34 +523,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                                     timeZoneId:timeZoneId)
                                                       });
 
-            var result = viewModels.ToDataSourceResult(request:request, selector:vm => new
-                                                                                       {
-                                                                                           vm.CromerrAuditLogId,
-                                                                                           vm.AuditLogTemplateId,
-                                                                                           vm.RegulatoryProgramName,
-                                                                                           vm.OrganizationId,
-                                                                                           vm.OrganizationName,
-                                                                                           vm.RegulatorName,
-                                                                                           vm.EventCategory,
-                                                                                           vm.EventType,
-                                                                                           vm.UserProfileIdDisplay,
-                                                                                           vm.UserName,
-                                                                                           vm.FirstName,
-                                                                                           vm.LastName,
-                                                                                           vm.EmailAddress,
-                                                                                           vm.IPAddress,
-                                                                                           vm.HostName,
-                                                                                           vm.Comment,
-                                                                                           LogDateTimeUtc = vm.LogDateTimeUtc.ToString(provider:CultureInfo.CurrentCulture),
-                                                                                           vm.LogDateTimeUtcDetailString
-                                                                                       });
-            result.Total = totalCount;
-
-            //var result = new DataSourceResult()
-            //{
-            //    Data = viewModels,
-            //    Total = totalCount
-            //};
+            var result = new DataSourceResult()
+            {
+                Data = viewModels,
+                Total = totalCount
+            };
 
             return Json(data:result);
         }
