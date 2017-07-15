@@ -1165,26 +1165,26 @@ namespace Linko.LinkoExchange.Web.Controllers
         [Route(template:"Sample/New/Step2")]
         public ActionResult NewSampleDetailsStep2(SampleViewModel model, FormCollection collection)
         {
-            // don't check ModelState.IsValid as SampleResults is always invalid and it is re-populated later from the FormCollection[name: "SampleResults"]
-            if (!ModelState.IsValidField(key: "FlowUnitId") || !ModelState.IsValidField(key: "StartDateTimeLocal") || !ModelState.IsValidField(key: "EndDateTimeLocal"))
+            try
             {
-                if (ModelState[key: "."] != null)
+                var objJavascript = new JavaScriptSerializer();
+
+                model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input: collection[name: "FlowUnitValidValues"]);
+                model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input: HttpUtility.HtmlDecode(s: collection[name: "SampleResults"]));
+
+                // don't check ModelState.IsValid as SampleResults is always invalid and it is re-populated later from the FormCollection[name: "SampleResults"]
+                if (!ModelState.IsValidField(key: "FlowUnitId") || !ModelState.IsValidField(key: "StartDateTimeLocal") || !ModelState.IsValidField(key: "EndDateTimeLocal"))
                 {
-                    foreach (var issue in ModelState[key: "."].Errors)
+                    if (ModelState[key: "."] != null)
                     {
-                        ModelState.AddModelError(key: string.Empty, errorMessage: issue.ErrorMessage);
+                        foreach (var issue in ModelState[key: "."].Errors)
+                        {
+                            ModelState.AddModelError(key: string.Empty, errorMessage: issue.ErrorMessage);
+                        }
                     }
                 }
-            }
-            else
-            {
-                try
+                else
                 {
-                    var objJavascript = new JavaScriptSerializer();
-
-                    model.FlowUnitValidValues = objJavascript.Deserialize<IEnumerable<UnitDto>>(input: collection[name: "FlowUnitValidValues"]);
-                    model.SampleResults = objJavascript.Deserialize<IEnumerable<SampleResultViewModel>>(input: HttpUtility.HtmlDecode(s: collection[name: "SampleResults"]));
-
                     var vm = ConvertSampleViewModelToDto(model: model);
 
                     var id = _sampleService.SaveSample(sample: vm);
@@ -1194,12 +1194,12 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     ModelState.Clear();
 
-                    return RedirectToAction(actionName: "SampleDetails", controllerName: "Industry", routeValues: new { id });
+                    return RedirectToAction(actionName: "SampleDetails", controllerName: "Industry", routeValues: new {id});
                 }
-                catch (RuleViolationException rve)
-                {
-                    MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
-                }
+            }
+            catch (RuleViolationException rve)
+            {
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException: rve, modelState: ViewData.ModelState);
             }
 
             ViewBag.Satus = "New";
