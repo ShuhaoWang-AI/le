@@ -988,7 +988,8 @@ namespace Linko.LinkoExchange.Web.Controllers
             var currentOrganizationRegulatoryProgramId = int.Parse(s:GetClaimValue(key:CacheKey.OrganizationRegulatoryProgramId));
 
             // int currentOrganizationRegulatoryProgramId = int.Parse(_sessionCache.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-            var industries = _organizationService.GetChildOrganizationRegulatoryPrograms(orgRegProgId:currentOrganizationRegulatoryProgramId, searchString:searchString);
+            var industries = _organizationService.GetChildOrganizationRegulatoryPrograms(orgRegProgId: currentOrganizationRegulatoryProgramId, searchString: searchString)
+                                                 .Where(i => i.IsRemoved == false);
 
             var viewModels = industries.Select(vm => new IndustryViewModel
                                                      {
