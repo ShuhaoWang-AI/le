@@ -2104,6 +2104,16 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                        }).ToList();
 
             viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select CTS Event Type", Value = "0"});
+            if (viewModel.Id.HasValue && !viewModel.AvailableCtsEventTypes.Any(c => c.Selected))
+            {
+                // If previously selected one is not in the list then add that
+                viewModel.AvailableCtsEventTypes.Add(item:new SelectListItem
+                                                          {
+                                                              Text = viewModel.CtsEventTypeName,
+                                                              Value = viewModel.CtsEventTypeId.ToString(),
+                                                              Selected = true
+                                                          });
+            }
 
             return viewModel;
         }
@@ -2449,6 +2459,16 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                                           }).ToList();
 
             viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select CTS Event Type", Value = "0"});
+            if (viewModel.Id.HasValue && !viewModel.AvailableCtsEventTypes.Any(c => c.Selected))
+            {
+                // If previously selected one is not in the list then add that
+                viewModel.AvailableCtsEventTypes.Add(item:new SelectListItem
+                                                          {
+                                                              Text = viewModel.CtsEventTypeName,
+                                                              Value = viewModel.CtsEventTypeId.ToString(),
+                                                              Selected = true
+                                                          });
+            }
 
 
             return viewModel;
