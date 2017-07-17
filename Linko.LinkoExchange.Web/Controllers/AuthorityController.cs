@@ -2109,7 +2109,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 // If previously selected one is not in the list then add that
                 viewModel.AvailableCtsEventTypes.Add(item:new SelectListItem
                                                           {
-                                                              Text = viewModel.CtsEventTypeName,
+                                                              Text = $@"{viewModel.CtsEventTypeName} ({viewModel.CategoryName})",
                                                               Value = viewModel.CtsEventTypeId.ToString(),
                                                               Selected = true
                                                           });
@@ -2323,6 +2323,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 LastModifierUserName = reportPackageTemplate.LastModifierFullName,
                                 CtsEventTypeId = reportPackageTemplate.CtsEventType?.CtsEventTypeId ?? 0,
                                 CtsEventTypeName = reportPackageTemplate.CtsEventType?.Name ?? "",
+                                CategoryName = reportPackageTemplate.CtsEventType?.CtsEventCategoryName??"",
                                 SamplesAndResultsTypes = reportPackageTemplate.SamplesAndResultsTypes.Select(t => new ReportElementTypeViewModel
                                                                                                                   {
                                                                                                                       Id = t.ReportElementTypeId,
@@ -2464,7 +2465,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 // If previously selected one is not in the list then add that
                 viewModel.AvailableCtsEventTypes.Add(item:new SelectListItem
                                                           {
-                                                              Text = viewModel.CtsEventTypeName,
+                                                              Text = $@"{viewModel.CtsEventTypeName} ({viewModel.CategoryName})",
                                                               Value = viewModel.CtsEventTypeId.ToString(),
                                                               Selected = true
                                                           });
