@@ -819,11 +819,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             }
             try
             {
-                var result = _userService.RemoveUser(orgRegProgUserId: model.Id, isAuthorizationRequired: true); 
+                var result = _userService.RemoveUser(orgRegProgUserId: model.Id, isAuthorizationRequired: true);  
                 if (result)
                 {
                     TempData["UserDeleteSucceed"] = true; 
-                    return RedirectToAction("Users");  
+                    return RedirectToAction("AuthorityUsers");  
                 }
                 var validationIssues = new List<RuleViolation>();
                 var message = "Remove user failed.";
@@ -838,20 +838,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             
            return View(viewName:"AuthorityUserDetails", model:model);
         }
-
-        // user remove successfully
-        // GET: /Authority/AuthorityUserRemoved
-        public ActionResult AuthorityUserRemoved()
-        {
-            var model = new ConfirmationViewModel
-                        {
-                            Title = "User Remove Status",
-                            Message = "User Removed!"
-                        };
-
-            return View(viewName:"Confirmation", model:model);
-        }
-
+ 
         [AcceptVerbs(verbs:HttpVerbs.Post)]
         [ValidateAntiForgeryToken]
         [Route(template:"User/{id:int}/Details/UserReset")]

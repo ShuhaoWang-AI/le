@@ -68,7 +68,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         private readonly IJurisdictionService _jurisdictionService;
         private readonly ISettingService _settingService;
         private readonly ProfileHelper _profileHelper;
-        private readonly IMapHelper _mapHelper;
+        private readonly IMapHelper _mapHelper; 
 
         public AccountController(
             IAuthenticationService authenticationService,
@@ -93,7 +93,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _invitationService = invitationService;
             _jurisdictionService = jurisdictionService;
             _settingService = settingService;
-            _mapHelper = mapHelper;
+            _mapHelper = mapHelper; 
             _profileHelper = new ProfileHelper(questAnswerService:questionAnswerService, userService:userService, jurisdictionService:jurisdictionService,
                                                mapHelper:mapHelper, httpContextService:httpContextService);
         }
@@ -104,7 +104,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         [AllowAnonymous]
         public ActionResult Register(string token)
-        {
+        { 
             ViewBag.newRegistration = true;
             ViewBag.profileCollapsed = false;
             ViewBag.kbqCollapsed = false;
@@ -1132,25 +1132,14 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 TempData["ChangePasswordSucceed"] = true;
                 TempData[key:"KbqPass"] = "true";
-                return RedirectToAction(actionName: "Profile", controllerName: "User");
+                return RedirectToAction(actionName: "UserProfile", controllerName: "User");
             }
 
             var errorMessage = result.Errors.Aggregate((i, j) => i + j);
             ModelState.AddModelError(key:string.Empty, errorMessage:errorMessage);
             return View(model:model);
         }
-        
-        public ActionResult ChangePasswordConfirmation()
-        {
-            var model = new ConfirmationViewModel
-                        {
-                            Title = "Change Password Confirmation",
-                            Message = "Password successfully changed."
-                        };
-
-            return View(viewName:"Confirmation", model:model);
-        }
-
+ 
         [Authorize]
         public ActionResult ChangeEmail()
         {
@@ -1206,21 +1195,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                 
                 TempData["ChangeEmailSucceed"] = true;
                 TempData[key:"KbqPass"] = "true";
-                return RedirectToAction(actionName: "Profile", controllerName: "User"); 
+                return RedirectToAction(actionName: "UserProfile", controllerName: "User"); 
             }
         }
-        
-        public ActionResult ChangeEmailConfirmation()
-        {
-            var model = new ConfirmationViewModel
-                        {
-                            Title = "Change Email Address Confirmation",
-                            Message = "Email successfully changed."
-                        };
-
-            return View(viewName:"Confirmation", model:model);
-        }
-
+         
         public ActionResult KbqChallenge(string returnUrl)
         {
             var claimsIdentity = HttpContext.User.Identity as ClaimsIdentity;
@@ -1394,8 +1372,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return invalidMessages;
         }
-
-
+        
         private bool NeedToValidKbq()
         {
             var kbqPass = TempData[key:"KbqPass"] as string;
