@@ -2071,6 +2071,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 IsContentProvided = reportElementType.IsContentProvided,
                                 CtsEventTypeId = reportElementType.CtsEventType?.CtsEventTypeId ?? 0,
                                 CtsEventTypeName = reportElementType.CtsEventType?.Name ?? "",
+                                CtsCategoryName = reportElementType.CtsEventType?.CtsEventCategoryName ?? "",
                                 LastModificationDateTimeLocal = reportElementType.LastModificationDateTimeLocal,
                                 LastModifierUserName = reportElementType.LastModifierFullName
                             };
@@ -2091,15 +2092,15 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                        }).ToList();
 
             viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select CTS Event Type", Value = "0"});
-            if (viewModel.Id.HasValue && !viewModel.AvailableCtsEventTypes.Any(c => c.Selected))
+            if (viewModel.Id.HasValue && !viewModel.AvailableCtsEventTypes.Any(c => c.Selected) && viewModel.CtsEventTypeName.Trim().Length > 0)
             {
                 // If previously selected one is not in the list then add that
-                viewModel.AvailableCtsEventTypes.Add(item:new SelectListItem
-                                                          {
-                                                              Text = $@"{viewModel.CtsEventTypeName} ({viewModel.CategoryName})",
-                                                              Value = viewModel.CtsEventTypeId.ToString(),
-                                                              Selected = true
-                                                          });
+                viewModel.AvailableCtsEventTypes.Add(item: new SelectListItem
+                                                           {
+                                                               Text = $@"{viewModel.CtsEventTypeName} ({viewModel.CtsCategoryName})",
+                                                               Value = viewModel.CtsEventTypeId.ToString(),
+                                                               Selected = true
+                                                           });
             }
 
             return viewModel;
@@ -2310,7 +2311,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 LastModifierUserName = reportPackageTemplate.LastModifierFullName,
                                 CtsEventTypeId = reportPackageTemplate.CtsEventType?.CtsEventTypeId ?? 0,
                                 CtsEventTypeName = reportPackageTemplate.CtsEventType?.Name ?? "",
-                                CategoryName = reportPackageTemplate.CtsEventType?.CtsEventCategoryName??"",
+                                CtsCategoryName = reportPackageTemplate.CtsEventType?.CtsEventCategoryName ?? "",
                                 SamplesAndResultsTypes = reportPackageTemplate.SamplesAndResultsTypes.Select(t => new ReportElementTypeViewModel
                                                                                                                   {
                                                                                                                       Id = t.ReportElementTypeId,
@@ -2447,12 +2448,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                                                                           }).ToList();
 
             viewModel.AvailableCtsEventTypes.Insert(index:0, item:new SelectListItem {Text = @"Select CTS Event Type", Value = "0"});
-            if (viewModel.Id.HasValue && !viewModel.AvailableCtsEventTypes.Any(c => c.Selected))
+            if (viewModel.Id.HasValue && !viewModel.AvailableCtsEventTypes.Any(c => c.Selected) && viewModel.CtsEventTypeName.Trim().Length > 0)
             {
                 // If previously selected one is not in the list then add that
                 viewModel.AvailableCtsEventTypes.Add(item:new SelectListItem
                                                           {
-                                                              Text = $@"{viewModel.CtsEventTypeName} ({viewModel.CategoryName})",
+                                                              Text = $@"{viewModel.CtsEventTypeName} ({viewModel.CtsCategoryName})",
                                                               Value = viewModel.CtsEventTypeId.ToString(),
                                                               Selected = true
                                                           });

@@ -36,6 +36,9 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "CTS Event Type")]
         public string CtsEventTypeName { get; set; }
         public IList<SelectListItem> AvailableCtsEventTypes { get; set; }
+        
+        [Display(Name = "CTS Event Type Category")]
+        public string CtsCategoryName { get; set; }
 
         [Display(Name = "Created/Modified Date")]
         public DateTime LastModificationDateTimeLocal { get; set; }

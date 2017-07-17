@@ -39,8 +39,8 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string CtsEventTypeName { get; set; }
         public IList<SelectListItem> AvailableCtsEventTypes { get; set; }
         
-        [Display(Name = "Category")]
-        public string CategoryName { get; set; }
+        [Display(Name = "CTS Event Type Category")]
+        public string CtsCategoryName { get; set; }
 
         [Display(Name = "Active")]
         public bool IsActive { get; set; }
