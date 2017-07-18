@@ -31,25 +31,27 @@
                 @(Html.Kendo().Grid<IndustryUserViewModel>()
                       .Name(componentName:"gridUser")
                       .Columns(columns =>
-                               {
-                                   columns.Bound(c => c.FirstName)
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.LastName)
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.PhoneNumber)
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.Email)
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.DateRegistered).Format(value:"{0:MM/dd/yyyy}")
-                                          .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
-                                   columns.Bound(c => c.StatusText)
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Bound(c => c.AccountLockedText)
-                                          .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
-                                   columns.Template(m => { })
-                                          .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
-                                          .Width(pixelWidth:60);
-                               })
+                      {
+                          columns.Bound(c => c.FirstName)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.LastName)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.PhoneNumber)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.Email)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.DateRegistered).Format(value:"{0:MM/dd/yyyy}")
+                                 .Filterable(ftb => ftb.Enabled(value:true).Extra(value:true));
+                          columns.Bound(c => c.StatusText)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Bound(c => c.IsSignatoryText)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators: false).Operator(defaultOperator: "contains").SuggestionOperator(filterType: FilterType.Contains)));
+                          columns.Bound(c => c.AccountLockedText)
+                                 .Filterable(ftb => ftb.Cell(cell => cell.ShowOperators(showOperators:false).Operator(defaultOperator:"contains").SuggestionOperator(filterType:FilterType.Contains)));
+                          columns.Template(m => { })
+                                 .ClientTemplate(value:"<div class='fa fa-chevron-right pull-right'></div>")
+                                 .Width(pixelWidth:60);
+                      })
                       .Pageable(pageable => pageable
                                                 .PageSizes(enabled:true)
                                                 .Refresh(enabled:true)
@@ -57,10 +59,10 @@
                                                 .Numeric(enabled:false)
                       )
                       .Selectable(selectable =>
-                                  {
-                                      selectable.Mode(mode:GridSelectionMode.Single);
-                                      selectable.Type(type:GridSelectionType.Row);
-                                  })
+                      {
+                          selectable.Mode(mode:GridSelectionMode.Single);
+                          selectable.Type(type:GridSelectionType.Row);
+                      })
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                       //.Filterable(filterable => filterable.Enabled(value: false).Mode(GridFilterMode.Row))
                       .Resizable(resizable => resizable.Columns(value:true))
@@ -72,14 +74,14 @@
                                                     .ServerOperation(enabled:true)
                                                     .Batch(enabled:true)
                                                     .Sort(sort =>
-                                                          {
-                                                              sort.Add(memberName:"FirstName").Ascending();
-                                                              sort.Add(memberName:"LastName").Ascending();
-                                                          }) // <-- initial sort expression
+                                                    {
+                                                        sort.Add(memberName:"FirstName").Ascending();
+                                                        sort.Add(memberName:"LastName").Ascending();
+                                                    }) // <-- initial sort expression
                                                     .Read(read => read.Action(actionName:"IndustryUsers_Read", controllerName:"Authority", routeValues:new
-                                                                                                                                                       {
-                                                                                                                                                           industryId = ViewBag.IndustryId
-                                                                                                                                                       }))
+                                                    {
+                                                        industryId = ViewBag.IndustryId
+                                                    }))
                                                     .PageSize(pageSize:10)
                                                     .Events(events => events.Error(handler:"error_handler.bind({gridId: '#gridUser'})"))
                       )

@@ -153,6 +153,16 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         }
 
         [Editable(false)]
+        [Display(Name = "Signatory")]
+        public string IsSignatoryText
+        {
+            get
+            {
+                return IsSignatory ? "Yes" : "No";
+            }
+        }
+
+        [Editable(false)]
         [Display(Name = "Security Question 1")]
         public string SecurityQuestion1
         {

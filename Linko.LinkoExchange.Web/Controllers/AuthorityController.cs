@@ -1161,6 +1161,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                     ResetEmail = vm.UserProfileDto.Email,
                                                     DateRegistered = vm.RegistrationDateTimeUtc?.DateTime,
                                                     Status = vm.IsEnabled,
+                                                    IsSignatory = vm.IsSignatory,
                                                     AccountLocked = vm.UserProfileDto.IsAccountLocked,
                                                     Role = vm.PermissionGroup.PermissionGroupId ?? 0,
                                                     RoleText = vm.PermissionGroup.Name
@@ -1178,6 +1179,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                                            vm.ResetEmail,
                                                                                            DateRegistered = vm.DateRegistered.ToString(),
                                                                                            vm.StatusText,
+                                                                                           vm.IsSignatoryText,
                                                                                            vm.AccountLockedText,
                                                                                            vm.Role,
                                                                                            vm.RoleText
