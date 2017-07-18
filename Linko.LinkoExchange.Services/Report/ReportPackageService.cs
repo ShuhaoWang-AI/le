@@ -178,6 +178,8 @@ namespace Linko.LinkoExchange.Services.Report
             var submitterFirstName = _httpContextService.GetClaimValue(CacheKey.FirstName);
             var submitterLastName = _httpContextService.GetClaimValue(CacheKey.LastName);
             var submitterUserName = _httpContextService.GetClaimValue(CacheKey.UserName);
+            ReportPackageDto reportPackageDto;
+            CopyOfRecordDto copyOfRecordDto; 
 
             _logger.Info($"Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={reportPackageId}, submitterUserId={submitterUserId}, submitterUserName={submitterUserName}");
 
@@ -211,19 +213,14 @@ namespace Linko.LinkoExchange.Services.Report
 
                     UpdateStatus(reportPackageId, ReportStatusName.Submitted, false);
                     _dbContext.SaveChanges();
-                    var reportPackageDto = GetReportPackage(reportPackageId, true);
-                    var copyOfRecordDto = CreateCopyOfRecordForReportPackage(reportPackageDto);
-
-                    //// Send emails 
-                    SendSignAndSubmitEmail(reportPackageDto, copyOfRecordDto);
+                    reportPackageDto = GetReportPackage(reportPackageId, true);
+                    copyOfRecordDto = CreateCopyOfRecordForReportPackage(reportPackageDto);
 
                     // Add for crommer log
                     WriteCrommerrLog(reportPackageDto, submitterIpAddress, copyOfRecordDto);
 
                     _dbContext.SaveChanges();
                     transaction.Commit();
-
-                    _logger.Info($"Leaving ReportPackageService.SignAndSubmitReportPackage. reportPackageId={reportPackageId}, submitterUserId={submitterUserId}, submitterUserName={submitterUserName}");
                 }
                 catch (DbEntityValidationException ex)
                 {
@@ -260,6 +257,14 @@ namespace Linko.LinkoExchange.Services.Report
                     throw;
                 }
             }
+
+           if(reportPackageDto != null && copyOfRecordDto != null)
+            {
+                //// Send emails 
+                SendSignAndSubmitEmail(reportPackageDto, copyOfRecordDto);
+            } 
+
+          _logger.Info($"Leaving ReportPackageService.SignAndSubmitReportPackage. reportPackageId={reportPackageId}, submitterUserId={submitterUserId}, submitterUserName={submitterUserName}");
         }
 
         public CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(int reportPackageId)
