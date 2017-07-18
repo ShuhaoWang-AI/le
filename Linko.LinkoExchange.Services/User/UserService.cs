@@ -618,7 +618,8 @@ namespace Linko.LinkoExchange.Services.User
 
             var allOrgRegProgramUsers = _dbContext.OrganizationRegulatoryProgramUsers
                 .Include(orpu => orpu.OrganizationRegulatoryProgram)
-                .Where(orpu => orpu.UserProfileId == userProfileId);
+                .Where(orpu => orpu.UserProfileId == userProfileId)
+                .ToList();
 
             foreach (var targetOrgRegProgramUser in allOrgRegProgramUsers)
             {
