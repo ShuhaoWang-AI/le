@@ -83,7 +83,6 @@ namespace Linko.LinkoExchange.Data
 
             modelBuilder.Entity<LESampleResultParsedData>().Property(x => x.LinkoVersionNo).IsRequired().HasMaxLength(50);
             modelBuilder.Entity<LESampleResultParsedData>().Property(x => x.LinkoClientID).IsRequired();
-            //modelBuilder.Entity<LESampleResultParsedData>().Property(x => x.LinkoLabID).IsRequired();
             modelBuilder.Entity<LESampleResultParsedData>().Property(x => x.LabPermitMPID).HasMaxLength(250).IsRequired();
             modelBuilder.Entity<LESampleResultParsedData>().Property(x => x.LabSampleName).HasMaxLength(50).IsRequired();
             modelBuilder.Entity<LESampleResultParsedData>().Property(x => x.LabDateSampled).IsRequired();

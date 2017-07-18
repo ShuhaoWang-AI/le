@@ -28,11 +28,6 @@ namespace Linko.LinkoExchange.Core.Domain
         public int LinkoClientID { get; set; }
 
         /// <summary>
-        /// May not be needed.
-        /// </summary>
-        public int LinkoLabID { get; set; }
-
-        /// <summary>
         /// A unique identifier for the location from which the sample was taken, 
         ///  it will contain Industry Name and Monitoring Point Name (Abbrv).
         /// </summary>
