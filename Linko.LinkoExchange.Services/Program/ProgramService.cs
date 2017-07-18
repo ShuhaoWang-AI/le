@@ -56,9 +56,10 @@ namespace Linko.LinkoExchange.Services.Program
         /// <returns></returns>
         public IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string email, bool isIncludeRemoved = false)
         {
-            var userProfile = _linkoExchangeDbContext.Users.SingleOrDefault(u => u.Email == email);
-            if (userProfile == null)
+            var userProfile = _linkoExchangeDbContext.Users.SingleOrDefault(u => u.Email == email) ?? _linkoExchangeDbContext.Users.SingleOrDefault(u => u.OldEmailAddress == email);
+            if (userProfile == null) {
                 return null;
+            }
 
             var organziationRegulatoryProgramUserDtos = new List<OrganizationRegulatoryProgramUserDto>();
             var regulatoryProgramUsers = _linkoExchangeDbContext
