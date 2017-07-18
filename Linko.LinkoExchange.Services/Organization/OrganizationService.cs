@@ -505,21 +505,22 @@ namespace Linko.LinkoExchange.Services.Organization
 
         public OrganizationRegulatoryProgramDto GetAuthority(int orgRegProgramId)
         {
-            OrganizationRegulatoryProgramDto authorityDto;
-            var org = _dbContext.OrganizationRegulatoryPrograms.Include("Organization.Jurisdiction")
+            var orgRegProgram = _dbContext.OrganizationRegulatoryPrograms.Include("Organization.Jurisdiction")
                 .Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
-            OrganizationRegulatoryProgram authority;
-            if (org.RegulatorOrganization != null)
+            OrganizationRegulatoryProgram authorityRegProgram;
+            if (orgRegProgram.RegulatorOrganization != null)
             {
-                authority = _dbContext.OrganizationRegulatoryPrograms.Include("Organization")
-                    .Single(o => o.OrganizationId == org.RegulatorOrganization.OrganizationId
-                    && o.RegulatoryProgramId == org.RegulatoryProgramId);
+                authorityRegProgram = _dbContext.OrganizationRegulatoryPrograms.Include("Organization")
+                                      .Single(o => o.OrganizationId == orgRegProgram.RegulatorOrganization.OrganizationId
+                                                   && o.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
 
             }
             else
-                authority = org;
+            {
+                authorityRegProgram = orgRegProgram;
+            }
 
-            authorityDto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(authority);
+            var authorityDto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(authorityRegProgram);
             return authorityDto;
         }
 

@@ -737,8 +737,7 @@ namespace Linko.LinkoExchange.Test
 
             var qaServiceMock = Mock.Get(questionAnswerService);
             qaServiceMock.Verify(i => i.CreateUserQuestionAnswers(It.IsAny<int>(), It.IsAny<IEnumerable<AnswerDto>>()), Times.Once);
-            progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), RegistrationType.NewRegistration));
-            permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>()));
+            permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<OrganizationRegulatoryProgramDto>(), It.IsAny<bool>()));
         }
 
         // Test new existing user re-register
@@ -759,8 +758,7 @@ namespace Linko.LinkoExchange.Test
             qaServiceMock.Verify(i => i.CreateUserQuestionAnswers(It.IsAny<int>(), It.IsAny<IEnumerable<AnswerDto>>()), Times.Once);
             qaServiceMock.Verify(i => i.DeleteUserQuestionAndAnswers(It.IsAny<int>()));
 
-            progServiceMock.Verify(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), RegistrationType.ReRegistration));
-            permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<int>()));
+            permissionMock.Verify(i => i.GetApprovalPeople(It.IsAny<OrganizationRegulatoryProgramDto>(), It.IsAny<bool>()));
         }
 
         [TestMethod]
@@ -924,12 +922,11 @@ namespace Linko.LinkoExchange.Test
                       Mock.Of<OrganizationRegulatoryProgramDto>(i=>i.OrganizationId == 1001)
                   });
 
-            progServiceMock.Setup(i => i.CreateOrganizationRegulatoryProgramForUser(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), RegistrationType.NewRegistration)).Returns(
-                   Mock.Of<OrganizationRegulatoryProgramUserDto>(i => i.IsEnabled == true && i.OrganizationRegulatoryProgramId == 100
-                   )
+            orgServiceMock.Setup(i=>i.GetAuthority(It.IsAny<int>())).Returns( 
+                  Mock.Of<OrganizationRegulatoryProgramDto>(i=>i.OrganizationId == 1000)
                 );
 
-            permissionMock.Setup(i => i.GetApprovalPeople(It.IsAny<int>())).Returns(
+            permissionMock.Setup(i => i.GetApprovalPeople(It.IsAny<OrganizationRegulatoryProgramDto>(), It.IsAny<bool>())).Returns(
                  new[]{
                            Mock.Of<UserDto>(i=>i.Email=="test@water.com"),
                            Mock.Of<UserDto>(i=>i.Email=="test2@water.com"),

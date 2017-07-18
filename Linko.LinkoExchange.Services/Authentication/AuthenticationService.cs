@@ -334,6 +334,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             RegistrationType registrationType)
         {
             var registrationResult = new RegistrationResultDto();
+
             if (registrationType != RegistrationType.ReRegistration)
             {
                 if (userInfo == null)
@@ -343,19 +344,11 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
                 if (string.IsNullOrWhiteSpace(userInfo.UserName))
                 {
-                    var errText = $"Username cannot be null or whitespace.";
+                    var errText = $"User name cannot be null or whitespace.";
                     _logger.Error(errText);
                     throw new Exception(errText);
                 }
                 userInfo.UserName = userInfo.UserName.Trim();
-
-                if (string.IsNullOrWhiteSpace(registrationToken))
-                {
-                    registrationResult.Result = RegistrationResult.InvalidRegistrationToken;
-                    return registrationResult;
-                }
-
-                _logger.Info("Register. userName={0}, registrationToken={1}", userInfo.UserName, registrationToken);
 
                 var validatResult = ValidateRegistrationData(userInfo, securityQuestions, kbqQuestions);
                 if (validatResult != RegistrationResult.Success)
@@ -364,6 +357,15 @@ namespace Linko.LinkoExchange.Services.Authentication
                     return registrationResult;
                 }
             }
+
+            if (string.IsNullOrWhiteSpace(registrationToken))
+            {
+                registrationResult.Result = RegistrationResult.InvalidRegistrationToken;
+                return registrationResult;
+            }
+                
+            _requestCache.SetValue(CacheKey.Token, registrationToken);
+            _logger.Info("Register. userName={0}, registrationToken={1}", userInfo.UserName, registrationToken);
 
             var invitationDto = _invitationService.GetInvitation(registrationToken);
 
@@ -422,7 +424,6 @@ namespace Linko.LinkoExchange.Services.Authentication
                         registrationResult.Result = RegistrationResult.UserNameIsUsed;
                         return registrationResult;
                     }
-
                 }
             }
 
@@ -431,6 +432,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 try
                 {
                     var termConditionId = _termConditionService.GetLatestTermConditionId();
+
                     #region Create a new user registration 
 
                     if (registrationType == RegistrationType.NewRegistration)
@@ -550,156 +552,32 @@ namespace Linko.LinkoExchange.Services.Authentication
                     }
 
                     #endregion 
+                     
+                    var inviterOrganizationRegulatoryProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.SenderOrganizationRegulatoryProgramId);
 
-                    // UC-42 6
-                    // 2 Create organization regulatory program userProfile, and set the approved statue to false  
-                    var orpu = _programService.CreateOrganizationRegulatoryProgramForUser(applicationUser.UserProfileId, invitationDto.RecipientOrganizationRegulatoryProgramId, invitationDto.SenderOrganizationRegulatoryProgramId, registrationType);
-
-                    // need to move inside _programService.CreateOrganizationRegulatoryProgramForUser otherwise it will be send email to all approver when registrationType == RegistrationType.ResetRegistration 
-                    // UC-42 7, 8
-                    // Find out who have approval permission    
-                    var sendTo = new List<string>(); 
-                    if(registrationType == RegistrationType.ResetRegistration)
-                    {
-                       sendTo = _permissionService.GetAllAuthoritiesApprovalPeopleForUser(applicationUser.UserProfileId).Select(i=>i.Email).ToList();   
-                    } 
-                    else
-                    {
-                        sendTo = _permissionService.GetApprovalPeople(invitationDto.SenderOrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
-                    }
-
-                    //  Determine if user is authority user or is industry user; 
-                    var senderProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.SenderOrganizationRegulatoryProgramId);
-
-                    var recipientProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
+                    var recipientOrganizationRegulatoryProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
                     //  Program is disabled or not found
                     //  UC-42 2.c, 2.d, 2.e
-                    if (recipientProgram == null || senderProgram == null ||
-                         !recipientProgram.IsEnabled || !senderProgram.IsEnabled ||
-                         recipientProgram.OrganizationDto == null
-                         )
+                    if (recipientOrganizationRegulatoryProgram == null || inviterOrganizationRegulatoryProgram == null ||
+                        !recipientOrganizationRegulatoryProgram.IsEnabled || !inviterOrganizationRegulatoryProgram.IsEnabled ||
+                        recipientOrganizationRegulatoryProgram.OrganizationDto == null
+                    )
                     {
-                        registrationResult.Result = RegistrationResult.InvitationExpired; //TODO: Is it correct Enum ???
+                        registrationResult.Result = RegistrationResult.Failed;
+                        return registrationResult;
+                    }
+                    
+                    if (!recipientOrganizationRegulatoryProgram.RegulatorOrganizationId.HasValue && inviterOrganizationRegulatoryProgram.RegulatorOrganizationId.HasValue)
+                    {
+                        // IU invited the authority user; AU can only invite authority user
+                        registrationResult.Result = RegistrationResult.Failed;
                         return registrationResult;
                     }
 
-                    var isInvitedToIndustry = false;
-
-                    if (recipientProgram.RegulatorOrganizationId.HasValue)
-                    {
-                        // Invites Industry user
-                        isInvitedToIndustry = true;
-                    }
-                    else
-                    {
-                        if (senderProgram.RegulatorOrganizationId.HasValue)
-                        {
-                            // IU invited the authority user; AU can only invite authority user
-                            registrationResult.Result = RegistrationResult.Failed;
-                            return registrationResult;
-                        }
-                    }
-
-                    _requestCache.SetValue(CacheKey.Token, registrationToken);
-
-                    var authorityOrg = _organizationService.GetAuthority(recipientProgram.OrganizationRegulatoryProgramId);
-
-                    #region Send registration email to approvals
-
-                    var emailContentReplacements = new Dictionary<string, string>();
-                    emailContentReplacements.Add("firstName", applicationUser.FirstName);
-                    emailContentReplacements.Add("lastName", applicationUser.LastName);
-
-                    var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(senderProgram.RegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
-                    var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(senderProgram.RegulatoryProgramId, SettingType.EmailContactInfoPhone);
-                    var authorityName = _settingService.GetOrgRegProgramSettingValue(senderProgram.RegulatoryProgramId, SettingType.EmailContactInfoName);
-
-                    emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
-                    emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
-                    emailContentReplacements.Add("authorityName", authorityName);
-                    emailContentReplacements.Add("authorityOrganizationName", authorityOrg.OrganizationDto.OrganizationName);
-                    emailContentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
-
-                    if (!sendTo.Any())
-                    {
-                        sendTo.Add(emailAddressOnEmail);    // send email to authority support email when no approval email found
-                    }
-                    if (isInvitedToIndustry)
-                    {
-                        var receipientOrg = _organizationService.GetOrganization(recipientProgram.OrganizationId);
-
-                        emailContentReplacements.Add("addressLine1", receipientOrg.AddressLine1);
-                        emailContentReplacements.Add("cityName", receipientOrg.CityName);
-                        emailContentReplacements.Add("stateName", receipientOrg.State);
-                    }
-
-                    if (isInvitedToIndustry)
-                    {
-                        await _emailService.SendEmail(recipients: sendTo, emailType: EmailType.Registration_IndustryUserRegistrationPendingToApprovers, contentReplacements: emailContentReplacements);
-                    }
-                    else
-                    {
-                        await _emailService.SendEmail(recipients: sendTo, emailType: EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, contentReplacements: emailContentReplacements);
-                    }
-
-                    #endregion
-
-                    //Cromerr log
-                    int thisUserOrgRegProgUserId = orpu.OrganizationRegulatoryProgramUserId;
-                    var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                        .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
-                    var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
-                    var actorUser = _userService.GetUserProfileById(actorProgramUserDto.UserProfileId);
-
-                    var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
-                    {
-                        RegulatoryProgramId = recipientProgram.RegulatoryProgramId,
-                        OrganizationId = recipientProgram.OrganizationId,
-                        RegulatorOrganizationId = recipientProgram.RegulatorOrganizationId ?? recipientProgram.OrganizationId,
-                        UserProfileId = applicationUser.UserProfileId,
-                        UserName = applicationUser.UserName,
-                        UserFirstName = applicationUser.FirstName,
-                        UserLastName = applicationUser.LastName,
-                        UserEmailAddress = applicationUser.Email,
-                        IPAddress = _httpContext.CurrentUserIPAddress(),
-                        HostName = _httpContext.CurrentUserHostName()
-                    };
-                    var contentReplacements = new Dictionary<string, string>();
-                    contentReplacements.Add("authorityName", authorityOrg.OrganizationDto.OrganizationName);
-                    contentReplacements.Add("organizationName", recipientProgram.OrganizationDto.OrganizationName);
-                    contentReplacements.Add("regulatoryProgram", recipientProgram.RegulatoryProgramDto.Name);
-                    contentReplacements.Add("firstName", applicationUser.FirstName);
-                    contentReplacements.Add("lastName", applicationUser.LastName);
-                    contentReplacements.Add("userName", applicationUser.UserName);
-                    contentReplacements.Add("emailAddress", applicationUser.Email);
-                    contentReplacements.Add("actorFirstName", actorUser.FirstName);
-                    contentReplacements.Add("actorLastName", actorUser.LastName);
-                    contentReplacements.Add("actorUserName", actorUser.UserName);
-                    contentReplacements.Add("actorEmailAddress", actorUser.Email);
-
-                    await _crommerAuditLogService.Log(CromerrEvent.Registration_RegistrationPending, cromerrAuditLogEntryDto, contentReplacements);
-
-                    if (registrationType == RegistrationType.ResetRegistration)
-                    {
-                        //Log additional event in the case of "registration after a reset" TO ALL AUTHORITIES.
-                        var orgRegPrograms = _dbContext.OrganizationRegulatoryProgramUsers
-                            .Include(o => o.OrganizationRegulatoryProgram)
-                            .Where(o => o.UserProfileId == applicationUser.UserProfileId
-                                && o.OrganizationRegulatoryProgram.IsEnabled)
-                                .Select(o => o.OrganizationRegulatoryProgram)
-                                .Distinct()
-                                .ToList();
-
-                        foreach (var orp in orgRegPrograms)
-                        {
-                            cromerrAuditLogEntryDto.RegulatoryProgramId = orp.RegulatoryProgramId;
-                            cromerrAuditLogEntryDto.OrganizationId = orp.OrganizationId;
-                            cromerrAuditLogEntryDto.RegulatorOrganizationId = orp.RegulatorOrganizationId;
-                            await _crommerAuditLogService.Log(CromerrEvent.UserAccess_AccountResetSuccessful, cromerrAuditLogEntryDto, contentReplacements);
-                        }
-                    }
-
-
+                    // UC-42 6
+                    // 2 Create organization regulatory program user, and set the approved statue to false  
+                    await CreateOrUpdateOrganizationRegulatoryProgramUserDuringRegistration(applicationUser, recipientOrganizationRegulatoryProgram, inviterOrganizationRegulatoryProgram, registrationType);
+                    
                     // All succeed
                     // 4 Remove the invitation from table 
                     _invitationService.DeleteInvitation(invitationDto.InvitationId, true);
@@ -730,6 +608,189 @@ namespace Linko.LinkoExchange.Services.Authentication
             _logger.Info("Register. userName={0}, email={1}, registrationResult{2}", argument1: userInfo.UserName, argument2: registrationToken, argument3: registrationResult);
 
             return registrationResult;
+        }
+
+        private async Task CreateOrUpdateOrganizationRegulatoryProgramUserDuringRegistration(UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
+                                                                                             OrganizationRegulatoryProgramDto inviterOrganizationRegulatoryProgram, RegistrationType registrationType)
+        {
+            if (registrationType == RegistrationType.ResetRegistration)
+            {
+                // Set IsRegistrationApproved value as false to enforce all the users need to be approved again for the all programs where they were approved before.
+                // Only Authority can approve again 
+                var orpus = _dbContext.OrganizationRegulatoryProgramUsers.Include(o => o.OrganizationRegulatoryProgram)
+                                      .Where(i => i.UserProfileId == registeredUser.UserProfileId && i.IsRemoved == false && i.IsRegistrationApproved
+                                                  && i.OrganizationRegulatoryProgram.IsEnabled && i.OrganizationRegulatoryProgram.IsRemoved == false)
+                                      .ToList();
+
+                foreach (var prog in orpus)
+                {
+                    prog.IsRegistrationApproved = false;
+
+                    // Update to new re-registration time-stamp
+                    prog.RegistrationDateTimeUtc = DateTimeOffset.Now;
+
+                    // Update old InviterOrganizationRegulatoryProgramId with authority OrganizationRegulatoryProgramId to show registration approval pending in 
+                    // the authority portal as only Authority User can approve
+                    var prevRegisteredOrgRegProg = _programService.GetOrganizationRegulatoryProgram(prog.OrganizationRegulatoryProgramId);
+                    var authorityOrgRegProg  = _organizationService.GetAuthority(prevRegisteredOrgRegProg.OrganizationRegulatoryProgramId);
+                    prog.InviterOrganizationRegulatoryProgramId = authorityOrgRegProg.OrganizationRegulatoryProgramId;
+                    prog.LastModificationDateTimeUtc = DateTimeOffset.Now;
+                    
+                    _dbContext.SaveChanges();
+
+                    // Send Approval Emails
+                    await SendApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: prevRegisteredOrgRegProg,
+                                                           inviterOrganizationRegulatoryProgram: authorityOrgRegProg,
+                                                           authorityOrg: authorityOrgRegProg.OrganizationDto);
+
+                    // Do COMERR Log
+                    await DoComerrLogForRegistration(registrationType: registrationType, registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: prevRegisteredOrgRegProg,
+                                                     authorityOrg: authorityOrgRegProg.OrganizationDto);
+                }
+            }
+            else
+            {
+                var orpu = _dbContext.OrganizationRegulatoryProgramUsers
+                                     .SingleOrDefault(i => i.UserProfileId == registeredUser.UserProfileId
+                                                           && i.OrganizationRegulatoryProgramId == registeredOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId);
+
+                if (orpu == null) // totally new user or invited to new organization
+                {
+                    // To create a new OrgRegProgramUser
+                    orpu = new OrganizationRegulatoryProgramUser
+                           {
+                               IsEnabled = true,
+                               IsRegistrationApproved = false,
+                               IsRegistrationDenied = false,
+                               IsSignatory = false,
+                               UserProfileId = registeredUser.UserProfileId,
+                               IsRemoved = false,
+                               CreationDateTimeUtc = DateTimeOffset.Now,
+                               RegistrationDateTimeUtc = DateTimeOffset.Now,
+                               OrganizationRegulatoryProgramId = registeredOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId,
+                               InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId
+                           };
+
+                    _dbContext.OrganizationRegulatoryProgramUsers.Add(orpu);
+                }
+                else // re-register after removed
+                {
+                    // To update the existing one.  
+                    orpu.IsRegistrationApproved = false;
+                    orpu.IsRegistrationDenied = false;
+                    orpu.IsEnabled = true;
+
+                    //Update to new re-reg time-stamp
+                    orpu.RegistrationDateTimeUtc = DateTimeOffset.Now;
+
+                    //Update because the new "Inviter" is now the Authority
+                    //(need to do this so that this pending registration show up under the Authority)
+                    orpu.InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId;
+                    orpu.LastModificationDateTimeUtc = DateTimeOffset.Now;
+                }
+
+                var authorityOrg = registeredOrganizationRegulatoryProgram.RegulatorOrganization ?? registeredOrganizationRegulatoryProgram.OrganizationDto;
+
+                // Send Approval Emails
+                await SendApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: registeredOrganizationRegulatoryProgram,
+                                                       inviterOrganizationRegulatoryProgram: inviterOrganizationRegulatoryProgram, authorityOrg: authorityOrg);
+
+                // Do COMERR Log
+                await DoComerrLogForRegistration(registrationType: registrationType, registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: registeredOrganizationRegulatoryProgram,
+                                                 authorityOrg: authorityOrg);
+                _dbContext.SaveChanges();
+            }
+        }
+
+        private async Task SendApprovalEmailForRegistration(UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
+                                                            OrganizationRegulatoryProgramDto inviterOrganizationRegulatoryProgram, OrganizationDto authorityOrg)
+        {
+            //  Determine if user is authority user or is industry user;
+            bool isInvitedToIndustry = registeredOrganizationRegulatoryProgram.RegulatorOrganizationId.HasValue;
+
+            // UC-42 7, 8
+            // Find out who have approval permission    
+            var sendTo = _permissionService.GetApprovalPeople(inviterOrganizationRegulatoryProgram, isInvitedToIndustry).Select(i => i.Email).ToList();
+
+            var emailContentReplacements = new Dictionary<string, string>();
+            emailContentReplacements.Add("firstName", registeredUser.FirstName);
+            emailContentReplacements.Add("lastName", registeredUser.LastName);
+
+            var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(inviterOrganizationRegulatoryProgram.RegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+            var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(inviterOrganizationRegulatoryProgram.RegulatoryProgramId, SettingType.EmailContactInfoPhone);
+            var authorityName = _settingService.GetOrgRegProgramSettingValue(inviterOrganizationRegulatoryProgram.RegulatoryProgramId, SettingType.EmailContactInfoName);
+
+            emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
+            emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
+            emailContentReplacements.Add("authorityName", authorityName);
+            emailContentReplacements.Add("authorityOrganizationName", authorityOrg.OrganizationName);
+            emailContentReplacements.Add("organizationName", registeredOrganizationRegulatoryProgram.OrganizationDto.OrganizationName);
+
+            if (!sendTo.Any())
+            {
+                sendTo.Add(emailAddressOnEmail); // send email to authority support email when no approval email found
+            }
+
+            if (isInvitedToIndustry)
+            {
+                var receipientOrg = _organizationService.GetOrganization(registeredOrganizationRegulatoryProgram.OrganizationId);
+
+                emailContentReplacements.Add("addressLine1", receipientOrg.AddressLine1);
+                emailContentReplacements.Add("cityName", receipientOrg.CityName);
+                emailContentReplacements.Add("stateName", receipientOrg.State);
+            }
+
+            if (isInvitedToIndustry)
+            {
+                await _emailService.SendEmail(recipients: sendTo, emailType: EmailType.Registration_IndustryUserRegistrationPendingToApprovers, contentReplacements: emailContentReplacements);
+            }
+            else
+            {
+                await _emailService.SendEmail(recipients: sendTo, emailType: EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, contentReplacements: emailContentReplacements);
+            }
+        }
+
+        private async Task DoComerrLogForRegistration(RegistrationType registrationType, UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
+                                                      OrganizationDto authorityOrg)
+        {
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto
+                                          {
+                                              RegulatoryProgramId = registeredOrganizationRegulatoryProgram.RegulatoryProgramId,
+                                              OrganizationId = registeredOrganizationRegulatoryProgram.OrganizationId,
+                                              RegulatorOrganizationId = registeredOrganizationRegulatoryProgram.RegulatorOrganizationId ?? registeredOrganizationRegulatoryProgram.OrganizationId,
+                                              UserProfileId = registeredUser.UserProfileId,
+                                              UserName = registeredUser.UserName,
+                                              UserFirstName = registeredUser.FirstName,
+                                              UserLastName = registeredUser.LastName,
+                                              UserEmailAddress = registeredUser.Email,
+                                              IPAddress = _httpContext.CurrentUserIPAddress(),
+                                              HostName = _httpContext.CurrentUserHostName()
+                                          };
+            var contentReplacements = new Dictionary<string, string>
+                                      {
+                                          {"authorityName", authorityOrg.OrganizationName},
+                                          {"organizationName", registeredOrganizationRegulatoryProgram.OrganizationDto.OrganizationName},
+                                          {"regulatoryProgram", registeredOrganizationRegulatoryProgram.RegulatoryProgramDto.Name},
+                                          {"firstName", registeredUser.FirstName},
+                                          {"lastName", registeredUser.LastName},
+                                          {"userName", registeredUser.UserName},
+                                          {"emailAddress", registeredUser.Email},
+                                          {"actorFirstName", registeredUser.FirstName},
+                                          {"actorLastName", registeredUser.LastName},
+                                          {"actorUserName", registeredUser.UserName},
+                                          {"actorEmailAddress", registeredUser.Email}
+                                      };
+
+            await _crommerAuditLogService.Log(eventType: CromerrEvent.Registration_RegistrationPending, dto: cromerrAuditLogEntryDto, contentReplacements: contentReplacements);
+
+            if (registrationType == RegistrationType.ResetRegistration)
+            {
+                cromerrAuditLogEntryDto.RegulatoryProgramId = registeredOrganizationRegulatoryProgram.RegulatoryProgramId;
+                cromerrAuditLogEntryDto.OrganizationId = registeredOrganizationRegulatoryProgram.OrganizationId;
+                cromerrAuditLogEntryDto.RegulatorOrganizationId = registeredOrganizationRegulatoryProgram.RegulatorOrganizationId ?? registeredOrganizationRegulatoryProgram.OrganizationId;
+
+                await _crommerAuditLogService.Log(eventType: CromerrEvent.UserAccess_AccountResetSuccessful, dto: cromerrAuditLogEntryDto, contentReplacements: contentReplacements);
+            }
         }
 
         public bool CheckPasswordResetUrlNotExpired(string token)

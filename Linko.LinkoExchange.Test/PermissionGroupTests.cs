@@ -1,5 +1,6 @@
 ﻿using System.Configuration;
 using Linko.LinkoExchange.Data;
+using Linko.LinkoExchange.Services.Dto;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.Program;
@@ -32,7 +33,13 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetApprovalPeople()
         {
-            var approvers = _pService.GetApprovalPeople(1);
+            var dto = new OrganizationRegulatoryProgramDto
+            {
+                OrganizationId = 1000, 
+                OrganizationRegulatoryProgramId = 1001
+            }; 
+
+            var approvers = _pService.GetApprovalPeople(dto, true);
         }
     }
 }

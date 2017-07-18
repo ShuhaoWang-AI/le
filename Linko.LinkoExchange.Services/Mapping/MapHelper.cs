@@ -178,29 +178,29 @@ namespace Linko.LinkoExchange.Services.Mapping
         }
 
         public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram
-            (OrganizationRegulatoryProgram org, OrganizationRegulatoryProgramDto dto = null)
+            (OrganizationRegulatoryProgram orgRegProgram, OrganizationRegulatoryProgramDto dto = null)
         {
             if (dto == null)
             {
                 dto = new OrganizationRegulatoryProgramDto();
             }
-            dto.OrganizationRegulatoryProgramId = org.OrganizationRegulatoryProgramId;
-            dto.RegulatoryProgramId = org.RegulatoryProgramId;
-            dto.RegulatoryProgramDto = GetProgramDtoFromOrganizationRegulatoryProgram(org.RegulatoryProgram);
-            dto.OrganizationId = org.OrganizationId;
-            dto.RegulatorOrganizationId = org.RegulatorOrganizationId;
+            dto.OrganizationRegulatoryProgramId = orgRegProgram.OrganizationRegulatoryProgramId;
+            dto.RegulatoryProgramId = orgRegProgram.RegulatoryProgramId;
+            dto.RegulatoryProgramDto = GetProgramDtoFromOrganizationRegulatoryProgram(orgRegProgram.RegulatoryProgram);
+            dto.OrganizationId = orgRegProgram.OrganizationId;
+            dto.RegulatorOrganizationId = orgRegProgram.RegulatorOrganizationId;
 
-            dto.OrganizationDto = GetOrganizationDtoFromOrganization(org.Organization);
+            dto.OrganizationDto = GetOrganizationDtoFromOrganization(orgRegProgram.Organization);
 
-            if (org.RegulatorOrganization != null)
+            if (orgRegProgram.RegulatorOrganization != null)
             {
-                dto.RegulatorOrganization = GetOrganizationDtoFromOrganization(org.RegulatorOrganization);
+                dto.RegulatorOrganization = GetOrganizationDtoFromOrganization(orgRegProgram.RegulatorOrganization);
             }
 
-            dto.IsEnabled = org.IsEnabled;
-            dto.IsRemoved = org.IsRemoved;
-            dto.AssignedTo = org.AssignedTo;
-            dto.ReferenceNumber = org.ReferenceNumber;
+            dto.IsEnabled = orgRegProgram.IsEnabled;
+            dto.IsRemoved = orgRegProgram.IsRemoved;
+            dto.AssignedTo = orgRegProgram.AssignedTo;
+            dto.ReferenceNumber = orgRegProgram.ReferenceNumber;
 
             //IGNORE HasSignatory
             //IGNORE HasAdmin

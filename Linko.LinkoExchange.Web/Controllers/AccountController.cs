@@ -148,6 +148,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 model.RegistrationType = RegistrationType.ResetRegistration;
                 model.UserProfile = _profileHelper.GetUserProfileViewModel(userProfileId:user.UserProfileId);
+                model.UserProfile.Password = "";
                 model.UserProfile.ShowConfirmPassword = true;
             }
             else
@@ -348,6 +349,8 @@ namespace Linko.LinkoExchange.Web.Controllers
                     inValidUserProfileMessages.Add("Password does not meet criteria.");
                     break;
                 case RegistrationResult.CanNotUseLastNumberOfPasswords:
+                    model.UserProfile.Password = "";
+                    model.UserProfile.ConfirmPassword = "";
                     ViewBag.inValidProfile = true;
                     inValidUserProfileMessages.Add(string.Join(separator:" ", values:result.Errors));
                     break;

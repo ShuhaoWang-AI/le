@@ -92,16 +92,32 @@ namespace Linko.LinkoExchange.Services.Permission
             return userDtos;
         }
         
-        public IEnumerable<UserDto> GetApprovalPeople(int organizationRegulatoryProgramId)
+        public IEnumerable<UserDto> GetApprovalPeople(OrganizationRegulatoryProgramDto approverOrganizationRegulatoryProgram, bool isInvitedToIndustry) 
         {
             try
             {
+                var isInviterOrgIndustry = approverOrganizationRegulatoryProgram.RegulatorOrganizationId.HasValue;
+
                 var users = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
-                .Where(u => u.IsRemoved == false && 
-                            u.IsEnabled && u.IsRegistrationApproved &&
-                            u.IsRegistrationDenied == false &&
-                            u.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId &&
-                            u.PermissionGroup.Name == UserRole.Administrator.ToString());
+                                      .Where(u => u.IsRemoved == false &&
+                                                  u.IsEnabled && u.IsRegistrationApproved &&
+                                                  u.IsRegistrationDenied == false &&
+                                                  u.OrganizationRegulatoryProgramId == approverOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId);
+
+                if (!isInvitedToIndustry)
+                {
+                    // if registering for authority then only administrators can approve or deny
+                    users = users.Where(u => u.PermissionGroup.Name == UserRole.Administrator.ToString());
+                }
+                else if (isInviterOrgIndustry && isInvitedToIndustry)
+                {
+                    // if registering for industry and inviter organization is also industry then only administrators can approve or deny
+                    users = users.Where(u => u.PermissionGroup.Name == UserRole.Administrator.ToString());
+                }
+                else
+                {
+                    // if registering for industry and inviter organization is authority then all user can approve or deny
+                }
 
                 var userProfileIds = users.Select(i => i.UserProfileId).Distinct();
                 var userProfiles = _dbContext.Users.Where(i => userProfileIds.Contains(i.UserProfileId) &&

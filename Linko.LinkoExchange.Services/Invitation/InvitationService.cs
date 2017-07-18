@@ -374,7 +374,9 @@ namespace Linko.LinkoExchange.Services.Invitation
             // tOrganizationRegulatoryProgramUser.IsRemoved should be set to false
             if (existingUser != null)
             {
-                existingUser.IsRemoved = false;
+                var user = _dbContext.OrganizationRegulatoryProgramUsers.Single(u => u.OrganizationRegulatoryProgramUserId == existingUser.OrganizationRegulatoryProgramUserId);
+                user.IsRemoved = false;
+                _dbContext.SaveChanges();
             }
 
             cromerrAuditLogEntryDto.RegulatoryProgramId = targetOrgRegProgram.RegulatoryProgramId;

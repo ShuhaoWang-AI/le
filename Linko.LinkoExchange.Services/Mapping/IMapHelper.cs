@@ -10,7 +10,7 @@ namespace Linko.LinkoExchange.Services.Mapping
         UserDto GetUserDtoFromUserProfile(UserProfile userProfile, UserDto dto = null);
         UserProfile GetUserProfileFromUserDto(UserDto dto, UserProfile userProfile = null);
         OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(OrganizationRegulatoryProgramUser user, OrganizationRegulatoryProgramUserDto dto = null);
-        OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(OrganizationRegulatoryProgram org, OrganizationRegulatoryProgramDto dto = null);
+        OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(OrganizationRegulatoryProgram orgRegProgram, OrganizationRegulatoryProgramDto dto = null);
         SettingDto GetSettingDtoFromOrganizationRegulatoryProgramSetting(OrganizationRegulatoryProgramSetting setting, SettingDto dto = null);
         SettingDto GetSettingDtoFromOrganizationSetting(OrganizationSetting setting, SettingDto dto = null);
         InvitationDto GetInvitationDtoFromInvitation(Core.Domain.Invitation invitation, InvitationDto dto = null);

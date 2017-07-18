@@ -124,67 +124,6 @@ namespace Linko.LinkoExchange.Services.Program
             return authorityList;
         }
 
-        public OrganizationRegulatoryProgramUserDto CreateOrganizationRegulatoryProgramForUser(int userProfileId, int organizationRegulatoryProgramId, int inviterOrganizationRegulatoryProgramId, RegistrationType registrationType)
-        {
-            //var orpu = new OrganizationRegulatoryProgramUser();
-            var orpu = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault
-                (i => i.UserProfileId == userProfileId &&
-                 i.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId);
-            if (orpu == null)
-            {
-                // To create a new OrgRegProgram
-                orpu = new OrganizationRegulatoryProgramUser();
-                orpu.IsEnabled = true;
-                orpu.IsRegistrationApproved = false;
-                orpu.IsRegistrationDenied = false;
-                orpu.IsSignatory = false;
-                orpu.UserProfileId = userProfileId;
-                //orpu.LastModificationDateTimeUtc = DateTimeOffset.Now;
-                orpu.IsRemoved = false;
-                orpu.CreationDateTimeUtc = DateTimeOffset.Now;
-                orpu.RegistrationDateTimeUtc = DateTimeOffset.Now;
-                orpu.OrganizationRegulatoryProgramId = organizationRegulatoryProgramId;
-                orpu.InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgramId;
-
-                _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Add(orpu);
-            }
-            else
-            {
-                // To update the existing one.  
-                orpu.IsRegistrationApproved = false;
-                orpu.IsRegistrationDenied = false;
-                orpu.IsRemoved = false;
-
-                //Update to new re-reg time-stamp
-                orpu.RegistrationDateTimeUtc = DateTimeOffset.Now;
-
-                //Update because the new "Inviter" is now the Authority
-                //(need to do this so that this pending registration show up under the Authority)
-                orpu.InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgramId;
-
-                //RESET SCENARIO
-                if (registrationType == RegistrationType.ResetRegistration)
-                {
-                    // Update all other OrgRegProgm  IsRegistrationApproved to be false to enforce all the user be approved again by all program administrators where they were approved before 
-                    var orpus = _linkoExchangeDbContext.OrganizationRegulatoryProgramUsers.Where
-                        (i =>
-                             i.UserProfileId == userProfileId &&
-                             i.OrganizationRegulatoryProgramId != organizationRegulatoryProgramId &&
-                             i.IsRemoved == false && i.IsRegistrationApproved).ToList();
-
-                    foreach (var prog in orpus)
-                    {
-                        prog.IsRegistrationApproved = false;
-                    }
-                }
-            }
-
-            _linkoExchangeDbContext.SaveChanges();
-
-            return _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(orpu);
-
-        }
-
         public IEnumerable<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int currentOrganizationRegulatoryProgramId, string searchString)
         {
             throw new NotImplementedException();
