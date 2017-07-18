@@ -190,13 +190,11 @@ namespace Linko.LinkoExchange.Services.Email
                     RecipientFirstName = firstName,
                     RecipientLastName = lastName,
                     RecipientUserName = userName,
+                    RecipientUserProfileId = user.UserProfileId,
 
-                    RecipientRegulatoryProgramId =
-                        ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientRegulatoryProgramId) as string, 0),
-                    RecipientOrganizationId =
-                        ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientOrganizationId) as string, 0),
-                    RecipientRegulatorOrganizationId =
-                        ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientRegulatoryOrganizationId) as string, 0)
+                    RecipientRegulatoryProgramId = ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientRegulatoryProgramId) as string, null),
+                    RecipientOrganizationId = ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientOrganizationId) as string, null),
+                    RecipientRegulatorOrganizationId = ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientRegulatoryOrganizationId) as string, null)
                 };
 
                 emailAuditLogs.Add(auditLog);
@@ -268,7 +266,7 @@ namespace Linko.LinkoExchange.Services.Email
                 log.SenderEmailAddress = _senderEmailAddres;
                 log.SenderFirstName = _senderFistName;
                 log.SenderLastName = _senderLastName;
-
+                log.SenderUserProfileId = null;
                 log.AuditLogTemplateId = emailTemplateId;
                 log.Body = body;
                 log.Subject = subject;

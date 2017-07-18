@@ -5,6 +5,12 @@
     /// </summary>
     public class ValueParser
     {
+        public static int? TryParseInt(string value, int? defaultValue)
+        {
+            int result;
+            return int.TryParse(value, out result) ? result : defaultValue;
+        }
+
         public static int TryParseInt(string value, int defaultValue)
         {
             int result;

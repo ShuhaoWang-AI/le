@@ -29,7 +29,7 @@ namespace Linko.LinkoExchange.Services.Dto
             get; set;
         }
 
-        public int SenderUserProfileId
+        public int? SenderUserProfileId
         {
             get;set;
         }
