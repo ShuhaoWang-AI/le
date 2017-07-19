@@ -1621,7 +1621,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <summary>
         /// Gets a collection of SampleDto's that are eligible to be added this Report Package -- also indicate which are already associated.
         /// </summary>
-        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <param name="reportPackageElementTypeId">tReportPackage.reportPackageElementTypeId</param>
         /// <returns>Collection of SampleDto objects</returns>
         public ICollection<SampleDto> GetSamplesForSelection(int reportPackageElementTypeId)
         {
@@ -1631,10 +1631,11 @@ namespace Linko.LinkoExchange.Services.Report
             var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
 
             var associatedSampleIds = _dbContext.ReportSamples
-                .OrderBy(rs => rs.SampleId)
-                .Select(rs => rs.SampleId)
-                .Distinct()
-                .ToList();
+                                                .Where(rs => rs.ReportPackageElementTypeId == reportPackageElementTypeId)
+                                                .OrderBy(rs => rs.SampleId)
+                                                .Select(rs => rs.SampleId)
+                                                .Distinct()
+                                                .ToList();
 
             var existingSamplesReportPackageElementType = _dbContext.ReportPackageElementTypes
                                 .Include(rp => rp.ReportPackageElementCategory.ReportPackage)
