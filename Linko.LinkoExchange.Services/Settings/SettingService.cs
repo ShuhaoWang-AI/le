@@ -11,8 +11,8 @@ using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
-using System.Web.Caching;
 using Linko.LinkoExchange.Services.Cache;
+using System.Configuration;
 
 namespace Linko.LinkoExchange.Services.Settings
 {
@@ -24,37 +24,18 @@ namespace Linko.LinkoExchange.Services.Settings
         private readonly ILogger _logger;
         private readonly IMapHelper _mapHelper;
         private readonly IApplicationCache _cache;
-
-        private  Dictionary<SystemSettingType, string> _globalSettings = new Dictionary<SystemSettingType, string>();
-
+        private readonly IGlobalSettings _globalSettings;
 
         #endregion
 
         public SettingService(LinkoExchangeContext dbContext, ILogger logger,
-            IMapHelper mapHelper, IApplicationCache cache)
+            IMapHelper mapHelper, IApplicationCache cache, IGlobalSettings globalSettings)
         {
             _dbContext = dbContext; 
             _logger = logger;
             _mapHelper = mapHelper;
             _cache = cache;
-
-            var systemSettings = _dbContext.SystemSettings.ToList(); 
-
-            _globalSettings.Add(SystemSettingType.EmailServer, systemSettings.First(i => i.Name == SystemSettingType.EmailServer.ToString()).Value);
-            _globalSettings.Add(SystemSettingType.PasswordExpiredDays, systemSettings.First(i => i.Name == SystemSettingType.PasswordExpiredDays.ToString()).Value);
-            _globalSettings.Add(SystemSettingType.SupportPhoneNumber, systemSettings.First(i => i.Name == SystemSettingType.SupportPhoneNumber.ToString()).Value);
-            _globalSettings.Add(SystemSettingType.SupportEmailAddress, systemSettings.First(i => i.Name == SystemSettingType.SupportEmailAddress.ToString()).Value);
-            _globalSettings.Add(SystemSettingType.SystemEmailEmailAddress, systemSettings.First(i => i.Name == SystemSettingType.SystemEmailEmailAddress.ToString()).Value);
-            _globalSettings.Add(SystemSettingType.SystemEmailFirstName, systemSettings.First(i => i.Name == SystemSettingType.SystemEmailFirstName.ToString()).Value);
-            _globalSettings.Add(SystemSettingType.SystemEmailLastName, systemSettings.First(i => i.Name == SystemSettingType.SystemEmailLastName.ToString()).Value);
-
-            _globalSettings.Add(SystemSettingType.PasswordRequireDigit, systemSettings.First(i => i.Name == SystemSettingType.PasswordRequireDigit.ToString()).Value);
-            _globalSettings.Add(SystemSettingType.PasswordRequiredLength, systemSettings.First(i => i.Name == SystemSettingType.PasswordRequiredLength.ToString()).Value);
-            _globalSettings.Add(SystemSettingType.PasswordRequiredMaxLength, systemSettings.First(i => i.Name == SystemSettingType.PasswordRequiredMaxLength.ToString()).Value);
-            _globalSettings.Add(SystemSettingType.MassLoadingUnitName, systemSettings.First(i => i.Name == SystemSettingType.MassLoadingUnitName.ToString()).Value);
-            _globalSettings.Add(SystemSettingType.FileAvailableToAttachMaxAgeMonths, systemSettings.First(i => i.Name == SystemSettingType.FileAvailableToAttachMaxAgeMonths.ToString()).Value);
-            _globalSettings.Add(SystemSettingType.CTSDatabaseMinVersion, systemSettings.First(i => i.Name == SystemSettingType.CTSDatabaseMinVersion.ToString()).Value);
-            _globalSettings.Add(SystemSettingType.CTSDatabaseMinPatch, systemSettings.First(i => i.Name == SystemSettingType.CTSDatabaseMinPatch.ToString()).Value);
+            _globalSettings = globalSettings;
         }
 
         /// <summary>
@@ -332,7 +313,7 @@ namespace Linko.LinkoExchange.Services.Settings
         /// <returns>The settings for dictionary object</returns>
         public IDictionary<SystemSettingType, string> GetGlobalSettings()
 		{
-            return _globalSettings;
+            return _globalSettings.GetGlobalSettings();
 		}
 
         public string GetOrganizationSettingValueByUserId(int userProfileId, SettingType settingType, bool? isChooseMin, bool? isChooseMax)
@@ -435,7 +416,7 @@ namespace Linko.LinkoExchange.Services.Settings
         public string GetOrganizationSettingValue(int orgRegProgramId, SettingType settingType)
         {
             string cacheKey = $"{orgRegProgramId}-{settingType}";
-            if (settingType == SettingType.TimeZone && _cache.Get(cacheKey) != null)
+            if (_cache.Get(cacheKey) != null)
             {
                 return (string)_cache.Get(cacheKey);
             }
@@ -445,9 +426,12 @@ namespace Linko.LinkoExchange.Services.Settings
                .Single(s => s.OrganizationId == authority.OrganizationId
                && s.SettingTemplate.Name == settingType.ToString()).Value;
 
-            //Cache time zone value only
-            if (settingType == SettingType.TimeZone)
-                _cache.Insert(cacheKey, settingValue);
+            //Only cache certain settings
+            int durationHours;
+            if (_globalSettings.IsCacheRequired(settingType, out durationHours))
+            {
+                _cache.Insert(cacheKey, settingValue, durationHours);
+            }
 
             return settingValue;
 

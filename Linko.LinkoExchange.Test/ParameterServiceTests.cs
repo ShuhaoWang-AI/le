@@ -48,8 +48,8 @@ namespace Linko.LinkoExchange.Test
             _mockAppCache.Setup(c => c.Get("VolumeFlowRateLimitBasisId")).Returns("3");
             _mockAppCache.Setup(c => c.Get("TimeZoneId_6")).Returns("Eastern Standard Time");
 
-            var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper(), _mockAppCache.Object), new MapHelper(), _mockAppCache.Object);
-            var actualSettings = new SettingService(connection, _logger.Object, new MapHelper(), _mockAppCache.Object);
+            var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper(), _mockAppCache.Object, new Mock<IGlobalSettings>().Object), new MapHelper(), _mockAppCache.Object);
+            var actualSettings = new SettingService(connection, _logger.Object, new MapHelper(), _mockAppCache.Object, new Mock<IGlobalSettings>().Object);
 
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
             _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });

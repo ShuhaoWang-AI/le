@@ -28,7 +28,7 @@ namespace Linko.LinkoExchange.Test
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
             _logger = new Mock<ILogger>();
-            _settingService = new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object);
+            _settingService = new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object, new Mock<IGlobalSettings>().Object);
         }
 
         [TestMethod]

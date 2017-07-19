@@ -65,7 +65,7 @@ namespace Linko.LinkoExchange.Test
 
             invitationService = new InvitationService(
                 new LinkoExchangeContext(connectionString),
-                new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object),
+                new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object, new Mock<IGlobalSettings>().Object),
                 new UserService(new LinkoExchangeContext(connectionString),
                                 new EmailAuditLogEntryDto(),
                                 new PasswordHasher(),
@@ -83,7 +83,7 @@ namespace Linko.LinkoExchange.Test
                 _requestCache,//new RequestCache(),
                 _emailService,
                 new OrganizationService(new LinkoExchangeContext(connectionString),
-                                        new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object),
+                                        new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object, new Mock<IGlobalSettings>().Object),
                                         new HttpContextService(),
                                         new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), _timeZones.Object, new MapHelper()),
                                         _httpContext.Object,

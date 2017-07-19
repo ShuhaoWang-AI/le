@@ -71,7 +71,7 @@ namespace Linko.LinkoExchange.Test
             _mockSessionCache = new Mock<ISessionCache>();
             _mockSessionCache.Setup(c => c.GetValue("GetFlowUnitsFromCommaDelimitedString-gpd,mgd")).Returns(cachedFlowUnits);
 
-            var actualSettingService = new SettingService(connection, _logger.Object, new MapHelper(), _mockAppCache.Object);
+            var actualSettingService = new SettingService(connection, _logger.Object, new MapHelper(), _mockAppCache.Object, new Mock<IGlobalSettings>().Object);
             var actualTimeZoneService = new TimeZoneService(connection, actualSettingService, new MapHelper(), _mockAppCache.Object);
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
 

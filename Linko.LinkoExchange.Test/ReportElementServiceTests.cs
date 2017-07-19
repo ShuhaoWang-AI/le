@@ -38,7 +38,7 @@ namespace Linko.LinkoExchange.Test
             _orgService = new Mock<IOrganizationService>();
             _logger = new Mock<ILogger>();
             _timeZoneService = new Mock<ITimeZoneService>();
-            var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object), new MapHelper(), new Mock<IApplicationCache>().Object);
+            var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object, new Mock<IGlobalSettings>().Object), new MapHelper(), new Mock<IApplicationCache>().Object);
 
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
             _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });

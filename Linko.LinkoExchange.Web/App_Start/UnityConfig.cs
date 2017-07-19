@@ -113,6 +113,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<ISampleService, SampleService>();
             container.RegisterType<ISessionCache, SessionCache>();
             container.RegisterType<ISettingService, SettingService>();
+            container.RegisterType<IGlobalSettings, GlobalSettings>(new ContainerControlledLifetimeManager());
             container.RegisterType<ITimeZoneService, TimeZoneService>();
             container.RegisterType<IUnitService, UnitService>();
             container.RegisterType<IUserService, UserService>();

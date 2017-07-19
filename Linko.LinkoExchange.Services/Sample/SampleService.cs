@@ -17,6 +17,7 @@ using Linko.LinkoExchange.Services.Unit;
 using System.Data.Entity.Validation;
 using System.Data.Entity.Infrastructure;
 using System.Runtime.CompilerServices;
+using System.Configuration;
 
 namespace Linko.LinkoExchange.Services.Sample
 {
@@ -747,7 +748,8 @@ namespace Linko.LinkoExchange.Services.Sample
                 var flowlimitBasisId = _dbContext.LimitBases
                     .Single(lb => lb.Name == LimitBasisName.VolumeFlowRate.ToString()).LimitBasisId;
 
-                _cache.Insert("VolumeFlowRateLimitBasisId", flowlimitBasisId);
+                var cacheDurationHours = int.Parse(ConfigurationManager.AppSettings[name: "VolumeFlowRateLimitBasisCacheDurationHours"]);
+                _cache.Insert("VolumeFlowRateLimitBasisId", flowlimitBasisId, cacheDurationHours);
             }
 
             return Convert.ToInt32(_cache.Get("VolumeFlowRateLimitBasisId"));

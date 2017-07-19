@@ -6,6 +6,7 @@ using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Settings;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 
 namespace Linko.LinkoExchange.Services.TimeZone
@@ -27,11 +28,12 @@ namespace Linko.LinkoExchange.Services.TimeZone
 
         public string GetTimeZoneName(int timeZoneId)
         {
-            string cacheKey = $"TimeZoneId_{timeZoneId}";
+            string cacheKey = $"TimeZoneId-{timeZoneId}";
             if (_appCache.Get(cacheKey) == null)
             {
                 var cacheItem = _dbContext.TimeZones.Single(t => t.TimeZoneId == timeZoneId).Name;
-                _appCache.Insert(cacheKey, cacheItem);
+                int cacheDurationHours = int.Parse(ConfigurationManager.AppSettings[name: "TimeZoneNameCacheDurationHours"]);
+                _appCache.Insert(cacheKey, cacheItem, cacheDurationHours);
             }
 
             return (string)_appCache.Get(cacheKey);
