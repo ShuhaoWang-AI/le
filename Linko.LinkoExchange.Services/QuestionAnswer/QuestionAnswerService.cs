@@ -16,6 +16,7 @@ using Linko.LinkoExchange.Services.Email;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Services.Cache;
 
 namespace Linko.LinkoExchange.Services.QuestionAnswer
 {
@@ -32,11 +33,14 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         private readonly IEmailService _emailService;
         private readonly IMapHelper _mapHelper;
         private readonly ICromerrAuditLogService _crommerAuditLogService;
+        private readonly IOrganizationService _organizationService;
+        private readonly IRequestCache _requestCache;
 
         public QuestionAnswerService(LinkoExchangeContext dbContext, ILogger logger, IHttpContextService httpContext,
             IEncryptionService encryption, IPasswordHasher passwordHasher, ISettingService settingService,
             IOrganizationService orgService, IEmailService emailService,
-            IMapHelper mapHelper, ICromerrAuditLogService crommerAuditLogService)
+            IMapHelper mapHelper, ICromerrAuditLogService crommerAuditLogService,
+            IOrganizationService organizationService, IRequestCache requestCache)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -49,6 +53,8 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             _emailService = emailService;
             _mapHelper = mapHelper;
             _crommerAuditLogService = crommerAuditLogService;
+            _organizationService = organizationService;
+            _requestCache = requestCache;
         }
 
         public void AddUserQuestionAnswer(int userProfileId, AnswerDto answer)
@@ -331,6 +337,18 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             contentReplacements.Add("authorityList", authorityList);
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
             contentReplacements.Add("supportEmail", supportEmail);
+
+            
+            var currentOrganizationRegulatoryProgramId = _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId);
+
+            if (currentOrganizationRegulatoryProgramId.Trim().Length > 0)
+            {
+                var currentOrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(int.Parse(currentOrganizationRegulatoryProgramId));
+
+                _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, currentOrganizationRegulatoryProgram.RegulatoryProgramId);
+                _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, currentOrganizationRegulatoryProgram.OrganizationId);
+                _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, currentOrganizationRegulatoryProgram.RegulatorOrganizationId);
+            }
 
             if (questionCountKBQ > 0)
                 _emailService.SendEmail(new[] { userProfile.Email }, EmailType.Profile_KBQChanged, contentReplacements);

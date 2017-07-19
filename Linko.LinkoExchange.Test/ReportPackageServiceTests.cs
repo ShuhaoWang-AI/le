@@ -114,20 +114,22 @@ namespace Linko.LinkoExchange.Test
             var actualProgramService = new ProgramService(connection, new MapHelper());
 
             _reportPackageService = new ReportPackageService(
-                actualProgramService,
-                _copyOfRecordService.Object,
-                actualTimeZoneService,
-                _logger.Object,
-                connection,
-                _httpContext.Object,
-                _userService.Object,
-                actualEmailService,
-                _settingService.Object,
-                _orgService.Object,
-                actualSampleService,
-                new MapHelper(),
-                actualCromerrService
-            );
+                                                             actualProgramService,
+                                                             _copyOfRecordService.Object,
+                                                             actualTimeZoneService,
+                                                             _logger.Object,
+                                                             connection,
+                                                             _httpContext.Object,
+                                                             _userService.Object,
+                                                             actualEmailService,
+                                                             _settingService.Object,
+                                                             _orgService.Object,
+                                                             actualSampleService,
+                                                             new MapHelper(),
+                                                             actualCromerrService,
+                                                             new Mock<IOrganizationService>().Object,
+                                                             new Mock<IRequestCache>().Object
+                                                            );
         }
 
         [TestMethod]

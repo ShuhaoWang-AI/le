@@ -424,6 +424,11 @@ namespace Linko.LinkoExchange.Services.User
             //Email user
             EmailType emailType = isSignatory ? EmailType.Signature_SignatoryGranted : EmailType.Signature_SignatoryRevoked;
             EmailType adminEmailType = isSignatory ? EmailType.Signature_SignatoryGrantedToAdmin : EmailType.Signature_SignatoryRevokedToAdmin;
+
+            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, orgRegProgram.RegulatoryProgramId);
+            _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, orgRegProgram.OrganizationId);
+            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, orgRegProgram.RegulatorOrganizationId);
+
             _emailService.SendEmail(new[] { user.Email }, emailType, contentReplacements);
 
             //Log Cromerr
@@ -866,10 +871,6 @@ namespace Linko.LinkoExchange.Services.User
                 }
                 throw new RuleViolationException("Validation errors", validationIssues);
 
-            }
-            catch (Exception ex)
-            {
-                throw (ex);
             }
 
             if (isAttemptingLock)
@@ -1659,11 +1660,15 @@ namespace Linko.LinkoExchange.Services.User
 
         public ICollection<UserDto> GetOrgRegProgSignators(int orgRegProgId)
         {
-            var signatoryIds = _dbContext.OrganizationRegulatoryProgramUsers.Where(i => i.IsEnabled && i.IsSignatory &&
-                                                                           i.IsRegistrationApproved && !i.IsRegistrationDenied)
-                            .Select(b => b.UserProfileId);
-            var userProfiles = _dbContext.Users.Where(i => i.IsAccountLocked == false && i.IsAccountResetRequired == false
-                                                       && signatoryIds.Contains(i.UserProfileId));
+            var signatoryIds = _dbContext.OrganizationRegulatoryProgramUsers
+                                         .Where(i => i.OrganizationRegulatoryProgramId == orgRegProgId
+                                                     && i.IsSignatory
+                                                     && i.IsEnabled
+                                                     && !i.IsRemoved
+                                                     && !i.IsRegistrationDenied
+                                                     && i.IsRegistrationApproved)
+                                         .Select(b => b.UserProfileId);
+            var userProfiles = _dbContext.Users.Where(i => i.IsAccountLocked == false && i.IsAccountResetRequired == false && signatoryIds.Contains(i.UserProfileId));
 
             var userDtos = new List<UserDto>();
             foreach (var userProfile in userProfiles)
@@ -1677,14 +1682,18 @@ namespace Linko.LinkoExchange.Services.User
         public ICollection<UserDto> GetAuthorityAdministratorAndStandardUsers(int authorityOrganizationId)
         {
             var userIds = _dbContext.OrganizationRegulatoryProgramUsers
-                .Where(i => i.OrganizationRegulatoryProgram.OrganizationId == authorityOrganizationId &&
-                       i.OrganizationRegulatoryProgram.Organization.OrganizationType.Name == OrganizationTypeName.Authority.ToString() &&
-                       (i.PermissionGroup.Name == PermissionGroupName.Administrator.ToString() ||
-                        i.PermissionGroup.Name == PermissionGroupName.Standard.ToString())
-                       ).Select(i => i.UserProfileId);
+                                    .Where(i => i.OrganizationRegulatoryProgram.OrganizationId == authorityOrganizationId 
+                                                && i.OrganizationRegulatoryProgram.Organization.OrganizationType.Name == OrganizationTypeName.Authority.ToString()
+                                                && i.IsEnabled
+                                                && !i.IsRemoved
+                                                && !i.IsRegistrationDenied
+                                                && i.IsRegistrationApproved
+                                                && (i.PermissionGroup.Name == PermissionGroupName.Administrator.ToString() ||
+                                                    i.PermissionGroup.Name == PermissionGroupName.Standard.ToString())
+                                          ).Select(i => i.UserProfileId);
 
 
-            var userProfiles = _dbContext.Users.Where(i => userIds.Contains(i.UserProfileId));
+            var userProfiles = _dbContext.Users.Where(i => i.IsAccountLocked == false && i.IsAccountResetRequired == false && userIds.Contains(i.UserProfileId));
             var userDtos = new List<UserDto>();
             foreach (var userProfile in userProfiles)
             {

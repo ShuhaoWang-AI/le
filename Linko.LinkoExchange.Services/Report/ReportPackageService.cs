@@ -48,6 +48,9 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly ISampleService _sampleService;
         private readonly IMapHelper _mapHelper;
         private readonly ICromerrAuditLogService _crommerAuditLogService;
+        private readonly IOrganizationService _organizationService;
+        private readonly IRequestCache _requestCache;
+
         public ReportPackageService(
            IProgramService programService,
            ICopyOfRecordService copyOfRecordService,
@@ -61,7 +64,9 @@ namespace Linko.LinkoExchange.Services.Report
            IOrganizationService orgService,
            ISampleService sampleService,
            IMapHelper mapHelper,
-           ICromerrAuditLogService crommerAuditLogService
+           ICromerrAuditLogService crommerAuditLogService,
+           IOrganizationService organizationService, 
+           IRequestCache requestCache
            )
         {
             _programService = programService;
@@ -77,6 +82,8 @@ namespace Linko.LinkoExchange.Services.Report
             _sampleService = sampleService;
             _mapHelper = mapHelper;
             _crommerAuditLogService = crommerAuditLogService;
+            _organizationService = organizationService;
+            _requestCache = requestCache;
         }
 
         public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
@@ -770,19 +777,26 @@ namespace Linko.LinkoExchange.Services.Report
 
             // Send emails to all IU signatories 
             var signatoriesEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
-            foreach(var email in signatoriesEmails)
-            {
-              _emailService.SendEmail(new[] {email}, EmailType.Report_Submission_IU, emailContentReplacements, false);
-            }
+            
+            var iuOrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(reportPackage.OrganizationRegulatoryProgramId);
+
+            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, iuOrganizationRegulatoryProgram.RegulatoryProgramId);
+            _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, iuOrganizationRegulatoryProgram.OrganizationId);
+            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, iuOrganizationRegulatoryProgram.RegulatorOrganizationId);
+            
+            _emailService.SendEmail(signatoriesEmails, EmailType.Report_Submission_IU, emailContentReplacements, false).Wait();
 
             // Send emails to all Standard Users for the authority  
             var authorityOrganzationId = reportPackage.OrganizationRegulatoryProgramDto.RegulatorOrganizationId.Value;
             var authorityAdminAndStandardUsersEmails = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganzationId).Select(i => i.Email).ToList();
-            foreach(var email in authorityAdminAndStandardUsersEmails)
-            {
-               _emailService.SendEmail(new[] {email}, EmailType.Report_Submission_AU, emailContentReplacements, false);
-            }
-           
+            
+            var auOrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(reportPackage.OrganizationRegulatoryProgramId);
+
+            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, auOrganizationRegulatoryProgram.RegulatoryProgramId);
+            _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, auOrganizationRegulatoryProgram.OrganizationId);
+            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, auOrganizationRegulatoryProgram.RegulatorOrganizationId);
+            _emailService.SendEmail(authorityAdminAndStandardUsersEmails, EmailType.Report_Submission_AU, emailContentReplacements, false).Wait();
+
             _logger.Info("Leave ReportPackageService.SendSignAndSubmitEmail. reportPackageId={0}", reportPackage.ReportPackageId);
         }
 
@@ -1929,17 +1943,8 @@ namespace Linko.LinkoExchange.Services.Report
                     //===========
 
                     //System sends Repudiation Receipt email to all Signatories for Industry (UC-19 8.3.)
-                    var industrySignatories = _dbContext.OrganizationRegulatoryProgramUsers
-                        .Where(orpu => orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId
-                            && orpu.IsSignatory
-                            && orpu.IsEnabled
-                            && !orpu.IsRemoved
-                            && !orpu.IsRegistrationDenied
-                            && orpu.IsRegistrationApproved)
-                         .ToList();
 
-                    var corHash = _dbContext.CopyOfRecords
-                        .SingleOrDefault(cor => cor.ReportPackageId == reportPackageId);
+                    var corHash = _dbContext.CopyOfRecords.SingleOrDefault(cor => cor.ReportPackageId == reportPackageId);
 
                     if (corHash == null)
                     {
@@ -2012,32 +2017,6 @@ namespace Linko.LinkoExchange.Services.Report
                     contentReplacements.Add("lastName", currentUser.LastName);
                     contentReplacements.Add("emailAddress", currentUser.Email);
 
-                    foreach (var industrySignatory in industrySignatories)
-                    {
-                        var industrySignatoryUser = _dbContext.Users
-                            .Single(user => user.UserProfileId == industrySignatory.UserProfileId);
-
-                        _emailService.SendEmail(new[] { industrySignatoryUser.Email }, EmailType.Report_Repudiation_IU, contentReplacements);
-                    }
-
-                    //System sends Report Repudiated Receipt to all Admin and Standard Users for the Authority (UC-19 8.4.)
-                    var usersOfAuthority = _dbContext.OrganizationRegulatoryProgramUsers
-                        .Include(orpu => orpu.PermissionGroup)
-                        .Where(orpu => orpu.OrganizationRegulatoryProgramId == authorityOrganization.OrganizationRegulatoryProgramId
-                            && orpu.IsEnabled 
-                            && !orpu.IsRemoved
-                            && !orpu.IsRegistrationDenied
-                            && orpu.IsRegistrationApproved
-                            && (orpu.PermissionGroup.Name == PermissionGroupName.Standard.ToString() || orpu.PermissionGroup.Name == PermissionGroupName.Administrator.ToString()))
-                        .ToList();
-
-                    foreach (var userOfAuthority in usersOfAuthority)
-                    {
-                        var thisUserObject = _dbContext.Users
-                            .Single(user => user.UserProfileId == userOfAuthority.UserProfileId);
-
-                        _emailService.SendEmail(new[] { thisUserObject.Email }, EmailType.Report_Repudiation_AU, contentReplacements);
-                    }
 
                     //Cromerr Log (UC-19 8.6.)
                     var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
@@ -2053,10 +2032,31 @@ namespace Linko.LinkoExchange.Services.Report
                     cromerrAuditLogEntryDto.IPAddress = _httpContextService.CurrentUserIPAddress();
                     cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
 
-                    _crommerAuditLogService.Log(CromerrEvent.Report_Repudiated, cromerrAuditLogEntryDto,
-                                                contentReplacements);
+                    _crommerAuditLogService.Log(CromerrEvent.Report_Repudiated, cromerrAuditLogEntryDto, contentReplacements);
 
                     _dbContext.SaveChanges();
+                    
+                    var signatoriesEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
+            
+                    var iuOrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(reportPackage.OrganizationRegulatoryProgramId);
+
+                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, iuOrganizationRegulatoryProgram.RegulatoryProgramId);
+                    _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, iuOrganizationRegulatoryProgram.OrganizationId);
+                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, iuOrganizationRegulatoryProgram.RegulatorOrganizationId);
+            
+                    _emailService.SendEmail(signatoriesEmails, EmailType.Report_Repudiation_IU, contentReplacements, false).Wait();
+
+                    //System sends Report Repudiated Receipt to all Admin and Standard Users for the Authority (UC-19 8.4.)
+                    var authorityOrganzationId = authorityOrganization.OrganizationId;
+                    var authorityAdminAndStandardUsersEmails = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganzationId).Select(i => i.Email).ToList();
+            
+                    var auOrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(reportPackage.OrganizationRegulatoryProgramId);
+
+                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, auOrganizationRegulatoryProgram.RegulatoryProgramId);
+                    _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, auOrganizationRegulatoryProgram.OrganizationId);
+                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, auOrganizationRegulatoryProgram.RegulatorOrganizationId);
+
+                    _emailService.SendEmail(authorityAdminAndStandardUsersEmails, EmailType.Report_Repudiation_AU, contentReplacements, false).Wait();
 
                     transaction.Commit();
                 }
@@ -2073,12 +2073,12 @@ namespace Linko.LinkoExchange.Services.Report
 
                         foreach (DbValidationError subItem in item.ValidationErrors)
                         {
-                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            string message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
                             errors.Add(message);
                         }
                     }
 
-                    _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
+                    _logger.Error("Error happens {0} ", string.Join("," + Environment.NewLine, errors));
 
                     throw;
 
@@ -2146,7 +2146,7 @@ namespace Linko.LinkoExchange.Services.Report
 
                         foreach (DbValidationError subItem in item.ValidationErrors)
                         {
-                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            string message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
                             errors.Add(message);
                         }
                     }
@@ -2219,7 +2219,7 @@ namespace Linko.LinkoExchange.Services.Report
 
                         foreach (DbValidationError subItem in item.ValidationErrors)
                         {
-                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            string message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
                             errors.Add(message);
                         }
                     }

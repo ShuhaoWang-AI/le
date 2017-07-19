@@ -247,6 +247,16 @@ namespace Linko.LinkoExchange.Services.Authentication
                 contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
                 contentReplacements.Add("supportEmail", supportEmail);
 
+                var currentOrganizationRegulatoryProgramId = _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId);
+
+                if (currentOrganizationRegulatoryProgramId.Trim().Length > 0)
+                {
+                    var currentOrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(int.Parse(currentOrganizationRegulatoryProgramId));
+
+                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, currentOrganizationRegulatoryProgram.RegulatoryProgramId);
+                    _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, currentOrganizationRegulatoryProgram.OrganizationId);
+                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, currentOrganizationRegulatoryProgram.RegulatorOrganizationId);
+                }
                 _emailService.SendEmail(new[] { applicationUser.Email }, EmailType.Profile_PasswordChanged, contentReplacements);
 
                 //Cromerr
@@ -364,7 +374,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 return registrationResult;
             }
                 
-            _requestCache.SetValue(CacheKey.Token, registrationToken);
+            //_requestCache.SetValue(CacheKey.Token, registrationToken);
             _logger.Info("Register. userName={0}, registrationToken={1}", userInfo.UserName, registrationToken);
 
             var invitationDto = _invitationService.GetInvitation(registrationToken);
@@ -618,25 +628,29 @@ namespace Linko.LinkoExchange.Services.Authentication
                 // Set IsRegistrationApproved value as false to enforce all the users need to be approved again for the all programs where they were approved before.
                 // Only Authority can approve again 
                 var orpus = _dbContext.OrganizationRegulatoryProgramUsers.Include(o => o.OrganizationRegulatoryProgram)
-                                      .Where(i => i.UserProfileId == registeredUser.UserProfileId && i.IsRemoved == false && i.IsRegistrationApproved
-                                                  && i.OrganizationRegulatoryProgram.IsEnabled && i.OrganizationRegulatoryProgram.IsRemoved == false)
+                                      .Where(i => i.UserProfileId == registeredUser.UserProfileId && i.IsRemoved == false && i.IsRegistrationApproved)
                                       .ToList();
 
-                foreach (var prog in orpus)
+                foreach (var orpu in orpus)
                 {
-                    prog.IsRegistrationApproved = false;
+                    orpu.IsRegistrationApproved = false;
 
                     // Update to new re-registration time-stamp
-                    prog.RegistrationDateTimeUtc = DateTimeOffset.Now;
+                    orpu.RegistrationDateTimeUtc = DateTimeOffset.Now;
 
                     // Update old InviterOrganizationRegulatoryProgramId with authority OrganizationRegulatoryProgramId to show registration approval pending in 
                     // the authority portal as only Authority User can approve
-                    var prevRegisteredOrgRegProg = _programService.GetOrganizationRegulatoryProgram(prog.OrganizationRegulatoryProgramId);
+                    var prevRegisteredOrgRegProg = _programService.GetOrganizationRegulatoryProgram(orpu.OrganizationRegulatoryProgramId);
                     var authorityOrgRegProg  = _organizationService.GetAuthority(prevRegisteredOrgRegProg.OrganizationRegulatoryProgramId);
-                    prog.InviterOrganizationRegulatoryProgramId = authorityOrgRegProg.OrganizationRegulatoryProgramId;
-                    prog.LastModificationDateTimeUtc = DateTimeOffset.Now;
+                    orpu.InviterOrganizationRegulatoryProgramId = authorityOrgRegProg.OrganizationRegulatoryProgramId;
+                    orpu.LastModificationDateTimeUtc = DateTimeOffset.Now;
                     
                     _dbContext.SaveChanges();
+
+                    if (!orpu.OrganizationRegulatoryProgram.IsEnabled || orpu.OrganizationRegulatoryProgram.IsRemoved)
+                    {
+                        continue;
+                    }
 
                     // Send Approval Emails
                     await SendApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: prevRegisteredOrgRegProg,
@@ -688,16 +702,21 @@ namespace Linko.LinkoExchange.Services.Authentication
                     orpu.InviterOrganizationRegulatoryProgramId = inviterOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId;
                     orpu.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 }
+                
+                if (orpu.OrganizationRegulatoryProgram.IsEnabled && !orpu.OrganizationRegulatoryProgram.IsRemoved)
+                {
+                    var authorityOrg = registeredOrganizationRegulatoryProgram.RegulatorOrganization ?? registeredOrganizationRegulatoryProgram.OrganizationDto;
 
-                var authorityOrg = registeredOrganizationRegulatoryProgram.RegulatorOrganization ?? registeredOrganizationRegulatoryProgram.OrganizationDto;
+                    // Send Approval Emails
+                    await SendApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: registeredOrganizationRegulatoryProgram,
+                                                           inviterOrganizationRegulatoryProgram: inviterOrganizationRegulatoryProgram, authorityOrg: authorityOrg);
 
-                // Send Approval Emails
-                await SendApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: registeredOrganizationRegulatoryProgram,
-                                                       inviterOrganizationRegulatoryProgram: inviterOrganizationRegulatoryProgram, authorityOrg: authorityOrg);
+                    // Do COMERR Log
+                    await DoComerrLogForRegistration(registrationType: registrationType, registeredUser: registeredUser,
+                                                     registeredOrganizationRegulatoryProgram: registeredOrganizationRegulatoryProgram,
+                                                     authorityOrg: authorityOrg);
+                }
 
-                // Do COMERR Log
-                await DoComerrLogForRegistration(registrationType: registrationType, registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: registeredOrganizationRegulatoryProgram,
-                                                 authorityOrg: authorityOrg);
                 _dbContext.SaveChanges();
             }
         }
@@ -711,6 +730,10 @@ namespace Linko.LinkoExchange.Services.Authentication
             // UC-42 7, 8
             // Find out who have approval permission    
             var sendTo = _permissionService.GetApprovalPeople(inviterOrganizationRegulatoryProgram, isInvitedToIndustry).Select(i => i.Email).ToList();
+
+            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, inviterOrganizationRegulatoryProgram.RegulatoryProgramId);
+            _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, inviterOrganizationRegulatoryProgram.OrganizationId);
+            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, inviterOrganizationRegulatoryProgram.RegulatorOrganizationId);
 
             var emailContentReplacements = new Dictionary<string, string>();
             emailContentReplacements.Add("firstName", registeredUser.FirstName);

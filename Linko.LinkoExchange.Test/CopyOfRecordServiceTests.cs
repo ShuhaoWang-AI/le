@@ -121,17 +121,21 @@ namespace Linko.LinkoExchange.Test
                        .Returns(programDto);
 
             IReportPackageService reportPackageService =
-                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
-                  _logger.Object,
-                  _dbContext,
-                  _httpContext.Object,
-                  _userService,
-                  emailService.Object,
-                  _settService,
-                  _orgService.Object,
-                  _sampleService.Object,
-                  _mapHeper,
-                  _cromerrService.Object);
+                new ReportPackageService(_programService,
+                                         _copyOrRecordService,
+                                         _actualTimeZoneService,
+                                         _logger.Object,
+                                         _dbContext,
+                                         _httpContext.Object,
+                                         _userService,
+                                         emailService.Object,
+                                         _settService,
+                                         _orgService.Object,
+                                         _sampleService.Object,
+                                         _mapHeper,
+                                         _cromerrService.Object,
+                                         new Mock<IOrganizationService>().Object,
+                                         new Mock<IRequestCache>().Object);
 
             var reportPackageId = 527466233;
             var validResult = reportPackageService.VerififyCopyOfRecord(reportPackageId);
@@ -148,17 +152,21 @@ namespace Linko.LinkoExchange.Test
                        .Returns(programDto);
 
             IReportPackageService reportPackageService =
-                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
-                  _logger.Object,
-                  _dbContext,
-                  _httpContext.Object,
-                  _userService,
-                  emailService.Object,
-                  _settService,
-                  _orgService.Object,
-                  _sampleService.Object,
-                  _mapHeper,
-                  _cromerrService.Object);
+                new ReportPackageService(_programService,
+                                         _copyOrRecordService,
+                                         _actualTimeZoneService,
+                                         _logger.Object,
+                                         _dbContext,
+                                         _httpContext.Object,
+                                         _userService,
+                                         emailService.Object,
+                                         _settService,
+                                         _orgService.Object,
+                                         _sampleService.Object,
+                                         _mapHeper,
+                                         _cromerrService.Object,
+                                         new Mock<IOrganizationService>().Object,
+                                         new Mock<IRequestCache>().Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -178,17 +186,21 @@ namespace Linko.LinkoExchange.Test
                        .Returns(programDto);
 
             IReportPackageService reportPackageService =
-                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
-                  _logger.Object,
-                  _dbContext,
-                  _httpContext.Object,
-                  _userService,
-                  emailService.Object,
-                  _settService,
-                  _orgService.Object,
-                  _sampleService.Object,
-                  _mapHeper,
-                  _cromerrService.Object);
+                new ReportPackageService(_programService,
+                                         _copyOrRecordService,
+                                         _actualTimeZoneService,
+                                         _logger.Object,
+                                         _dbContext,
+                                         _httpContext.Object,
+                                         _userService,
+                                         emailService.Object,
+                                         _settService,
+                                         _orgService.Object,
+                                         _sampleService.Object,
+                                         _mapHeper,
+                                         _cromerrService.Object,
+                                         new Mock<IOrganizationService>().Object,
+                                         new Mock<IRequestCache>().Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -212,17 +224,21 @@ namespace Linko.LinkoExchange.Test
                        .Returns(programDto);
 
             IReportPackageService reportPackageService =
-                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
-                  _logger.Object,
-                  _dbContext,
-                  _httpContext.Object,
-                  _userService,
-                  emailService.Object,
-                  _settService,
-                  _orgService.Object,
-                  _sampleService.Object,
-                  _mapHeper,
-                  _cromerrService.Object);
+                new ReportPackageService(_programService,
+                                         _copyOrRecordService,
+                                         _actualTimeZoneService,
+                                         _logger.Object,
+                                         _dbContext,
+                                         _httpContext.Object,
+                                         _userService,
+                                         emailService.Object,
+                                         _settService,
+                                         _orgService.Object,
+                                         _sampleService.Object,
+                                         _mapHeper,
+                                         _cromerrService.Object,
+                                         new Mock<IOrganizationService>().Object,
+                                         new Mock<IRequestCache>().Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -248,7 +264,9 @@ namespace Linko.LinkoExchange.Test
                        .Returns(programDto);
 
             IReportPackageService reportPackageService =
-                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
+                new ReportPackageService(_programService, 
+                _copyOrRecordService, 
+                _actualTimeZoneService,
                   _logger.Object,
                   _dbContext,
                   _httpContext.Object,
@@ -258,7 +276,9 @@ namespace Linko.LinkoExchange.Test
                   _orgService.Object,
                   _sampleService.Object,
                   _mapHeper,
-                  _cromerrService.Object);
+                  _cromerrService.Object,
+                                         new Mock<IOrganizationService>().Object,
+                                         new Mock<IRequestCache>().Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -282,17 +302,21 @@ namespace Linko.LinkoExchange.Test
                        .Returns(programDto);
 
             IReportPackageService reportPackageService =
-                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
-                  _logger.Object,
-                  _dbContext,
-                  _httpContext.Object,
-                  _userService,
-                  emailService.Object,
-                  _settService,
-                  _orgService.Object,
-                  _sampleService.Object,
-                  _mapHeper,
-                  _cromerrService.Object);
+                new ReportPackageService(_programService,
+                                         _copyOrRecordService,
+                                         _actualTimeZoneService,
+                                         _logger.Object,
+                                         _dbContext,
+                                         _httpContext.Object,
+                                         _userService,
+                                         emailService.Object,
+                                         _settService,
+                                         _orgService.Object,
+                                         _sampleService.Object,
+                                         _mapHeper,
+                                         _cromerrService.Object,
+                                         new Mock<IOrganizationService>().Object,
+                                         new Mock<IRequestCache>().Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -315,17 +339,21 @@ namespace Linko.LinkoExchange.Test
                        .Returns(programDto);
 
             IReportPackageService reportPackageService =
-                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
-                  _logger.Object,
-                  _dbContext,
-                  _httpContext.Object,
-                  _userService,
-                  emailService.Object,
-                  _settService,
-                  _orgService.Object,
-                  _sampleService.Object,
-                  _mapHeper,
-                  _cromerrService.Object);
+                new ReportPackageService(_programService,
+                                         _copyOrRecordService,
+                                         _actualTimeZoneService,
+                                         _logger.Object,
+                                         _dbContext,
+                                         _httpContext.Object,
+                                         _userService,
+                                         emailService.Object,
+                                         _settService,
+                                         _orgService.Object,
+                                         _sampleService.Object,
+                                         _mapHeper,
+                                         _cromerrService.Object,
+                                         new Mock<IOrganizationService>().Object,
+                                         new Mock<IRequestCache>().Object);
 
             var reportPackageId = 527466233;
             var copyOfRecordDto = reportPackageService.GetCopyOfRecordByReportPackageId(reportPackageId);
@@ -352,17 +380,21 @@ namespace Linko.LinkoExchange.Test
                        .Returns(programDto);
 
             IReportPackageService reportPackageService =
-                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
-                  _logger.Object,
-                  _dbContext,
-                  _httpContext.Object,
-                  _userService,
-                  emailService.Object,
-                  _settService,
-                  _orgService.Object,
-                  _sampleService.Object,
-                  _mapHeper,
-                  _cromerrService.Object);
+                new ReportPackageService(_programService,
+                                         _copyOrRecordService,
+                                         _actualTimeZoneService,
+                                         _logger.Object,
+                                         _dbContext,
+                                         _httpContext.Object,
+                                         _userService,
+                                         emailService.Object,
+                                         _settService,
+                                         _orgService.Object,
+                                         _sampleService.Object,
+                                         _mapHeper,
+                                         _cromerrService.Object,
+                                         new Mock<IOrganizationService>().Object,
+                                         new Mock<IRequestCache>().Object);
 
             var xmlDate = reportPackageService.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
 
@@ -386,17 +418,21 @@ namespace Linko.LinkoExchange.Test
 
 
             IReportPackageService reportPackageService =
-                new ReportPackageService(_programService, _copyOrRecordService, _actualTimeZoneService,
-                  _logger.Object,
-                  _dbContext,
-                  _httpContext.Object,
-                  _userService,
-                  emailService.Object,
-                  _settingService.Object,
-                  _orgService.Object,
-                  _sampleService.Object,
-                  _mapHeper,
-                  _cromerrService.Object);
+                new ReportPackageService(_programService,
+                                         _copyOrRecordService,
+                                         _actualTimeZoneService,
+                                         _logger.Object,
+                                         _dbContext,
+                                         _httpContext.Object,
+                                         _userService,
+                                         emailService.Object,
+                                         _settingService.Object,
+                                         _orgService.Object,
+                                         _sampleService.Object,
+                                         _mapHeper,
+                                         _cromerrService.Object,
+                                         new Mock<IOrganizationService>().Object,
+                                         new Mock<IRequestCache>().Object);
 
             var xmlFileData = reportPackageService.GetReportPackageCopyOfRecordDataXmlFile(reportPackageDto);
 

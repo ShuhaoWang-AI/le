@@ -58,7 +58,9 @@ namespace Linko.LinkoExchange.Test
                                                                _orgService.Object,
                                                                _emailService.Object,
                                                                _mapHelper.Object,
-                                                               _crommerAuditLogService.Object
+                                                               _crommerAuditLogService.Object,
+                                                               new Mock<IOrganizationService>().Object,
+                                                               new Mock<IRequestCache>().Object
                                                                );
             _encrypter = new EncryptionService();
             _passwordHasher = new PasswordHasher();
