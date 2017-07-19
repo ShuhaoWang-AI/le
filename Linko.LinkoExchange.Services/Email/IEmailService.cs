@@ -8,5 +8,7 @@ namespace Linko.LinkoExchange.Services.Email
     {
         Task SendEmail(IEnumerable<string> recipients, EmailType emailType,
             IDictionary<string, string> contentReplacements, bool perRegulatoryProgram = true);
+
+        void SendCachedEmailEntries();
     }
 }

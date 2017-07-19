@@ -25,7 +25,7 @@ namespace Linko.LinkoExchange.Services.Email
         private readonly ISettingService _settingService;
         private readonly IRequestCache _requestCache;
 
-        private string _emailServer = "";
+        private string _emailServer;
 
         private readonly string _senderEmailAddres;
         private readonly string _senderFistName;
@@ -52,10 +52,28 @@ namespace Linko.LinkoExchange.Services.Email
             _emailServer = settingService.GetGlobalSettings()[SystemSettingType.EmailServer];
         }
 
+        public void SendCachedEmailEntries()
+        {
+            var emailEntries = (EmailEntry[]) _requestCache.GetValue(CacheKey.EmailEntriesToSend);
+            if(emailEntries != null && emailEntries.Any())
+            { 
+                foreach(var entry in emailEntries)
+                { 
+                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, entry.ReceipientOrgulatoryProgramId);
+                    _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId,  entry.ReceipientOrganizationId);
+                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId,  entry.ReceipientRegulatorOrganizationId); 
+
+                   SendEmail(entry.SendToEmails, entry.EmailType, entry.ContentReplacements).Wait();
+                }
+            }
+            
+            _requestCache.SetValue(CacheKey.EmailEntriesToSend, null);
+        }
+
         public async Task SendEmail(IEnumerable<string> recipients, EmailType emailType,
             IDictionary<string, string> contentReplacements, bool perRegulatoryProgram = true)
         {
-            string sendTo = string.Join(separator: ",", values: recipients);
+            string sendTo = string.Join(separator: ",", values: recipients); 
 
             var template = await GetTemplate(emailType);
             if (template == null)

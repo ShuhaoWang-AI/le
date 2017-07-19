@@ -615,6 +615,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
             }
 
+            //Send pending registration emails
+            _emailService.SendCachedEmailEntries(); 
+
             _logger.Info("Register. userName={0}, email={1}, registrationResult{2}", argument1: userInfo.UserName, argument2: registrationToken, argument3: registrationResult);
 
             return registrationResult;
@@ -628,7 +631,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                 // Set IsRegistrationApproved value as false to enforce all the users need to be approved again for the all programs where they were approved before.
                 // Only Authority can approve again 
                 var orpus = _dbContext.OrganizationRegulatoryProgramUsers.Include(o => o.OrganizationRegulatoryProgram)
-                                      .Where(i => i.UserProfileId == registeredUser.UserProfileId && i.IsRemoved == false && i.IsRegistrationApproved)
+                                      .Where(i => i.UserProfileId == registeredUser.UserProfileId && i.IsRemoved == false && i.IsRegistrationApproved &&
+                                        i.InviterOrganizationRegulatoryProgram.IsRemoved == false && i.OrganizationRegulatoryProgram.IsEnabled)
                                       .ToList();
 
                 foreach (var orpu in orpus)
@@ -640,6 +644,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     // Update old InviterOrganizationRegulatoryProgramId with authority OrganizationRegulatoryProgramId to show registration approval pending in 
                     // the authority portal as only Authority User can approve
+                     
                     var prevRegisteredOrgRegProg = _programService.GetOrganizationRegulatoryProgram(orpu.OrganizationRegulatoryProgramId);
                     var authorityOrgRegProg  = _organizationService.GetAuthority(prevRegisteredOrgRegProg.OrganizationRegulatoryProgramId);
                     orpu.InviterOrganizationRegulatoryProgramId = authorityOrgRegProg.OrganizationRegulatoryProgramId;
@@ -652,8 +657,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                         continue;
                     }
 
-                    // Send Approval Emails
-                    await SendApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: prevRegisteredOrgRegProg,
+                    // Prepare Registration Approval Emails
+                    PrepareApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: prevRegisteredOrgRegProg,
                                                            inviterOrganizationRegulatoryProgram: authorityOrgRegProg,
                                                            authorityOrg: authorityOrgRegProg.OrganizationDto);
 
@@ -707,8 +712,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                 {
                     var authorityOrg = registeredOrganizationRegulatoryProgram.RegulatorOrganization ?? registeredOrganizationRegulatoryProgram.OrganizationDto;
 
-                    // Send Approval Emails
-                    await SendApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: registeredOrganizationRegulatoryProgram,
+                    // Prepare Registration Approval Emails
+                    PrepareApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: registeredOrganizationRegulatoryProgram,
                                                            inviterOrganizationRegulatoryProgram: inviterOrganizationRegulatoryProgram, authorityOrg: authorityOrg);
 
                     // Do COMERR Log
@@ -721,19 +726,16 @@ namespace Linko.LinkoExchange.Services.Authentication
             }
         }
 
-        private async Task SendApprovalEmailForRegistration(UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
+        private void PrepareApprovalEmailForRegistration(UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
                                                             OrganizationRegulatoryProgramDto inviterOrganizationRegulatoryProgram, OrganizationDto authorityOrg)
         {
+
             //  Determine if user is authority user or is industry user;
             bool isInvitedToIndustry = registeredOrganizationRegulatoryProgram.RegulatorOrganizationId.HasValue;
 
             // UC-42 7, 8
             // Find out who have approval permission    
             var sendTo = _permissionService.GetApprovalPeople(inviterOrganizationRegulatoryProgram, isInvitedToIndustry).Select(i => i.Email).ToList();
-
-            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, inviterOrganizationRegulatoryProgram.RegulatoryProgramId);
-            _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, inviterOrganizationRegulatoryProgram.OrganizationId);
-            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, inviterOrganizationRegulatoryProgram.RegulatorOrganizationId);
 
             var emailContentReplacements = new Dictionary<string, string>();
             emailContentReplacements.Add("firstName", registeredUser.FirstName);
@@ -763,14 +765,26 @@ namespace Linko.LinkoExchange.Services.Authentication
                 emailContentReplacements.Add("stateName", receipientOrg.State);
             }
 
-            if (isInvitedToIndustry)
+            var emailEntry = new EmailEntry
             {
-                await _emailService.SendEmail(recipients: sendTo, emailType: EmailType.Registration_IndustryUserRegistrationPendingToApprovers, contentReplacements: emailContentReplacements);
+                SendToEmails = sendTo,
+                ContentReplacements = emailContentReplacements,
+                ReceipientOrgulatoryProgramId= inviterOrganizationRegulatoryProgram.RegulatoryProgramId, 
+                ReceipientOrganizationId = inviterOrganizationRegulatoryProgram.OrganizationId,
+                ReceipientRegulatorOrganizationId = inviterOrganizationRegulatoryProgram.RegulatorOrganizationId
+            }; 
+            
+            if (isInvitedToIndustry)
+            { 
+                emailEntry.EmailType = EmailType.Registration_IndustryUserRegistrationPendingToApprovers;
             }
             else
             {
-                await _emailService.SendEmail(recipients: sendTo, emailType: EmailType.Registration_AuthorityUserRegistrationPendingToApprovers, contentReplacements: emailContentReplacements);
+                emailEntry.EmailType = EmailType.Registration_AuthorityUserRegistrationPendingToApprovers;
             }
+
+            // put email entry to request cache 
+            _requestCache.SetValue(key:CacheKey.EmailEntriesToSend, value:new [] { emailEntry });
         }
 
         private async Task DoComerrLogForRegistration(RegistrationType registrationType, UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,

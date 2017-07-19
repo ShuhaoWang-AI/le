@@ -25,6 +25,6 @@
         public static string EmailRecipientRegulatoryOrganizationId = "EmailRecipientRegulatoryOrganizationId";
         public static string EmailSenderUserProfileId = "EmailSenderUserProfileId";
         public static string EmailRecipientUserProfileId = "EmailRecipientUserProfileId";
-        
+        public static string EmailEntriesToSend = "EmailEntriesToSend";
     }
 }

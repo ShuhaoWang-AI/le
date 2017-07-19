@@ -100,6 +100,8 @@ namespace Linko.LinkoExchange.Services.Permission
 
                 var users = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
                                       .Where(u => u.IsRemoved == false &&
+                                                  u.OrganizationRegulatoryProgram.IsEnabled && 
+                                                  u.OrganizationRegulatoryProgram.IsRemoved == false && 
                                                   u.IsEnabled && u.IsRegistrationApproved &&
                                                   u.IsRegistrationDenied == false &&
                                                   u.OrganizationRegulatoryProgramId == approverOrganizationRegulatoryProgram.OrganizationRegulatoryProgramId);
