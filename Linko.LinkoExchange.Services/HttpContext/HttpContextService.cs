@@ -2,6 +2,7 @@
 using Linko.LinkoExchange.Core.Extensions;
 using System.Security.Claims;
 using System.Linq;
+using System.Net;
 
 namespace Linko.LinkoExchange.Services
 {
@@ -81,12 +82,16 @@ namespace Linko.LinkoExchange.Services
         }
         public string CurrentUserHostName()
         {
-            if (System.Web.HttpContext.Current?.Request?.UserHostName != null)
+            if (System.Web.HttpContext.Current?.Request?.UserHostAddress != null)
             {
-                string userHostName = System.Web.HttpContext.Current.Request.UserHostName;
-                if (!String.IsNullOrEmpty(userHostName))
+                string userIPAddress = System.Web.HttpContext.Current.Request.UserHostAddress;
+                if (!String.IsNullOrEmpty(userIPAddress))
                 {
-                    return userHostName;
+                    string userHostName = Dns.GetHostEntry(userIPAddress).HostName;
+                    if (!String.IsNullOrEmpty(userHostName))
+                    {
+                        return userHostName;
+                    }
                 }
             }
 
