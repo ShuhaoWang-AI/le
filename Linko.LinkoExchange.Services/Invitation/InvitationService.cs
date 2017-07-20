@@ -289,6 +289,9 @@ namespace Linko.LinkoExchange.Services.Invitation
                 SenderOrganizationRegulatoryProgramId = senderOrgRegProgramId
             });
 
+            // Call SaveChanges to make sure data is good before sending emails.
+            _dbContext.SaveChanges(); 
+
             //Send invite with link
             var contentReplacements = new Dictionary<string, string>();
             OrganizationRegulatoryProgram authority;
