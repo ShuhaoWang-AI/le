@@ -4,16 +4,17 @@ using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Linq;
 using System.Text;
+using System.Configuration;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
+using Linko.LinkoExchange.Core.Extensions;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Settings;
 using NLog;
-using System.Configuration;
 
 namespace Linko.LinkoExchange.Services.Sync
 {
@@ -258,38 +259,38 @@ namespace Linko.LinkoExchange.Services.Sync
             reportPackageParsedData.LinkoVersionNo = "ExchangeReportSync_1.0";
 
             reportPackageParsedData.LinkoClientID = reportPackageDto.RecipientOrganizationRegulatoryProgramId;
-            reportPackageParsedData.LEPermitNo = reportPackageDto.OrganizationReferenceNumber;
+            reportPackageParsedData.LEPermitNo = reportPackageDto.OrganizationReferenceNumber.GetValueOrNull();
             reportPackageParsedData.LEReportPackageID = reportPackageDto.ReportPackageId;
-            reportPackageParsedData.LEReportPackageName = reportPackageDto.Name;
-            reportPackageParsedData.LEReportPackageCTSEventTypeName = reportPackageDto.CtsEventTypeName;
-            reportPackageParsedData.LEReportPackageCTSEventCategoryName = reportPackageDto.CtsEventCategoryName;
+            reportPackageParsedData.LEReportPackageName = reportPackageDto.Name.GetValueOrNull();
+            reportPackageParsedData.LEReportPackageCTSEventTypeName = reportPackageDto.CtsEventTypeName.GetValueOrNull();
+            reportPackageParsedData.LEReportPackageCTSEventCategoryName = reportPackageDto.CtsEventCategoryName.GetValueOrNull();
             reportPackageParsedData.LEReportPeriodStartDate = reportPackageDto.PeriodStartDateTimeLocal;
             reportPackageParsedData.LEReportPeriodEndDate = reportPackageDto.PeriodEndDateTimeLocal;
             
-            reportPackageParsedData.LEReportPackageSubmissionComments = reportPackageDto.Comments;
+            reportPackageParsedData.LEReportPackageSubmissionComments = reportPackageDto.Comments.GetValueOrNull();
             reportPackageParsedData.LEReportPackageSampleComplianceSummary = null;
 
             reportPackageParsedData.LEReportPackageURL = $"{_httpContextService.GetRequestBaseUrl()}ReportPackage/{reportPackageDto.ReportPackageId}/Details";
 
             reportPackageParsedData.LEReportPackageSubmissionDate = reportPackageDto.SubmissionDateTimeLocal.Value; // the package is expected to have been submitted
-            reportPackageParsedData.LEReportPackageSubmissionBy = $"{reportPackageDto.SubmitterFirstName} {reportPackageDto.SubmitterLastName}";
+            reportPackageParsedData.LEReportPackageSubmissionBy = $"{reportPackageDto.SubmitterFirstName} {reportPackageDto.SubmitterLastName}".GetValueOrNull();
 
             reportPackageParsedData.LEReportPackageReviewedDate = reportPackageDto.SubmissionReviewDateTimeLocal;
-            reportPackageParsedData.LEReportPackageReviewedBy = $"{reportPackageDto.SubmissionReviewerFirstName} {reportPackageDto.SubmissionReviewerLastName}";
-            reportPackageParsedData.LEReportPackageReviewedByComments = reportPackageDto.SubmissionReviewComments;
+            reportPackageParsedData.LEReportPackageReviewedBy = $"{reportPackageDto.SubmissionReviewerFirstName} {reportPackageDto.SubmissionReviewerLastName}".GetValueOrNull();
+            reportPackageParsedData.LEReportPackageReviewedByComments = reportPackageDto.SubmissionReviewComments.GetValueOrNull();
 
             reportPackageParsedData.LEReportPackageLastSentDate = reportPackageDto.LastSentDateTimeLocal;
-            reportPackageParsedData.LEReportPackageLastSentToCTSBy = $"{reportPackageDto.LastSenderFirstName} {reportPackageDto.LastSenderLastName}";
+            reportPackageParsedData.LEReportPackageLastSentToCTSBy = $"{reportPackageDto.LastSenderFirstName} {reportPackageDto.LastSenderLastName}".GetValueOrNull();
 
             reportPackageParsedData.LEReportPackageIsRepudiated = reportPackageDto.ReportStatusName.Equals(ReportStatusName.Repudiated);
             reportPackageParsedData.LEReportPackageRepudiatedDate = reportPackageDto.RepudiationDateTimeLocal;
-            reportPackageParsedData.LEReportPackageRepudiatedBy = $"{reportPackageDto.RepudiatorFirstName} {reportPackageDto.RepudiatorLastName}";
-            reportPackageParsedData.LEReportPackageRepudiatedByReason = reportPackageDto.RepudiationReasonName;
-            reportPackageParsedData.LEReportPackageRepudiatedByComments = reportPackageDto.RepudiationComments;
+            reportPackageParsedData.LEReportPackageRepudiatedBy = $"{reportPackageDto.RepudiatorFirstName} {reportPackageDto.RepudiatorLastName}".GetValueOrNull();
+            reportPackageParsedData.LEReportPackageRepudiatedByReason = reportPackageDto.RepudiationReasonName.GetValueOrNull();
+            reportPackageParsedData.LEReportPackageRepudiatedByComments = reportPackageDto.RepudiationComments.GetValueOrNull();
 
             reportPackageParsedData.LEReportPackageRepudiationReviewedByDate = reportPackageDto.RepudiationReviewDateTimeLocal;
-            reportPackageParsedData.LEReportPackageRepudiationReviewedBy = $"{reportPackageDto.RepudiationReviewerFirstName} {reportPackageDto.RepudiationReviewerLastName}";
-            reportPackageParsedData.LEReportPackageRepudiatedReviewedByComments = reportPackageDto.RepudiationReviewComments;
+            reportPackageParsedData.LEReportPackageRepudiationReviewedBy = $"{reportPackageDto.RepudiationReviewerFirstName} {reportPackageDto.RepudiationReviewerLastName}".GetValueOrNull();
+            reportPackageParsedData.LEReportPackageRepudiatedReviewedByComments = reportPackageDto.RepudiationReviewComments.GetValueOrNull();
         }
 
         /// <summary>
@@ -302,10 +303,10 @@ namespace Linko.LinkoExchange.Services.Sync
                                                           ReportElementCategoryName reportElementCategoryName)
         {
             reportPackageParsedData.LEReportPackageElementTypeID = reportPackageElementTypeDto.ReportPackageElementTypeId;
-            reportPackageParsedData.LEReportPackageElementCTSEventTypeName = reportPackageElementTypeDto.CtsEventTypeName;
-            reportPackageParsedData.LEReportPackageElementCTSEventCategoryName = reportPackageElementTypeDto.CtsEventCategoryName;
+            reportPackageParsedData.LEReportPackageElementCTSEventTypeName = reportPackageElementTypeDto.CtsEventTypeName.GetValueOrNull();
+            reportPackageParsedData.LEReportPackageElementCTSEventCategoryName = reportPackageElementTypeDto.CtsEventCategoryName.GetValueOrNull();
             reportPackageParsedData.LEReportPackageElementCategoryName = reportElementCategoryName.ToString();
-            reportPackageParsedData.LEReportPackageElementTypeName = reportPackageElementTypeDto.ReportElementTypeName;
+            reportPackageParsedData.LEReportPackageElementTypeName = reportPackageElementTypeDto.ReportElementTypeName.GetValueOrNull();
         }
 
         /// <summary>
@@ -323,35 +324,35 @@ namespace Linko.LinkoExchange.Services.Sync
 
             // LabPermitMPID max length: 250 characters
             var labPermitMpid = $"{reportPackageDto.OrganizationName} - {sampleDto.MonitoringPointName}";
-            sampleResultParsedData.LabPermitMPID = labPermitMpid.Substring(0, labPermitMpid.Length > 250 ? 250 :labPermitMpid.Length);
+            sampleResultParsedData.LabPermitMPID = labPermitMpid.Substring(0, labPermitMpid.Length > 250 ? 250 : labPermitMpid.Length).GetValueOrNull();
 
-            sampleResultParsedData.LabSampleName = sampleDto.Name;
+            sampleResultParsedData.LabSampleName = sampleDto.Name.GetValueOrNull();
             sampleResultParsedData.LabDateSampled = sampleDto.StartDateTimeLocal.Date;
             sampleResultParsedData.LabStartDateTimeSampled = sampleDto.StartDateTimeLocal;
             sampleResultParsedData.LabStopDateTimeSampled = sampleDto.EndDateTimeLocal;
-            sampleResultParsedData.LabSampleID = sampleDto.LabSampleIdentifier;
-            sampleResultParsedData.LabSampleEventType = sampleDto.CtsEventTypeName;
-            sampleResultParsedData.LabCollectMethod = sampleDto.CollectionMethodName;
+            sampleResultParsedData.LabSampleID = sampleDto.LabSampleIdentifier.GetValueOrNull();
+            sampleResultParsedData.LabSampleEventType = sampleDto.CtsEventTypeName.GetValueOrNull();
+            sampleResultParsedData.LabCollectMethod = sampleDto.CollectionMethodName.GetValueOrNull();
             sampleResultParsedData.LabSampler = null;
 
 
             // Sample result info
 
             sampleResultParsedData.LabAnalysisDate = sampleResultDto.AnalysisDateTimeLocal;
-            sampleResultParsedData.LabAnalysisMethod = sampleResultDto.AnalysisMethod;
-            sampleResultParsedData.LabParamName = sampleResultDto.ParameterName;
+            sampleResultParsedData.LabAnalysisMethod = sampleResultDto.AnalysisMethod.GetValueOrNull();
+            sampleResultParsedData.LabParamName = sampleResultDto.ParameterName.GetValueOrNull();
 
             // it is assumed that whenever that qualifier and value are matched and stored correctly in the DB,
             // i.e. "ND and NF" will not have value component, "<" will have corresponding value component, and numeric value only (no qualifier).
-            sampleResultParsedData.LabResult = $"{sampleResultDto.Qualifier}{sampleResultDto.EnteredValue}";
+            sampleResultParsedData.LabResult = $"{sampleResultDto.Qualifier}{sampleResultDto.EnteredValue}".GetValueOrNull();
 
             double labNumResult = default(double);
             sampleResultParsedData.LabNumResult = double.TryParse(sampleResultDto.EnteredValue, out labNumResult) ? labNumResult : default(double?);
 
             sampleResultParsedData.LabResultFlag = null;
-            sampleResultParsedData.LabResultUnits = sampleResultDto.UnitName;
+            sampleResultParsedData.LabResultUnits = sampleResultDto.UnitName.GetValueOrNull();
             sampleResultParsedData.LabRepLimit = null;
-            sampleResultParsedData.LabMDL = sampleResultDto.EnteredMethodDetectionLimit;
+            sampleResultParsedData.LabMDL = sampleResultDto.EnteredMethodDetectionLimit.GetValueOrNull();
             sampleResultParsedData.IsLabQCResult = false;
             sampleResultParsedData.LabReportedDate = reportPackageDto.LastSentDateTimeLocal;
             sampleResultParsedData.LabSampleComments = null;
