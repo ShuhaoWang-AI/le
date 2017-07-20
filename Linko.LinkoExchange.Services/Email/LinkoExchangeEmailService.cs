@@ -155,8 +155,9 @@ namespace Linko.LinkoExchange.Services.Email
         private IEnumerable<EmailAuditLogEntryDto> PopulateRecipientLogDataForAllPrograms(string email, ICollection<int> programFilters = null)
         {
             var emailAuditLogs = new List<EmailAuditLogEntryDto>();
-            var oRpUs = _programService.GetUserRegulatoryPrograms(email);
-            if (oRpUs != null && oRpUs.Any())
+            var oRpUs = _programService.GetActiveRegulatoryProgramUsers(email); 
+
+            if (oRpUs.Any())
             {
                 foreach (var user in oRpUs)
                 {
@@ -251,10 +252,10 @@ namespace Linko.LinkoExchange.Services.Email
                     break;
 
                 // Below type needs to log for all programs 
-                case EmailType.UserAccess_AccountLockout:
-                    if (perRegulatoryPrrogram)
+                case EmailType.UserAccess_AccountLockout: 
+                    if(perRegulatoryPrrogram)
                     {
-                        emailAuditLogs.AddRange(PopulateRecipientLogDataForAllPrograms(receipientEmail));
+                       emailAuditLogs.AddRange(PopulateRecipientLogDataForAllPrograms(receipientEmail));
                     }
                     else
                     {
@@ -273,6 +274,10 @@ namespace Linko.LinkoExchange.Services.Email
                 case EmailType.Profile_ResetProfileRequired:
                 case EmailType.ForgotUserName_ForgotUserName:
                 case EmailType.Registration_RegistrationResetPending:
+                case EmailType.COR_KBQFailedLockout:
+                case EmailType.COR_PasswordFailedLockout:
+                case EmailType.Repudiation_KBQFailedLockout:
+                case EmailType.Repudiation_PasswordFailedLockout:
                     emailAuditLogs.AddRange(PopulateRecipientLogDataForAllPrograms(receipientEmail));
                     break;
                 default:

@@ -19,7 +19,7 @@ using NLog;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.AuditLog;
 using System.Data.Entity;
-using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices; 
 
 namespace Linko.LinkoExchange.Services.User
 {
@@ -67,7 +67,7 @@ namespace Linko.LinkoExchange.Services.User
             _questionAnswerServices = questionAnswerServices;
             _logService = logService;
             _mapHelper = mapHelper;
-            _crommerAuditLogService = crommerAuditLogService;
+            _crommerAuditLogService = crommerAuditLogService; 
         }
 
         #endregion
@@ -685,7 +685,7 @@ namespace Linko.LinkoExchange.Services.User
                     .Where(o => o.PermissionGroup.Name == "Administrator"
                     && o.OrganizationRegulatoryProgramId == program.OrganizationRegulatoryProgramId);
 
-                var perProgram = program.RegulatorOrganizationId.HasValue ? true : false;
+                var perProgram = program.RegulatorOrganizationId.HasValue;
 
                 foreach (var admin in admins.ToList())
                 {
@@ -992,7 +992,10 @@ namespace Linko.LinkoExchange.Services.User
                             .Single(rp => rp.ReportPackageId == reportPackageId.Value);
                         var periodStartDateLocal = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(reportPackage.PeriodStartDateTimeUtc.UtcDateTime, programUser.OrganizationRegulatoryProgramId);
                         var periodEndDateLocal = _timeZones.GetLocalizedDateTimeUsingSettingForThisOrg(reportPackage.PeriodEndDateTimeUtc.UtcDateTime, programUser.OrganizationRegulatoryProgramId);
-
+                        if(contentReplacements.Keys.Contains("organizationName"))
+                        {
+                            contentReplacements.Remove("organizationName");  
+                        }
                         contentReplacements.Add("organizationName", reportPackage.OrganizationName);
                         contentReplacements.Add("reportPackageName", reportPackage.Name);
                         contentReplacements.Add("periodStartDate", periodStartDateLocal.ToString("MMM dd, yyyy"));

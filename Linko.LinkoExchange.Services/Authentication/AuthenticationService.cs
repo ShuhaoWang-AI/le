@@ -1103,8 +1103,15 @@ namespace Linko.LinkoExchange.Services.Authentication
             SetPasswordPolicy(organizationSettings);
 
             _signInManager.UserManager = _userManager;
-
-            bool isUserPasswordLockedOutBeforeSignInAttempt = _userManager.IsLockedOut(applicationUser.Id);
+            
+            // UC-29, 2.c
+            // Check if the user is in 'password lock' status
+            if (_userManager.IsLockedOut(applicationUser.Id))
+            {
+                LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_AccountLocked);
+                signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
+                return Task.FromResult(signInResultDto);
+            }
 
             var signInStatus = _signInManager.PasswordSignIn(userName, password, isPersistent, shouldLockout: true);
 
@@ -1127,19 +1134,6 @@ namespace Linko.LinkoExchange.Services.Authentication
                     LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_AccountResetRequired);
 
                     signInResultDto.AutehticationResult = AuthenticationResult.AccountResetRequired;
-                    return Task.FromResult(signInResultDto);
-                }
-
-                // UC-29, 2.c
-                // Check if the user is in 'password lock' status
-                if (_userManager.IsLockedOut(applicationUser.Id))
-                {
-                    if (isUserPasswordLockedOutBeforeSignInAttempt)
-                        LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_AccountLocked);
-                    else
-                        LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_PasswordLockout);
-
-                    signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
                     return Task.FromResult(signInResultDto);
                 }
 
@@ -1188,12 +1182,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 signInResultDto.AutehticationResult = AuthenticationResult.PasswordLockedOut;
 
                 //Log to Cromerr
-                if (isUserPasswordLockedOutBeforeSignInAttempt)
-                    LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_AccountLocked);
-                else
-                    LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_PasswordLockout);
-
-
+                LogProhibitedSignInActivityToCromerr(applicationUser, CromerrEvent.Login_PasswordLockout);
             }
 
             _logger.Info(message: "SignInByUserName. signInStatus={0}", argument: signInStatus.ToString());
@@ -1349,7 +1338,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         // Validate user access for UC-29(4.a, 5.a, 6.a)
         private bool ValidateUserAccess(UserProfile userProfile, SignInResultDto signInResultDto)
         {
-            var orpus = _programService.GetUserRegulatoryPrograms(userProfile.Email, true).ToList();
+            var orpus = _programService.GetUserRegulatoryPrograms(userProfile.Email, true, true).ToList();
             if (orpus.Any())
             {
                 // User at least has one approved program

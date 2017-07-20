@@ -62,7 +62,7 @@ namespace Linko.LinkoExchange.Test
             );
 
             var psMockObject = new Mock<IProgramService>();
-            psMockObject.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false))
+            psMockObject.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false, false))
                 .Returns(new List<OrganizationRegulatoryProgramUserDto> {orpu});
 
 

@@ -11,8 +11,11 @@ namespace Linko.LinkoExchange.Services.Program
         /// </summary>
         /// <param name="email">The email address.</param>
         /// <param name="isIncludeRemoved">True if we want to include org reg programs the user has been removed from (for logging purposes)</param>
+        /// /// <param name="isIncludeDisabled">True if we want to include org reg programs the user has been removed from (for logging purposes)</param>
         /// <returns></returns>
-        IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string email, bool isIncludeRemoved = false);
+        IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string email, bool isIncludeRemoved = false, bool isIncludeDisabled = false);
+        ICollection<OrganizationRegulatoryProgramUserDto> GetActiveRegulatoryProgramUsers(string email);
+
         /// <summary>
         /// Get programs that a user can access
         /// </summary>

@@ -242,7 +242,7 @@ namespace Linko.LinkoExchange.Test
               );
 
             var pObj = Mock.Get(progService);
-            pObj.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false)).Returns(new[] {
+            pObj.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false, false)).Returns(new[] {
                  orpu1, orpu2
             });
 
@@ -269,7 +269,7 @@ namespace Linko.LinkoExchange.Test
               );
 
             var pObj = Mock.Get(progService);
-            pObj.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false)).Returns(new[] {
+            pObj.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false, false)).Returns(new[] {
                  orpu1, orpu2
             });
 
@@ -300,7 +300,7 @@ namespace Linko.LinkoExchange.Test
               );
 
             var pObj = Mock.Get(progService);
-            pObj.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false)).Returns(new[] {
+            pObj.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false, false)).Returns(new[] {
                  orpu1, orpu2
             });
 
@@ -339,7 +339,7 @@ namespace Linko.LinkoExchange.Test
            );
 
             var pObj = Mock.Get(progService);
-            pObj.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false)).Returns(new[] {
+            pObj.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false, false)).Returns(new[] {
                  orpu1, orpu2, orpu3
             });
 
@@ -410,7 +410,7 @@ namespace Linko.LinkoExchange.Test
            );
 
             var progMock = Mock.Get(progService);
-            progMock.Setup(i => i.GetUserRegulatoryPrograms(It.IsAny<string>(), false)).Returns(new[] {
+            progMock.Setup(i => i.GetUserRegulatoryPrograms(It.IsAny<string>(), false, false)).Returns(new[] {
                  orpu1, orpu2, orpu3
             });
 
@@ -473,7 +473,7 @@ namespace Linko.LinkoExchange.Test
          );
 
             var progMock = Mock.Get(progService);
-            progMock.Setup(i => i.GetUserRegulatoryPrograms(It.IsAny<string>(), false)).Returns(new[] { orpu });
+            progMock.Setup(i => i.GetUserRegulatoryPrograms(It.IsAny<string>(), false, false)).Returns(new[] { orpu });
 
             signmanager.Setup(i => i.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), true, true))
                .Returns(Task.FromResult(SignInStatus.Success));

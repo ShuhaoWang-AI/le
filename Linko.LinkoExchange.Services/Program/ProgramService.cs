@@ -34,10 +34,7 @@ namespace Linko.LinkoExchange.Services.Program
                                     .Where(i => i.IsRemoved == false &&
                                            i.OrganizationRegulatoryProgram.IsRemoved == false &&
                                            i.UserProfileId == userId).ToList();
-            return orp.Select(i =>
-            {
-                return _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(i.OrganizationRegulatoryProgram);
-            });
+            return orp.Select(i => _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(i.OrganizationRegulatoryProgram));
         }
 
         public OrganizationRegulatoryProgramDto GetOrganizationRegulatoryProgram(int organizationRegulatoryProgramId)
@@ -53,8 +50,9 @@ namespace Linko.LinkoExchange.Services.Program
         /// </summary>
         /// <param name="email">The email address.</param>
         /// <param name="isIncludeRemoved">True if we want to include org reg programs the user has been removed from (for logging purposes)</param>
+        /// /// <param name="isIncludeDisabled">True if we want to include org reg programs the user has been disabled from (for logging purposes)</param>
         /// <returns></returns>
-        public IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string email, bool isIncludeRemoved = false)
+        public IEnumerable<OrganizationRegulatoryProgramUserDto> GetUserRegulatoryPrograms(string email, bool isIncludeRemoved = false, bool isIncludeDisabled = false)
         {
             var userProfile = _linkoExchangeDbContext.Users.SingleOrDefault(u => u.Email == email) ?? _linkoExchangeDbContext.Users.SingleOrDefault(u => u.OldEmailAddress == email);
             if (userProfile == null) {
@@ -70,6 +68,11 @@ namespace Linko.LinkoExchange.Services.Program
             if (!isIncludeRemoved)
             {
                 regulatoryProgramUsers = regulatoryProgramUsers.FindAll(users => !users.IsRemoved);
+            }
+
+            if (!isIncludeDisabled)
+            {
+                regulatoryProgramUsers = regulatoryProgramUsers.FindAll(users => users.IsEnabled);
             }
 
             if (regulatoryProgramUsers.Any())
@@ -123,6 +126,14 @@ namespace Linko.LinkoExchange.Services.Program
             }
 
             return authorityList;
+        }
+        
+        /// <inheritdoc />
+        public ICollection<OrganizationRegulatoryProgramUserDto> GetActiveRegulatoryProgramUsers(string email)
+        {
+            return GetUserRegulatoryPrograms(email)
+                .Where(i => i.OrganizationRegulatoryProgramDto.IsEnabled 
+                            && !i.InviterOrganizationRegulatoryProgramDto.IsRemoved).ToList();
         }
 
         public IEnumerable<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int currentOrganizationRegulatoryProgramId, string searchString)
