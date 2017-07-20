@@ -47,9 +47,7 @@ namespace Linko.LinkoExchange.Services.User
         /// </summary>
         /// <param name="dto">Profile DTO</param>
         void UpdateProfile(UserDto dto);
-
-        RegistrationResult UpdateProfile(UserDto dto, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions);
-
+        
         RegistrationResult ValidateUserProfileData(UserDto userProfile);
 
         ICollection<RegistrationResult> KbqValidation(IEnumerable<AnswerDto> kbqQuestions);

@@ -1162,7 +1162,7 @@ namespace Linko.LinkoExchange.Services.User
             return true;
         }
 
-        public void UpdateUser(UserDto dto)
+        private void UpdateUser(UserDto dto)
         {
             UserProfile userProfile = _dbContext.Users.Single(up => up.UserProfileId == dto.UserProfileId);
             userProfile = _mapHelper.GetUserProfileFromUserDto(dto, userProfile);
@@ -1187,39 +1187,7 @@ namespace Linko.LinkoExchange.Services.User
             contentReplacements.Add("supportEmail", supportEmail);
             _emailService.SendEmail(new[] { dto.Email }, EmailType.Profile_ProfileChanged, contentReplacements);
         }
-
-        public RegistrationResult UpdateProfile(UserDto dto, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions)
-        {
-            var validationResult = ValidateRegistrationUserData(dto, securityQuestions, kbqQuestions);
-
-            if (validationResult != RegistrationResult.Success)
-                return validationResult;
-
-            var transaction = _dbContext.BeginTransaction();
-            try
-            {
-                UpdateProfile(dto);
-                ICollection<AnswerDto> securityQuestionCollection = securityQuestions.ToList();
-                ICollection<AnswerDto> kbqQuestionCollection = kbqQuestions.ToList();
-                _questionAnswerServices.CreateOrUpdateUserQuestionAnswers(dto.UserProfileId, securityQuestionCollection);
-                _questionAnswerServices.CreateOrUpdateUserQuestionAnswers(dto.UserProfileId, kbqQuestionCollection);
-
-                transaction.Commit();
-            }
-            catch (Exception ex)
-            {
-                transaction.Rollback();
-                throw ex;
-            }
-            finally
-            {
-                transaction.Dispose();
-            }
-
-            return RegistrationResult.Success;
-
-        }
-
+  
         public RegistrationResult ValidateUserProfileData(UserDto userProfile)
         {
 

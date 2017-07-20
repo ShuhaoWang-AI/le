@@ -194,27 +194,6 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
-        public void UpdateUser()
-        {
-            var dto = new UserDto()
-            {
-                FirstName = "Billy",
-                LastName = "Goat",
-                TitleRole = "President",
-                BusinessName = "Acme Corp.",
-                UserProfileId = 1,
-                AddressLine1 = "1234 Main St",
-                AddressLine2 = "Apt 102",
-                CityName = "Toronto",
-                ZipCode = "55555",
-                PhoneNumber = "555-555-5555",
-                JurisdictionId = 4
-            };
-
-            _userService.UpdateUser(dto);
-        }
-
-        [TestMethod]
         public void UpdateProfile()
         {
             var dto = new UserDto()
@@ -233,29 +212,6 @@ namespace Linko.LinkoExchange.Test
             };
 
             _userService.UpdateProfile(dto);
-        }
-
-        [TestMethod]
-        public void UpdateProfileComplete()
-        {
-            var dto = new UserDto()
-            {
-                FirstName = "Billy",
-                LastName = "Goat",
-                TitleRole = "President",
-                BusinessName = "Acme Corp.",
-                UserProfileId = 1,
-                AddressLine1 = "1234 Main St",
-                AddressLine2 = "Apt 102",
-                CityName = "Toronto",
-                ZipCode = "55555",
-                PhoneNumber = "555-555-5555",
-                JurisdictionId = 4
-            };
-
-            List<AnswerDto> kbqList = new List<AnswerDto>();
-            List<AnswerDto> sqList = new List<AnswerDto>();
-            _userService.UpdateProfile(dto, sqList, kbqList);
         }
 
         [TestMethod]
