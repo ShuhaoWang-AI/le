@@ -2423,7 +2423,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                              }).ToList();
             
             var currentOrganizationRegulatoryProgramId = int.Parse(s:GetClaimValue(key:CacheKey.OrganizationRegulatoryProgramId));
-            var industries = _organizationService.GetChildOrganizationRegulatoryPrograms(orgRegProgId:currentOrganizationRegulatoryProgramId);
+            var industries = _organizationService.GetChildOrganizationRegulatoryPrograms(orgRegProgId:currentOrganizationRegulatoryProgramId).Where(i => !i.IsRemoved);
 
             viewModel.AllReportPackageTemplateAssignments = industries.Select(vm => new IndustryViewModel
                                                                                     {
