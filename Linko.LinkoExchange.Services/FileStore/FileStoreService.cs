@@ -98,18 +98,19 @@ namespace Linko.LinkoExchange.Services.FileStore
                         {
                             var fileStore = _dbContext.FileStores
                                 .Include(fs => fs.OrganizationRegulatoryProgram)
+                                .Include(fs => fs.OrganizationRegulatoryProgram.RegulatorOrganization)
                                 .SingleOrDefault(fs => fs.FileStoreId == fileStoreId);
 
                             if (fileStore != null)
                             {
                                 //check if current user is authority of file store owner
-                                var authorityOrgRegProgram = fileStore.OrganizationRegulatoryProgram;
+                                var authorityOrganization = fileStore.OrganizationRegulatoryProgram.RegulatorOrganization ?? fileStore.OrganizationRegulatoryProgram.Organization;
 
                                 var currentOrgRegProgram = _dbContext.OrganizationRegulatoryPrograms
                                     .Single(orpu => orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
 
-                                bool isCurrentOrgRegProgramTheAuthority = currentOrgRegProgram.OrganizationId == authorityOrgRegProgram.OrganizationId
-                                    && currentOrgRegProgram.RegulatoryProgramId == authorityOrgRegProgram.RegulatoryProgramId;
+                                bool isCurrentOrgRegProgramTheAuthority = currentOrgRegProgram.OrganizationId == authorityOrganization.OrganizationId
+                                    && currentOrgRegProgram.RegulatoryProgramId == fileStore.OrganizationRegulatoryProgram.RegulatoryProgramId;
 
                                 if (isCurrentOrgRegProgramTheAuthority)
                                 {
