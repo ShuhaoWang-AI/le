@@ -544,12 +544,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         ModelState.AddModelError(key:"Password", errorMessage:@"Password is required.");
                         isValid = false;
+                        ViewBag.ShowSubmissionValidationErrorMessage = true;
                     }
 
                     if (model.Answer == null || model.Answer.Trim().Length == 0)
                     {
                         ModelState.AddModelError(key:"Answer", errorMessage:@"KBQ answer is required.");
                         isValid = false;
+                        ViewBag.ShowSubmissionValidationErrorMessage = true;
                     }
 
                     if (isValid)
@@ -607,12 +609,13 @@ namespace Linko.LinkoExchange.Web.Controllers
 
                     TempData[key:"ShowSubmissionConfirmationMessage"] = true;
                     TempData[key:"SubmissionConfirmationMessage"] = "Report package submitted successfully!";
-                    return  Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }));
+                    return  Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }) + "#divSubmissionConfirmation");
                 }
             }
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+                ViewBag.ShowSubmissionValidationErrorMessage = true;
             }
 
             model = PrepareReportPackageDetails(id: id, failedCountPassword: model.FailedCountPassword, failedCountKbq: model.FailedCountKbq);
@@ -637,12 +640,14 @@ namespace Linko.LinkoExchange.Web.Controllers
                     {
                         ModelState.AddModelError(key:"Password", errorMessage:@"Password is required.");
                         isValid = false;
+                        ViewBag.ShowRepudiateValidationErrorMessage = true;
                     }
 
                     if (model.Answer == null || model.Answer.Trim().Length == 0)
                     {
                         ModelState.AddModelError(key:"Answer", errorMessage:@"KBQ answer is required.");
                         isValid = false;
+                        ViewBag.ShowRepudiateValidationErrorMessage = true;
                     }
 
                     if (isValid)
@@ -713,6 +718,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             catch (RuleViolationException rve)
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
+                ViewBag.ShowRepudiateValidationErrorMessage = true;
             }
             
             model = PrepareReportPackageDetails(id:id, failedCountPassword:model.FailedCountPassword, failedCountKbq:model.FailedCountKbq);

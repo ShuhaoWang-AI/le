@@ -555,7 +555,7 @@
                 </div>
             </div>
             <div class="box-body form-horizontal">
-                @if (ViewBag.ShowSubmissionValidationErrorMessage != null && ViewBag.ShowSubmissionValidationErrorMessage)
+                @if (ViewBag.ShowSubmissionValidationErrorMessage != null && ViewBag.ShowSubmissionValidationErrorMessage && ViewBag.SubmissionValidationErrorMessage != null)
                 {
                     <div class="alert alert-danger alert-dismissible">
                         <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
@@ -666,20 +666,20 @@
                 <h3 class="box-title">Repudiate Report</h3>
                 <div class="box-tools pull-right">
                     <button class="btn btn-box-tool" data-widget="collapse">
-                        @if (ViewBag.ShowSubmissionConfirmationMessage != null && ViewBag.ShowSubmissionConfirmationMessage)
+                        @if (Model.Status == ReportStatusName.Repudiated || (ViewBag.ShowRepudiateValidationErrorMessage != null && ViewBag.ShowRepudiateValidationErrorMessage))
                         {
-                            // if showing submission confirmation message then collapese the repudiation box onload
-                            <i class="fa fa-plus"></i>
+                            // if Model.Status is Repudiated or showing any error for repudiation then open the repudiation box onload, otherwise collapse
+                            <i class="fa fa-minus"></i>
                         }
                         else
                         {
-                            <i class="fa fa-minus"></i>
+                            <i class="fa fa-plus"></i>
                         }
                     </button>
                 </div>
             </div>
             <div class="box-body form-horizontal">
-                @if (ViewBag.ShowRepudiateValidationErrorMessage != null && ViewBag.ShowRepudiateValidationErrorMessage)
+                @if (ViewBag.ShowRepudiateValidationErrorMessage != null && ViewBag.ShowRepudiateValidationErrorMessage && ViewBag.RepudiateValidationErrorMessage != null)
                 {
                     <div class="alert alert-danger alert-dismissible">
                         <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
@@ -1254,10 +1254,10 @@
 
 @section Scripts {
 
-    @if (ViewBag.ShowSubmissionConfirmationMessage != null && ViewBag.ShowSubmissionConfirmationMessage)
+    @if (Model.CanCurrentUserSubmitAndReputiate && Model.Status == ReportStatusName.Submitted && (ViewBag.ShowRepudiateValidationErrorMessage == null))
     {
         <script>
-            // if showing submission confirmation message then collapese the repudiation box onload
+            // if Model.Status is Submitted and not showing Repudiation validation error message, then collapse the repudiation box onload
             $('#divRepudiateReport').addClass('collapsed-box');
         </script>
     }
