@@ -192,7 +192,7 @@
                                     @(Html.Kendo().DateTimePicker()
                                           .Name(componentName: "StartDateTimeLocal")
                                           .Value(date: Model.StartDateTimeLocal)
-                                          .Format(format: "MM/dd/yyyy hh:mm tt")
+                                          .Format(format: "MM/dd/yyyy")
                                           .Max(date: DateTime.Now)
                                           .HtmlAttributes(attributes: new
                                                                       {
@@ -802,7 +802,6 @@
                             , clearMaskOnLostFocus: false
                             , clearIncomplete: true
                         });
-                    $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().replace("12:00 am", ""));
 
                     $("#EndDateTimeLocal")
                         .inputmask({
@@ -813,7 +812,6 @@
                             , clearMaskOnLostFocus: false
                             , clearIncomplete: true
                         });
-                    $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().replace("12:00 am", ""));
 
                     $("input[id^='AnalysisDateTime_']")
                         .inputmask({
@@ -824,12 +822,6 @@
                             , clearMaskOnLostFocus: false
                             , clearIncomplete: true
                         });
-                    $("input[id^='AnalysisDateTime_']")
-                        .each(function()
-                        {
-                            var value = $(this).val().replace("12:00 am", "");
-                            $(this).val(value);
-                        });
                 });
 
             $(document)
@@ -837,7 +829,7 @@
                     , "input[id^='AnalysisDateTime_']"
                     , function()
                     {
-                        var value = $(this).val().replace("12:00 am", "");
+                        var value = $(this).val().toLowerCase().replace("12:00 am", "");
                         $(this).val(value);
                     });
 
@@ -1306,13 +1298,13 @@
             $("#StartDateTimeLocal")
                 .change(function()
                 {
-                    $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().replace("12:00 am", ""));
+                    $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
                 });
 
             $("#EndDateTimeLocal")
                 .change(function()
                 {
-                    $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().replace("12:00 am", ""));
+                    $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
 
                     var viewModel = {};
                     viewModel.monitoringPointId = $('#MonitoringPointId').val();
@@ -1369,4 +1361,20 @@
                 });
         </script>
     }
+
+    <script>
+        $(document)
+            .ready(function()
+            {
+                $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
+                $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
+
+                $("input[id^='AnalysisDateTime_']")
+                    .each(function()
+                    {
+                        var value = $(this).val().toLowerCase().replace("12:00 am", "");
+                        $(this).val(value);
+                    });
+            });
+    </script>
 }}
