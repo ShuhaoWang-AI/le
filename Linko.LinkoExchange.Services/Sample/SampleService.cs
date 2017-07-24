@@ -762,9 +762,9 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <param name="sample">POCO</param>
         /// <param name="isIncludeChildObjects">Switch to load result list or not (for display in grid)</param>
         /// <returns></returns>
-        public SampleDto GetSampleDetails(Core.Domain.Sample sample, bool isIncludeChildObjects = true, bool isLoggingDisabled = false)
+        public SampleDto GetSampleDetails(Core.Domain.Sample sample, bool isIncludeChildObjects = true, bool isLoggingEnabled = true)
         {
-            if (!isLoggingDisabled)
+            if (isLoggingEnabled)
                 _logger.Info($"Enter SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
 
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
@@ -774,7 +774,7 @@ namespace Linko.LinkoExchange.Services.Sample
             var dto = _mapHelper.GetSampleDtoFromSample(sample);
 
             //Handle FlowUnitValidValues
-            dto.FlowUnitValidValues = _unitService.GetFlowUnitsFromCommaDelimitedString(sample.FlowUnitValidValues);
+            dto.FlowUnitValidValues = _unitService.GetFlowUnitsFromCommaDelimitedString(sample.FlowUnitValidValues, isLoggingEnabled: isLoggingEnabled);
 
             //Set Sample Start Local Timestamp
             dto.StartDateTimeLocal = _timeZoneService
@@ -896,8 +896,8 @@ namespace Linko.LinkoExchange.Services.Sample
 
             dto.SampleResults = resultDtoList.Values.ToList();
 
-            if (!isLoggingDisabled)
-                    _logger.Info($"Leaving SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
+            if (isLoggingEnabled)
+                _logger.Info($"Leaving SampleService.GetSampleDetails. sample.SampleId={sample.SampleId}");
 
             return dto;
         }

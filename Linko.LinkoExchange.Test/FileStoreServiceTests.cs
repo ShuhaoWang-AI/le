@@ -33,7 +33,7 @@ namespace Linko.LinkoExchange.Test
             _httpContext = new Mock<IHttpContextService>();
             _logger = new Mock<ILogger>();
             _timeZoneService = new Mock<ITimeZoneService>();
-            var actualSettingService = new SettingService(connection, _logger.Object, new MapHelper(), new Mock<IApplicationCache>().Object, new Mock<IGlobalSettings>().Object);
+            var actualSettingService = new SettingService(connection, _logger.Object, new MapHelper(), new Mock<IRequestCache>().Object, new Mock<IGlobalSettings>().Object);
             var actualTimeZoneService = new TimeZoneService(connection, actualSettingService, new MapHelper(), new Mock<IApplicationCache>().Object);
 
             _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
@@ -51,7 +51,7 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetFileStoreById()
         {
-            var fileStore = _fileStoreService.GetFileStoreById(2);
+            var fileStore = _fileStoreService.GetFileStoreById(1);
         }
 
       

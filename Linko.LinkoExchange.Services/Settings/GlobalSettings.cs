@@ -13,10 +13,6 @@ namespace Linko.LinkoExchange.Services.Settings
     {
         private static Dictionary<SystemSettingType, string> _globalSettings = new Dictionary<SystemSettingType, string>();
 
-        //Only cache those settings that appear here and for these number of hours
-        //  (Populated from Resource Manager)
-        private Dictionary<SettingType, int> _settingsCacheDurationHours = new Dictionary<SettingType, int>();
-
         public GlobalSettings(LinkoExchangeContext dbContext)
         {
             _globalSettings = new Dictionary<SystemSettingType, string>();
@@ -39,27 +35,6 @@ namespace Linko.LinkoExchange.Services.Settings
             _globalSettings.Add(SystemSettingType.CTSDatabaseMinVersion, systemSettings.First(i => i.Name == SystemSettingType.CTSDatabaseMinVersion.ToString()).Value);
             _globalSettings.Add(SystemSettingType.CTSDatabaseMinPatch, systemSettings.First(i => i.Name == SystemSettingType.CTSDatabaseMinPatch.ToString()).Value);
 
-            //
-            //Read config and pre-load "Settings Cache Duration Hours" dictionary so we know 
-            //which Org Reg Program settings to cache (and for how many hours).
-            //
-            //      Example: "TimeZone:24|EmailContactInfoName:48|EmailContactInfoPhone:48|EmailContactInfoEmailAddress:48"
-            //
-
-            string settingsCacheDurationHoursString = ConfigurationManager.AppSettings[name: "SettingsCacheDurationHours"];
-            
-            string[] settingsCacheDurationHoursArray = settingsCacheDurationHoursString.Split('|');
-            foreach (string settingHours in settingsCacheDurationHoursArray)
-            {
-                string[] settingHoursArray = settingHours.Split(':');
-                string settingString = settingHoursArray[0];
-                int hours = Convert.ToInt32(settingHoursArray[1]);
-                SettingType settingType;
-                if (Enum.TryParse(settingString, out settingType))
-                {
-                    _settingsCacheDurationHours.Add(settingType, hours);
-                }
-            }
         }
 
         public string GetSetting(SystemSettingType settingType)
@@ -70,20 +45,6 @@ namespace Linko.LinkoExchange.Services.Settings
         public IDictionary<SystemSettingType, string> GetGlobalSettings()
         {
             return _globalSettings;
-        }
-
-        public bool IsCacheRequired(SettingType cacheKey, out int durationHours)
-        {
-            if (_settingsCacheDurationHours.ContainsKey(cacheKey))
-            {
-                durationHours = _settingsCacheDurationHours[cacheKey];
-                return true;
-            }
-            else
-            {
-                durationHours = 0;
-                return false;
-            }
         }
     }
 }

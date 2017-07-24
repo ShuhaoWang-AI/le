@@ -11,6 +11,5 @@ namespace Linko.LinkoExchange.Services.Settings
     {
         string GetSetting(SystemSettingType settingType);
         IDictionary<SystemSettingType, string> GetGlobalSettings();
-        bool IsCacheRequired(SettingType cacheKey, out int durationHours);
     }
 }

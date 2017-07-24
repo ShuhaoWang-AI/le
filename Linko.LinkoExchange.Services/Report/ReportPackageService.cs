@@ -1656,7 +1656,7 @@ namespace Linko.LinkoExchange.Services.Report
 
             foreach (var existingEligibleSample in existingEligibleSamples)
             {
-                var sampleDto = _sampleService.GetSampleDetails(existingEligibleSample, isLoggingDisabled: true);
+                var sampleDto = _sampleService.GetSampleDetails(existingEligibleSample, isLoggingEnabled: false);
 
                 sampleDto.IsAssociatedWithReportPackage = existingSamplesReportPackageElementType
                                                              .ReportSamples.Any(rs => rs.SampleId == existingEligibleSample.SampleId);

@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Linko.LinkoExchange.Core.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Linko.LinkoExchange.Services.Cache
 {
@@ -15,6 +17,17 @@ namespace Linko.LinkoExchange.Services.Cache
         public void Insert(string key, object item, int hours)
         {
             System.Web.HttpContext.Current.Cache.Insert(key, item, null, DateTime.Now.AddHours(hours), System.Web.Caching.Cache.NoSlidingExpiration);
+        }
+        public void RemoveAllItemsForThisSettingType(SettingType settingType)
+        {
+            foreach (string key in HttpContext.Current.Cache)
+            {
+                if (key.StartsWith(settingType.ToString()))
+                {
+                    // remove
+                    HttpContext.Current.Cache.Remove(key);
+                }
+            }
         }
     }
 }

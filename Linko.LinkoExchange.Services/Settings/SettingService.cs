@@ -23,13 +23,13 @@ namespace Linko.LinkoExchange.Services.Settings
         private readonly LinkoExchangeContext _dbContext;
         private readonly ILogger _logger;
         private readonly IMapHelper _mapHelper;
-        private readonly IApplicationCache _cache;
+        private readonly IRequestCache _cache;
         private readonly IGlobalSettings _globalSettings;
 
         #endregion
 
         public SettingService(LinkoExchangeContext dbContext, ILogger logger,
-            IMapHelper mapHelper, IApplicationCache cache, IGlobalSettings globalSettings)
+            IMapHelper mapHelper, IRequestCache cache, IGlobalSettings globalSettings)
         {
             _dbContext = dbContext; 
             _logger = logger;
@@ -415,10 +415,10 @@ namespace Linko.LinkoExchange.Services.Settings
 
         public string GetOrganizationSettingValue(int orgRegProgramId, SettingType settingType)
         {
-            string cacheKey = $"{orgRegProgramId}-{settingType}";
-            if (_cache.Get(cacheKey) != null)
+            string cacheKey = $"OrgRegProgramId-{orgRegProgramId}-{settingType}";
+            if (_cache.GetValue(cacheKey) != null)
             {
-                return (string)_cache.Get(cacheKey);
+                return (string)_cache.GetValue(cacheKey);
             }
 
             OrganizationRegulatoryProgram authority = GetAuthority(orgRegProgramId: orgRegProgramId);
@@ -426,12 +426,8 @@ namespace Linko.LinkoExchange.Services.Settings
                .Single(s => s.OrganizationId == authority.OrganizationId
                && s.SettingTemplate.Name == settingType.ToString()).Value;
 
-            //Only cache certain settings
-            int durationHours;
-            if (_globalSettings.IsCacheRequired(settingType, out durationHours))
-            {
-                _cache.Insert(cacheKey, settingValue, durationHours);
-            }
+
+            _cache.SetValue(cacheKey, settingValue);
 
             return settingValue;
 

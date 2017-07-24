@@ -56,7 +56,7 @@ namespace Linko.LinkoExchange.Test
                 _timeZones.Object,
                 _orgService.Object,
                 _settings.Object,
-                new Mock<ISessionCache>().Object);
+                new Mock<IRequestCache>().Object);
         }
 
         [TestMethod]

@@ -22,7 +22,7 @@ namespace Linko.LinkoExchange.Services.Unit
         /// </summary>
         /// <param name="commaDelimitedString"></param>
         /// <returns>Collection of unit dto's corresponding to the labels read from passed in string</returns>
-        IEnumerable<UnitDto> GetFlowUnitsFromCommaDelimitedString(string commaDelimitedString);
+        IEnumerable<UnitDto> GetFlowUnitsFromCommaDelimitedString(string commaDelimitedString, bool isLoggingEnabled = true);
 
         /// <summary>
         /// Always ppd as per client's requirements

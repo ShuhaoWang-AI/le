@@ -56,7 +56,7 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <param name="sample">POCO</param>
         /// <param name="isIncludeChildObjects">Switch to load result list or not (for display in grid)</param>
         /// <returns></returns>
-        SampleDto GetSampleDetails(Core.Domain.Sample sample, bool isIncludeChildObjects = true, bool isLoggingDisabled = false);
+        SampleDto GetSampleDetails(Core.Domain.Sample sample, bool isIncludeChildObjects = true, bool isLoggingEnabled = true);
 
         /// <summary>
         /// Test to see if a Sample is included in at least 1 report package

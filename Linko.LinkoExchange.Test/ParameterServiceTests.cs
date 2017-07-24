@@ -26,6 +26,7 @@ namespace Linko.LinkoExchange.Test
         Mock<ILogger> _logger;
         Mock<ITimeZoneService> _timeZoneService;
         Mock<ISettingService> _settingsService;
+        Mock<IRequestCache> _mockRequestCache;
         Mock<IApplicationCache> _mockAppCache;
 
         public ParameterServiceTests()
@@ -43,13 +44,15 @@ namespace Linko.LinkoExchange.Test
             _timeZoneService = new Mock<ITimeZoneService>();
             _settingsService = new Mock<ISettingService>();
 
+            _mockRequestCache = new Mock<IRequestCache>();
+            _mockRequestCache.Setup(c => c.GetValue("1-TimeZone")).Returns("6");
+            _mockRequestCache.Setup(c => c.GetValue("VolumeFlowRateLimitBasisId")).Returns("3");
+
             _mockAppCache = new Mock<IApplicationCache>();
-            _mockAppCache.Setup(c => c.Get("1-TimeZone")).Returns("6");
-            _mockAppCache.Setup(c => c.Get("VolumeFlowRateLimitBasisId")).Returns("3");
             _mockAppCache.Setup(c => c.Get("TimeZoneId_6")).Returns("Eastern Standard Time");
 
-            var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper(), _mockAppCache.Object, new Mock<IGlobalSettings>().Object), new MapHelper(), _mockAppCache.Object);
-            var actualSettings = new SettingService(connection, _logger.Object, new MapHelper(), _mockAppCache.Object, new Mock<IGlobalSettings>().Object);
+            var actualTimeZoneService = new TimeZoneService(connection, new SettingService(connection, _logger.Object, new MapHelper(), _mockRequestCache.Object, new Mock<IGlobalSettings>().Object), new MapHelper(), _mockAppCache.Object);
+            var actualSettings = new SettingService(connection, _logger.Object, new MapHelper(), _mockRequestCache.Object, new Mock<IGlobalSettings>().Object);
 
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
             _orgService.Setup(s => s.GetAuthority(It.IsAny<int>())).Returns(new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 1 });
