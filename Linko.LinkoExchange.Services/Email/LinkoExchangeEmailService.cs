@@ -242,6 +242,7 @@ namespace Linko.LinkoExchange.Services.Email
                 case EmailType.Registration_IndustryInviteIndustryUser:
                 case EmailType.Signature_SignatoryGranted:
                 case EmailType.Signature_SignatoryRevoked:
+                case EmailType.Signature_SignatoryGrantedToAdmin:
                 case EmailType.Registration_AuthorityUserRegistrationPendingToApprovers:
                 case EmailType.Registration_IndustryUserRegistrationPendingToApprovers:
                 case EmailType.Report_Submission_IU:
