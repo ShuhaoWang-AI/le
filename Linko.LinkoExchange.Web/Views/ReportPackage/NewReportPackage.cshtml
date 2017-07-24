@@ -78,7 +78,7 @@
                                                                                          })
                         <div class="col-md-4">
                             @(Html.Kendo().DatePickerFor(model => model.StartDateTimeLocal)
-                                  .Max(date: DateTime.Today)
+                                  //.Max(date: DateTime.Today)
                                   .Format(format:"MM/dd/yyyy")
                                   .HtmlAttributes(attributes:new
                                                              {
@@ -92,7 +92,7 @@
                                                                                        })
                         <div class="col-md-4">
                             @(Html.Kendo().DatePickerFor(model => model.EndDateTimeLocal)
-                                  .Max(date: DateTime.Today)
+                                  //.Max(date: DateTime.Today)
                                   .Format(format:"MM/dd/yyyy")
                                   .HtmlAttributes(attributes:new
                                   {
