@@ -106,7 +106,7 @@ namespace Linko.LinkoExchange.Services.Sync
                         //      then that element is not included in the data export. 
                         // No event would be created for that Element in LinkoCTS even if it had an Event Type assigned.
 
-                        StringBuilder reportPackageElements = new StringBuilder("Report Element Type\tRequired?\tPresent in Report?\r\n");
+                        StringBuilder reportPackageElements = new StringBuilder("Report Element Type\tPresent in Report?\r\n");
                         var isElementTypePresent = false;
                         foreach (var categoryName in reportPackageDto.ReportPackageElementCategories)
                         {
@@ -130,7 +130,7 @@ namespace Linko.LinkoExchange.Services.Sync
                                         // No record to send. See the general comment for LEReportPackageParsedData above.
                                     }
 
-                                    reportPackageElements.Append($"{attachmentType.ReportElementTypeName}\t{(attachmentType.IsRequired ? "Yes" : "No")}\t{(isElementTypePresent ? "Yes" : "No")}\r\n");
+                                    reportPackageElements.Append($"{attachmentType.ReportElementTypeName}\t{(isElementTypePresent ? "Yes" : "No")}\r\n");
                                 }
                             }
 
@@ -154,7 +154,7 @@ namespace Linko.LinkoExchange.Services.Sync
                                         // No record to send. See the general comment for LEReportPackageParsedData above.
                                     }
 
-                                    reportPackageElements.Append($"{certificationType.ReportElementTypeName}\t{(certificationType.IsRequired ? "Yes" : "No")}\t{(isElementTypePresent ? "Yes" : "No")}\r\n");
+                                    reportPackageElements.Append($"{certificationType.ReportElementTypeName}\t{(isElementTypePresent ? "Yes" : "No")}\r\n");
                                 }
                             }
                         }
