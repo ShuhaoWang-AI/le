@@ -87,7 +87,16 @@ namespace Linko.LinkoExchange.Services
                 string userIPAddress = System.Web.HttpContext.Current.Request.UserHostAddress;
                 if (!String.IsNullOrEmpty(userIPAddress))
                 {
-                    string userHostName = Dns.GetHostEntry(userIPAddress)?.HostName ?? "";
+                    string userHostName = null;
+                    try
+                    {
+                        userHostName = Dns.GetHostEntry(userIPAddress)?.HostName ?? "";
+                    }
+                    catch
+                    {
+                        
+                    }
+
                     if (!String.IsNullOrEmpty(userHostName))
                     {
                         return userHostName;
