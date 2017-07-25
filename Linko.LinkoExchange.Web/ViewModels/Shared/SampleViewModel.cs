@@ -139,8 +139,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
             RuleFor(x => x.StartDateTimeLocal).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
 
             //EndDateTimeLocal
-            RuleFor(x => x.EndDateTimeLocal).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.").GreaterThanOrEqualTo(x => x.StartDateTimeLocal)
-                                            .WithMessage(errorMessage: "End date must be after Start date");
+            RuleFor(x => x.EndDateTimeLocal).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.");
 
             //FlowUnitId
             RuleFor(x => x.FlowUnitId).NotEmpty().WithMessage(errorMessage: "{PropertyName} is required.").GreaterThan(valueToCompare: 0)

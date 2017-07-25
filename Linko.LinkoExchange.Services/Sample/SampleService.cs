@@ -547,19 +547,16 @@ namespace Linko.LinkoExchange.Services.Sample
                 isValid = false;
                 if (!isSuppressExceptions)
                 {
-                    this.ThrowSimpleException("End date must be after start date");
+                    this.ThrowSimpleException("End date must be after Start date");
                 }
             }
 
 
             //Check Flow Value exists and is complete if provided (both value and unit)
-
-            bool isValidFlowValueExists = false;
+            
             if (!string.IsNullOrEmpty(sampleDto.FlowValue) && sampleDto.FlowUnitId.HasValue &&
                 sampleDto.FlowUnitId.Value > 0 && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
             {
-                isValidFlowValueExists = true;
-
                 Double flowValueAsDouble;
                 if (!Double.TryParse(sampleDto.FlowValue, out flowValueAsDouble))
                 {
