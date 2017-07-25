@@ -73,7 +73,24 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
             get
             {
                 if (string.IsNullOrEmpty(address))
-                    return string.Format(format: "{0} {1}, {2}, {3} {4}", args: new object[] { AddressLine1, AddressLine2, CityName, State, ZipCode });
+                {
+                    string formattedAddress = string.Format(format: "{0} {1}, {2}, {3} {4}", args: new object[] { AddressLine1, AddressLine2, CityName, State, ZipCode });
+                    formattedAddress = formattedAddress.Replace(" , , ", "");
+                    formattedAddress = formattedAddress.Replace(", ,", ",");
+                    formattedAddress = formattedAddress.Replace(" , ", ", ").Trim();
+                    if (formattedAddress.Length > 0 && formattedAddress[0] == ',')
+                    {
+                        //trim leading comma
+                        formattedAddress = formattedAddress.Substring(1);
+                    }
+                    if (formattedAddress.Length > 0 && formattedAddress[formattedAddress.Length - 1] == ',')
+                    {
+                        //trim trailing comma
+                        formattedAddress = formattedAddress.Substring(0, formattedAddress.Length - 1);
+                    }
+
+                    return formattedAddress.Trim();
+                }
                 else
                 {
                     return address;
