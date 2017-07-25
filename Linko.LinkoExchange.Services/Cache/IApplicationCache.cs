@@ -11,6 +11,5 @@ namespace Linko.LinkoExchange.Services.Cache
     {
         object Get(string key);
         void Insert(string key, object item, int hours);
-        void RemoveAllItemsForThisSettingType(SettingType settingType);
     }
 }

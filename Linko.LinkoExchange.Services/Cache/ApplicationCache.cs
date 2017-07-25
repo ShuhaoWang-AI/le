@@ -18,16 +18,5 @@ namespace Linko.LinkoExchange.Services.Cache
         {
             System.Web.HttpContext.Current.Cache.Insert(key, item, null, DateTime.Now.AddHours(hours), System.Web.Caching.Cache.NoSlidingExpiration);
         }
-        public void RemoveAllItemsForThisSettingType(SettingType settingType)
-        {
-            foreach (string key in HttpContext.Current.Cache)
-            {
-                if (key.StartsWith(settingType.ToString()))
-                {
-                    // remove
-                    HttpContext.Current.Cache.Remove(key);
-                }
-            }
-        }
     }
 }
