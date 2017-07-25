@@ -787,14 +787,12 @@ namespace Linko.LinkoExchange.Services.Report
             _emailService.SendEmail(signatoriesEmails, EmailType.Report_Submission_IU, emailContentReplacements, false).Wait();
 
             // Send emails to all Standard Users for the authority  
-            var authorityOrganzationId = reportPackage.OrganizationRegulatoryProgramDto.RegulatorOrganizationId.Value;
-            var authorityAdminAndStandardUsersEmails = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganzationId).Select(i => i.Email).ToList();
-            
-            var auOrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(reportPackage.OrganizationRegulatoryProgramId);
+            var authorityOrganizationRegulatoryProgramDto = _organizationService.GetAuthority(reportPackage.OrganizationRegulatoryProgramId);
+            var authorityAdminAndStandardUsersEmails = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganizationRegulatoryProgramDto.OrganizationId).Select(i => i.Email).ToList();
 
-            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, auOrganizationRegulatoryProgram.RegulatoryProgramId);
-            _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, auOrganizationRegulatoryProgram.OrganizationId);
-            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, auOrganizationRegulatoryProgram.RegulatorOrganizationId);
+            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, authorityOrganizationRegulatoryProgramDto.RegulatoryProgramId);
+            _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, authorityOrganizationRegulatoryProgramDto.OrganizationId);
+            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, authorityOrganizationRegulatoryProgramDto.RegulatorOrganizationId);
             _emailService.SendEmail(authorityAdminAndStandardUsersEmails, EmailType.Report_Submission_AU, emailContentReplacements, false).Wait();
 
             _logger.Info("Leave ReportPackageService.SendSignAndSubmitEmail. reportPackageId={0}", reportPackage.ReportPackageId);
@@ -1884,12 +1882,12 @@ namespace Linko.LinkoExchange.Services.Report
                         throw new UnauthorizedAccessException();
                     }
 
-                    var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
+                    var authorityOrganizationRegulatoryProgramDto = _orgService.GetAuthority(currentOrgRegProgramId);
                     var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
                     var timeZone = _dbContext.TimeZones.Single(tz => tz.TimeZoneId == timeZoneId);
 
                     //Check ARP config "Max days after report period end date to repudiate" has not passed (UC-19 5.2.)
-                    var reportRepudiatedDays = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.ReportRepudiatedDays));
+                    var reportRepudiatedDays = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(authorityOrganizationRegulatoryProgramDto.OrganizationRegulatoryProgramId, SettingType.ReportRepudiatedDays));
 
                     var reportPackage = _dbContext.ReportPackages
                         .Include(rep => rep.OrganizationRegulatoryProgram)
@@ -1995,9 +1993,9 @@ namespace Linko.LinkoExchange.Services.Report
                     contentReplacements.Add("userName", currentUser.UserName);
                     contentReplacements.Add("corViewLink", $"{_httpContextService.GetRequestBaseUrl()}reportPackage/{reportPackage.ReportPackageId}/Details");
 
-                    var authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
-                    var authorityEmail = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
-                    var authorityPhone = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+                    var authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganizationRegulatoryProgramDto.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+                    var authorityEmail = _settingService.GetOrgRegProgramSettingValue(authorityOrganizationRegulatoryProgramDto.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+                    var authorityPhone = _settingService.GetOrgRegProgramSettingValue(authorityOrganizationRegulatoryProgramDto.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
 
                     contentReplacements.Add("authorityName", authorityName);
                     contentReplacements.Add("supportEmail", authorityEmail);
@@ -2039,14 +2037,12 @@ namespace Linko.LinkoExchange.Services.Report
                     _emailService.SendEmail(signatoriesEmails, EmailType.Report_Repudiation_IU, contentReplacements, false).Wait();
 
                     //System sends Report Repudiated Receipt to all Admin and Standard Users for the Authority (UC-19 8.4.)
-                    var authorityOrganzationId = authorityOrganization.OrganizationId;
-                    var authorityAdminAndStandardUsersEmails = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganzationId).Select(i => i.Email).ToList();
-            
-                    var auOrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(reportPackage.OrganizationRegulatoryProgramId);
+                    var authorityAdminAndStandardUsersEmails = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganizationRegulatoryProgramDto.OrganizationId)
+                                                                           .Select(i => i.Email).ToList();
 
-                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, auOrganizationRegulatoryProgram.RegulatoryProgramId);
-                    _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, auOrganizationRegulatoryProgram.OrganizationId);
-                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, auOrganizationRegulatoryProgram.RegulatorOrganizationId);
+                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, authorityOrganizationRegulatoryProgramDto.RegulatoryProgramId);
+                    _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, authorityOrganizationRegulatoryProgramDto.OrganizationId);
+                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, authorityOrganizationRegulatoryProgramDto.RegulatorOrganizationId);
 
                     _emailService.SendEmail(authorityAdminAndStandardUsersEmails, EmailType.Report_Repudiation_AU, contentReplacements, false).Wait();
 

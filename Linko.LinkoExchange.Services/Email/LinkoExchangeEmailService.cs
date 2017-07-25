@@ -211,9 +211,9 @@ namespace Linko.LinkoExchange.Services.Email
                     RecipientUserName = userName,
                     RecipientUserProfileId = user.UserProfileId,
 
-                    RecipientRegulatoryProgramId = ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientRegulatoryProgramId) as string, null),
-                    RecipientOrganizationId = ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientOrganizationId) as string, null),
-                    RecipientRegulatorOrganizationId = ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientRegulatoryOrganizationId) as string, null)
+                    RecipientRegulatoryProgramId = ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientRegulatoryProgramId)?.ToString(), null),
+                    RecipientOrganizationId = ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientOrganizationId)?.ToString(), null),
+                    RecipientRegulatorOrganizationId = ValueParser.TryParseInt(_requestCache.GetValue(CacheKey.EmailRecipientRegulatoryOrganizationId)?.ToString(), null)
                 };
 
                 emailAuditLogs.Add(auditLog);
