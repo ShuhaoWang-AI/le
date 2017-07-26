@@ -57,7 +57,7 @@ namespace Linko.LinkoExchange.Services.Report
         ///     - tCopyofRecord (via ReportPackageId)
         /// </summary>
         /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
-        void DeleteReportPackage(int reportPackageId);
+        ReportPackageDto DeleteReportPackage(int reportPackageId);
 
         /// <summary>
         ///     To be called after a User selects a template and date range but before

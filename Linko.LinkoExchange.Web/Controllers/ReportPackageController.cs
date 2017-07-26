@@ -436,9 +436,9 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             try
             {
-                _reportPackageService.DeleteReportPackage(reportPackageId:id);
+                var reportPackageDeleted = _reportPackageService.DeleteReportPackage(reportPackageId:id);
                 TempData["ReportPackageDeletedSucceed"] = true;
-                return RedirectToAction("ReportPackages", new {reportStatus="Draft" }); 
+                return RedirectToAction("ReportPackages", new {reportStatus = reportPackageDeleted.ReportStatusName}); 
             }
             catch (RuleViolationException rve)
             {

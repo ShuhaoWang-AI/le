@@ -809,7 +809,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// - tCopyofRecord (via ReportPackageId)
         /// </summary>
         /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
-        public void DeleteReportPackage(int reportPackageId)
+        public ReportPackageDto DeleteReportPackage(int reportPackageId)
         {
             _logger.Info($"Enter ReportPackageService.DeleteReportPackage. reportPackageId={reportPackageId}");
 
@@ -828,14 +828,14 @@ namespace Linko.LinkoExchange.Services.Report
                         {
                             var reportSamples = _dbContext.ReportSamples
                                 .Where(rs => rs.ReportPackageElementTypeId == rpet.ReportPackageElementTypeId);
-                            if (reportSamples.Count() > 0)
+                            if (reportSamples.Any())
                             {
                                 _dbContext.ReportSamples.RemoveRange(reportSamples);
                             }
 
                             var reportFiles = _dbContext.ReportFiles
                                 .Where(rf => rf.ReportPackageElementTypeId == rpet.ReportPackageElementTypeId);
-                            if (reportFiles.Count() > 0)
+                            if (reportFiles.Any())
                             {
                                 _dbContext.ReportFiles.RemoveRange(reportFiles);
                             }
@@ -851,6 +851,10 @@ namespace Linko.LinkoExchange.Services.Report
                     _dbContext.SaveChanges();
 
                     transaction.Commit();
+                    var reportPackagegDto = _mapHelper.GetReportPackageDtoFromReportPackage(reportPackage);
+                    reportPackagegDto.ReportStatusName = GetReportStatusName(reportPackage);
+                    _logger.Info($"Leave ReportPackageService.DeleteReportPackage. reportPackageId={reportPackageId}"); 
+                    return reportPackagegDto;
                 }
                 catch (DbEntityValidationException ex)
                 {
@@ -865,7 +869,7 @@ namespace Linko.LinkoExchange.Services.Report
 
                         foreach (DbValidationError subItem in item.ValidationErrors)
                         {
-                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            string message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
                             errors.Add(message);
                         }
                     }
@@ -890,12 +894,8 @@ namespace Linko.LinkoExchange.Services.Report
                     _logger.Error("Error(s): {0} ", String.Join("," + Environment.NewLine, errors));
 
                     throw;
-                }
-
-            }
-
-            _logger.Info($"Leave ReportPackageService.DeleteReportPackage. reportPackageId={reportPackageId}");
-
+                } 
+            } 
         }
 
         /// <summary>
