@@ -241,6 +241,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.OrgTypeName = (OrganizationTypeName)Enum.Parse(typeof(OrganizationTypeName), setting.OrganizationRegulatoryProgram.Organization.OrganizationType.Name);
             dto.Value = setting.Value;
             dto.DefaultValue = setting.SettingTemplate.DefaultValue;
+            dto.Description = setting.SettingTemplate.Description;
             return dto;
         }
 
@@ -254,6 +255,7 @@ namespace Linko.LinkoExchange.Services.Mapping
             dto.OrgTypeName = (OrganizationTypeName)Enum.Parse(typeof(OrganizationTypeName), setting.SettingTemplate.OrganizationType.Name);
             dto.Value = setting.Value;
             dto.DefaultValue = setting.SettingTemplate.DefaultValue;
+            dto.Description = setting.SettingTemplate.Description;
             return dto;
         }
 

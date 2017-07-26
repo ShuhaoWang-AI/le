@@ -194,19 +194,19 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         [Display(Name = "Number of Industry Users per Industry")]
         public string UserPerIndustryMaxCount { get; set; }
 
-        [Display(Name = "Name on Emails")]
+        [Display(Name = "Contact Information Name on Emails")]
         public string EmailContactInfoName { get; set; }
 
         [Editable(allowEdit: false)]
         public string EmailContactInfoNameDefault { get; set; }
 
-        [Display(Name = "Phone on Emails")]
+        [Display(Name = "Contact Information Phone on Emails")]
         public string EmailContactInfoPhone { get; set; }
 
         [Editable(allowEdit: false)]
         public string EmailContactInfoPhoneDefault { get; set; }
 
-        [Display(Name = "Email on Emails")]
+        [Display(Name = "Contact Information Email Address on Emails")]
         [EmailAddress]
         public string EmailContactInfoEmailAddress { get; set; }
 

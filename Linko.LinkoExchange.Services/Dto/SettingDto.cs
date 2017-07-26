@@ -8,5 +8,6 @@ namespace Linko.LinkoExchange.Services.Dto
         public OrganizationTypeName OrgTypeName { get; set; }
         public string Value { get; set; }
         public string DefaultValue { get; set; }
+        public string Description { get; set; }
     }
 }

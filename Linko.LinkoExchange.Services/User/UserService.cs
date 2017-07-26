@@ -737,7 +737,7 @@ namespace Linko.LinkoExchange.Services.User
                         contentReplacements.Add("lastName", user.LastName);
                         contentReplacements.Add("userName", user.UserName);
                         contentReplacements.Add("email", user.Email);
-                        _emailService.SendEmail(new[] { adminUserProfile.Email }, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements);
+                        _emailService.SendEmail(new[] { adminUserProfile.Email }, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements); // sending email to locked user's authority Admin's
                         adminEmailList.Add(adminUserProfile.Email);
                     }
                 }

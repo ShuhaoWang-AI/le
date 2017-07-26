@@ -233,7 +233,7 @@ namespace Linko.LinkoExchange.Services.Sync
 
                         _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
 
-                        validationIssues.Add(new RuleViolation(string.Empty, null, "Send to CTS Failed. An unknown error occured. Please contact Linko for assistance."));
+                        validationIssues.Add(new RuleViolation(string.Empty, null, "Send to CTS Failed. An unknown error occurred. Please contact Linko for assistance."));
 
                         throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                     }
@@ -251,7 +251,7 @@ namespace Linko.LinkoExchange.Services.Sync
 
                         _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
 
-                        validationIssues.Add(new RuleViolation(string.Empty, null, "Send to CTS Failed. An unknown error occured. Please contact Linko for assistance."));
+                        validationIssues.Add(new RuleViolation(string.Empty, null, "Send to CTS Failed. An unknown error occurred. Please contact Linko for assistance."));
 
                         throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                     }
