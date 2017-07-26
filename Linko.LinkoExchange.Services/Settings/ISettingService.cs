@@ -20,12 +20,47 @@ namespace Linko.LinkoExchange.Services.Settings
         /// <returns></returns>
         string GetSettingTemplateValue(SettingType settingType, OrganizationTypeName? orgType = null);
 
+        /// <summary>
+        /// Finds all org reg programs associated with the user and their authorities. Compares each authority's setting of the
+        /// requested setting type (found in the tOrganizationSetting table) and returns either the first (or only value) 
+        /// or optionally returns the minimum or maximum value.
+        /// </summary>
+        /// <param name="userProfileId"></param>
+        /// <param name="settingType"></param>
+        /// <param name="isChooseMin"></param>
+        /// <param name="isChooseMax"></param>
+        /// <returns></returns>
         string GetOrganizationSettingValueByUserId(int userProfileId, SettingType settingType, bool? isChooseMin, bool? isChooseMax);
 
+        /// <summary>
+        /// Finds the authority of the passed in org reg program (if applicable) and returns the
+        /// setting from the tOrganizationSetting table associated with the authority. If the
+        /// org reg program is itself the authority, the setting will be associated with this org reg program.
+        /// </summary>
+        /// <param name="orgRegProgramId"></param>
+        /// <param name="settingType"></param>
+        /// <returns></returns>
         string GetOrganizationSettingValue(int orgRegProgramId, SettingType settingType);
 
+        /// <summary>
+        /// Finds the authority of the organization within the regulatory program (if applicable) and returns the
+        /// setting from the tOrganizatioSetting table associated with the authority. If the
+        /// organization is itself the authority, the setting will be associated with this organization.
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="regProgramId"></param>
+        /// <param name="settingType"></param>
+        /// <returns></returns>
         string GetOrganizationSettingValue(int organizationId, int regProgramId, SettingType settingType);
 
+        /// <summary>
+        /// Finds the authority of the passed in org reg program (if applicable) and returns the
+        /// setting from the tOrganizatioRegulatoryProgramSetting table associated with the authority. If the
+        /// org reg program is itself the authority, the setting will be associated with this org reg program.
+        /// </summary>
+        /// <param name="orgRegProgramId"></param>
+        /// <param name="settingType"></param>
+        /// <returns></returns>
         string GetOrgRegProgramSettingValue(int orgRegProgramId, SettingType settingType);
 
         /// <summary>
