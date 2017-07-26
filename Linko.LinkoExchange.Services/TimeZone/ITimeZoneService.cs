@@ -6,10 +6,24 @@ namespace Linko.LinkoExchange.Services.TimeZone
 {
     public interface ITimeZoneService
     {
+        /// <summary>
+        /// Gets the name associated with the TimeZoneId from the tTimeZone table
+        /// </summary>
+        /// <param name="timeZoneId">tTimeZone.TimeZoneId</param>
+        /// <returns></returns>
         string GetTimeZoneName(int timeZoneId);
 
+        /// <summary>
+        /// Gets the time zone object associated with the TimeZoneId from the tTimeZone table
+        /// </summary>
+        /// <param name="timeZoneId">tTimeZone.TimeZoneId</param>
+        /// <returns></returns>
         TimeZoneDto GetTimeZone(int timeZoneId);
 
+        /// <summary>
+        /// Gets all the time zone objects from the tTimeZone table
+        /// </summary>
+        /// <returns></returns>
         ICollection<TimeZoneDto> GetTimeZones();
 
         /// <summary>
