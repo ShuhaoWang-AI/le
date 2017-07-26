@@ -100,7 +100,7 @@ namespace Linko.LinkoExchange.Services.Sync
                         PopulateCommonReportPackageInfo(reportPackageParsedData: reportPackageRecord, reportPackageDto: reportPackageDto);
                         reportPackageParsedDatas.Add(reportPackageRecord);
 
-                        // LEReportPackageParsedData: Report Package Element records
+                        // --------------------- LEReportPackageParsedData: Report Package Element records ---------------------
                         // If an element in a Report Package does not have data created for it,
                         // e.g. a Lab Analysis Report attachment was supposed to be included in the report but it was not added to the report 
                         //      then that element is not included in the data export. 
@@ -110,6 +110,43 @@ namespace Linko.LinkoExchange.Services.Sync
                         var isElementTypePresent = false;
                         foreach (var categoryName in reportPackageDto.ReportPackageElementCategories)
                         {
+                            // Sample and Results
+                            if (categoryName.Equals(ReportElementCategoryName.SamplesAndResults) && reportPackageDto.SamplesAndResultsTypes != null)
+                            {
+                                // --------------------- LESampleResultParsedData: Samples and Results records ---------------------
+                                // a Samples and Results element category is present only if there is at least one Sample with at least one Result
+
+                                foreach (var samplesAndResultsType in reportPackageDto.SamplesAndResultsTypes)
+                                {
+                                    isElementTypePresent = false;
+                                    if (samplesAndResultsType.CtsEventTypeId != null && samplesAndResultsType.Samples != null)
+                                    {
+                                        foreach (var sample in samplesAndResultsType.Samples)
+                                        {
+                                            isElementTypePresent |= sample.SampleResults != null && sample.SampleResults.Any();
+                                            if (isElementTypePresent)
+                                            {
+                                                foreach (var sampleResult in sample.SampleResults)
+                                                {
+                                                    var sampleResultParsedData = new LESampleResultParsedData();
+                                                    PopulateSampleResultParsedData(sampleResultParsedData: sampleResultParsedData, reportPackageDto: reportPackageDto, sampleDto: sample,
+                                                                                   sampleResultDto: sampleResult);
+                                                    syncContext.LESampleResultParsedDatas.Add(sampleResultParsedData);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // No record to send
+                                    }
+
+                                    reportPackageElements.Append($"{samplesAndResultsType.ReportElementTypeName}\t{(isElementTypePresent ? "Yes" : "No")}\r\n");
+                                }
+
+                                // --------------------- End of LESampleResultParsedData ---------------------
+                            }
+
                             // Attachments
                             if (categoryName.Equals(ReportElementCategoryName.Attachments) && reportPackageDto.AttachmentTypes != null)
                             {
@@ -167,26 +204,6 @@ namespace Linko.LinkoExchange.Services.Sync
 
                         syncContext.LEReportPackageParsedDatas.AddRange(reportPackageParsedDatas);
                         syncContext.SaveChanges();
-
-
-                        // LESampleResultParsedData
-                        if (reportPackageDto.SamplesAndResultsTypes != null)
-                        {
-                            foreach (var samplesAndResultsType in reportPackageDto.SamplesAndResultsTypes)
-                            {
-                                foreach (var sample in samplesAndResultsType.Samples)
-                                {
-                                    foreach (var sampleResult in sample.SampleResults)
-                                    {
-                                        var sampleResultParsedData = new LESampleResultParsedData();
-                                        PopulateSampleResultParsedData(sampleResultParsedData: sampleResultParsedData, reportPackageDto: reportPackageDto, sampleDto: sample, sampleResultDto: sampleResult);
-                                        syncContext.LESampleResultParsedDatas.Add(sampleResultParsedData);
-                                    }
-                                }
-                            }
-
-                            syncContext.SaveChanges();
-                        }
 
                         // Update ReportPackage last sent related info
                         _reportPackageService.UpdateLastSentDateTime(reportPackageId, 
