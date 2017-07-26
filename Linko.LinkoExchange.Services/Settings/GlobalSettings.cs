@@ -37,11 +37,6 @@ namespace Linko.LinkoExchange.Services.Settings
 
         }
 
-        public string GetSetting(SystemSettingType settingType)
-        {
-            return _globalSettings[settingType];
-        }
-
         public IDictionary<SystemSettingType, string> GetGlobalSettings()
         {
             return _globalSettings;
