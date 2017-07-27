@@ -119,7 +119,7 @@ namespace Linko.LinkoExchange.Services.Sync
                                 foreach (var samplesAndResultsType in reportPackageDto.SamplesAndResultsTypes)
                                 {
                                     isElementTypePresent = false;
-                                    if (samplesAndResultsType.CtsEventTypeId != null && samplesAndResultsType.Samples != null)
+                                    if (samplesAndResultsType.Samples != null)
                                     {
                                         foreach (var sample in samplesAndResultsType.Samples)
                                         {
