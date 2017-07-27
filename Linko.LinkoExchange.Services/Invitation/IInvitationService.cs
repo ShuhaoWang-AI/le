@@ -36,10 +36,44 @@ namespace Linko.LinkoExchange.Services.Invitation
         /// <returns></returns>
         ICollection<InvitationDto> GetInvitationsForOrgRegProgram(int senderOrgRegProgramId, int targetOrgRegProgramId);
 
+        /// <summary>
+        /// Adds a new entry to the tInvitation table. No validation is performed.
+        /// </summary>
+        /// <param name="dto"></param>
         void CreateInvitation(InvitationDto dto);
 
+        /// <summary>
+        /// Sends one of three types of invitation emails:
+        ///     1) Inviting the initial authority user
+        ///     2) An authority user inviting an industry user
+        ///     3) An industry user inviting another industry user
+        ///     
+        /// Various validation items are performed and logging occurs upon successful execution.
+        /// </summary>
+        /// <param name="orgRegProgramId"></param>
+        /// <param name="email"></param>
+        /// <param name="firstName"></param>
+        /// <param name="lastName"></param>
+        /// <param name="invitationType"></param>
+        /// <param name="existingOrgRegProgramUserId"></param>
+        /// <param name="isAuthorizationRequired"></param>
+        /// <returns></returns>
         InvitationServiceResultDto SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType, int? existingOrgRegProgramUserId = null, bool isAuthorizationRequired = false);
 
+        /// <summary>
+        /// This method is used to determine if an email address is 
+        ///     1) already associated with the specified org reg program
+        ///     2) associated with different org reg program(s)
+        ///     3) not associated with any users in the system.
+        /// 
+        /// Finds all org reg program users associated with the passed in email address.
+        /// If such user(s) exists, the list is iterated through to see if one of the users belongs to the
+        /// passed in org reg program or other org reg programs. All found org reg program users are returned
+        /// in the dto object.
+        /// </summary>
+        /// <param name="orgRegProgramId"></param>
+        /// <param name="email"></param>
+        /// <returns></returns>
         InvitationCheckEmailResultDto CheckEmailAddress(int orgRegProgramId, string email);
 
     }
