@@ -5,6 +5,7 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using System.Text;
 using System.Configuration;
+using System.Transactions;
 using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
@@ -14,6 +15,7 @@ using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.TimeZone;
 using NLog;
 
 namespace Linko.LinkoExchange.Services.Sync
@@ -26,18 +28,20 @@ namespace Linko.LinkoExchange.Services.Sync
         private readonly IHttpContextService _httpContextService;
         private readonly ISettingService _settingService;
         private readonly IReportPackageService _reportPackageService;
+        private readonly ITimeZoneService _timeZoneService;
 
         #endregion
 
 
         #region public methods
 
-        public SyncService(ILogger logger, IHttpContextService httpContextService, ISettingService settingService, IReportPackageService reportPackageService)
+        public SyncService(ILogger logger, IHttpContextService httpContextService, ISettingService settingService, IReportPackageService reportPackageService, ITimeZoneService timeZoneService)
         {
             _logger = logger;
             _httpContextService = httpContextService;
             _settingService = settingService;
             _reportPackageService = reportPackageService;
+            _timeZoneService = timeZoneService;
         }
 
         /// <summary>
@@ -89,10 +93,21 @@ namespace Linko.LinkoExchange.Services.Sync
                     throw new RuleViolationException(message: "Validation errors", validationIssues: validationIssues);
                 }
 
-                using (var transaction = syncContext.Database.BeginTransaction())
+                using (var scope = new TransactionScope())
                 {
                     try
                     {
+                        var timeZoneId = Convert.ToInt32(_settingService.GetOrganizationSettingValue(reportPackageDto.RecipientOrganizationRegulatoryProgramId, SettingType.TimeZone));
+                        var dateTimeOffsetNow = DateTimeOffset.Now;
+
+                        // This LastSent info is used by LinkoCTS users to determine when the data was sent to CTS.  
+                        // Thus, the lastsent data should be populated with the time of the "Send to CTS" button click so it can be placed in CTS_IMPORT.
+                        // We modify just the DTO early on so that it can be propagated to all fields that use them.
+                        // The actual save to the DB is done at the very last step (and with dateTimeOffsetNow value).
+                        reportPackageDto.LastSentDateTimeLocal = _timeZoneService.GetLocalizedDateTimeUsingThisTimeZoneId(dateTimeOffsetNow.UtcDateTime, timeZoneId);
+                        reportPackageDto.LastSenderFirstName = _httpContextService.GetClaimValue(CacheKey.FirstName);
+                        reportPackageDto.LastSenderLastName = _httpContextService.GetClaimValue(CacheKey.LastName);
+
                         List<LEReportPackageParsedData> reportPackageParsedDatas = new List<LEReportPackageParsedData>();
 
                         // LEReportPackageParsedData: Report Package record
@@ -207,17 +222,17 @@ namespace Linko.LinkoExchange.Services.Sync
 
                         // Update ReportPackage last sent related info
                         _reportPackageService.UpdateLastSentDateTime(reportPackageId, 
-                                                                     DateTimeOffset.Now, 
-                                                                     int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId)), 
+                                                                     dateTimeOffsetNow, 
+                                                                     int.Parse(_httpContextService.GetClaimValue(CacheKey.UserProfileId)),
                                                                      _httpContextService.GetClaimValue(CacheKey.FirstName), 
                                                                      _httpContextService.GetClaimValue(CacheKey.LastName));
 
-                        transaction.Commit();
+                        // The Complete method commits the transaction. If an exception has been thrown,
+                        // Complete is not  called and the transaction is rolled back.
+                        scope.Complete();
                     }
                     catch (DbEntityValidationException ex)
                     {
-                        transaction.Rollback();
-
                         var errors = new List<string>() { ex.Message };
                         foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
                         {
@@ -239,8 +254,6 @@ namespace Linko.LinkoExchange.Services.Sync
                     }
                     catch (Exception ex)
                     {
-                        transaction.Rollback();
-
                         var errors = new List<string>() { ex.Message };
 
                         while (ex.InnerException != null)
