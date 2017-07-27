@@ -18,7 +18,7 @@ using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Mapping;
 using Linko.LinkoExchange.Web.Mvc;
-using Linko.LinkoExchange.Web.shared;
+using Linko.LinkoExchange.Web.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 
 namespace Linko.LinkoExchange.Web.Controllers

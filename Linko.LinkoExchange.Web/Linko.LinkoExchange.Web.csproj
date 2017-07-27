@@ -489,7 +489,7 @@
     <Compile Include="Mvc\CustomHandleErrorAttribute.cs" />
     <Compile Include="Mvc\PortalAuthorizeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="shared\ProfileHelper.cs" />
+    <Compile Include="Shared\ProfileHelper.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="ViewModels\Account\ChangeEmailViewModel.cs" />
     <Compile Include="ViewModels\Account\ChangePasswordViewModel.cs" />

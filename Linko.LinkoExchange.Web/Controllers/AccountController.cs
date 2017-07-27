@@ -24,7 +24,7 @@ using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mapping;
-using Linko.LinkoExchange.Web.shared;
+using Linko.LinkoExchange.Web.Shared;
 using Linko.LinkoExchange.Web.ViewModels.Account;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;

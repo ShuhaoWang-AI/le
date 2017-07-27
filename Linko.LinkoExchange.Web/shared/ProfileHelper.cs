@@ -11,7 +11,7 @@ using Linko.LinkoExchange.Web.Mapping;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using Linko.LinkoExchange.Web.ViewModels.User;
 
-namespace Linko.LinkoExchange.Web.shared
+namespace Linko.LinkoExchange.Web.Shared
 {
     public class ProfileHelper
     {
