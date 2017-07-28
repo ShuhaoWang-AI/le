@@ -25,7 +25,8 @@ namespace Linko.LinkoExchange.Services.Unit
         IEnumerable<UnitDto> GetFlowUnitsFromCommaDelimitedString(string commaDelimitedString, bool isLoggingEnabled = true);
 
         /// <summary>
-        /// Always ppd as per client's requirements
+        /// Always return unit information for "ppd" = Pounds per Day (as per client's requirements)
+        /// from the tUnit table.
         /// </summary>
         /// <returns></returns>
         UnitDto GetUnitForMassLoadingCalculations();
