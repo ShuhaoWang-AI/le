@@ -88,7 +88,7 @@
                       .Sortable(sortable => { sortable.SortMode(value:GridSortMode.MultipleColumn); })
                       .Filterable(filterable =>
                       {
-                          if (new[] { "Submitted", "SubmittedPendingReview", "Repudiated", "RepudiatedPendingReview", "All" }.Contains(value: (string) ViewBag.ReportStatusName.ToString()))
+                          if (new[] { "Submitted", "Repudiated", "All" }.Contains(value: (string) ViewBag.ReportStatusName.ToString()))
                           {
                               filterable.Enabled(value: true).Mode(value: GridFilterMode.Row);
                           }
