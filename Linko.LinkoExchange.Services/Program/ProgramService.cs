@@ -136,9 +136,5 @@ namespace Linko.LinkoExchange.Services.Program
                             && !i.InviterOrganizationRegulatoryProgramDto.IsRemoved).ToList();
         }
 
-        public IEnumerable<OrganizationRegulatoryProgramDto> GetChildOrganizationRegulatoryPrograms(int currentOrganizationRegulatoryProgramId, string searchString)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
