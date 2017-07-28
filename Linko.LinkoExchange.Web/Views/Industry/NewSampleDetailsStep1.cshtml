@@ -134,7 +134,8 @@
             .change(function()
             {
                 $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().replace("12:00 am", ""));
-                $("#EndDateTimeLocal").val($("#StartDateTimeLocal").val());
+                $("#EndDateTimeLocal").data("kendoDateTimePicker").value($("#StartDateTimeLocal").data("kendoDateTimePicker").value());
+                $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().replace("12:00 am", ""));
             });
 
         $("#EndDateTimeLocal")
