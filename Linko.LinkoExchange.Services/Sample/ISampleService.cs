@@ -16,6 +16,7 @@ namespace Linko.LinkoExchange.Services.Sample
         /// Sample end dates must on or before this date/time. Null parameters are ignored and not part of the filter.</param>
         /// <returns>A list of different sample status</returns>
         List<SampleCount> GetSampleCounts(DateTime? startDate = null, DateTime? endDate = null);
+        
         /// <summary>
         /// Gets Samples from the database for displaying in a grid
         /// </summary>
@@ -74,6 +75,11 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <returns>Boolean indicating if Sample passed all validation (Draft or ReadyToReport mode)</returns>
         bool IsValidSample(SampleDto sampleDto, bool isSuppressExceptions = false);
 
+        /// <summary>
+        /// Returns a list of active collection methods associated with the current user's authority org reg program,
+        /// or the current org reg program if the user belongs to the authority.
+        /// </summary>
+        /// <returns></returns>
         IEnumerable<CollectionMethodDto> GetCollectionMethods();
 
     }
