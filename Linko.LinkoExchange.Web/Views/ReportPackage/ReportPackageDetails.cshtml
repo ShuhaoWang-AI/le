@@ -207,19 +207,34 @@
             {
                 <div class="form-group">
 
-                    @Html.LabelFor(model => model.CtsEventTypeName, htmlAttributes: new
-                                                                                    {
-                                                                                        @class = "control-label col-md-2"
-                                                                                    })
+                    @Html.LabelFor(model => model.Id, htmlAttributes:new
+                                                                     {
+                                                                         @class = "control-label col-md-2"
+                                                                     })
                     <div class="col-md-4">
-                        @Html.EditorFor(model => model.CtsEventTypeName, additionalViewData: new
-                                                                                             {
-                                                                                                 htmlAttributes = new
-                                                                                                                  {
-                                                                                                                      @class = "form-control",
-                                                                                                                      @readonly = "readonly"
-                                                                                                                  }
-                                                                                             })
+                        @Html.EditorFor(model => model.Id, additionalViewData:new
+                                                                              {
+                                                                                  htmlAttributes = new
+                                                                                                   {
+                                                                                                       @class = "form-control",
+                                                                                                       @readonly = "readonly"
+                                                                                                   }
+                                                                              })
+                    </div>
+
+                    @Html.LabelFor(model => model.CtsEventTypeName, htmlAttributes:new
+                                                                                   {
+                                                                                       @class = "control-label col-md-2"
+                                                                                   })
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.CtsEventTypeName, additionalViewData:new
+                                                                                            {
+                                                                                                htmlAttributes = new
+                                                                                                                 {
+                                                                                                                     @class = "form-control",
+                                                                                                                     @readonly = "readonly"
+                                                                                                                 }
+                                                                                            })
                     </div>
                 </div>
             }

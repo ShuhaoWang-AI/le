@@ -13,6 +13,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.ReportPackage
     public class ReportPackageViewModel
     {
         [ScaffoldColumn(scaffold:false)]
+        [Display(Name = "Report Package ID")]
         public int? Id { get; set; }
 
         [Display(Name = "Name")]
