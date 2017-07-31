@@ -14,12 +14,12 @@
     if (selection.length > 0)
     {
         $.ajax({
-            type: "POST"
-            , url: postUrl
-            , data: JSON.stringify({ returnUrl: returnUrl, items: selection })
-            , dataType: "JSON"
-            , contentType: "application/json; charset=utf-8"
-            , success: function(returnData)
+            type: "POST",
+            url: postUrl,
+            data: JSON.stringify({ returnUrl: returnUrl, items: selection }),
+            dataType: "JSON",
+            contentType: "application/json; charset=utf-8",
+            success: function(returnData)
             {
                 if ($.trim(returnData.message).length > 0)
                 {
@@ -30,25 +30,24 @@
                             + '<button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>'
                             + '<h4 class="box-title"><i class="fa fa-info icon"></i> Info</h4>'
                             + '<div class="form-horizontal">'
-                            + '<p>'
+                            + "<p>"
                             + returnData.message
-                            + '</p>'
-                            + '</div>'
-                            + '</div>'
-                            + '</div>'
-                            + '</div>');
+                            + "</p>"
+                            + "</div>"
+                            + "</div>"
+                            + "</div>"
+                            + "</div>");
 
-                    $('#AjaxReturnDataMessageModal').modal('toggle');
+                    $("#AjaxReturnDataMessageModal").modal("toggle");
                 }
 
                 setTimeout(function()
+                {
+                    if (returnData.redirect)
                     {
-                        if (returnData.redirect)
-                        {
-                            window.location.replace(returnData.newurl);
-                        }
+                        window.location.replace(returnData.newurl);
                     }
-                    , 500);
+                }, 500);
             }
         });
     }
@@ -61,35 +60,34 @@
                 + '<button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>'
                 + '<h4 class="box-title">Error</h4>'
                 + '<div class="form-horizontal">'
-                + '<p>'
+                + "<p>"
                 + noSelectionMessage
-                + '</p>'
-                + '</div>'
-                + '</div>'
-                + '</div>'
-                + '</div>');
+                + "</p>"
+                + "</div>"
+                + "</div>"
+                + "</div>"
+                + "</div>");
 
-        $('#NoSelectionMessageModal').modal('toggle');
+        $("#NoSelectionMessageModal").modal("toggle");
     }
 };
 
 $(document)
-    .on("ajaxError"
-        , function(event, jqXHR)
+    .on("ajaxError", function(event, jqXHR)
+    {
+        var json_response = jqXHR.getResponseHeader("X-Responded-JSON");
+
+        if (json_response)
         {
-            var json_response = jqXHR.getResponseHeader("X-Responded-JSON");
+            var json_response_obj = JSON.parse(json_response);
 
-            if (json_response)
+            if (json_response_obj.status == 401)
             {
-                var json_response_obj = JSON.parse(json_response);
-
-                if (json_response_obj.status == 401)
-                {
-                    $(location).attr("href", json_response_obj.headers.location); //login URL
-                    return;
-                }
+                $(location).attr("href", json_response_obj.headers.location); //login URL
+                return;
             }
-        });
+        }
+    });
 
 error_handler = function(e)
 {
@@ -97,18 +95,16 @@ error_handler = function(e)
     {
         var message = "There are some errors:\n";
         // Create a message containing all errors.
-        $.each(e.errors
-            , function(key, value)
+        $.each(e.errors, function(key, value)
+        {
+            if ("errors" in value)
             {
-                if ("errors" in value)
+                $.each(value.errors, function()
                 {
-                    $.each(value.errors
-                        , function()
-                        {
-                            message += this + "\n";
-                        });
-                }
-            });
+                    message += this + "\n";
+                });
+            }
+        });
 
         // Display the message.
         showPopupMessage(message);
@@ -121,7 +117,6 @@ error_handler = function(e)
 
 showPopupMessage = function(message)
 {
-
     $("body")
         .append('<div aria-labelledby="Error Handler Message" class="fade modal modal-info" id="ErrorHandlerModal" role="dialog" tabindex="-1">'
             + '<div class="modal-dialog" role="document">'
@@ -129,15 +124,15 @@ showPopupMessage = function(message)
             + '<button aria-label="Close" class="close" data-dismiss="modal" type="button">&times;</button>'
             + '<h4 class="box-title">Error</h4>'
             + '<div class="form-horizontal">'
-            + '<p>'
+            + "<p>"
             + message
-            + '</p>'
-            + '</div>'
-            + '</div>'
-            + '</div>'
-            + '</div>');
+            + "</p>"
+            + "</div>"
+            + "</div>"
+            + "</div>"
+            + "</div>");
 
-    $('#ErrorHandlerModal').modal('toggle');
+    $("#ErrorHandlerModal").modal("toggle");
 };
 
 $(document)
@@ -151,10 +146,9 @@ $(document)
                 try
                 {
                     isFormValid = $(this).valid();
-                }                
-                catch(e)
-                {
                 }
+                catch (e)
+                {}
 
                 if (isFormValid)
                 {
@@ -171,32 +165,31 @@ $(document)
 
         // Get all textareas that have a "maxlength" property.
         $("textarea[maxlength]")
-            .on("keyup blur"
-                , function()
+            .on("keyup blur", function()
+            {
+                //Counts all the newline characters (\r = return for macs, \r\n for Windows, \n for Linux/unix)
+                var newLineCharacterRegexMatch = /\r?\n|\r/g;
+
+                // Store the maxlength and value of the field.
+                var maxlength = $(this).attr("maxlength");
+                var val = $(this).val();
+
+                //count newline characters
+                var regexResult = val.match(newLineCharacterRegexMatch);
+                var newLineCount = regexResult ? regexResult.length : 0;
+
+                //replace newline characters with nothing
+                var replacedValue = val.replace(newLineCharacterRegexMatch, "");
+
+                //return the length of text without newline characters + doubled newline character count
+                var length = replacedValue.length + (newLineCount * 2);
+
+                // Trim the field if it has content over the maxlength.
+                if (length > maxlength)
                 {
-                    //Counts all the newline characters (\r = return for macs, \r\n for Windows, \n for Linux/unix)
-                    var newLineCharacterRegexMatch = /\r?\n|\r/g;
-
-                    // Store the maxlength and value of the field.
-                    var maxlength = $(this).attr("maxlength");
-                    var val = $(this).val();
-
-                    //count newline characters
-                    var regexResult = val.match(newLineCharacterRegexMatch);
-                    var newLineCount = regexResult ? regexResult.length : 0;
-
-                    //replace newline characters with nothing
-                    var replacedValue = val.replace(newLineCharacterRegexMatch, "");
-
-                    //return the length of text without newline characters + doubled newline character count
-                    var length = replacedValue.length + (newLineCount * 2);
-                    
-                    // Trim the field if it has content over the maxlength.
-                    if (length > maxlength)
-                    {
-                        $(this).val(val.slice(0, val.length - (length - maxlength)));
-                    }
-                });
+                    $(this).val(val.slice(0, val.length - (length - maxlength)));
+                }
+            });
     });
 
 $(document)
@@ -212,3 +205,13 @@ $(document)
         }
         return true;
     });
+
+
+if (!String.prototype.startsWith)
+{
+    String.prototype.startsWith = function(searchString, position)
+    {
+        position = position || 0;
+        return this.indexOf(searchString, position) === position;
+    };
+}
