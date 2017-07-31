@@ -199,6 +199,8 @@
     <Compile Include="Dto\ReportPackageTemplateElementCategoryDto.cs" />
     <Compile Include="MonitoringPoint\IMonitoringPointService.cs" />
     <Compile Include="MonitoringPoint\MonitoringPointService.cs" />
+    <Compile Include="PrivacyPolicy\IPrivacyPolicyService.cs" />
+    <Compile Include="PrivacyPolicy\PrivacyPolicyService.cs" />
     <Compile Include="Report\DataXML\Certification.cs" />
     <Compile Include="Report\DataXML\CopyOfRecordDataXml.cs" />
     <Compile Include="Report\DataXML\FileInfo.cs" />

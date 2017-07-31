@@ -35,6 +35,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using Microsoft.Practices.Unity;
 using NLog;
+using Linko.LinkoExchange.Services.PrivacyPolicy;
 
 namespace Linko.LinkoExchange.Web
 {
@@ -120,6 +121,7 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<ITermConditionService, TermConditionService>();
             container.RegisterType<ISyncService, SyncService>();
             container.RegisterType<IApplicationCache, ApplicationCache>();
+            container.RegisterType<IPrivacyPolicyService, PrivacyPolicyService>();
 
             // Custom identity services           
             container.RegisterType<ApplicationSignInManager>();
