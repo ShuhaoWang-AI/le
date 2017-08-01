@@ -3,6 +3,8 @@ using Linko.LinkoExchange.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.Mapping;
+using Moq;
+using NLog;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -10,6 +12,7 @@ namespace Linko.LinkoExchange.Test
     public class JurisdictionTests
     {
         private JurisdictionService _jService;
+        private Mock<ILogger> _logger;
 
         public JurisdictionTests()
         {
@@ -19,7 +22,8 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            _jService = new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper());
+            _logger = new Mock<ILogger>();
+            _jService = new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper(), _logger.Object);
         }
 
         [TestMethod]

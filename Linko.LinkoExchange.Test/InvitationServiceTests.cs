@@ -85,7 +85,7 @@ namespace Linko.LinkoExchange.Test
                 new OrganizationService(new LinkoExchangeContext(connectionString),
                                         new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IRequestCache>().Object, new Mock<IGlobalSettings>().Object),
                                         new HttpContextService(),
-                                        new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), _timeZones.Object, new MapHelper()),
+                                        new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper(), _logger.Object), _timeZones.Object, new MapHelper()),
                                         _httpContext.Object,
                                         _timeZones.Object,
                                         _logger.Object,

@@ -77,7 +77,7 @@ namespace Linko.LinkoExchange.Test
             _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString), _settingService.Object, new MapHelper(), new Mock<IApplicationCache>().Object);
             _realSettingService = new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IRequestCache>().Object, new Mock<IGlobalSettings>().Object);
             _realOrgService = new OrganizationService(new LinkoExchangeContext(connectionString),
-                _realSettingService, new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), _timeZones, new MapHelper());
+                _realSettingService, new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper(), _logger.Object), _timeZones, new MapHelper());
             _realUserService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(),
                 new PasswordHasher(), _httpContext.Object, _emailService, _realSettingService,
                 _sessionCache.Object, _realOrgService, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper(), _cromerrLogger.Object);

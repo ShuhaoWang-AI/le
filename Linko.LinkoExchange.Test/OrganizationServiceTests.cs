@@ -53,7 +53,7 @@ namespace Linko.LinkoExchange.Test
 
             orgService = new OrganizationService(new LinkoExchangeContext(connectionString), 
                 new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IRequestCache>().Object, new Mock<IGlobalSettings>().Object), _httpContext.Object,
-                new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper()), _timeZones, new MapHelper());
+                new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper(), _logger.Object), _timeZones, new MapHelper());
         }
 
         [TestMethod]
