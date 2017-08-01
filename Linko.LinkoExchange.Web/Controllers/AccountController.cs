@@ -422,6 +422,16 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             //model.UserName = (HttpContext.Request.Cookies["lastSignInName"] != null) ? HttpContext.Request.Cookies.Get(name: "lastSignInName").Value : "";
 
+            if (Request.IsAuthenticated && !string.IsNullOrWhiteSpace(value:returnUrl))
+            {
+                var portalName = _authenticationService.GetClaimsValue(claimType:CacheKey.PortalName);
+                portalName = string.IsNullOrWhiteSpace(value:portalName) ? "" : portalName.Trim().ToLower();
+                if (portalName.Equals(value:"authority") || portalName.Equals(value:"industry"))
+                {
+                    return Redirect(url:returnUrl);
+                }
+            }
+
             return View(model:model);
         }
 
