@@ -97,6 +97,7 @@ namespace Linko.LinkoExchange.Data
         public DbSet<ReportFile> ReportFiles { get; set; }
         public DbSet<ReportSample> ReportSamples { get; set; }
         public DbSet<TermCondition> TermConditions { get; set; }
+        public DbSet<PrivacyPolicy> PrivacyPolicies { get; set; }
         #endregion
 
 
