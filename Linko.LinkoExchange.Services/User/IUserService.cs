@@ -33,8 +33,6 @@ namespace Linko.LinkoExchange.Services.User
                              bool? isEnabled,
                              bool? isRemoved);
 
-        int AddNewUser(int orgRegProgId, int permissionGroupId, string emailAddress, string firstName, string lastName);
-
         void UpdateUserState(int orgRegProgUserId, bool? isRegApproved, bool? isRegDenied, bool? isEnabled, bool? isRemoved);
 
         void UpdateUserPermissionGroupId(int orgRegProgUserId, int permissionGroupId, bool isAuthorizationRequired = false);
@@ -70,12 +68,38 @@ namespace Linko.LinkoExchange.Services.User
         /// </summary>
         /// <param name="dto"></param>
         void UpdateProfile(UserDto dto);
-        
+
+        /// <summary>
+        /// Checks that required fields contain text
+        /// </summary>
+        /// <param name="userProfile"></param>
+        /// <returns></returns>
         RegistrationResult ValidateUserProfileData(UserDto userProfile);
 
+        /// <summary>
+        /// Validates knowledge-based questions and answers
+        /// </summary>
+        /// <param name="kbqQuestions"></param>
+        /// <returns></returns>
         ICollection<RegistrationResult> KbqValidation(IEnumerable<AnswerDto> kbqQuestions);
-        ICollection<RegistrationResult> SecurityValidation(IEnumerable<AnswerDto> securityQuestions); 
-        
+
+        /// <summary>
+        /// Validates security questions and answers
+        /// </summary>
+        /// <param name="securityQuestions"></param>
+        /// <returns></returns>
+        ICollection<RegistrationResult> SecurityValidation(IEnumerable<AnswerDto> securityQuestions);
+
+        /// <summary>
+        /// - Check if required fields contain text
+        /// - Check if minimum number of SQ/KBQ questions are present
+        /// - Check for duplicated questions and/or answers
+        /// - Check if answers are provided
+        /// </summary>
+        /// <param name="userProfile"></param>
+        /// <param name="securityQuestions"></param>
+        /// <param name="kbqQuestions"></param>
+        /// <returns></returns>
         RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions);
 
         /// <summary>

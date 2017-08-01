@@ -270,23 +270,6 @@ namespace Linko.LinkoExchange.Services.User
             return dtos;
         }
 
-
-        public int AddNewUser(int orgRegProgId, int permissionGroupId, string emailAddress, string firstName, string lastName)
-        {
-            var newOrgRegProgUser = _dbContext.OrganizationRegulatoryProgramUsers.Create();
-            newOrgRegProgUser.OrganizationRegulatoryProgramId = orgRegProgId;
-            newOrgRegProgUser.PermissionGroup = _dbContext.PermissionGroups.Single(p => p.PermissionGroupId == permissionGroupId);
-
-            var newUserProfile = _dbContext.Users.Create();
-            newUserProfile.Email = emailAddress;
-            newUserProfile.FirstName = firstName;
-            newUserProfile.LastName = lastName;
-            _dbContext.Users.Add(newUserProfile);
-            newOrgRegProgUser.UserProfileId = newUserProfile.UserProfileId;
-
-            return _dbContext.SaveChanges();
-        }
-
         public void UpdateUserState(int orgRegProgUserId, bool? isRegApproved, bool? isRegDenied, bool? isEnabled, bool? isRemoved)
         {
             OrganizationRegulatoryProgramUser user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
@@ -1254,13 +1237,13 @@ namespace Linko.LinkoExchange.Services.User
                 return RegistrationResult.DuplicatedKBQAnswer;
             }
 
-            // Test security questions mush have answer
+            // Test security questions must have answer
             if (securityQuestions.Any(i => i.Content == null))
             {
                 return RegistrationResult.MissingSecurityQuestionAnswer;
             }
 
-            // Test KBQ questions mush have answer
+            // Test KBQ questions must have answer
             if (kbqQuestions.Any(i => i.Content == null))
             {
                 return RegistrationResult.MissingKBQAnswer;
@@ -1290,7 +1273,7 @@ namespace Linko.LinkoExchange.Services.User
                 result.Add(RegistrationResult.DuplicatedKBQAnswer);
             }
             
-            // Test KBQ questions mush have answer
+            // Test KBQ questions must have answer
             if (kbqQuestions.Any(i => i.Content == null))
             {
                 result.Add(RegistrationResult.MissingKBQAnswer);
@@ -1320,7 +1303,7 @@ namespace Linko.LinkoExchange.Services.User
                 result.Add(RegistrationResult.DuplicatedSecurityQuestionAnswer);
             }
  
-            // Test security questions mush have answer
+            // Test security questions must have answer
             if (securityQuestions.Any(i => i.Content == null))
             {
                 result.Add(RegistrationResult.MissingSecurityQuestionAnswer);
