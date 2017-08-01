@@ -187,6 +187,31 @@ BEGIN
 END
 GO
 
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tPrivacyPolicy') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
+BEGIN
+	PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Create tPrivacyPolicy'
+    PRINT '---------------------'
+
+    CREATE TABLE dbo.tPrivacyPolicy 
+    (
+        PrivacyPolicyId                 int IDENTITY(1,1) NOT NULL  
+        , Content                       varchar(max) NOT NULL
+        , EffectiveDateTimeUtc          datetimeoffset(0) NOT NULL
+		, CreationDateTimeUtc           datetimeoffset(0) NOT NULL  
+        , LastModifierUserId            int NULL  
+    
+        CONSTRAINT PK_tPrivacyPolicy PRIMARY KEY CLUSTERED 
+        (
+	       PrivacyPolicyId ASC
+        ) WITH FILLFACTOR = 100 ON [LinkoExchange_FG1_Data]
+    ) ON [LinkoExchange_FG1_Data]
+    
+    ALTER TABLE dbo.tPrivacyPolicy ADD CONSTRAINT DF_tPrivacyPolicy_CreationDateTimeUtc DEFAULT SYSDATETIMEOFFSET() FOR CreationDateTimeUtc
+END
+GO
+
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.tTermCondition') AND OBJECTPROPERTY(object_id, N'IsUserTable') = 1)
 BEGIN
 	PRINT CHAR(13)
@@ -3417,6 +3442,443 @@ BEGIN
 		VALUES ('Authority', 'The regulator who is using LinkoExchange to receive Report Packages.') 
 	INSERT INTO dbo.tOrganizationType (Name, Description)
 		VALUES ('Industry', 'A company that discharges industrial process waters to the City’s sewers, permitted by Authority. Industries will be using LinkoExchange to submit reports electronically to Authority.') 
+END
+
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tPrivacyPolicy)
+BEGIN
+    PRINT CHAR(13)
+    PRINT CHAR(13)
+    PRINT 'Add records to tPrivacyPolicy'
+    PRINT '-----------------------------'
+    
+    INSERT INTO dbo.tPrivacyPolicy (EffectiveDateTimeUtc, Content)
+		VALUES (
+        TODATETIMEOFFSET('2017-08-01 00:00:00', '-07:00')
+        ,
+        '<style>
+            p.MsoListBullet
+            {
+                font-size: 10.0pt;
+                margin-bottom: .0001pt;
+                margin-left: .75in;
+                text-indent: -.29in;
+            }
+
+            p.MsoBodyText
+            {
+                font-size: 10.0pt;
+                margin-top: 12.0pt;
+                text-align: justify;
+            }
+        </style>
+
+        <div>
+            <p class="MsoBodyText" style="text-align: center;">
+                <b>GENERAL PRIVACY POLICY</b>
+            </p>
+
+            <p class="MsoBodyText">
+                <b>EFFECTIVE DATE</b>: August 1, 2017
+            </p>
+
+            <p class="MsoBodyText">
+                <b>OUR COMMITMENT TO PRIVACY</b>
+            </p>
+
+            <p class="MsoBodyText">
+                Linko Technology Inc. (“<b>we</b>” or “<b>Linko</b>”)<b> </b>is committed to maintaining the security, confidentiality and privacy of your personal information.
+            </p>
+
+            <p class="MsoBodyText">
+                This is our Privacy Policy. It documents our on-going commitment to you.
+            </p>
+
+            <p class="MsoBodyText">
+                <b>SCOPE OF POLICY</b>
+            </p>
+
+            <p class="MsoBodyText">
+                This Policy applies to our collection, use and disclosure of your personal information you enter into the LinkoExchange Web Site.
+            </p>
+
+            <p class="MsoBodyText">
+                This Policy does not impose any limits on the collection, use or disclosure of the following information by Linko:
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; business contact information; and
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; certain publicly available information.
+            </p>
+
+            <p class="MsoBodyText">
+                This Policy also does not apply to other customer data, such as confidential, non-personal information. That information is addressed in our Client Services
+                Agreement. Your use of our Services, and any dispute over privacy, is subject to this Privacy Policy and any other applicable agreements between you and us including
+                any applicable limitations on damages and the resolution of disputes.
+            </p>
+
+            <p class="MsoBodyText">
+                <b>ACCOUNTABILITY</b>
+            </p>
+
+            <p class="MsoBodyText">
+                We have designated a Privacy Officer who is responsible for our compliance with this Policy. The Privacy Officer may be contacted as described below.
+            </p>
+
+            <p class="MsoBodyText">
+                <b>COLLECTION</b>
+            </p>
+
+            <p class="MsoBodyText">
+                Information we collect includes Name, Address, Company, Phone, email, login/username, password, knowledge based questions and answers, associations with
+                Organizations such as Industries or Authorities that use the Web Site and your roles within those Organizations. We use the information you provide for such
+                purposes as confirming your identity, tracking what data records in the software you added, edited or created and sending electronic confirmations
+                (email, text messages, phone calls) to you regarding actions you have taken on the Web Site such as personal information changes, account status changes
+                (locked, unlocked, enabled, disabled, removed, role) and report or data submissions.
+            </p>
+
+            <p class="MsoBodyText">
+                <b>PURPOSES</b>
+            </p>
+
+            <p class="MsoBodyText">
+                When collecting personal information, we will state the purpose of collection and will provide, on request, contact information for the Privacy Officer who can
+                answer questions about the collection.
+            </p>
+
+            <p class="MsoBodyText">
+                We collect, use and disclose your personal information for the following purposes:
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; to provide and administer products and services requested, and to disclose the information for any purpose related to requested products and services;
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; to communicate with you regarding our products and services;
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; to authenticate your identity;
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; to monitor your compliance with any of your agreements with us;
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; to provide personal information to our third party suppliers of products and services, in connection with any products and services we provide to you;
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; to protect us, yourself and others, including from fraud and error and to safeguard our business interests;
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; to comply with legal and regulatory requirements;
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; to facilitate a merger, acquisition, sale or transfer of a business unit or assets, as part of a bankruptcy proceeding, or as part of any
+                other similar business transfer.
+            </p>
+
+            <p class="MsoBodyText">
+                The above collections, uses and disclosures are a reasonably necessary part of your relationship with us.
+            </p>
+
+            <p class="MsoBodyText">
+                We may also collect, use and disclose your personal information to offer additional or alternate products
+                and services to you, and we may add your personal information to customer lists for this purpose. You may instruct us to refrain from using or sharing your
+                personal information in this way by providing written notification to our Privacy Officer. We acknowledge that the sharing of your personal information
+                in this way is at your option and we will not refuse you access to any product or service merely because you have advised us to stop doing so.
+            </p>
+
+            <p class="MsoBodyText">
+                In addition, we will also disclose your information to (i) current or future affiliates or subsidiaries and (ii) vendors, service
+                providers, agents or others who perform functions on our behalf. We may also disclose aggregate, anonymous or de-identified information about users for marketing,
+                advertising, research, compliance or other purposes.
+            </p>
+
+            <p class="MsoBodyText">
+                When your personal information is to be used for a purpose not previously identified, the new purpose will be
+                disclosed to you prior to such use, and your consent will be sought unless the use is authorized or required by law.
+            </p>
+
+            <p class="MsoBodyText">
+                <b>COOKIES</b>
+            </p>
+
+            <p class="MsoBodyText">
+                We may also use cookies to collect your personal information. Cookies are unique identifiers which are used to customize your
+                website experience and allow our systems to recognize you and your device. Most web browsers automatically accept cookies, but you can usually change your
+                browser to prevent or notify you whenever you are sent a cookie. This gives you the chance to decide whether or not to accept the cookie. The use of cookies
+                is essential to the use of the website. Disabling cookies will prevent you from using the website and its services.
+            </p>
+
+            <p class="MsoBodyText">
+                <b>DO NOT TRACK</b>
+            </p>
+
+            <p class="MsoBodyText">
+                Our online services do not respond to Do Not Track signals. For more information about Do Not Track signals, please visit
+                <a href="https://allaboutdnt.com/">https://allaboutdnt.com/</a>. You may, however,
+                disable certain tracking as discussed in the Cookies section above (<i>e.g.</i>, by disabling cookies).
+            </p>
+
+            <p class="MsoBodyText">
+                <b>CROSS-BORDER TRANSFERS</b>
+            </p>
+
+            <p class="MsoBodyText">
+                Except to the extent we agree otherwise in writing, we may transfer your personal information across provincial, state or national borders
+                to fulfill any of the above purposes, including to service providers located in the United States, Canada and other jurisdictions who may be subject to
+                applicable disclosure laws in those jurisdictions. You may contact our Privacy Officer (whose contact information is provided below) to obtain information
+                about our policies and practices regarding our use of service providers outside of your country, or to ask questions about the collection, use, disclosure or
+                storage of personal information by our foreign service providers.
+            </p>
+
+            <p class="MsoBodyText">
+                <b>CONSENT</b>
+            </p>
+
+            <p class="MsoBodyText">
+                We will obtain your consent to collect, use or disclose personal information except where we are authorized or required by law to do so without consent.
+                For example, we may collect, use or disclose personal information without your knowledge or consent where:
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; the information is publicly available, as defined by statute or regulation;
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; we are obtaining legal advice; or
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; we reasonably expect that obtaining consent would compromise an investigation or proceeding.
+            </p>
+
+            <p class="MsoBodyText">
+                Other exceptions may apply.
+            </p>
+
+            <p class="MsoBodyText">
+                Your consent can be express, implied or given through an authorized representative such as a lawyer, agent or broker.
+            </p>
+
+            <p class="MsoBodyText">
+                Consent may be provided orally, in writing, electronically, through inaction (such as when you fail to notify us that you do not wish your personal information
+                collected/used/disclosed for various purposes after you have received notice of those purposes) or otherwise.
+            </p>
+
+            <p class="MsoBodyText">
+                You may withdraw consent at any time, subject to legal, contractual and other restrictions, provided that you give reasonable notice of withdrawal of consent
+                to us. On receipt of notice of withdrawal of consent, we will inform you of the likely consequences of the withdrawal of consent, which may include the
+                inability of us to provide certain services for which that information is necessary.
+            </p>
+
+            <p class="MsoBodyText">
+                <b>
+                    LIMITS ON COLLECTION OF PERSONAL INFORMATION
+                </b>
+            </p>
+
+            <p class="MsoBodyText">
+                We will not collect personal information indiscriminately but will limit collection of personal information to that which is reasonable and necessary.
+                We will also collect personal information as authorized by law.
+            </p>
+
+            <p class="MsoBodyText">
+                <b>
+                    LIMITS FOR USING, DISCLOSING AND RETAINING PERSONAL INFORMATION
+                </b>
+            </p>
+
+            <p class="MsoBodyText">
+                Your personal information will only be used or disclosed for the purposes set out above and as authorized by law.
+            </p>
+
+            <p class="MsoBodyText">
+                We will keep personal information used to make a decision affecting you for at least one year after using it to make the decision.
+            </p>
+
+            <p class="MsoBodyText">
+                We will destroy, erase or make anonymous documents or other records containing personal information as soon as it is reasonable to assume that the original
+                purpose is no longer being served by retention of the information and retention is no longer necessary for a legal or business purpose.
+            </p>
+
+            <p class="MsoBodyText">
+                We will take due care when destroying personal information so as to prevent unauthorized access to the information.
+            </p>
+
+            <p class="MsoBodyText">
+                <b>ACCURACY</b>
+            </p>
+
+            <p class="MsoBodyText">
+                We will make a reasonable effort to ensure that personal information we are using or disclosing is accurate and complete.
+            </p>
+
+            <p class="MsoBodyText">
+                If you demonstrate the inaccuracy or incompleteness of personal information, we will amend the information as required. If appropriate, we will send the
+                amended information to third parties to whom the information has been disclosed.
+            </p>
+
+            <p class="MsoBodyText">
+                When a challenge regarding the accuracy of personal information is not resolved to your satisfaction, we will annotate the personal information under our control
+                with a note that the correction was requested but not made.
+            </p>
+
+            <p class="MsoBodyText">
+                <b>
+                    SAFEGUARDING PERSONAL INFORMATION
+                </b>
+            </p>
+
+            <p class="MsoBodyText">
+                We protect the personal information in our custody or control by making reasonable security arrangements to prevent unauthorized access, collection, use,
+                disclosure, copying, modification, disposal or similar risks.
+            </p>
+
+            <p class="MsoBodyText">
+                We will take reasonable steps, through contractual or other reasonable means, to ensure that a comparable level of personal information protection is
+                implemented by the suppliers and agents who assist in providing services to us. Some specific safeguards include:
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; physical measures such as locked filing cabinets;
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; organizational measures such as restricting employee access to files and databases as appropriate;
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; electronic measures such as passwords and firewalls; and
+            </p>
+
+            <p class="MsoListBullet">
+                <span style="font-family: Symbol">·</span>
+                &nbsp;&nbsp;&nbsp;&nbsp; investigative measures where we have reasonable grounds to believe that personal information is being inappropriately collected, used or disclosed.
+            </p>
+
+            <p class="MsoBodyText">
+                Note that confidentiality and security are not assured when information is transmitted through e-mail or other wireless communication. Please notify Linko’s Privacy
+                Officer in writing if you do not want Linko to communicate with you through these means.
+            </p>
+
+            <p class="MsoBodyText">
+                <b> PROVIDING ACCESS </b>
+            </p>
+
+            <p class="MsoBodyText">
+                You have a right to access your personal information held by Linko.
+            </p>
+
+            <p class="MsoBodyText">
+                Upon written request to our Privacy Officer, and authentication of identity, we will provide you your personal information under our control. We will also give you
+                information about the ways in which that information is being used and a description of the individuals and organizations to whom that information has
+                been disclosed. We may charge you a reasonable fee for doing so.
+            </p>
+
+            <p class="MsoBodyText">
+                We will make the information available within 30 days of receiving a written request or provide written notice where additional time is required to fulfill the request.
+            </p>
+
+            <p class="MsoBodyText">
+                In some situations, Linko may not be able to provide access to certain personal information (e.g., if disclosure would reveal personal information about
+                another individual, the personal information is protected by solicitor/client privilege, the information was collected for the purposes of an investigation
+                or where disclosure of the information would reveal confidential commercial information that could harm the competitive position of Linko).
+                Linko may also be prevented by law from providing access to certain personal information.
+            </p>
+
+            <p class="MsoBodyText">
+                Where an access request is refused, we will notify you in writing, document the reasons for refusal and outline further steps which are available to you.
+            </p>
+
+            <p class="MsoBodyText">
+                <b> CHILDREN </b>
+            </p>
+
+            <p class="MsoBodyText">
+                Our services are not targeted to children under thirteen (13) years of age and we do not knowingly collect personal information from children under 13. If we
+                discover that a child under 13 has provided us with personal information, we will promptly delete such personal information from our systems.
+            </p>
+
+            <p class="MsoBodyText">
+                <b> COMPLAINTS </b>
+            </p>
+
+            <p class="MsoBodyText">
+                We will, on request, provide information regarding our complaint procedure.
+            </p>
+
+            <p class="MsoBodyText">
+                Any inquiries, complaints or questions regarding this Policy should be directed in writing to our Privacy Officer as follows:
+            </p>
+
+            <p class="MsoBodyText" style="margin-bottom: .0001pt;">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Address:
+            </p>
+
+            <p class="MsoBodyText" style="margin-bottom: .0001pt; margin-top: 0;">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Linko Technology Inc
+
+            </p>
+
+            <p class="MsoBodyText" style="margin-bottom: .0001pt; margin-top: 0;">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Attn: Privacy Officer
+
+            </p>
+
+            <p class="MsoBodyText" style="margin-bottom: .0001pt; margin-top: 0;">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4251 Kipling Street Suite 220
+
+            </p>
+
+            <p class="MsoBodyText" style="margin-top: 0;">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Wheat Ridge, CO 80033
+
+            </p>
+
+            <p class="MsoBodyText">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; E-mail:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="mailto:privacy@linkotechnology.com">privacy@linkotechnology.com</a>
+            </p>
+
+            <p class="MsoBodyText">
+                <b> CHANGES TO THIS PRIVACY POLICY </b>
+            </p>
+
+            <p class="MsoBodyText">
+                This Privacy Policy is current as of the Effective Date set forth above. We may change this Privacy Policy from time to time, so please be sure to check back
+                periodically. We will post any changes, including any material changes, to this Privacy Policy on
+                <a href="https://client.linkoexchange.com/privacypolicy">https://client.linkoexchange.com/privacypolicy</a>
+            </p>
+        </div>')
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tTermCondition)
