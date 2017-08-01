@@ -7,13 +7,24 @@ namespace Linko.LinkoExchange.Services.User
 
     public interface IUserService
     {
+        /// <summary>
+        /// Returns a user profile for a valid id.
+        /// </summary>
+        /// <param name="userProfileId"></param>
+        /// <returns></returns>
         UserDto GetUserProfileById(int userProfileId);
 
+        /// <summary>
+        /// Returns a user profile for a valid email address.
+        /// </summary>
+        /// <param name="emailAddress"></param>
+        /// <returns></returns>
         UserDto GetUserProfileByEmail(string emailAddress);
 
         ICollection<OrganizationRegulatoryProgramUserDto> GetProgramUsersByEmail(string emailAddress);
 
         int GetPendingRegistrationProgramUsersCount(int orgRegProgamId);
+
         List<OrganizationRegulatoryProgramUserDto> GetPendingRegistrationProgramUsers(int orgRegProgramId);
 
         List<OrganizationRegulatoryProgramUserDto> GetUserProfilesForOrgRegProgram(int orgRegProgramId,
@@ -38,14 +49,26 @@ namespace Linko.LinkoExchange.Services.User
 
         void EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable, bool isAuthorizationRequired = false);
 
+        /// <summary>
+        /// Updates the hashed password property of given user profile.
+        /// </summary>
+        /// <param name="userProfileId"></param>
+        /// <param name="passwordHash"></param>
         void SetHashedPassword(int userProfileId, string passwordHash);
 
+        /// <summary>
+        /// User is soft-deleted from the database. The current accessing user is optionally checked for authorization to perform this action.
+        /// Cromerr logging occurs as well.
+        /// </summary>
+        /// <param name="orgRegProgUserId"></param>
+        /// <param name="isAuthorizationRequired"></param>
+        /// <returns></returns>
         bool RemoveUser(int orgRegProgUserId, bool isAuthorizationRequired = false);
 
         /// <summary>
-        /// Method to be called by application layer to execute business logic.
+        /// Updates the various properties of a user profile.
         /// </summary>
-        /// <param name="dto">Profile DTO</param>
+        /// <param name="dto"></param>
         void UpdateProfile(UserDto dto);
         
         RegistrationResult ValidateUserProfileData(UserDto userProfile);
@@ -55,14 +78,38 @@ namespace Linko.LinkoExchange.Services.User
         
         RegistrationResult ValidateRegistrationUserData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions);
 
+        /// <summary>
+        /// Checks if new email address is already in use and returns false if so. If the email address is unused, the user profile
+        /// is updated with it. An email communication is sent out to the old and new email address as well as logging occurs.
+        /// </summary>
+        /// <param name="userProfileId"></param>
+        /// <param name="newEmailAddress"></param>
+        /// <returns></returns>
         bool UpdateEmail(int userProfileId, string newEmailAddress);
 
+        /// <summary>
+        /// Returns an org reg program user. The current accessing user can also optionally checked for authorization to query the target user.
+        /// </summary>
+        /// <param name="orgRegProgUserId"></param>
+        /// <param name="isAuthorizationRequired"></param>
+        /// <returns></returns>
         OrganizationRegulatoryProgramUserDto GetOrganizationRegulatoryProgramUser(int orgRegProgUserId, bool isAuthorizationRequired = false);
 
-        void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, int organizationRegulatoryProgramId, bool isApproved);
-
+        /// <summary>
+        /// Updates an org reg program user's approved status and signatory permissions if there is a change. If there is a change in signatory
+        /// permissions, various email communications are sent out and logging occurs.
+        /// </summary>
+        /// <param name="orgRegProgUserId"></param>
+        /// <param name="isApproved"></param>
+        /// <param name="isSigantory"></param>
         void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int orgRegProgUserId, bool isApproved, bool isSigantory);
 
+        /// <summary>
+        /// Updates the PermissionGroupId field of the OrganizationRegulatoryProgramUser
+        ///     (* No validation performed)
+        /// </summary>
+        /// <param name="orgRegProgUserId"></param>
+        /// <param name="permissionGroupId"></param>
         void UpdateOrganizationRegulatoryProgramUserRole(int orgRegProgUserId, int permissionGroupId);
 
         /// <summary>
@@ -76,7 +123,18 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="isApproved"></param>
         RegistrationResultDto ApprovePendingRegistration(int orgRegProgUserId, int permissionGroupId, bool isApproved, bool isAuthorizationRequired = false, bool isSignatory = false);
 
+        /// <summary>
+        /// Returns a collection of active users with signatory permission belonging to a given org reg program.
+        /// </summary>
+        /// <param name="orgRegProgId"></param>
+        /// <returns></returns>
         ICollection<UserDto> GetOrgRegProgSignators(int orgRegProgId);
+
+        /// <summary>
+        /// Returns all active admin and standard users for the authority
+        /// </summary>
+        /// <param name="authorityOrganizationId"></param>
+        /// <returns></returns>
         ICollection<UserDto> GetAuthorityAdministratorAndStandardUsers(int authorityOrganizationId);
     }
 }

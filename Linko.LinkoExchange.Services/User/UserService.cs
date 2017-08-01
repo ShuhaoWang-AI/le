@@ -1432,18 +1432,6 @@ namespace Linko.LinkoExchange.Services.User
             return userDto;
         }
 
-        public void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int userProfileId, int organizationRegulatoryProgramId,
-            bool isApproved)
-        {
-            var user = _dbContext.OrganizationRegulatoryProgramUsers
-                .SingleOrDefault(u => u.UserProfileId == userProfileId && u.OrganizationRegulatoryProgramId == organizationRegulatoryProgramId);
-
-            if (user == null) return;
-
-            user.IsRegistrationApproved = isApproved;
-            _dbContext.SaveChangesAsync();
-        }
-
         public void UpdateOrganizationRegulatoryProgramUserApprovedStatus(int orgRegProgUserId, bool isApproved, bool isSignatory)
         {
             var user = _dbContext.OrganizationRegulatoryProgramUsers.SingleOrDefault(u => u.OrganizationRegulatoryProgramUserId == orgRegProgUserId);
@@ -1452,7 +1440,7 @@ namespace Linko.LinkoExchange.Services.User
             user.IsRegistrationApproved = isApproved;
             user.IsRegistrationDenied = !isApproved;
              
-            // Call UpdateUserSignatoryStatus to set IsSignatory flag to void duplicated code for emails and Cromerr
+            // Call UpdateUserSignatoryStatus to set IsSignatory flag to avoid duplicated code for emails and Cromerr
             UpdateUserSignatoryStatus(orgRegProgUserId, isSignatory, true); 
             _dbContext.SaveChanges();
         }
