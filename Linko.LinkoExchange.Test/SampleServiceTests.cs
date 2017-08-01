@@ -89,7 +89,7 @@ namespace Linko.LinkoExchange.Test
             sampleDto.CtsEventCategoryName = "Sample Category 1";
             sampleDto.FlowUnitId = 5;
             sampleDto.FlowUnitName = "gpd";
-            sampleDto.FlowValue = "25000";
+            sampleDto.FlowEnteredValue = "25000";
             sampleDto.StartDateTimeLocal = DateTime.Now.AddDays(-7);
             sampleDto.EndDateTimeLocal = DateTime.Now;
             sampleDto.IsReadyToReport = false;
@@ -318,7 +318,7 @@ namespace Linko.LinkoExchange.Test
         {
             var sampleDto = GetTestSampleDto();
             sampleDto.FlowUnitId = 1;
-            sampleDto.FlowValue = null;
+            sampleDto.FlowEnteredValue = null;
             sampleDto.IsReadyToReport = false;
             try
             {
@@ -515,7 +515,7 @@ namespace Linko.LinkoExchange.Test
             var sampleDto = _sampleService.GetSampleDetails(sampleId);
 
             //Change (just increment by 1)
-            sampleDto.FlowValue = (Convert.ToInt32(sampleDto.FlowValue) + 1).ToString();
+            sampleDto.FlowEnteredValue = (Convert.ToInt32(sampleDto.FlowEnteredValue) + 1).ToString();
 
             //Remove 1 result
             var newList = new List<SampleResultDto>();

@@ -405,7 +405,7 @@ namespace Linko.LinkoExchange.Services.Report
                         StartDateTimeUtc = sampleDto.StartDateTimeLocal.ToString(dateTimeFormat),
                         EndDateTimeUtc = sampleDto.EndDateTimeLocal.ToString(dateTimeFormat),
 
-                        SampleFlowForMassCalcs = sampleDto.FlowValue.GetValueOrEmptyString(),
+                        SampleFlowForMassCalcs = sampleDto.FlowEnteredValue.GetValueOrEmptyString(),
                         SampleFlowForMassCalcsUnitName = sampleDto.FlowUnitName.GetValueOrEmptyString(),
 
                         MassLoadingsConversionFactorPounds = sampleDto.MassLoadingConversionFactorPounds?.ToString(),

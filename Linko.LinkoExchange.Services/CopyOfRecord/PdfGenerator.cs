@@ -392,7 +392,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                                                      : "";
 
                     row.Cells.Add(analysisDateTimeString, centerTextSize8);
-                    row.Cells.Add($"{sampleResultExtension.Sample.FlowValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}", rightTextSize8);
+                    row.Cells.Add($"{sampleResultExtension.Sample.FlowEnteredValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}", rightTextSize8);
 
                     if (!string.IsNullOrWhiteSpace(sampleResultExtension.SampleResult.MassLoadingValue))
                     {
@@ -408,7 +408,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
                         row.Cells.Add(sampleResultExtension.SampleResult.AnalysisMethod.GetValueOrEmptyString(), centerTextSize8);
                         row.Cells.Add(isEpaMethod, centerTextSize8);
                         row.Cells.Add(analysisDateTimeString, centerTextSize8);
-                        row.Cells.Add($"{sampleResultExtension.Sample.FlowValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}", rightTextSize8);
+                        row.Cells.Add($"{sampleResultExtension.Sample.FlowEnteredValue.GetValueOrEmptyString()} {sampleResultExtension.Sample.FlowUnitName.GetValueOrEmptyString()}", rightTextSize8);
                     }
                 }
             }

@@ -1399,7 +1399,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                                                           }),
                           FlowUnitId = model.FlowUnitId,
                           FlowUnitName = model.FlowUnitName,
-                          FlowValue = string.IsNullOrWhiteSpace(value:model.FlowValue) ? string.Empty : model.FlowValue,
+                          FlowEnteredValue = string.IsNullOrWhiteSpace(value:model.FlowValue) ? string.Empty : model.FlowValue,
                           StartDateTimeLocal = model.StartDateTimeLocal,
                           EndDateTimeLocal = model.EndDateTimeLocal
                           //LastModificationDateTimeLocal = 
@@ -1435,7 +1435,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                                 FlowUnitId = vm.FlowUnitId,
                                 FlowUnitName = vm.FlowUnitName,
                                 FlowUnitValidValues = vm.FlowUnitValidValues,
-                                FlowValue = vm.FlowValue,
+                                FlowValue = vm.FlowEnteredValue,
                                 Id = vm.SampleId,
                                 IsMassLoadingResultToUseLessThanSign = vm.IsMassLoadingResultToUseLessThanSign,
                                 IsReadyToReport = vm.IsReadyToReport,

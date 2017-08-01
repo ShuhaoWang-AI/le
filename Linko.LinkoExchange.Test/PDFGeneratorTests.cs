@@ -179,7 +179,7 @@ namespace Linko.LinkoExchange.Test
 
                     CollectionMethodName = "a-collection method",
                     LabSampleIdentifier = "123232",
-                    FlowValue = "0.18",
+                    FlowEnteredValue = "0.18",
                     FlowUnitName = "mgd",
                     MonitoringPointId = 30 + i,
                     MonitoringPointName = $"TestingMonitoringPoint_{i}",
@@ -193,7 +193,7 @@ namespace Linko.LinkoExchange.Test
 
                     CollectionMethodName = "b-collection method",
                     LabSampleIdentifier = "123232",
-                    FlowValue = "0.19",
+                    FlowEnteredValue = "0.19",
                     FlowUnitName = "mgd",
                     MonitoringPointId = 30 + i,
                     MonitoringPointName = $"TestingMonitoringPoint_{i}",
@@ -301,7 +301,7 @@ namespace Linko.LinkoExchange.Test
 
                     CollectionMethodName = GetRandomCollectionMethod(),
                     LabSampleIdentifier = "123232",
-                    FlowValue = "0.18",
+                    FlowEnteredValue = "0.18",
                     FlowUnitName = "mgd",
                     MonitoringPointId = 30 + i,
                     MonitoringPointName = $"TestingMonitoringPoint_{i}",
@@ -316,7 +316,7 @@ namespace Linko.LinkoExchange.Test
 
                     CollectionMethodName = GetRandomCollectionMethod(),
                     LabSampleIdentifier = "123232",
-                    FlowValue = "0.19",
+                    FlowEnteredValue = "0.19",
                     FlowUnitName = "mgd",
                     MonitoringPointId = 30 + i,
                     MonitoringPointName = $"TestingMonitoringPoint_{i}",
@@ -332,7 +332,7 @@ namespace Linko.LinkoExchange.Test
 
                     CollectionMethodName = GetRandomCollectionMethod(),
                     LabSampleIdentifier = "123232",
-                    FlowValue = "0.31",
+                    FlowEnteredValue = "0.31",
                     FlowUnitName = "mgd",
                     MonitoringPointId = 30 + i,
                     MonitoringPointName = $"TestingMonitoringPoint_{i}",

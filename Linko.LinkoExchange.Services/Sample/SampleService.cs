@@ -218,7 +218,7 @@ namespace Linko.LinkoExchange.Services.Sample
             var existingFlowResultRow = sampleToPersist.SampleResults
                     .SingleOrDefault(sr => sr.LimitBasis.Name == LimitBasisName.VolumeFlowRate.ToString());
 
-            if (!string.IsNullOrEmpty(sampleDto.FlowValue) && sampleDto.FlowUnitId != null && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
+            if (!string.IsNullOrEmpty(sampleDto.FlowEnteredValue) && sampleDto.FlowUnitId != null && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
             {
                 //Check flow unit id is within valid values
                 if (sampleDto.FlowUnitValidValues == null || !sampleDto.FlowUnitValidValues.Select(fu => fu.UnitId).Contains(sampleDto.FlowUnitId.Value))
@@ -241,7 +241,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 existingFlowResultRow.ParameterId = flowParameter.ParameterId;
                 existingFlowResultRow.ParameterName = flowParameter.Name;
                 existingFlowResultRow.Qualifier = "";
-                existingFlowResultRow.EnteredValue = sampleDto.FlowValue;
+                existingFlowResultRow.EnteredValue = sampleDto.FlowEnteredValue;
                 //existingFlowResultRow.Value = Convert.ToDouble(sampleDto.FlowValue); //handle this below
                 existingFlowResultRow.UnitId = sampleDto.FlowUnitId.Value;
                 existingFlowResultRow.UnitName = sampleDto.FlowUnitName;
@@ -554,14 +554,14 @@ namespace Linko.LinkoExchange.Services.Sample
 
             //Check Flow Value exists and is complete if provided (both value and unit)
             
-            if (!string.IsNullOrEmpty(sampleDto.FlowValue) && sampleDto.FlowUnitId.HasValue &&
+            if (!string.IsNullOrEmpty(sampleDto.FlowEnteredValue) && sampleDto.FlowUnitId.HasValue &&
                 sampleDto.FlowUnitId.Value > 0 && !string.IsNullOrEmpty(sampleDto.FlowUnitName))
             {
                 Double flowValueAsDouble;
-                if (!Double.TryParse(sampleDto.FlowValue, out flowValueAsDouble))
+                if (!Double.TryParse(sampleDto.FlowEnteredValue, out flowValueAsDouble))
                 {
                     //Could not convert -- throw exception
-                    ThrowSimpleException($"Could not convert provided flow value '{sampleDto.FlowValue}' to double.");
+                    ThrowSimpleException($"Could not convert provided flow value '{sampleDto.FlowEnteredValue}' to double.");
                 }
             }
 
@@ -827,7 +827,9 @@ namespace Linko.LinkoExchange.Services.Sample
 
                     if (sampleResult.LimitBasisId == flowLimitBasisId)
                     {
-                        dto.FlowValue = sampleResult.EnteredValue;
+                        dto.FlowParameterName = sampleResult.ParameterName;
+                        dto.FlowEnteredValue = sampleResult.EnteredValue;
+                        dto.FlowValue = sampleResult.Value;
                         dto.FlowUnitId = sampleResult.UnitId;
                         dto.FlowUnitName = sampleResult.UnitName;
                     }

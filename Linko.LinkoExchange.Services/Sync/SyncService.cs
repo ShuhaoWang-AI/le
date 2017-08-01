@@ -139,13 +139,21 @@ namespace Linko.LinkoExchange.Services.Sync
                                         foreach (var sample in samplesAndResultsType.Samples)
                                         {
                                             isElementTypePresent |= sample.SampleResults != null && sample.SampleResults.Any();
-                                            if (isElementTypePresent)
+                                            if (sample.SampleResults != null && sample.SampleResults.Any())
                                             {
+                                                if (!string.IsNullOrWhiteSpace(sample.FlowParameterName))
+                                                {
+                                                    var sampleResultParsedData = new LESampleResultParsedData();
+                                                    PopulateCommonSampleInfo(sampleResultParsedData: sampleResultParsedData, reportPackageDto: reportPackageDto, sampleDto: sample);
+                                                    PopulateSampleFlowResultInfo(sampleResultParsedData: sampleResultParsedData, sampleDto: sample);
+                                                    syncContext.LESampleResultParsedDatas.Add(sampleResultParsedData);
+                                                }
+
                                                 foreach (var sampleResult in sample.SampleResults)
                                                 {
                                                     var sampleResultParsedData = new LESampleResultParsedData();
-                                                    PopulateSampleResultParsedData(sampleResultParsedData: sampleResultParsedData, reportPackageDto: reportPackageDto, sampleDto: sample,
-                                                                                   sampleResultDto: sampleResult);
+                                                    PopulateCommonSampleInfo(sampleResultParsedData: sampleResultParsedData, reportPackageDto: reportPackageDto, sampleDto: sample);
+                                                    PopulateSampleResultInfo(sampleResultParsedData: sampleResultParsedData, sampleResultDto: sampleResult);
                                                     syncContext.LESampleResultParsedDatas.Add(sampleResultParsedData);
                                                 }
                                             }
@@ -340,17 +348,15 @@ namespace Linko.LinkoExchange.Services.Sync
         }
 
         /// <summary>
-        /// Populates the LESampleResultParsedData with the sample and sample result info.
+        /// Populates the LESampleResultParsedData with the common sample info.
         /// </summary>
         /// <param name="sampleResultParsedData">LESampleResultParsedData.</param>
         /// <param name="reportPackageDto">ReportPackageDto.</param>
-        private void PopulateSampleResultParsedData(LESampleResultParsedData sampleResultParsedData, ReportPackageDto reportPackageDto, SampleDto sampleDto, SampleResultDto sampleResultDto)
+        /// <param name="sampleDto">SampleDto.</param>
+        private void PopulateCommonSampleInfo(LESampleResultParsedData sampleResultParsedData, ReportPackageDto reportPackageDto, SampleDto sampleDto)
         {
-            
             sampleResultParsedData.LinkoVersionNo = "ExchangeLabSync_1.0";
             sampleResultParsedData.LinkoClientID = reportPackageDto.RecipientOrganizationRegulatoryProgramId;
-
-            // Sample Info
 
             // LabPermitMPID max length: 250 characters
             var labPermitMpid = $"{reportPackageDto.OrganizationName} - {sampleDto.MonitoringPointName}";
@@ -364,10 +370,19 @@ namespace Linko.LinkoExchange.Services.Sync
             sampleResultParsedData.LabSampleEventType = sampleDto.CtsEventTypeName.GetValueOrNull();
             sampleResultParsedData.LabCollectMethod = sampleDto.CollectionMethodName.GetValueOrNull();
             sampleResultParsedData.LabSampler = null;
+            sampleResultParsedData.LabReportedDate = reportPackageDto.LastSentDateTimeLocal;
+            sampleResultParsedData.IsResultRepudiated = reportPackageDto.ReportStatusName.Equals(ReportStatusName.Repudiated);
+            sampleResultParsedData.LEReportPackageID = reportPackageDto.ReportPackageId;
+            sampleResultParsedData.LESampleID = sampleDto.SampleId.Value;
+        }
 
-
-            // Sample result info
-
+        /// <summary>
+        /// Populates the LESampleResultParsedData with the sample result info.
+        /// </summary>
+        /// <param name="sampleResultParsedData">LESampleResultParsedData.</param>
+        /// <param name="sampleResultDto">SampleResultDto.</param>
+        private void PopulateSampleResultInfo(LESampleResultParsedData sampleResultParsedData, SampleResultDto sampleResultDto)
+        {
             sampleResultParsedData.LabAnalysisDate = sampleResultDto.AnalysisDateTimeLocal;
             sampleResultParsedData.LabAnalysisMethod = sampleResultDto.AnalysisMethod.GetValueOrNull();
             sampleResultParsedData.LabParamName = sampleResultDto.ParameterName.GetValueOrNull();
@@ -376,23 +391,46 @@ namespace Linko.LinkoExchange.Services.Sync
             // i.e. "ND and NF" will not have value component, "<" will have corresponding value component, and numeric value only (no qualifier).
             sampleResultParsedData.LabResult = $"{sampleResultDto.Qualifier}{sampleResultDto.EnteredValue}".GetValueOrNull();
 
-            double labNumResult = default(double);
-            sampleResultParsedData.LabNumResult = double.TryParse(sampleResultDto.EnteredValue, out labNumResult) ? labNumResult : default(double?);
+            sampleResultParsedData.LabNumResult = sampleResultDto.Value;
 
             sampleResultParsedData.LabResultFlag = null;
             sampleResultParsedData.LabResultUnits = sampleResultDto.UnitName.GetValueOrNull();
             sampleResultParsedData.LabRepLimit = null;
             sampleResultParsedData.LabMDL = sampleResultDto.EnteredMethodDetectionLimit.GetValueOrNull();
             sampleResultParsedData.IsLabQCResult = false;
-            sampleResultParsedData.LabReportedDate = reportPackageDto.LastSentDateTimeLocal;
             sampleResultParsedData.LabSampleComments = null;
             sampleResultParsedData.LabResultComments = null;
             sampleResultParsedData.LabStatus = "Approved";
             sampleResultParsedData.LabSampleMatchID = null;
-            sampleResultParsedData.IsResultRepudiated = reportPackageDto.ReportStatusName.Equals(ReportStatusName.Repudiated);
             sampleResultParsedData.LEIsValidEPAMethod = sampleResultDto.IsApprovedEPAMethod;
-            sampleResultParsedData.LEReportPackageID = reportPackageDto.ReportPackageId;
-            sampleResultParsedData.LESampleID = sampleDto.SampleId.Value;
+        }
+
+        /// <summary>
+        /// Populates the LESampleResultParsedData with the sample flow result info.
+        /// </summary>
+        /// <param name="sampleResultParsedData">LESampleResultParsedData.</param>
+        /// <param name="sampleDto">SampleDto.</param>
+        private void PopulateSampleFlowResultInfo(LESampleResultParsedData sampleResultParsedData, SampleDto sampleDto)
+        {
+            sampleResultParsedData.LabAnalysisDate = null;
+            sampleResultParsedData.LabAnalysisMethod = null;
+            sampleResultParsedData.LabParamName = sampleDto.FlowParameterName;
+
+            // no qualifier for flow
+            sampleResultParsedData.LabResult = sampleDto.FlowEnteredValue.GetValueOrNull();
+
+            sampleResultParsedData.LabNumResult = sampleDto.FlowValue;
+
+            sampleResultParsedData.LabResultFlag = null;
+            sampleResultParsedData.LabResultUnits = sampleDto.FlowUnitName.GetValueOrNull();
+            sampleResultParsedData.LabRepLimit = null;
+            sampleResultParsedData.LabMDL = null;
+            sampleResultParsedData.IsLabQCResult = false;
+            sampleResultParsedData.LabSampleComments = null;
+            sampleResultParsedData.LabResultComments = null;
+            sampleResultParsedData.LabStatus = "Approved";
+            sampleResultParsedData.LabSampleMatchID = null;
+            sampleResultParsedData.LEIsValidEPAMethod = null;
         }
 
         /// <summary>

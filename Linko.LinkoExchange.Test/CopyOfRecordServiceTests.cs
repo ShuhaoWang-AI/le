@@ -618,7 +618,7 @@ namespace Linko.LinkoExchange.Test
                 IsMassLoadingResultToUseLessThanSign = true,
                 SampleStatusName = SampleStatusName.ReadyToReport,
                 LastModifierFullName = "Test-Modification-full-name",
-                FlowValue = "1.11",
+                FlowEnteredValue = "1.11",
                 FlowUnitId = 1,
                 FlowUnitName = "%",
                 SampleResults = new[]
@@ -709,7 +709,7 @@ namespace Linko.LinkoExchange.Test
                 IsMassLoadingResultToUseLessThanSign = true,
                 SampleStatusName = SampleStatusName.ReadyToReport,
                 LastModifierFullName = "Test-Modification-full-name",
-                FlowValue = "51.23",
+                FlowEnteredValue = "51.23",
                 FlowUnitId = 1,
                 FlowUnitName = "gpd",
                 SampleResults = new[]
