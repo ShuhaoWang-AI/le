@@ -63,12 +63,36 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         QuestionAnswerPairDto GetRandomQuestionAnswerFromUserProfileId(int userProfileId, QuestionTypeName questionType);
 
+        /// <summary>
+        /// Returns all active questions in the database.
+        /// </summary>
+        /// <returns></returns>
         ICollection<QuestionDto> GetQuestions();
 
+        /// <summary>
+        /// Compares the passed in string answer with the stored answer in the database.
+        /// </summary>
+        /// <param name="userQuestionAnswerId">tUserQuestionAnswer.UserQuestionAnswerId</param>
+        /// <param name="answer">Readable string answer being tested against the actual hashed (KBQ) or encrypted (SQ) answer in the database.</param>
+        /// <returns>True is answer is correct. False otherwise.</returns>
         bool ConfirmCorrectAnswer(int userQuestionAnswerId, string answer);
 
+        /// <summary>
+        /// - Check for duplicated knowledge-based questions
+        /// - Check for duplicated knowledge-based question answers
+        /// - Check that knowledge-based questions have answers
+        /// </summary>
+        /// <param name="kbqQuestions"></param>
+        /// <returns></returns>
         RegistrationResult ValidateUserKbqData(IEnumerable<AnswerDto> kbqQuestions);
 
+        /// <summary>
+        /// - Check for duplicated security questions
+        /// - Check for duplicated security question answers
+        /// - Check that security questions have answers
+        /// </summary>
+        /// <param name="securityQuestions"></param>
+        /// <returns></returns>
         RegistrationResult ValidateUserSqData(IEnumerable<AnswerDto> securityQuestions); 
     }
 }

@@ -677,7 +677,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 return RegistrationResult.DuplicatedKBQAnswer;
             }
 
-            // Test KBQ questions mush have answer
+            // Test KBQ questions must have answer
             if (kbqQuestions.Any(i => i.Content == null))
             {
                 return RegistrationResult.MissingKBQAnswer;
