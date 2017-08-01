@@ -2,6 +2,7 @@
 using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.PrivacyPolicy;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.TermCondition;
@@ -10,11 +11,39 @@ using Linko.LinkoExchange.Web.ViewModels.Shared;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {
-    public class HomeController:BaseController
+    public class HomeController : BaseController
     {
+        #region fields
+
+        private readonly IAuthenticationService _authenticationService;
+        private readonly IPrivacyPolicyService _privacyPolicyService;
+        private readonly ITermConditionService _termConditionService;
+
+        #endregion
+
+        #region constructors and destructor
+
+        public HomeController(
+            IAuthenticationService authenticationService,
+            ITermConditionService termConditionService,
+            IHttpContextService httpContextService,
+            IUserService userService,
+            IReportPackageService reportPackageService,
+            ISampleService sampleService,
+            IPrivacyPolicyService privacyPolicyService)
+            : base(httpContextService:httpContextService, userService:userService, reportPackageService:reportPackageService, sampleService:sampleService)
+        {
+            _authenticationService = authenticationService;
+            _termConditionService = termConditionService;
+            _privacyPolicyService = privacyPolicyService;
+        }
+
+        #endregion
+
         #region default action
 
         [AllowAnonymous]
+
         // GET: Home
         public ActionResult Index()
         {
@@ -46,26 +75,6 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         #endregion
 
-        #region constructor
-
-        private readonly IAuthenticationService _authenticationService;
-        private readonly ITermConditionService _termConditionService;
-
-        public HomeController(
-            IAuthenticationService authenticationService, 
-            ITermConditionService termConditionService,
-            IHttpContextService httpContextService,
-            IUserService userService,
-            IReportPackageService reportPackageService,
-            ISampleService sampleService)
-            :base(httpContextService,userService,reportPackageService,sampleService)
-        {
-            _authenticationService = authenticationService;
-            _termConditionService = termConditionService;
-        }
-
-        #endregion
-        
         #region Terms And Conditions
 
         // GET: /TermsAndConditions
@@ -82,17 +91,25 @@ namespace Linko.LinkoExchange.Web.Controllers
 
             return View(viewName:"TermsAndConditions", model:model);
         }
+
         #endregion
 
-        #region /PrivacyPolicy
+        #region Privacy Policy
 
         // GET: /PrivacyPolicy
         [AllowAnonymous]
         [Route(template:"PrivacyPolicy")]
         public ActionResult PrivacyPolicy()
         {
-            return View();
+            var privacyPolicy = _privacyPolicyService.GetPrivacyPolicyContent();
+            var model = new ConfirmationViewModel
+                        {
+                            Title = "General Privacy Policy",
+                            HtmlStr = privacyPolicy
+                        };
+            return View(viewName:"PrivacyPolicy", model:model);
         }
+
         #endregion
     }
 }

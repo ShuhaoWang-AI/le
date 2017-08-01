@@ -1,10 +1,9 @@
-﻿<div id="divPrivacyPolicy_outer">
+﻿@model Linko.LinkoExchange.Web.ViewModels.Shared.ConfirmationViewModel
+<div id="divPrivacyPolicy_outer">
     <div class="box box-primary" id="divPrivacyPolicy">
-        <div class="box-header with-border">
-            <h3 class="box-title">Privacy Policy</h3>
-        </div>
         <section class="box-body form-horizontal">
-            Need to add proper text for Privacy Policy
+            
+            @Html.Raw(value:Model.HtmlStr)
 
         </section>
     </div>
@@ -28,8 +27,8 @@ else
     {
         $('#divPrivacyPolicyr')
             .slimScroll({
-                height: $(window).height() - 200
-                , alwaysVisible: true
+                height: $(window).height() - 200,
+                alwaysVisible: true
             });
     });
 </script>
