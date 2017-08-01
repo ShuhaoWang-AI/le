@@ -430,7 +430,7 @@ namespace Linko.LinkoExchange.Services.Sync
             sampleResultParsedData.LabResultComments = null;
             sampleResultParsedData.LabStatus = "Approved";
             sampleResultParsedData.LabSampleMatchID = null;
-            sampleResultParsedData.LEIsValidEPAMethod = null;
+            sampleResultParsedData.LEIsValidEPAMethod = false;
         }
 
         /// <summary>
