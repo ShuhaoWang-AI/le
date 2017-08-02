@@ -42,7 +42,7 @@ namespace Linko.LinkoExchange.Services.Permission
             // For industry users, the approval people are authority stand users and authority admins
             // For authority users, the approval people are only  authority admin 
             
-            var isAuthorityUser = IsAuhtorityUser(userProfileId); 
+            var isAuthorityUser = IsAuthorityUser(userProfileId); 
              
             var authorityOrganizationIds = new List<int>();
             // step 1,  find all the OrganziationRegulatoryPrograms this user is in
@@ -139,6 +139,11 @@ namespace Linko.LinkoExchange.Services.Permission
             }
         }
 
+        /// <summary>
+        /// Returns the permission groups allowable for a given org reg program.
+        /// </summary>
+        /// <param name="orgRegProgramId"></param>
+        /// <returns></returns>
         public IEnumerable<PermissionGroupDto> GetRoles(int orgRegProgramId)
         {
             var roleList = new List<PermissionGroupDto>();
@@ -152,7 +157,13 @@ namespace Linko.LinkoExchange.Services.Permission
             return roleList;
         }
 
-        private bool IsAuhtorityUser(int userProfileId)
+
+        /// <summary>
+        /// Checks to see if the given user profile id belongs to at least one active and valid user of an authority.
+        /// </summary>
+        /// <param name="userProfileId"></param>
+        /// <returns></returns>
+        private bool IsAuthorityUser(int userProfileId)
         {
             return(_dbContext.OrganizationRegulatoryProgramUsers.Any(i=>
                 i.OrganizationRegulatoryProgram.Organization.OrganizationType.Name == OrganizationTypeName.Authority.ToString() && 
