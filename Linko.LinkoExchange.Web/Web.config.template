@@ -57,6 +57,13 @@ For more information on how to configure your ASP.NET application, please visit 
     </rules>
   </nlog>
   <appSettings>
+      <!--LE Logo image file names. Note image file need to be in "/Content/images/" -->
+      <add
+          key="FileName_Logo-min"
+          value="logo-min.png" />
+      <add
+          key="FileName_Logo"
+          value="logo.png" />
     
     <!--minutes -->
     <!--change sessionState timeout value with same value-->
