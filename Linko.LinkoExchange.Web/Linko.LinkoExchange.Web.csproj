@@ -580,6 +580,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Help\Authorityportal\" />
+    <Folder Include="Help\Industryportal\" />
     <Folder Include="ViewModels\Common\" />
     <Folder Include="Views\Invite\" />
   </ItemGroup>

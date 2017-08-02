@@ -86,12 +86,18 @@
                             </ul>
                         </li>
                         @* END User Account Menu *@
-                        @* BEGIN Control Sidebar Toggle Button *@
+                        @if (!string.IsNullOrWhiteSpace(value:ViewBag.PortalName))
+                        {
+                            <li>
+                                <a href="@(ViewBag.PortalName.ToLower().Equals(value:"authority") ? "/Help/Authorityportal/" : "/Help/Industryportal/")" target="_blank">
+                                    <i aria-hidden="true" class="fa fa-question-circle"></i>
+                                </a>
+                            </li>
+                        }
                         @* Keep the following line so that user Account menu does not push to right side edge of the screen *@
                         <li>
                             <a href="#">&nbsp;</a>
                         </li>
-                        @* END Control Sidebar Toggle Button *@
                     </ul>
                 }
             </div>
