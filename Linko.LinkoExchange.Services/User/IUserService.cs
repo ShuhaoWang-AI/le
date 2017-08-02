@@ -21,18 +21,54 @@ namespace Linko.LinkoExchange.Services.User
         /// <returns></returns>
         UserDto GetUserProfileByEmail(string emailAddress);
 
+        /// <summary>
+        /// Returns a collection of org reg program users that share the same user profile that is associated with a given email address.
+        /// </summary>
+        /// <param name="emailAddress"></param>
+        /// <returns></returns>
         ICollection<OrganizationRegulatoryProgramUserDto> GetProgramUsersByEmail(string emailAddress);
 
+        /// <summary>
+        /// Returns the number of valid users that are waiting for their registration to get approved/denied
+        /// for a given org reg program.
+        /// </summary>
+        /// <param name="orgRegProgamId"></param>
+        /// <returns></returns>
         int GetPendingRegistrationProgramUsersCount(int orgRegProgamId);
 
+
+        /// <summary>
+        /// Returns the valid org reg program user that are waiting for their registration to get approved/denied
+        /// for a given org reg program.
+        /// </summary>
+        /// <param name="orgRegProgramId"></param>
+        /// <returns></returns>
         List<OrganizationRegulatoryProgramUserDto> GetPendingRegistrationProgramUsers(int orgRegProgramId);
 
+        /// <summary>
+        /// Returns the org reg program users that belong to a given org reg program
+        /// optionally filtered by the various state-related flags.
+        /// </summary>
+        /// <param name="orgRegProgramId"></param>
+        /// <param name="isRegApproved"></param>
+        /// <param name="isRegDenied"></param>
+        /// <param name="isEnabled"></param>
+        /// <param name="isRemoved"></param>
+        /// <returns></returns>
         List<OrganizationRegulatoryProgramUserDto> GetUserProfilesForOrgRegProgram(int orgRegProgramId,
                              bool? isRegApproved,
                              bool? isRegDenied,
                              bool? isEnabled,
                              bool? isRemoved);
 
+        /// <summary>
+        /// Used to update one or more of the various state-related flags for an org reg program user.
+        /// </summary>
+        /// <param name="orgRegProgUserId"></param>
+        /// <param name="isRegApproved"></param>
+        /// <param name="isRegDenied"></param>
+        /// <param name="isEnabled"></param>
+        /// <param name="isRemoved"></param>
         void UpdateUserState(int orgRegProgUserId, bool? isRegApproved, bool? isRegDenied, bool? isEnabled, bool? isRemoved);
 
         void UpdateUserPermissionGroupId(int orgRegProgUserId, int permissionGroupId, bool isAuthorizationRequired = false);

@@ -291,8 +291,7 @@ namespace Linko.LinkoExchange.Services.User
             }
             else
             {
-                //_logger.Log("ERROR")
-                throw new Exception();
+                throw new Exception($"ERROR: Cannot find Org Reg Program User associated with OrganizationRegulatoryProgramUserId={orgRegProgUserId}.");
             }
         }
 
