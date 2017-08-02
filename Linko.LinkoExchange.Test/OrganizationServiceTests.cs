@@ -76,12 +76,6 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
-        public void GetUserOrganizationsByOrgRegProgUserId()
-        {
-            var orgs = orgService.GetUserOrganizationsByOrgRegProgUserId(1);
-        }
-
-        [TestMethod]
         public void Test_GetUserOrganizations()
         {
             var orgs = orgService.GetUserOrganizations(7); 

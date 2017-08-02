@@ -5,8 +5,6 @@ namespace Linko.LinkoExchange.Services.Organization
 {
     public interface IOrganizationService
     {
-        IEnumerable<OrganizationDto> GetUserOrganizationsByOrgRegProgUserId(int orgRegProgUserId);
-
         IEnumerable<OrganizationRegulatoryProgramDto> GetUserOrganizations();
         /// <summary>
         /// Get organizations that a user can access to (IU portal, AU portal, content MGT portal)

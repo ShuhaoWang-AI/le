@@ -117,22 +117,6 @@ namespace Linko.LinkoExchange.Services.Organization
             return retVal;
         }
 
-        public IEnumerable<OrganizationDto> GetUserOrganizationsByOrgRegProgUserId(int orgRegProgUserId)
-        {
-            var orgDtoList = new List<OrganizationDto>();
-            var orgRegProgramId = _dbContext.OrganizationRegulatoryProgramUsers.Single(o => o.OrganizationRegulatoryProgramUserId == orgRegProgUserId).OrganizationRegulatoryProgramId;
-            var regProgramId = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId).RegulatoryProgramId;
-            var orgList = _dbContext.OrganizationRegulatoryPrograms.Include(o => o.Organization.OrganizationType).Where(o => o.RegulatoryProgramId == regProgramId);
-            if (orgList != null)
-            {
-                foreach (var org in orgList)
-                {
-                    orgDtoList.Add(_mapHelper.GetOrganizationDtoFromOrganization(org.Organization));
-                }
-            }
-            return orgDtoList;
-        }
-
         public IEnumerable<OrganizationRegulatoryProgramDto> GetUserOrganizations()
         {
             int userProfileId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
