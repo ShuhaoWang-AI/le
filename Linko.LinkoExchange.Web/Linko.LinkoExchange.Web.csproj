@@ -337,6 +337,8 @@
     <Content Include="Content\Images\handle.png" />
     <Content Include="Content\Images\logo-min.png" />
     <Content Include="Content\Images\logo.png" />
+    <Content Include="Content\Images\training-logo-min.gif" />
+    <Content Include="Content\Images\training-logo.gif" />
     <Content Include="Content\site.css" />
     <Content Include="ErrorPage.htm" />
     <Content Include="favicon.ico" />
@@ -580,8 +582,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Help\Authorityportal\" />
-    <Folder Include="Help\Industryportal\" />
+    <Folder Include="Help\AuthorityPortal\" />
+    <Folder Include="Help\IndustryPortal\" />
     <Folder Include="ViewModels\Common\" />
     <Folder Include="Views\Invite\" />
   </ItemGroup>

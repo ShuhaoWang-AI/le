@@ -89,7 +89,7 @@
                         @if (!string.IsNullOrWhiteSpace(value:ViewBag.PortalName))
                         {
                             <li>
-                                <a href="@(ViewBag.PortalName.ToLower().Equals(value:"authority") ? "/Help/Authorityportal/" : "/Help/Industryportal/")" target="_blank">
+                                <a href="@(ViewBag.PortalName.ToLower().Equals(value:"authority") ? "/Help/AuthorityPortal/" : "/Help/IndustryPortal/")" target="_blank">
                                     <i aria-hidden="true" class="fa fa-question-circle"></i>
                                 </a>
                             </li>
