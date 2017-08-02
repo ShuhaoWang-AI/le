@@ -71,16 +71,56 @@ namespace Linko.LinkoExchange.Services.User
         /// <param name="isRemoved"></param>
         void UpdateUserState(int orgRegProgUserId, bool? isRegApproved, bool? isRegDenied, bool? isEnabled, bool? isRemoved);
 
+        /// <summary>
+        /// Updates an org reg program user's permissions group.
+        /// The current accessing user can be optionally authorized to perform this action.
+        /// </summary>
+        /// <param name="orgRegProgUserId"></param>
+        /// <param name="permissionGroupId"></param>
+        /// <param name="isAuthorizationRequired"></param>
         void UpdateUserPermissionGroupId(int orgRegProgUserId, int permissionGroupId, bool isAuthorizationRequired = false);
 
+        /// <summary>
+        /// Updates an org reg program user's signatory rights. Emails are then sent to appropriate stakeholders informing them
+        /// of the action.
+        /// The current accessing user can be optionally authorized to perform this action. 
+        /// </summary>
+        /// <param name="orgRegProgUserId"></param>
+        /// <param name="isSignatory"></param>
+        /// <param name="isAuthorizationRequired"></param>
         void UpdateUserSignatoryStatus(int orgRegProgUserId, bool isSignatory, bool isAuthorizationRequired = false);
 
+        /// <summary>
+        /// Resets an org reg program user. Emails are then sent to the appropriate stakeholders including the user's email address
+        /// and potentially a different unassociated email address.
+        /// The current accessing user can be optionally authorized to perform this action. 
+        /// </summary>
+        /// <param name="targetOrgRegProgUserId"></param>
+        /// <param name="newEmailAddress"></param>
+        /// <param name="isAuthorizationRequired"></param>
+        /// <returns></returns>
         ResetUserResultDto ResetUser(int targetOrgRegProgUserId, string newEmailAddress, bool isAuthorizationRequired = false);
 
         AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, AccountLockEvent reason, int? reportPackageId = null);
 
+        /// <summary>
+        /// Locks (or unlocks) an org reg program user. Emails are then sent to the appropriate stakeholders.
+        /// The current accessing user can be optionally authorized to perform this action.
+        /// </summary>
+        /// <param name="targetOrgRegProgUserId"></param>
+        /// <param name="isAttemptingLock"></param>
+        /// <param name="reason"></param>
+        /// <param name="isAuthorizationRequired"></param>
+        /// <returns></returns>
         AccountLockoutResultDto LockUnlockUserAccount(int targetOrgRegProgUserId, bool isAttemptingLock, AccountLockEvent reason, bool isAuthorizationRequired = false);
 
+        /// <summary>
+        /// Enables (or disables) an org reg program user. Emails are then sent to the appropriate stakeholders.
+        /// The current accessing user can be optionally authorized to perform this action.
+        /// </summary>
+        /// <param name="orgRegProgramUserId"></param>
+        /// <param name="isAttemptingDisable"></param>
+        /// <param name="isAuthorizationRequired"></param>
         void EnableDisableUserAccount(int orgRegProgramUserId, bool isAttemptingDisable, bool isAuthorizationRequired = false);
 
         /// <summary>
