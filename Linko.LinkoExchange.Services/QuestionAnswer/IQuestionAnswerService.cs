@@ -10,14 +10,6 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
     public interface IQuestionAnswerService
     {
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="userProfileId"></param>
-        /// <param name="question"></param>
-        /// <param name="answer"></param>
-        void AddUserQuestionAnswer(int userProfileId, AnswerDto answer);
-
-        /// <summary>
         /// Adds a question if no Id's are provided or updates if Id's are present
         /// </summary>
         /// <param name="userProfileId"></param>
@@ -36,20 +28,8 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="question"></param>
-        void UpdateQuestion(QuestionDto question);
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="answer"></param>
         void UpdateAnswer(AnswerDto answer);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="userQuestionAnswerId"></param>
-        void DeleteUserQuestionAnswer(int userQuestionAnswerId);
 
         /// <summary>
         /// Delete all user's KBQ an Security Questions and answers

@@ -79,27 +79,9 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
-        public void DeleteQuestionAnswerPair()
-        {
-            _questionAnswerService.DeleteUserQuestionAnswer(4);
-        }
-        [TestMethod]
         public void UpdateAnswer()
         {
             _questionAnswerService.UpdateAnswer(new AnswerDto() { UserQuestionAnswerId = 36, Content = "test answer" });
-        }
-
-        [TestMethod]
-        public void UpdateQuestion()
-        {
-            _questionAnswerService.UpdateQuestion(
-                new QuestionDto()
-                {
-                    QuestionId = 10,
-                    QuestionType = QuestionTypeName.KBQ,
-                    IsActive = true,
-                    Content = "Color of your first bike?"
-                });
         }
 
         [TestMethod]

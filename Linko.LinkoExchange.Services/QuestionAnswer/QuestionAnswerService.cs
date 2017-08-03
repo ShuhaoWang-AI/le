@@ -57,61 +57,6 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
             _requestCache = requestCache;
         }
 
-        public void AddUserQuestionAnswer(int userProfileId, AnswerDto answer)
-        {
-            try
-            {
-                var question = _dbContext.Questions.Include(q => q.QuestionType)
-                    .Single(q => q.QuestionId == answer.QuestionId);
-
-                if (question.QuestionType.Name == QuestionTypeName.KBQ.ToString())
-                {
-                    //Hash answer
-                    answer.Content = _passwordHasher.HashPassword(answer.Content.Trim().ToLower());
-                }
-                else if (question.QuestionType.Name == QuestionTypeName.SQ.ToString())
-                {
-                    //Encrypt answer
-                    answer.Content = _encryption.EncryptString(answer.Content.Trim());
-                }
-
-
-                UserQuestionAnswer newAnswer = _dbContext.UserQuestionAnswers.Create();
-                newAnswer.Content = answer.Content;
-                newAnswer.UserProfileId = userProfileId;
-                newAnswer.CreationDateTimeUtc = DateTimeOffset.Now;
-                newAnswer.LastModificationDateTimeUtc = null;
-                newAnswer.QuestionId = answer.QuestionId;
-                newAnswer.UserProfileId = userProfileId;
-                newAnswer.CreationDateTimeUtc = DateTimeOffset.Now;
-                newAnswer.LastModificationDateTimeUtc = DateTimeOffset.Now;
-
-
-                _dbContext.UserQuestionAnswers.Add(newAnswer);
-                _dbContext.SaveChanges();
-            }
-            catch (DbEntityValidationException ex)
-            {
-                List<RuleViolation> validationIssues = new List<RuleViolation>();
-
-                foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
-                {
-                    DbEntityEntry entry = item.Entry;
-                    string entityTypeName = entry.Entity.GetType().Name;
-
-                    foreach (DbValidationError subItem in item.ValidationErrors)
-                    {
-                        string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
-                        validationIssues.Add(new RuleViolation(string.Empty, null, message));
-
-                    }
-                }
-
-                throw new RuleViolationException("Validation errors", validationIssues);
-            }
-
-        }
-
         public void CreateOrUpdateUserQuestionAnswer(int userProfileId, AnswerDto answerDto)
         {
             var question = _dbContext.Questions.Include(q => q.QuestionType)
@@ -391,51 +336,6 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         }
 
-        public void UpdateQuestion(QuestionDto question)
-        {
-            if (question != null && question.QuestionId.HasValue && question.QuestionId > 0)
-            {
-                var questionToUpdate = _dbContext.Questions.Single(q => q.QuestionId == question.QuestionId);
-                questionToUpdate.Content = question.Content;
-                questionToUpdate.QuestionTypeId = _dbContext.QuestionTypes.Single(q => q.Name == question.QuestionType.ToString()).QuestionTypeId;
-                questionToUpdate.IsActive = question.IsActive;
-                questionToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
-                questionToUpdate.LastModifierUserId = Convert.ToInt32(_httpContext.CurrentUserProfileId());
-
-                try
-                {
-                    _dbContext.SaveChanges();
-                }
-                catch (DbEntityValidationException ex)
-                {
-                    List<RuleViolation> validationIssues = new List<RuleViolation>();
-
-                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
-                    {
-                        DbEntityEntry entry = item.Entry;
-                        string entityTypeName = entry.Entity.GetType().Name;
-
-                        foreach (DbValidationError subItem in item.ValidationErrors)
-                        {
-                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
-                            validationIssues.Add(new RuleViolation(string.Empty, null, message));
-
-                        }
-                    }
-
-                    throw new RuleViolationException("Validation errors", validationIssues);
-                }
-            }
-            else
-            {
-                List<RuleViolation> validationIssues = new List<RuleViolation>();
-                validationIssues.Add(new RuleViolation(string.Empty, null, "Question update attempt failed."));
-                //_logger.Error("SubmitPOMDetails. Null question or missing QuestionId.");
-                throw new RuleViolationException("Validation errors", validationIssues);
-            }
-
-        }
-
         public void UpdateAnswer(AnswerDto answer)
         {
             if (answer != null && answer.UserQuestionAnswerId.HasValue && answer.UserQuestionAnswerId > 0)
@@ -490,51 +390,6 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 throw new RuleViolationException("Validation errors", validationIssues);
             }
 
-        }
-
-        public void DeleteUserQuestionAnswer(int userQuestionAnswerId)
-        {
-            var answerToDelete = _dbContext.UserQuestionAnswers
-                .Include(a => a.Question)
-                .Single(a => a.UserQuestionAnswerId == userQuestionAnswerId);
-            if (answerToDelete != null)
-            {
-                _dbContext.UserQuestionAnswers.Remove(answerToDelete);
-
-                try
-                {
-                    _dbContext.SaveChanges();
-                }
-                catch (DbEntityValidationException ex)
-                {
-                    List<RuleViolation> validationIssues = new List<RuleViolation>();
-
-                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
-                    {
-                        DbEntityEntry entry = item.Entry;
-                        string entityTypeName = entry.Entity.GetType().Name;
-
-                        foreach (DbValidationError subItem in item.ValidationErrors)
-                        {
-                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
-                            validationIssues.Add(new RuleViolation(string.Empty, null, message));
-
-                        }
-                    }
-
-                    //_logger.Info("???");
-                    throw new RuleViolationException("Validation errors", validationIssues);
-                }
-
-            }
-            else
-            {
-                string errorMsg = string.Format("DeleteQuestionAnswerPair. Could not find UserQuestionAnswer associated with Id={0}", userQuestionAnswerId);
-                List<RuleViolation> validationIssues = new List<RuleViolation>();
-                validationIssues.Add(new RuleViolation(string.Empty, null, errorMsg));
-                //_logger.Info("SubmitPOMDetails. Null question or missing QuestionId.");
-                throw new RuleViolationException("Validation errors", validationIssues);
-            }
         }
 
         public ICollection<QuestionAnswerPairDto> GetUsersQuestionAnswers(int userProfileId, QuestionTypeName questionType)
