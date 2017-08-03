@@ -147,7 +147,6 @@
     <Compile Include="Authentication\AuthenticationService.cs" />
     <Compile Include="Authentication\IAuthenticationService.cs" />
     <Compile Include="Authentication\IdentityConfig.cs" />
-    <Compile Include="Authentication\TokenGenerator.cs" />
     <Compile Include="Cache\CacheKey.cs" />
     <Compile Include="Cache\ISessionCache.cs" />
     <Compile Include="Cache\SessionCache.cs" />
