@@ -13,6 +13,10 @@ namespace Linko.LinkoExchange.Services.Settings
     {
         private static Dictionary<SystemSettingType, string> _globalSettings = new Dictionary<SystemSettingType, string>();
 
+        /// <summary>
+        /// Constructor code is executed once only as this class is instantiated once per application lifetime by the Unity container.
+        /// </summary>
+        /// <param name="dbContext"></param>
         public GlobalSettings(LinkoExchangeContext dbContext)
         {
             _globalSettings = new Dictionary<SystemSettingType, string>();
