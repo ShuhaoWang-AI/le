@@ -57,10 +57,29 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         /// <param name="userProfileId"></param>
         void DeleteUserQuestionAndAnswers(int userProfileId);
 
+        /// <summary>
+        /// Gets all a user's saved question/answers of a specified type. Security question answers are decrypted.
+        /// </summary>
+        /// <param name="userProfileId"></param>
+        /// <param name="questionType"></param>
+        /// <returns></returns>
         ICollection<QuestionAnswerPairDto> GetUsersQuestionAnswers(int userProfileId, QuestionTypeName questionType);
 
+        /// <summary>
+        /// Finds a user profile associated with the passed in token (from tEmailAuditLog).
+        /// Returns a random question/answer pair selection from amongst the user's saved question/answers. 
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="questionType"></param>
+        /// <returns></returns>
         QuestionAnswerPairDto GetRandomQuestionAnswerFromToken(string token, QuestionTypeName questionType);
 
+        /// <summary>
+        /// Returns a random question/answer pair selection from amongst a user's saved question/answers. 
+        /// </summary>
+        /// <param name="userProfileId"></param>
+        /// <param name="questionType">Security question or knowledge-based question.</param>
+        /// <returns></returns>
         QuestionAnswerPairDto GetRandomQuestionAnswerFromUserProfileId(int userProfileId, QuestionTypeName questionType);
 
         /// <summary>
