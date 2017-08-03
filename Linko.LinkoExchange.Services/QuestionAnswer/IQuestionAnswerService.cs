@@ -26,9 +26,10 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         void CreateUserQuestionAnswers(int userProfileId, IEnumerable<AnswerDto> questionAnswers);
 
         /// <summary>
-        /// 
+        /// Overwrites a saved answer to a question. Answers for security questions are encrypted and
+        /// answers for knowledge based questions are hashed.
         /// </summary>
-        /// <param name="answer"></param>
+        /// <param name="answer">Must have UserQuestionAnswerId property set.</param>
         void UpdateAnswer(AnswerDto answer);
 
         /// <summary>
