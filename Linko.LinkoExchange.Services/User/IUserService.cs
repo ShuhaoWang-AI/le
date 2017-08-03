@@ -101,6 +101,15 @@ namespace Linko.LinkoExchange.Services.User
         /// <returns></returns>
         ResetUserResultDto ResetUser(int targetOrgRegProgUserId, string newEmailAddress, bool isAuthorizationRequired = false);
 
+        /// <summary>
+        /// Locks (or unlocks) a user profile across all related org reg programs. 
+        /// Emails are then sent to the appropriate stakeholders and this action is logged for Cromerr purposes.
+        /// </summary>
+        /// <param name="userProfileId"></param>
+        /// <param name="isAttemptingLock"></param>
+        /// <param name="reason"></param>
+        /// <param name="reportPackageId"></param>
+        /// <returns></returns>
         AccountLockoutResultDto LockUnlockUserAccount(int userProfileId, bool isAttemptingLock, AccountLockEvent reason, int? reportPackageId = null);
 
         /// <summary>
