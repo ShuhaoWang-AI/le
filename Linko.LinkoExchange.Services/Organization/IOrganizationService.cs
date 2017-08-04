@@ -20,6 +20,13 @@ namespace Linko.LinkoExchange.Services.Organization
         /// <returns></returns>
         IEnumerable<AuthorityDto> GetUserRegulators(int userId, bool isIncludeRemoved = false);
 
+        /// <summary>
+        /// Returns a formatted string for email communication display purposes of all the regulators
+        /// associated with a user profile. The name, address and phone number of each authority is included
+        /// on seperated lines.
+        /// </summary>
+        /// <param name="userProfileId"></param>
+        /// <returns></returns>
         string GetUserAuthorityListForEmailContent(int userProfileId);
 
             /// <summary>
