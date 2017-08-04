@@ -16,6 +16,14 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         /// <param name="questionAnswer"></param>
         void CreateOrUpdateUserQuestionAnswer(int userProfileId, AnswerDto questionAnswer);
 
+        /// <summary>
+        /// Takes a collections of a user's answers to questions and creates new objects in the database
+        /// if answers do not already exist or updates existing answers if they exist.
+        /// Email communications are sent to stakeholders and the activity is logged for Cromerr purposes.
+        /// </summary>
+        /// <param name="userProfileId"></param>
+        /// <param name="questionAnswers"></param>
+        /// <returns></returns>
         CreateOrUpdateAnswersResult CreateOrUpdateUserQuestionAnswers(int userProfileId, ICollection<AnswerDto> questionAnswers);
 
         /// <summary>
