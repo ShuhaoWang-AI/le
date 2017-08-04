@@ -707,5 +707,31 @@ namespace Linko.LinkoExchange.Test
 
             Assert.IsFalse(isAuthorized);
         }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetSampleDetails_AsIndustry_True_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("13");
+
+            int sampleId = 2;
+            var isAuthorized = _sampleService.CanUserExecuteApi("GetSampleDetails", sampleId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetSampleDetails_AsIndustry_False_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("99");
+
+            int sampleId = 2;
+            var isAuthorized = _sampleService.CanUserExecuteApi("GetSampleDetails", sampleId);
+
+            Assert.IsFalse(isAuthorized);
+        }
     }
 }
