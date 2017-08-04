@@ -694,5 +694,18 @@ namespace Linko.LinkoExchange.Test
 
             Assert.IsTrue(isAuthorized);
         }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetSampleDetails_AsAuthority_False_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("99");
+
+            int sampleId = 2;
+            var isAuthorized = _sampleService.CanUserExecuteApi("GetSampleDetails", sampleId);
+
+            Assert.IsFalse(isAuthorized);
+        }
     }
 }
