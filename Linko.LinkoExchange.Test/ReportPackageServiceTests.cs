@@ -357,5 +357,57 @@ namespace Linko.LinkoExchange.Test
             var result = _reportPackageService.CanRepudiateReportPackage(4);
         }
 
+        [TestMethod]
+        public void CanUserExecuteApi_GetReportPackage_AsAuthority_True_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+
+            int reportPackageId = 1;
+            var isAuthorized = _reportPackageService.CanUserExecuteApi("GetReportPackage", reportPackageId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetReportPackage_AsAuthority_False_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("99");
+
+            int reportPackageId = 1;
+            var isAuthorized = _reportPackageService.CanUserExecuteApi("GetReportPackage", reportPackageId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetReportPackage_AsIndustry_True_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("13");
+
+            int reportPackageId = 1;
+            var isAuthorized = _reportPackageService.CanUserExecuteApi("GetReportPackage", reportPackageId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetReportPackage_AsIndustry_False_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("99");
+
+            int reportPackageId = 1;
+            var isAuthorized = _reportPackageService.CanUserExecuteApi("GetReportPackage", reportPackageId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
     }
 }
