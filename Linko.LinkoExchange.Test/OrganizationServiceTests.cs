@@ -18,7 +18,7 @@ namespace Linko.LinkoExchange.Test
     [TestClass]
     public class OrganizationServiceTests
     {
-        private OrganizationService orgService;
+        private OrganizationService _orgService;
         Mock<ILogger> _logger;
         Mock<IHttpContextService> _httpContext;
         ITimeZoneService _timeZones;
@@ -51,7 +51,7 @@ namespace Linko.LinkoExchange.Test
 
             _timeZones = new TimeZoneService(new LinkoExchangeContext(connectionString), _settingService.Object, new MapHelper(), new Mock<IApplicationCache>().Object);
 
-            orgService = new OrganizationService(new LinkoExchangeContext(connectionString), 
+            _orgService = new OrganizationService(new LinkoExchangeContext(connectionString), 
                 new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IRequestCache>().Object, new Mock<IGlobalSettings>().Object), _httpContext.Object,
                 new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper(), _logger.Object), _timeZones, new MapHelper());
         }
@@ -59,71 +59,71 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void GetOrganization()
         {
-            var org = orgService.GetOrganization(1001);
+            var org = _orgService.GetOrganization(1001);
         }
 
         [TestMethod]
         public void GetChildOrganizationRegulatoryPrograms()
         {
-            var childOrgs = orgService.GetChildOrganizationRegulatoryPrograms(1);
+            var childOrgs = _orgService.GetChildOrganizationRegulatoryPrograms(1);
         }
 
         
         [TestMethod]
         public void UpdateEnableDisableFlag()
         {
-            var result = orgService.UpdateEnableDisableFlag(2, true);
+            var result = _orgService.UpdateEnableDisableFlag(2, true);
         }
 
         [TestMethod]
         public void Test_GetUserOrganizations()
         {
-            var orgs = orgService.GetUserOrganizations(7); 
+            var orgs = _orgService.GetUserOrganizations(7); 
 
         }
 
         [TestMethod]
         public void Test_GetUserRegulatories()
         {
-            var orgs = orgService.GetUserRegulators(1); 
+            var orgs = _orgService.GetUserRegulators(1); 
 
         }
 
         [TestMethod]
         public void Test_GetChildOrganizationRegulatoryPrograms()
         {
-            var orgs = orgService.GetChildOrganizationRegulatoryPrograms(1, "M");
+            var orgs = _orgService.GetChildOrganizationRegulatoryPrograms(1, "M");
 
         }
 
         [TestMethod]
         public void GetRemainingIndustryLicenseCount()
         {
-            var dto = orgService.GetRemainingIndustryLicenseCount(1);
+            var dto = _orgService.GetRemainingIndustryLicenseCount(1);
         }
 
         [TestMethod]
         public void GetRemainingUserLicenseCount_ForAuthority()
         {
-            var dto = orgService.GetRemainingUserLicenseCount(1);
+            var dto = _orgService.GetRemainingUserLicenseCount(1);
         }
 
         [TestMethod]
         public void GetRemainingUserLicenseCount_ForIndustry()
         {
-            var dto = orgService.GetRemainingUserLicenseCount(2);
+            var dto = _orgService.GetRemainingUserLicenseCount(2);
         }
 
         [TestMethod]
         public void GetUserRegulatories()
         {
-            var dto = orgService.GetUserRegulators(13);
+            var dto = _orgService.GetUserRegulators(13);
         }
 
         [TestMethod]
         public void GetUserAuthorityListForEmailContent()
         {
-            string authorityListString = orgService.GetUserAuthorityListForEmailContent(1);
+            string authorityListString = _orgService.GetUserAuthorityListForEmailContent(1);
         }
 
         [TestMethod]
@@ -131,8 +131,97 @@ namespace Linko.LinkoExchange.Test
         {
             _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("Industry");
 
-            var result = orgService.GetOrganizationRegulatoryProgram(1);
+            var result = _orgService.GetOrganizationRegulatoryProgram(1);
         }
 
+        [TestMethod]
+        public void CanUserExecuteApi_GetOrganizationRegulatoryProgram_AsAuthority_Authorized_Itself_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationId)).Returns("1000");
+
+            int targetOrgRegProgId = 1;
+            var isAuthorized = _orgService.CanUserExecuteApi("GetOrganizationRegulatoryProgram", targetOrgRegProgId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetOrganizationRegulatoryProgram_AsIndustry_Authorized_Itself_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("3");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("2");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationId)).Returns("1002");
+
+            int targetOrgRegProgId = 3;
+            var isAuthorized = _orgService.CanUserExecuteApi("GetOrganizationRegulatoryProgram", targetOrgRegProgId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetOrganizationRegulatoryProgram_AsAuthority_Unauthorized_AnotherAuthority_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationId)).Returns("1000");
+
+            int targetOrgRegProgId = 999;
+            var isAuthorized = _orgService.CanUserExecuteApi("GetOrganizationRegulatoryProgram", targetOrgRegProgId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetOrganizationRegulatoryProgram_AsIndustry_Unauthorized_AnotherIndustry_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("3");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("2");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationId)).Returns("1002");
+
+            int targetOrgRegProgId = 4;
+            var isAuthorized = _orgService.CanUserExecuteApi("GetOrganizationRegulatoryProgram", targetOrgRegProgId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetOrganizationRegulatoryProgram_AsIndustry_Unauthorized_NoPermissions_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("3");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("14");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationId)).Returns("1002");
+
+            int targetOrgRegProgId = 3;
+            var isAuthorized = _orgService.CanUserExecuteApi("GetOrganizationRegulatoryProgram", targetOrgRegProgId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetOrganizationRegulatoryProgram_AsIndustry_Unauthorized_StandardUser_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("3");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("10");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationId)).Returns("1002");
+
+            int targetOrgRegProgId = 3;
+            var isAuthorized = _orgService.CanUserExecuteApi("GetOrganizationRegulatoryProgram", targetOrgRegProgId);
+
+            Assert.IsFalse(isAuthorized);
+        }
     }
 }
