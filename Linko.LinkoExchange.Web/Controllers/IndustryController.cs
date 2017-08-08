@@ -1347,7 +1347,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 var sampleDto = _sampleService.DeleteSample(sampleId:id);
                 TempData["SampleDeleteSucceed"] = true; 
-                return RedirectToAction("Samples",new { sampleStatus = sampleDto.SampleStatusName.ToString()});
+                return RedirectToAction("Samples",new { sampleStatus = sampleDto.SampleStatusName});
             }
             catch (RuleViolationException rve)
             {

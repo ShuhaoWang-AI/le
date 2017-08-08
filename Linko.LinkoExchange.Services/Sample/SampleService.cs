@@ -676,7 +676,7 @@ namespace Linko.LinkoExchange.Services.Sample
                             .Include(s => s.SampleResults)
                             .Single(s => s.SampleId == sampleId);
 
-                        var sampleDto = _mapHelper.GetSampleDtoFromSample(sampleToRemove);  
+                        var sampleDto = GetSampleDetails(sampleToRemove,false,false);
                         //First remove results (if applicable)
                         if (sampleToRemove.SampleResults != null)
                         {
