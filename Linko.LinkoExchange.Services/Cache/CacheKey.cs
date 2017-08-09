@@ -1,8 +1,7 @@
 ﻿namespace Linko.LinkoExchange.Services.Cache
 {
-    public sealed class CacheKey
+    public static class CacheKey
     {
-        private CacheKey() { }
         public static string OwinUserId = "OwinUserId";
         public static string OwinClaims = "OwinClaims";
         public static string UserProfileId = "UserProfileId";
