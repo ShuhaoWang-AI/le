@@ -263,8 +263,59 @@ namespace Linko.LinkoExchange.Test
             var resultDtos = _paramService.GetAllParameterGroups(129, new DateTime(1997, 3, 31));
         }
 
+        [TestMethod]
+        public void CanUserExecuteApi_GetParameterGroup_AsAuthority_Authorized_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
 
+            int parameterGroupId = 1;
+            var isAuthorized = _paramService.CanUserExecuteApi("GetParameterGroup", parameterGroupId);
 
+            Assert.IsTrue(isAuthorized);
+        }
 
+        [TestMethod]
+        public void CanUserExecuteApi_GetParameterGroup_AsAuthority_Unauthorized_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("2");
+
+            int parameterGroupId = 1;
+            var isAuthorized = _paramService.CanUserExecuteApi("GetParameterGroup", parameterGroupId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetParameterGroup_AsIndustry_Authorized_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("2");
+
+            int parameterGroupId = 1;
+            var isAuthorized = _paramService.CanUserExecuteApi("GetParameterGroup", parameterGroupId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetParameterGroup_AsIndustry_Unauthorized_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("99");
+
+            var mockDifferentAuthority = new OrganizationRegulatoryProgramDto() { OrganizationRegulatoryProgramId = 3000 };
+            _orgService.Setup(s => s.GetAuthority(99)).Returns(mockDifferentAuthority);
+
+            int parameterGroupId = 1;
+            var isAuthorized = _paramService.CanUserExecuteApi("GetParameterGroup", parameterGroupId);
+
+            Assert.IsFalse(isAuthorized);
+        }
     }
 }
