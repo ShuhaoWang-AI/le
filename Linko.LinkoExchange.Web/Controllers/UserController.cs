@@ -266,6 +266,10 @@ namespace Linko.LinkoExchange.Web.Controllers
                     _questionAnswerService.CreateOrUpdateUserQuestionAnswers(userProfileId:userProfileId, questionAnswers:kbqQuestionAnswers);
                     ViewBag.SaveKBQSuccessfull = true;
                     ViewBag.SuccessMessage = "Save Knowledge Based Questions successfully.";
+
+                    //Reload the view model's kbq questions from database to handle potential new UserQuestionAnswer id's
+                    pristineUserModel.UserKBQ = _profileHelper.GetUserKbqViewModel(userProfileId: userProfileId);
+
                     break;
                 case RegistrationResult.DuplicatedKBQ:
                     ModelState.AddModelError(key:string.Empty, errorMessage:@"Duplicated Knowledge Based Questions.");
@@ -313,7 +317,12 @@ namespace Linko.LinkoExchange.Web.Controllers
                     _questionAnswerService.CreateOrUpdateUserQuestionAnswers(userProfileId:userProfileId, questionAnswers:sqQuestionAnswers);
                     ViewBag.SaveSQSuccessfull = true;
                     ViewBag.SuccessMessage = "Save Security Questions successfully.";
+
+                    //Reload the view model's security questions from database to handle potential new UserQuestionAnswer id's
+                    pristineUserModel.UserSQ = _profileHelper.GetUserSecurityQuestionViewModel(userProfileId: userProfileId);
+
                     break;
+
                 case RegistrationResult.DuplicatedSecurityQuestion:
                     ModelState.AddModelError(key:string.Empty, errorMessage:@"Duplicated Security Questions.");
                     ViewBag.inValidSQ = true;

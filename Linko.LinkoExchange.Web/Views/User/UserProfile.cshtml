@@ -1,4 +1,19 @@
-﻿@model Linko.LinkoExchange.Web.ViewModels.User.UserViewModel
+﻿<!--
+
+>>>>>>>>>>>>>>>> WARNING <<<<<<<<<<<<<<<<
+    
+    There are various places throughout this page where we have opted NOT to use Html.HiddenFor to persist values between postbacks.
+
+    It is a known issue that if we are modifying a viewmodel's property on the server after posting, MVC will choose the originally posted value
+    and NOT the manually updated value to repopulate the Html.HiddenFor fields.
+    
+    Please refer to this SO post:
+
+    https://stackoverflow.com/questions/4837744/hiddenfor-not-getting-correct-value-from-view-model    
+
+-->
+
+@model Linko.LinkoExchange.Web.ViewModels.User.UserViewModel
 @using Linko.LinkoExchange.Web.ViewModels.Shared
 
 @{
@@ -540,15 +555,10 @@
 
                         <div class="col-md-8">
                             <input class="disabled form-control" type="password" value="*******" />
-                            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ1,
-                                htmlAttributes:new
-                                               {
-                                                   htmlAttributes = new
-                                                                    {
-                                                                        @class = "form-control readonly kbq-answer"
-                                                                    }
-                                               })
-
+                            
+                            <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
+                            <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ1)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ1" /> 
+                            
                             @Html.EditorFor(m => m.UserKBQ.KBQAnswer1,
                                 additionalViewData:new
                                                    {
@@ -602,14 +612,10 @@
 
                         <div class="col-md-8">
                             <input class="disabled form-control" type="password" value="*******" />
-                            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ2,
-                                htmlAttributes:new
-                                               {
-                                                   htmlAttributes = new
-                                                                    {
-                                                                        @class = "form-control readonly"
-                                                                    }
-                                               })
+                            
+                            <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
+                            <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ2)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ2" />
+                            
                             @Html.EditorFor(m => m.UserKBQ.KBQAnswer2,
                                 additionalViewData:new
                                                    {
@@ -663,14 +669,10 @@
 
                         <div class="col-md-8">
                             <input class="disabled form-control" type="password" value="*******" />
-                            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ3,
-                                htmlAttributes:new
-                                               {
-                                                   htmlAttributes = new
-                                                                    {
-                                                                        @class = "form-control readonly"
-                                                                    }
-                                               })
+                            
+                            <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
+                            <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ3)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ3" />
+                            
                             @Html.EditorFor(m => m.UserKBQ.KBQAnswer3,
                                 additionalViewData:new
                                                    {
@@ -724,13 +726,10 @@
 
                         <div class="col-md-8">
                             <input class="disabled form-control" type="password" value="*******" />
-                            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ4, htmlAttributes:new
-                                                                                                    {
-                                                                                                        htmlAttributes = new
-                                                                                                                         {
-                                                                                                                             @class = "form-control readonly"
-                                                                                                                         }
-                                                                                                    })
+                            
+                            <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
+                            <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ4)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ4" />
+                            
                             @Html.EditorFor(m => m.UserKBQ.KBQAnswer4,
                                 additionalViewData:new
                                                    {
@@ -784,14 +783,10 @@
 
                         <div class="col-md-8">
                             <input class="disabled form-control" type="password" value="*******" />
-                            @Html.HiddenFor(m => m.UserKBQ.UserQuestionAnserId_KBQ5,
-                                htmlAttributes:new
-                                               {
-                                                   htmlAttributes = new
-                                                                    {
-                                                                        @class = "form-control readonly"
-                                                                    }
-                                               })
+                            
+                            <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
+                            <input type="hidden" name="@Html.NameFor(x => Model.UserKBQ.UserQuestionAnserId_KBQ5)" value="@Model.UserKBQ.UserQuestionAnserId_KBQ5" />
+                            
                             @Html.EditorFor(m => m.UserKBQ.KBQAnswer5,
                                 additionalViewData:new
                                                    {
@@ -911,7 +906,9 @@
                         </div>
 
                         <div class="col-md-8">
-                            @Html.HiddenFor(m => m.UserSQ.UserQuestionAnserId_SQ1)
+                            <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
+                            <input type="hidden" name="@Html.NameFor(x => Model.UserSQ.UserQuestionAnserId_SQ1)" value="@Model.UserSQ.UserQuestionAnserId_SQ1" />
+                            
                             @Html.EditorFor(m => m.UserSQ.SecurityQuestionAnswer1,
                                 additionalViewData:new
                                                    {
@@ -963,7 +960,9 @@
                         </div>
 
                         <div class="col-md-8">
-                            @Html.HiddenFor(m => m.UserSQ.UserQuestionAnserId_SQ2)
+                            <!-- DO NOT USE Html.HiddenFor HERE! Please refer to WARNING at the top of this page-->
+                            <input type="hidden" name="@Html.NameFor(x => Model.UserSQ.UserQuestionAnserId_SQ2)" value="@Model.UserSQ.UserQuestionAnserId_SQ2" />
+                            
                             @Html.EditorFor(m => m.UserSQ.SecurityQuestionAnswer2,
                                 additionalViewData:new
                                                    {
