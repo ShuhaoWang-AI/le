@@ -11,7 +11,6 @@ using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Core.Validation;
-using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
@@ -33,6 +32,7 @@ using NLog;
 using Linko.LinkoExchange.Core.Resources;
 using Linko.LinkoExchange.Services.Sample;
 using System.Web;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Web.Controllers
 {

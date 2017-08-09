@@ -17,6 +17,7 @@ using NLog;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Services.QuestionAnswer
 {

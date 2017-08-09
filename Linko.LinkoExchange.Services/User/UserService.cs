@@ -19,7 +19,9 @@ using NLog;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.AuditLog;
 using System.Data.Entity;
-using System.Runtime.CompilerServices; 
+using System.Runtime.CompilerServices;
+using Linko.LinkoExchange.Services.Base;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Services.User
 {

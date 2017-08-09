@@ -4,7 +4,6 @@ using Linko.LinkoExchange.Data;
 using Linko.LinkoExchange.Services.Dto;
 using System.Collections.Generic;
 using System.Configuration;
-using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Microsoft.AspNet.Identity;
@@ -15,6 +14,7 @@ using Linko.LinkoExchange.Core.Enum;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Test
 {

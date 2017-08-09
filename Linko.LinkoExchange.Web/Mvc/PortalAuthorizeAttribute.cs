@@ -1,9 +1,9 @@
-﻿using Linko.LinkoExchange.Services;
-using Linko.LinkoExchange.Services.Cache;
+﻿using Linko.LinkoExchange.Services.Cache;
 using Microsoft.Practices.Unity;
 using System.Configuration;
 using System.Web;
 using System.Web.Mvc;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Web.Mvc
 {

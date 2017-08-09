@@ -30,6 +30,8 @@ using System.Globalization;
 using System.Xml.Linq;
 using Linko.LinkoExchange.Core.Extensions;
 using System.Runtime.CompilerServices;
+using Linko.LinkoExchange.Services.Base;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Services.Report
 {

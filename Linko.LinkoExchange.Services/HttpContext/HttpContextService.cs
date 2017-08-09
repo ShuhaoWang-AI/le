@@ -1,10 +1,10 @@
 ﻿using System;
-using Linko.LinkoExchange.Core.Extensions;
-using System.Security.Claims;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
+using Linko.LinkoExchange.Core.Extensions;
 
-namespace Linko.LinkoExchange.Services
+namespace Linko.LinkoExchange.Services.HttpContext
 {
     public class HttpContextService : IHttpContextService
     {

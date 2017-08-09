@@ -1,6 +1,5 @@
 ﻿using Linko.LinkoExchange.Services.Dto;
 using System;
-using System.Web;
 using Linko.LinkoExchange.Data;
 using System.Threading.Tasks;
 using Linko.LinkoExchange.Core.Domain;
@@ -9,6 +8,7 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Core.Enum;
 using System.Collections.Generic;
 using System.Linq;
+using Linko.LinkoExchange.Services.HttpContext;
 using NLog;
 
 namespace Linko.LinkoExchange.Services.AuditLog
@@ -49,7 +49,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
             {
                 this._dbContext.SaveChanges();
             }
-            catch (Exception ex)
+            catch
             {
                 _logService.Info($"CromerrAuditLogService.Log. eventType={eventType}.");
                 throw;

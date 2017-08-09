@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Web;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Services.Cache
 {
@@ -51,7 +51,7 @@ namespace Linko.LinkoExchange.Services.Cache
 
         public void Clear()
         {
-            HttpContext.Current.Session.Clear();
+            _httpContextService.Current().Session.Clear();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Linko.LinkoExchange.Services
+﻿namespace Linko.LinkoExchange.Services.HttpContext
 {
     public interface IHttpContextService
     {
@@ -37,7 +37,7 @@
         void SetSessionValue(string key, object value);
 
         /// <summary>
-        /// Returns the tUserProfile.UserProfileId associated with the logged in user's identidy.
+        /// Returns the tUserProfile.UserProfileId associated with the logged in user's identity.
         /// If no such user exists, the value returned is -1.
         /// </summary>
         /// <returns></returns>

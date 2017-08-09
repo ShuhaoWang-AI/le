@@ -8,17 +8,20 @@ using System.Threading.Tasks;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services;
+using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
+using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Invitation;
+using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Permission;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.Settings;
+using Linko.LinkoExchange.Services.TermCondition;
 using Linko.LinkoExchange.Services.User;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -27,9 +30,6 @@ using Microsoft.Owin.Security;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NLog;
-using Linko.LinkoExchange.Services.AuditLog;
-using Linko.LinkoExchange.Services.Mapping;
-using Linko.LinkoExchange.Services.TermCondition;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -79,19 +79,19 @@ namespace Linko.LinkoExchange.Test
         {
             userInfo = GetUserInfo();
             userProfile = Mock.Of<UserProfile>(
-                  i => i.UserProfileId == 1 &&
-                  i.Id == "owin-user-id" &&
-                  i.FirstName == "firstName" &&
-                  i.LastName == "lastName" &&
-                  i.IsAccountLocked == true &&
-                  i.IsAccountResetRequired == false &&
-                  i.IsIdentityProofed == true &&
-                  i.UserName == "firstNameLastName" &&
-                  i.UserProfileId == 1 &&
-                  i.ZipCode == "zipcode" &&
-                  i.Email == "test@watertrax.com" &&
-                  i.Claims == new List<IdentityUserClaim>()
-              );
+                                               i => i.UserProfileId == 1 &&
+                                                    i.Id == "owin-user-id" &&
+                                                    i.FirstName == "firstName" &&
+                                                    i.LastName == "lastName" &&
+                                                    i.IsAccountLocked == true &&
+                                                    i.IsAccountResetRequired == false &&
+                                                    i.IsIdentityProofed == true &&
+                                                    i.UserName == "firstNameLastName" &&
+                                                    i.UserProfileId == 1 &&
+                                                    i.ZipCode == "zipcode" &&
+                                                    i.Email == "test@watertrax.com" &&
+                                                    i.Claims == new List<IdentityUserClaim>()
+                                              );
 
             progServiceMock = Mock.Get(progService);
             permissionMock = Mock.Get(permService);
@@ -136,33 +136,33 @@ namespace Linko.LinkoExchange.Test
             _termConditionService.Setup(i => i.GetTermCondtionContent()).Returns("test content");
 
             _authenticationService = new AuthenticationService(
-                userManagerObj.Object,
-                signmanager.Object,
-                authManger.Object,
-                settService,
-                orgService,
-                progService,
-                invitService,
-                emailService,
-                permService,
-                dbContext.Object,
-                userService,
-                sessionCache,
-                requestCache,
-                passwordHasher,
-                httpContextService,
-                logger,
-                questionAnswerService,
-                _mapHelper.Object,
-                _cromerrLog.Object,
-                _termConditionService.Object
-                );
+                                                               userManagerObj.Object,
+                                                               signmanager.Object,
+                                                               authManger.Object,
+                                                               settService,
+                                                               orgService,
+                                                               progService,
+                                                               invitService,
+                                                               emailService,
+                                                               permService,
+                                                               dbContext.Object,
+                                                               userService,
+                                                               sessionCache,
+                                                               requestCache,
+                                                               passwordHasher,
+                                                               httpContextService,
+                                                               logger,
+                                                               questionAnswerService,
+                                                               _mapHelper.Object,
+                                                               _cromerrLog.Object,
+                                                               _termConditionService.Object
+                                                              );
 
             userManagerObj.Setup(
-                   p => p.FindByNameAsync(It.IsAny<string>())).
+                                 p => p.FindByNameAsync(It.IsAny<string>())).
                            Returns(
-                              Task.FromResult(userProfile)
-                           );
+                                   Task.FromResult(userProfile)
+                                  );
         }
 
 
@@ -171,10 +171,10 @@ namespace Linko.LinkoExchange.Test
         {
             userProfile = null;
             userManagerObj.Setup(
-               p => p.FindByNameAsync(It.IsAny<string>())).
-                       Returns(
-                          Task.FromResult(userProfile)
-                       );
+                                 p => p.FindByNameAsync(It.IsAny<string>())).
+                           Returns(
+                                   Task.FromResult(userProfile)
+                                  );
             var result = _authenticationService.SignInByUserName("shuhao", "password", true);
             Assert.AreEqual(AuthenticationResult.UserNotFound, result.Result.AutehticationResult);
         }
@@ -200,10 +200,10 @@ namespace Linko.LinkoExchange.Test
         {
             userProfile.IsAccountLocked = true;
             userManagerObj.Setup(
-               p => p.FindByNameAsync(It.IsAny<string>())).
-                       Returns(
-                          Task.FromResult(userProfile)
-                       );
+                                 p => p.FindByNameAsync(It.IsAny<string>())).
+                           Returns(
+                                   Task.FromResult(userProfile)
+                                  );
             var result = _authenticationService.SignInByUserName("shuhao", "password", true);
 
             Assert.AreEqual(AuthenticationResult.UserIsLocked, result.Result.AutehticationResult);
@@ -219,9 +219,9 @@ namespace Linko.LinkoExchange.Test
 
             // Setup for dbContext 
             var users = new List<UserProfile>
-            {
-                userProfile
-            }.AsQueryable();
+                        {
+                            userProfile
+                        }.AsQueryable();
 
             var usersMock = new Mock<DbSet<UserProfile>>();
             usersMock.As<IQueryable<UserProfile>>().Setup(p => p.Provider).Returns(users.Provider);
@@ -234,17 +234,17 @@ namespace Linko.LinkoExchange.Test
             // Setup for program service  
 
             var orpu1 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
-                   p => p.IsRegistrationApproved == false
-                );
+                                                                      p => p.IsRegistrationApproved == false
+                                                                     );
 
             var orpu2 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
-                p => p.IsRegistrationApproved == false
-              );
+                                                                      p => p.IsRegistrationApproved == false
+                                                                     );
 
             var pObj = Mock.Get(progService);
             pObj.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false, false)).Returns(new[] {
-                 orpu1, orpu2
-            });
+                                                                                                             orpu1, orpu2
+                                                                                                         });
 
             var result = _authenticationService.SignInByUserName("shuhao", "password", true);
 
@@ -260,18 +260,18 @@ namespace Linko.LinkoExchange.Test
             userProfile.IsAccountLocked = false;
             // Setup for program service  
             var orpu1 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
-                   p => p.IsRegistrationApproved == false
-                );
+                                                                      p => p.IsRegistrationApproved == false
+                                                                     );
 
             var orpu2 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
-                p => p.IsRegistrationApproved == true &&
-                    p.OrganizationRegulatoryProgramDto.IsEnabled == false
-              );
+                                                                      p => p.IsRegistrationApproved == true &&
+                                                                           p.OrganizationRegulatoryProgramDto.IsEnabled == false
+                                                                     );
 
             var pObj = Mock.Get(progService);
             pObj.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false, false)).Returns(new[] {
-                 orpu1, orpu2
-            });
+                                                                                                             orpu1, orpu2
+                                                                                                         });
 
             var result = _authenticationService.SignInByUserName("shuhao", "password", true);
 
@@ -289,20 +289,20 @@ namespace Linko.LinkoExchange.Test
 
             // Setup for program service  
             var orpu1 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
-                  p => p.IsRegistrationApproved == false
-               );
+                                                                      p => p.IsRegistrationApproved == false
+                                                                     );
 
             var orpu2 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
-                p => p.IsRegistrationApproved == true &&
-                     p.IsEnabled == false &&
-                    p.OrganizationRegulatoryProgramDto.IsEnabled == true
+                                                                      p => p.IsRegistrationApproved == true &&
+                                                                           p.IsEnabled == false &&
+                                                                           p.OrganizationRegulatoryProgramDto.IsEnabled == true
 
-              );
+                                                                     );
 
             var pObj = Mock.Get(progService);
             pObj.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false, false)).Returns(new[] {
-                 orpu1, orpu2
-            });
+                                                                                                             orpu1, orpu2
+                                                                                                         });
 
             var result = _authenticationService.SignInByUserName("shuhao", "password", true);
 
@@ -321,27 +321,27 @@ namespace Linko.LinkoExchange.Test
 
             // Setup for program service  
             var orpu1 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
-                  p => p.IsRegistrationApproved == false
-               );
+                                                                      p => p.IsRegistrationApproved == false
+                                                                     );
 
             var orpu2 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
-                p => p.IsRegistrationApproved == true &&
-                     p.IsEnabled == true &&
-                    p.OrganizationRegulatoryProgramDto.IsEnabled == false
+                                                                      p => p.IsRegistrationApproved == true &&
+                                                                           p.IsEnabled == true &&
+                                                                           p.OrganizationRegulatoryProgramDto.IsEnabled == false
 
-              );
+                                                                     );
 
             var orpu3 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
-             p => p.IsRegistrationApproved == true &&
-                  p.IsEnabled == false &&
-                 p.OrganizationRegulatoryProgramDto.IsEnabled == true
+                                                                      p => p.IsRegistrationApproved == true &&
+                                                                           p.IsEnabled == false &&
+                                                                           p.OrganizationRegulatoryProgramDto.IsEnabled == true
 
-           );
+                                                                     );
 
             var pObj = Mock.Get(progService);
             pObj.Setup(p => p.GetUserRegulatoryPrograms(It.IsAny<string>(), false, false)).Returns(new[] {
-                 orpu1, orpu2, orpu3
-            });
+                                                                                                             orpu1, orpu2, orpu3
+                                                                                                         });
 
             var result = _authenticationService.SignInByUserName("shuhao", "password", true);
 
@@ -357,14 +357,14 @@ namespace Linko.LinkoExchange.Test
 
             // Setup for dbContext 
             var passwordHistries = new List<UserPasswordHistory>
-            {
-                new UserPasswordHistory
-                {
-                    UserProfileId = userProfile.UserProfileId,
-                    LastModificationDateTimeUtc = DateTime.Now.AddDays(-2)
-                }
+                                   {
+                                       new UserPasswordHistory
+                                       {
+                                           UserProfileId = userProfile.UserProfileId,
+                                           LastModificationDateTimeUtc = DateTime.Now.AddDays(-2)
+                                       }
 
-            }.AsQueryable();
+                                   }.AsQueryable();
 
             var passwordHistryMock = new Mock<DbSet<UserPasswordHistory>>();
             passwordHistryMock.As<IQueryable<UserPasswordHistory>>().Setup(p => p.Provider).Returns(passwordHistries.Provider);
@@ -376,15 +376,15 @@ namespace Linko.LinkoExchange.Test
 
             // Setup for Setting service 
             var orgSettingDto = Mock.Of<OrganizationSettingDto>(
-                  i => i.OrganizationId == 1 &&
-                      i.Settings == new List<SettingDto> {
-                           new SettingDto
-                           {
-                               TemplateName = SettingType.PasswordChangeRequiredDays,
-                               Value = "1"
-                           }
-                      }
-                );
+                                                                i => i.OrganizationId == 1 &&
+                                                                     i.Settings == new List<SettingDto> {
+                                                                                                            new SettingDto
+                                                                                                            {
+                                                                                                                TemplateName = SettingType.PasswordChangeRequiredDays,
+                                                                                                                Value = "1"
+                                                                                                            }
+                                                                                                        }
+                                                               );
             var settings = new List<OrganizationSettingDto> { orgSettingDto };
 
             var setMock = Mock.Get(settService);
@@ -392,27 +392,27 @@ namespace Linko.LinkoExchange.Test
 
 
             var orpu1 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
-                  p => p.IsRegistrationApproved == false
-               );
+                                                                      p => p.IsRegistrationApproved == false
+                                                                     );
 
             var orpu2 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
-                p => p.IsRegistrationApproved == true &&
-                     p.IsEnabled == true &&
-                    p.OrganizationRegulatoryProgramDto.IsEnabled == false
+                                                                      p => p.IsRegistrationApproved == true &&
+                                                                           p.IsEnabled == true &&
+                                                                           p.OrganizationRegulatoryProgramDto.IsEnabled == false
 
-              );
+                                                                     );
 
             var orpu3 = Mock.Of<OrganizationRegulatoryProgramUserDto>(
-             p => p.IsRegistrationApproved == true &&
-                  p.IsEnabled == true &&
-                 p.OrganizationRegulatoryProgramDto.IsEnabled == true
+                                                                      p => p.IsRegistrationApproved == true &&
+                                                                           p.IsEnabled == true &&
+                                                                           p.OrganizationRegulatoryProgramDto.IsEnabled == true
 
-           );
+                                                                     );
 
             var progMock = Mock.Get(progService);
             progMock.Setup(i => i.GetUserRegulatoryPrograms(It.IsAny<string>(), false, false)).Returns(new[] {
-                 orpu1, orpu2, orpu3
-            });
+                                                                                                                 orpu1, orpu2, orpu3
+                                                                                                             });
 
             var result = _authenticationService.SignInByUserName("shuhao", "password", true);
 
@@ -431,14 +431,14 @@ namespace Linko.LinkoExchange.Test
 
             // Setup for dbContext 
             var passwordHistries = new List<UserPasswordHistory>
-            {
-                new UserPasswordHistory
-                {
-                    UserProfileId = userProfile.UserProfileId,
-                    LastModificationDateTimeUtc = DateTime.Now.AddDays(-1)
-                }
+                                   {
+                                       new UserPasswordHistory
+                                       {
+                                           UserProfileId = userProfile.UserProfileId,
+                                           LastModificationDateTimeUtc = DateTime.Now.AddDays(-1)
+                                       }
 
-            }.AsQueryable();
+                                   }.AsQueryable();
 
             var passwordHistryMock = new Mock<DbSet<UserPasswordHistory>>();
             passwordHistryMock.As<IQueryable<UserPasswordHistory>>().Setup(p => p.Provider).Returns(passwordHistries.Provider);
@@ -449,16 +449,16 @@ namespace Linko.LinkoExchange.Test
             dbContext.Setup(p => p.UserPasswordHistories).Returns(passwordHistryMock.Object);
 
             var settings = settingDict.Select(i => new SettingDto
-            {
-                TemplateName = i.Key,
-                Value = i.Value
-            }).ToList();
+                                                   {
+                                                       TemplateName = i.Key,
+                                                       Value = i.Value
+                                                   }).ToList();
 
             // Setup for Setting service 
             var orgSettingDto = Mock.Of<OrganizationSettingDto>(
-                  i => i.OrganizationId == 1 &&
-                      i.Settings == settings
-                      );
+                                                                i => i.OrganizationId == 1 &&
+                                                                     i.Settings == settings
+                                                               );
 
             var orgSettings = new List<OrganizationSettingDto> { orgSettingDto };
 
@@ -466,17 +466,17 @@ namespace Linko.LinkoExchange.Test
             setMock.Setup(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>())).Returns(orgSettings);
 
             var orpu = Mock.Of<OrganizationRegulatoryProgramUserDto>(
-                    p => p.IsRegistrationApproved == true &&
-                    p.IsEnabled == true &&
-                    p.OrganizationRegulatoryProgramDto.IsEnabled == true
+                                                                     p => p.IsRegistrationApproved == true &&
+                                                                          p.IsEnabled == true &&
+                                                                          p.OrganizationRegulatoryProgramDto.IsEnabled == true
 
-         );
+                                                                    );
 
             var progMock = Mock.Get(progService);
             progMock.Setup(i => i.GetUserRegulatoryPrograms(It.IsAny<string>(), false, false)).Returns(new[] { orpu });
 
             signmanager.Setup(i => i.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), true, true))
-               .Returns(Task.FromResult(SignInStatus.Success));
+                       .Returns(Task.FromResult(SignInStatus.Success));
 
             var result = _authenticationService.SignInByUserName("shuhao", "password", true);
 
@@ -668,8 +668,8 @@ namespace Linko.LinkoExchange.Test
 
             // set invitation 5 days ago
             var invitationDto = Mock.Of<InvitationDto>(i => i.InvitationDateTimeUtc == DateTimeOffset.UtcNow.AddDays(-5)
-                && i.RecipientOrganizationRegulatoryProgramId == 1000
-            );
+                                                            && i.RecipientOrganizationRegulatoryProgramId == 1000
+                                                      );
 
             var invitServiceMock = Mock.Get(invitService);
             invitServiceMock.Setup(i => i.GetInvitation(It.IsAny<string>())).Returns(invitationDto);
@@ -685,27 +685,27 @@ namespace Linko.LinkoExchange.Test
             // set setting service 
             var settings = new List<SettingDto>();
             settings.AddRange(
-                new[] { new SettingDto
-                        {
-                            TemplateName = SettingType.InvitationExpiredHours,
-                            Value = "72"
-                        },
+                              new[] { new SettingDto
+                                      {
+                                          TemplateName = SettingType.InvitationExpiredHours,
+                                          Value = "72"
+                                      },
 
-                        new SettingDto
-                        {
-                            TemplateName = SettingType.PasswordHistoryMaxCount,
-                            Value = "10"
-                        }
-                });
+                                        new SettingDto
+                                        {
+                                            TemplateName = SettingType.PasswordHistoryMaxCount,
+                                            Value = "10"
+                                        }
+                                    });
 
             var orgSettingDto = Mock.Of<OrganizationSettingDto>(i => i.Settings == settings);
             var settingServiceMock = Mock.Get(settService);
             settingServiceMock.Setup(i => i.GetOrganizationSettingsById(It.IsAny<int>()))
-                .Returns(orgSettingDto);
+                              .Returns(orgSettingDto);
 
 
             settingServiceMock.Setup(i => i.GetOrganizationSettingsByIds(It.IsAny<IEnumerable<int>>()))
-               .Returns(new[] { orgSettingDto });
+                              .Returns(new[] { orgSettingDto });
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
@@ -726,10 +726,10 @@ namespace Linko.LinkoExchange.Test
             IdentityResult createUserResult = IdentityResult.Success;
 
             userManagerObj.Setup(i => i.CreateAsync(It.IsAny<UserProfile>(), It.IsAny<string>())).
-                Returns(Task.FromResult(createUserResult));
+                           Returns(Task.FromResult(createUserResult));
 
             userManagerObj.Setup(i => i.FindByIdAsync(It.IsAny<string>())).
-                Returns(Task.FromResult(userProfile));
+                           Returns(Task.FromResult(userProfile));
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
@@ -776,7 +776,7 @@ namespace Linko.LinkoExchange.Test
             IdentityResult createUserResult = null;
 
             userManagerObj.Setup(i => i.CreateAsync(It.IsAny<UserProfile>(), It.IsAny<string>())).
-                Returns(Task.FromResult((IdentityResult)createUserResult));
+                           Returns(Task.FromResult((IdentityResult)createUserResult));
 
             var ret = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration).Result;
         }
@@ -791,9 +791,9 @@ namespace Linko.LinkoExchange.Test
 
             // sender program is disabled 
             progServiceMock.Setup(i => i.GetOrganizationRegulatoryProgram(1001)).Returns(
-                Mock.Of<OrganizationRegulatoryProgramDto>(
-                      i => i.IsEnabled == false)
-                    );
+                                                                                         Mock.Of<OrganizationRegulatoryProgramDto>(
+                                                                                                                                   i => i.IsEnabled == false)
+                                                                                        );
 
             // To test new user register    
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
@@ -810,9 +810,9 @@ namespace Linko.LinkoExchange.Test
 
             // sender program is disabled 
             progServiceMock.Setup(i => i.GetOrganizationRegulatoryProgram(1000)).Returns(
-                Mock.Of<OrganizationRegulatoryProgramDto>(
-                      i => i.IsEnabled == false)
-                    );
+                                                                                         Mock.Of<OrganizationRegulatoryProgramDto>(
+                                                                                                                                   i => i.IsEnabled == false)
+                                                                                        );
 
             // To test new user register    
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
@@ -832,7 +832,7 @@ namespace Linko.LinkoExchange.Test
             var emailServiceMock = Mock.Get(emailService);
 
             emailServiceMock.Verify(i => i.SendEmail(It.IsAny<IEnumerable<string>>(),
-                It.IsAny<EmailType>(), It.IsAny<IDictionary<string, string>>(), true));
+                                                     It.IsAny<EmailType>(), It.IsAny<IDictionary<string, string>>(), true));
 
             var invitServiceMock = Mock.Get(invitService);
 
@@ -845,33 +845,33 @@ namespace Linko.LinkoExchange.Test
         public void Test_SetClaimsForOrgRegProgramSelection()
         {
             userManagerObj.Setup(p => p.FindByNameAsync(It.IsAny<string>())).
-                 Returns(
-                    Task.FromResult(userProfile)
-                 );
+                           Returns(
+                                   Task.FromResult(userProfile)
+                                  );
 
 
             var authService = new AuthenticationService(
-                userManagerObj.Object,
-                signmanager.Object,
-                authManger.Object,
-                settService,
-                orgService,
-                progService,
-                invitService,
-                emailService,
-                permService,
-                new LinkoExchangeContext(connectionString),
-                userService,
-                sessionCache,
-                requestCache,
-                passwordHasher,
-                httpContextService,
-                logger,
-                null,
-                _mapHelper.Object,
-                _cromerrLog.Object,
-                _termConditionService.Object
-                );
+                                                        userManagerObj.Object,
+                                                        signmanager.Object,
+                                                        authManger.Object,
+                                                        settService,
+                                                        orgService,
+                                                        progService,
+                                                        invitService,
+                                                        emailService,
+                                                        permService,
+                                                        new LinkoExchangeContext(connectionString),
+                                                        userService,
+                                                        sessionCache,
+                                                        requestCache,
+                                                        passwordHasher,
+                                                        httpContextService,
+                                                        logger,
+                                                        null,
+                                                        _mapHelper.Object,
+                                                        _cromerrLog.Object,
+                                                        _termConditionService.Object
+                                                       );
 
             authService.SetClaimsForOrgRegProgramSelection(1);
         }
@@ -884,19 +884,19 @@ namespace Linko.LinkoExchange.Test
 
             // set invitation 5 days ago
             var invitationDto = Mock.Of<InvitationDto>(i => i.InvitationDateTimeUtc == DateTimeOffset.UtcNow.AddDays(-5)
-                && i.RecipientOrganizationRegulatoryProgramId == 1000 &&
-                   i.SenderOrganizationRegulatoryProgramId == 1001
-            );
+                                                            && i.RecipientOrganizationRegulatoryProgramId == 1000 &&
+                                                            i.SenderOrganizationRegulatoryProgramId == 1001
+                                                      );
 
             var invitServiceMock = Mock.Get(invitService);
             invitServiceMock.Setup(i => i.GetInvitation(It.IsAny<string>())).Returns(invitationDto);
 
             // set invitationRecipientProgram 
             var orgRegulatoryProgramDto = Mock.Of<OrganizationRegulatoryProgramDto>(i => i.OrganizationId == 2000
-                 && i.IsEnabled == true
-                 && i.RegulatorOrganizationId == 1000
-                 && i.OrganizationDto == Mock.Of<OrganizationDto>(b => b.OrganizationId == 5000)
-            );
+                                                                                         && i.IsEnabled == true
+                                                                                         && i.RegulatorOrganizationId == 1000
+                                                                                         && i.OrganizationDto == Mock.Of<OrganizationDto>(b => b.OrganizationId == 5000)
+                                                                                   );
 
             // set prgramService 
             // recipient
@@ -904,55 +904,55 @@ namespace Linko.LinkoExchange.Test
 
             // sender 
             progServiceMock.Setup(i => i.GetOrganizationRegulatoryProgram(1001)).Returns(
-                Mock.Of<OrganizationRegulatoryProgramDto>(
-                      i => i.IsEnabled == true
-                      )
-                    );
+                                                                                         Mock.Of<OrganizationRegulatoryProgramDto>(
+                                                                                                                                   i => i.IsEnabled == true
+                                                                                                                                  )
+                                                                                        );
 
             var orgServiceMock = Mock.Get(orgService);
             orgServiceMock.Setup(i => i.GetOrganization(It.IsAny<int>())).Returns(
-                    Mock.Of<OrganizationDto>(i => i.OrganizationName == "test-org-name")
-                );
+                                                                                  Mock.Of<OrganizationDto>(i => i.OrganizationName == "test-org-name")
+                                                                                 );
 
             orgServiceMock.Setup(i => i.GetUserOrganizations(It.IsAny<int>())).
-                Returns(
-                  new[]
-                  {
-                      Mock.Of<OrganizationRegulatoryProgramDto>(i=>i.OrganizationId == 1000),
-                      Mock.Of<OrganizationRegulatoryProgramDto>(i=>i.OrganizationId == 1001)
-                  });
+                           Returns(
+                                   new[]
+                                   {
+                                       Mock.Of<OrganizationRegulatoryProgramDto>(i=>i.OrganizationId == 1000),
+                                       Mock.Of<OrganizationRegulatoryProgramDto>(i=>i.OrganizationId == 1001)
+                                   });
 
             orgServiceMock.Setup(i=>i.GetAuthority(It.IsAny<int>())).Returns( 
-                  Mock.Of<OrganizationRegulatoryProgramDto>(i=>i.OrganizationId == 1000)
-                );
+                                                                             Mock.Of<OrganizationRegulatoryProgramDto>(i=>i.OrganizationId == 1000)
+                                                                            );
 
             permissionMock.Setup(i => i.GetApprovalPeople(It.IsAny<OrganizationRegulatoryProgramDto>(), It.IsAny<bool>())).Returns(
-                 new[]{
-                           Mock.Of<UserDto>(i=>i.Email=="test@water.com"),
-                           Mock.Of<UserDto>(i=>i.Email=="test2@water.com"),
-                       }
-                );
+                                                                                                                                   new[]{
+                                                                                                                                            Mock.Of<UserDto>(i=>i.Email=="test@water.com"),
+                                                                                                                                            Mock.Of<UserDto>(i=>i.Email=="test2@water.com"),
+                                                                                                                                        }
+                                                                                                                                  );
 
             // set setting service 
             var settings = new List<SettingDto>();
             settings.AddRange(
-                new[] {
-                    new SettingDto
-                    {
-                        TemplateName = SettingType.InvitationExpiredHours,
-                        Value = "172"
-                    },
-                    new SettingDto
-                    {
-                        TemplateName = SettingType.PasswordHistoryMaxCount,
-                        Value="10"
-                    }});
+                              new[] {
+                                        new SettingDto
+                                        {
+                                            TemplateName = SettingType.InvitationExpiredHours,
+                                            Value = "172"
+                                        },
+                                        new SettingDto
+                                        {
+                                            TemplateName = SettingType.PasswordHistoryMaxCount,
+                                            Value="10"
+                                        }});
 
 
             var orgSettingDto = Mock.Of<OrganizationSettingDto>(i => i.Settings == settings);
             var settingServiceMock = Mock.Get(settService);
             settingServiceMock.Setup(i => i.GetOrganizationSettingsById(It.IsAny<int>()))
-                .Returns(orgSettingDto);
+                              .Returns(orgSettingDto);
 
             var orgSettings = new List<OrganizationSettingDto> { orgSettingDto };
 
@@ -960,14 +960,14 @@ namespace Linko.LinkoExchange.Test
 
             // Setup for dbContext 
             var passwordHistries = new List<UserPasswordHistory>
-            {
-                new UserPasswordHistory
-                {
-                    UserProfileId = userProfile.UserProfileId,
-                    LastModificationDateTimeUtc = DateTime.Now.AddDays(-1)
-                }
+                                   {
+                                       new UserPasswordHistory
+                                       {
+                                           UserProfileId = userProfile.UserProfileId,
+                                           LastModificationDateTimeUtc = DateTime.Now.AddDays(-1)
+                                       }
 
-            }.AsQueryable();
+                                   }.AsQueryable();
 
             var passwordHistryMock = new Mock<DbSet<UserPasswordHistory>>();
             passwordHistryMock.As<IQueryable<UserPasswordHistory>>().Setup(p => p.Provider).Returns(passwordHistries.Provider);
@@ -982,44 +982,44 @@ namespace Linko.LinkoExchange.Test
         private UserDto GetUserInfo()
         {
             return new UserDto()
-            {
-                UserName = "test-user-name",
-                FirstName = "test",
-                LastName = "last",
-                AddressLine1 = "addreess line1",
-                CityName = "City name",
-                Email = "test@test.com",
-                ZipCode = "zipcode",
-                AgreeTermsAndConditions = true,
-                Password = "123456789"
-            };
+                   {
+                       UserName = "test-user-name",
+                       FirstName = "test",
+                       LastName = "last",
+                       AddressLine1 = "addreess line1",
+                       CityName = "City name",
+                       Email = "test@test.com",
+                       ZipCode = "zipcode",
+                       AgreeTermsAndConditions = true,
+                       Password = "123456789"
+                   };
         }
 
         private QuestionDto CreateQuestion(int questionId, QuestionTypeName type, string content)
         {
             return new QuestionDto
-            {
-                QuestionId = questionId,
-                QuestionType = type,
-                Content = content
-            };
+                   {
+                       QuestionId = questionId,
+                       QuestionType = type,
+                       Content = content
+                   };
         }
 
         private AnswerDto CreateAnswer(string content)
         {
             return new AnswerDto
-            {
-                Content = content
-            };
+                   {
+                       Content = content
+                   };
         }
 
         private QuestionAnswerPairDto CreateQuestion(QuestionDto question, AnswerDto answer)
         {
             return new QuestionAnswerPairDto
-            {
-                Question = question,
-                Answer = answer
-            };
+                   {
+                       Question = question,
+                       Answer = answer
+                   };
         }
 
         private List<AnswerDto> CreateQuestions(IEnumerable<QuestionDto> questions, IEnumerable<AnswerDto> answers)
@@ -1049,16 +1049,16 @@ namespace Linko.LinkoExchange.Test
             for (var i = 0; i < count; i++)
             {
                 questions.Add(new QuestionDto
-                {
-                    QuestionId = i,
-                    QuestionType = type,
-                    Content = string.Format(qformat, i)
-                });
+                              {
+                                  QuestionId = i,
+                                  QuestionType = type,
+                                  Content = string.Format(qformat, i)
+                              });
 
                 answers.Add(new AnswerDto
-                {
-                    Content = string.Format(aformat, i)
-                });
+                            {
+                                Content = string.Format(aformat, i)
+                            });
             }
 
             return CreateQuestions(questions, answers);
@@ -1067,50 +1067,50 @@ namespace Linko.LinkoExchange.Test
     }
 }
 
-public class HttpContextServiceMock : IHttpContextService
-{
-    private Dictionary<string, object> session = new Dictionary<string, object>();
-    public System.Web.HttpContext Current()
+    public class HttpContextServiceMock : IHttpContextService
     {
-        throw new NotImplementedException();
-    }
-
-    public string GetRequestBaseUrl()
-    {
-        return "";
-    }
-
-    public object GetSessionValue(string key)
-    {
-        if (session.ContainsKey(key))
+        private Dictionary<string, object> session = new Dictionary<string, object>();
+        public System.Web.HttpContext Current()
         {
-            return session[key];
+            throw new NotImplementedException();
         }
-        return "";
-    }
 
-    public void SetSessionValue(string key, object value)
-    {
-        session[key] = value;
-    }
+        public string GetRequestBaseUrl()
+        {
+            return "";
+        }
 
-    public int CurrentUserProfileId()
-    {
-        return 1;
-    }
+        public object GetSessionValue(string key)
+        {
+            if (session.ContainsKey(key))
+            {
+                return session[key];
+            }
+            return "";
+        }
 
-    public string CurrentUserIPAddress()
-    {
-        return "000.000.000.000";
-    }
+        public void SetSessionValue(string key, object value)
+        {
+            session[key] = value;
+        }
 
-    public string CurrentUserHostName()
-    {
-        return "test.dns.hostname";
-    }
+        public int CurrentUserProfileId()
+        {
+            return 1;
+        }
 
-    public string GetClaimValue(string claimType)
-    {
-        throw new NotImplementedException();
-    }
+        public string CurrentUserIPAddress()
+        {
+            return "000.000.000.000";
+        }
+
+        public string CurrentUserHostName()
+        {
+            return "test.dns.hostname";
+        }
+
+        public string GetClaimValue(string claimType)
+        {
+            throw new NotImplementedException();
+        }
 }

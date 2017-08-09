@@ -6,7 +6,6 @@ using Linko.LinkoExchange.Services.Dto;
 using Microsoft.AspNet.Identity;
 using System.Configuration;
 using Linko.LinkoExchange.Services.Settings;
-using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Email;
@@ -21,6 +20,7 @@ using NLog;
 using Linko.LinkoExchange.Services.Program;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Test
 {

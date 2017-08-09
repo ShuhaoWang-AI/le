@@ -27,6 +27,7 @@ using NLog;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.TermCondition;
 using System.Data.Entity;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Services.Authentication
 {

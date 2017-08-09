@@ -3,7 +3,6 @@ using System.Configuration;
 using Linko.LinkoExchange.Core.Domain;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Authentication;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
@@ -20,6 +19,7 @@ using Moq;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.AuditLog;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Test
 {

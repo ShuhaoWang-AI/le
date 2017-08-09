@@ -1,6 +1,5 @@
 ﻿using System.Configuration;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,6 +12,7 @@ using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.Config;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Test
 {

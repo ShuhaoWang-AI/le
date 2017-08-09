@@ -14,6 +14,8 @@ using NLog;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Organization;
 using System.Runtime.CompilerServices;
+using Linko.LinkoExchange.Services.Base;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Services.Report
 {

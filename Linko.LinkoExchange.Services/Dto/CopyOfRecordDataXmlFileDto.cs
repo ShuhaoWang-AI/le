@@ -1,4 +1,4 @@
-namespace Linko.LinkoExchange.Services
+namespace Linko.LinkoExchange.Services.Dto
 {
     public class CopyOfRecordDataXmlFileDto : CorFileDtoBase
     {

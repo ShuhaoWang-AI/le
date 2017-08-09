@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
 using Linko.LinkoExchange.Core.Enum;
-using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.User;

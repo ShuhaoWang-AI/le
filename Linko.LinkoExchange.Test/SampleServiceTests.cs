@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
-using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Organization;
 using System;
 using Linko.LinkoExchange.Services.TimeZone;
@@ -19,6 +18,7 @@ using Linko.LinkoExchange.Services.Unit;
 using System.Diagnostics;
 using Linko.LinkoExchange.Core.Resources;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Test
 {

@@ -18,6 +18,8 @@ using System.Data.Entity.Validation;
 using System.Data.Entity.Infrastructure;
 using System.Runtime.CompilerServices;
 using System.Configuration;
+using Linko.LinkoExchange.Services.Base;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Services.Sample
 {

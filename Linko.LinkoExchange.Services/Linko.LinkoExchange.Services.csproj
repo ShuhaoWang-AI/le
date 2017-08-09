@@ -115,7 +115,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseService\BaseService.cs" />
+    <Compile Include="Base\BaseService.cs" />
     <Compile Include="Cache\ApplicationCache.cs" />
     <Compile Include="Cache\IApplicationCache.cs" />
     <Compile Include="Config\ConfigSettingService.cs" />

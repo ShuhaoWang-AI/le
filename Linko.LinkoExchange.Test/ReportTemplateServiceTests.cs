@@ -7,7 +7,6 @@ using Moq;
 using NLog;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Report;
-using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.TimeZone;
 using Linko.LinkoExchange.Services.Program;
@@ -16,8 +15,8 @@ using Linko.LinkoExchange.Services.User;
 using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.Unit;
-using Linko.LinkoExchange.Services.Config;
 using Linko.LinkoExchange.Services.Cache;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Test
 {

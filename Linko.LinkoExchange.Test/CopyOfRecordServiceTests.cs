@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using Linko.LinkoExchange.Core.Enum;
 using Linko.LinkoExchange.Data;
-using Linko.LinkoExchange.Services;
 using Linko.LinkoExchange.Services.CopyOfRecord;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Mapping;
@@ -25,6 +24,7 @@ using Linko.LinkoExchange.Services.QuestionAnswer;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Sample;
 using System.Data.Entity;
+using Linko.LinkoExchange.Services.HttpContext;
 
 namespace Linko.LinkoExchange.Test
 {
