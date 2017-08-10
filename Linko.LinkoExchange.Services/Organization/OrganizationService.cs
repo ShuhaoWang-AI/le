@@ -121,7 +121,7 @@ namespace Linko.LinkoExchange.Services.Organization
 
         public IEnumerable<OrganizationRegulatoryProgramDto> GetUserOrganizations()
         {
-            int userProfileId = Convert.ToInt32(_httpContext.Current().User.Identity.UserProfileId());
+            int userProfileId = Convert.ToInt32(_httpContext.Current.User.Identity.UserProfileId());
             return GetUserOrganizations(userProfileId);
         }
 

@@ -6,7 +6,7 @@
         /// Returns the current httpcontext 
         /// </summary>
         /// <returns></returns>
-        System.Web.HttpContext Current();
+        System.Web.HttpContext Current { get; }
 
         /// <summary>
         /// Returns the fully qualified URL of the current request

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -8,37 +9,30 @@ namespace Linko.LinkoExchange.Services.HttpContext
 {
     public class HttpContextService : IHttpContextService
     {
-        public System.Web.HttpContext Current()
-        {
-            return System.Web.HttpContext.Current;
-        }
+        #region interface implementations
+
+        public System.Web.HttpContext Current => System.Web.HttpContext.Current;
 
         public object GetSessionValue(string key)
         {
-            return System.Web.HttpContext.Current.Session[key];
+            return Current.Session[name:key];
         }
 
         public void SetSessionValue(string key, object value)
         {
-            System.Web.HttpContext.Current.Session[key] = value;
+            Current.Session[name:key] = value;
         }
 
         public string GetClaimValue(string claimType)
         {
-            if (Current().User.Identity.IsAuthenticated)
+            if (Current.User.Identity.IsAuthenticated)
             {
-                var identity = Current().User.Identity as ClaimsIdentity;
-                var claims = identity.Claims.ToList();
+                var identity = Current.User.Identity as ClaimsIdentity;
+                var claims = identity?.Claims.ToList();
 
+                Debug.Assert(condition:claims != null, message:"claims != null");
                 var claim = claims.FirstOrDefault(i => i.Type == claimType);
-                if (claim != null)
-                {
-                    return claim.Value;
-                }
-                else
-                {
-                    return string.Empty;
-                }
+                return claim != null ? claim.Value : string.Empty;
             }
             else
             {
@@ -48,19 +42,21 @@ namespace Linko.LinkoExchange.Services.HttpContext
 
         public string GetRequestBaseUrl()
         {
-            return Current().Request.Url.Scheme + "://"
-             + Current().Request.Url.Authority
-             + Current().Request.ApplicationPath.TrimEnd('/') + "/";
+            return Current.Request.Url.Scheme
+                   + "://"
+                   + Current.Request.Url.Authority
+                   + Current.Request.ApplicationPath?.TrimEnd('/')
+                   + "/";
         }
 
         public int CurrentUserProfileId()
         {
             if (System.Web.HttpContext.Current?.User?.Identity != null)
             {
-                string userProfileIdString = System.Web.HttpContext.Current.User.Identity.UserProfileId();
-                if (!String.IsNullOrEmpty(userProfileIdString))
+                var userProfileIdString = Current.User.Identity.UserProfileId();
+                if (!string.IsNullOrEmpty(value:userProfileIdString))
                 {
-                    return Convert.ToInt32(userProfileIdString);
+                    return Convert.ToInt32(value:userProfileIdString);
                 }
             }
 
@@ -69,35 +65,28 @@ namespace Linko.LinkoExchange.Services.HttpContext
 
         public string CurrentUserIPAddress()
         {
-            if (System.Web.HttpContext.Current?.Request?.UserHostAddress != null)
-            {
-                string userIPAddress = System.Web.HttpContext.Current.Request.UserHostAddress;
-                if (!String.IsNullOrEmpty(userIPAddress))
-                {
-                    return userIPAddress;
-                }
-            }
-
-            return "";
+            var userIPAddress = Current?.Request?.UserHostAddress;
+            return !string.IsNullOrEmpty(value:userIPAddress) ? userIPAddress : "";
         }
+
         public string CurrentUserHostName()
         {
             if (System.Web.HttpContext.Current?.Request?.UserHostAddress != null)
             {
-                string userIPAddress = System.Web.HttpContext.Current.Request.UserHostAddress;
-                if (!String.IsNullOrEmpty(userIPAddress))
+                var userIPAddress = Current.Request.UserHostAddress;
+                if (!string.IsNullOrEmpty(value:userIPAddress))
                 {
-                    string userHostName = null;
+                    string userHostName;
                     try
                     {
-                        userHostName = Dns.GetHostEntry(userIPAddress)?.HostName ?? "";
+                        userHostName = Dns.GetHostEntry(hostNameOrAddress:userIPAddress)?.HostName ?? "";
                     }
                     catch
                     {
-                        
+                        userHostName = null;
                     }
 
-                    if (!String.IsNullOrEmpty(userHostName))
+                    if (!string.IsNullOrEmpty(value:userHostName))
                     {
                         return userHostName;
                     }
@@ -106,5 +95,7 @@ namespace Linko.LinkoExchange.Services.HttpContext
 
             return "";
         }
+
+        #endregion
     }
 }

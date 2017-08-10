@@ -125,9 +125,9 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         public IList<Claim> GetClaims()
         {
-            if (_httpContext.Current().User.Identity.IsAuthenticated)
+            if (_httpContext.Current.User.Identity.IsAuthenticated)
             {
-                var identity = _httpContext.Current().User.Identity as ClaimsIdentity;
+                var identity = _httpContext.Current.User.Identity as ClaimsIdentity;
                 if (identity == null)
                 {
                     return null;
@@ -1123,7 +1123,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 // Save claim
                 SaveClaims(applicationUser.Id, claims);
 
-                var identity = new ClaimsIdentity(_httpContext.Current().User.Identity);
+                var identity = new ClaimsIdentity(_httpContext.Current.User.Identity);
                 identity.AddClaims(claims);
                 _authenticationManager.AuthenticationResponseGrant = new AuthenticationResponseGrant
                     (identity, new AuthenticationProperties { IsPersistent = isPersistent });
@@ -1591,7 +1591,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             claims.Add(new Claim(CacheKey.LastName, userProfile.LastName));
             claims.Add(new Claim(CacheKey.UserName, userProfile.UserName));
             claims.Add(new Claim(CacheKey.Email, userProfile.Email));
-            claims.Add(new Claim(CacheKey.SessionId, _httpContext.Current().Session.SessionID));
+            claims.Add(new Claim(CacheKey.SessionId, _httpContext.Current.Session.SessionID));
 
             return claims;
         }

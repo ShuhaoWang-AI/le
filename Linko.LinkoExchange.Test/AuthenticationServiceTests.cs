@@ -1070,10 +1070,7 @@ namespace Linko.LinkoExchange.Test
     public class HttpContextServiceMock : IHttpContextService
     {
         private Dictionary<string, object> session = new Dictionary<string, object>();
-        public System.Web.HttpContext Current()
-        {
-            throw new NotImplementedException();
-        }
+        public System.Web.HttpContext Current => null; 
 
         public string GetRequestBaseUrl()
         {
