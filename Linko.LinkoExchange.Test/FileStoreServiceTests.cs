@@ -54,6 +54,83 @@ namespace Linko.LinkoExchange.Test
             var fileStore = _fileStoreService.GetFileStoreById(1);
         }
 
-      
+        [TestMethod]
+        public void CanUserExecuteApi_UpdateFileStore_True_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+
+            int fileStoreId = 3;
+            var isAuthorized = _fileStoreService.CanUserExecuteApi("UpdateFileStore", fileStoreId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_UpdateFileStore_False_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("2");
+
+            int fileStoreId = 3;
+            var isAuthorized = _fileStoreService.CanUserExecuteApi("UpdateFileStore", fileStoreId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetFileStoreById_AsIndustry_True_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+
+            int fileStoreId = 3;
+            var isAuthorized = _fileStoreService.CanUserExecuteApi("GetFileStoreById", fileStoreId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetFileStoreById_AsIndustry_False_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("2");
+
+            int fileStoreId = 3;
+            var isAuthorized = _fileStoreService.CanUserExecuteApi("GetFileStoreById", fileStoreId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetFileStoreById_CorrectAuthority_NotIncludedInReport_False_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+
+            int fileStoreId = 3;
+            var isAuthorized = _fileStoreService.CanUserExecuteApi("GetFileStoreById", fileStoreId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetFileStoreById_AsAuthority_False_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("2");
+
+            int fileStoreId = 3;
+            var isAuthorized = _fileStoreService.CanUserExecuteApi("GetFileStoreById", fileStoreId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
     }
 }
