@@ -3474,7 +3474,7 @@ BEGIN
 
         <div>
             <p class="MsoBodyText" style="text-align: center;">
-                <b>GENERAL PRIVACY POLICY</b>
+                <b>LinkoExchange Privacy Policy</b>
             </p>
 
             <p class="MsoBodyText">
