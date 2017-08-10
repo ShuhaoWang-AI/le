@@ -13,12 +13,7 @@ if '%1' == '-?' goto usage
 if '%1' == '?' goto usage
 if '%1' == '/help' goto usage
 
-REM: comment out the execution of this folder after the initial release since the DB has been created
-cd ".\Schema Create Scripts"
- sqlcmd -S %1 -d %2 -U %3 -P %4 -b -i "LinkoExchangeCreateScript.sql"
-if %ERRORLEVEL% NEQ 0 goto errors
-
-cd "..\Schema Change Scripts"
+cd ".\Schema Change Scripts"
  sqlcmd -S %1 -d %2 -U %3 -P %4 -b -i "AlterTableScript.sql"
 if %ERRORLEVEL% NEQ 0 goto errors
  sqlcmd -S %1 -d %2 -U %3 -P %4 -b -i "AlterTrigger.sql"

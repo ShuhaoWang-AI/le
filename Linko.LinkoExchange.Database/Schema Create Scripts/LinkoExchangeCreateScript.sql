@@ -46,20 +46,21 @@ PRINT 'Set LinkoExchange DB user'
 USE [LinkoExchange]
 GO
 
-IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT 1 FROM master.sys.server_principals WHERE name = 'exnet')
-BEGIN
-    CREATE LOGIN exnet WITH PASSWORD = N'test$1234'
-END
-GO
+-- Uncomment the following section if this script is run on QA
+--IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT 1 FROM master.sys.server_principals WHERE name = 'exnet')
+--BEGIN
+--    CREATE LOGIN exnet WITH PASSWORD = N'test$1234'
+--END
+--GO
 
-IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'exnet')
-BEGIN
-	CREATE USER exnet FOR LOGIN exnet
-	EXEC sp_addrolemember 'db_datareader', 'exnet'
-	EXEC sp_addrolemember 'db_datawriter', 'exnet'
-	EXEC sp_addrolemember 'db_owner', 'exnet'
-END
-GO
+--IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'exnet')
+--BEGIN
+--	CREATE USER exnet FOR LOGIN exnet
+--	EXEC sp_addrolemember 'db_datareader', 'exnet'
+--	EXEC sp_addrolemember 'db_datawriter', 'exnet'
+--	EXEC sp_addrolemember 'db_owner', 'exnet'
+--END
+--GO
 
 
 -------------------------------- Create new tables for LinkoExchange --------------------------------
@@ -4620,7 +4621,7 @@ BEGIN
 		(
 		    'SendToCtsDatabaseServerName'
 		    , 'Database server name where the LinkoCTS related data are sent.'
-            , 'localhost'
+            , 'LINKO-SQL1'
 		    , @OrganizationTypeId_Authority
 		    , @RegulatoryProgramId_IPP
 		)
@@ -4660,7 +4661,7 @@ BEGIN
 		VALUES 
 		(
 		    'SystemEmailEmailAddress'
-		    , 'noreply@linkotechnology.com'
+		    , 'noreply@linkoexchange.com'
 		    , ''
 		)
 	INSERT INTO dbo.tSystemSetting (Name, Value, Description)
