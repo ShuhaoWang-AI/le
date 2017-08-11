@@ -240,5 +240,47 @@ namespace Linko.LinkoExchange.Test
             _userService.GetOrganizationRegulatoryProgramUser(5, true);
         }
 
+        [TestMethod]
+        public void CanUserExecuteApi_EnableDisableUserAccount_Within_Same_OrgRegProgram_Is_Admin_True_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("3");
+
+            int targetOrgRegProgUserId = 4;
+            var isAuthorized = _userService.CanUserExecuteApi("EnableDisableUserAccount", targetOrgRegProgUserId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_EnableDisableUserAccount_Within_Same_OrgRegProgram_Not_Admin_False_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("4");
+
+            int targetOrgRegProgUserId = 3;
+            var isAuthorized = _userService.CanUserExecuteApi("EnableDisableUserAccount", targetOrgRegProgUserId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_EnableDisableUserAccount_Within_Same_Authority_Is_Admin_True_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("3");
+
+            int targetOrgRegProgUserId = 4;
+            var isAuthorized = _userService.CanUserExecuteApi("EnableDisableUserAccount", targetOrgRegProgUserId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
     }
 }
