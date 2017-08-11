@@ -12,6 +12,8 @@ using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Dto;
 using System;
 using Linko.LinkoExchange.Core.Domain;
+using System.Linq;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -124,20 +126,7 @@ namespace Linko.LinkoExchange.Test
         }
 
         [TestMethod]
-        public void CanUserExecuteApi_GetFileStoreById_AsAuthority_False_Test()
-        {
-            //Setup mocks
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
-            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("2");
-
-            int fileStoreId = 3;
-            var isAuthorized = _fileStoreService.CanUserExecuteApi("GetFileStoreById", fileStoreId);
-
-            Assert.IsFalse(isAuthorized);
-        }
-
-        [TestMethod]
-        public void CanUserExecuteApi_GetFileStoreById_AsAuthority_True_Test()
+        public void CanUserExecuteApi_GetFileStoreById_AsAuthority_Included_In_Submitted_Report_True_Test()
         {
             //Setup mocks
             _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
@@ -162,11 +151,206 @@ namespace Linko.LinkoExchange.Test
             var fileStoreId = _fileStoreService.CreateFileStore(fileStoreDto);
 
             _dbContext.ReportFiles.Add(new ReportFile() { ReportPackageElementTypeId = 1, FileStoreId = fileStoreId });
+
+            //update report package to submitted
+            var reportPackage = _dbContext.ReportPackages
+                .Single(rp => rp.ReportPackageId == 1);
+
+            reportPackage.ReportStatusId = _dbContext.ReportStatuses.Single(rs => rs.Name == ReportStatusName.Submitted.ToString()).ReportStatusId;
+
             _dbContext.SaveChanges();
 
             var isAuthorized = _fileStoreService.CanUserExecuteApi("GetFileStoreById", fileStoreId);
 
+            //Tear down - delete file store
+            _dbContext.ReportFiles
+                .RemoveRange(_dbContext.ReportFiles
+                                .Where(rf => rf.FileStoreId == fileStoreId));
+
+            _dbContext.SaveChanges();
+
+            _fileStoreService.DeleteFileStore(fileStoreId);
+
             Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetFileStoreById_AsAuthority_Included_In_Repudiated_Report_True_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns("1");
+
+            //Create file object in the database
+            var fileStoreDto = new FileStoreDto()
+            {
+                Name = "Test File Store Name",
+                OriginalFileName = "test_filestore.docx",
+                SizeByte = 1.1,
+                FileTypeId = 1,
+                ReportElementTypeId = 1,
+                ReportElementTypeName = "RPET Name",
+                OrganizationRegulatoryProgramId = 1,
+                UploadDateTimeLocal = DateTime.Now,
+                UploaderUserId = 1,
+                Data = new byte[1]
+            };
+
+            var fileStoreId = _fileStoreService.CreateFileStore(fileStoreDto);
+
+            _dbContext.ReportFiles.Add(new ReportFile() { ReportPackageElementTypeId = 1, FileStoreId = fileStoreId });
+
+            //update report package to submitted
+            var reportPackage = _dbContext.ReportPackages
+                .Single(rp => rp.ReportPackageId == 1);
+
+            reportPackage.ReportStatusId = _dbContext.ReportStatuses.Single(rs => rs.Name == ReportStatusName.Repudiated.ToString()).ReportStatusId;
+
+            _dbContext.SaveChanges();
+
+            var isAuthorized = _fileStoreService.CanUserExecuteApi("GetFileStoreById", fileStoreId);
+
+            //Tear down - delete file store
+            _dbContext.ReportFiles
+                .RemoveRange(_dbContext.ReportFiles
+                                .Where(rf => rf.FileStoreId == fileStoreId));
+
+            _dbContext.SaveChanges();
+
+            _fileStoreService.DeleteFileStore(fileStoreId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetFileStoreById_AsAuthority_Included_In_Draft_Report_False_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns("1");
+
+            //Create file object in the database
+            var fileStoreDto = new FileStoreDto()
+            {
+                Name = "Test File Store Name",
+                OriginalFileName = "test_filestore.docx",
+                SizeByte = 1.1,
+                FileTypeId = 1,
+                ReportElementTypeId = 1,
+                ReportElementTypeName = "RPET Name",
+                OrganizationRegulatoryProgramId = 1,
+                UploadDateTimeLocal = DateTime.Now,
+                UploaderUserId = 1,
+                Data = new byte[1]
+            };
+
+            var fileStoreId = _fileStoreService.CreateFileStore(fileStoreDto);
+
+            _dbContext.ReportFiles.Add(new ReportFile() { ReportPackageElementTypeId = 1, FileStoreId = fileStoreId });
+
+            //update report package to submitted
+            var reportPackage = _dbContext.ReportPackages
+                .Single(rp => rp.ReportPackageId == 1);
+
+            reportPackage.ReportStatusId = _dbContext.ReportStatuses.Single(rs => rs.Name == ReportStatusName.Draft.ToString()).ReportStatusId;
+
+            _dbContext.SaveChanges();
+
+            var isAuthorized = _fileStoreService.CanUserExecuteApi("GetFileStoreById", fileStoreId);
+
+            //Tear down - delete file store
+            _dbContext.ReportFiles
+                .RemoveRange(_dbContext.ReportFiles
+                                .Where(rf => rf.FileStoreId == fileStoreId));
+
+            _dbContext.SaveChanges();
+
+            _fileStoreService.DeleteFileStore(fileStoreId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetFileStoreById_AsAuthority_Included_In_ReadyToSubmit_Report_False_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns("1");
+
+            //Create file object in the database
+            var fileStoreDto = new FileStoreDto()
+            {
+                Name = "Test File Store Name",
+                OriginalFileName = "test_filestore.docx",
+                SizeByte = 1.1,
+                FileTypeId = 1,
+                ReportElementTypeId = 1,
+                ReportElementTypeName = "RPET Name",
+                OrganizationRegulatoryProgramId = 1,
+                UploadDateTimeLocal = DateTime.Now,
+                UploaderUserId = 1,
+                Data = new byte[1]
+            };
+
+            var fileStoreId = _fileStoreService.CreateFileStore(fileStoreDto);
+
+            _dbContext.ReportFiles.Add(new ReportFile() { ReportPackageElementTypeId = 1, FileStoreId = fileStoreId });
+
+            //update report package to submitted
+            var reportPackage = _dbContext.ReportPackages
+                .Single(rp => rp.ReportPackageId == 1);
+
+            reportPackage.ReportStatusId = _dbContext.ReportStatuses.Single(rs => rs.Name == ReportStatusName.ReadyToSubmit.ToString()).ReportStatusId;
+
+            _dbContext.SaveChanges();
+
+            var isAuthorized = _fileStoreService.CanUserExecuteApi("GetFileStoreById", fileStoreId);
+
+            //Tear down - delete file store
+            _dbContext.ReportFiles
+                .RemoveRange(_dbContext.ReportFiles
+                                .Where(rf => rf.FileStoreId == fileStoreId));
+
+            _dbContext.SaveChanges();
+
+            _fileStoreService.DeleteFileStore(fileStoreId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetFileStoreById_AsAuthority_NotIncluded_In_Any_Report_True_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns("1");
+
+            //Create file object in the database
+            var fileStoreDto = new FileStoreDto()
+            {
+                Name = "Test File Store Name",
+                OriginalFileName = "test_filestore.docx",
+                SizeByte = 1.1,
+                FileTypeId = 1,
+                ReportElementTypeId = 1,
+                ReportElementTypeName = "RPET Name",
+                OrganizationRegulatoryProgramId = 1,
+                UploadDateTimeLocal = DateTime.Now,
+                UploaderUserId = 1,
+                Data = new byte[1]
+            };
+
+            var fileStoreId = _fileStoreService.CreateFileStore(fileStoreDto);
+
+            var isAuthorized = _fileStoreService.CanUserExecuteApi("GetFileStoreById", fileStoreId);
+
+            _fileStoreService.DeleteFileStore(fileStoreId);
+
+            Assert.IsFalse(isAuthorized);
         }
 
     }
