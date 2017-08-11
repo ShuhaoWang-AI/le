@@ -117,12 +117,13 @@ namespace Linko.LinkoExchange.Services.FileStore
                                 if (isCurrentOrgRegProgramTheAuthority)
                                 {
                                     bool isFileIncludedInSubmittedReport = _dbContext.FileStores
-                                    .Single(fs => fs.FileStoreId == fileStoreId)
-                                    .ReportFiles.Select(rf => rf.ReportPackageElementType)
-                                        .Select(rpet => rpet.ReportPackageElementCategory)
-                                            .Select(rpec => rpec.ReportPackage)
-                                                .Any(rp => rp.ReportStatus.Name == ReportStatusName.Submitted.ToString()
-                                                    || rp.ReportStatus.Name == ReportStatusName.Repudiated.ToString());
+                                        .Include(fs => fs.ReportFiles.Select(rf => rf.ReportPackageElementType.ReportPackageElementCategory.ReportPackage.ReportStatus))
+                                        .Single(fs => fs.FileStoreId == fileStoreId)
+                                        .ReportFiles.Select(rf => rf.ReportPackageElementType)
+                                            .Select(rpet => rpet.ReportPackageElementCategory)
+                                                .Select(rpec => rpec.ReportPackage)
+                                                    .Any(rp => rp.ReportStatus.Name == ReportStatusName.Submitted.ToString()
+                                                        || rp.ReportStatus.Name == ReportStatusName.Repudiated.ToString());
 
                                     retVal = isFileIncludedInSubmittedReport;
                                 }
