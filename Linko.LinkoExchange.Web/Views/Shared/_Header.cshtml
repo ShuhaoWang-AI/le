@@ -44,7 +44,7 @@
                         @* BEGIN User Account Menu *@
                         <li class="dropdown user user-menu">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                <i class="fa fa-user"></i>
+                                <i class="fa fa-lg fa-user"></i>
                                 <span class="hidden-xs">
                                     @if (!string.IsNullOrWhiteSpace(value:ViewBag.UserName))
                                     {
@@ -90,7 +90,7 @@
                         {
                             <li>
                                 <a href="@(ViewBag.PortalName.ToLower().Equals(value:"authority") ? "/Help/AuthorityPortal/" : "/Help/IndustryPortal/")" target="_blank">
-                                    <i aria-hidden="true" class="fa fa-question-circle"></i>
+                                    <i aria-hidden="true" class="fa fa-lg fa-question-circle"></i>
                                 </a>
                             </li>
                         }
