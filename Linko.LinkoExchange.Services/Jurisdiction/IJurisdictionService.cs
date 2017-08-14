@@ -17,6 +17,6 @@ namespace Linko.LinkoExchange.Services.Jurisdiction
         /// </summary>
         /// <param name="jurisdictionId"></param>
         /// <returns></returns>
-        JurisdictionDto GetJurisdictionById(int jurisdictionId);
+        JurisdictionDto GetJurisdictionById(int? jurisdictionId);
     }
 }
