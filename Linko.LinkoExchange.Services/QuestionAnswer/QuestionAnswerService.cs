@@ -425,52 +425,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 throw new RuleViolationException("Validation errors", validationIssues);
             }
 
-        }
-
-        public void DeleteUserQuestionAnswer(int userQuestionAnswerId)
-        {
-            var answerToDelete = _dbContext.UserQuestionAnswers
-                .Include(a => a.Question)
-                .Single(a => a.UserQuestionAnswerId == userQuestionAnswerId);
-            if (answerToDelete != null)
-            {
-                _dbContext.UserQuestionAnswers.Remove(answerToDelete);
-
-                try
-                {
-                    _dbContext.SaveChanges();
-                }
-                catch (DbEntityValidationException ex)
-                {
-                    List<RuleViolation> validationIssues = new List<RuleViolation>();
-
-                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
-                    {
-                        DbEntityEntry entry = item.Entry;
-                        string entityTypeName = entry.Entity.GetType().Name;
-
-                        foreach (DbValidationError subItem in item.ValidationErrors)
-                        {
-                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
-                            validationIssues.Add(new RuleViolation(string.Empty, null, message));
-
-                        }
-                    }
-
-                    //_logger.Info("???");
-                    throw new RuleViolationException("Validation errors", validationIssues);
-                }
-
-            }
-            else
-            {
-                string errorMsg = string.Format("DeleteQuestionAnswerPair. Could not find UserQuestionAnswer associated with Id={0}", userQuestionAnswerId);
-                List<RuleViolation> validationIssues = new List<RuleViolation>();
-                validationIssues.Add(new RuleViolation(string.Empty, null, errorMsg));
-                //_logger.Info("SubmitPOMDetails. Null question or missing QuestionId.");
-                throw new RuleViolationException("Validation errors", validationIssues);
-            }
-        }
+        } 
 
         public ICollection<QuestionAnswerPairDto> GetUsersQuestionAnswers(int userProfileId, QuestionTypeName questionType)
         {
@@ -603,7 +558,7 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 return RegistrationResult.DuplicatedKBQAnswer;
             }
 
-            // Test KBQ questions mush have answer
+            // Test KBQ questions must have answer
             if (answerDtos.Any(i => i.Content == null))
             {
                 return RegistrationResult.MissingKBQAnswer;
