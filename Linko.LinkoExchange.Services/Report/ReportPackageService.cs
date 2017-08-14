@@ -144,8 +144,14 @@ namespace Linko.LinkoExchange.Services.Report
                         {
                             //Get current user
                             var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                                .Single(orpu => orpu.UserProfileId == currentUserId
+                                .SingleOrDefault(orpu => orpu.UserProfileId == currentUserId
                                     && orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
+
+                            //Does this user belong to this org reg program?
+                            if (orgRegProgramUser == null)
+                            {
+                                return false;
+                            }
 
                             //Check if user has signatory rights
                             if (!orgRegProgramUser.IsSignatory)
