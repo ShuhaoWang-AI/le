@@ -282,5 +282,33 @@ namespace Linko.LinkoExchange.Test
             Assert.IsTrue(isAuthorized);
         }
 
+        [TestMethod]
+        public void CanUserExecuteApi_GetOrganizationRegulatoryProgramUser_Accessing_Self_True_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("3");
+
+            int targetOrgRegProgUserId = 3;
+            var isAuthorized = _userService.CanUserExecuteApi("GetOrganizationRegulatoryProgramUser", targetOrgRegProgUserId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetOrganizationRegulatoryProgramUser_Accessing_Another_True_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId)).Returns("3");
+
+            int targetOrgRegProgUserId = 4;
+            var isAuthorized = _userService.CanUserExecuteApi("GetOrganizationRegulatoryProgramUser", targetOrgRegProgUserId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
     }
 }
