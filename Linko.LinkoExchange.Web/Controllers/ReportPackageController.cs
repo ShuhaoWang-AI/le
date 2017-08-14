@@ -869,7 +869,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             try
             {
-                var verifyResult = _reportPackageService.VerififyCopyOfRecord(reportPackageId:id);
+                var verifyResult = _reportPackageService.VerifyCopyOfRecord(reportPackageId:id);
                 ViewBag.ShowValidateCorMessage = true;
                 ViewBag.VerifyResult = verifyResult;
             }

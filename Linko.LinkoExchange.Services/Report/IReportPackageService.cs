@@ -9,7 +9,7 @@ namespace Linko.LinkoExchange.Services.Report
     {
         void SignAndSubmitReportPackage(int reportPackageId);
         CopyOfRecordDto GetCopyOfRecordByReportPackageId(int reportPackageId, ReportPackageDto reportPackageDto = null);
-        CopyOfRecordValidationResultDto VerififyCopyOfRecord(int reportPackageId);
+        CopyOfRecordValidationResultDto VerifyCopyOfRecord(int reportPackageId);
 
         /// <summary>
         ///     Get ReportPackageDto object by report package Id.

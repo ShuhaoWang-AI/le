@@ -138,7 +138,7 @@ namespace Linko.LinkoExchange.Test
                                          new Mock<IRequestCache>().Object);
 
             var reportPackageId = 527466233;
-            var validResult = reportPackageService.VerififyCopyOfRecord(reportPackageId);
+            var validResult = reportPackageService.VerifyCopyOfRecord(reportPackageId);
 
             Assert.IsTrue(validResult.Valid);
         }

@@ -481,7 +481,7 @@ namespace Linko.LinkoExchange.Services.Report
             return xmlData;
         }
 
-        public CopyOfRecordValidationResultDto VerififyCopyOfRecord(int reportPackageId)
+        public CopyOfRecordValidationResultDto VerifyCopyOfRecord(int reportPackageId)
         {
             _logger.Info("Enter ReportPackageService.VerififyCopyOfRecord. reportPackageId={0}", reportPackageId);
 
