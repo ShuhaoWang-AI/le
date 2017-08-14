@@ -21,6 +21,7 @@ using Linko.LinkoExchange.Services.Unit;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.HttpContext;
+using System.Linq;
 
 namespace Linko.LinkoExchange.Test
 {
@@ -42,6 +43,9 @@ namespace Linko.LinkoExchange.Test
         Mock<IAuditLogService> _auditLogService = new Mock<IAuditLogService>();
         Mock<IApplicationCache> _mockAppCache = new Mock<IApplicationCache>();
         Mock<IRequestCache> _mockRequestCache = new Mock<IRequestCache>();
+
+        private LinkoExchangeContext _dbContext;
+
         public ReportPackageServiceTests()
         {
         }
@@ -50,7 +54,7 @@ namespace Linko.LinkoExchange.Test
         public void Initialize()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
-            var connection = new LinkoExchangeContext(connectionString);
+            _dbContext = new LinkoExchangeContext(connectionString);
             _httpContext = new Mock<IHttpContextService>();
             _orgService = new Mock<IOrganizationService>();
             _logger = new Mock<ILogger>();
@@ -71,8 +75,8 @@ namespace Linko.LinkoExchange.Test
             cachedFlowUnits.Add(new UnitDto() { UnitId = 5, Name = "test", Description = "blahblahblahblahblahblahblahblahblahblahblahblah" });
             _mockRequestCache.Setup(c => c.GetValue("GetFlowUnitsFromCommaDelimitedString-gpd,mgd")).Returns(cachedFlowUnits);
 
-            var actualSettingService = new SettingService(connection, _logger.Object, new MapHelper(), _mockRequestCache.Object, new Mock<IGlobalSettings>().Object);
-            var actualTimeZoneService = new TimeZoneService(connection, actualSettingService, new MapHelper(), _mockAppCache.Object);
+            var actualSettingService = new SettingService(_dbContext, _logger.Object, new MapHelper(), _mockRequestCache.Object, new Mock<IGlobalSettings>().Object);
+            var actualTimeZoneService = new TimeZoneService(_dbContext, actualSettingService, new MapHelper(), _mockAppCache.Object);
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
 
             var authorityOrgRegProgramDto = new OrganizationRegulatoryProgramDto();
@@ -105,20 +109,20 @@ namespace Linko.LinkoExchange.Test
 
             _requestCache.Setup(s => s.GetValue(CacheKey.Token)).Returns("some_token_string");
 
-            var actualUnitService = new UnitService(connection, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, actualSettingService, _mockRequestCache.Object);
-            var actualSampleService = new SampleService(connection, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService, _mockAppCache.Object);
+            var actualUnitService = new UnitService(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, actualSettingService, _mockRequestCache.Object);
+            var actualSampleService = new SampleService(_dbContext, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService, _mockAppCache.Object);
 
-            var actualAuditLogService = new EmailAuditLogService(connection, _requestCache.Object, new MapHelper());
-            var actualEmailService = new LinkoExchangeEmailService(connection, actualAuditLogService, _programService.Object, _settingService.Object, _requestCache.Object);
-            var actualCromerrService = new CromerrAuditLogService(connection, _requestCache.Object, new MapHelper(), _httpContext.Object, _logger.Object);
-            var actualProgramService = new ProgramService(connection, new MapHelper());
+            var actualAuditLogService = new EmailAuditLogService(_dbContext, _requestCache.Object, new MapHelper());
+            var actualEmailService = new LinkoExchangeEmailService(_dbContext, actualAuditLogService, _programService.Object, _settingService.Object, _requestCache.Object);
+            var actualCromerrService = new CromerrAuditLogService(_dbContext, _requestCache.Object, new MapHelper(), _httpContext.Object, _logger.Object);
+            var actualProgramService = new ProgramService(_dbContext, new MapHelper());
 
             _reportPackageService = new ReportPackageService(
                                                              actualProgramService,
                                                              _copyOfRecordService.Object,
                                                              actualTimeZoneService,
                                                              _logger.Object,
-                                                             connection,
+                                                             _dbContext,
                                                              _httpContext.Object,
                                                              _userService.Object,
                                                              actualEmailService,
@@ -409,5 +413,136 @@ namespace Linko.LinkoExchange.Test
             Assert.IsFalse(isAuthorized);
         }
 
+        [TestMethod]
+        public void CanUserExecuteApi_SignAndSubmitReportPackage_Authorized_Test()
+        {
+            //Setup mocks
+            var orgRegProgramId = 13;
+            var userProfileId = 4;
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(orgRegProgramId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(userProfileId.ToString());
+
+            //Set flags of the user to allow authorization
+            var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(orpu => orpu.UserProfileId == userProfileId
+                    && orpu.OrganizationRegulatoryProgramId == orgRegProgramId);
+
+            orgRegProgramUser.IsSignatory = true;
+            orgRegProgramUser.IsEnabled = true;
+            orgRegProgramUser.IsRemoved = false;
+
+            int reportPackageId = 1;
+
+            var isAuthorized = _reportPackageService.CanUserExecuteApi("SignAndSubmitReportPackage", reportPackageId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_SignAndSubmitReportPackage_Unauthorized_NotSignatory_Test()
+        {
+            //Setup mocks
+            var orgRegProgramId = 13;
+            var userProfileId = 4;
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(orgRegProgramId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(userProfileId.ToString());
+
+            //Set flags of the user to block authorization
+            var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(orpu => orpu.UserProfileId == userProfileId
+                    && orpu.OrganizationRegulatoryProgramId == orgRegProgramId);
+
+            orgRegProgramUser.IsSignatory = false; //UNAUTHORIZED
+            orgRegProgramUser.IsEnabled = true;
+            orgRegProgramUser.IsRemoved = false;
+
+            int reportPackageId = 1;
+
+            var isAuthorized = _reportPackageService.CanUserExecuteApi("SignAndSubmitReportPackage", reportPackageId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_SignAndSubmitReportPackage_Unauthorized_Disabled_Test()
+        {
+            //Setup mocks
+            var orgRegProgramId = 13;
+            var userProfileId = 4;
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(orgRegProgramId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(userProfileId.ToString());
+
+            //Set flags of the user to block authorization
+            var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(orpu => orpu.UserProfileId == userProfileId
+                    && orpu.OrganizationRegulatoryProgramId == orgRegProgramId);
+
+            orgRegProgramUser.IsSignatory = true;
+            orgRegProgramUser.IsEnabled = false; //UNAUTHORIZED
+            orgRegProgramUser.IsRemoved = false;
+
+            int reportPackageId = 1;
+
+            var isAuthorized = _reportPackageService.CanUserExecuteApi("SignAndSubmitReportPackage", reportPackageId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_SignAndSubmitReportPackage_Unauthorized_Removed_Test()
+        {
+            //Setup mocks
+            var orgRegProgramId = 13;
+            var userProfileId = 4;
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(orgRegProgramId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(userProfileId.ToString());
+
+            //Set flags of the user to block authorization
+            var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(orpu => orpu.UserProfileId == userProfileId
+                    && orpu.OrganizationRegulatoryProgramId == orgRegProgramId);
+
+            orgRegProgramUser.IsSignatory = true;
+            orgRegProgramUser.IsEnabled = true;
+            orgRegProgramUser.IsRemoved = true; //UNAUTHORIZED
+
+            int reportPackageId = 1;
+
+            var isAuthorized = _reportPackageService.CanUserExecuteApi("SignAndSubmitReportPackage", reportPackageId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_SignAndSubmitReportPackage_Unauthorized_User_Does_Not_Exist_Test()
+        {
+            //Setup mocks
+            var orgRegProgramId = 13;
+            var userProfileId = -99; //WRONG USER PROFILE
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(orgRegProgramId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(userProfileId.ToString());
+
+            int reportPackageId = 1;
+
+            var isAuthorized = _reportPackageService.CanUserExecuteApi("SignAndSubmitReportPackage", reportPackageId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_SignAndSubmitReportPackage_Unauthorized_Invalid_User_OrgRegProgram_Combination_Test()
+        {
+            //Setup mocks
+            var orgRegProgramId = 13;
+            var userProfileId = 2;
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns(orgRegProgramId.ToString());
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.UserProfileId)).Returns(userProfileId.ToString());
+
+            int reportPackageId = 1;
+
+            var isAuthorized = _reportPackageService.CanUserExecuteApi("SignAndSubmitReportPackage", reportPackageId);
+
+            Assert.IsFalse(isAuthorized);
+        }
     }
 }
