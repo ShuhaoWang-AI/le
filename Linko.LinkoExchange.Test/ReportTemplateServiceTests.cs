@@ -82,6 +82,56 @@ namespace Linko.LinkoExchange.Test
             var templateDtos = _reportTemplateService.GetReportPackageTemplates(true, false);
         }
 
-      
+        [TestMethod]
+        public void CanUserExecuteApi_GetReportPackageTemplate_AsAuthority_True_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("1");
+
+            int reportPackageTemplateId = 1;
+            var isAuthorized = _reportTemplateService.CanUserExecuteApi("GetReportPackageTemplate", reportPackageTemplateId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetReportPackageTemplate_AsAuthority_False_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("authority");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("99");
+
+            int reportPackageTemplateId = 1;
+            var isAuthorized = _reportTemplateService.CanUserExecuteApi("GetReportPackageTemplate", reportPackageTemplateId);
+
+            Assert.IsFalse(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetReportPackageTemplate_AsIndustry_True_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("2");
+
+            int reportPackageTemplateId = 5;
+            var isAuthorized = _reportTemplateService.CanUserExecuteApi("GetReportPackageTemplate", reportPackageTemplateId);
+
+            Assert.IsTrue(isAuthorized);
+        }
+
+        [TestMethod]
+        public void CanUserExecuteApi_GetReportPackageTemplate_AsIndustry_False_Test()
+        {
+            //Setup mocks
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.PortalName)).Returns("industry");
+            _httpContext.Setup(s => s.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId)).Returns("2");
+
+            int reportPackageTemplateId = 1;
+            var isAuthorized = _reportTemplateService.CanUserExecuteApi("GetReportPackageTemplate", reportPackageTemplateId);
+
+            Assert.IsFalse(isAuthorized);
+        }
     }
 }
