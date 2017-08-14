@@ -20,42 +20,77 @@ For more information on how to configure your ASP.NET application, please visit 
          connectionString="data source=localhost;initial catalog=LinkoExchange;user id=exnet;password=test;MultipleActiveResultSets=True;App=LinkoExchange"
          providerName="System.Data.SqlClient" />
   </connectionStrings>
-  <nlog autoReload="true"
-        throwExceptions="true">
-    <targets async="true">
-      <target type="File"
-              name="default"
-              layout="${longdate} [${threadid:padding=5}] ${level:padding=-5:uppercase=true} [${logger:padding=40:fixedLength=true:alignmentOnTruncation=right}] - ${message}${onexception:${newline}EXCEPTION\: ${exception:format=ToString}}"
-              fileName="D:\\logs\\LinkoExchange-log.txt"
-              archiveFileName="D:\\logs\\LinkoExchange-log_${shortdate}_{##}.txt"
-              archiveNumbering="Sequence"
-              archiveEvery="Day"
-              archiveAboveSize="80000"
-              maxArchiveFiles="50"
-              concurrentWrites="false"
-              keepFileOpen="false" />
-
-      <target type="Mail"
-              name="errorMail"
-              layout="${longdate} [${threadid:padding=5}] ${level:padding=-5:uppercase=true} [${logger:padding=40:fixedLength=true:alignmentOnTruncation=right}] - ${message}${onexception:${newline}EXCEPTION\: ${exception:format=ToString}}"
-              smtpServer="127.0.0.1"
-              smtpPort="25"
-              subject="Localhost Linko Exchange Error"
-              from="alert@linkoexchange.com"
-              to="support@linkoexchange.com"
-              smtpAuthentication="None"
-              html="true"
-              replaceNewlineWithBrTagInHtml="true" />
-    </targets>
-    <rules>
-      <logger name="*"
-              writeTo="default"
-              minlevel="Info" />
-      <logger name="*"
-              writeTo="errorMail"
-              minlevel="Error" />
-    </rules>
-  </nlog>
+    <nlog
+          autoReload="true"
+          throwExceptions="true">
+        <variable
+            name="logDirectory"
+            value="D:/logs/" />
+        <targets
+            async="true">
+            <target
+                type="File"
+                name="default"
+                layout="${longdate} [${threadid:padding=5}] ${level:padding=-5:uppercase=true} [${logger:padding=40:fixedLength=true:alignmentOnTruncation=right}] - ${message}${onexception:${newline}EXCEPTION\: ${exception:format=ToString}}"
+                fileName="${logDirectory}/LinkoExchange-log.txt"
+                archiveFileName="${logDirectory}/LinkoExchange-log_${shortdate}_{##}.txt"
+                archiveNumbering="Sequence"
+                archiveEvery="Day"
+                archiveAboveSize="80000"
+                maxArchiveFiles="50"
+                concurrentWrites="false"
+                keepFileOpen="false" />
+            <target
+                type="Mail"
+                name="errorMail"
+                layout="${longdate} [${threadid:padding=5}] ${level:padding=-5:uppercase=true} [${logger:padding=40:fixedLength=true:alignmentOnTruncation=right}] - ${message}${onexception:${newline}EXCEPTION\: ${exception:format=ToString}}"
+                smtpServer="127.0.0.1"
+                smtpPort="25"
+                subject="Localhost Linko Exchange Error"
+                from="alert@linkoexchange.com"
+                to="support@linkoexchange.com"
+                smtpAuthentication="None"
+                html="true"
+                replaceNewlineWithBrTagInHtml="true" />
+            <target
+                type="File"
+                name="emailLog"
+                layout="${longdate} [${threadid:padding=5}] ${level:padding=-5:uppercase=true} [${logger:padding=40:fixedLength=true:alignmentOnTruncation=right}] - ${message}${onexception:${newline}EXCEPTION\: ${exception:format=ToString}}"
+                fileName="${logDirectory}/LinkoExchange-Email-log.txt"
+                archiveFileName="${logDirectory}/LinkoExchange-Email_log_${shortdate}_{##}.txt"
+                archiveNumbering="Sequence"
+                archiveEvery="Day"
+                archiveAboveSize="80000"
+                maxArchiveFiles="50"
+                concurrentWrites="false"
+                keepFileOpen="false" />
+        </targets>
+        <rules>
+            <logger
+                name="*"
+                writeTo="default"
+                minlevel="Info">
+                <filters>
+                    <when
+                        condition="starts-with('${message}','LogToEmailLogFile')"
+                        action="Ignore" />
+                </filters>
+            </logger>
+            <logger
+                name="*"
+                writeTo="errorMail"
+                minlevel="Error" />
+            <logger
+                name="*"
+                writeTo="emailLog">
+                <filters>
+                    <when
+                        condition="not starts-with('${message}','LogToEmailLogFile')"
+                        action="Ignore" />
+                </filters>
+            </logger>
+        </rules>
+    </nlog>
   <appSettings>
       <!--LE Logo image file names. Note image file need to be in "/Content/images/" -->
       <add
