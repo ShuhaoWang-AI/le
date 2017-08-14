@@ -32,8 +32,7 @@ namespace Linko.LinkoExchange.Services.User
         private readonly LinkoExchangeContext _dbContext;
         private readonly IAuditLogEntry _logger;
         private readonly IPasswordHasher _passwordHasher;
-        private readonly IHttpContextService _httpContext;
-        private readonly IEmailService _emailService;
+        private readonly IHttpContextService _httpContext; 
         private readonly ISettingService _settingService;
         private readonly ISessionCache _sessionCache;
         private readonly IOrganizationService _orgService;
@@ -44,22 +43,23 @@ namespace Linko.LinkoExchange.Services.User
         private readonly ILogger _logService;
         private readonly IMapHelper _mapHelper;
         private readonly ICromerrAuditLogService _crommerAuditLogService;
+        private readonly ILinkoExchangeEmailService _linkoExchangeEmaiService;
         #endregion
 
         #region constructor
 
         public UserService(LinkoExchangeContext dbContext, IAuditLogEntry logger,
-            IPasswordHasher passwordHasher, IHttpContextService httpContext,
-            IEmailService emailService, ISettingService settingService, ISessionCache sessionCache,
-            IOrganizationService orgService, IRequestCache requestCache, ITimeZoneService timeZones,
+             IPasswordHasher passwordHasher, IHttpContextService httpContext,
+             ISettingService settingService, ISessionCache sessionCache,
+             IOrganizationService orgService, IRequestCache requestCache, ITimeZoneService timeZones,
              IQuestionAnswerService questionAnswerServices, ILogger logService, IMapHelper mapHelper,
-             ICromerrAuditLogService crommerAuditLogService)
+             ICromerrAuditLogService crommerAuditLogService,
+             ILinkoExchangeEmailService linkoExchangeEmailService)
         {
             this._dbContext = dbContext;
             _logger = logger;
             _passwordHasher = passwordHasher;
-            _httpContext = httpContext;
-            _emailService = emailService;
+            _httpContext = httpContext; 
             _settingService = settingService;
             _sessionCache = sessionCache;
             _orgService = orgService;
@@ -70,6 +70,7 @@ namespace Linko.LinkoExchange.Services.User
             _logService = logService;
             _mapHelper = mapHelper;
             _crommerAuditLogService = crommerAuditLogService; 
+            _linkoExchangeEmaiService = linkoExchangeEmailService;
         }
 
         #endregion
@@ -390,20 +391,25 @@ namespace Linko.LinkoExchange.Services.User
                 authority = orgRegProgram;
             }
 
+            var authorityName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName); 
+            var stateName = orgRegProgram.Organization.JurisdictionId.HasValue ?
+                                                 _dbContext.Jurisdictions.Single(j => j.JurisdictionId == orgRegProgram.Organization.JurisdictionId.Value).Code : ""; 
+            var emailAddress =  _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
+            var phoneNumber = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
+
             var contentReplacements = new Dictionary<string, string>();
             contentReplacements.Add("firstName", user.FirstName);
             contentReplacements.Add("lastName", user.LastName);
             contentReplacements.Add("userName", user.UserName);
             contentReplacements.Add("emailAddress", user.Email);
-            contentReplacements.Add("authorityName", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName));
+            contentReplacements.Add("authorityName", authorityName);
             contentReplacements.Add("authorityOrganizationName", authority.Organization.Name);
             contentReplacements.Add("organizationName", orgRegProgram.Organization.Name);
             contentReplacements.Add("addressLine1", orgRegProgram.Organization.AddressLine1);
             contentReplacements.Add("cityName", orgRegProgram.Organization.CityName);
-            contentReplacements.Add("stateName", orgRegProgram.Organization.JurisdictionId.HasValue ?
-                                                 _dbContext.Jurisdictions.Single(j => j.JurisdictionId == orgRegProgram.Organization.JurisdictionId.Value).Code : "");
-            contentReplacements.Add("supportEmail", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress));
-            contentReplacements.Add("supportPhoneNumber", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone));
+            contentReplacements.Add("stateName", stateName);
+            contentReplacements.Add("supportEmail", emailAddress);
+            contentReplacements.Add("supportPhoneNumber", phoneNumber);
 
             //Email user
             EmailType emailType = isSignatory ? EmailType.Signature_SignatoryGranted : EmailType.Signature_SignatoryRevoked;
@@ -430,7 +436,9 @@ namespace Linko.LinkoExchange.Services.User
             _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
 
             //Email the user
-            _emailService.SendEmail(new[] { user.Email }, emailType, contentReplacements);
+            var emailEntries = new List<EmailEntry>(); 
+            var emailEntry = _linkoExchangeEmaiService.GetEmailEntryForUser(user, emailType, contentReplacements, orgRegProgram);
+            emailEntries.Add(emailEntry); 
 
             //Email all IU Admins
             var admins = _dbContext.OrganizationRegulatoryProgramUsers
@@ -451,21 +459,21 @@ namespace Linko.LinkoExchange.Services.User
                     contentReplacementsForAdmin.Add("adminLastName", adminProfile.LastName);
                     contentReplacementsForAdmin.Add("firstName", user.FirstName);
                     contentReplacementsForAdmin.Add("lastName", user.LastName);
-                    contentReplacementsForAdmin.Add("authorityName", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName));
+                    contentReplacementsForAdmin.Add("authorityName", authorityName);
                     contentReplacementsForAdmin.Add("authorityOrganizationName", authority.Organization.Name);
                     contentReplacementsForAdmin.Add("email", user.Email);
                     contentReplacementsForAdmin.Add("organizationName", orgRegProgram.Organization.Name);
                     contentReplacementsForAdmin.Add("addressLine1", orgRegProgram.Organization.AddressLine1);
                     contentReplacementsForAdmin.Add("cityName", orgRegProgram.Organization.CityName);
-                    contentReplacementsForAdmin.Add("stateName", orgRegProgram.Organization.JurisdictionId.HasValue ?
-                                                         _dbContext.Jurisdictions.Single(j => j.JurisdictionId == orgRegProgram.Organization.JurisdictionId.Value).Code : "");
-                    contentReplacementsForAdmin.Add("emailAddress", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress));
-                    contentReplacementsForAdmin.Add("phoneNumber", _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone));
-
-                    _emailService.SendEmail(new[] { adminProfile.Email }, adminEmailType, contentReplacementsForAdmin).Wait();
-
+                    contentReplacementsForAdmin.Add("stateName",  stateName);
+                    contentReplacementsForAdmin.Add("emailAddress", emailAddress);
+                    contentReplacementsForAdmin.Add("phoneNumber", phoneNumber);
+                     
+                   emailEntries.Add(_linkoExchangeEmaiService.GetEmailEntryForUser(adminProfile, adminEmailType,contentReplacementsForAdmin,orgRegProgram));  
                 } 
-            }  
+            }
+            _dbContext.SaveChanges(); 
+            _linkoExchangeEmaiService.SendEmails(emailEntries);
         }
 
         public ResetUserResultDto ResetUser(int targetOrgRegProgUserId, string newEmailAddress, bool isAuthorizationRequired = false)
@@ -483,23 +491,46 @@ namespace Linko.LinkoExchange.Services.User
             var user = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
             //Check user is not support role
             if (user.IsInternalAccount)
+            {
                 return new ResetUserResultDto()
-                {
-                    IsSuccess = false,
-                    FailureReason = ResetUserFailureReason.CannotResetSupportRole
-                };
-
+                        {
+                            IsSuccess = false,
+                            FailureReason = ResetUserFailureReason.CannotResetSupportRole
+                        };
+            }
             //Check user is not THIS user's own account
             int thisUserProfileId = _httpContext.CurrentUserProfileId();
             if (userProfileId == thisUserProfileId)
+            { 
                 return new ResetUserResultDto()
-                {
-                    IsSuccess = false,
-                    FailureReason = ResetUserFailureReason.CannotResetOwnAccount
-                };
+                        {
+                            IsSuccess = false,
+                            FailureReason = ResetUserFailureReason.CannotResetOwnAccount
+                        }; 
+            }
+             
+            var emailEntries = new List<EmailEntry>();
+
+            //Send all email types
+            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
+            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
+            
+            //1) Send "Email Changed" emails  
+            //Find all possible authorities
+            var authorityList = _orgService.GetUserAuthorityListForEmailContent(userProfileId);
+
+            var contentReplacements = new Dictionary<string, string>
+                                      {
+                                          {"firstName", user.FirstName},
+                                          {"lastName", user.LastName},
+                                          {"oldEmail", user.OldEmailAddress},
+                                          {"newEmail", user.Email},
+                                          {"authorityList", authorityList},
+                                          {"supportPhoneNumber", supportPhoneNumber},
+                                          {"supportEmail", supportEmail}
+                                      };
 
 
-            var sendEmailChangedNotifications = new List<string>();
             if (String.IsNullOrEmpty(newEmailAddress) || user.Email == newEmailAddress)
             {
                 // no change
@@ -518,9 +549,12 @@ namespace Linko.LinkoExchange.Services.User
                 else
                 {
                     user.OldEmailAddress = user.Email;
-                    user.Email = newEmailAddress;
-                    sendEmailChangedNotifications.Add(user.OldEmailAddress);
-                    sendEmailChangedNotifications.Add(user.Email);
+                    user.Email = newEmailAddress; 
+                    var entries = _linkoExchangeEmaiService.GetAllProgramEmailEntiresForUser(user, EmailType.Profile_EmailChanged, contentReplacements).ToList();  
+
+                    emailEntries.AddRange(entries);    
+                    var emailEntriesForOldEmailAddress = entries.Select(i=>i.Clone(user.OldEmailAddress)).ToList();
+                    emailEntries.AddRange(emailEntriesForOldEmailAddress);  
                 }
             }
 
@@ -540,31 +574,7 @@ namespace Linko.LinkoExchange.Services.User
             //    }
             //}
 
-            _dbContext.SaveChanges();
-
-            //Send all email types
-            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
-            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
-
-
-            //1) Send "Email Changed" emails
-            var contentReplacements = new Dictionary<string, string>();
-
-            //Find all possible authorities
-            var authorityList = _orgService.GetUserAuthorityListForEmailContent(userProfileId);
-
-            foreach (var email in sendEmailChangedNotifications)
-            {
-                contentReplacements = new Dictionary<string, string>();
-                contentReplacements.Add("firstName", user.FirstName);
-                contentReplacements.Add("lastName", user.LastName);
-                contentReplacements.Add("oldEmail", user.OldEmailAddress);
-                contentReplacements.Add("newEmail", user.Email);
-                contentReplacements.Add("authorityList", authorityList);
-                contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
-                contentReplacements.Add("supportEmail", supportEmail);
-                _emailService.SendEmail(new[] { email }, EmailType.Profile_EmailChanged, contentReplacements);
-            }
+            _dbContext.SaveChanges(); 
 
             //2) Send "Reg Reset" Email
             var token = Guid.NewGuid().ToString();
@@ -592,8 +602,10 @@ namespace Linko.LinkoExchange.Services.User
             contentReplacements.Add("link", link);
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
             contentReplacements.Add("supportEmail", supportEmail);
-            _requestCache.SetValue(CacheKey.Token, token);
-            _emailService.SendEmail(new[] { user.Email }, EmailType.Profile_ResetProfileRequired, contentReplacements);
+            _requestCache.SetValue(CacheKey.Token, token); 
+
+            //_emailService.SendEmail(new[] { user.Email }, EmailType.Profile_ResetProfileRequired, contentReplacements); 
+            emailEntries.AddRange(_linkoExchangeEmaiService.GetAllProgramEmailEntiresForUser(user, EmailType.Profile_ResetProfileRequired, contentReplacements));
 
             //Log to Cromerr
             int actorOrgRegProgUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
@@ -635,15 +647,19 @@ namespace Linko.LinkoExchange.Services.User
                 _crommerAuditLogService.Log(CromerrEvent.UserAccess_AccountResetInitiated, cromerrAuditLogEntryDto, contentReplacements);
             }
 
+            // Send emails
+            _linkoExchangeEmaiService.SendEmails(emailEntries);
+
             return new ResetUserResultDto()
             {
                 IsSuccess = true
-            };
-
+            }; 
         }
 
         private void SendAccountLockoutEmails(UserProfile user, AccountLockEvent reason)
         {
+            var emailEntries = new List<EmailEntry>(); 
+
             //Email industry admins and authority admins
             //
             //1. Find all organization reg programs user is associated with
@@ -665,10 +681,9 @@ namespace Linko.LinkoExchange.Services.User
                 //Find admin users in each of these
                 var admins = _dbContext.OrganizationRegulatoryProgramUsers
                     .Where(o => o.PermissionGroup.Name == "Administrator"
-                    && o.OrganizationRegulatoryProgramId == program.OrganizationRegulatoryProgramId);
-
-                var perProgram = program.RegulatorOrganizationId.HasValue;
-
+                    && o.OrganizationRegulatoryProgramId == program.OrganizationRegulatoryProgramId).Distinct();
+                 
+                // Send emails to IU admins
                 foreach (var admin in admins.ToList())
                 {
                     string adminEmail = GetUserProfileById(admin.UserProfileId).Email;
@@ -679,8 +694,12 @@ namespace Linko.LinkoExchange.Services.User
                         contentReplacements.Add("lastName", user.LastName);
                         contentReplacements.Add("userName", user.UserName);
                         contentReplacements.Add("email", user.Email);
-                        _emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements, perProgram);
-                        adminEmailList.Add(adminEmail);
+                        //_emailService.SendEmail(new[] { adminEmail }, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements, perProgram);
+                        adminEmailList.Add(adminEmail); 
+
+                        var userDto = GetUserProfileById(admin.UserProfileId);
+                        var emailEntry = _linkoExchangeEmaiService.GetEmailEntryForUser(userDto, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements, program);
+                        emailEntries.Add(emailEntry);
                     }
                 }
 
@@ -721,78 +740,94 @@ namespace Linko.LinkoExchange.Services.User
                         contentReplacements.Add("lastName", user.LastName);
                         contentReplacements.Add("userName", user.UserName);
                         contentReplacements.Add("email", user.Email);
-                        _emailService.SendEmail(new[] { adminUserProfile.Email }, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements); // sending email to locked user's authority Admin's
-                        adminEmailList.Add(adminUserProfile.Email);
-                    }
-                }
+                        //_emailService.SendEmail(new[] { adminUserProfile.Email }, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements);
+                        adminEmailList.Add(adminUserProfile.Email);  
 
+                        var userDto = GetUserProfileById(admin.UserProfileId);
+                        var emailEntry = _linkoExchangeEmaiService.GetEmailEntryForUser(userDto, EmailType.UserAccess_LockoutToSysAdmins, contentReplacements, authority);
+                        emailEntries.Add(emailEntry);
+                    }
+                } 
+            }
+            
+            foreach (var program in programs.ToList())
+            { 
                 if (reason == AccountLockEvent.ManualAction)
                 {
                     //Send to user on behalf of each program's authority
+                    var authority = _orgService.GetAuthority(program.OrganizationRegulatoryProgramId); 
                     authorityName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
                     var authorityEmail = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
                     var authorityPhone = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
 
                     contentReplacements = new Dictionary<string, string>();
                     contentReplacements.Add("authorityName", authorityName);
-                    contentReplacements.Add("authorityOrganizationName", authority.Organization.Name);
+                    contentReplacements.Add("authorityOrganizationName", authority.OrganizationDto.OrganizationName);
                     contentReplacements.Add("authoritySupportEmail", authorityEmail);
                     contentReplacements.Add("authoritySupportPhoneNumber", authorityPhone);
-                    _emailService.SendEmail(new[] { user.Email }, EmailType.UserAccess_AccountLockout, contentReplacements);
-                }
-            }
 
-            if (reason != AccountLockEvent.ManualAction)
-            {
-                string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
-                string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
-                var authorityListString = _orgService.GetUserAuthorityListForEmailContent(user.UserProfileId);
-                contentReplacements = new Dictionary<string, string>();
-                contentReplacements.Add("firstName", user.FirstName);
-                contentReplacements.Add("lastName", user.LastName);
-                contentReplacements.Add("authorityList", authorityListString);
-                contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
-                contentReplacements.Add("supportEmail", supportEmail);
-
-                var orgRegProgramIdStr = _httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId);
-                if (!string.IsNullOrWhiteSpace(orgRegProgramIdStr))
+                    //_emailService.SendEmail(new[] { user.Email }, EmailType.UserAccess_AccountLockout, contentReplacements); 
+                    var emailEntry = _linkoExchangeEmaiService.GetEmailEntryForUser(user, EmailType.UserAccess_AccountLockout, contentReplacements, program);
+                    emailEntries.Add(emailEntry);
+                } 
+                else 
                 {
-                    var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
-                    var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
+                    string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
+                    string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
+                    var authorityListString = _orgService.GetUserAuthorityListForEmailContent(user.UserProfileId); 
 
-                    authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+                    contentReplacements = new Dictionary<string, string>();
+                    contentReplacements.Add("firstName", user.FirstName);
+                    contentReplacements.Add("lastName", user.LastName);
+                    contentReplacements.Add("authorityList", authorityListString);
+                    contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
+                    contentReplacements.Add("supportEmail", supportEmail);
 
-                    if (!contentReplacements.Keys.Contains("authorityName"))
+                    var orgRegProgramIdStr = _httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId);
+                    if (!string.IsNullOrWhiteSpace(orgRegProgramIdStr))
                     {
-                        contentReplacements.Add("authorityName", authorityName);
-                    }
-                }
+                        var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
+                        var authorityOrganization = _orgService.GetAuthority(currentOrgRegProgramId);
 
-                var emailType = EmailType.Profile_KBQFailedLockout;
-                switch (reason)
-                {
-                    case AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony:
-                        emailType = EmailType.COR_PasswordFailedLockout;
-                        break;
-                    case AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony:
-                        emailType = EmailType.Repudiation_PasswordFailedLockout;
-                        break;
-                    case AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony:
-                        emailType = EmailType.Repudiation_KBQFailedLockout;
-                        break;
-                    case AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony:
-                        emailType = EmailType.COR_KBQFailedLockout;
-                        break;
-                    default:
-                        if (reason != AccountLockEvent.ManualAction)
+                        authorityName = _settingService.GetOrgRegProgramSettingValue(authorityOrganization.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
+
+                        if (!contentReplacements.Keys.Contains("authorityName"))
                         {
-                            emailType = EmailType.Profile_KBQFailedLockout;
+                            contentReplacements.Add("authorityName", authorityName);
                         }
-                        break;
-                }
+                    }
 
-                _emailService.SendEmail(new[] { user.Email }, emailType, contentReplacements);
+                    var emailType = EmailType.Profile_KBQFailedLockout;
+                    switch (reason)
+                    {
+                        case AccountLockEvent.ExceededPasswordMaxAttemptsDuringSignatureCeremony:
+                            emailType = EmailType.COR_PasswordFailedLockout;
+                            break;
+                        case AccountLockEvent.ExceededPasswordMaxAttemptsDuringRepudiationCeremony:
+                            emailType = EmailType.Repudiation_PasswordFailedLockout;
+                            break;
+                        case AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringRepudiationCeremony:
+                            emailType = EmailType.Repudiation_KBQFailedLockout;
+                            break;
+                        case AccountLockEvent.ExceededKBQMaxAnswerAttemptsDuringSignatureCeremony:
+                            emailType = EmailType.COR_KBQFailedLockout;
+                            break;
+                        default:
+                            if (reason != AccountLockEvent.ManualAction)
+                            {
+                                emailType = EmailType.Profile_KBQFailedLockout;
+                            }
+                            break;
+                    }
+
+                    var emailEntry = _linkoExchangeEmaiService.GetEmailEntryForUser(user, emailType, contentReplacements, program);
+                    emailEntries.Add(emailEntry); 
+                }
             }
+
+            // Send emails; 
+
+            _linkoExchangeEmaiService.SendEmails(emailEntries); 
         }
 
         public AccountLockoutResultDto LockUnlockUserAccount(int targetOrgRegProgUserId, bool isAttemptingLock, AccountLockEvent reason, bool isAuthorizationRequired = false)
@@ -1167,7 +1202,8 @@ namespace Linko.LinkoExchange.Services.User
             contentReplacements.Add("authorityList", authorityList);
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
             contentReplacements.Add("supportEmail", supportEmail);
-            _emailService.SendEmail(new[] { dto.Email }, EmailType.Profile_ProfileChanged, contentReplacements);
+            var emailEntries = _linkoExchangeEmaiService.GetAllProgramEmailEntiresForUser(dto, EmailType.Profile_ProfileChanged, contentReplacements);
+            _linkoExchangeEmaiService.SendEmails(emailEntries);
         }
   
         public RegistrationResult ValidateUserProfileData(UserDto userProfile)
@@ -1346,23 +1382,7 @@ namespace Linko.LinkoExchange.Services.User
             {
                 dbContextTransaction.Dispose();
             }
-
-            //Send emails (to old and new address)
-            var contentReplacements = new Dictionary<string, string>();
-            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
-            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
-
-            var authorityList = _orgService.GetUserAuthorityListForEmailContent(userProfileId);
-            contentReplacements.Add("firstName", userProfile.FirstName);
-            contentReplacements.Add("lastName", userProfile.LastName);
-            contentReplacements.Add("oldEmail", oldEmailAddress);
-            contentReplacements.Add("newEmail", newEmailAddress);
-            contentReplacements.Add("authorityList", authorityList);
-            contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
-            contentReplacements.Add("supportEmail", supportEmail);
-            _emailService.SendEmail(new[] { oldEmailAddress }, EmailType.Profile_EmailChanged, contentReplacements);
-            _emailService.SendEmail(new[] { newEmailAddress }, EmailType.Profile_EmailChanged, contentReplacements);
-
+            
             //Need to log this activity for all Org Reg Program users
             var orgRegProgramUsers = _dbContext.OrganizationRegulatoryProgramUsers
                 .Include(orpu => orpu.OrganizationRegulatoryProgram)
@@ -1381,17 +1401,40 @@ namespace Linko.LinkoExchange.Services.User
                 cromerrAuditLogEntryDto.UserEmailAddress = newEmailAddress;
                 cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
                 cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-                contentReplacements = new Dictionary<string, string>();
-                contentReplacements.Add("firstName", userProfile.FirstName);
-                contentReplacements.Add("lastName", userProfile.LastName);
-                contentReplacements.Add("userName", userProfile.UserName);
-                contentReplacements.Add("oldEmail", oldEmailAddress);
-                contentReplacements.Add("newEmail", newEmailAddress);
-                contentReplacements.Add("emailAddress", newEmailAddress);
 
-                _crommerAuditLogService.Log(CromerrEvent.Profile_EmailChanged, cromerrAuditLogEntryDto, contentReplacements);
+                var cromerrContentReplacements = new Dictionary<string, string>();
+                cromerrContentReplacements.Add("firstName", userProfile.FirstName);
+                cromerrContentReplacements.Add("lastName", userProfile.LastName);
+                cromerrContentReplacements.Add("userName", userProfile.UserName);
+                cromerrContentReplacements.Add("oldEmail", oldEmailAddress);
+                cromerrContentReplacements.Add("newEmail", newEmailAddress);
+                cromerrContentReplacements.Add("emailAddress", newEmailAddress);
+
+                _crommerAuditLogService.Log(CromerrEvent.Profile_EmailChanged, cromerrAuditLogEntryDto, cromerrContentReplacements);
             }
 
+            //Send emails (to old and new address)
+            var supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
+            var supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress]; 
+            var authorityList = _orgService.GetUserAuthorityListForEmailContent(userProfileId);
+
+            var contentReplacements = new Dictionary<string, string>
+                                      {
+                                          {"firstName", userProfile.FirstName},
+                                          {"lastName", userProfile.LastName},
+                                          {"oldEmail", oldEmailAddress},
+                                          {"newEmail", newEmailAddress},
+                                          {"authorityList", authorityList},
+                                          {"supportPhoneNumber", supportPhoneNumber},
+                                          {"supportEmail", supportEmail}
+                                      };
+
+            var emailEntries = _linkoExchangeEmaiService.GetAllProgramEmailEntiresForUser(userProfile:userProfile, emailType:EmailType.Profile_EmailChanged, contentReplacements:contentReplacements).ToList();  
+            var emailEntriesForOldEmailAddress = emailEntries.Select(i=>i.Clone(overrideEmailAddress:userProfile.OldEmailAddress)).ToList();
+            emailEntries.AddRange(emailEntriesForOldEmailAddress);     
+
+            //Send out emails;
+            _linkoExchangeEmaiService.SendEmails(emailEntries);
             return true;
         }
 
@@ -1497,8 +1540,7 @@ namespace Linko.LinkoExchange.Services.User
             {
                 transaction.Dispose();
             }
-
-
+            
             //Send email(s)
             //
             EmailType emailType;
@@ -1507,17 +1549,52 @@ namespace Linko.LinkoExchange.Services.User
             {
                 //Authority or Industry?
                 emailType = isAuthorityUser ? EmailType.Registration_AuthorityRegistrationApproved : EmailType.Registration_IndustryRegistrationApproved;
-
                 cromerrEvent = CromerrEvent.Registration_RegistrationApproved;
             }
             else
             {
                 //Authority or Industry?
                 emailType = isAuthorityUser ? EmailType.Registration_AuthorityRegistrationDenied : EmailType.Registration_IndustryRegistrationDenied;
-
                 cromerrEvent = CromerrEvent.Registration_RegistrationDenied;
             }
 
+            //Cromerr log
+            int thisUserOrgRegProgUserId = Convert.ToInt32(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
+            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
+                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
+            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
+            var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
+
+            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
+            cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgramDto.RegulatoryProgramId;
+            cromerrAuditLogEntryDto.OrganizationId = programUser.OrganizationRegulatoryProgramDto.OrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = programUser.OrganizationRegulatoryProgramDto.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
+            cromerrAuditLogEntryDto.UserProfileId = programUser.UserProfileId;
+            cromerrAuditLogEntryDto.UserName = programUser.UserProfileDto.UserName;
+            cromerrAuditLogEntryDto.UserFirstName = programUser.UserProfileDto.FirstName;
+            cromerrAuditLogEntryDto.UserLastName = programUser.UserProfileDto.LastName;
+            cromerrAuditLogEntryDto.UserEmailAddress = programUser.UserProfileDto.Email;
+            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
+            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
+
+            var cromerrContentReplacements = new Dictionary<string, string>
+                                             {
+                                                 {"authorityName", authority.OrganizationDto.OrganizationName},
+                                                 {"organizationName", programUser.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName},
+                                                 {"regulatoryProgram", authority.RegulatoryProgramDto.Name},
+                                                 {"firstName", programUser.UserProfileDto.FirstName},
+                                                 {"lastName", programUser.UserProfileDto.LastName},
+                                                 {"userName", programUser.UserProfileDto.UserName},
+                                                 {"emailAddress", programUser.UserProfileDto.Email},
+                                                 {"actorFirstName", actorUser.FirstName},
+                                                 {"actorLastName", actorUser.LastName},
+                                                 {"actorUserName", actorUser.UserName},
+                                                 {"actorEmailAddress", actorUser.Email}
+                                             };
+
+            _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, cromerrContentReplacements);
+
+            // Sending emails
             var contentReplacements = new Dictionary<string, string>();
             string authorityName = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoName);
             string authorityPhoneNumber = _settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.EmailContactInfoPhone);
@@ -1549,45 +1626,10 @@ namespace Linko.LinkoExchange.Services.User
                 string link = baseUrl + "Account/SignIn";
                 contentReplacements.Add("link", link);
             }
-
-            _emailService.SendEmail(new[] { programUser.UserProfileDto.Email }, emailType, contentReplacements);
-
-            //Cromerr log
-            int thisUserOrgRegProgUserId = Convert.ToInt32(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
-            var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                .Single(u => u.OrganizationRegulatoryProgramUserId == thisUserOrgRegProgUserId);
-            var actorProgramUserDto = _mapHelper.GetOrganizationRegulatoryProgramUserDtoFromOrganizationRegulatoryProgramUser(actorProgramUser);
-            var actorUser = this.GetUserProfileById(actorProgramUserDto.UserProfileId);
-
-            var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-            cromerrAuditLogEntryDto.RegulatoryProgramId = programUser.OrganizationRegulatoryProgramDto.RegulatoryProgramId;
-            cromerrAuditLogEntryDto.OrganizationId = programUser.OrganizationRegulatoryProgramDto.OrganizationId;
-            cromerrAuditLogEntryDto.RegulatorOrganizationId = programUser.OrganizationRegulatoryProgramDto.RegulatorOrganizationId ?? cromerrAuditLogEntryDto.OrganizationId;
-            cromerrAuditLogEntryDto.UserProfileId = programUser.UserProfileId;
-            cromerrAuditLogEntryDto.UserName = programUser.UserProfileDto.UserName;
-            cromerrAuditLogEntryDto.UserFirstName = programUser.UserProfileDto.FirstName;
-            cromerrAuditLogEntryDto.UserLastName = programUser.UserProfileDto.LastName;
-            cromerrAuditLogEntryDto.UserEmailAddress = programUser.UserProfileDto.Email;
-            cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
-            cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-            contentReplacements = new Dictionary<string, string>();
-            contentReplacements.Add("authorityName", authority.OrganizationDto.OrganizationName);
-            contentReplacements.Add("organizationName", programUser.OrganizationRegulatoryProgramDto.OrganizationDto.OrganizationName);
-            contentReplacements.Add("regulatoryProgram", authority.RegulatoryProgramDto.Name);
-            contentReplacements.Add("firstName", programUser.UserProfileDto.FirstName);
-            contentReplacements.Add("lastName", programUser.UserProfileDto.LastName);
-            contentReplacements.Add("userName", programUser.UserProfileDto.UserName);
-            contentReplacements.Add("emailAddress", programUser.UserProfileDto.Email);
-            contentReplacements.Add("actorFirstName", actorUser.FirstName);
-            contentReplacements.Add("actorLastName", actorUser.LastName);
-            contentReplacements.Add("actorUserName", actorUser.UserName);
-            contentReplacements.Add("actorEmailAddress", actorUser.Email);
-
-            _crommerAuditLogService.Log(cromerrEvent, cromerrAuditLogEntryDto, contentReplacements);
-
-
-            return new RegistrationResultDto() { Result = RegistrationResult.Success };
-
+            
+            _linkoExchangeEmaiService.SendEmails(new List<EmailEntry> { _linkoExchangeEmaiService.GetEmailEntryForOrgRegProgramUser(programUser, emailType, contentReplacements) }); 
+            
+            return new RegistrationResultDto() { Result = RegistrationResult.Success }; 
         }
 
         public ICollection<UserDto> GetOrgRegProgSignators(int orgRegProgId)

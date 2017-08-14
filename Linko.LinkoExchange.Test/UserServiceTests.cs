@@ -34,14 +34,13 @@ namespace Linko.LinkoExchange.Test
         Mock<IOrganizationService> _orgService;
         IOrganizationService _realOrgService;
         Mock<ISettingService> _settingService;
-        ISettingService _realSettingService;
-        IEmailService _emailService = Mock.Of<IEmailService>();
+        ISettingService _realSettingService; 
         ITimeZoneService _timeZones;
         Mock<ApplicationUserManager> _userManager;
         Mock<IQuestionAnswerService> _qaService;
         Mock<ILogger> _logger;
         Mock<ICromerrAuditLogService> _cromerrLogger;
-
+        Mock<ILinkoExchangeEmailService> _linkoExchangeEmailService = new Mock<ILinkoExchangeEmailService>();
         public UserServiceTests()
         {
         }
@@ -79,12 +78,12 @@ namespace Linko.LinkoExchange.Test
             _realOrgService = new OrganizationService(new LinkoExchangeContext(connectionString),
                 _realSettingService, new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper(), _logger.Object), _timeZones, new MapHelper());
             _realUserService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(),
-                new PasswordHasher(), _httpContext.Object, _emailService, _realSettingService,
-                _sessionCache.Object, _realOrgService, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper(), _cromerrLogger.Object);
+                new PasswordHasher(), _httpContext.Object, _realSettingService,
+                _sessionCache.Object, _realOrgService, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper(), _cromerrLogger.Object, _linkoExchangeEmailService.Object);
 
             _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(),
-                new PasswordHasher(), _httpContext.Object, _emailService, _settingService.Object,
-                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper(), _cromerrLogger.Object);
+                new PasswordHasher(), _httpContext.Object, _settingService.Object,
+                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper(), _cromerrLogger.Object,_linkoExchangeEmailService.Object);
         }
 
         [TestMethod]

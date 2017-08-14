@@ -476,7 +476,7 @@ namespace Linko.LinkoExchange.Services.Parameter
                     transaction.Commit();
                     
                 }
-                catch (RuleViolationException ex)
+                catch (RuleViolationException)
                 {
                     transaction.Rollback();
                     throw;

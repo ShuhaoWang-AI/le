@@ -137,6 +137,8 @@
     <Compile Include="Dto\ReportSampleDto.cs" />
     <Compile Include="Dto\RepudiationReasonDto.cs" />
     <Compile Include="Email\EmailEntry.cs" />
+    <Compile Include="Email\ILinkoExchangeEmailService.cs" />
+    <Compile Include="Email\LinkoExchangeEmailServiceSimple.cs" />
     <Compile Include="FileStore\FileStoreService.cs" />
     <Compile Include="FileStore\IFileStoreService.cs" />
     <Compile Include="Dto\FileStoreDto.cs" />
@@ -182,13 +184,11 @@
     <Compile Include="Dto\SettingDto.cs" />
     <Compile Include="Dto\TimeZoneDto.cs" />
     <Compile Include="Dto\UnitDto.cs" />
-    <Compile Include="Email\IEmailService.cs" />
     <Compile Include="Email\EmailService.cs" />
     <Compile Include="Dto\UserDto.cs" />
     <Compile Include="Dto\SignInResultDto.cs" />
     <Compile Include="Dto\AuthenticationResultDto.cs" />
     <Compile Include="Cache\IRequestCache.cs" />
-    <Compile Include="Email\LinkoExchangeEmailService.cs" />
     <Compile Include="HttpContext\HttpContextService.cs" />
     <Compile Include="HttpContext\IHttpContextService.cs" />
     <Compile Include="Config\IConfigSettingService.cs" />

@@ -655,7 +655,6 @@ namespace Linko.LinkoExchange.Test
                             if (resultFieldName == "ConcentrationSampleResultId" || resultFieldName == "MassLoadingSampleResultId")
                             {
                                 //Some results are updates and some are new
-                                string setBreakPointHereToManuallyInspec = "";
                             }
                             else if (resultFieldName == "LastModifierFullName")
                             {

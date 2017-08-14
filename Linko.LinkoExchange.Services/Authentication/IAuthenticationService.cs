@@ -19,6 +19,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="failedPasswordCount">Failed password count</param>
         /// <param name="failedKbqCount">Failed KBQ answer count</param>
         /// <param name="reportOperation">Sign & Submit or Repudiate</param>
+        /// <param name="reportPackageId"></param>
         /// <returns></returns>
         PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount, ReportOperation reportOperation, int? reportPackageId = null);
         /// <summary>
@@ -30,7 +31,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="kbqQuestions">KBQ question and answers</param>
         /// <param name="registrationType">Registration type</param>
         /// <returns></returns>
-        Task<RegistrationResultDto> Register(UserDto userInfo, string registrationToken, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions, RegistrationType registrationType);
+        RegistrationResultDto Register(UserDto userInfo, string registrationToken, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions, RegistrationType registrationType);
 
         // Change or reset password
         /// <summary>

@@ -93,7 +93,7 @@ namespace Linko.LinkoExchange.Web.Controllers
             _invitationService = invitationService;
             _jurisdictionService = jurisdictionService;
             _settingService = settingService;
-            _mapHelper = mapHelper; 
+            _mapHelper = mapHelper;
             _profileHelper = new ProfileHelper(questAnswerService:questionAnswerService, userService:userService, jurisdictionService:jurisdictionService,
                                                mapHelper:mapHelper, httpContextService:httpContextService);
         }
@@ -179,7 +179,7 @@ namespace Linko.LinkoExchange.Web.Controllers
 
         [AllowAnonymous]
         [AcceptVerbs(verbs:HttpVerbs.Post)]
-        public async Task<ActionResult> Register(RegistrationViewModel model, FormCollection form)
+        public ActionResult Register(RegistrationViewModel model, FormCollection form)
         {
             var invitation = _invitationService.GetInvitation(invitationId:model.Token);
             ViewBag.newRegistration = true;
@@ -266,7 +266,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                 return View(model:model);
             }
 
-            var result = await _authenticationService.Register(userInfo:userDto, registrationToken:model.Token, securityQuestions:sqs, kbqQuestions:kbqs, registrationType:model.RegistrationType);
+            var result = _authenticationService.Register(userInfo:userDto, registrationToken:model.Token, securityQuestions:sqs, kbqQuestions:kbqs, registrationType:model.RegistrationType);
             switch (result.Result)
             {
                 case RegistrationResult.Success:

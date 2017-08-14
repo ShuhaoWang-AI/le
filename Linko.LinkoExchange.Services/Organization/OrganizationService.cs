@@ -245,9 +245,8 @@ namespace Linko.LinkoExchange.Services.Organization
             {
                 var foundOrg = _dbContext.Organizations.Single(o => o.OrganizationId == organizationId);
                 returnDto = _mapHelper.GetOrganizationDtoFromOrganization(foundOrg);
-                JurisdictionDto jurisdiction = _jurisdictionService.GetJurisdictionById(foundOrg.JurisdictionId);
-
-                returnDto.State = jurisdiction?.Code ?? "";
+                var jurisdiction = _jurisdictionService.GetJurisdictionById(foundOrg.JurisdictionId ?? 0);
+                returnDto.State = jurisdiction == null ? "" : jurisdiction.Code;
             }
             catch (DbEntityValidationException ex)
             {
@@ -319,7 +318,8 @@ namespace Linko.LinkoExchange.Services.Organization
                 && o.IsEnabled == true
                 && o.IsRemoved == false);
             dto.HasAdmin = adminUserCount > 0;
-            dto.OrganizationDto.State = _jurisdictionService.GetJurisdictionById(orgRegProgram.Organization.JurisdictionId)?.Code ?? "";
+            dto.OrganizationDto.State = orgRegProgram.Organization.JurisdictionId.HasValue ? 
+                                        _jurisdictionService.GetJurisdictionById(orgRegProgram.Organization.JurisdictionId.Value).Code : "";
 
             var lastReportPackageSubmitted = _dbContext.ReportPackages
                 .Where(rp => rp.OrganizationRegulatoryProgramId == orgRegProgId
@@ -368,7 +368,8 @@ namespace Linko.LinkoExchange.Services.Organization
                         dto.HasAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
                             .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
                             && o.PermissionGroup.Name == "Administrator") > 0;
-                        dto.OrganizationDto.State = _jurisdictionService.GetJurisdictionById(orgRegProgram.Organization.JurisdictionId)?.Code ?? "";
+                        dto.OrganizationDto.State = orgRegProgram.Organization.JurisdictionId.HasValue ?
+                                                    _jurisdictionService.GetJurisdictionById(orgRegProgram.Organization.JurisdictionId.Value).Code : "";
                         dtoList.Add(dto);
 
                     }

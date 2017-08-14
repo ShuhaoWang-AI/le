@@ -70,7 +70,6 @@ namespace Linko.LinkoExchange.Test
             var sampleDtos = new List<SampleDto>();
 
             var random = new Random();
-            var sampleResultCount = 3;
 
             // samples results
             {

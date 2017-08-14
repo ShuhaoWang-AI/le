@@ -93,8 +93,8 @@ namespace Linko.LinkoExchange.Web
             container.RegisterType<IConfigSettingService, ConfigSettingService>();
             container.RegisterType<ICopyOfRecordService, CopyOfRecordService>();
             container.RegisterType<ICromerrAuditLogService, CromerrAuditLogService>();
-            container.RegisterType<IDigitalSignatureManager, CertificateDigitalSignatureManager>();
-            container.RegisterType<IEmailService, LinkoExchangeEmailService>(new InjectionConstructor(typeof(LinkoExchangeContext), typeof(EmailAuditLogService), typeof(IProgramService), typeof(ISettingService), typeof(IRequestCache)));
+            container.RegisterType<IDigitalSignatureManager, CertificateDigitalSignatureManager>(); 
+            container.RegisterType<ILinkoExchangeEmailService, LinkoExchangeEmailServiceSimple>();
             container.RegisterType<IEncryptionService, EncryptionService>();
             container.RegisterType<IFileStoreService, FileStoreService>();
             container.RegisterType<IHttpContextService, HttpContextService>();

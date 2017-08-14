@@ -43,15 +43,14 @@ namespace Linko.LinkoExchange.Services.Report
         private readonly ILogger _logger;
         private readonly LinkoExchangeContext _dbContext;
         private readonly IHttpContextService _httpContextService;
-        private readonly IUserService _userService;
-        private readonly IEmailService _emailService;
+        private readonly IUserService _userService; 
         private readonly ISettingService _settingService;
         private readonly IOrganizationService _orgService;
         private readonly ISampleService _sampleService;
         private readonly IMapHelper _mapHelper;
         private readonly ICromerrAuditLogService _crommerAuditLogService;
-        private readonly IOrganizationService _organizationService;
-        private readonly IRequestCache _requestCache;
+        private readonly IOrganizationService _organizationService; 
+        private readonly ILinkoExchangeEmailService _linkoExchangeEmailService;
 
         public ReportPackageService(
            IProgramService programService,
@@ -60,15 +59,14 @@ namespace Linko.LinkoExchange.Services.Report
            ILogger logger,
            LinkoExchangeContext linkoExchangeContext,
            IHttpContextService httpContextService,
-           IUserService userService,
-           IEmailService emailService,
+           IUserService userService, 
            ISettingService settingService,
            IOrganizationService orgService,
            ISampleService sampleService,
            IMapHelper mapHelper,
            ICromerrAuditLogService crommerAuditLogService,
            IOrganizationService organizationService, 
-           IRequestCache requestCache
+           ILinkoExchangeEmailService linkoExchangeEmailService
            )
         {
             _programService = programService;
@@ -77,15 +75,14 @@ namespace Linko.LinkoExchange.Services.Report
             _logger = logger;
             _dbContext = linkoExchangeContext;
             _httpContextService = httpContextService;
-            _userService = userService;
-            _emailService = emailService;
+            _userService = userService; 
             _settingService = settingService;
             _orgService = orgService;
             _sampleService = sampleService;
             _mapHelper = mapHelper;
             _crommerAuditLogService = crommerAuditLogService;
-            _organizationService = organizationService;
-            _requestCache = requestCache;
+            _organizationService = organizationService; 
+            _linkoExchangeEmailService = linkoExchangeEmailService;
         }
 
         public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
@@ -130,7 +127,7 @@ namespace Linko.LinkoExchange.Services.Report
                             }
                         }
                     }
-                  
+
                     break;
 
                 case "SignAndSubmitReportPackage":
@@ -147,14 +144,8 @@ namespace Linko.LinkoExchange.Services.Report
                         {
                             //Get current user
                             var orgRegProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
-                                .SingleOrDefault(orpu => orpu.UserProfileId == currentUserId
+                                .Single(orpu => orpu.UserProfileId == currentUserId
                                     && orpu.OrganizationRegulatoryProgramId == currentOrgRegProgramId);
-
-                            //Does this user belong to this org reg program?
-                            if (orgRegProgramUser == null)
-                            {
-                                return false;
-                            }
 
                             //Check if user has signatory rights
                             if (!orgRegProgramUser.IsSignatory)
@@ -194,7 +185,7 @@ namespace Linko.LinkoExchange.Services.Report
             var submitterLastName = _httpContextService.GetClaimValue(CacheKey.LastName);
             var submitterUserName = _httpContextService.GetClaimValue(CacheKey.UserName);
             ReportPackageDto reportPackageDto;
-            CopyOfRecordDto copyOfRecordDto; 
+            CopyOfRecordDto copyOfRecordDto;
 
             _logger.Info($"Enter ReportPackageService.SignAndSubmitReportPackage. reportPackageId={reportPackageId}, submitterUserId={submitterUserId}, submitterUserName={submitterUserName}");
 
@@ -273,13 +264,13 @@ namespace Linko.LinkoExchange.Services.Report
                 }
             }
 
-           if(reportPackageDto != null && copyOfRecordDto != null)
+            if (reportPackageDto != null && copyOfRecordDto != null)
             {
                 //// Send emails 
                 SendSignAndSubmitEmail(reportPackageDto, copyOfRecordDto);
-            } 
+            }
 
-          _logger.Info($"Leaving ReportPackageService.SignAndSubmitReportPackage. reportPackageId={reportPackageId}, submitterUserId={submitterUserId}, submitterUserName={submitterUserName}");
+            _logger.Info($"Leaving ReportPackageService.SignAndSubmitReportPackage. reportPackageId={reportPackageId}, submitterUserId={submitterUserId}, submitterUserName={submitterUserName}");
         }
 
         public CopyOfRecordPdfFileDto GetReportPackageCopyOfRecordPdfFile(int reportPackageId)
@@ -438,7 +429,7 @@ namespace Linko.LinkoExchange.Services.Report
                         {
                             ParameterName = sampleResultDto.ParameterName,
                             Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier).GetValueOrEmptyString(),
-                            EnteredValue = sampleResultDto.EnteredValue.GetValueOrEmptyString(), 
+                            EnteredValue = sampleResultDto.EnteredValue.GetValueOrEmptyString(),
                             Value = sampleResultDto.Value?.ToString(CultureInfo.InvariantCulture) ?? "",
                             UnitName = sampleResultDto.UnitName.GetValueOrEmptyString(),
                             EnteredMethodDetectionLimit = sampleResultDto.EnteredMethodDetectionLimit.GetValueOrEmptyString(),
@@ -728,7 +719,7 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("corSignature", copyOfRecordDto.Signature);
             emailContentReplacements.Add("submitterFirstName", _httpContextService.GetClaimValue(CacheKey.FirstName));
             emailContentReplacements.Add("submitterLastName", _httpContextService.GetClaimValue(CacheKey.LastName));
-            emailContentReplacements.Add("submitterTitle",  reportPackage.SubmitterTitleRole.GetValueOrEmptyString());
+            emailContentReplacements.Add("submitterTitle", reportPackage.SubmitterTitleRole.GetValueOrEmptyString());
 
             emailContentReplacements.Add("permitNumber", reportPackage.OrganizationReferenceNumber);
 
@@ -784,25 +775,20 @@ namespace Linko.LinkoExchange.Services.Report
             emailContentReplacements.Add("corViewLink", $"{_httpContextService.GetRequestBaseUrl()}reportPackage/{reportPackage.ReportPackageId}/Details");
 
             // Send emails to all IU signatories 
-            var signatoriesEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
-            
             var iuOrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(reportPackage.OrganizationRegulatoryProgramId);
+            var signatories = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).ToList();
+            var emailEntries = signatories
+                .Select(user => _linkoExchangeEmailService.GetEmailEntryForUser(user, EmailType.Report_Submission_IU, emailContentReplacements, iuOrganizationRegulatoryProgram))
+                .ToList();
 
-            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, iuOrganizationRegulatoryProgram.RegulatoryProgramId);
-            _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, iuOrganizationRegulatoryProgram.OrganizationId);
-            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, iuOrganizationRegulatoryProgram.RegulatorOrganizationId);
-            
-            _emailService.SendEmail(signatoriesEmails, EmailType.Report_Submission_IU, emailContentReplacements, false).Wait();
-
-            // Send emails to all Standard Users for the authority  
+            // Send emails to all Standard Users for the authority
             var authorityOrganizationRegulatoryProgramDto = _organizationService.GetAuthority(reportPackage.OrganizationRegulatoryProgramId);
-            var authorityAdminAndStandardUsersEmails = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganizationRegulatoryProgramDto.OrganizationId).Select(i => i.Email).ToList();
+            var authorityAdminAndStandardUsers = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganizationRegulatoryProgramDto.OrganizationId).ToList();
 
-            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, authorityOrganizationRegulatoryProgramDto.RegulatoryProgramId);
-            _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, authorityOrganizationRegulatoryProgramDto.OrganizationId);
-            _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, authorityOrganizationRegulatoryProgramDto.RegulatorOrganizationId);
-            _emailService.SendEmail(authorityAdminAndStandardUsersEmails, EmailType.Report_Submission_AU, emailContentReplacements, false).Wait();
+            emailEntries.AddRange(authorityAdminAndStandardUsers
+                 .Select(user => _linkoExchangeEmailService.GetEmailEntryForUser(user, EmailType.Report_Submission_AU, emailContentReplacements, authorityOrganizationRegulatoryProgramDto)));
 
+            _linkoExchangeEmailService.SendEmails(emailEntries);
             _logger.Info("Leave ReportPackageService.SendSignAndSubmitEmail. reportPackageId={0}", reportPackage.ReportPackageId);
         }
 
@@ -2034,27 +2020,22 @@ namespace Linko.LinkoExchange.Services.Report
 
                     _dbContext.SaveChanges();
                     
-                    var signatoriesEmails = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).Select(i => i.Email).ToList();
-            
+                    // Send emails to all IU signatories
                     var iuOrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(reportPackage.OrganizationRegulatoryProgramId);
+                    var signatories = _userService.GetOrgRegProgSignators(reportPackage.OrganizationRegulatoryProgramId).ToList();
+                    var emailEntries = signatories
+                        .Select(user => _linkoExchangeEmailService.GetEmailEntryForUser(user, EmailType.Report_Repudiation_IU, contentReplacements, iuOrganizationRegulatoryProgram))
+                        .ToList(); 
 
-                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, iuOrganizationRegulatoryProgram.RegulatoryProgramId);
-                    _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, iuOrganizationRegulatoryProgram.OrganizationId);
-                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, iuOrganizationRegulatoryProgram.RegulatorOrganizationId);
-            
-                    _emailService.SendEmail(signatoriesEmails, EmailType.Report_Repudiation_IU, contentReplacements, false).Wait();
-
-                    //System sends Report Repudiated Receipt to all Admin and Standard Users for the Authority (UC-19 8.4.)
-                    var authorityAdminAndStandardUsersEmails = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganizationRegulatoryProgramDto.OrganizationId)
-                                                                           .Select(i => i.Email).ToList();
-
-                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, authorityOrganizationRegulatoryProgramDto.RegulatoryProgramId);
-                    _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, authorityOrganizationRegulatoryProgramDto.OrganizationId);
-                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, authorityOrganizationRegulatoryProgramDto.RegulatorOrganizationId);
-
-                    _emailService.SendEmail(authorityAdminAndStandardUsersEmails, EmailType.Report_Repudiation_AU, contentReplacements, false).Wait();
+                    //System sends Report Repudiated Receipt to all Admin and Standard Users for the Authority (UC-19 8.4.) 
+                    var authorityAdminAndStandardUsers = _userService.GetAuthorityAdministratorAndStandardUsers(authorityOrganizationRegulatoryProgramDto.OrganizationId).ToList();
+                    emailEntries.AddRange(authorityAdminAndStandardUsers
+                        .Select(user => _linkoExchangeEmailService.GetEmailEntryForUser(user, EmailType.Report_Repudiation_AU, contentReplacements, authorityOrganizationRegulatoryProgramDto)));  
 
                     transaction.Commit();
+
+                    // Send emails after all others completed.
+                   _linkoExchangeEmailService.SendEmails(emailEntries);
                 }
                 catch (DbEntityValidationException ex)
                 {
@@ -2087,7 +2068,6 @@ namespace Linko.LinkoExchange.Services.Report
                 }
 
             }
-
 
             _logger.Info($"Leave ReportPackageService.RepudiateReport. reportPackageId={reportPackageId}, repudiationReasonId={repudiationReasonId}, currentOrgRegProgramId={currentOrgRegProgramId}, currentUserId={currentUserId}");
 
@@ -2257,7 +2237,7 @@ namespace Linko.LinkoExchange.Services.Report
             bool isRequirementsMet = true;
             foreach (var requiredRPET in requiredReportPackageElementTypes)
             {
-                if (requiredRPET.ReportSamples.Count() < 1 && requiredRPET.ReportFiles.Count() < 1)
+                if (!requiredRPET.ReportSamples.Any() && !requiredRPET.ReportFiles.Any())
                 {
                     isRequirementsMet = false;
                     break;
@@ -2359,8 +2339,8 @@ namespace Linko.LinkoExchange.Services.Report
 
             var reportPackage = _dbContext.ReportPackages
                 .Single(rep => rep.ReportPackageId == reportPackageId);
-
-            if (reportPackage.PeriodEndDateTimeUtc < DateTime.UtcNow.AddDays(-reportRepudiatedDays))
+             
+            if (reportPackage.PeriodEndDateTimeUtc.UtcDateTime < DateTime.UtcNow.AddDays(-reportRepudiatedDays))
             {
                 canRepudiate = false;
             }
@@ -2412,7 +2392,7 @@ namespace Linko.LinkoExchange.Services.Report
                         }
                         break;
                     case ReportElementCategoryName.SamplesAndResults:
-                        if(samplesCloned != null)
+                        if (samplesCloned != null)
                         {
                             xmlDoc.Root.Add(samplesCloned);
                         }
@@ -2431,7 +2411,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             if (node != null)
             {
-                var nodeCloned = new XElement(node);
+                var nodeCloned = new XElement(other:node);
                 node.Remove();
                 return nodeCloned;
             }
@@ -2441,9 +2421,10 @@ namespace Linko.LinkoExchange.Services.Report
 
         private XElement GetXElementNode(IEnumerable<XElement> corElements, string tagName)
         {
-            if (corElements.Any(i => i.Name.LocalName == tagName))
+            var xElements = corElements as XElement[] ?? corElements.ToArray();
+            if (xElements.Any(i => i.Name.LocalName == tagName))
             {
-                return corElements.Single(i => i.Name.LocalName == tagName);
+                return xElements.Single(i => i.Name.LocalName == tagName);
             }
 
             return null;
@@ -2459,7 +2440,7 @@ namespace Linko.LinkoExchange.Services.Report
             var reportStatusName = _dbContext.ReportStatuses
                 .Single(rs => rs.ReportStatusId == reportPackage.ReportStatusId).Name;
 
-            return (ReportStatusName)Enum.Parse(typeof(ReportStatusName), reportStatusName);
+            return (ReportStatusName) Enum.Parse(typeof(ReportStatusName), reportStatusName);
         }
 
         /// <summary>
@@ -2544,7 +2525,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info($"Enter SampleService.ThrowSimpleException. message={message}");
 
-            List<RuleViolation> validationIssues = new List<RuleViolation>();
+            var validationIssues = new List<RuleViolation>();
             validationIssues.Add(new RuleViolation(propertyName ?? string.Empty, propertyValue: null, errorMessage: message));
 
             _logger.Info($"Leaving SampleService.ThrowSimpleException. message={message}");

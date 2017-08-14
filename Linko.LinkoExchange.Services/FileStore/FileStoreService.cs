@@ -89,7 +89,7 @@ namespace Linko.LinkoExchange.Services.FileStore
                 case "DeleteFileStore":
                     {
                         var fileStoreId = id[0];
-                        retVal = isFileStoreWithThisOwnerExist(fileStoreId, currentOrgRegProgramId);
+                        retVal = IsFileStoreWithThisOwnerExist(fileStoreId, currentOrgRegProgramId);
                     }
                     break;
 
@@ -133,7 +133,7 @@ namespace Linko.LinkoExchange.Services.FileStore
                         }
                         else
                         {
-                            retVal = isFileStoreWithThisOwnerExist(fileStoreId, currentOrgRegProgramId);
+                            retVal = IsFileStoreWithThisOwnerExist(fileStoreId, currentOrgRegProgramId);
                         }
                     }
                     break;
@@ -147,7 +147,7 @@ namespace Linko.LinkoExchange.Services.FileStore
             return retVal;
         }
 
-        private bool isFileStoreWithThisOwnerExist(int fileStoreId, int orgRegProgramId)
+        private bool IsFileStoreWithThisOwnerExist(int fileStoreId, int orgRegProgramId)
         {
             //Also handles scenarios where FileStoreId does not exist
             return _dbContext.FileStores
@@ -327,6 +327,12 @@ namespace Linko.LinkoExchange.Services.FileStore
         {
             _logger.Info("Enter FileStoreService.UpdateFileStore.");
 
+            if(fileStoreDto == null || fileStoreDto.FileStoreId.HasValue == false )
+            {
+                  _logger.Info("Leave FileStoreService.UpdateFileStore. null filsStoreDto or fileStoreDto.FileStoreId");
+                return ;
+            }
+
             if (!CanUserExecuteApi(id:fileStoreDto.FileStoreId.Value))
             {
                 throw new UnauthorizedAccessException();
@@ -445,12 +451,9 @@ namespace Linko.LinkoExchange.Services.FileStore
             fileStoreDto.LastModifierUserFullName = GetUserFullName(fileStoreDto.LastModifierUserId);
 
             fileStoreDto.LastModificationDateTimeLocal = fileStoreDto.UploadDateTimeLocal;
-            if (fileStoreDto.LastModificationDateTimeLocal.HasValue)
-            {
-                fileStoreDto.LastModificationDateTimeLocal = _timeZoneService.
-                    GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.LastModificationDateTimeLocal.Value, currentOrgRegProgramId);
-            }
-
+            fileStoreDto.LastModificationDateTimeLocal = _timeZoneService.
+                GetLocalizedDateTimeUsingSettingForThisOrg(fileStoreDto.LastModificationDateTimeLocal.Value, currentOrgRegProgramId);
+            
             if (fileStoreDto.FileStoreId.HasValue && IsFileInReports(fileStoreDto.FileStoreId.Value))
             {
                 if (_dbContext.ReportFiles.Any(i => i.FileStoreId == fileStoreDto.FileStoreId))

@@ -1,21 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Net.Mail;
 using Linko.LinkoExchange.Core.Enum;
+using Newtonsoft.Json;
 
 namespace Linko.LinkoExchange.Services.Email
 {
     public class EmailEntry
     {
-        public List<string> SendToEmails {get;set; }
+        public int? AuditLogId {get;set; }
+        public string RecipientEmailAddress {get;set; } 
         public EmailType  EmailType {get;set; }  
-
         public Dictionary<string,string> ContentReplacements {get;set; } 
+        public int? RecipientOrgulatoryProgramId {get;set; }
+        public int? RecipientOrganizationId {get;set; }
+        public int? RecipientRegulatorOrganizationId {get;set; }
+        public MailMessage MailMessage {get;set; }
+        public string RecipientFirstName { get; set; }
+        public string RecipientLastName { get; set; }
+        public string RecipientUserName { get; set; }
+        public int? RecipientUserProfileId { get; set; } 
+        
+        public EmailEntry Clone(string overrideEmailAddress = null)
+        { 
+            var temp = JsonConvert.SerializeObject(this); 
+            var obj = JsonConvert.DeserializeObject<EmailEntry>(temp);
+            if(string.IsNullOrEmpty(overrideEmailAddress) == false)
+            {
+                obj.RecipientEmailAddress = overrideEmailAddress;
+            }
 
-        public int? ReceipientOrgulatoryProgramId {get;set; }
-        public int? ReceipientOrganizationId {get;set; }
-        public int? ReceipientRegulatorOrganizationId {get;set; }
+            return obj;
+        }
     }
 }

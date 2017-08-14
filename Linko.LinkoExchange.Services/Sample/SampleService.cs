@@ -58,7 +58,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
         public override bool CanUserExecuteApi([CallerMemberName] string apiName = "", params int[] id)
         {
-            bool retVal = false;
+            bool retVal;
 
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var currentPortalName = _httpContext.GetClaimValue(CacheKey.PortalName);
@@ -109,17 +109,9 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <returns>Existing Id or newly created Id of Sample row in tSample table</returns>
         private int SimplePersist(SampleDto sampleDto)
         {
-            string sampleIdString = string.Empty;
-            if (sampleDto.SampleId.HasValue)
-            {
-                sampleIdString = sampleDto.SampleId.Value.ToString();
-            }
-            else
-            {
-                sampleIdString = "null";
-            }
+            var sampleIdString = sampleDto.SampleId.HasValue ? sampleDto.SampleId.Value.ToString() : "null"; 
 
-            _logger.Info($"Enter SampleService.SimplePersist. sampleDto.SampleId.Value={sampleIdString}");
+            _logger.Info($"Enter SampleService.SimplePersist. sampleDto.SampleId. Value={sampleIdString}");
 
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             //var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
@@ -131,7 +123,7 @@ namespace Linko.LinkoExchange.Services.Sample
             var concentrationLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.Concentration.ToString()).LimitBasisId;
             var dailyLimitTypeId = _dbContext.LimitTypes.Single(lt => lt.Name == LimitTypeName.Daily.ToString()).LimitTypeId;
 
-            Core.Domain.Sample sampleToPersist = null;
+            Core.Domain.Sample sampleToPersist;
             if (sampleDto.SampleId.HasValue && sampleDto.SampleId.Value > 0)
             {
                 //Update existing
@@ -235,7 +227,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 }
 
                 var flowParameter = _dbContext.Parameters
-                    .First(p => p.IsFlowForMassLoadingCalculation == true); //Chris: "Should be one but just get first". // TODO: Need to check OrganizationRegulatoryProgramId
+                    .First(p => p.IsFlowForMassLoadingCalculation); //Chris: "Should be one but just get first". // TODO: Need to check OrganizationRegulatoryProgramId
 
                 var flowLimitBasisId = _dbContext.LimitBases.Single(lb => lb.Name == LimitBasisName.VolumeFlowRate.ToString()).LimitBasisId;
 
@@ -275,10 +267,10 @@ namespace Linko.LinkoExchange.Services.Sample
             foreach (var sampleResultDto in sampleDto.SampleResults)
             {
                 //Each SampleResultDto has at least a Concentration component
-                SampleResult concentrationResultRowToUpdate = null;
+                SampleResult concentrationResultRowToUpdate;
                 if (!sampleResultDto.ConcentrationSampleResultId.HasValue)
                 {
-                    concentrationResultRowToUpdate = new SampleResult() { CreationDateTimeUtc = DateTimeOffset.UtcNow, SampleId = sampleToPersist.SampleId };
+                    concentrationResultRowToUpdate = new SampleResult { CreationDateTimeUtc = DateTimeOffset.UtcNow, SampleId = sampleToPersist.SampleId };
                     _dbContext.SampleResults.Add(concentrationResultRowToUpdate);
                 }
                 else
@@ -305,6 +297,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         concentrationResultRowToUpdate.MethodDetectionLimit = mdlAsDouble;
                     } 
                 }
+
                 if (sampleResultDto.AnalysisDateTimeLocal.HasValue)
                 {
                     concentrationResultRowToUpdate.AnalysisDateTimeUtc = _timeZoneService
@@ -391,7 +384,7 @@ namespace Linko.LinkoExchange.Services.Sample
                     //      (UC-15-1.2(*.a.) - System identifies Sample is in use in a Report Package (draft or otherwise) an displays the "REPORTED" Status.  
                     //      Actor cannot perform any actions of any kind except view all details.)
                     if (sampleDto.SampleId.HasValue &&
-                        this.IsSampleIncludedInReportPackage(sampleDto.SampleId.Value))
+                        IsSampleIncludedInReportPackage(sampleDto.SampleId.Value))
                     {
                         ThrowSimpleException("Sample is in use in a Report Package and is therefore READ-ONLY.");
                     }
@@ -402,7 +395,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         transaction.Commit();
                     }
                 }
-                catch (RuleViolationException ex)
+                catch (RuleViolationException)
                 {
                     transaction.Rollback();
                     throw;
@@ -477,7 +470,7 @@ namespace Linko.LinkoExchange.Services.Sample
         /// <returns>Boolean indicating if Sample passed all validation (Draft or ReadyToReport mode)</returns>
         public bool IsValidSample(SampleDto sampleDto, bool isSuppressExceptions = false)
         {
-            string sampleIdString = string.Empty;
+            string sampleIdString;
             if (sampleDto.SampleId.HasValue)
             {
                 sampleIdString = sampleDto.SampleId.Value.ToString();
@@ -490,7 +483,7 @@ namespace Linko.LinkoExchange.Services.Sample
 
             var currentOrgRegProgramId = int.Parse(_httpContext.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
             var authOrgRegProgramId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationRegulatoryProgramId;
-            var currentUserId = int.Parse(_httpContext.GetClaimValue(CacheKey.UserProfileId));
+       
             var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(authOrgRegProgramId, SettingType.TimeZone));
             bool isValid = true;
 
@@ -509,7 +502,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 isValid = false;
                 if (!isSuppressExceptions)
                 {
-                    this.ThrowSimpleException("Collection Method is required.");
+                    ThrowSimpleException("Collection Method is required.");
                 }
             }
             //Check required field (UC-15-1.2.1): "Start Date/Time"
@@ -518,7 +511,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 isValid = false;
                 if (!isSuppressExceptions)
                 {
-                    this.ThrowSimpleException("Start Date/Time is required.");
+                    ThrowSimpleException("Start Date/Time is required.");
                 }
             }
             //Check required field (UC-15-1.2.1): "End Date/Time"
@@ -527,7 +520,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 isValid = false;
                 if (!isSuppressExceptions)
                 {
-                    this.ThrowSimpleException("End Date/Time is required.");
+                    ThrowSimpleException("End Date/Time is required.");
                 }
             }
 
@@ -539,7 +532,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 isValid = false;
                 if (!isSuppressExceptions)
                 {
-                    this.ThrowSimpleException("Sample dates cannot be future dates.");
+                    ThrowSimpleException("Sample dates cannot be future dates.");
                 }
             }
 
@@ -549,7 +542,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 isValid = false;
                 if (!isSuppressExceptions)
                 {
-                    this.ThrowSimpleException("End date must be after Start date");
+                    ThrowSimpleException("End date must be after Start date");
                 }
             }
 
@@ -603,7 +596,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         isValid = false;
                         if (!isSuppressExceptions)
                         {
-                            this.ThrowSimpleException("All results must be associated with a valid unit.");
+                            ThrowSimpleException("All results must be associated with a valid unit.");
                         }
                     }
 
@@ -666,7 +659,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 try
                 {
 
-                    if (this.IsSampleIncludedInReportPackage(sampleId))
+                    if (IsSampleIncludedInReportPackage(sampleId))
                     {
                         string message = "Attempting to delete a sample that is included in a report.";
                         validationIssues.Add(new RuleViolation(string.Empty, propertyValue: null, errorMessage: message));
@@ -677,7 +670,7 @@ namespace Linko.LinkoExchange.Services.Sample
                         var sampleToRemove = _dbContext.Samples
                             .Include(s => s.SampleResults)
                             .Single(s => s.SampleId == sampleId);
-
+                         
                         var sampleDto = GetSampleDetails(sampleToRemove,false,false);
                         //First remove results (if applicable)
                         if (sampleToRemove.SampleResults != null)
@@ -687,11 +680,10 @@ namespace Linko.LinkoExchange.Services.Sample
                         _dbContext.Samples.Remove(sampleToRemove);
                         _dbContext.SaveChanges();
                         transaction.Commit();
+                        _logger.Info($"Leaving SampleService.DeleteSample. sampleId={sampleId}"); 
+
                         return sampleDto;
-                    }
-
-                    _logger.Info($"Leaving SampleService.DeleteSample. sampleId={sampleId}");
-
+                    } 
                 }
                 catch (RuleViolationException)
                 {
@@ -760,6 +752,7 @@ namespace Linko.LinkoExchange.Services.Sample
         /// </summary>
         /// <param name="sample">POCO</param>
         /// <param name="isIncludeChildObjects">Switch to load result list or not (for display in grid)</param>
+        /// <param name="isLoggingEnabled"></param>
         /// <returns></returns>
         public SampleDto GetSampleDetails(Core.Domain.Sample sample, bool isIncludeChildObjects = true, bool isLoggingEnabled = true)
         {
@@ -1088,13 +1081,13 @@ namespace Linko.LinkoExchange.Services.Sample
                     foundSamples = foundSamples.Where(s => !s.IsReadyToReport);
                     break;
                 case SampleStatusName.ReadyToReport:
-                    foundSamples = foundSamples.Where(s => s.IsReadyToReport && s.ReportSamples.Count() < 1);
+                    foundSamples = foundSamples.Where(s => s.IsReadyToReport && !s.ReportSamples.Any());
                     break;
                 case SampleStatusName.Reported:
-                    foundSamples = foundSamples.Where(s => s.ReportSamples.Count() > 0);
+                    foundSamples = foundSamples.Where(s => s.ReportSamples.Any());
                     break;
                 case SampleStatusName.DraftOrReadyToReport:
-                    foundSamples = foundSamples.Where(s => s.ReportSamples.Count() < 1);
+                    foundSamples = foundSamples.Where(s => !s.ReportSamples.Any());
                     break;
                 default:
                     throw new Exception($"Unhandled SampleStatusName = {status}");
@@ -1118,9 +1111,7 @@ namespace Linko.LinkoExchange.Services.Sample
             _logger.Info($"Enter SampleService.GetCollectionMethods. currentOrgRegProgramId={currentOrgRegProgramId}");
 
             var collectionMethodList = new List<CollectionMethodDto>();
-            var authOrganizationId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationId;
-            var timeZoneId = Convert.ToInt32(_settings.GetOrganizationSettingValue(currentOrgRegProgramId, SettingType.TimeZone));
-
+            var authOrganizationId = _orgService.GetAuthority(currentOrgRegProgramId).OrganizationId;  
             var collectionMethods = _dbContext.CollectionMethods
                 .Where(cm => cm.IsEnabled
                 && !cm.IsRemoved

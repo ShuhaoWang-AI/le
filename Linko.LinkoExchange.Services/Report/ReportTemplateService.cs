@@ -239,7 +239,7 @@ namespace Linko.LinkoExchange.Services.Report
         {
             _logger.Info("Enter ReportTemplateService.SaveReportPackageTemplate.");
 
-            var rptId = rpt.ReportPackageTemplateId.HasValue ? rpt.ReportPackageTemplateId.Value : -1;
+            var rptId = rpt.ReportPackageTemplateId ?? -1;
 
             using (var transaction = _dbContext.BeginTransaction())
             {
@@ -330,7 +330,7 @@ namespace Linko.LinkoExchange.Services.Report
                         reportPackageTemplate.EffectiveDateTimeUtc = effectiveDateTimeUtc;
                         reportPackageTemplate.LastModifierUserId = currentUserId;
 
-                        // First time creation recorder DO NOT need to provide creation datetime.
+                        // First time creation recorder DO NOT need to provide creation date time.
                         reportPackageTemplate = _dbContext.ReportPackageTempates.Add(reportPackageTemplate);
                         _dbContext.SaveChanges();
                         rptId = reportPackageTemplate.ReportPackageTemplateId;

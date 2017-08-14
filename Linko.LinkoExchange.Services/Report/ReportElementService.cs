@@ -227,7 +227,7 @@ namespace Linko.LinkoExchange.Services.Report
 
                     transaction.Commit();
                 }
-                catch (RuleViolationException ex)
+                catch (RuleViolationException)
                 {
                     transaction.Rollback();
                     throw;
@@ -298,10 +298,13 @@ namespace Linko.LinkoExchange.Services.Report
                     _dbContext.ReportElementTypes.Remove(foundReportElementType);
 
                     _dbContext.SaveChanges();
-                    transaction.Commit(); 
+                    transaction.Commit();
+
+                    _logger.Info($"Leaving ReportElementService.DeleteReportElementType. reportElementTypeId={reportElementTypeId}");
+
                     return elementTypeDto;
                 }
-                catch (RuleViolationException ex)
+                catch (RuleViolationException)
                 {
                     transaction.Rollback();
                     throw;
@@ -321,12 +324,8 @@ namespace Linko.LinkoExchange.Services.Report
                     _logger.Error("Error happens {0} ", String.Join("," + Environment.NewLine, errors));
 
                     throw;
-                }
-
-            }
-
-            _logger.Info($"Leaving ReportElementService.DeleteReportElementType. reportElementTypeId={reportElementTypeId}");
-
+                } 
+            } 
         }
 
         /// <summary>
@@ -348,19 +347,10 @@ namespace Linko.LinkoExchange.Services.Report
                     .Where(r => r.OrganizationRegulatoryProgramId == authOrgRegProgramId);
 
 
-            if (rpTemplatesUsingThis.Count() > 0)
-            {
-                isInUse = true;
-            }
-            else
-            {
-                isInUse = false;
-            }
-
+            isInUse = rpTemplatesUsingThis.Any();
             _logger.Info($"Leaving ReportElementService.IsReportElementTypeInUse. reportElementTypeId={reportElementTypeId}, isInUse={isInUse}");
 
-            return isInUse;
-
+            return isInUse; 
         }
     }
 }

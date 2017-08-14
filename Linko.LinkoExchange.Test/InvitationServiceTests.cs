@@ -27,8 +27,7 @@ namespace Linko.LinkoExchange.Test
     [TestClass]
     public class InvitationServiceTests
     {
-        private InvitationService invitationService;
-        IEmailService _emailService = Mock.Of<IEmailService>();
+        private InvitationService invitationService; 
         IRequestCache _requestCache = Mock.Of<IRequestCache>();
         ISettingService _settingService = Mock.Of<ISettingService>();
         IProgramService _programService = Mock.Of<IProgramService>();
@@ -41,6 +40,7 @@ namespace Linko.LinkoExchange.Test
 
         Mock<ILogger> _logger;
         Mock<ICromerrAuditLogService> _cromerrLogger;
+        Mock<ILinkoExchangeEmailService> _linkoExchangeEmailService;
 
         public InvitationServiceTests()
         {
@@ -61,7 +61,9 @@ namespace Linko.LinkoExchange.Test
             _logger = new Mock<ILogger>();
             _cromerrLogger = new Mock<ICromerrAuditLogService>();
 
+
             _httpContext.Setup(x => x.GetRequestBaseUrl()).Returns("http://test.linkoexchange.com/");
+            _linkoExchangeEmailService = new Mock<ILinkoExchangeEmailService>();
 
             invitationService = new InvitationService(
                 new LinkoExchangeContext(connectionString),
@@ -69,8 +71,7 @@ namespace Linko.LinkoExchange.Test
                 new UserService(new LinkoExchangeContext(connectionString),
                                 new EmailAuditLogEntryDto(),
                                 new PasswordHasher(),
-                                new HttpContextService(),
-                                _emailService,
+                                new HttpContextService(), 
                                 _settingService,
                                 _sessionCache.Object,
                                 _orgService.Object,
@@ -79,9 +80,9 @@ namespace Linko.LinkoExchange.Test
                                 _qaService.Object,
                                 _logger.Object,
                                 new MapHelper(),
-                                _cromerrLogger.Object),
-                _requestCache,//new RequestCache(),
-                _emailService,
+                                _cromerrLogger.Object,
+                                _linkoExchangeEmailService.Object),
+                _requestCache,//new RequestCache(), 
                 new OrganizationService(new LinkoExchangeContext(connectionString),
                                         new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IRequestCache>().Object, new Mock<IGlobalSettings>().Object),
                                         new HttpContextService(),
@@ -92,7 +93,8 @@ namespace Linko.LinkoExchange.Test
                                         _programService,
                                         new SessionCache(_httpContext.Object),
                                         new MapHelper(),
-                _cromerrLogger.Object
+                _cromerrLogger.Object,
+                _linkoExchangeEmailService.Object
                 );
         }
 

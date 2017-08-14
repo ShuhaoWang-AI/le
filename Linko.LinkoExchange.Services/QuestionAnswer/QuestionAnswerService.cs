@@ -14,7 +14,6 @@ using Linko.LinkoExchange.Services.Settings;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Email;
 using NLog;
-using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.AuditLog;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.HttpContext;
@@ -28,34 +27,30 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         private readonly IHttpContextService _httpContext;
         private readonly IEncryptionService _encryption;
         private readonly IPasswordHasher _passwordHasher;
-        private readonly ISettingService _settingService;
         private readonly IDictionary<SystemSettingType, string> _globalSettings;
-        private readonly IOrganizationService _orgService;
-        private readonly IEmailService _emailService;
-        private readonly IMapHelper _mapHelper;
-        private readonly ICromerrAuditLogService _crommerAuditLogService;
-        private readonly IOrganizationService _organizationService;
-        private readonly IRequestCache _requestCache;
-
-        public QuestionAnswerService(LinkoExchangeContext dbContext, ILogger logger, IHttpContextService httpContext,
-            IEncryptionService encryption, IPasswordHasher passwordHasher, ISettingService settingService,
-            IOrganizationService orgService, IEmailService emailService,
-            IMapHelper mapHelper, ICromerrAuditLogService crommerAuditLogService,
-            IOrganizationService organizationService, IRequestCache requestCache)
+        private readonly IOrganizationService _orgService;  
+        private readonly ICromerrAuditLogService _crommerAuditLogService; 
+        private readonly ILinkoExchangeEmailService  _linkoExchangeEmailService;
+        public QuestionAnswerService(
+            LinkoExchangeContext dbContext, 
+            ILogger logger, 
+            IHttpContextService httpContext,
+            IEncryptionService encryption, 
+            IPasswordHasher passwordHasher, 
+            ISettingService settingService,
+            IOrganizationService orgService,
+            ICromerrAuditLogService crommerAuditLogService,
+            ILinkoExchangeEmailService linkoExchangeEmailService)
         {
             _dbContext = dbContext;
             _logger = logger;
             _httpContext = httpContext;
             _encryption = encryption;
             _passwordHasher = passwordHasher;
-            _settingService = settingService;
-            _globalSettings = _settingService.GetGlobalSettings();
-            _orgService = orgService;
-            _emailService = emailService;
-            _mapHelper = mapHelper;
-            _crommerAuditLogService = crommerAuditLogService;
-            _organizationService = organizationService;
-            _requestCache = requestCache;
+            _globalSettings = settingService.GetGlobalSettings();
+            _orgService = orgService;  
+            _crommerAuditLogService = crommerAuditLogService; 
+            _linkoExchangeEmailService = linkoExchangeEmailService;
         }
 
         public void CreateOrUpdateUserQuestionAnswer(int userProfileId, AnswerDto answerDto)
@@ -198,8 +193,8 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 return CreateOrUpdateAnswersResult.DuplicateQuestionsInNewAndExisting;
 
 
-            int questionCountKBQ = 0;
-            int questionCountSQ = 0;
+            int questionCountKbq = 0;
+            int questionCountSq = 0;
             //Persist to DB
             //
             using (var transaction = _dbContext.BeginTransaction())
@@ -242,8 +237,8 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                     {
                         var questionTypeName = _dbContext.Questions.Include(q => q.QuestionType)
                             .Single(q => q.QuestionId == questionAnswer.QuestionId).QuestionType.Name;
-                        questionCountKBQ += questionTypeName == QuestionTypeName.KBQ.ToString() ? 1 : 0;
-                        questionCountSQ += questionTypeName == QuestionTypeName.SQ.ToString() ? 1 : 0;
+                        questionCountKbq += questionTypeName == QuestionTypeName.KBQ.ToString() ? 1 : 0;
+                        questionCountSq += questionTypeName == QuestionTypeName.SQ.ToString() ? 1 : 0;
 
                         CreateOrUpdateUserQuestionAnswer(userProfileId, questionAnswer);
                     }
@@ -269,38 +264,9 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
             }
 
-            var userProfile = _dbContext.Users.Single(u => u.UserProfileId == userProfileId);
-
-            //Send Emails
-            var contentReplacements = new Dictionary<string, string>();
-            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
-            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
-
-            var authorityList = _orgService.GetUserAuthorityListForEmailContent(userProfileId);
-            contentReplacements.Add("firstName", userProfile.FirstName);
-            contentReplacements.Add("lastName", userProfile.LastName);
-
-            contentReplacements.Add("authorityList", authorityList);
-            contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
-            contentReplacements.Add("supportEmail", supportEmail);
-
-            
-            var currentOrganizationRegulatoryProgramId = _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId);
-
-            if (currentOrganizationRegulatoryProgramId.Trim().Length > 0)
-            {
-                var currentOrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(int.Parse(currentOrganizationRegulatoryProgramId));
-
-                _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, currentOrganizationRegulatoryProgram.RegulatoryProgramId);
-                _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, currentOrganizationRegulatoryProgram.OrganizationId);
-                _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, currentOrganizationRegulatoryProgram.RegulatorOrganizationId);
-            }
-
-            if (questionCountKBQ > 0)
-                _emailService.SendEmail(new[] { userProfile.Email }, EmailType.Profile_KBQChanged, contentReplacements);
-            if (questionCountSQ > 0)
-                _emailService.SendEmail(new[] { userProfile.Email }, EmailType.Profile_SecurityQuestionsChanged, contentReplacements);
-
+            var userProfile = _dbContext.Users.Single(u => u.UserProfileId == userProfileId); 
+              
+            // Cromerr audit log
             var allOrgRegProgramUsers = _dbContext.OrganizationRegulatoryProgramUsers
                 .Include(orpu => orpu.OrganizationRegulatoryProgram)
                 .Where(orpu => orpu.UserProfileId == userProfileId);
@@ -318,22 +284,91 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
                 cromerrAuditLogEntryDto.UserEmailAddress = userProfile.Email;
                 cromerrAuditLogEntryDto.IPAddress = _httpContext.CurrentUserIPAddress();
                 cromerrAuditLogEntryDto.HostName = _httpContext.CurrentUserHostName();
-                contentReplacements = new Dictionary<string, string>();
-                contentReplacements.Add("firstName", userProfile.FirstName);
-                contentReplacements.Add("lastName", userProfile.LastName);
-                contentReplacements.Add("userName", userProfile.UserName);
-                contentReplacements.Add("emailAddress", userProfile.Email);
+                var cromerrContentReplacements = new Dictionary<string, string>();
+                cromerrContentReplacements.Add("firstName", userProfile.FirstName);
+                cromerrContentReplacements.Add("lastName", userProfile.LastName);
+                cromerrContentReplacements.Add("userName", userProfile.UserName);
+                cromerrContentReplacements.Add("emailAddress", userProfile.Email);
 
-                if (questionCountKBQ > 0)
-                    _crommerAuditLogService.Log(CromerrEvent.Profile_KBQChanged, cromerrAuditLogEntryDto, contentReplacements);
-                if (questionCountSQ > 0)
-                    _crommerAuditLogService.Log(CromerrEvent.Profile_SQChanged, cromerrAuditLogEntryDto, contentReplacements);
+                if (questionCountKbq > 0)
+                    _crommerAuditLogService.Log(CromerrEvent.Profile_KBQChanged, cromerrAuditLogEntryDto, cromerrContentReplacements);
+                if (questionCountSq > 0)
+                    _crommerAuditLogService.Log(CromerrEvent.Profile_SQChanged, cromerrAuditLogEntryDto, cromerrContentReplacements);
             }
 
-            
+            //Send Emails
+            var contentReplacements = new Dictionary<string, string>();
+            string supportPhoneNumber = _globalSettings[SystemSettingType.SupportPhoneNumber];
+            string supportEmail = _globalSettings[SystemSettingType.SupportEmailAddress];
 
+            var authorityList = _orgService.GetUserAuthorityListForEmailContent(userProfileId);
+            contentReplacements.Add("firstName", userProfile.FirstName);
+            contentReplacements.Add("lastName", userProfile.LastName);
+
+            contentReplacements.Add("authorityList", authorityList);
+            contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
+            contentReplacements.Add("supportEmail", supportEmail);
+
+            // Profile_KBQChanged, and Profile_SecurityQuestionsChanged emails are logged for all programs 
+            var emailEntries = new List<EmailEntry>(); 
+            
+            if (questionCountKbq > 0) {
+                emailEntries = _linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile, EmailType.Profile_KBQChanged, contentReplacements); 
+            } 
+
+            if(questionCountSq > 0)
+            {
+                emailEntries.AddRange(_linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile, EmailType.Profile_SecurityQuestionsChanged, contentReplacements));
+            }
+             
+            _linkoExchangeEmailService.SendEmails(emailEntries);
 
             return CreateOrUpdateAnswersResult.Success;
+
+        }
+
+        public void UpdateQuestion(QuestionDto question)
+        {
+            if (question != null && question.QuestionId.HasValue && question.QuestionId > 0)
+            {
+                var questionToUpdate = _dbContext.Questions.Single(q => q.QuestionId == question.QuestionId);
+                questionToUpdate.Content = question.Content;
+                questionToUpdate.QuestionTypeId = _dbContext.QuestionTypes.Single(q => q.Name == question.QuestionType.ToString()).QuestionTypeId;
+                questionToUpdate.IsActive = question.IsActive;
+                questionToUpdate.LastModificationDateTimeUtc = DateTimeOffset.Now;
+                questionToUpdate.LastModifierUserId = Convert.ToInt32(_httpContext.CurrentUserProfileId());
+
+                try
+                {
+                    _dbContext.SaveChanges();
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    List<RuleViolation> validationIssues = new List<RuleViolation>();
+
+                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                    {
+                        DbEntityEntry entry = item.Entry;
+                        string entityTypeName = entry.Entity.GetType().Name;
+
+                        foreach (DbValidationError subItem in item.ValidationErrors)
+                        {
+                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            validationIssues.Add(new RuleViolation(string.Empty, null, message));
+
+                        }
+                    }
+
+                    throw new RuleViolationException("Validation errors", validationIssues);
+                }
+            }
+            else
+            {
+                List<RuleViolation> validationIssues = new List<RuleViolation>();
+                validationIssues.Add(new RuleViolation(string.Empty, null, "Question update attempt failed."));
+                //_logger.Error("SubmitPOMDetails. Null question or missing QuestionId.");
+                throw new RuleViolationException("Validation errors", validationIssues);
+            }
 
         }
 
@@ -374,9 +409,8 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
                         foreach (DbValidationError subItem in item.ValidationErrors)
                         {
-                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            string message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
                             validationIssues.Add(new RuleViolation(string.Empty, null, message));
-
                         }
                     }
 
@@ -393,40 +427,78 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         }
 
+        public void DeleteUserQuestionAnswer(int userQuestionAnswerId)
+        {
+            var answerToDelete = _dbContext.UserQuestionAnswers
+                .Include(a => a.Question)
+                .Single(a => a.UserQuestionAnswerId == userQuestionAnswerId);
+            if (answerToDelete != null)
+            {
+                _dbContext.UserQuestionAnswers.Remove(answerToDelete);
+
+                try
+                {
+                    _dbContext.SaveChanges();
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    List<RuleViolation> validationIssues = new List<RuleViolation>();
+
+                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                    {
+                        DbEntityEntry entry = item.Entry;
+                        string entityTypeName = entry.Entity.GetType().Name;
+
+                        foreach (DbValidationError subItem in item.ValidationErrors)
+                        {
+                            string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
+                            validationIssues.Add(new RuleViolation(string.Empty, null, message));
+
+                        }
+                    }
+
+                    //_logger.Info("???");
+                    throw new RuleViolationException("Validation errors", validationIssues);
+                }
+
+            }
+            else
+            {
+                string errorMsg = string.Format("DeleteQuestionAnswerPair. Could not find UserQuestionAnswer associated with Id={0}", userQuestionAnswerId);
+                List<RuleViolation> validationIssues = new List<RuleViolation>();
+                validationIssues.Add(new RuleViolation(string.Empty, null, errorMsg));
+                //_logger.Info("SubmitPOMDetails. Null question or missing QuestionId.");
+                throw new RuleViolationException("Validation errors", validationIssues);
+            }
+        }
+
         public ICollection<QuestionAnswerPairDto> GetUsersQuestionAnswers(int userProfileId, QuestionTypeName questionType)
         {
-            var usersQAList = new List<Dto.QuestionAnswerPairDto>();
+            var usersQaList = new List<QuestionAnswerPairDto>();
             var foundQAs = _dbContext.UserQuestionAnswers.Include(a => a.Question.QuestionType)
                 .Where(a => a.UserProfileId == userProfileId
-                && a.Question.QuestionType.Name == questionType.ToString());
+                && a.Question.QuestionType.Name == questionType.ToString()).ToList();
 
-            if (foundQAs != null)
+            if (foundQAs.Any())
             {
-                foreach (var foundQA in foundQAs)
+                foreach (var foundQa in foundQAs)
                 {
-                    var newQADto = new QuestionAnswerPairDto() { Answer = new Dto.AnswerDto(), Question = new Dto.QuestionDto() };
-                    newQADto.Answer.UserQuestionAnswerId = foundQA.UserQuestionAnswerId;
+                    var newQaDto = new QuestionAnswerPairDto() { Answer = new AnswerDto(), Question = new QuestionDto() }; 
 
-                    if (questionType == QuestionTypeName.SQ)
-                    {
-                        //Decrypt answer
-                        newQADto.Answer.Content = _encryption.DecryptString(foundQA.Content);
-                    }
-                    else
-                    {
-                        newQADto.Answer.Content = foundQA.Content;
-                    }
+                    newQaDto.Answer.UserQuestionAnswerId = foundQa.UserQuestionAnswerId;
 
-                    newQADto.Question.QuestionId = foundQA.Question.QuestionId;
-                    newQADto.Question.IsActive = foundQA.Question.IsActive;
-                    newQADto.Question.QuestionType = (QuestionTypeName) Enum.Parse(typeof(QuestionTypeName), foundQA.Question.QuestionType.Name, true);
-                    newQADto.Question.Content = foundQA.Question.Content;
+                    newQaDto.Answer.Content = questionType == QuestionTypeName.SQ ? _encryption.DecryptString(foundQa.Content) : foundQa.Content;
 
-                    usersQAList.Add(newQADto);
+                    newQaDto.Question.QuestionId = foundQa.Question.QuestionId;
+                    newQaDto.Question.IsActive = foundQa.Question.IsActive;
+                    newQaDto.Question.QuestionType = (QuestionTypeName) Enum.Parse(typeof(QuestionTypeName), foundQa.Question.QuestionType.Name, true);
+                    newQaDto.Question.Content = foundQa.Question.Content;
 
+                    usersQaList.Add(newQaDto);
                 }
             }
-            return usersQAList;
+
+            return usersQaList;
         }
 
         public QuestionAnswerPairDto GetRandomQuestionAnswerFromToken(string token, QuestionTypeName questionType)
@@ -440,8 +512,9 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
             }
             else
-                throw new Exception(string.Format("ERROR: Cannot find email audit log for token={0}", token));
-
+            {
+                throw new Exception($"ERROR: Cannot find email audit log for token={token}");
+            }
         }
 
         public QuestionAnswerPairDto GetRandomQuestionAnswerFromUserProfileId(int userProfileId, QuestionTypeName questionType)
@@ -452,9 +525,10 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         public void CreateUserQuestionAnswers(int userProfileId, IEnumerable<AnswerDto> questionAnswers)
         {
-            if (questionAnswers != null && questionAnswers.Any())
+            var answerDtos = questionAnswers as IList<AnswerDto> ?? questionAnswers.ToList();
+            if (answerDtos.Any())
             {
-                foreach (var qa in questionAnswers)
+                foreach (var qa in answerDtos)
                 {
                     CreateOrUpdateUserQuestionAnswer(userProfileId, qa);
                 }
@@ -463,9 +537,9 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         public void DeleteUserQuestionAndAnswers(int userProfileId)
         {
-            var userQuestionAndAnswers = _dbContext.UserQuestionAnswers.Where(i => i.UserProfileId == userProfileId);
+            var userQuestionAndAnswers = _dbContext.UserQuestionAnswers.Where(i => i.UserProfileId == userProfileId).ToList();
 
-            if (userQuestionAndAnswers != null && userQuestionAndAnswers.Any())
+            if (userQuestionAndAnswers.Any())
             {
                 foreach (var answer in userQuestionAndAnswers)
                 {
@@ -477,25 +551,20 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         public ICollection<QuestionDto> GetQuestions()
         {
             var list = new List<QuestionDto>();
-
-            var questions = _dbContext.Questions
-                .Where(q => q.IsActive == true);
-
-
+            var questions = _dbContext.Questions.Where(q => q.IsActive);
             foreach (var question in questions)
             {
-                var dto = new Dto.QuestionDto()
-                {
-                    QuestionId = question.QuestionId,
-                    Content = question.Content
-                };
-                dto.QuestionType = (QuestionTypeName) Enum.Parse(typeof(QuestionTypeName), question.QuestionType.Name, true);
+                var dto = new QuestionDto
+                          {
+                              QuestionId = question.QuestionId,
+                              Content = question.Content,
+                              QuestionType = (QuestionTypeName) Enum.Parse(typeof(QuestionTypeName), question.QuestionType.Name, true)
+                          };
 
                 list.Add(dto);
             }
 
             return list;
-
         }
 
         public bool ConfirmCorrectAnswer(int userQuestionAnswerId, string answer)
@@ -516,25 +585,26 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         public RegistrationResult ValidateUserKbqData(IEnumerable<AnswerDto> kbqQuestions)
         {
-            if (kbqQuestions == null || kbqQuestions.Count() < 5)
+            var answerDtos = kbqQuestions as AnswerDto[] ?? kbqQuestions.ToArray();
+            if (answerDtos.Count() < 5)
             {
                 return RegistrationResult.MissingKBQ;
             }
 
             // Test duplicated KBQ questions
-            if (kbqQuestions.GroupBy(i => i.QuestionId).Any(i => i.Count() > 1))
+            if (answerDtos.GroupBy(i => i.QuestionId).Any(i => i.Count() > 1))
             {
                 return RegistrationResult.DuplicatedKBQ;
             }
 
             // Test duplicated KBQ question answers
-            if (kbqQuestions.GroupBy(i => i.Content).Any(i => i.Count() > 1))
+            if (answerDtos.GroupBy(i => i.Content).Any(i => i.Count() > 1))
             {
                 return RegistrationResult.DuplicatedKBQAnswer;
             }
 
-            // Test KBQ questions must have answer
-            if (kbqQuestions.Any(i => i.Content == null))
+            // Test KBQ questions mush have answer
+            if (answerDtos.Any(i => i.Content == null))
             {
                 return RegistrationResult.MissingKBQAnswer;
             }
@@ -544,25 +614,26 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
 
         public RegistrationResult ValidateUserSqData(IEnumerable<AnswerDto> securityQuestions)
         {
-            if (securityQuestions == null || securityQuestions.Count() < 2)
+            var answerDtos = securityQuestions as AnswerDto[] ?? securityQuestions.ToArray();
+            if (answerDtos.Count() < 2)
             {
                 return RegistrationResult.MissingSecurityQuestion;
             }
 
             // Test duplicated security questions
-            if (securityQuestions.GroupBy(i => i.QuestionId).Any(i => i.Count() > 1))
+            if (answerDtos.GroupBy(i => i.QuestionId).Any(i => i.Count() > 1))
             {
                 return RegistrationResult.DuplicatedSecurityQuestion;
             }
 
             // Test duplicated security question answers
-            if (securityQuestions.GroupBy(i => i.Content.ToLower()).Any(i => i.Count() > 1))
+            if (answerDtos.GroupBy(i => i.Content.ToLower()).Any(i => i.Count() > 1))
             {
                 return RegistrationResult.DuplicatedSecurityQuestionAnswer;
             }
 
             // Test security questions mush have answer
-            if (securityQuestions.Any(i => i.Content == null))
+            if (answerDtos.Any(i => i.Content == null))
             {
                 return RegistrationResult.MissingSecurityQuestionAnswer;
             }

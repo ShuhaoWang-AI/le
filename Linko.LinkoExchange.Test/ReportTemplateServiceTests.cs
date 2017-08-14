@@ -29,8 +29,7 @@ namespace Linko.LinkoExchange.Test
         Mock<ITimeZoneService> _timeZoneService = new Mock<ITimeZoneService>();
         Mock<ILogger> _logger = new Mock<ILogger>();
         Mock<IHttpContextService> _httpContext = new Mock<IHttpContextService>();
-        Mock<IUserService> _userService = new Mock<IUserService>();
-        Mock<IEmailService> _emailService = new Mock<IEmailService>();
+        Mock<IUserService> _userService = new Mock<IUserService>(); 
         Mock<ISettingService> _settingService = new Mock<ISettingService>();
         Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
 

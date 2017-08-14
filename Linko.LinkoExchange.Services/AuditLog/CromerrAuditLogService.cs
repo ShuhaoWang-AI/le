@@ -16,16 +16,17 @@ namespace Linko.LinkoExchange.Services.AuditLog
     public class CromerrAuditLogService : ICromerrAuditLogService
     {
         private readonly LinkoExchangeContext _dbContext;
-        private readonly IRequestCache _requestCache;
         private readonly IMapHelper _mapHelper;
         private readonly IHttpContextService _httpContext;
         private readonly ILogger _logService;
 
-        public CromerrAuditLogService(LinkoExchangeContext linkoExchangeContext, IRequestCache requestCache,
-            IMapHelper mapHelper, IHttpContextService httpContext, ILogger logService)
+        public CromerrAuditLogService(
+            LinkoExchangeContext linkoExchangeContext,
+            IMapHelper mapHelper, 
+            IHttpContextService httpContext, 
+            ILogger logService)
         {
             _dbContext = linkoExchangeContext;
-            _requestCache = requestCache;
             _mapHelper = mapHelper;
             _httpContext = httpContext;
             _logService = logService;
@@ -43,11 +44,11 @@ namespace Linko.LinkoExchange.Services.AuditLog
             cromerrAuditLogEntry.Comment = comment;
             cromerrAuditLogEntry.LogDateTimeUtc = DateTimeOffset.Now;
 
-            this._dbContext.CromerrAuditLogs.Add(cromerrAuditLogEntry);
+            _dbContext.CromerrAuditLogs.Add(cromerrAuditLogEntry);
 
             try
             {
-                this._dbContext.SaveChanges();
+                _dbContext.SaveChanges();
             }
             catch
             {

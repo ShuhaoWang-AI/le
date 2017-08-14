@@ -43,8 +43,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IProgramService _programService;
         private readonly IInvitationService _invitationService;
         private readonly IAuthenticationManager _authenticationManager;
-        private readonly IPermissionService _permissionService;
-        private readonly IEmailService _emailService;
+        private readonly IPermissionService _permissionService; 
         private readonly IUserService _userService;
         private readonly ISessionCache _sessionCache;
         private readonly IRequestCache _requestCache;
@@ -57,18 +56,18 @@ namespace Linko.LinkoExchange.Services.Authentication
         private readonly IMapHelper _mapHelper;
         private readonly ICromerrAuditLogService _crommerAuditLogService;
         private readonly ITermConditionService _termConditionService;
+        private readonly ILinkoExchangeEmailService _linkoExchangeEmailService;
 
         public AuthenticationService(ApplicationUserManager userManager,
-            ApplicationSignInManager signInManager,
-            IAuthenticationManager authenticationManager,
-            ISettingService settingService,
-            IOrganizationService organizationService,
-            IProgramService programService,
-            IInvitationService invitationService,
-            IEmailService emailService,
-            IPermissionService permissionService,
-            LinkoExchangeContext linkoExchangeContext,
-            IUserService userService
+            ApplicationSignInManager signInManager
+           ,IAuthenticationManager authenticationManager
+           ,ISettingService settingService
+           ,IOrganizationService organizationService
+           ,IProgramService programService
+           ,IInvitationService invitationService
+           ,IPermissionService permissionService
+           ,LinkoExchangeContext linkoExchangeContext
+           ,IUserService userService
            , ISessionCache sessionCache
            , IRequestCache requestCache
            , IPasswordHasher passwordHasher
@@ -78,6 +77,7 @@ namespace Linko.LinkoExchange.Services.Authentication
            , IMapHelper mapHelper
            , ICromerrAuditLogService crommerAuditLogService
            , ITermConditionService termConditionService
+           , ILinkoExchangeEmailService linkoExchangeEmailService
             )
         {
             if (linkoExchangeContext == null) throw new ArgumentNullException(paramName: "linkoExchangeContext");
@@ -88,7 +88,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (organizationService == null) throw new ArgumentNullException(paramName: "organizationService");
             if (programService == null) throw new ArgumentNullException(paramName: "programService");
             if (invitationService == null) throw new ArgumentNullException(paramName: "invitationService");
-            if (emailService == null) throw new ArgumentNullException(paramName: "emailService");
+            
             if (permissionService == null) throw new ArgumentNullException(paramName: "permissionService");
             if (userService == null) throw new ArgumentNullException("userService");
             if (sessionCache == null) throw new ArgumentNullException("sessionCache");
@@ -99,6 +99,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             if (mapHelper == null) throw new ArgumentNullException("mapHelper");
             if (crommerAuditLogService == null) throw new ArgumentNullException("crommerAuditLogService");
             if (termConditionService == null) throw new ArgumentNullException("termConditionService");
+            if (linkoExchangeEmailService == null) throw new ArgumentNullException("linkoExchangeEmailService");
 
             _dbContext = linkoExchangeContext;
             _userManager = userManager;
@@ -109,7 +110,6 @@ namespace Linko.LinkoExchange.Services.Authentication
             _programService = programService;
             _invitationService = invitationService;
             _globalSettings = _settingService.GetGlobalSettings();
-            _emailService = emailService;
             _permissionService = permissionService;
             _userService = userService;
             _sessionCache = sessionCache;
@@ -121,6 +121,7 @@ namespace Linko.LinkoExchange.Services.Authentication
             _mapHelper = mapHelper;
             _crommerAuditLogService = crommerAuditLogService;
             _termConditionService = termConditionService;
+            _linkoExchangeEmailService = linkoExchangeEmailService;
         }
 
         public IList<Claim> GetClaims()
@@ -190,6 +191,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <returns></returns>
         public Task<AuthenticationResultDto> ChangePasswordAsync(string userId, string newPassword)
         {
+            var emailEntries= new List<EmailEntry>(); 
             var authenticationResult = new AuthenticationResultDto();
             try
             {
@@ -215,7 +217,6 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
 
                 // Check if the new password is one of the password used last # numbers
-
                 if (!IsValidPasswordCheckInHistory(newPassword, applicationUser.UserProfileId, organizationSettings))
                 {
                     var numberOfPasswordsInHistory = GetStrictestPasswordHistoryCounts(organizationSettings, null);
@@ -247,18 +248,26 @@ namespace Linko.LinkoExchange.Services.Authentication
                 contentReplacements.Add("authorityList", authorityList);
                 contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
                 contentReplacements.Add("supportEmail", supportEmail);
-
+                
+                var emailEntry = new EmailEntry
+                {
+                    EmailType = EmailType.Profile_PasswordChanged, 
+                    ContentReplacements = contentReplacements, 
+                    RecipientEmailAddress = applicationUser.Email,
+                    RecipientFirstName = applicationUser.FirstName,
+                    RecipientLastName = applicationUser.LastName
+                }; 
+                
                 var currentOrganizationRegulatoryProgramId = _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId);
-
                 if (currentOrganizationRegulatoryProgramId.Trim().Length > 0)
                 {
                     var currentOrganizationRegulatoryProgram = _organizationService.GetOrganizationRegulatoryProgram(int.Parse(currentOrganizationRegulatoryProgramId));
+                    emailEntry.RecipientOrganizationId = currentOrganizationRegulatoryProgram.OrganizationId; 
+                    emailEntry.RecipientOrgulatoryProgramId = currentOrganizationRegulatoryProgram.RegulatoryProgramId; 
+                    emailEntry.RecipientRegulatorOrganizationId = currentOrganizationRegulatoryProgram.RegulatorOrganizationId; 
+                }  
 
-                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryProgramId, currentOrganizationRegulatoryProgram.RegulatoryProgramId);
-                    _requestCache.SetValue(CacheKey.EmailRecipientOrganizationId, currentOrganizationRegulatoryProgram.OrganizationId);
-                    _requestCache.SetValue(CacheKey.EmailRecipientRegulatoryOrganizationId, currentOrganizationRegulatoryProgram.RegulatorOrganizationId);
-                }
-                _emailService.SendEmail(new[] { applicationUser.Email }, EmailType.Profile_PasswordChanged, contentReplacements);
+                emailEntries.Add(emailEntry); 
 
                 //Cromerr
                 //Need to log for all associated regulatory program orgs
@@ -296,6 +305,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                 var errors = new List<string> { ex.Message };
                 authenticationResult.Errors = errors;
             }
+            
+            // Send emails.
+            _linkoExchangeEmailService.SendEmails(emailEntries); 
             return Task.FromResult(authenticationResult);
         }
 
@@ -313,15 +325,17 @@ namespace Linko.LinkoExchange.Services.Authentication
             {
                 inValidUserProfileMessages.Add(RegistrationResult.BadUserProfileData);
             }
-
-            if (string.IsNullOrWhiteSpace(userInfo.UserName))
+            else
             {
-              inValidUserProfileMessages.Add(RegistrationResult.MissingUserName);
-            }
+                if (string.IsNullOrWhiteSpace(userInfo.UserName))
+                {
+                  inValidUserProfileMessages.Add(RegistrationResult.MissingUserName);
+                }
 
-            if(string.IsNullOrWhiteSpace(userInfo.Email))
-            { 
-              inValidUserProfileMessages.Add(RegistrationResult.MissingEmailAddress); 
+                if(string.IsNullOrWhiteSpace(userInfo.Email))
+                { 
+                  inValidUserProfileMessages.Add(RegistrationResult.MissingEmailAddress); 
+                }
             }
 
             return inValidUserProfileMessages; 
@@ -337,7 +351,7 @@ namespace Linko.LinkoExchange.Services.Authentication
         /// <param name="kbqQuestions">KBQ questions</param>
         /// <param name="registrationType">Registration type</param>
         /// <returns>Registration results.</returns>
-        public async Task<RegistrationResultDto> Register(
+        public RegistrationResultDto Register(
             UserDto userInfo,
             string registrationToken,
             IEnumerable<AnswerDto> securityQuestions,
@@ -355,12 +369,12 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
                 if (string.IsNullOrWhiteSpace(userInfo.UserName))
                 {
-                    var errText = $"User name cannot be null or whitespace.";
+                    var errText = "User name cannot be null or whitespace.";
                     _logger.Error(errText);
                     throw new Exception(errText);
                 }
                 userInfo.UserName = userInfo.UserName.Trim();
-
+                
                 var validatResult = ValidateRegistrationData(userInfo, securityQuestions, kbqQuestions);
                 if (validatResult != RegistrationResult.Success)
                 {
@@ -374,9 +388,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                 registrationResult.Result = RegistrationResult.InvalidRegistrationToken;
                 return registrationResult;
             }
-                
-            //_requestCache.SetValue(CacheKey.Token, registrationToken);
-            _logger.Info("Register. userName={0}, registrationToken={1}", userInfo.UserName, registrationToken);
+ 
+            _logger.Info(message:$"Register. userName={userInfo.UserName}, registrationToken={registrationToken}");
 
             var invitationDto = _invitationService.GetInvitation(registrationToken);
 
@@ -498,9 +511,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                     if (registrationType == RegistrationType.ReRegistration && applicationUser.TermConditionId != termConditionId)
                     {
                         applicationUser.TermConditionAgreedDateTimeUtc = DateTimeOffset.Now;
-                        applicationUser.TermConditionId = termConditionId; 
+                        applicationUser.TermConditionId = termConditionId;
                     }
-                    
+
                     // Existing user re-register
                     // Check if the password has been in # password in history
                     if (registrationType == RegistrationType.ResetRegistration)
@@ -562,8 +575,8 @@ namespace Linko.LinkoExchange.Services.Authentication
                         _questionAnswerService.CreateUserQuestionAnswers(applicationUser.UserProfileId, combined);
                     }
 
-                    #endregion 
-                     
+                    #endregion
+
                     var inviterOrganizationRegulatoryProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.SenderOrganizationRegulatoryProgramId);
 
                     var recipientOrganizationRegulatoryProgram = _programService.GetOrganizationRegulatoryProgram(invitationDto.RecipientOrganizationRegulatoryProgramId);
@@ -577,7 +590,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                         registrationResult.Result = RegistrationResult.Failed;
                         return registrationResult;
                     }
-                    
+
                     if (!recipientOrganizationRegulatoryProgram.RegulatorOrganizationId.HasValue && inviterOrganizationRegulatoryProgram.RegulatorOrganizationId.HasValue)
                     {
                         // IU invited the authority user; AU can only invite authority user
@@ -587,8 +600,8 @@ namespace Linko.LinkoExchange.Services.Authentication
 
                     // UC-42 6
                     // 2 Create organization regulatory program user, and set the approved statue to false  
-                    await CreateOrUpdateOrganizationRegulatoryProgramUserDuringRegistration(applicationUser, recipientOrganizationRegulatoryProgram, inviterOrganizationRegulatoryProgram, registrationType);
-                    
+                    var emailEntries = CreateOrUpdateOrganizationRegulatoryProgramUserDuringRegistration(applicationUser, recipientOrganizationRegulatoryProgram, inviterOrganizationRegulatoryProgram, registrationType);
+
                     // All succeed
                     // 4 Remove the invitation from table 
                     _invitationService.DeleteInvitation(invitationDto.InvitationId, true);
@@ -596,6 +609,9 @@ namespace Linko.LinkoExchange.Services.Authentication
                     _dbContext.SaveChanges();
                     transaction.Commit();
                     registrationResult.Result = RegistrationResult.Success;
+
+                    //Send pending registration emails  
+                    _linkoExchangeEmailService.SendEmails(emailEntries);
                 }
                 catch (Exception ex)
                 {
@@ -616,17 +632,15 @@ namespace Linko.LinkoExchange.Services.Authentication
                 }
             }
 
-            //Send pending registration emails
-            _emailService.SendCachedEmailEntries(); 
-
-            _logger.Info("Register. userName={0}, email={1}, registrationResult{2}", argument1: userInfo.UserName, argument2: registrationToken, argument3: registrationResult);
-
+            _logger.Info(message:$"Register. userName={userInfo.UserName}, email={registrationToken}, registrationResult{registrationResult}");
             return registrationResult;
         }
 
-        private async Task CreateOrUpdateOrganizationRegulatoryProgramUserDuringRegistration(UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
+        private List<EmailEntry> CreateOrUpdateOrganizationRegulatoryProgramUserDuringRegistration(UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
                                                                                              OrganizationRegulatoryProgramDto inviterOrganizationRegulatoryProgram, RegistrationType registrationType)
         {
+            var emailEntries = new List<EmailEntry>(); 
+
             if (registrationType == RegistrationType.ResetRegistration)
             {
                 // Set IsRegistrationApproved value as false to enforce all the users need to be approved again for the all programs where they were approved before.
@@ -659,13 +673,13 @@ namespace Linko.LinkoExchange.Services.Authentication
                     }
 
                     // Prepare Registration Approval Emails
-                    PrepareApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: prevRegisteredOrgRegProg,
+                    emailEntries = PrepareApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: prevRegisteredOrgRegProg,
                                                            inviterOrganizationRegulatoryProgram: authorityOrgRegProg,
                                                            authorityOrg: authorityOrgRegProg.OrganizationDto);
 
                     // Do COMERR Log
-                    await DoComerrLogForRegistration(registrationType: registrationType, registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: prevRegisteredOrgRegProg,
-                                                     authorityOrg: authorityOrgRegProg.OrganizationDto);
+                    DoComerrLogForRegistration(registrationType: registrationType, registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: prevRegisteredOrgRegProg,
+                                                     authorityOrg: authorityOrgRegProg.OrganizationDto).Wait();
                 }
             }
             else
@@ -714,47 +728,57 @@ namespace Linko.LinkoExchange.Services.Authentication
                     var authorityOrg = registeredOrganizationRegulatoryProgram.RegulatorOrganization ?? registeredOrganizationRegulatoryProgram.OrganizationDto;
 
                     // Prepare Registration Approval Emails
-                    PrepareApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: registeredOrganizationRegulatoryProgram,
+                    emailEntries = PrepareApprovalEmailForRegistration(registeredUser: registeredUser, registeredOrganizationRegulatoryProgram: registeredOrganizationRegulatoryProgram,
                                                            inviterOrganizationRegulatoryProgram: inviterOrganizationRegulatoryProgram, authorityOrg: authorityOrg);
 
                     // Do COMERR Log
-                    await DoComerrLogForRegistration(registrationType: registrationType, registeredUser: registeredUser,
+                    DoComerrLogForRegistration(registrationType: registrationType, registeredUser: registeredUser,
                                                      registeredOrganizationRegulatoryProgram: registeredOrganizationRegulatoryProgram,
-                                                     authorityOrg: authorityOrg);
-                }
-
-                _dbContext.SaveChanges();
+                                                     authorityOrg: authorityOrg).Wait();
+                } 
             }
+            _dbContext.SaveChanges(); 
+            return emailEntries;
         }
 
-        private void PrepareApprovalEmailForRegistration(UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
+        private List<EmailEntry> PrepareApprovalEmailForRegistration(UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
                                                             OrganizationRegulatoryProgramDto inviterOrganizationRegulatoryProgram, OrganizationDto authorityOrg)
         {
-
             //  Determine if user is authority user or is industry user;
+            //  To change here when we have multiple level authorities
             bool isInvitedToIndustry = registeredOrganizationRegulatoryProgram.RegulatorOrganizationId.HasValue;
 
             // UC-42 7, 8
             // Find out who have approval permission    
-            var sendTo = _permissionService.GetApprovalPeople(inviterOrganizationRegulatoryProgram, isInvitedToIndustry).Select(i => i.Email).ToList();
-
-            var emailContentReplacements = new Dictionary<string, string>();
-            emailContentReplacements.Add("firstName", registeredUser.FirstName);
-            emailContentReplacements.Add("lastName", registeredUser.LastName);
+            var approvalPeople = _permissionService.GetApprovalPeople(inviterOrganizationRegulatoryProgram, isInvitedToIndustry).ToList();
 
             var emailAddressOnEmail = _settingService.GetOrgRegProgramSettingValue(inviterOrganizationRegulatoryProgram.RegulatoryProgramId, SettingType.EmailContactInfoEmailAddress);
             var phoneNumberOnEmail = _settingService.GetOrgRegProgramSettingValue(inviterOrganizationRegulatoryProgram.RegulatoryProgramId, SettingType.EmailContactInfoPhone);
             var authorityName = _settingService.GetOrgRegProgramSettingValue(inviterOrganizationRegulatoryProgram.RegulatoryProgramId, SettingType.EmailContactInfoName);
 
-            emailContentReplacements.Add("supportEmail", emailAddressOnEmail);
-            emailContentReplacements.Add("supportPhoneNumber", phoneNumberOnEmail);
-            emailContentReplacements.Add("authorityName", authorityName);
-            emailContentReplacements.Add("authorityOrganizationName", authorityOrg.OrganizationName);
-            emailContentReplacements.Add("organizationName", registeredOrganizationRegulatoryProgram.OrganizationDto.OrganizationName);
+            var emailContentReplacements = new Dictionary<string, string>
+                                           {
+                                               {"firstName", registeredUser.FirstName},
+                                               {"lastName", registeredUser.LastName},
+                                               {"supportEmail", emailAddressOnEmail},
+                                               {"supportPhoneNumber", phoneNumberOnEmail},
+                                               {"authorityName", authorityName},
+                                               {"authorityOrganizationName", authorityOrg.OrganizationName},
+                                               {"organizationName", registeredOrganizationRegulatoryProgram.OrganizationDto.OrganizationName}
+                                           };
 
-            if (!sendTo.Any())
+            if (!approvalPeople.Any())
             {
-                sendTo.Add(emailAddressOnEmail); // send email to authority support email when no approval email found
+                var support = _dbContext.Users.SingleOrDefault(i=>i.Email == emailAddressOnEmail && i.IsAccountResetRequired == false);
+                if(support == null)
+                {
+                    support = new UserProfile
+                    {
+                        Email = emailAddressOnEmail 
+                    };
+                }
+
+                approvalPeople.Add(_mapHelper.GetUserDtoFromUserProfile(support)); // send email to authority support email when no approval email found
             }
 
             if (isInvitedToIndustry)
@@ -766,26 +790,23 @@ namespace Linko.LinkoExchange.Services.Authentication
                 emailContentReplacements.Add("stateName", receipientOrg.State);
             }
 
-            var emailEntry = new EmailEntry
-            {
-                SendToEmails = sendTo,
-                ContentReplacements = emailContentReplacements,
-                ReceipientOrgulatoryProgramId= inviterOrganizationRegulatoryProgram.RegulatoryProgramId, 
-                ReceipientOrganizationId = inviterOrganizationRegulatoryProgram.OrganizationId,
-                ReceipientRegulatorOrganizationId = inviterOrganizationRegulatoryProgram.RegulatorOrganizationId
-            }; 
-            
-            if (isInvitedToIndustry)
-            { 
-                emailEntry.EmailType = EmailType.Registration_IndustryUserRegistrationPendingToApprovers;
-            }
-            else
-            {
-                emailEntry.EmailType = EmailType.Registration_AuthorityUserRegistrationPendingToApprovers;
-            }
+            return approvalPeople.Select(i=> {
+                var emailEntry = new EmailEntry
+                {
+                    RecipientEmailAddress = i.Email,
+                    RecipientUserProfileId = i.UserProfileId,
+                    RecipientFirstName = i.FirstName,
+                    RecipientLastName = i.LastName,
+                    RecipientUserName = i.UserName,
+                    ContentReplacements = emailContentReplacements,
+                    RecipientOrgulatoryProgramId= inviterOrganizationRegulatoryProgram.RegulatoryProgramId,
+                    RecipientOrganizationId = inviterOrganizationRegulatoryProgram.OrganizationId,
+                    RecipientRegulatorOrganizationId = inviterOrganizationRegulatoryProgram.RegulatorOrganizationId,
+                    EmailType = isInvitedToIndustry ? EmailType.Registration_IndustryUserRegistrationPendingToApprovers : EmailType.Registration_AuthorityUserRegistrationPendingToApprovers
+                }; 
 
-            // put email entry to request cache 
-            _requestCache.SetValue(key:CacheKey.EmailEntriesToSend, value:new [] { emailEntry });
+                return emailEntry;
+            }).ToList(); 
         }
 
         private async Task DoComerrLogForRegistration(RegistrationType registrationType, UserProfile registeredUser, OrganizationRegulatoryProgramDto registeredOrganizationRegulatoryProgram,
@@ -804,6 +825,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                                               IPAddress = _httpContext.CurrentUserIPAddress(),
                                               HostName = _httpContext.CurrentUserHostName()
                                           };
+             
             var contentReplacements = new Dictionary<string, string>
                                       {
                                           {"authorityName", authorityOrg.OrganizationName},
@@ -903,7 +925,7 @@ namespace Linko.LinkoExchange.Services.Authentication
                 foreach (var orgRegProgDto in _organizationService.GetUserOrganizations(userProfileId))
                 {
                     var userDto = _userService.GetUserProfileById(userProfileId);
-                    _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_PasswordResetExpired, orgRegProgDto, userDto);
+                    await _crommerAuditLogService.SimpleLog(CromerrEvent.ForgotPassword_PasswordResetExpired, orgRegProgDto, userDto);
                 }
 
                 return authenticationResult;
@@ -1192,7 +1214,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
         public PasswordAndKbqValidationResult ValidatePasswordAndKbq(string password, int userQuestionAnswerId, string kbqAnswer, int failedPasswordCount, int failedKbqCount, ReportOperation reportOperation, int? reportPackageId = null)
         {
-            _logger.Info($"Enter AuthenticationService.PasswordAndKbqValidationResult");
+            _logger.Info("Enter AuthenticationService.PasswordAndKbqValidationResult");
 
             var userProfileId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.UserProfileId));
             var orgRegProgramId = int.Parse(s: _httpContext.GetClaimValue(claimType: CacheKey.OrganizationRegulatoryProgramId));
@@ -1425,12 +1447,9 @@ namespace Linko.LinkoExchange.Services.Authentication
             var claims = GetClaims();
 
             //return claims?.ToList();
-            if (claims != null)
-            {
-                var claim = claims.FirstOrDefault(c => c.Type == claimType);
-                if (claim != null)
-                    claimsValue = claim.Value;
-            }
+            var claim = claims?.FirstOrDefault(c => c.Type == claimType);
+            if (claim != null)
+                claimsValue = claim.Value;
 
             return claimsValue;
         }
@@ -1716,11 +1735,13 @@ namespace Linko.LinkoExchange.Services.Authentication
             contentReplacements.Add("supportEmail", supportEmail);
 
             _requestCache.SetValue(CacheKey.Token, token);
-            _emailService.SendEmail(new[] { userProfile.Email }, EmailType.ForgotPassword_ForgotPassword, contentReplacements);
+
+            //ForgotPassword_ForgotPassword: Email Audit logs to all programs  
+            var emailEntries = _linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile,EmailType.ForgotPassword_ForgotPassword, contentReplacements); 
+
+            _linkoExchangeEmailService.SendEmails(emailEntries); 
         }
-
-
-
+        
         private void SendRequestUsernameEmail(UserProfile userProfile)
         {
             string baseUrl = _httpContext.GetRequestBaseUrl();
@@ -1735,10 +1756,12 @@ namespace Linko.LinkoExchange.Services.Authentication
             contentReplacements.Add("supportPhoneNumber", supportPhoneNumber);
             contentReplacements.Add("supportEmail", supportEmail);
 
-            _emailService.SendEmail(new[] { userProfile.Email }, EmailType.ForgotUserName_ForgotUserName, contentReplacements);
+            // ForgotUserName_ForgotUserName email logs for all programs
+            var emailEntries = _linkoExchangeEmailService.GetAllProgramEmailEntiresForUser(userProfile, EmailType.ForgotUserName_ForgotUserName, contentReplacements); 
+            _linkoExchangeEmailService.SendEmails(emailEntries); 
         }
 
-        public RegistrationResult ValidateRegistrationData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions)
+        private RegistrationResult ValidateRegistrationData(UserDto userProfile, IEnumerable<AnswerDto> securityQuestions, IEnumerable<AnswerDto> kbqQuestions)
         {
             if (userProfile.AgreeTermsAndConditions == false)
             {
@@ -1763,16 +1786,7 @@ namespace Linko.LinkoExchange.Services.Authentication
 
             return _userService.ValidateRegistrationUserData(userProfile, securityQuestions, kbqQuestions);
         }
-
-        public RegistrationResult[] KbqValidation(UserDto userProfile, IEnumerable<AnswerDto> kbqQuestions)
-        {
-            return null;
-        }
-        public RegistrationResult[] SecurityValidation(UserDto userProfile, IEnumerable<AnswerDto> kbqQuestions)
-        { 
-            return null;
-        } 
-
+        
         public void UpdateClaim(string key, string value)
         {
             var currentClaims = GetClaims();

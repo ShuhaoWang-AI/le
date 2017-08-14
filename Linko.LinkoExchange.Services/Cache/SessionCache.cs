@@ -31,7 +31,7 @@ namespace Linko.LinkoExchange.Services.Cache
 
         public object GetValue(string key)
         {
-            var value = _httpContextService.GetSessionValue(key:key);
+            var value = _httpContextService.GetSessionValue(key);
             return value;
         }
 

@@ -24,13 +24,12 @@ namespace Linko.LinkoExchange.Test
         private QuestionAnswerService _questionAnswerService;
         private EncryptionService _encrypter;
         Mock<ISettingService> _settings = new Mock<ISettingService>();
-        Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
-        Mock<IEmailService> _emailService = new Mock<IEmailService>();
+        Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>(); 
         private IPasswordHasher _passwordHasher;
         Mock<ISessionCache> _sessionCache;
         Mock<IMapHelper> _mapHelper;
         Mock<ICromerrAuditLogService> _crommerAuditLogService;
-
+        Mock<ILinkoExchangeEmailService> _linkoExchangeEmailService = new Mock<ILinkoExchangeEmailService>();
         public QuestionAnswerServiceTests()
         {
         }
@@ -55,12 +54,9 @@ namespace Linko.LinkoExchange.Test
                                                                new EncryptionService(),
                                                                new PasswordHasher(),
                                                                _settings.Object,
-                                                               _orgService.Object,
-                                                               _emailService.Object,
-                                                               _mapHelper.Object,
-                                                               _crommerAuditLogService.Object,
-                                                               new Mock<IOrganizationService>().Object,
-                                                               new Mock<IRequestCache>().Object
+                                                               _orgService.Object, 
+                                                               _crommerAuditLogService.Object, 
+                                                               _linkoExchangeEmailService.Object
                                                                );
             _encrypter = new EncryptionService();
             _passwordHasher = new PasswordHasher();

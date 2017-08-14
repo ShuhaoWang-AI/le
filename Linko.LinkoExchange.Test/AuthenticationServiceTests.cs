@@ -39,13 +39,11 @@ namespace Linko.LinkoExchange.Test
         string connectionString = ConfigurationManager.ConnectionStrings["LinkoExchangeContext"].ConnectionString;
         private string testEmailAddress = ConfigurationManager.AppSettings["EmailSenderFromEmail"];
         private string emailServer = ConfigurationManager.AppSettings["EmailServer"];
-        private string userName = "Test User Name";
 
         ISettingService settService = Mock.Of<ISettingService>();
         IOrganizationService orgService = Mock.Of<IOrganizationService>();
         IProgramService progService = Mock.Of<IProgramService>();
-        IInvitationService invitService = Mock.Of<IInvitationService>();
-        IEmailService emailService = Mock.Of<IEmailService>();
+        IInvitationService invitService = Mock.Of<IInvitationService>(); 
         IPermissionService permService = Mock.Of<IPermissionService>();
         IUserService userService = Mock.Of<IUserService>();
         ISessionCache sessionCache = new SessionCache(new HttpContextServiceMock());
@@ -71,8 +69,9 @@ namespace Linko.LinkoExchange.Test
         private IQuestionAnswerService questionAnswerService = Mock.Of<IQuestionAnswerService>();
         Mock<IProgramService> progServiceMock;
         Mock<IPermissionService> permissionMock;
-        Mock<IMapHelper> _mapHelper;
-        Mock<ICromerrAuditLogService> _cromerrLog;
+        Mock<IMapHelper> _mapHelper = new Mock<IMapHelper>();
+        Mock<ICromerrAuditLogService> _cromerrLog = new Mock<ICromerrAuditLogService>(); 
+        Mock<ILinkoExchangeEmailService> _linkoExchangeEmailService = new Mock<ILinkoExchangeEmailService>();
 
         [TestInitialize]
         public void TestInitialize()
@@ -102,7 +101,8 @@ namespace Linko.LinkoExchange.Test
             var userStore = new Mock<IUserStore<UserProfile>>();
             userManagerObj = new Mock<ApplicationUserManager>(userStore.Object);
             signmanager = new Mock<ApplicationSignInManager>(userManagerObj.Object, authManger.Object);
-            dbContext = new Mock<LinkoExchangeContext>(connectionString);
+            dbContext = new Mock<LinkoExchangeContext>(connectionString); 
+             
             IList<Claim> claims = new List<Claim>();
             var tc = Task.FromResult(claims);
             userManagerObj.Setup(p => p.GetClaimsAsync(It.IsAny<string>())).Returns(tc);
@@ -142,8 +142,7 @@ namespace Linko.LinkoExchange.Test
                                                                settService,
                                                                orgService,
                                                                progService,
-                                                               invitService,
-                                                               emailService,
+                                                               invitService, 
                                                                permService,
                                                                dbContext.Object,
                                                                userService,
@@ -155,7 +154,8 @@ namespace Linko.LinkoExchange.Test
                                                                questionAnswerService,
                                                                _mapHelper.Object,
                                                                _cromerrLog.Object,
-                                                               _termConditionService.Object
+                                                               _termConditionService.Object,
+                                                                _linkoExchangeEmailService.Object
                                                               );
 
             userManagerObj.Setup(
@@ -489,7 +489,7 @@ namespace Linko.LinkoExchange.Test
             userInfo.AgreeTermsAndConditions = false;
             var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.NotAgreedTermsAndConditions, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.NotAgreedTermsAndConditions, result.Result);
         }
 
         [TestMethod]
@@ -498,7 +498,7 @@ namespace Linko.LinkoExchange.Test
             userInfo.Password = "1";
             var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.BadPassword, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.BadPassword, result.Result);
         }
 
         [TestMethod]
@@ -507,7 +507,7 @@ namespace Linko.LinkoExchange.Test
             userInfo.Password = "VERY long password that is not supported";
             var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.BadPassword, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.BadPassword, result.Result);
         }
 
         [TestMethod]
@@ -515,7 +515,7 @@ namespace Linko.LinkoExchange.Test
         {
             var result = _authenticationService.Register(null, registrationToken, null, null, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result);
         }
 
         [TestMethod]
@@ -524,7 +524,7 @@ namespace Linko.LinkoExchange.Test
             userInfo.FirstName = null;
             var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result);
         }
 
         [TestMethod]
@@ -533,7 +533,7 @@ namespace Linko.LinkoExchange.Test
             userInfo.LastName = null;
             var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result);
         }
 
         [TestMethod]
@@ -542,7 +542,7 @@ namespace Linko.LinkoExchange.Test
             userInfo.UserName = null;
             var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result);
         }
 
         [TestMethod]
@@ -550,7 +550,7 @@ namespace Linko.LinkoExchange.Test
         {
             userInfo.AddressLine1 = "";
             var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
-            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result);
         }
 
         [TestMethod]
@@ -559,7 +559,7 @@ namespace Linko.LinkoExchange.Test
             userInfo.CityName = ""; ;
             var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result);
         }
 
         [TestMethod]
@@ -568,7 +568,7 @@ namespace Linko.LinkoExchange.Test
             userInfo.ZipCode = ""; ;
             var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result);
         }
 
         [TestMethod]
@@ -577,7 +577,7 @@ namespace Linko.LinkoExchange.Test
             userInfo.Email = "";
             var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result);
         }
 
         [TestMethod]
@@ -585,7 +585,7 @@ namespace Linko.LinkoExchange.Test
         {
             var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result);
         }
 
 
@@ -593,7 +593,7 @@ namespace Linko.LinkoExchange.Test
         public void Test_Register_Failed_UserProfile_Return_MissingSecurityQuestion()
         {
             var result = _authenticationService.Register(userInfo, registrationToken, null, null, RegistrationType.NewRegistration);
-            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.BadUserProfileData, result.Result);
         }
 
         [TestMethod]
@@ -604,7 +604,7 @@ namespace Linko.LinkoExchange.Test
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.MissingKBQ, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.MissingKBQ, result.Result);
         }
 
         [TestMethod]
@@ -615,7 +615,7 @@ namespace Linko.LinkoExchange.Test
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.MissingSecurityQuestion, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.MissingSecurityQuestion, result.Result);
         }
 
         // Test for duplicate questions  
@@ -628,7 +628,7 @@ namespace Linko.LinkoExchange.Test
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.DuplicatedKBQ, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.DuplicatedKBQ, result.Result);
         }
 
         // Test for duplicate answers  
@@ -641,7 +641,7 @@ namespace Linko.LinkoExchange.Test
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.DuplicatedSecurityQuestion, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.DuplicatedSecurityQuestion, result.Result);
         }
 
         // Test for null inivtation 
@@ -656,7 +656,7 @@ namespace Linko.LinkoExchange.Test
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.InvalidRegistrationToken, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.InvalidRegistrationToken, result.Result);
         }
 
         // Test for expired invitation  
@@ -709,7 +709,7 @@ namespace Linko.LinkoExchange.Test
 
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
 
-            Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result);
         }
 
         // Test new user register
@@ -797,7 +797,7 @@ namespace Linko.LinkoExchange.Test
 
             // To test new user register    
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
-            Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result);
         }
 
         [TestMethod]
@@ -816,7 +816,7 @@ namespace Linko.LinkoExchange.Test
 
             // To test new user register    
             var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
-            Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.InvitationExpired, result.Result);
         }
 
         [TestMethod]
@@ -828,17 +828,13 @@ namespace Linko.LinkoExchange.Test
             SetRegistrations(out sqQuestions, out kbqQuestions);
 
             // To test new user register    
-            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);
-            var emailServiceMock = Mock.Get(emailService);
-
-            emailServiceMock.Verify(i => i.SendEmail(It.IsAny<IEnumerable<string>>(),
-                                                     It.IsAny<EmailType>(), It.IsAny<IDictionary<string, string>>(), true));
+            var result = _authenticationService.Register(userInfo, registrationToken, sqQuestions, kbqQuestions, RegistrationType.NewRegistration);  
 
             var invitServiceMock = Mock.Get(invitService);
 
             invitServiceMock.Verify(i => i.DeleteInvitation(It.IsAny<string>(), It.IsAny<bool>()));
 
-            Assert.AreEqual(RegistrationResult.Success, result.Result.Result);
+            Assert.AreEqual(RegistrationResult.Success, result.Result);
 
         }
 
@@ -858,7 +854,6 @@ namespace Linko.LinkoExchange.Test
                                                         orgService,
                                                         progService,
                                                         invitService,
-                                                        emailService,
                                                         permService,
                                                         new LinkoExchangeContext(connectionString),
                                                         userService,
@@ -870,7 +865,8 @@ namespace Linko.LinkoExchange.Test
                                                         null,
                                                         _mapHelper.Object,
                                                         _cromerrLog.Object,
-                                                        _termConditionService.Object
+                                                        _termConditionService.Object,
+                                                        _linkoExchangeEmailService.Object
                                                        );
 
             authService.SetClaimsForOrgRegProgramSelection(1);

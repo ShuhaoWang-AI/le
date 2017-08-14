@@ -49,7 +49,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <summary>
         ///     *WARNING: NO VALIDATION CHECK -- CASCADE DELETE*
         ///     Hard delete of row from tReportPackage table associated with passed in parameter.
-        ///     Programatically cascade deletes rows in the following associated tables:
+        ///     Programmatically cascade deletes rows in the following associated tables:
         ///     - tReportPackageElementCategory (via ReportPackageId)
         ///     - tReportPackageElementType (via ReportPackageElementCategoryId)
         ///     - tReportSample (via ReportPackageElementTypeId)
@@ -90,14 +90,14 @@ namespace Linko.LinkoExchange.Services.Report
         /// <summary>
         ///     Gets a collection of FileStoreDto's that are eligible to be added this Report Package -- also indicate which are already associated.
         /// </summary>
-        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <param name="reportPackageElementTypeId">tReportPackage.ReportPackageId</param>
         /// <returns>Collection of FileStoreDto objects</returns>
         ICollection<FileStoreDto> GetFilesForSelection(int reportPackageElementTypeId);
 
         /// <summary>
         ///     Gets a collection of SampleDto's that are eligible to be added this Report Package -- also indicate which are already associated.
         /// </summary>
-        /// <param name="reportPackageId">tReportPackage.ReportPackageId</param>
+        /// <param name="reportPackageElementTypeId">ReportPackageElementTypeId</param>
         /// <returns>Collection of SampleDto objects</returns>
         ICollection<SampleDto> GetSamplesForSelection(int reportPackageElementTypeId);
 

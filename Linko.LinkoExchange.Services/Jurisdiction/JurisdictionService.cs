@@ -42,13 +42,8 @@ namespace Linko.LinkoExchange.Services.Jurisdiction
             return dtos;
         }
 
-        public JurisdictionDto GetJurisdictionById(int? jurisdictionId)
+        public JurisdictionDto GetJurisdictionById(int jurisdictionId)
         {
-            if(jurisdictionId.HasValue == false)
-            {
-                return null; 
-            }
-
             var jurisdiction = _dbContext.Jurisdictions
                 .SingleOrDefault(j => j.JurisdictionId == jurisdictionId);
 

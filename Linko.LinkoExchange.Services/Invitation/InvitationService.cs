@@ -28,37 +28,37 @@ namespace Linko.LinkoExchange.Services.Invitation
         private readonly LinkoExchangeContext _dbContext;
         private readonly ISettingService _settingService;
         private readonly IUserService _userService;
-        private readonly IRequestCache _requestCache;
-        private readonly IEmailService _emailService;
+        private readonly IRequestCache _requestCache; 
         private readonly IOrganizationService _organizationService;
         private readonly IHttpContextService _httpContextService;
         private readonly ITimeZoneService _timeZones;
         private readonly IProgramService _programService;
-        private readonly ILogger _logger;
-        private readonly ISessionCache _sessionCache;
+        private readonly ILogger _logger; 
         private readonly IMapHelper _mapHelper;
         private readonly ICromerrAuditLogService _crommerAuditLogService;
+        private readonly ILinkoExchangeEmailService _linkoExchangeEmailService;
 
         public InvitationService(LinkoExchangeContext dbContext,
             ISettingService settingService, IUserService userService, IRequestCache requestCache,
-            IEmailService emailService, IOrganizationService organizationService, IHttpContextService httpContext,
+            IOrganizationService organizationService, IHttpContextService httpContext,
             ITimeZoneService timeZones, ILogger logger,
             IProgramService programService, ISessionCache sessionCache, IMapHelper mapHelper,
-            ICromerrAuditLogService crommerAuditLogService)
+            ICromerrAuditLogService crommerAuditLogService,
+            ILinkoExchangeEmailService linkoExchangeEmailService
+            )
         {
             _dbContext = dbContext;
             _settingService = settingService;
             _userService = userService;
-            _requestCache = requestCache;
-            _emailService = emailService;
+            _requestCache = requestCache; 
             _organizationService = organizationService;
             _httpContextService = httpContext;
             _timeZones = timeZones;
             _programService = programService;
-            _logger = logger;
-            _sessionCache = sessionCache;
+            _logger = logger; 
             _mapHelper = mapHelper;
             _crommerAuditLogService = crommerAuditLogService;
+            _linkoExchangeEmailService = linkoExchangeEmailService;
         }
 
         public InvitationDto GetInvitation(string invitationId)
@@ -229,12 +229,12 @@ namespace Linko.LinkoExchange.Services.Invitation
 
                     if (existingUserForThisProgram != null)
                     {
-                        _logger.Info(string.Format("SendInvitation Failed. User with email={0} already exists within OrgRegProgramId={0}", email, targetOrgRegProgramId));
+                        _logger.Info($"SendInvitation Failed. User with email={email} already exists within OrgRegProgramId={targetOrgRegProgramId}");
                         return new InvitationServiceResultDto()
                         {
                             Success = false,
                             ErrorType = InvitationError.Duplicated,
-                            Errors = new string[] { existingUserForThisProgram.UserProfileDto.FirstName, existingUserForThisProgram.UserProfileDto.LastName }
+                            Errors = new[] { existingUserForThisProgram.UserProfileDto.FirstName, existingUserForThisProgram.UserProfileDto.LastName }
                         };
                     }
                 }
@@ -247,13 +247,13 @@ namespace Linko.LinkoExchange.Services.Invitation
                 var orgRegProgram = _organizationService.GetOrganizationRegulatoryProgram(targetOrgRegProgramId);
                 if (orgRegProgram.HasAdmin) //already
                 {
-                    _logger.Info(string.Format("SendInvitation Failed. Industry already has Admin User. OrgRegProgramId={0}", targetOrgRegProgramId));
+                    _logger.Info($"SendInvitation Failed. Industry already has Admin User. OrgRegProgramId={targetOrgRegProgramId}");
                     string errorMsg = "This organization already has an Administrator.";
                     return new InvitationServiceResultDto()
                     {
                         Success = false,
                         ErrorType = InvitationError.IndustryAlreadyHasAdminUser,
-                        Errors = new string[] { errorMsg }
+                        Errors = new[] { errorMsg }
                     };
                 }
             }
@@ -264,12 +264,12 @@ namespace Linko.LinkoExchange.Services.Invitation
 
             if (remaining < 1)
             {
-                _logger.Info(string.Format("SendInvitation Failed. No more remaining user licenses. OrgRegProgramId={0}, InviteType={0}", targetOrgRegProgramId, invitationType.ToString()));
+                _logger.Info($"SendInvitation Failed. No more remaining user licenses. OrgRegProgramId={targetOrgRegProgramId}, InviteType={invitationType}");
                 return new InvitationServiceResultDto()
                 {
                     Success = false,
-                    ErrorType = Core.Enum.InvitationError.NoMoreRemainingUserLicenses,
-                    Errors = new string[] { "No more User Licenses are available for this organization.  Disable another User and try again." }
+                    ErrorType = InvitationError.NoMoreRemainingUserLicenses,
+                    Errors = new[] { "No more User Licenses are available for this organization.  Disable another User and try again." }
                 };
             }
 
@@ -279,7 +279,7 @@ namespace Linko.LinkoExchange.Services.Invitation
 
             int senderOrgRegProgramId = int.Parse(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramId));
 
-            CreateInvitation(new Dto.InvitationDto()
+            CreateInvitation(new InvitationDto()
             {
                 InvitationId = invitationId,
                 InvitationDateTimeUtc = DateTime.UtcNow,
@@ -335,25 +335,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             string baseUrl = _httpContextService.GetRequestBaseUrl();
             string url = baseUrl + "Account/Register?token=" + invitationId;
             contentReplacements.Add("link", url);
-
-            EmailType emailType;
-            switch (invitationType)
-            {
-                case InvitationType.AuthorityToAuthority:
-                    emailType = EmailType.Registration_InviteAuthorityUser;
-                    break;
-                case InvitationType.AuthorityToIndustry:
-                    emailType = EmailType.Registration_AuthorityInviteIndustryUser;
-                    break;
-                case InvitationType.IndustryToIndustry:
-                    emailType = EmailType.Registration_IndustryInviteIndustryUser;
-                    break;
-                default:
-
-                    throw new Exception("ERROR: unknown EmailType");
-            }
-
-            _emailService.SendEmail(new[] { email }, emailType, contentReplacements);
+            
 
             int thisUserOrgRegProgUserId = Convert.ToInt32(_httpContextService.GetClaimValue(CacheKey.OrganizationRegulatoryProgramUserId));
             var actorProgramUser = _dbContext.OrganizationRegulatoryProgramUsers
@@ -361,17 +343,17 @@ namespace Linko.LinkoExchange.Services.Invitation
             var actorUser = _userService.GetUserProfileById(actorProgramUser.UserProfileId);
 
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
-            contentReplacements = new Dictionary<string, string>();
+            var cromerrContentReplacements = new Dictionary<string, string>();
             if (existingUser != null)
             {
                 cromerrAuditLogEntryDto.UserProfileId = existingUser.UserProfileId;
                 cromerrAuditLogEntryDto.UserName = existingUser.UserProfileDto.UserName;
-                contentReplacements.Add("userName", existingUser.UserProfileDto.UserName);
+                cromerrContentReplacements.Add("userName", existingUser.UserProfileDto.UserName);
             }
             else
             {
                 cromerrAuditLogEntryDto.UserName = "n/a";
-                contentReplacements.Add("userName", "n/a");
+                cromerrContentReplacements.Add("userName", "n/a");
             }
 
             // Per discussion between Sundoro, Rejeeb, Shuhao, during re-invitation,
@@ -391,19 +373,53 @@ namespace Linko.LinkoExchange.Services.Invitation
             cromerrAuditLogEntryDto.UserEmailAddress = email;
             cromerrAuditLogEntryDto.IPAddress = _httpContextService.CurrentUserIPAddress();
             cromerrAuditLogEntryDto.HostName = _httpContextService.CurrentUserHostName();
-            contentReplacements.Add("authorityName", authority.Organization.Name);
-            contentReplacements.Add("organizationName", targetOrgRegProgram.Organization.Name);
-            contentReplacements.Add("regulatoryProgram", authority.RegulatoryProgram.Name);
-            contentReplacements.Add("firstName", firstName);
-            contentReplacements.Add("lastName", lastName);
-            contentReplacements.Add("emailAddress", email);
-            contentReplacements.Add("inviterFirstName", actorUser.FirstName);
-            contentReplacements.Add("inviterLastName", actorUser.LastName);
-            contentReplacements.Add("inviterUserName", actorUser.UserName);
-            contentReplacements.Add("inviterEmailAddress", actorUser.Email);
+            cromerrContentReplacements.Add("authorityName", authority.Organization.Name);
+            cromerrContentReplacements.Add("organizationName", targetOrgRegProgram.Organization.Name);
+            cromerrContentReplacements.Add("regulatoryProgram", authority.RegulatoryProgram.Name);
+            cromerrContentReplacements.Add("firstName", firstName);
+            cromerrContentReplacements.Add("lastName", lastName);
+            cromerrContentReplacements.Add("emailAddress", email);
+            cromerrContentReplacements.Add("inviterFirstName", actorUser.FirstName);
+            cromerrContentReplacements.Add("inviterLastName", actorUser.LastName);
+            cromerrContentReplacements.Add("inviterUserName", actorUser.UserName);
+            cromerrContentReplacements.Add("inviterEmailAddress", actorUser.Email);
 
-            _crommerAuditLogService.Log(CromerrEvent.Registration_InviteSent, cromerrAuditLogEntryDto, contentReplacements);
+            _crommerAuditLogService.Log(CromerrEvent.Registration_InviteSent, cromerrAuditLogEntryDto, cromerrContentReplacements).Wait();
+            
+            //Invitation email logs only for the program that is invited to   
 
+            EmailType emailType;
+            switch (invitationType)
+            {
+                case InvitationType.AuthorityToAuthority:
+                    emailType = EmailType.Registration_InviteAuthorityUser;
+                    break;
+                case InvitationType.AuthorityToIndustry:
+                    emailType = EmailType.Registration_AuthorityInviteIndustryUser;
+                    break;
+                case InvitationType.IndustryToIndustry:
+                    emailType = EmailType.Registration_IndustryInviteIndustryUser;
+                    break;
+                default:
+
+                    throw new Exception("ERROR: unknown EmailType");
+            }
+            if(existingUser == null)
+            {
+                existingUser = new OrganizationRegulatoryProgramUserDto
+                {
+                    UserProfileDto = new UserDto
+                    {
+                        Email = email,
+                        FirstName = firstName,
+                        LastName = lastName, 
+                    }
+                };
+            } 
+            
+            var emailEntry = _linkoExchangeEmailService.GetEmailEntryForOrgRegProgramUser(user:existingUser, emailType:emailType, contentReplacements:contentReplacements); 
+            _linkoExchangeEmailService.SendEmails(emailEntries:new List<EmailEntry> { emailEntry }); 
+            
             _logger.Info($"Leaving InvitationService.SendUserInvite. targetOrgRegProgramId={targetOrgRegProgramId}, email={email}, invitationType={invitationType}");
 
             return new InvitationServiceResultDto()
@@ -434,25 +450,23 @@ namespace Linko.LinkoExchange.Services.Invitation
                 foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
                 {
                     DbEntityEntry entry = item.Entry;
-                    string entityTypeName = entry.Entity.GetType().Name;
+                    var entityTypeName = entry.Entity.GetType().Name;
 
                     foreach (DbValidationError subItem in item.ValidationErrors)
                     {
-                        string message = string.Format("Error '{0}' occurred in {1} at {2}", subItem.ErrorMessage, entityTypeName, subItem.PropertyName);
-                        validationIssues.Add(new RuleViolation(string.Empty, null, message));
-
+                        string message = $"Error '{subItem.ErrorMessage}' occurred in {entityTypeName} at {subItem.PropertyName}";
+                        validationIssues.Add(new RuleViolation(string.Empty, null, message)); 
                     }
                 }
-                _logger.Info(string.Format("CreateInvitation. DbEntityValidationException. Email={0}", dto.EmailAddress));
+                _logger.Info($"CreateInvitation. DbEntityValidationException. Email={dto.EmailAddress}");
                 throw new RuleViolationException("Validation errors", validationIssues);
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.Info(string.Format("CreateInvitation. Error creating invitation. Email={0}", dto.EmailAddress));
-                throw (ex);
-            }
-
+                _logger.Info($"CreateInvitation. Error creating invitation. Email={dto.EmailAddress}");
+                throw;
+            } 
         }
 
         public void DeleteInvitation(string invitationId, bool isSystemAction = false)
@@ -462,19 +476,10 @@ namespace Linko.LinkoExchange.Services.Invitation
                 .Include(x => x.RecipientOrganizationRegulatoryProgram.RegulatoryProgram)
                 .Single(i => i.InvitationId == invitationId);
             var recipientOrganizationRegulatoryProgram = invitation.RecipientOrganizationRegulatoryProgram;
-            string authorityName;
-            if (recipientOrganizationRegulatoryProgram.RegulatorOrganization != null)
-            {
-                authorityName = recipientOrganizationRegulatoryProgram.RegulatorOrganization.Name;
-            }
-            else
-            {
-                authorityName = "";
-            }
+            var authorityName = recipientOrganizationRegulatoryProgram.RegulatorOrganization != null ? recipientOrganizationRegulatoryProgram.RegulatorOrganization.Name : "";
             _dbContext.Invitations.Remove(invitation);
             _dbContext.SaveChanges();
-
-
+            
             //Only log Cromerr if action was a result of a User Delete scenario
             //and not system automatically deleting Invite after Registration Pending (Bug 1989)
             if (!isSystemAction)
@@ -519,16 +524,14 @@ namespace Linko.LinkoExchange.Services.Invitation
 
                 _crommerAuditLogService.Log(CromerrEvent.Registration_InviteDeleted, cromerrAuditLogEntryDto, contentReplacements);
             }
-
-            
         }
-
+         
         public InvitationCheckEmailResultDto CheckEmailAddress(int orgRegProgramId, string emailAddress)
         {
             var existingUsers = _userService.GetProgramUsersByEmail(emailAddress);
             var existingUsersDifferentPrograms = new List<OrganizationRegulatoryProgramUserDto>();
 
-            if (existingUsers != null && existingUsers.Count() > 0)
+            if (existingUsers != null && existingUsers.Any())
             {
                 foreach (var existingUser in existingUsers)
                 {
@@ -546,7 +549,6 @@ namespace Linko.LinkoExchange.Services.Invitation
                     {
                         existingUsersDifferentPrograms.Add(existingUser);
                     }
-
                 }
 
                 //Found match(es) for user not yet part of this program (4.a)
@@ -555,7 +557,6 @@ namespace Linko.LinkoExchange.Services.Invitation
                     ExistingUserSameProgram = null,
                     ExistingUsersDifferentPrograms = existingUsersDifferentPrograms
                 };
-
             }
 
             return new InvitationCheckEmailResultDto()
@@ -563,7 +564,6 @@ namespace Linko.LinkoExchange.Services.Invitation
                 ExistingUsersDifferentPrograms = null,
                 ExistingUserSameProgram = null
             };
-
         }
     }
 }

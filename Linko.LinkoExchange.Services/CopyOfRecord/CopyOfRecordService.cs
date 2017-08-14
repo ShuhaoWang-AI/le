@@ -112,6 +112,11 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         public CopyOfRecordDto GetCopyOfRecordByReportPackage(ReportPackageDto reportPackage)
         {
+            if(reportPackage == null)
+            {
+                throw new ArgumentNullException("reportPackage");
+            }
+
             _logger.Info($"Enter CopyOfRecordService.GetCopyOfRecordByReportPackage. ReportPackageId:{reportPackage.ReportPackageId}");
 
             var copyOfRecord = _dbContext.CopyOfRecords.Single(i => i.ReportPackageId == reportPackage.ReportPackageId);

@@ -19,7 +19,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
         private RSACryptoServiceProvider _privateKey;
         private RSACryptoServiceProvider _publicKey;
         private int _currentCertificateId;
-        private bool _initialized = false;
+        private bool _initialized;
         private readonly object _lock = new object();
 
 
@@ -93,7 +93,7 @@ namespace Linko.LinkoExchange.Services.CopyOfRecord
 
         private string GetDataSignature(byte[] data)
         {
-            return Convert.ToBase64String(this.SignData(data));
+            return Convert.ToBase64String(inArray:SignData(data));
         }
 
         private byte[] SignData(byte[] data)

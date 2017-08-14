@@ -34,16 +34,16 @@ namespace Linko.LinkoExchange.Test
         Mock<ITimeZoneService> _timeZoneService = new Mock<ITimeZoneService>();
         Mock<ILogger> _logger = new Mock<ILogger>();
         Mock<IHttpContextService> _httpContext = new Mock<IHttpContextService>();
-        Mock<IUserService> _userService = new Mock<IUserService>();
-        Mock<IEmailService> _emailService = new Mock<IEmailService>();
+        Mock<IUserService> _userService = new Mock<IUserService>(); 
         Mock<ISettingService> _settingService = new Mock<ISettingService>();
         Mock<IOrganizationService> _orgService = new Mock<IOrganizationService>();
         Mock<ICromerrAuditLogService> _cromerrService = new Mock<ICromerrAuditLogService>();
         Mock<IRequestCache> _requestCache = new Mock<IRequestCache>();
         Mock<IAuditLogService> _auditLogService = new Mock<IAuditLogService>();
         Mock<IApplicationCache> _mockAppCache = new Mock<IApplicationCache>();
-        Mock<IRequestCache> _mockRequestCache = new Mock<IRequestCache>();
-
+        Mock<ISessionCache> _mockSessionCache = new Mock<ISessionCache>();
+        Mock<ILinkoExchangeEmailService> _linkoExchangeEmailService = new Mock<ILinkoExchangeEmailService>();
+        Mock<IRequestCache> _mockRequestCache = new Mock<IRequestCache>(); 
         private LinkoExchangeContext _dbContext;
 
         public ReportPackageServiceTests()
@@ -112,9 +112,9 @@ namespace Linko.LinkoExchange.Test
             var actualUnitService = new UnitService(_dbContext, new MapHelper(), _logger.Object, _httpContext.Object, actualTimeZoneService, _orgService.Object, actualSettingService, _mockRequestCache.Object);
             var actualSampleService = new SampleService(_dbContext, _httpContext.Object, _orgService.Object, new MapHelper(), _logger.Object, actualTimeZoneService, actualSettingService, actualUnitService, _mockAppCache.Object);
 
-            var actualAuditLogService = new EmailAuditLogService(_dbContext, _requestCache.Object, new MapHelper());
-            var actualEmailService = new LinkoExchangeEmailService(_dbContext, actualAuditLogService, _programService.Object, _settingService.Object, _requestCache.Object);
-            var actualCromerrService = new CromerrAuditLogService(_dbContext, _requestCache.Object, new MapHelper(), _httpContext.Object, _logger.Object);
+            var actualAuditLogService = new EmailAuditLogService(_dbContext, _requestCache.Object, new MapHelper(), _logger.Object);
+         //   var actualEmailService = new LinkoExchangeEmailService(_dbContext, actualAuditLogService, _programService.Object, _settingService.Object, _logger.Object);
+            var actualCromerrService = new CromerrAuditLogService(_dbContext, new MapHelper(), _httpContext.Object, _logger.Object);
             var actualProgramService = new ProgramService(_dbContext, new MapHelper());
 
             _reportPackageService = new ReportPackageService(
@@ -124,15 +124,14 @@ namespace Linko.LinkoExchange.Test
                                                              _logger.Object,
                                                              _dbContext,
                                                              _httpContext.Object,
-                                                             _userService.Object,
-                                                             actualEmailService,
+                                                             _userService.Object, 
                                                              _settingService.Object,
                                                              _orgService.Object,
                                                              actualSampleService,
                                                              new MapHelper(),
                                                              actualCromerrService,
-                                                             new Mock<IOrganizationService>().Object,
-                                                             new Mock<IRequestCache>().Object
+                                                             new Mock<IOrganizationService>().Object, 
+                                                             _linkoExchangeEmailService.Object
                                                             );
         }
 
