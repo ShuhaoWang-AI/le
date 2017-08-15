@@ -1689,7 +1689,8 @@ namespace Linko.LinkoExchange.Services.User
                                                      && !i.IsRegistrationDenied
                                                      && i.IsRegistrationApproved)
                                          .Select(b => b.UserProfileId);
-            var userProfiles = _dbContext.Users.Where(i => i.IsAccountLocked == false && i.IsAccountResetRequired == false && signatoryIds.Contains(item:i.UserProfileId));
+            // ReSharper disable once ArgumentsStyleNamedExpression
+            var userProfiles = _dbContext.Users.Where(i => i.IsAccountLocked == false && i.IsAccountResetRequired == false && signatoryIds.Contains(i.UserProfileId));
 
             var userDtos = new List<UserDto>();
             foreach (var userProfile in userProfiles)
@@ -1714,7 +1715,8 @@ namespace Linko.LinkoExchange.Services.User
                                                     i.PermissionGroup.Name == PermissionGroupName.Standard.ToString())
                                           ).Select(i => i.UserProfileId);
 
-            var userProfiles = _dbContext.Users.Where(i => i.IsAccountLocked == false && i.IsAccountResetRequired == false && userIds.Contains(item:i.UserProfileId));
+            // ReSharper disable once ArgumentsStyleNamedExpression
+            var userProfiles = _dbContext.Users.Where(i => i.IsAccountLocked == false && i.IsAccountResetRequired == false && userIds.Contains(i.UserProfileId));
             var userDtos = new List<UserDto>();
             foreach (var userProfile in userProfiles)
             {
