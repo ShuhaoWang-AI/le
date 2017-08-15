@@ -37,6 +37,7 @@ namespace Linko.LinkoExchange.Test
         Mock<ApplicationUserManager> _userManager;
         Mock<IQuestionAnswerService> _qaService;
         Mock<IHttpContextService> _httpContext;
+        Mock<IJurisdictionService> _jurisdiction;
 
         Mock<ILogger> _logger;
         Mock<ICromerrAuditLogService> _cromerrLogger;
@@ -57,6 +58,7 @@ namespace Linko.LinkoExchange.Test
             _userManager = new Mock<ApplicationUserManager>();
             _qaService = new Mock<IQuestionAnswerService>();
             _httpContext = new Mock<IHttpContextService>();
+            _jurisdiction = new Mock<IJurisdictionService>();
 
             _logger = new Mock<ILogger>();
             _cromerrLogger = new Mock<ICromerrAuditLogService>();
@@ -86,11 +88,12 @@ namespace Linko.LinkoExchange.Test
                                         _httpContext.Object,
                                         _timeZones.Object,
                                         _logger.Object,
-                                        _programService,
-                                        new SessionCache(_httpContext.Object),
+                                        _programService, 
                                         new MapHelper(),
-                _cromerrLogger.Object,
-                _linkoExchangeEmailService.Object
+                                        _cromerrLogger.Object,
+                                        _linkoExchangeEmailService.Object,
+                                        _jurisdiction.Object
+                                        
                 );
         }
 

@@ -12,6 +12,7 @@ using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.Dto;
 using Linko.LinkoExchange.Services.Email;
 using Linko.LinkoExchange.Services.HttpContext;
+using Linko.LinkoExchange.Services.Jurisdiction;
 using Linko.LinkoExchange.Services.Mapping;
 using Linko.LinkoExchange.Services.Organization;
 using Linko.LinkoExchange.Services.Program;
@@ -38,7 +39,7 @@ namespace Linko.LinkoExchange.Services.Invitation
         private readonly ISettingService _settingService;
         private readonly ITimeZoneService _timeZones;
         private readonly IUserService _userService;
-
+        private readonly IJurisdictionService _jurisdictionService;
         #endregion
 
         #region constructors and destructor
@@ -47,9 +48,10 @@ namespace Linko.LinkoExchange.Services.Invitation
                                  ISettingService settingService, IUserService userService, IRequestCache requestCache,
                                  IOrganizationService organizationService, IHttpContextService httpContext,
                                  ITimeZoneService timeZones, ILogger logger,
-                                 IProgramService programService, ISessionCache sessionCache, IMapHelper mapHelper,
+                                 IProgramService programService, IMapHelper mapHelper,
                                  ICromerrAuditLogService crommerAuditLogService,
-                                 ILinkoExchangeEmailService linkoExchangeEmailService
+                                 ILinkoExchangeEmailService linkoExchangeEmailService,
+                                 IJurisdictionService jurisdictionService
         )
         {
             _dbContext = dbContext;
@@ -64,6 +66,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             _mapHelper = mapHelper;
             _crommerAuditLogService = crommerAuditLogService;
             _linkoExchangeEmailService = linkoExchangeEmailService;
+            _jurisdictionService = jurisdictionService;
         }
 
         #endregion
@@ -225,7 +228,7 @@ namespace Linko.LinkoExchange.Services.Invitation
             {
                 //See if any existing users belong to this program
                 var existingProgramUsers = _userService.GetProgramUsersByEmail(emailAddress:email);
-                if (existingProgramUsers != null && existingProgramUsers.Count() > 0)
+                if (existingProgramUsers != null && existingProgramUsers.Any())
                 {
                     var existingUserForThisProgram = existingProgramUsers
                         .SingleOrDefault(u => u.OrganizationRegulatoryProgramId == targetOrgRegProgramId
@@ -338,11 +341,8 @@ namespace Linko.LinkoExchange.Services.Invitation
             {
                 contentReplacements.Add(key:"organizationName", value:targetOrgRegProgram.Organization.Name);
                 contentReplacements.Add(key:"addressLine1", value:targetOrgRegProgram.Organization.AddressLine1);
-                contentReplacements.Add(key:"cityName", value:targetOrgRegProgram.Organization.CityName);
-                contentReplacements.Add(key:"stateName", value:targetOrgRegProgram.Organization.JurisdictionId.HasValue
-                                                                   ? _dbContext.Jurisdictions.Single(j => j.JurisdictionId == targetOrgRegProgram.Organization.JurisdictionId.Value)
-                                                                               .Code
-                                                                   : "");
+                contentReplacements.Add(key:"cityName", value:targetOrgRegProgram.Organization.CityName); 
+                contentReplacements.Add(key:"stateName", value: _jurisdictionService.GetJurisdictionById(targetOrgRegProgram.Organization.JurisdictionId)?.Code ?? "");
             }
 
             var baseUrl = _httpContextService.GetRequestBaseUrl();
@@ -368,7 +368,7 @@ namespace Linko.LinkoExchange.Services.Invitation
                 cromerrContentReplacements.Add(key:"userName", value:"n/a");
             }
 
-            // Per discussion between Sundoro, Rejeeb, Shuhao, during re-invitation,
+            // Per discussion between Sundoro, Rajeeb, Shuhao, during re-invitation,
             // tOrganizationRegulatoryProgramUser.IsRemoved should be set to false
             if (existingUser != null)
             {
