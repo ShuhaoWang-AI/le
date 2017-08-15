@@ -244,6 +244,7 @@ namespace Linko.LinkoExchange.Services.Sample
                 existingFlowResultRow.LimitBasisId = flowLimitBasisId;
                 existingFlowResultRow.LastModificationDateTimeUtc = DateTimeOffset.Now;
                 existingFlowResultRow.LastModifierUserId = currentUserId;
+                existingFlowResultRow.IsApprovedEPAMethod = true;
 
 
                 Double valueAsDouble;
