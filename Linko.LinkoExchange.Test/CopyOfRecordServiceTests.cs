@@ -74,9 +74,9 @@ namespace Linko.LinkoExchange.Test
             _actualTimeZoneService = new TimeZoneService(_dbContext, _settService, new MapHelper(), new Mock<IApplicationCache>().Object);
             _httpContext.Setup(s => s.GetClaimValue(It.IsAny<string>())).Returns("1");
 
-            _userService = new UserService(_dbContext, _auditLoger.Object, _passwordHasher.Object, _httpContext.Object,  
-                _settingService.Object, _sessionCache.Object, _orgService.Object, _requestCache.Object, _actualTimeZoneService,
-                _questionAnswerServices.Object, _logger.Object, _mapHeper, _crommerAuditLogService.Object,_linkoExchangeEmailService.Object);
+            _userService = new UserService(_dbContext, _httpContext.Object,  
+                _settingService.Object, _orgService.Object, _requestCache.Object, _actualTimeZoneService,
+                _logger.Object, _mapHeper, _crommerAuditLogService.Object,_linkoExchangeEmailService.Object);
 
 
             IDigitalSignatureManager certificateDigitalSignatureManager = new CertificateDigitalSignatureManager(_dbContext, _logger.Object, _httpContext.Object);

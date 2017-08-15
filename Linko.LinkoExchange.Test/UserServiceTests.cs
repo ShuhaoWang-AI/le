@@ -77,13 +77,12 @@ namespace Linko.LinkoExchange.Test
             _realSettingService = new SettingService(new LinkoExchangeContext(connectionString), _logger.Object, new MapHelper(), new Mock<IRequestCache>().Object, new Mock<IGlobalSettings>().Object);
             _realOrgService = new OrganizationService(new LinkoExchangeContext(connectionString),
                 _realSettingService, new HttpContextService(), new JurisdictionService(new LinkoExchangeContext(connectionString), new MapHelper(), _logger.Object), _timeZones, new MapHelper());
-            _realUserService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(),
-                new PasswordHasher(), _httpContext.Object, _realSettingService,
-                _sessionCache.Object, _realOrgService, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper(), _cromerrLogger.Object, _linkoExchangeEmailService.Object);
+            _realUserService = new UserService(new LinkoExchangeContext(connectionString),_httpContext.Object, _realSettingService,
+                 _realOrgService, _requestCache, _timeZones, _logger.Object, new MapHelper(), _cromerrLogger.Object, _linkoExchangeEmailService.Object);
 
-            _userService = new UserService(new LinkoExchangeContext(connectionString), new EmailAuditLogEntryDto(),
-                new PasswordHasher(), _httpContext.Object, _settingService.Object,
-                _sessionCache.Object, _orgService.Object, _requestCache, _timeZones, _qaService.Object, _logger.Object, new MapHelper(), _cromerrLogger.Object,_linkoExchangeEmailService.Object);
+            _userService = new UserService(new LinkoExchangeContext(connectionString),
+                 _httpContext.Object, _settingService.Object,
+                 _orgService.Object, _requestCache, _timeZones,_logger.Object, new MapHelper(), _cromerrLogger.Object,_linkoExchangeEmailService.Object);
         }
 
         [TestMethod]
