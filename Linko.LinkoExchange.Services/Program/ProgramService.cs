@@ -132,7 +132,7 @@ namespace Linko.LinkoExchange.Services.Program
         public ICollection<OrganizationRegulatoryProgramUserDto> GetActiveRegulatoryProgramUsers(string email)
         {
             return GetUserRegulatoryPrograms(email)
-                .Where(i => i.OrganizationRegulatoryProgramDto.IsEnabled 
+                .Where(i => i.OrganizationRegulatoryProgramDto.IsEnabled && i.IsRegistrationApproved && i.IsRegistrationDenied == false
                             && !i.InviterOrganizationRegulatoryProgramDto.IsRemoved).ToList();
         }
 
