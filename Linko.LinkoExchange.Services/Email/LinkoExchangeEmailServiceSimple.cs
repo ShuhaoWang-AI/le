@@ -91,8 +91,7 @@ namespace Linko.LinkoExchange.Services.Email
 
         private void WriteEmailAuditLog(EmailEntry emailEntry)
         {
-            string sendTo = emailEntry.RecipientEmailAddress;
-            sendTo = sendTo +",shuhao.wang@watertrax.com"; 
+            string sendTo = emailEntry.RecipientEmailAddress; 
 
             var template = GetTemplate(emailEntry.EmailType).Result;
             if (template == null)
