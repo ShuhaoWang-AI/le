@@ -9,15 +9,13 @@ namespace Linko.LinkoExchange.Services.QuestionAnswer
         }
 
         public string EncryptString(string readableString)
-        {
-            var encryptionPassword = ConfigurationManager.AppSettings["EncryptionPassword"];
-            return StringCipher.Encrypt(readableString, encryptionPassword);
+        { 
+            return StringCipher.Encrypt(readableString);
         }
 
         public string DecryptString(string encryptedString)
-        {
-            var encryptionPassword = ConfigurationManager.AppSettings["EncryptionPassword"];
-            return StringCipher.Decrypt(encryptedString, encryptionPassword);
+        { 
+            return StringCipher.Decrypt(encryptedString);
         }
 
     }

@@ -1019,7 +1019,7 @@ BEGIN
 	-- SQs
     -- string: Test answer
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'bTnDtaQz5oHY/cbKJbvAOLjvCEegDzjjRGIpIoJlOZ63oRl/Qa5qf4iMTZnoFm3GhKC20ZQn0HP6uO22EaIYPaW55QmdDG3U/VxbJLZQF3jRiwEtHPuNk8+OiKZeLFGZ'
+	SELECT 'SjZF/gS1UraAPjQuf5QbbBsgf+TRXhVsNOmHE/mCfMlkGUp7egGFcLcb+jzHh1G82SA5NN/YmOOUWrczy9zc1luE+bO3UU0JijWTJHAl9+YnsHciLG86oVDVI/Uo/HC2'
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite color?')
 		, UserProfileId
 	FROM dbo.tUserProfile
@@ -1027,7 +1027,7 @@ BEGIN
 
     -- string: Test answer
 	INSERT INTO dbo.tUserQuestionAnswer (Content, QuestionId, UserProfileId)
-	SELECT 'bTnDtaQz5oHY/cbKJbvAOLjvCEegDzjjRGIpIoJlOZ63oRl/Qa5qf4iMTZnoFm3GhKC20ZQn0HP6uO22EaIYPaW55QmdDG3U/VxbJLZQF3jRiwEtHPuNk8+OiKZeLFGZ'
+	SELECT 'SjZF/gS1UraAPjQuf5QbbBsgf+TRXhVsNOmHE/mCfMlkGUp7egGFcLcb+jzHh1G82SA5NN/YmOOUWrczy9zc1luE+bO3UU0JijWTJHAl9+YnsHciLG86oVDVI/Uo/HC2'
         , (SELECT QuestionID FROM dbo.tQuestion WHERE Content = 'What is your favorite food?')
 		, UserProfileId
 	FROM dbo.tUserProfile
