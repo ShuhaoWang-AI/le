@@ -6856,7 +6856,7 @@ BEGIN
     INSERT INTO dbo.tCollectionMethodType (Name, Description)
 		VALUES ('Composite', 'Composite')
     INSERT INTO dbo.tCollectionMethodType (Name, Description)
-		VALUES ('Field/Meter', 'Field/Meter')
+		VALUES ('Field\Meter', 'Field\Meter')
 END
 
 IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT TOP 1 * FROM dbo.tLimitType)
