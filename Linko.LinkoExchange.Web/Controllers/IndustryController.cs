@@ -811,10 +811,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
-
+            var previousUri = HttpContext.Request.UrlReferrer;
+            ViewBag.fromCreateAttachment = previousUri != null && previousUri.AbsolutePath.Equals("/industry/attachment/new", StringComparison.OrdinalIgnoreCase); 
             ViewBag.ShowSuccessMessage = TempData[key:"ShowSuccessMessage"] ?? false;
             ViewBag.SuccessMessage = TempData[key:"SuccessMessage"] ?? "";
-
+            
             return View(model:viewModel);
         }
 

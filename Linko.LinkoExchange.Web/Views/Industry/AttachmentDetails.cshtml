@@ -220,6 +220,11 @@
                         <input type="submit" value="Save" class="btn btn-primary btn-sm" formaction="@Url.Action(actionName: "AttachmentDetails", controllerName: "Industry")" formmethod="post" />
 
                         <input class="btn btn-primary btn-sm" data-target="#DeleteAttachmentModal" data-toggle="modal" type="button" value="Delete" />
+
+                        if (ViewBag.fromCreateAttachment)
+                        {
+                            <input class="btn btn-primary btn-sm" type="submit" value="Add New" formaction= "@Url.Action(actionName:"NewAttachmentDetails", controllerName:"Industry")" formmethod="get" />
+                        }
                     }
                     else
                     {
