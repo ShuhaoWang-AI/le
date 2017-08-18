@@ -39,7 +39,7 @@
                         @Html.TextBoxFor(m => m.OldEmail, htmlAttributes:new
                                                                          {
                                                                              @class = "form-control",
-                                                                             @readonly = "readonly"
+                                                                             @readonly = "readonly" 
                                                                          })
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.NewEmail, htmlAttributes:new {@class = "col-md-3 required control-label"})
                     <div class="col-md-9">
-                        @Html.TextBoxFor(m => m.NewEmail, htmlAttributes:new {@class = "form-control"})
+                        @Html.TextBoxFor(m => m.NewEmail, htmlAttributes:new {@class = "form-control", AutoComplete="off"})
                         @Html.ValidationMessageFor(m => m.NewEmail, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                     </div>
                 </div>

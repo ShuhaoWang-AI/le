@@ -1002,6 +1002,10 @@
         var profileCollapsed = '@Html.Raw(ViewBag.profileCollapsed)';
         var kbqCollapsed = '@Html.Raw(ViewBag.kbqCollapsed)';
         var sqCollapsed = '@Html.Raw(ViewBag.sqCollapsed)';
-        var newRegistration = '@Html.Raw(ViewBag.newRegistration)';
+        var newRegistration = '@Html.Raw(ViewBag.newRegistration)'; 
+
+        $(document).ready(function(){
+            disableAutoComplete();
+        }());
     </script>
 }

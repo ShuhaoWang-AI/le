@@ -442,16 +442,16 @@
                             </td>
                             <td>
                                 <div class="input-group input-group-sm" style="min-width: 125px">
-                                    <input class="form-control input-sm" id="Result_@sampleResult.ParameterId" type="text" value="@sampleResult.Value">
+                                    <input class="form-control input-sm" id="Result_@sampleResult.ParameterId" type="text" value="@sampleResult.Value" autocomplete="off" >
                                     <input id="UnitId_@sampleResult.ParameterId" type="hidden" value="@sampleResult.UnitId">
                                     <span id="UnitName_@sampleResult.ParameterId" class="input-group-addon">@sampleResult.UnitName</span>
                                 </div>
                             </td>
                             <td>
-                                <input class="form-control input-sm" id="MDL_@sampleResult.ParameterId" type="text" style="width: 80px" value="@sampleResult.EnteredMethodDetectionLimit">
+                                <input class="form-control input-sm" id="MDL_@sampleResult.ParameterId" type="text" autocomplete="off" style="width: 80px" value="@sampleResult.EnteredMethodDetectionLimit">
                             </td>
                             <td>
-                                <input class="form-control input-sm" id="AnalysisMethod_@sampleResult.ParameterId" type="text" value="@sampleResult.AnalysisMethod">
+                                <input class="form-control input-sm" id="AnalysisMethod_@sampleResult.ParameterId" type="text" autocomplete="off" value="@sampleResult.AnalysisMethod">
                             </td>
                             <td>
                                 @if (ViewBag.Readonly)
@@ -1181,7 +1181,7 @@
                     {
                         //console.debug(value.Id + " : " + value.Name);
                         var data = {};
-                        data[0] = "<input id='sampleResultId_" + value.Id + "' type='hidden' value=''>";
+                        data[0] = "<input id='sampleResultId_" + value.Id + "' type='hidden' value=''  autocomplete='false' >";
                         data[1] = value.Name;
 
                         var availableResultQualifierValidValues =
@@ -1216,7 +1216,7 @@
                             '<div class="input-group input-group-sm" style="min-width:125px">'
                             + '<input class="form-control input-sm" id="Result_'
                             + value.Id
-                            + '" type="text" value=""><input id="UnitId_'
+                            + '" type="text" value=""  autocomplete="false"><input id="UnitId_'
                             + value.Id
                             + '" type="hidden" value="'
                             + value.DefaultUnitId
@@ -1227,14 +1227,14 @@
                             + '</span></div>';
                         data[4] = '<input class="form-control input-sm" id="MDL_'
                             + value.Id
-                            + '" type="text" style="width: 80px" value="">';
+                            + '" type="text" style="width: 80px" value="" autocomplete="false">';
                         data[5] = '<input class="form-control input-sm" id="AnalysisMethod_'
                             + value.Id
-                            + '" type="text" value="">';
+                            + '" type="text" value="" autocomplete="false">';
                         data[6] = '<input id="AnalysisDateTime_'
                             + value.Id
                             + '" style="width: 100%; font-size: 12px;"'
-                            + ' />';
+                            + 'autocomplete="false" />';
                         data[7] =
                             '<input type="checkbox" class="checkbox" id="EPAMethod_'
                             + value.Id
@@ -1374,7 +1374,9 @@
                     {
                         var value = $(this).val().toLowerCase().replace("12:00 am", "");
                         $(this).val(value);
-                    });
+                    }); 
+
+                disableAutoComplete();
             });
     </script>
 }}

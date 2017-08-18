@@ -215,3 +215,8 @@ if (!String.prototype.startsWith)
         return this.indexOf(searchString, position) === position;
     };
 }
+
+function disableAutoComplete() { 
+    $("input[type='text'").attr("autocomplete", "off");
+    $("input[type='tel'").attr("autocomplete", "off");
+}

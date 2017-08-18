@@ -20,7 +20,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.UserName, htmlAttributes:new {@class = "col-md-2 control-label"})
                     <div class="col-md-10">
-                        @Html.TextBoxFor(m => m.UserName, htmlAttributes:new {@class = "form-control", autofocus = "autofocus", autocomplete = "off"})
+                        @Html.TextBoxFor(m => m.UserName, htmlAttributes:new {@class = "form-control", autofocus = "autofocus", AutoComplete = "off"})
                         @Html.ValidationMessageFor(m => m.UserName, validationMessage:"", htmlAttributes:new {@class = "text-red"})
                     </div>
                 </div>
