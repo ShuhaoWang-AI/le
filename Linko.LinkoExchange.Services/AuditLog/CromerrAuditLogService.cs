@@ -66,7 +66,7 @@ namespace Linko.LinkoExchange.Services.AuditLog
             var cromerrAuditLogEntryDto = new CromerrAuditLogEntryDto();
             cromerrAuditLogEntryDto.RegulatoryProgramId = orgRegProgram.RegulatoryProgramId;
             cromerrAuditLogEntryDto.OrganizationId = orgRegProgram.OrganizationId;
-            cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgram.RegulatorOrganizationId;
+            cromerrAuditLogEntryDto.RegulatorOrganizationId = orgRegProgram.RegulatorOrganizationId ?? orgRegProgram.OrganizationId;
             cromerrAuditLogEntryDto.UserProfileId = user.UserProfileId;
             cromerrAuditLogEntryDto.UserName = user.UserName;
             cromerrAuditLogEntryDto.UserFirstName = user.FirstName;
