@@ -25,7 +25,7 @@ namespace Linko.LinkoExchange.Services.PrivacyPolicy
         { 
             _logger.Info($"Enter PrivacyPolicyService.GetPrivacyPolicyContent.");
 
-            var privacyPolicy = _dbContext.PrivacyPolicies.OrderByDescending(i=>i.CreationDateTimeUtc).First();  
+            var privacyPolicy = _dbContext.PrivacyPolicies.OrderByDescending(i=>i.EffectiveDateTimeUtc).First();  
 
             _logger.Info($"Enter PrivacyPolicyService.GetPrivacyPolicyContent.");
 
