@@ -54,10 +54,7 @@ namespace Linko.LinkoExchange.Web
 
             bundles.Add(bundle:new ScriptBundle(virtualPath:"~/bundles/profile")
                             .Include(virtualPath:"~/Scripts/profile.js"));
-
-            bundles.Add(bundle:new ScriptBundle(virtualPath:"~/bundles/invite")
-                            .Include(virtualPath:"~/Scripts/invite.js"));
-
+                                                
             bundles.Add(bundle:new ScriptBundle(virtualPath:"~/bundles/auditlogs")
                             .Include(virtualPath:"~/Scripts/auditlogs.js"));
 

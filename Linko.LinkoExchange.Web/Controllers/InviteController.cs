@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using Linko.LinkoExchange.Core.Enum;
+using Linko.LinkoExchange.Core.Validation;
 using Linko.LinkoExchange.Services.Cache;
 using Linko.LinkoExchange.Services.HttpContext;
 using Linko.LinkoExchange.Services.Invitation;
 using Linko.LinkoExchange.Services.Report;
 using Linko.LinkoExchange.Services.Sample;
 using Linko.LinkoExchange.Services.User;
+using Linko.LinkoExchange.Web.Extensions;
 using Linko.LinkoExchange.Web.Mvc;
 using Linko.LinkoExchange.Web.ViewModels.Shared;
 using NLog;
@@ -53,6 +55,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         public ActionResult InviteCheckEmail(string emailAddress, string orgRegProgramIdString)
         {
             int orgRegProgramId;
+
             if (string.IsNullOrEmpty(value:orgRegProgramIdString) || int.Parse(s:orgRegProgramIdString) < 1)
             {
                 orgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
@@ -61,46 +64,35 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 orgRegProgramId = int.Parse(s:orgRegProgramIdString);
             }
+            
+            var result = _invitationService.CheckEmailAddress(orgRegProgramId:orgRegProgramId, email:emailAddress);
 
-            var viewModel = new InviteViewModel();
-            var foundUsers = _invitationService.CheckEmailAddress(orgRegProgramId:orgRegProgramId, email:emailAddress);
-            if (foundUsers.ExistingUserSameProgram != null)
-            {
-                viewModel = new InviteViewModel
+            var viewModel = new InviteViewModel
                             {
-                                DisplayMessage = "This user is already associated with this account. No invite can be sent.",
-                                IsExistingProgramUser = true,
-                                FirstName = foundUsers.ExistingUserSameProgram.UserProfileDto.FirstName,
-                                LastName = foundUsers.ExistingUserSameProgram.UserProfileDto.LastName,
-                                EmailAddress = foundUsers.ExistingUserSameProgram.UserProfileDto.Email,
-                                BusinessName = foundUsers.ExistingUserSameProgram.UserProfileDto.BusinessName,
-                                PhoneNumber = foundUsers.ExistingUserSameProgram.UserProfileDto.PhoneNumber
+                                OrgRegProgramId = orgRegProgramId,
+                                IsUserActiveInSameProgram = result.IsUserActiveInSameProgram
                             };
+
+            if (result.ExistingOrgRegProgramUser == null)
+            {
+                viewModel.EmailAddress = emailAddress;
+                viewModel.DisplayMessage = "The user does not exist. Enter a first and last name and click the 'Send Invite' button.";
             }
-            else if (foundUsers.ExistingUsersDifferentPrograms != null)
+            else
             {
-                viewModel = new InviteViewModel
-                            {
-                                DisplayMessage = "This user is not yet associated with this account. Click the 'Send Invite' button to invite them.",
-                                IsExistingProgramUser = false,
-                                ExistingUsers = new List<InviteExistingUserViewModel>()
-                            };
+                viewModel.FirstName = result.ExistingOrgRegProgramUser.UserProfileDto.FirstName;
+                viewModel.LastName = result.ExistingOrgRegProgramUser.UserProfileDto.LastName;
+                viewModel.EmailAddress = result.ExistingOrgRegProgramUser.UserProfileDto.Email;
+                viewModel.BusinessName = result.ExistingOrgRegProgramUser.UserProfileDto.BusinessName;
+                viewModel.PhoneNumber = result.ExistingOrgRegProgramUser.UserProfileDto.PhoneNumber;
 
-                foreach (var distinctExistingUser in
-                    foundUsers.ExistingUsersDifferentPrograms
-                              .GroupBy(user => user.UserProfileId)
-                              .Select(user => user.First())
-                              .ToList())
+                if (result.IsUserActiveInSameProgram)
                 {
-                    viewModel.ExistingUsers.Add(item:new InviteExistingUserViewModel
-                                                     {
-                                                         OrgRegProgramUserId = distinctExistingUser.OrganizationRegulatoryProgramUserId,
-                                                         FirstName = distinctExistingUser.UserProfileDto.FirstName,
-                                                         LastName = distinctExistingUser.UserProfileDto.LastName,
-                                                         EmailAddress = distinctExistingUser.UserProfileDto.Email,
-                                                         BusinessName = distinctExistingUser.UserProfileDto.BusinessName,
-                                                         PhoneNumber = distinctExistingUser.UserProfileDto.PhoneNumber
-                                                     });
+                    viewModel.DisplayMessage = "This user is already associated with this account. No invite can be sent.";
+                }
+                else
+                {
+                    viewModel.DisplayMessage = "This user is not yet associated with this account. Click the 'Send Invite' button to invite them.";
                 }
             }
 
@@ -114,92 +106,43 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 return View(model:viewModel);
             }
-
-            var orgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-            if (viewModel.OrgRegProgramId > 0)
+            
+            if (viewModel.OrgRegProgramId == 0)
             {
-                //Inviting Admin user to UI
-                orgRegProgramId = viewModel.OrgRegProgramId;
+                //Inviting to current organization
+                var orgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
+                viewModel.OrgRegProgramId = orgRegProgramId;
             }
 
-           var redirectUrl = GetRedirectUrl(invitationType:viewModel.InvitationType, industryOrgRegProgramId:orgRegProgramId);
-            var result = _invitationService.SendUserInvite(orgRegProgramId:orgRegProgramId, email:viewModel.EmailAddress, firstName:viewModel.FirstName, lastName:viewModel.LastName,
-                                                           invitationType:viewModel.InvitationType);
-            if (result.Success)
+
+            try
             {
+                _invitationService.SendUserInvite(orgRegProgramId:viewModel.OrgRegProgramId, email:viewModel.EmailAddress, firstName:viewModel.FirstName,
+                                                  lastName:viewModel.LastName, invitationType:viewModel.InvitationType);
                 _logger.Info(message:string.Format(format:"Invite successfully sent. Email={0}, FirstName={1}, LastName={2}.",
                                                    arg0:viewModel.EmailAddress, arg1:viewModel.FirstName, arg2:viewModel.LastName));
-                TempData["InivteSendSucceed"] = true; 
-                return Redirect(redirectUrl);  
+                TempData["InivteSendSucceed"] = true;
+
+                var redirectUrl = GetRedirectUrl(invitationType:viewModel.InvitationType, orgRegProgramId:viewModel.OrgRegProgramId);
+                return Redirect(redirectUrl); 
             }
-            foreach (var error in result.Errors)
+            catch (RuleViolationException rve)
             {
-                ModelState.AddModelError(key:string.Empty, errorMessage:error);
+                MvcValidationExtensions.UpdateModelStateWithViolations(ruleViolationException:rve, modelState:ViewData.ModelState);
             }
 
-            viewModel.EmailAddress = "";
-            viewModel.FirstName = "";
-            viewModel.LastName = "";
             return View(model:viewModel);
         }
 
-        [AcceptVerbs(verbs:HttpVerbs.Post)]
-        public ActionResult InviteExistingUser(string orgRegProgUserIdString, string industryOrgRegProgramId, string invitationType)
-        {
-            var orgRegProgramUserId = int.Parse(s:orgRegProgUserIdString);
-            var orgRegProgramId = int.Parse(s:_httpContextService.GetClaimValue(claimType:CacheKey.OrganizationRegulatoryProgramId));
-            var thisInvitationType = (InvitationType) Enum.Parse(enumType:typeof(InvitationType), value:invitationType);
-            if (!string.IsNullOrEmpty(value:industryOrgRegProgramId) && int.Parse(s:industryOrgRegProgramId) > 0)
-            {
-                //Inviting Admin user to UI
-                orgRegProgramId = int.Parse(s:industryOrgRegProgramId);
-            }
-
-            var redirectUrl = GetRedirectUrl(invitationType:thisInvitationType, industryOrgRegProgramId:orgRegProgramId);
-            var result = _invitationService.SendUserInvite(orgRegProgramId:orgRegProgramId, email:"", firstName:"", lastName:"", invitationType:thisInvitationType,
-                                                           existingOrgRegProgramUserId:orgRegProgramUserId);
-            if (result.Success)
-            {
-                _logger.Info(message: $"Invite successfully sent to existing user in different program. OrgRegProgUserId={orgRegProgramUserId} from ProgramId={orgRegProgramId}") ;
-                TempData["InivteSendSucceed"] = true; 
-                return Redirect(redirectUrl);  
-            }
-            else
-            {
-                foreach (var error in result.Errors)
-                {
-                    _logger.Info(message:
-                                 string.Format(format:"Invite failed to send to existing user {0} in different program. Error={1} from ProgramId={2}", arg0:orgRegProgramUserId, arg1:error,
-                                               arg2:orgRegProgramId));
-                }
-
-               //return new RedirectResult(redirectUrl);
-                return View(viewName:"Confirmation", model:new ConfirmationViewModel
-                                                       {
-                                                           Title = "Invitation Confirmation",
-                                                           Message = "An invitation has been sent",
-                                                           HtmlStr = "<p><a href=\"#\" onclick=\"location.href='" + redirectUrl + "'\" class=\"btn btn-sm btn-primary\">OK</a></p>"
-                                                       });
-            }
-        }
-
-        private string GetRedirectUrl(InvitationType invitationType, int? industryOrgRegProgramId = null)
+        private string GetRedirectUrl(InvitationType invitationType, int orgRegProgramId )
         {
             switch (invitationType)
             {
-                case InvitationType.AuthorityToAuthority:
-                    return "/Authority/Users";
-                case InvitationType.IndustryToIndustry:
-                    return "/Industry/Users";
-                case InvitationType.AuthorityToIndustry:
-                    if (industryOrgRegProgramId.HasValue && industryOrgRegProgramId.Value > 0)
-                    {
-                        return string.Format(format:"/Authority/Industry/{0}/Users", arg0:industryOrgRegProgramId.Value);
-                    }
-                    break;
+                case InvitationType.AuthorityToAuthority: return "/Authority/Users";
+                case InvitationType.IndustryToIndustry: return "/Industry/Users";
+                case InvitationType.AuthorityToIndustry: return string.Format(format:"/Authority/Industry/{0}/Users", arg0:orgRegProgramId);
+                default: return @"../";
             }
-
-            return @"../";
         } 
     }
 }

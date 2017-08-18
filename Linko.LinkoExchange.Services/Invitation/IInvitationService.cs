@@ -21,13 +21,6 @@ namespace Linko.LinkoExchange.Services.Invitation
         InvitationDto GetInvitation(string invitationId);
 
         /// <summary>
-        /// Get the organization of the invitation
-        /// </summary>
-        /// <param name="invitationId">Invitation id</param>
-        /// <returns>The organization of the invitation</returns>
-        IEnumerable<OrganizationDto> GetInvitationrRecipientOrganization(string invitationId);
-
-        /// <summary>
         /// Returns all records in the Invitation table 
         /// where recipient program id matches
         /// </summary>
@@ -55,10 +48,8 @@ namespace Linko.LinkoExchange.Services.Invitation
         /// <param name="firstName"></param>
         /// <param name="lastName"></param>
         /// <param name="invitationType"></param>
-        /// <param name="existingOrgRegProgramUserId"></param>
-        /// <param name="isAuthorizationRequired"></param>
         /// <returns></returns>
-        InvitationServiceResultDto SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType, int? existingOrgRegProgramUserId = null, bool isAuthorizationRequired = false);
+        void SendUserInvite(int orgRegProgramId, string email, string firstName, string lastName, InvitationType invitationType);
 
         /// <summary>
         /// This method is used to determine if an email address is 

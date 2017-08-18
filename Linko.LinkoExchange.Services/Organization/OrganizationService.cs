@@ -318,7 +318,7 @@ namespace Linko.LinkoExchange.Services.Organization
                 && o.IsRegistrationDenied == false
                 && o.IsEnabled == true
                 && o.IsRemoved == false);
-            dto.HasAdmin = adminUserCount > 0;
+            dto.HasActiveAdmin = adminUserCount > 0;
             dto.OrganizationDto.State = _jurisdictionService.GetJurisdictionById(orgRegProgram.Organization.JurisdictionId)?.Code ?? "";
 
             var lastReportPackageSubmitted = _dbContext.ReportPackages
@@ -344,7 +344,7 @@ namespace Linko.LinkoExchange.Services.Organization
                 var childOrgRegProgs = _dbContext.OrganizationRegulatoryPrograms.Where(o => o.RegulatorOrganizationId == orgRegProgram.OrganizationId
                     && o.RegulatoryProgramId == orgRegProgram.RegulatoryProgramId);
 
-                if (childOrgRegProgs != null && !String.IsNullOrEmpty(searchString))
+                if (childOrgRegProgs != null && !string.IsNullOrEmpty(searchString))
                 {
                     childOrgRegProgs = childOrgRegProgs.Where(x =>
                                                                x.ReferenceNumber.Contains(searchString)
@@ -363,11 +363,15 @@ namespace Linko.LinkoExchange.Services.Organization
                     {
                         OrganizationRegulatoryProgramDto dto = _mapHelper.GetOrganizationRegulatoryProgramDtoFromOrganizationRegulatoryProgram(orgRegProg);
                         dto.HasSignatory = _dbContext.OrganizationRegulatoryProgramUsers
-                            .Count(o => o.OrganizationRegulatoryProgramId == orgRegProg.OrganizationRegulatoryProgramId
-                            && o.IsSignatory == true) > 0;
-                        dto.HasAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
-                            .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
-                            && o.PermissionGroup.Name == "Administrator") > 0;
+                                                     .Count(o => o.OrganizationRegulatoryProgramId == orgRegProg.OrganizationRegulatoryProgramId && o.IsSignatory)
+                                           > 0;
+                        dto.HasActiveAdmin = _dbContext.OrganizationRegulatoryProgramUsers.Include("PermissionGroup")
+                                                       .Count(o => o.OrganizationRegulatoryProgramId == orgRegProgram.OrganizationRegulatoryProgramId
+                                                                   && o.IsRegistrationApproved
+                                                                   && o.IsEnabled
+                                                                   && o.PermissionGroup.Name == "Administrator"
+                                                             )
+                                             > 0;
                         dto.OrganizationDto.State = _jurisdictionService.GetJurisdictionById(orgRegProgram.Organization.JurisdictionId)?.Code ?? "";
                         dtoList.Add(dto);
 
@@ -429,14 +433,15 @@ namespace Linko.LinkoExchange.Services.Organization
             bool isForAuthority = !orgRegProgram.RegulatorOrganizationId.HasValue;
 
             if (isForAuthority)
+            {
                 maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(orgRegProgramId, SettingType.AuthorityUserLicenseTotalCount));
+            }
             else
             {
                 //Setting will be at the Authority of this Industry
                 var thisIndustry = _dbContext.OrganizationRegulatoryPrograms.Single(o => o.OrganizationRegulatoryProgramId == orgRegProgramId);
                 var authority = _dbContext.OrganizationRegulatoryPrograms
-                    .Single(o => o.OrganizationId == thisIndustry.RegulatorOrganizationId &&
-                    o.RegulatoryProgramId == thisIndustry.RegulatoryProgramId);
+                                          .Single(o => o.OrganizationId == thisIndustry.RegulatorOrganizationId && o.RegulatoryProgramId == thisIndustry.RegulatoryProgramId);
 
                 maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.UserPerIndustryMaxCount));
             }

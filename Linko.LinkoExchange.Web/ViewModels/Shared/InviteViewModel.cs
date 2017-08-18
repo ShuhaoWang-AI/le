@@ -1,12 +1,13 @@
-﻿using Linko.LinkoExchange.Core.Enum;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Linko.LinkoExchange.Core.Enum;
 
 namespace Linko.LinkoExchange.Web.ViewModels.Shared
 {
     public class InviteViewModel
     {
-        public string DisplayMessage {  get; set; }
+        #region public properties
+
+        public string DisplayMessage { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [EmailAddress]
@@ -29,21 +30,10 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
 
-        public bool IsExistingProgramUser { get; set; }
-
-        public ICollection<InviteExistingUserViewModel> ExistingUsers { get; set; }
+        public bool IsUserActiveInSameProgram { get; set; }
 
         public InvitationType InvitationType { get; set; }
 
-    }
-
-    public class InviteExistingUserViewModel
-    {
-        public int? OrgRegProgramUserId { get; set; }
-        public string EmailAddress { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string BusinessName { get; set; }
-        public string PhoneNumber { get; set; }
+        #endregion
     }
 }

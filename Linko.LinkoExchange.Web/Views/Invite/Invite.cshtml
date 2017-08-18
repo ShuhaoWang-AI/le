@@ -1,0 +1,311 @@
+﻿@using Linko.LinkoExchange.Core.Enum
+@model Linko.LinkoExchange.Web.ViewModels.Shared.InviteViewModel
+
+@{
+    ViewBag.Title = "Invite";
+}
+
+<section>
+    <ol class="breadcrumb">
+        @if (Model.InvitationType == InvitationType.AuthorityToAuthority)
+        {
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Authority")'"><i class=""></i> Home </a>
+            </li>
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"AuthorityUsers", controllerName:"Authority")'"><i class=""></i> Users </a>
+            </li>
+        }
+        else if (Model.InvitationType == InvitationType.AuthorityToIndustry)
+        {
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Authority")'"><i class=""></i> Home </a>
+            </li>
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Industries", controllerName:"Authority")'"><i class=""></i> Industries </a>
+            </li>
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"IndustryDetails", controllerName:"Authority", routeValues:new {id = Model.OrgRegProgramId})'"><i class=""></i> Details </a>
+            </li>
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"IndustryUsers", controllerName:"Authority", routeValues:new {id = Model.OrgRegProgramId})'"><i class=""></i> Users </a>
+            </li>
+        }
+        else if (Model.InvitationType == InvitationType.IndustryToIndustry)
+        {
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"Index", controllerName:"Industry")'"><i class=""></i> Home </a>
+            </li>
+            <li>
+                <a href="#" onclick="location.href = '@Url.Action(actionName:"IndustryUsers", controllerName:"Industry")'"><i class=""></i> Users </a>
+            </li>
+        }
+        <li class="active">Invite</li>
+    </ol>
+</section>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.OrgRegProgramId)
+    @Html.HiddenFor(model => model.InvitationType)
+
+    <div class="box box-primary" id="boxSearchEmailAddress">
+        <div class="box-header with-border">
+            <h3 class="box-title" id="boxHeader">Search Email Address</h3>
+            <div class="box-tools pull-right">
+                <div class="pull-right">
+                </div>
+            </div>
+        </div>
+
+        <section class="box-body form-horizontal">
+
+            @Html.ValidationSummary(excludePropertyErrors:true, message:Message.ValidationSummaryHeaderText, htmlAttributes:new {@class = "alert alert-danger"})
+
+            @if (ViewBag.ShowSuccessMessage != null && ViewBag.ShowSuccessMessage)
+            {
+                <div class="alert alert-dismissible alert-success">
+                    <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
+                    <h5>
+                        <i class="fa fa-check icon"></i>
+                        @ViewBag.SuccessMessage
+                    </h5>
+                </div>
+            }
+
+            <div class="alert" id="divDisplayMessage" style="display: none;">
+                <h5>
+                    <i class="fa fa-check icon" id="iconDisplayMessage"></i>
+                    <span id="displayMessage"></span>
+                </h5>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.EmailAddress, htmlAttributes:new
+                                                                           {
+                                                                               @class = "control-label col-md-2 required"
+                                                                           })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.EmailAddress, additionalViewData:new
+                                                                                    {
+                                                                                        htmlAttributes = new
+                                                                                                         {
+                                                                                                             @class = "form-control"
+                                                                                                         }
+                                                                                    })
+                    @Html.ValidationMessageFor(model => model.EmailAddress, validationMessage:"", htmlAttributes:new {@class = "text-red"})
+                    @Html.HiddenFor(model => model.EmailAddress)
+                </div>
+            </div>
+
+            <div id="divNameContainer" style="display: none;">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.FirstName, htmlAttributes:new
+                                                                            {
+                                                                                @class = "control-label col-md-2 required"
+                                                                            })
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.FirstName, additionalViewData:new
+                                                                                     {
+                                                                                         htmlAttributes = new
+                                                                                                          {
+                                                                                                              @class = "form-control"
+                                                                                                          }
+                                                                                     })
+                        @Html.ValidationMessageFor(model => model.FirstName, validationMessage:"", htmlAttributes:new {@class = "text-red"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.LastName, htmlAttributes:new
+                                                                           {
+                                                                               @class = "control-label col-md-2 required"
+                                                                           })
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.LastName, additionalViewData:new
+                                                                                    {
+                                                                                        htmlAttributes = new
+                                                                                                         {
+                                                                                                             @class = "form-control"
+                                                                                                         }
+                                                                                    })
+                        @Html.ValidationMessageFor(model => model.LastName, validationMessage:"", htmlAttributes:new {@class = "text-red"})
+                    </div>
+                </div>
+            </div>
+
+            <div id="divAdditionalUserInfo" style="display: none;">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.BusinessName, htmlAttributes:new
+                                                                               {
+                                                                                   @class = "control-label col-md-2"
+                                                                               })
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.BusinessName, additionalViewData:new
+                                                                                        {
+                                                                                            htmlAttributes = new
+                                                                                                             {
+                                                                                                                 @class = "form-control",
+                                                                                                                 @readonly = "readonly"
+                                                                                                             }
+                                                                                        })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PhoneNumber, htmlAttributes:new
+                                                                              {
+                                                                                  @class = "control-label col-md-2"
+                                                                              })
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.PhoneNumber, additionalViewData:new
+                                                                                       {
+                                                                                           htmlAttributes = new
+                                                                                                            {
+                                                                                                                @class = "form-control",
+                                                                                                                @readonly = "readonly"
+                                                                                                            }
+                                                                                       })
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="box-footer">
+            <div class="form-group pull-right">
+                <input class="btn btn-primary btn-sm" id="btnSearchEmail" type="submit" value="Search Email" />
+                <input class="btn btn-primary btn-sm" formmethod="post" id="btnSendInvite" style="display: none;" type="submit" value="Send Invite" />
+                <input class="btn btn-primary btn-sm" id="btnCancelInvite" style="display: none;" type="button" value="Cancel" />
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render(paths:"~/bundles/jqueryval")
+
+    <script>
+        $(document)
+            .ready(function()
+            {
+                $("#btnSendInvite")
+                    .click(function()
+                    {
+                        //Prevent empty (just white space) strings
+                        $("#FirstName").val($("#FirstName").val().trim());
+                        $("#LastName").val($("#LastName").val().trim());
+                        var form = $(this).parents('form:first');
+                        form.submit();
+                    });
+
+                $("#btnSearchEmail")
+                    .click(function(event)
+                    {
+                        event.preventDefault();
+
+                        if (!$('#EmailAddress').valid())
+                        {
+                            return false;
+                        }
+
+                        var validationSummary = $('.validation-summary-errors');
+
+                        if (validationSummary.length === 0)
+                        {
+                            // Form is still valid
+                            validationSummary = $('.validation-summary-valid');
+                        }
+
+                        validationSummary.removeClass("validation-summary-errors").addClass("validation-summary-valid");
+
+                        $.post("/Invite/InviteCheckEmail",
+                            {
+                                emailAddress: $("#EmailAddress").val(),
+                                orgRegProgramIdString: $("#OrgRegProgramId").val()
+                            },
+                            function(data, status)
+                            {
+                                //alert("Data: " + data + "\nStatus: " + status);
+
+                                $("#btnSearchEmail").hide();
+                                $("#btnCancelInvite").show();
+
+                                $("#divDisplayMessage").show();
+                                $("#displayMessage").html(data.DisplayMessage);
+
+                                $("#divNameContainer").show();
+
+                                $("#boxHeader").html("Search Result");
+
+                                $("#EmailAddress").prop('readonly', true);
+
+                                if (data.FirstName == null && data.LastName == null)
+                                {
+                                    // user not exist in LE
+                                    $("input[type=text]").prop('readonly', false);
+                                    $("#divDisplayMessage").addClass("alert-info");
+                                    
+                                    $("#btnSendInvite").show();
+                                }
+                                else
+                                {
+                                    $("#divAdditionalUserInfo").show();
+
+                                    $("#EmailAddress").val(data.EmailAddress);
+                                    $("[id=FirstName]").val(data.FirstName);
+                                    $("[id=LastName]").val(data.LastName);
+                                    $("#BusinessName").val(data.BusinessName);
+                                    $("#PhoneNumber").val(data.PhoneNumber);
+
+                                    $("input[type=text]").prop('readonly', true);
+
+                                    if (data.IsUserActiveInSameProgram)
+                                    {
+                                        @* user is active in same org program *@
+                                        $("#divDisplayMessage").addClass("alert-danger");
+                                        $("#iconDisplayMessage").removeClass("fa-check").addClass("fa-close");
+                                        
+                                        $("#btnSendInvite").hide();
+                                    }
+                                    else
+                                    {
+                                        @* user is not in same org program but in different org program *@
+                                        $("#divDisplayMessage").addClass("alert-info");
+
+                                        $("#btnSendInvite").show();
+                                    }
+                                }
+                            });
+                        return false;
+                    });
+
+                $("[id=btnCancelInvite]")
+                    .click(function()
+                    {
+                        clearFields();
+                        $("#btnSearchEmail").show();
+                        $("#btnSendInvite").hide();
+                        $("#btnCancelInvite").hide();
+        
+                        $("#EmailAddress").prop('readonly', false);
+                        $("input[type=text]").prop('readonly', false);
+        
+                        $("#iconDisplayMessage").removeClass("fa-close").addClass("fa-check");
+                        $("#divDisplayMessage").removeClass().addClass("alert");
+                        $("#divDisplayMessage").hide();
+
+                        $("#divNameContainer").hide();
+                        $("#divAdditionalUserInfo").hide();
+                        $("#boxHeader").html("Search Email Address");
+                    });
+            });
+
+        function clearFields()
+        {
+            $("#displayMessage").html("");
+            $("#EmailAddress").val(null);
+            $("#FirstName").val(null);
+            $("#LastName").val(null);
+            $("#BusinessName").val(null);
+            $("#PhoneNumber").val(null);
+        }
+    </script>
+}

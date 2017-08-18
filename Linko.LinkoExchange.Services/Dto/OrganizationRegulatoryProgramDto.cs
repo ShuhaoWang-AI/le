@@ -17,7 +17,7 @@ namespace Linko.LinkoExchange.Services.Dto
         public string AssignedTo { get; set; }
         public string ReferenceNumber { get; set; }
         public bool HasSignatory { get; set; }
-        public bool HasAdmin { get; set; }
+        public bool HasActiveAdmin { get; set; }
 
         //Localized most recent date (or null) found in tReportPackage for this OrganizationRegulatoryProgramId
         public DateTime? LastSubmissionDateTimeLocal { get; set; }

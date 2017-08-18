@@ -167,7 +167,6 @@
     <Compile Include="Dto\EmailAuditLogEntryDto.cs" />
     <Compile Include="Dto\IAuditLogEntry.cs" />
     <Compile Include="Dto\InvitationDto.cs" />
-    <Compile Include="Dto\InvitationServiceResultDto.cs" />
     <Compile Include="Dto\OrganizationRegulatoryProgramDto.cs" />
     <Compile Include="Dto\OrganizationRegulatoryProgramUserDto.cs" />
     <Compile Include="Dto\AuthorityDetailsDto.cs" />

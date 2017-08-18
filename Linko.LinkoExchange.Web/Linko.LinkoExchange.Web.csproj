@@ -437,7 +437,6 @@
     <None Include="Scripts\_references.js" />
     <Content Include="Scripts\kendo.modernizr.custom.js" />
     <Content Include="Scripts\linkoExchange.js" />
-    <Content Include="Scripts\invite.js" />
     <Content Include="Scripts\pendingInvitation.js" />
     <Content Include="Scripts\Profile.js" />
     <Content Include="Views\Account\ChangeEmail.cshtml" />
@@ -576,7 +575,7 @@
     <Content Include="Views\Industry\PendingUserApprovalDetails.cshtml" />
     <Content Include="Views\Industry\PendingUserApprovals.cshtml" />
     <Content Include="Views\User\RequestSignatory.cshtml" />
-    <Content Include="Views\Shared\Invite.cshtml" />
+    <Content Include="Views\Invite\Invite.cshtml" />
     <Content Include="Views\Common\Unauthorized.cshtml" />
     <Content Include="Views\Authority\AuditLogs.cshtml" />
   </ItemGroup>
@@ -585,7 +584,6 @@
     <Folder Include="Help\AuthorityPortal\" />
     <Folder Include="Help\IndustryPortal\" />
     <Folder Include="ViewModels\Common\" />
-    <Folder Include="Views\Invite\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Linko.LinkoExchange.Core\Linko.LinkoExchange.Core.csproj">

@@ -121,19 +121,19 @@ namespace Linko.LinkoExchange.Test
         [TestMethod]
         public void SendUserInvite_AuthorityToAuthority_UnknownEmail()
         {
-            var dto = invitationService.SendUserInvite(1, "unknown@test.com", "Bob", "Smith", InvitationType.AuthorityToAuthority);
+            invitationService.SendUserInvite(1, "unknown@test.com", "Bob", "Smith", InvitationType.AuthorityToAuthority);
         }
 
         [TestMethod]
         public void SendUserInvite_AuthorityToAuthority_EmailExists()
         {
-            var dto = invitationService.SendUserInvite(1, "support@linkotechnology.com", "Jen", "Lee", InvitationType.AuthorityToAuthority);
+            invitationService.SendUserInvite(1, "support@linkotechnology.com", "Jen", "Lee", InvitationType.AuthorityToAuthority);
         }
 
         [TestMethod]
         public void SendUserInvite_AuthorityToAuthority_EmailExistsInDifferentProgram()
         {
-            var dto = invitationService.SendUserInvite(1, "jbourne@test.com", "Jen", "Lee", InvitationType.AuthorityToAuthority);
+            invitationService.SendUserInvite(1, "jbourne@test.com", "Jen", "Lee", InvitationType.AuthorityToAuthority);
         }
 
     }

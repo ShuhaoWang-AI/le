@@ -28,7 +28,6 @@
 /// <reference path="inputmask/phone-codes/phone-nl.js" />
 /// <reference path="inputmask/phone-codes/phone-ru.min.js" />
 /// <reference path="inputmask/phone-codes/phone-uk.js" />
-/// <reference path="invite.js" />
 /// <reference path="jquery.icheck.js" />
 /// <reference path="jquery.inputmask.bundle.min.js" />
 /// <reference path="jquery.unobtrusive-ajax.min.js" />
