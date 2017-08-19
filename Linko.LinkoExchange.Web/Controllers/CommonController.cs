@@ -35,7 +35,7 @@ namespace Linko.LinkoExchange.Web.Controllers
         {
             Response.StatusCode = 404;
             Response.TrySkipIisCustomErrors = true;
-
+            _logger.Warn($"Page not found. Url: {Request.Url}");
             return View();
         }
 

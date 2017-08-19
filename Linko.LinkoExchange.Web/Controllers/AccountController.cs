@@ -460,30 +460,30 @@ namespace Linko.LinkoExchange.Web.Controllers
                         _logger.Info(message:string.Format(format:"SignIn. User={0} has successfully logged in.", arg0:model.UserName));
                         return RedirectToAction(actionName:"PortalDirector", controllerName:"Account"); // 6.b
                     case AuthenticationResult.PasswordLockedOut: // 2.c
-                        _logger.Info(message:string.Format(format:"SignIn. User={0} has been locked out for exceeding the maximum login attempts.", arg0:model.UserName));
+                        _logger.Warn(message:string.Format(format:"SignIn. User={0} has been locked out for exceeding the maximum login attempts.", arg0:model.UserName));
                         return RedirectToAction(actionName:"LockedOut", controllerName:"Account");
                     case AuthenticationResult.AccountResetRequired:
-                        _logger.Info(message:string.Format(format:"SignIn. User={0} has been reset and requires re-reg.", arg0:model.UserName));
+                        _logger.Warn(message:string.Format(format:"SignIn. User={0} has been reset and requires re-reg.", arg0:model.UserName));
                         TempData[key:"RegulatoryList"] = result.RegulatoryList;
                         return RedirectToAction(actionName:"AccountReset", controllerName:"Account");
                     case AuthenticationResult.UserIsLocked: // 3.a
-                        _logger.Info(message:string.Format(format:"SignIn. User={0} has been locked out.", arg0:model.UserName));
+                        _logger.Warn(message:string.Format(format:"SignIn. User={0} has been locked out.", arg0:model.UserName));
                         TempData[key:"RegulatoryList"] = result.RegulatoryList;
                         return RedirectToAction(actionName:"AccountLocked", controllerName:"Account");
                     case AuthenticationResult.UserIsDisabled: // 5.a
-                        _logger.Info(message:string.Format(format:"SignIn. User={0} has been disabled.", arg0:model.UserName));
+                        _logger.Warn(message:string.Format(format:"SignIn. User={0} has been disabled.", arg0:model.UserName));
                         TempData[key:"RegulatoryList"] = result.RegulatoryList;
                         return RedirectToAction(actionName:"AccountDisabled", controllerName:"Account");
                     case AuthenticationResult.AccountIsNotAssociated: // 6.a
-                        _logger.Info(message:string.Format(format:"SignIn. User={0} is not associated with an active Industry or Authority.", arg0:model.UserName));
+                        _logger.Warn(message:string.Format(format:"SignIn. User={0} is not associated with an active Industry or Authority.", arg0:model.UserName));
                         TempData[key:"RegulatoryList"] = result.RegulatoryList;
                         return RedirectToAction(actionName:"AccountIsNotAssociated", controllerName:"Account");
                     case AuthenticationResult.RegistrationApprovalPending: // 4.a
-                        _logger.Info(message:string.Format(format:"SignIn. User={0} registration approval pending.", arg0:model.UserName));
+                        _logger.Warn(message:string.Format(format:"SignIn. User={0} registration approval pending.", arg0:model.UserName));
                         TempData[key:"RegulatoryList"] = result.RegulatoryList;
                         return RedirectToAction(actionName:"RegistrationApprovalPending", controllerName:"Account");
                     case AuthenticationResult.PasswordExpired: // 7.a
-                        _logger.Info(message:string.Format(format:"SignIn. User={0} password is expired.", arg0:model.UserName));
+                        _logger.Warn(message:string.Format(format:"SignIn. User={0} password is expired.", arg0:model.UserName));
                         TempData[key:"UserProfileId"] = result.UserProfileId;
                         TempData[key:"OwinUserId"] = result.OwinUserId;
                         return RedirectToAction(actionName:"ResetExpiredPassword", controllerName:"Account");
@@ -491,7 +491,7 @@ namespace Linko.LinkoExchange.Web.Controllers
                     case AuthenticationResult.InvalidUserNameOrPassword: // 2.b
                     case AuthenticationResult.Failed:
                     default:
-                        _logger.Info(message:string.Format(format:"SignIn. Invalid user name or password for user name ={0}.", arg0:model.UserName));
+                        _logger.Warn(message:string.Format(format:"SignIn. Invalid user name or password for user name ={0}.", arg0:model.UserName));
                         ModelState.AddModelError(key:"", errorMessage:Message.InvalidLoginAttempt);
                         break;
                 }

@@ -86,9 +86,9 @@ namespace Linko.LinkoExchange.Services.Email
                 using (var smtpClient = new SmtpClient(host:_emailServer))
                 {
                     smtpClient.Send(message:entry.MailMessage);
-                    _logger.Info(
-                                 message:
-                                 $"LogToEmailLogFile - LinkoExchangeEmailService. SendEmail successful. Email Audit Log ID: {entry.AuditLogId}, Recipient Username:{entry.RecipientUserName}, Recipient Email Address:{entry.RecipientEmailAddress}, Subject:{entry.MailMessage.Subject}");
+                    _logger.Info( message: $"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail successful. Email Audit Log ID: {entry.AuditLogId}, "
+                                           + $"Recipient User name:{entry.RecipientUserName}, Recipient Email Address:{entry.RecipientEmailAddress}, "
+                                           + $"Subject:{entry.MailMessage.Subject}");
                 }
             }
             catch (Exception ex)
@@ -100,10 +100,10 @@ namespace Linko.LinkoExchange.Services.Email
                     errors.Add(item:ex.Message);
                 }
 
-                _logger.Info(
-                             message:
-                             $"LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails. Email Audit Log ID: {entry.AuditLogId}, Recipient Username:{entry.RecipientUserName}, Recipient Email Address:{entry.RecipientEmailAddress}, Subject:{entry.MailMessage.Subject}");
-                _logger.Error(message:$"LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails", argument:string.Join(",", Environment.NewLine, errors));
+                _logger.Info( message: $"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails. Email Audit Log ID: {entry.AuditLogId}, "
+                                       + $"Recipient User name:{entry.RecipientUserName}, Recipient Email Address:{entry.RecipientEmailAddress}, "
+                                       + $"Subject:{entry.MailMessage.Subject}");
+                _logger.Error(message:$"#LogToEmailLogFile - LinkoExchangeEmailService. SendEmail fails", argument:string.Join(",", Environment.NewLine, errors));
             }
         }
 
