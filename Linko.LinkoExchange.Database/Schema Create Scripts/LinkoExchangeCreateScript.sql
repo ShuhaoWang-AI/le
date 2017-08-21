@@ -7085,6 +7085,7 @@ BEGIN
     GRANT SELECT ON dbo.tOrganizationType TO db_ctssync
     GRANT SELECT ON dbo.tRegulatoryProgram TO db_ctssync
     GRANT SELECT ON dbo.tSettingTemplate TO db_ctssync
+    GRANT SELECT ON dbo.tSystemSetting TO db_ctssync
     GRANT SELECT ON dbo.tUserProfile TO db_ctssync
     GRANT SELECT ON dbo.tJurisdiction TO db_ctssync
     GRANT SELECT ON dbo.tPermissionGroupTemplate TO db_ctssync
