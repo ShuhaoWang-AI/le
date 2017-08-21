@@ -64,6 +64,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 
         [Editable(allowEdit: false)]
         [Display(Name = "Phone Number")]
+        [Phone]
         public string PhoneNumber { get; set; }
 
         [Editable(allowEdit: false)]
@@ -72,6 +73,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 
         [Editable(allowEdit: false)]
         [Display(Name = "Fax Number")]
+        [Phone]
         public string FaxNumber { get; set; }
 
         [Editable(allowEdit: false)]
@@ -201,9 +203,11 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
         public string EmailContactInfoNameDefault { get; set; }
 
         [Display(Name = "Contact Information Phone on Emails")]
+        [Phone]
         public string EmailContactInfoPhone { get; set; }
 
         [Editable(allowEdit: false)]
+        [Phone]
         public string EmailContactInfoPhoneDefault { get; set; }
 
         [Display(Name = "Contact Information Email Address on Emails")]

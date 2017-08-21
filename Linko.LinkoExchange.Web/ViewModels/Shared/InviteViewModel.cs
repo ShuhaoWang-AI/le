@@ -28,6 +28,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Shared
         public string BusinessName { get; set; }
 
         [Display(Name = "Phone Number")]
+        [Phone]
         public string PhoneNumber { get; set; }
 
         public bool IsUserActiveInSameProgram { get; set; }

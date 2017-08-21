@@ -103,6 +103,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 
         [Editable(false)]
         [Display(Name = "Phone Number")]
+        [Phone]
         public string PhoneNumber
         {
             get; set;
@@ -117,6 +118,7 @@ namespace Linko.LinkoExchange.Web.ViewModels.Authority
 
         [Editable(false)]
         [Display(Name = "Fax Number")]
+        [Phone]
         public string FaxNumber
         {
             get; set;
