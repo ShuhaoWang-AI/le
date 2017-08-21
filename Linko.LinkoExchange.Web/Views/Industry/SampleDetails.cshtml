@@ -1294,16 +1294,30 @@
                         , clearIncomplete: true
                     });
             };
+            
+            $("#StartDateTimeLocal")
+                .on("blur", function()
+                {
+                    $("#StartDateTimeLocal").trigger('change');
+                });
 
             $("#StartDateTimeLocal")
-                .change(function()
+                .on("change", function()
                 {
+                    $("#StartDateTimeLocal").data("kendoDateTimePicker").value(kendo.parseDate($("#StartDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
                     $("#StartDateTimeLocal").val($("#StartDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
+                });
+            
+            $("#EndDateTimeLocal")
+                .on("blur", function()
+                {
+                    $("#EndDateTimeLocal").trigger('change');
                 });
 
             $("#EndDateTimeLocal")
-                .change(function()
+                .on("change", function()
                 {
+                    $("#EndDateTimeLocal").data("kendoDateTimePicker").value(kendo.parseDate($("#EndDateTimeLocal").val(), ["MM/dd/yyyy hh:mm tt", "MM/dd/yyyy"]));
                     $("#EndDateTimeLocal").val($("#EndDateTimeLocal").val().toLowerCase().replace("12:00 am", ""));
 
                     var viewModel = {};
