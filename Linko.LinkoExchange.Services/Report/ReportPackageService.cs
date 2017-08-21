@@ -434,7 +434,7 @@ namespace Linko.LinkoExchange.Services.Report
                         var sampleResultNode = new SampleResultNode
                         {
                             ParameterName = sampleResultDto.ParameterName,
-                            Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier).GetValueOrEmptyString(),
+                            Qualifier = sampleResultDto.Qualifier.GetValueOrEmptyString(),
                             EnteredValue = sampleResultDto.EnteredValue.GetValueOrEmptyString(),
                             Value = sampleResultDto.Value?.ToString(CultureInfo.InvariantCulture) ?? "",
                             UnitName = sampleResultDto.UnitName.GetValueOrEmptyString(),
@@ -453,7 +453,7 @@ namespace Linko.LinkoExchange.Services.Report
                             sampleResultNode = new SampleResultNode
                             {
                                 ParameterName = sampleResultDto.ParameterName,
-                                Qualifier = System.Net.WebUtility.HtmlEncode(sampleResultDto.Qualifier).GetValueOrEmptyString(),
+                                Qualifier = sampleResultDto.Qualifier.GetValueOrEmptyString(),
                                 Value = sampleResultDto.MassLoadingValue.GetValueOrEmptyString(),
                                 UnitName = sampleResultDto.MassLoadingUnitName.GetValueOrEmptyString(),
                                 LimitBasis = LimitBasisName.MassLoading.ToString()

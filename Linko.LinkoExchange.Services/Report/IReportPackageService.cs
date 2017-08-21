@@ -49,7 +49,7 @@ namespace Linko.LinkoExchange.Services.Report
         /// <summary>
         ///     *WARNING: NO VALIDATION CHECK -- CASCADE DELETE*
         ///     Hard delete of row from tReportPackage table associated with passed in parameter.
-        ///     Programmatically cascade deletes rows in the following associated tables:
+        ///     Programatically cascade deletes rows in the following associated tables:
         ///     - tReportPackageElementCategory (via ReportPackageId)
         ///     - tReportPackageElementType (via ReportPackageElementCategoryId)
         ///     - tReportSample (via ReportPackageElementTypeId)
