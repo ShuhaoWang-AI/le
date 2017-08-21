@@ -8,7 +8,7 @@ IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'dbo.Admin_SetupNe
 	DROP PROCEDURE dbo.Admin_SetupNewClient
 GO
 
--- ============================================================
+-- ==========================================================================================
 -- Author:		Sundoro S
 -- Create date: 2017-06-23
 -- Description:	sets up a new client, usually a regulator,
@@ -16,10 +16,14 @@ GO
 -- This script is the first step during the onboarding process.
 -- Separate synching process must be done later to bring other
 --  related data from LinkoCTS.
--- ============================================================
+-- 
+-- Changes:		SS: 20170818 - Added DB user creation for LinkoCTS sync
+-- ==========================================================================================
 CREATE PROCEDURE Admin_SetupNewClient
     (
-	    @RegulatoryProgramName          varchar(100)
+		@ExistingServerLoginName		varchar(50)
+		, @NewDatabaseUserNameForSync	varchar(50)
+	    , @RegulatoryProgramName        varchar(100)
         , @OrganizationTypeName         varchar(100)
         , @OrganizationName             varchar(254)
         , @OrganizationAddressLine1     varchar(100)
@@ -41,27 +45,33 @@ SET XACT_ABORT ON;
 
 BEGIN TRY
 
+	DECLARE @SQL VARCHAR(4000)
+    SET @SQL = 'CREATE USER '+ QUOTENAME(@NewDatabaseUserNameForSync,'[') +' FOR LOGIN '+ QUOTENAME(@ExistingServerLoginName,'[')
+	EXEC(@SQL)
+    SET @SQL = 'ALTER ROLE [db_ctssync]' +' ADD MEMBER '+ QUOTENAME(@NewDatabaseUserNameForSync,'[')
+    EXEC(@SQL)
+
 BEGIN TRANSACTION
 
     DECLARE @RegulatoryProgramId int
     SELECT @RegulatoryProgramId = RegulatoryProgramId 
     FROM dbo.tRegulatoryProgram 
-    WHERE Name = @RegulatoryProgramName
+    WHERE Name = @RegulatoryProgramName;
 
     DECLARE @OrganizationTypeId int
     SELECT @OrganizationTypeId = OrganizationTypeId 
     FROM dbo.tOrganizationType 
-    WHERE Name = @OrganizationTypeName
+    WHERE Name = @OrganizationTypeName;
 
     DECLARE @OrganizationJurisdictionId int
     SELECT @OrganizationJurisdictionId = JurisdictionId 
     FROM dbo.tJurisdiction 
-    WHERE Code = @OrganizationJurisdictionCode
+    WHERE Code = @OrganizationJurisdictionCode;
 
     DECLARE @UserProfileId_Linko int
     SELECT @UserProfileId_Linko = UserProfileId 
     FROM dbo.tUserProfile 
-    WHERE UserName = 'Linko'
+    WHERE UserName = 'Linko';
 
 
     -- Add record to tOrganization
@@ -90,11 +100,11 @@ BEGIN TRANSACTION
 	    , @OrganizationPhoneNumber
 	    , @OrganizationFaxNumber
         , @OrganizationWebsiteURL
-	) 
+	); 
 
     -- Get the last identity value inserted
-    DECLARE @OrganizationId int
-    SELECT @OrganizationId = SCOPE_IDENTITY()
+    DECLARE @OrganizationId int;
+    SELECT @OrganizationId = SCOPE_IDENTITY();
 
 
     -- Add record to tOrganizationRegulatoryProgram
@@ -106,7 +116,7 @@ BEGIN TRANSACTION
 		    , NULL
             , @OrganizationRegulatoryProgramReferenceNumber
 		    , 1
-		)
+		);
 
 
     -- Add records to tOrganizationSetting
@@ -114,7 +124,7 @@ BEGIN TRANSACTION
 	SELECT @OrganizationId, SettingTemplateId, DefaultValue
     FROM dbo.tSettingTemplate
     WHERE OrganizationTypeId = @OrganizationTypeId 
-        AND RegulatoryProgramId IS NULL
+        AND RegulatoryProgramId IS NULL;
 
     -- Add records to tOrganizationRegulatoryProgramSetting
     INSERT INTO dbo.tOrganizationRegulatoryProgramSetting (OrganizationRegulatoryProgramId, SettingTemplateId, Value)
@@ -123,7 +133,7 @@ BEGIN TRANSACTION
         INNER JOIN dbo.tOrganizationRegulatoryProgram orp ON orp.RegulatoryProgramId = st.RegulatoryProgramId
     WHERE st.OrganizationTypeId = @OrganizationTypeId 
         AND st.RegulatoryProgramId = @RegulatoryProgramId
-        AND orp.OrganizationId = @OrganizationId
+        AND orp.OrganizationId = @OrganizationId;
 
     
     -- Add records to tPermissionGroup
@@ -135,15 +145,15 @@ BEGIN TRANSACTION
     WHERE orp.OrganizationId = @OrganizationId
         AND orp.RegulatoryProgramId = otrp.RegulatoryProgramId
         AND otrp.OrganizationTypeId = @OrganizationTypeId
-        AND otrp.RegulatoryProgramId = @RegulatoryProgramId
+        AND otrp.RegulatoryProgramId = @RegulatoryProgramId;
 
 
     -- Add records to tOrganizationRegulatoryProgramUser
-    DECLARE @OrganizationRegulatoryProgramId int
+    DECLARE @OrganizationRegulatoryProgramId int;
     SELECT @OrganizationRegulatoryProgramId = OrganizationRegulatoryProgramId 
     FROM dbo.tOrganizationRegulatoryProgram 
     WHERE RegulatoryProgramId = @RegulatoryProgramId 
-        AND OrganizationId = @OrganizationId
+        AND OrganizationId = @OrganizationId;
     
     INSERT INTO dbo.tOrganizationRegulatoryProgramUser (UserProfileId, OrganizationRegulatoryProgramId, InviterOrganizationRegulatoryProgramId, PermissionGroupId, RegistrationDateTimeUtc, IsRegistrationApproved, IsEnabled)
 		VALUES 
@@ -155,7 +165,7 @@ BEGIN TRANSACTION
 		    , SYSDATETIMEOFFSET()
 		    , 1
 		    , 1
-        )
+        );
 
 COMMIT TRANSACTION
 

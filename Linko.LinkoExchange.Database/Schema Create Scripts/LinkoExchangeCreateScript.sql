@@ -46,6 +46,80 @@ PRINT 'Set LinkoExchange DB user'
 USE [LinkoExchange]
 GO
 
+IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'db_ctssync' AND type = 'R')
+BEGIN
+	-- Create new role specific for LinkoCTS sync
+	CREATE ROLE db_ctssync
+
+    GRANT SELECT ON dbo.tOrganization TO db_ctssync
+	GRANT INSERT ON dbo.tOrganization TO db_ctssync
+	GRANT UPDATE ON dbo.tOrganization TO db_ctssync
+
+    GRANT SELECT ON dbo.tOrganizationSetting TO db_ctssync
+	GRANT INSERT ON dbo.tOrganizationSetting TO db_ctssync
+	GRANT UPDATE ON dbo.tOrganizationSetting TO db_ctssync
+
+    GRANT SELECT ON dbo.tOrganizationRegulatoryProgram TO db_ctssync
+	GRANT INSERT ON dbo.tOrganizationRegulatoryProgram TO db_ctssync
+	GRANT UPDATE ON dbo.tOrganizationRegulatoryProgram TO db_ctssync
+
+    GRANT SELECT ON dbo.tOrganizationRegulatoryProgramSetting TO db_ctssync
+	GRANT INSERT ON dbo.tOrganizationRegulatoryProgramSetting TO db_ctssync
+	GRANT UPDATE ON dbo.tOrganizationRegulatoryProgramSetting TO db_ctssync
+
+    GRANT SELECT ON dbo.tPermissionGroup TO db_ctssync
+	GRANT INSERT ON dbo.tPermissionGroup TO db_ctssync
+
+    GRANT SELECT ON dbo.tCtsEventType TO db_ctssync
+	GRANT INSERT ON dbo.tCtsEventType TO db_ctssync
+	GRANT UPDATE ON dbo.tCtsEventType TO db_ctssync
+
+    GRANT SELECT ON dbo.tCollectionMethod TO db_ctssync
+	GRANT INSERT ON dbo.tCollectionMethod TO db_ctssync
+	GRANT UPDATE ON dbo.tCollectionMethod TO db_ctssync
+
+    GRANT SELECT ON dbo.tUnit TO db_ctssync
+	GRANT INSERT ON dbo.tUnit TO db_ctssync
+	GRANT UPDATE ON dbo.tUnit TO db_ctssync
+
+    GRANT SELECT ON dbo.tMonitoringPoint TO db_ctssync
+	GRANT INSERT ON dbo.tMonitoringPoint TO db_ctssync
+	GRANT UPDATE ON dbo.tMonitoringPoint TO db_ctssync
+
+    GRANT SELECT ON dbo.tParameter TO db_ctssync
+	GRANT INSERT ON dbo.tParameter TO db_ctssync
+	GRANT UPDATE ON dbo.tParameter TO db_ctssync
+
+    GRANT SELECT ON dbo.tMonitoringPointParameter TO db_ctssync
+	GRANT INSERT ON dbo.tMonitoringPointParameter TO db_ctssync
+	GRANT DELETE ON dbo.tMonitoringPointParameter TO db_ctssync
+
+    GRANT SELECT ON dbo.tSampleFrequency TO db_ctssync
+	GRANT INSERT ON dbo.tSampleFrequency TO db_ctssync
+	GRANT DELETE ON dbo.tSampleFrequency TO db_ctssync
+
+    GRANT SELECT ON dbo.tSampleRequirement TO db_ctssync
+	GRANT INSERT ON dbo.tSampleRequirement TO db_ctssync
+	GRANT DELETE ON dbo.tSampleRequirement TO db_ctssync
+
+    GRANT SELECT ON dbo.tMonitoringPointParameterLimit TO db_ctssync
+	GRANT INSERT ON dbo.tMonitoringPointParameterLimit TO db_ctssync
+	GRANT DELETE ON dbo.tMonitoringPointParameterLimit TO db_ctssync
+
+    -- Requires only SELECT because they are involved in SELECT statements
+    GRANT SELECT ON dbo.tOrganizationTypeRegulatoryProgram TO db_ctssync
+    GRANT SELECT ON dbo.tOrganizationType TO db_ctssync
+    GRANT SELECT ON dbo.tRegulatoryProgram TO db_ctssync
+    GRANT SELECT ON dbo.tSettingTemplate TO db_ctssync
+    GRANT SELECT ON dbo.tUserProfile TO db_ctssync
+    GRANT SELECT ON dbo.tJurisdiction TO db_ctssync
+    GRANT SELECT ON dbo.tPermissionGroupTemplate TO db_ctssync
+    GRANT SELECT ON dbo.tCollectionMethodType TO db_ctssync
+    GRANT SELECT ON dbo.tLimitBasis TO db_ctssync
+    GRANT SELECT ON dbo.tLimitType TO db_ctssync
+END
+GO
+
 -- Uncomment the following section if this script is run on QA
 --IF DB_NAME() = 'LinkoExchange' AND NOT EXISTS (SELECT 1 FROM master.sys.server_principals WHERE name = 'exnet')
 --BEGIN
