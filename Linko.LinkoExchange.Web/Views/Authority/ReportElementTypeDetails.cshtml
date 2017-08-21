@@ -98,14 +98,14 @@
                     </h5>
                 </div>
             }
-            
+
             @if (!ViewBag.Satus.Equals("ViewOnly"))
             {
                 if (!ViewBag.Satus.Equals("New"))
                 {
                     <h5>
                         Any changes you make will be reflected immediately in all Report Package Templates
-                        this @((Model.CategoryName == ReportElementCategoryName.Certifications) ? "certification" : "attachment") is used in,
+                        this @(Model.CategoryName == ReportElementCategoryName.Certifications ? "certification" : "attachment") is used in,
                         but not any Report Package Drafts the Industry has already created.
                     </h5>
                 }
@@ -132,8 +132,8 @@
                                                                                                          })
                 </div>
                 <div class="col-md-1">
-                    <button class="btn btn-info btn-sm"tabindex="-1" data-placement="top" data-toggle="tooltip" title="The Industry sees this Name. It should describe what they need to attach or certify." type="button">
-                        <i class="fa fa-lg fa-info-circle"></i>
+                    <button class="btn btn-info btn-sm" data-placement="top" data-toggle="tooltip" tabindex="-1" title="The Industry sees this Name. It should describe what they need to attach or certify." type="button">
+                        <i class="fa fa-info-circle fa-lg"></i>
                     </button>
                 </div>
             </div>
@@ -181,7 +181,6 @@
                     </div>
                 </div>
             }
-            
 
             <hr />
 
@@ -204,6 +203,11 @@
                                                                                                                      {
                                                                                                                          @class = "text-danger"
                                                                                                                      })
+                </div>
+                <div>
+                    <button class="btn btn-info btn-sm" data-toggle="tooltip" tabdata-placement="top" tabindex="-1" title="The Report Package Template must also have a CTS Event Type assigned for this Element to show up in LinkoCTS." type="button">
+                        <i class="fa fa-info-circle fa-lg"></i>
+                    </button>
                 </div>
             </div>
         </section>
