@@ -445,9 +445,7 @@ namespace Linko.LinkoExchange.Services.Organization
 
                 maxCount = Convert.ToInt32(_settingService.GetOrgRegProgramSettingValue(authority.OrganizationRegulatoryProgramId, SettingType.UserPerIndustryMaxCount));
             }
-            var currentProgramUserCount = _dbContext.OrganizationRegulatoryProgramUsers
-                                                    .Count(u => u.OrganizationRegulatoryProgramId == orgRegProgramId
-                                                    && !u.IsRemoved && u.IsRegistrationApproved && u.IsEnabled);
+            var currentProgramUserCount = GetCurrentUserLicenseCount(orgRegProgramId);
 
             return maxCount - currentProgramUserCount;
 
