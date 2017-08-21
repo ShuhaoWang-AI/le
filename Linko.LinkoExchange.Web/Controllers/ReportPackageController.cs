@@ -263,6 +263,12 @@ namespace Linko.LinkoExchange.Web.Controllers
             ViewBag.ShowRepudiationConfirmationMessage = TempData[key:"ShowRepudiationConfirmationMessage"] ?? false;
             ViewBag.RepudiationConfirmationMessage = TempData[key:"RepudiationConfirmationMessage"] ?? "";
             
+            ViewBag.ShowSubmissionReviewConfirmationMessage = TempData[key:"ShowSubmissionReviewConfirmationMessage"] ?? false;
+            ViewBag.SubmissionReviewConfirmationMessage = TempData[key:"SubmissionReviewConfirmationMessage"] ?? "";
+            
+            ViewBag.ShowRepudiationReviewConfirmationMessage = TempData[key:"ShowRepudiationReviewConfirmationMessage"] ?? false;
+            ViewBag.RepudiationReviewConfirmationMessage = TempData[key:"RepudiationReviewConfirmationMessage"] ?? "";
+            
             ViewBag.ShowSendToLinkoCTSSuccessMessage = TempData[key:"ShowSendToLinkoCTSSuccessMessage"] ?? false;
             ViewBag.SendToLinkoCTSSuccessMessage = TempData[key:"SendToLinkoCTSSuccessMessage"] ?? "";
 
@@ -738,11 +744,11 @@ namespace Linko.LinkoExchange.Web.Controllers
             {
                 _reportPackageService.ReviewSubmission(reportPackageId:id, comments:model.SubmissionReviewComments);
 
-                TempData[key:"ShowSuccessMessage"] = true;
-                TempData[key:"SuccessMessage"] = "Report Package submission review completed successfully!";
+                TempData[key:"ShowSubmissionReviewConfirmationMessage"] = true;
+                TempData[key:"SubmissionReviewConfirmationMessage"] = "Report Package submission review completed successfully!";
 
                 ModelState.Clear();
-                return RedirectToAction(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id});
+                return Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }) + "#divSubmissionReview");
             }
             catch (RuleViolationException rve)
             {
@@ -768,11 +774,11 @@ namespace Linko.LinkoExchange.Web.Controllers
                 {
                     _reportPackageService.ReviewRepudiation(reportPackageId:id, comments:model.RepudiationReviewComments);
 
-                    TempData[key:"ShowSuccessMessage"] = true;
-                    TempData[key:"SuccessMessage"] = "Report Package repudiation review completed successfully!";
+                    TempData[key:"ShowRepudiationReviewConfirmationMessage"] = true;
+                    TempData[key:"RepudiationReviewConfirmationMessage"] = "Report Package repudiation review completed successfully!";
 
                     ModelState.Clear();
-                    return RedirectToAction(actionName:"ReportPackageDetails", controllerName:"ReportPackage", routeValues:new {id});
+                    return Redirect(url: Url.Action(actionName: "ReportPackageDetails", controllerName: "ReportPackage", routeValues: new { id }) + "#divRepudiationReview");
                 }
             }
             catch (RuleViolationException rve)

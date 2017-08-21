@@ -813,6 +813,16 @@
                 </div>
             </div>
             <div class="box-body form-horizontal">
+                @if (ViewBag.ShowSubmissionReviewConfirmationMessage != null && ViewBag.ShowSubmissionReviewConfirmationMessage)
+                {
+                    <div class="alert alert-dismissible alert-success">
+                        <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
+                        <h5>
+                            <i class="fa fa-check icon"></i>
+                            @ViewBag.SubmissionReviewConfirmationMessage
+                        </h5>
+                    </div>
+                }
                 @if (Model.SubmissionReviewDateTimeLocal.HasValue)
                 {
                     <div class="form-group">
@@ -999,6 +1009,16 @@
                 </div>
             </div>
             <div class="box-body form-horizontal">
+                @if (ViewBag.ShowRepudiationReviewConfirmationMessage != null && ViewBag.ShowRepudiationReviewConfirmationMessage)
+                {
+                    <div class="alert alert-dismissible alert-success">
+                        <button aria-hidden="true" class="close" data-dismiss="alert" type="button">&times;</button>
+                        <h5>
+                            <i class="fa fa-check icon"></i>
+                            @ViewBag.RepudiationReviewConfirmationMessage
+                        </h5>
+                    </div>
+                }
                 @if (Model.RepudiationReviewDateTimeLocal.HasValue)
                 {
                     <div class="form-group">
