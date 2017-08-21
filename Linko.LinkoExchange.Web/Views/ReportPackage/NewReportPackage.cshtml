@@ -78,6 +78,7 @@
                                                                                          })
                         <div class="col-md-4">
                             @(Html.Kendo().DatePickerFor(model => model.StartDateTimeLocal)
+
                                   //.Max(date: DateTime.Today)
                                   .Format(format:"MM/dd/yyyy")
                                   .HtmlAttributes(attributes:new
@@ -92,12 +93,13 @@
                                                                                        })
                         <div class="col-md-4">
                             @(Html.Kendo().DatePickerFor(model => model.EndDateTimeLocal)
+
                                   //.Max(date: DateTime.Today)
                                   .Format(format:"MM/dd/yyyy")
                                   .HtmlAttributes(attributes:new
-                                  {
-                                      style = "width:210px;"
-                                  }))
+                                                             {
+                                                                 style = "width:210px;"
+                                                             }))
                         </div>
                     </div>
                 </div>
@@ -112,4 +114,33 @@
             </div>
         }
     </div>
-}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/inputmask")
+
+    <script>
+        $(document)
+            .ready(function()
+            {
+                $("#StartDateTimeLocal")
+                    .inputmask({
+                        alias: 'mm/dd/yyyy'
+                        , mask: "1/2/y"
+                        , placeholder: "mm/dd/yyyy"
+                        , greedy: false
+                        , clearMaskOnLostFocus: false
+                        , clearIncomplete: true
+                    });
+
+                $("#EndDateTimeLocal")
+                    .inputmask({
+                        alias: 'mm/dd/yyyy'
+                        , mask: "1/2/y"
+                        , placeholder: "mm/dd/yyyy"
+                        , greedy: false
+                        , clearMaskOnLostFocus: false
+                        , clearIncomplete: true
+                    });
+            });
+    </script>
+}}
