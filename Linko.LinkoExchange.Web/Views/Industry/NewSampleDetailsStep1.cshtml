@@ -95,7 +95,7 @@
         </div>
         <div class="box-footer">
             <div class="col-md-12 form-group">
-                <input type="submit" value="Next" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"NewSampleDetailsStep1", controllerName:"Industry")" formmethod="post" />
+                <input type="submit" value="Next" id="next-step" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"NewSampleDetailsStep1", controllerName:"Industry")" formmethod="post" />
             </div>
         </div>
     </div>
@@ -158,6 +158,15 @@
                     });
             });
 
+         
+        $(document)
+            .keypress(function(evt)
+            {
+                if (evt.which === 13)
+                {
+                    $("#next-step").click();
+                }
+            }); 
         
     </script>
 }}

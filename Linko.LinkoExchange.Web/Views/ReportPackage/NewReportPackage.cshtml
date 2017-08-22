@@ -109,7 +109,7 @@
         {
             <div class="box-footer">
                 <div class="col-md-12 form-group">
-                    <input type="submit" value="Create Draft" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"NewReportPackage", controllerName:"ReportPackage")" formmethod="post" />
+                    <input type="submit" value="Create Draft" id="create-draft-btn" class="btn btn-primary btn-sm pull-right" formaction="@Url.Action(actionName:"NewReportPackage", controllerName:"ReportPackage")" formmethod="post" />
                 </div>
             </div>
         }
@@ -142,5 +142,14 @@
                         , clearIncomplete: true
                     });
             });
+                 
+        $(document)
+            .keypress(function(evt)
+            {
+                if (evt.which === 13)
+                {
+                    $("#create-draft-btn").click();
+                }
+            }); 
     </script>
 }}
